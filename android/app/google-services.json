@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "896891711392",
+    "project_id": "avochat-b6288",
+    "storage_bucket": "avochat-b6288.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896891711392:android:344e94b2b23a1edd137ec5",
+        "android_client_info": {
+          "package_name": "com.atod.avochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896891711392-pdgiv6o934tsa5dkh8jm8dvfag455tv2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.atod.avochat",
+            "certificate_hash": "e2074eb025e868a2a36d3fa2774e4cde681854ad"
+          }
+        },
+        {
+          "client_id": "896891711392-hak2jcbqri8f53cbdifkghk8f5m7bp79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRrQ1a5Xz5Qznh0ugA492WHJiE-CW2t_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "896891711392-hak2jcbqri8f53cbdifkghk8f5m7bp79.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "896891711392-leei0u8lemskpfma1dvmvcmhs6r5u4bo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.avochat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

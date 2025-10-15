@@ -1,0 +1,91 @@
+{
+  "Matematică": {
+    "5": {
+      "1": {
+        "title": "Adunări și scăderi cu numere naturale",
+        "description": "Se dau două numere naturale. Să se afișeze suma și diferența lor.",
+        "input": "Programul citește două numere naturale a și b.",
+        "output": "Programul afișează pe prima linie suma lor, iar pe a doua diferența.",
+        "constraints": ["0 ≤ a, b ≤ 10⁶"],
+        "examples": {
+          "input": "5 3",
+          "output": "8\n2"
+        },
+        "hints": [
+          "Folosim operatorii + și - pentru calcul.",
+          "Nu este nevoie de structuri complexe."
+        ],
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main(){\n int a,b; cin>>a>>b;\n cout<<a+b<<\"\\n\"<<a-b;\n return 0;\n}"
+        },
+        "tests": [
+          {
+            "input": "5 3",
+            "output": "8\n2",
+            "subject_solution": "suma=a+b;dif=a-b"
+          },
+          {
+            "input": "10 4",
+            "output": "14\n6",
+            "subject_solution": "suma=a+b;dif=a-b"
+          }
+        ]
+      },
+      "2": {
+        "title": "Înmulțiri și împărțiri cu numere naturale",
+        "description": "Se dau două numere naturale. Să se afișeze produsul și câtul lor (împărțire întreagă).",
+        "input": "Programul citește două numere naturale a și b.",
+        "output": "Programul afișează produsul și câtul (doar dacă b ≠ 0).",
+        "constraints": ["0 ≤ a, b ≤ 10⁶", "b ≠ 0 pentru împărțire."],
+        "examples": {
+          "input": "6 3",
+          "output": "18\n2"
+        },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main(){\n int a,b; cin>>a>>b;\n cout<<a*b<<\"\\n\";\n if(b!=0) cout<<a/b;\n return 0;\n}"
+        },
+        "tests": [
+          {
+            "input": "6 3",
+            "output": "18\n2",
+            "subject_solution": "produs=a*b;cat=a/b"
+          }
+        ]
+      }
+    }
+  },
+  "Informatică": {
+    "9": {
+      "2": {
+        "title": "Suma numerelor de la 1 la n",
+        "description": "Se citește un număr natural n. Să se afișeze suma numerelor de la 1 la n.",
+        "input": "Programul citește un singur număr n.",
+        "output": "Programul afișează pe o linie suma cerută.",
+        "constraints": ["1 ≤ n ≤ 10⁹"],
+        "examples": {
+          "input": "5",
+          "output": "15"
+        },
+        "hints": ["Folosește formula n*(n+1)/2 pentru eficiență."],
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main(){\n long long n; cin>>n;\n cout<<n*(n+1)/2;\n return 0;\n}"
+        },
+        "tests": [
+          {
+            "input": "5",
+            "output": "15",
+            "subject_solution": "n*(n+1)/2"
+          },
+          {
+            "input": "10",
+            "output": "55",
+            "subject_solution": "n*(n+1)/2"
+          }
+        ]
+      }
+    }
+  }
+}

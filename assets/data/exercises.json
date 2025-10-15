@@ -1,0 +1,48 @@
+{
+  "Matematică": {
+    "5": {
+      "Aritmetică": [
+        { "id": "1", "title": "Adunări și scăderi cu numere naturale", "difficulty": "ușoară" },
+        { "id": "2", "title": "Înmulțiri și împărțiri cu numere naturale", "difficulty": "medie" }
+      ],
+      "Fracții": [
+        { "id": "3", "title": "Compararea fracțiilor", "difficulty": "medie" }
+      ]
+    },
+    "6": {
+      "Fracții": [
+        { "id": "1", "title": "Adunarea fracțiilor cu același numitor", "difficulty": "ușoară" },
+        { "id": "2", "title": "Scăderea fracțiilor cu același numitor", "difficulty": "ușoară" }
+      ],
+      "Proporționalitate": [
+        { "id": "3", "title": "Raportul a două numere", "difficulty": "medie" }
+      ]
+    }
+  },
+
+  "Informatică": {
+    "9": {
+      "Structuri secvențiale": [
+        { "id": "1", "title": "Afișează primele 10 numere naturale", "difficulty": "ușoară" },
+        { "id": "2", "title": "Suma numerelor de la 1 la n", "difficulty": "medie" }
+      ],
+      "Structuri alternative": [
+        { "id": "3", "title": "Verifică dacă un număr este par", "difficulty": "ușoară" }
+      ]
+    },
+    "10": {
+      "Funcții": [
+        { "id": "1", "title": "Funcție care calculează factorialul", "difficulty": "medie" }
+      ]
+    }
+  },
+
+  "Fizică": {
+    "8": {
+      "Energie și lucru mecanic": [
+        { "id": "1", "title": "Calculează energia potențială", "difficulty": "ușoară" },
+        { "id": "2", "title": "Calculează energia cinetică", "difficulty": "medie" }
+      ]
+    }
+  }
+}
