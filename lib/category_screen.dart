@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'exercise_list_screen.dart';
+import 'package:go_router/go_router.dart'; // 🚀 Importul necesar pentru navigare
 
 class CategoryScreen extends StatefulWidget {
   final String subject;
@@ -63,30 +63,32 @@ class _CategoryScreenState extends State<CategoryScreen> {
       appBar: AppBar(
         title: Text("${widget.subject} - Clasa ${widget.grade}"),
         backgroundColor: Colors.blueAccent,
+        iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : categories.isEmpty
           ? const Center(child: Text("Nu există categorii pentru această clasă."))
           : ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
           return Card(
-            margin: const EdgeInsets.all(10),
-            elevation: 3,
+            margin: const EdgeInsets.only(bottom: 12),
+            elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
-              title: Text(category, style: const TextStyle(fontWeight: FontWeight.bold)),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              title: Text(category, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.blueAccent),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ExerciseListScreen(
-                      subject: widget.subject,
-                      //exercises: classData[category], // lista exactă din JSON
-                    ),
-                  ),
+                // 🚀 SCHIMBAREA AICI: Navigăm folosind GoRouter.
+                // Trimitem numele categoriei prin parametrul 'extra' în caz că ecranul următor are nevoie de ea.
+                context.go(
+                  '/exercitii/${widget.subject}/${widget.grade}',
+                  extra: category,
                 );
               },
             ),

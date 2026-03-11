@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AllReviewsScreen extends StatelessWidget {
-  final String lawyerId;
+  final String teacherId;
 
-  const AllReviewsScreen({Key? key, required this.lawyerId}) : super(key: key);
+  const AllReviewsScreen({Key? key, required this.teacherId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final reviewsRef = FirebaseFirestore.instance
-        .collection('lawyers')
-        .doc(lawyerId)
+        .collection('teachers')
+        .doc(teacherId)
         .collection('reviews')
         .orderBy('createdAt', descending: true);
 

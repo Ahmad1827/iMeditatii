@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'specialization_screen.dart';
-import 'teachers_dashboard.dart';
+import 'package:go_router/go_router.dart'; // 🚀 Importul pentru navigare curată
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({Key? key}) : super(key: key);
@@ -84,19 +83,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           const SnackBar(content: Text('Profil completat cu succes!')),
         );
 
-        // Navigare în funcție de rol
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-            role == 'teacher' ? const TeachersDashboard() : const SpecializationScreen(),
-          ),
-              (route) => false,
-        );
+        // 🚀 Navigare cu GoRouter
+        if (role == 'teacher') {
+          context.go('/panou-profesor');
+        } else {
+          context.go('/materii');
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Eroare la salvarea profilului: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Eroare la salvarea profilului: $e'))
+        );
+      }
     } finally {
       if (mounted) setState(() => loading = false);
     }

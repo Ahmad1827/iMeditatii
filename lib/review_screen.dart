@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart'; // 🚀 Import obligatoriu pentru navigare
 
 class ReviewScreen extends StatefulWidget {
-  final String lawyerId;
-  final String lawyerName;
+  final String teacherId;
+  final String teacherName;
   final String chatId;
 
   const ReviewScreen({
-    required this.lawyerId,
-    required this.lawyerName,
+    required this.teacherId,
+    required this.teacherName,
     required this.chatId,
     Key? key,
   }) : super(key: key);
@@ -55,8 +56,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
     try {
       await FirebaseFirestore.instance
-          .collection('lawyers')
-          .doc(widget.lawyerId)
+          .collection('teachers')
+          .doc(widget.teacherId)
           .collection('reviews')
           .add(reviewData);
 
@@ -66,16 +67,20 @@ class _ReviewScreenState extends State<ReviewScreen> {
           .update({'reviewed': true});
 
       if (mounted) {
-        Navigator.pop(context);
+        // 🚀 Am înlocuit Navigator.pop cu GoRouter
+        context.pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Recenzia a fost trimisă cu succes!')),
         );
       }
     } catch (e) {
-      setState(() => _isSubmitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Eroare la trimitere: $e')),
-      );
+      if (mounted) setState(() => _isSubmitting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Eroare la trimitere: $e')),
+        );
+      }
     }
   }
 
@@ -88,7 +93,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
         title: Text(
-          'Review ${widget.lawyerName}',
+          'Review ${widget.teacherName}',
           style: const TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,

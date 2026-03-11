@@ -1,11 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'specialization_screen.dart';
-import 'teachers_dashboard.dart';
+import 'package:go_router/go_router.dart';
 
 class SignupScreen extends StatefulWidget {
-  final bool googleUser; // true dacă vine din Google Sign-In
+  final bool googleUser;
   final String? initialEmail;
   final String? initialName;
 
@@ -27,10 +27,13 @@ class _SignupScreenState extends State<SignupScreen> {
   final passCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
 
-  String role = 'user'; // 'user' sau 'teacher'
+  String role = 'student';
   String? selectedSubject;
   bool loading = false;
-  bool _isHovering = false; // Pentru efectul de hover pe butonul de înapoi
+  bool _isHovering = false;
+
+  bool _acceptedTerms = false;
+  bool _acceptedPrivacy = false;
 
   final List<String> subjects = [
     "Matematică",
@@ -51,26 +54,34 @@ class _SignupScreenState extends State<SignupScreen> {
     if (widget.googleUser) {
       emailCtrl.text = widget.initialEmail ?? '';
       nameCtrl.text = widget.initialName ?? '';
-      // Asigură-te că rolul este setat implicit pe 'user' sau cum dorești la înregistrarea Google
     }
   }
 
   Future<void> _signup() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_acceptedTerms || !_acceptedPrivacy) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Trebuie să accepți Termenii și Politica de Confidențialitate!"),
+            backgroundColor: Colors.redAccent,
+          )
+      );
+      return;
+    }
+
     setState(() => loading = true);
 
     try {
       String uid;
 
       if (widget.googleUser) {
-        // User deja logat prin Google
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
           throw Exception("Utilizatorul Google nu este autentificat!");
         }
         uid = user.uid;
       } else {
-        // Creare cont clasic cu email și parolă
         final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailCtrl.text.trim(),
           password: passCtrl.text.trim(),
@@ -78,13 +89,14 @@ class _SignupScreenState extends State<SignupScreen> {
         uid = cred.user!.uid;
       }
 
-      // Datele de salvat în Firestore
       final data = {
         'name': nameCtrl.text.trim(),
         'email': emailCtrl.text.trim(),
         'phone': phoneCtrl.text.trim(),
         'role': role,
         'profileCompleted': true,
+        'acceptedTerms': true,
+        'acceptedPrivacy': true,
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
@@ -92,46 +104,41 @@ class _SignupScreenState extends State<SignupScreen> {
         data['subject'] = selectedSubject ?? '';
       }
 
-      // adaugă în users
       await FirebaseFirestore.instance.collection('users').doc(uid).set(data);
 
-      // dacă e profesor -> adaugă și în teachers
       if (role == 'teacher') {
         await FirebaseFirestore.instance.collection('teachers').doc(uid).set({
           'name': nameCtrl.text.trim(),
           'email': emailCtrl.text.trim(),
           'subject': selectedSubject ?? '',
           'image': '',
-          'active': true,
+          'active': false,
           'hasAccount': true,
           'createdAt': FieldValue.serverTimestamp(),
         });
-      }
 
-      // Navigare după înregistrare
-      if (mounted) {
-        if (role == 'teacher') {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => TeachersDashboard()),
-                (route) => false,
-          );
-        } else {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => SpecializationScreen()),
-                (route) => false,
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Cont creat! Așteaptă aprobarea administratorului.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 4),
+            ),
           );
         }
       }
+
+      if (mounted) {
+        if (role == 'teacher') {
+          context.go('/profesor/$uid');
+        } else {
+          context.go('/materii');
+        }
+      }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Înregistrare eșuată')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Înregistrare eșuată', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.redAccent));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString(), style: const TextStyle(color: Colors.white)), backgroundColor: Colors.redAccent));
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -146,16 +153,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  // Widget reutilizabil pentru câmpurile de text
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    required IconData prefixIcon,
-    bool obscureText = false,
-    bool readOnly = false,
-    String? Function(String?)? validator,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+  Widget _buildTextField({required TextEditingController controller, required String labelText, required IconData prefixIcon, bool obscureText = false, bool readOnly = false, String? Function(String?)? validator, TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
@@ -188,13 +186,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Definirea lățimii maxime a cardului, similar cu LoginScreen
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = screenWidth > 700 ? 700.0 : screenWidth * 0.9;
 
     return Scaffold(
       body: Container(
-        // Fundal cu gradient
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.blue.shade50, Colors.white],
@@ -204,7 +200,6 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         child: Stack(
           children: [
-            // Conținutul principal (Centru)
             Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
@@ -228,28 +223,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Titlu
-                        const Text(
-                          'Creează-ți un cont',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black87,
-                          ),
-                        ),
+                        const Text('Creează-ți un cont', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.black87)),
                         const SizedBox(height: 8),
-                        Text(
-                          widget.googleUser
-                              ? 'Finalizează înregistrarea pentru contul tău Google.'
-                              : 'Introdu detaliile de mai jos.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
+                        Text(widget.googleUser ? 'Finalizează înregistrarea pentru contul tău Google.' : 'Introdu detaliile de mai jos.', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
                         const SizedBox(height: 30),
 
-                        // Nume complet
                         _buildTextField(
                           controller: nameCtrl,
                           labelText: 'Nume complet',
@@ -258,7 +236,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Email
                         _buildTextField(
                           controller: emailCtrl,
                           labelText: 'Email',
@@ -268,7 +245,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Parola doar dacă nu e Google
                         if (!widget.googleUser)
                           _buildTextField(
                             controller: passCtrl,
@@ -279,36 +255,26 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         if (!widget.googleUser) const SizedBox(height: 20),
 
-                        // Telefon
                         _buildTextField(
                           controller: phoneCtrl,
                           labelText: 'Număr de telefon (opțional)',
                           prefixIcon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
-                          validator: (v) => null, // Fără validare strictă, e opțional
+                          validator: (v) => null,
                         ),
                         const SizedBox(height: 30),
 
-                        // Alegere rol
-                        const Text(
-                          'Selectează rolul tău:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
-                        ),
+                        const Text('Selectează rolul tău:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
                         const SizedBox(height: 10),
 
                         Row(
                           children: [
-                            Expanded(
-                              child: _buildRoleSelector('Elev', 'user'),
-                            ),
-                            Expanded(
-                              child: _buildRoleSelector('Profesor', 'teacher'),
-                            ),
+                            Expanded(child: _buildRoleSelector('Elev', 'student')),
+                            Expanded(child: _buildRoleSelector('Profesor', 'teacher')),
                           ],
                         ),
                         const SizedBox(height: 20),
 
-                        // Dacă este profesor, alege materia
                         if (role == 'teacher') ...[
                           DropdownButtonFormField<String>(
                             decoration: InputDecoration(
@@ -316,31 +282,83 @@ class _SignupScreenState extends State<SignupScreen> {
                               prefixIcon: const Icon(Icons.school_outlined, color: Colors.blueAccent),
                               filled: true,
                               fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
-                              ),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5)),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Colors.blueAccent, width: 2)),
                             ),
-                            items: subjects
-                                .map((s) =>
-                                DropdownMenuItem(value: s, child: Text(s)))
-                                .toList(),
+                            items: subjects.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
                             value: selectedSubject,
-                            onChanged: (val) {
-                              setState(() => selectedSubject = val);
-                            },
-                            validator: (v) =>
-                            v == null || v.isEmpty ? 'Te rog selectează o materie' : null,
+                            onChanged: (val) => setState(() => selectedSubject = val),
+                            validator: (v) => v == null || v.isEmpty ? 'Te rog selectează o materie' : null,
                           ),
-                          const SizedBox(height: 30),
-                        ] else const SizedBox(height: 30),
+                          const SizedBox(height: 20),
+                        ] else const SizedBox(height: 20),
 
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.grey.shade200)
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _acceptedTerms,
+                                    activeColor: Colors.blueAccent,
+                                    onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
+                                  ),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Am citit și sunt de acord cu ',
+                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
+                                        children: [
+                                          TextSpan(
+                                            text: 'Termenii și Condițiile',
+                                            style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+                                            recognizer: TapGestureRecognizer()..onTap = () {
+                                              context.go('/termeni-si-conditii'); // 🚀 Actualizează URL
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _acceptedPrivacy,
+                                    activeColor: Colors.blueAccent,
+                                    onChanged: (val) => setState(() => _acceptedPrivacy = val ?? false),
+                                  ),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Sunt de acord cu ',
+                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
+                                        children: [
+                                          TextSpan(
+                                            text: 'Politica de Confidențialitate',
+                                            style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+                                            recognizer: TapGestureRecognizer()..onTap = () {
+                                              context.go('/politica-confidentialitate'); // 🚀 Actualizează URL
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
 
-                        // Buton Sign Up
                         loading
                             ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
                             : SizedBox(
@@ -350,27 +368,18 @@ class _SignupScreenState extends State<SignupScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueAccent,
                               padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               elevation: 8,
                             ),
-                            child: const Text(
-                              'Creează Cont',
-                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
+                            child: const Text('Creează Cont', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                           ),
                         ),
                         const SizedBox(height: 10),
 
-                        // Navigare la Login
                         Center(
                           child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text(
-                              "Ai deja cont? Autentifică-te",
-                              style: TextStyle(color: Colors.blueAccent, fontSize: 15),
-                            ),
+                            onPressed: () => context.go('/login'),
+                            child: const Text("Ai deja cont? Autentifică-te", style: TextStyle(color: Colors.blueAccent, fontSize: 15)),
                           ),
                         ),
                       ],
@@ -380,7 +389,6 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
 
-            // Back button animat (Opțional, dar bun pentru consistență)
             Positioned(
               top: 16,
               left: 16,
@@ -388,26 +396,15 @@ class _SignupScreenState extends State<SignupScreen> {
                 onEnter: (_) => setState(() => _isHovering = true),
                 onExit: (_) => setState(() => _isHovering = false),
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+                  onTap: () => context.go('/login'),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: _isHovering
-                          ? Colors.blueAccent.withOpacity(0.1)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    decoration: BoxDecoration(color: _isHovering ? Colors.blueAccent.withOpacity(0.1) : Colors.transparent, borderRadius: BorderRadius.circular(12)),
                     child: AnimatedScale(
                       scale: _isHovering ? 1.15 : 1.0,
                       duration: const Duration(milliseconds: 200),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.blueAccent,
-                        size: 28,
-                      ),
+                      child: const Icon(Icons.arrow_back, color: Colors.blueAccent, size: 28),
                     ),
                   ),
                 ),
@@ -419,15 +416,10 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Widget custom pentru selectarea rolului (mai arătos decât RadioListTile)
   Widget _buildRoleSelector(String title, String value) {
     final isSelected = role == value;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          role = value;
-        });
-      },
+      onTap: () => setState(() => role = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -435,38 +427,15 @@ class _SignupScreenState extends State<SignupScreen> {
         decoration: BoxDecoration(
           color: isSelected ? Colors.blueAccent : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? Colors.blueAccent : Colors.grey.shade300,
-            width: 2,
-          ),
-          boxShadow: isSelected
-              ? [
-            BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.2),
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            )
-          ]
-              : null,
+          border: Border.all(color: isSelected ? Colors.blueAccent : Colors.grey.shade300, width: 2),
+          boxShadow: isSelected ? [BoxShadow(color: Colors.blueAccent.withOpacity(0.2), blurRadius: 5, offset: const Offset(0, 3))] : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              value == 'teacher' ? Icons.badge : Icons.school,
-              color: isSelected ? Colors.white : Colors.blueAccent,
-              size: 20,
-            ),
+            Icon(value == 'teacher' ? Icons.badge : Icons.school, color: isSelected ? Colors.white : Colors.blueAccent, size: 20),
             const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                ),
-              ),
-            ),
+            Flexible(child: Text(title, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500))),
           ],
         ),
       ),

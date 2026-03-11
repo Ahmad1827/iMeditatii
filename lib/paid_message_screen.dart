@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
-
-import 'chat_screen.dart';
+import 'package:go_router/go_router.dart'; // 🚀 Import obligatoriu pentru navigare
 
 class PaidMessageScreen extends StatefulWidget {
   final String teacherId;
@@ -62,14 +61,11 @@ class _PaidMessageScreenState extends State<PaidMessageScreen> {
 
     if (!mounted) return;
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ChatScreen(
-          chatId: chatRef.id,
-          teacherName: widget.teacherName,
-        ),
-      ),
+    // 🚀 Am înlocuit Navigator.pushReplacement cu GoRouter
+    // Folosim pushReplacement ca userul să nu se poată întoarce la ecranul de plată cu butonul de Back
+    context.pushReplacement(
+      '/chat/${chatRef.id}',
+      extra: widget.teacherName,
     );
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'chat_screen.dart';
+import 'package:go_router/go_router.dart'; // 🚀 Import obligatoriu pentru navigare curată
 
 class UserProfileViewScreen extends StatelessWidget {
   final String userId;
@@ -67,7 +67,6 @@ class UserProfileViewScreen extends StatelessWidget {
 
     return newChat.id;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -164,16 +163,11 @@ class UserProfileViewScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     final chatId = await _openOrCreateChat(context, userId, name);
-                    // Navighează direct în chat
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatScreen(
-                          chatId: chatId,
-                          teacherName: name,
-                        ),
-                      ),
-                    );
+
+                    // 🚀 Navighează direct în chat folosind GoRouter
+                    if (context.mounted) {
+                      context.pushReplacement('/chat/$chatId', extra: name);
+                    }
                   },
                 ),
               ],

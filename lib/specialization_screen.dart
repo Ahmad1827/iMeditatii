@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:ui'; // Pentru BackdropFilter
+import 'package:go_router/go_router.dart';
 
-// ⚠️ Asigură-te că toate aceste ecrane există și sunt în calea corectă:
-import 'user_dashboard.dart';
-import 'login_screen.dart';
-import 'teachers_dashboard.dart';
-import 'teacher_list_screen.dart';
-import 'teacher_profile_screen.dart';
-import 'user_profile_screen.dart';
-import 'home_screen.dart';
-import 'exercises_screen.dart';
+import 'custom_navbar.dart';
 
 class SpecializationScreen extends StatefulWidget {
   const SpecializationScreen({super.key});
@@ -21,475 +13,446 @@ class SpecializationScreen extends StatefulWidget {
 }
 
 class _SpecializationScreenState extends State<SpecializationScreen> {
+  // Date îmbogățite pentru un aspect vizual premium
   final List<Map<String, dynamic>> specializations = [
-    {'name': 'Matematică', 'teachers': []},
-    {'name': 'Fizică', 'teachers': []},
-    {'name': 'Chimie', 'teachers': []},
-    {'name': 'Informatică', 'teachers': []},
-    {'name': 'Limba Română', 'teachers': []},
-    {'name': 'Engleză', 'teachers': []},
-    {'name': 'Franceză', 'teachers': []},
-    {'name': 'Istorie', 'teachers': []},
-    {'name': 'Geografie', 'teachers': []},
+    {'name': 'Matematică', 'icon': Icons.functions_rounded, 'color': const Color(0xFF3B82F6), 'desc': 'Algebră, Geometrie, Analiză și Bacalaureat.'},
+    {'name': 'Fizică', 'icon': Icons.bolt_rounded, 'color': const Color(0xFFF59E0B), 'desc': 'Mecanică, Termodinamică, Electricitate și Optică.'},
+    {'name': 'Chimie', 'icon': Icons.science_rounded, 'color': const Color(0xFF10B981), 'desc': 'Chimie Organică, Anorganică și admitere Medicină.'},
+    {'name': 'Informatică', 'icon': Icons.data_object_rounded, 'color': const Color(0xFF8B5CF6), 'desc': 'Algoritmi, C++, Python și pregătire olimpiade.'},
+    {'name': 'Limba Română', 'icon': Icons.menu_book_rounded, 'color': const Color(0xFFEF4444), 'desc': 'Eseuri, Gramatică, pregătire Evaluare și BAC.'},
+    {'name': 'Engleză', 'icon': Icons.language_rounded, 'color': const Color(0xFF4F46E5), 'desc': 'Gramatică, Vocabular, Conversație și Cambridge.'},
+    {'name': 'Franceză', 'icon': Icons.tour_rounded, 'color': const Color(0xFF06B6D4), 'desc': 'Nivel A1-C1, atestate DELF și conversație.'},
+    {'name': 'Istorie', 'icon': Icons.account_balance_rounded, 'color': const Color(0xFFD97706), 'desc': 'Istoria Românilor, Istorie Universală și BAC.'},
+    {'name': 'Geografie', 'icon': Icons.public_rounded, 'color': const Color(0xFF84CC16), 'desc': 'Geografia Europei, României și cartografie.'},
   ];
 
   String searchQuery = '';
   bool _loadingTeachers = true;
+  Map<String, int> teacherCounts = {};
 
   @override
   void initState() {
     super.initState();
-    _loadTeachers();
+    _loadTeacherData();
   }
 
-  Future<void> _loadTeachers() async {
-    final snapshot = await FirebaseFirestore.instance.collection('teachers')
-        .where('active', isEqualTo: true)
-        .get();
+  // Optimizare: Încărcăm doar numărul de profesori, nu toate datele lor
+  Future<void> _loadTeacherData() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('teachers')
+          .where('active', isEqualTo: true)
+          .get();
 
-    for (var doc in snapshot.docs) {
-      final data = doc.data();
-      final subject = data['subject'] ?? '';
-      if (subject.isNotEmpty) {
-        final index = specializations.indexWhere((s) => s['name'] == subject);
-        if (index != -1) {
-          specializations[index]['teachers'].add({
-            'uid': doc.id,
-            'name': data['name'] ?? '',
-            'email': data['email'] ?? '',
-            'image': data['image'] ?? '',
-            'experience': data['experience'] ?? 0,
-            'contact': data['contact'] ?? '',
-          });
-        }
+      Map<String, int> counts = {};
+      for (var doc in snapshot.docs) {
+        final subject = doc.data()['subject'] ?? '';
+        counts[subject] = (counts[subject] ?? 0) + 1;
       }
-    }
 
-    setState(() {
-      _loadingTeachers = false;
-    });
+      setState(() {
+        teacherCounts = counts;
+        _loadingTeachers = false;
+      });
+    } catch (e) {
+      debugPrint("Eroare: $e");
+      if (mounted) setState(() => _loadingTeachers = false);
+    }
   }
 
-  // --------------------------------------------------------------------------
-  // 🔨 WIDGETS NECESARE PENTRU NAVBAR
-  // --------------------------------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    final filtered = specializations.where((s) =>
+        s['name'].toString().toLowerCase().contains(searchQuery.toLowerCase())).toList();
 
-  // 1. Buton de Navigare Text
-  Widget _navText(String text, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: InkWell(
-        onTap: onTap,
-        child: Text(
-          text,
-          style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF1F2937)),
-        ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC), // Fundal neutru, modern
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.only(left: 24, right: 24, top: 40, bottom: 20),
+                  sliver: SliverToBoxAdapter(
+                    child: _buildHeaderAndSearch(),
+                  ),
+                ),
+                if (_loadingTeachers)
+                  const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator(color: Color(0xFF3B82F6))),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                    sliver: _buildBentoGrid(filtered),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // 2. Buton de Sign In (Login)
-  Widget _signInBtn(BuildContext ctx) => TextButton(
-    onPressed: () => Navigator.pushReplacement(
-      ctx,
-      MaterialPageRoute(builder: (_) => LoginScreen()),
-    ),
-    child: Text('Login', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800])),
-  );
-
-  // 3. Acțiunile Utilizatorului Logat
-  Widget _actionRow({required bool isTeacher, required String userId}) {
-    final String dashboardText = isTeacher ? 'Dashboard' : 'Contul Meu';
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Dashboard
-        TextButton(
-          onPressed: () {
-            if (isTeacher) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const TeachersDashboard()),
-              );
-            } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const UserDashboard()),
-              );
-            }
-          },
-          child: Text(
-            dashboardText,
-            style: const TextStyle(color: Colors.blueAccent, fontSize: 16),
+  // --------------------------------------------------------------------------
+  // NAVBAR (Standard și Curat)
+  // --------------------------------------------------------------------------
+  Widget _buildNavbar() {
+    return Container(
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Logo
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => context.go('/'), // 🚀 Navigare către HomeScreen
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
+                    child: const Icon(Icons.school, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('iMeditatii', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -0.5)),
+                ],
+              ),
+            ),
           ),
-        ),
+          // Linkuri & Auth
+          Row(
+            children: [
+              TextButton(onPressed: () {}, child: const Text("Profesori", style: TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.bold, fontSize: 15))),
+              const SizedBox(width: 8),
+              TextButton(onPressed: () => context.go('/exercitii'), // 🚀 Navigare către ExercisesScreen
+                  child: const Text("Exerciții", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600, fontSize: 15))),
+              const SizedBox(width: 16),
+              Container(width: 1, height: 24, color: Colors.grey.shade300),
+              const SizedBox(width: 16),
+              _buildAuthActions(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-        // Profil
-        IconButton(
-          icon: const Icon(Icons.person, color: Colors.blueAccent),
-          tooltip: 'Profilul meu',
-          onPressed: () async {
-            final user = FirebaseAuth.instance.currentUser;
-            if (user == null) return;
+  Widget _buildAuthActions() {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2));
+        }
 
-            if (isTeacher) {
-              final teacherDoc = FirebaseFirestore.instance.collection('teachers').doc(user.uid);
-              final docSnapshot = await teacherDoc.get();
+        final user = snapshot.data;
 
-              if (!docSnapshot.exists) {
-                final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-                final data = userData.data() ?? {};
-                await teacherDoc.set({
-                  'name': data['name'] ?? '',
-                  'email': user.email ?? '',
-                  'subject': data['subject'] ?? '',
-                  'contact': data['contact'] ?? '',
-                  'experience': 0,
-                  'image': data['image'] ?? '',
-                  'hasAccount': true,
-                  'active': true,
-                });
-              }
+        // Când NU este logat
+        if (user == null) {
+          return ElevatedButton(
+            onPressed: () => context.go('/login'), // 🚀 Navigare către LoginScreen
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0F172A),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16)
+            ),
+            child: const Text("Intră în cont", style: TextStyle(fontWeight: FontWeight.bold)),
+          );
+        }
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const TeacherProfileScreen()),
-              );
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const UserProfileScreen()),
-              );
-            }
-          },
-        ),
+        // Când ESTE logat (Dashboard + Profil + LOGOUT)
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 1. BUTON DASHBOARD
+            IconButton(
+              onPressed: () async {
+                try {
+                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+                  if (userDoc.exists && mounted) {
+                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
+                    if (role == 'teacher') {
+                      context.go('/panou-profesor'); // 🚀 Navigare TeachersDashboard
+                    } else {
+                      context.go('/panou-elev'); // 🚀 Navigare UserDashboard
+                    }
+                  }
+                } catch (e) {
+                  debugPrint("Eroare dashboard: $e");
+                }
+              },
+              icon: const Icon(Icons.dashboard_customize_rounded, color: Color(0xFF0F172A), size: 28),
+              tooltip: "Panou de control",
+            ),
 
-        // Logout
-        TextButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => LoginScreen()),
-              );
-            }
-          },
-          child: const Text(
-            'Sign Out',
-            style: TextStyle(color: Colors.blueAccent, fontSize: 16),
+            const SizedBox(width: 4),
+
+            // 2. BUTON PROFIL
+            IconButton(
+              onPressed: () async {
+                try {
+                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+                  if (userDoc.exists && mounted) {
+                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
+                    if (role == 'teacher') {
+                      context.go('/profesor/${user.uid}'); // 🚀 Navigare TeacherProfile
+                    } else {
+                      context.go('/elev/${user.uid}'); // 🚀 Navigare UserProfile
+                    }
+                  }
+                } catch (e) {
+                  debugPrint("Eroare profil: $e");
+                }
+              },
+              icon: const Icon(Icons.account_circle, color: Color(0xFF3B82F6), size: 30),
+              tooltip: "Contul meu",
+            ),
+
+            const SizedBox(width: 4),
+
+            // 3. BUTON LOGOUT
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: IconButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  if (mounted) {
+                    context.go('/'); // 🚀 Navigare Home după deconectare
+                  }
+                },
+                icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 24),
+                tooltip: "Deconectare",
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // HEADER & SEARCH BAR
+  // --------------------------------------------------------------------------
+  Widget _buildHeaderAndSearch() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Găsește materia dorită", style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -1)),
+        const SizedBox(height: 8),
+        Text("Peste 100 de profesori te așteaptă să începeți pregătirea.", style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
+        const SizedBox(height: 32),
+        Container(
+          width: 500, // Lățime maximă pentru search bar ca să nu arate imens pe desktop
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 4))],
+          ),
+          child: TextField(
+            onChanged: (v) => setState(() => searchQuery = v),
+            decoration: InputDecoration(
+              hintText: "Ex: Matematică, Fizică, Informatică...",
+              hintStyle: TextStyle(color: Colors.grey.shade400),
+              prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            ),
           ),
         ),
       ],
     );
   }
 
-  // 4. Glassmorphism Navbar
-  Widget _glassNavBar(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isWide = width > 800;
+  // --------------------------------------------------------------------------
+  // GRID ADAPTIV (Aici se controlează dimensiunea cardurilor)
+  // --------------------------------------------------------------------------
+  Widget _buildBentoGrid(List<Map<String, dynamic>> data) {
+    if (data.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Center(child: Text("Nu am găsit nicio materie.", style: TextStyle(color: Colors.grey.shade500, fontSize: 16))),
+      );
+    }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            color: Colors.white.withOpacity(0.65),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 320,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        childAspectRatio: 1.15, // Controlează raportul lățime/înălțime
+      ),
+      delegate: SliverChildBuilderDelegate(
+            (context, index) {
+          final spec = data[index];
+          final count = teacherCounts[spec['name']] ?? 0;
+          return AnimatedBentoCard(
+            data: spec,
+            count: count,
+            onTap: () {
+              // 🚀 Navigăm către lista de profesori din materia selectată
+              context.go(
+                '/materii/${spec['name']}',
+                extra: spec, // Trimitem restul datelor (icon, descriere) ca `extra`
+              );
+            },
+          );
+        },
+        childCount: data.length,
+      ),
+    );
+  }
+}
+
+// --------------------------------------------------------------------------
+// CARDUL ANIMAT (MODERN BENTO STYLE)
+// --------------------------------------------------------------------------
+class AnimatedBentoCard extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final int count;
+  final VoidCallback onTap;
+
+  const AnimatedBentoCard({super.key, required this.data, required this.count, required this.onTap});
+
+  @override
+  State<AnimatedBentoCard> createState() => _AnimatedBentoCardState();
+}
+
+class _AnimatedBentoCardState extends State<AnimatedBentoCard> with SingleTickerProviderStateMixin {
+  bool isHovered = false;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = widget.data['color'];
+
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() => isHovered = true);
+        _controller.forward();
+      },
+      onExit: (_) {
+        setState(() => isHovered = false);
+        _controller.reverse();
+      },
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isHovered ? primaryColor.withOpacity(0.5) : Colors.grey.shade200,
+                width: isHovered ? 2 : 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered ? primaryColor.withOpacity(0.1) : Colors.black.withOpacity(0.02),
+                  blurRadius: isHovered ? 20 : 10,
+                  offset: const Offset(0, 8),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ----------------------------------------------------
-                // STÂNGA: Logo și Link-uri (Logică de Comutare)
-                // ----------------------------------------------------
+                // Rândul de sus: Iconiță + Badge număr profesori
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Logo Gradient și Text (ÎNCAPSULAT ÎN GESTUREDETECTOR)
-                    GestureDetector( // 🎯 NOU: Adăugat GestureDetector
-                      onTap: () {
-                        // 🚀 MODIFICARE: Navigare la HomeScreen (fără const)
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF6366F1)]),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))],
-                            ),
-                            child: const Icon(Icons.school, color: Colors.white, size: 24),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text('iMeditatii', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF1F2937))),
-                        ],
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(14),
                       ),
+                      child: Icon(widget.data['icon'], color: primaryColor, size: 28),
                     ),
-
-                    if (isWide) const SizedBox(width: 30),
-
-                    // Logica de comutare a link-urilor (Vizitator vs. Logat)
-                    if (isWide)
-                      StreamBuilder<User?>(
-                        stream: FirebaseAuth.instance.authStateChanges(),
-                        builder: (context, snap) {
-                          final user = snap.data;
-
-                          // Logat (Afișează Profesori & Exerciții)
-                          if (user != null) {
-                            return Row(
-                              children: [
-                                _navText('Profesori', () {
-                                  // Rămâne pe SpecializationScreen (folosim replace ca să nu se adune paginile)
-                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SpecializationScreen()));
-                                }),
-                                _navText('Exerciții', () {
-                                  // 🚀 MODIFICARE: Folosim PUSH, nu PUSHREPLACEMENT, pentru a putea folosi POP pe ExercisesScreen
-                                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ExercisesScreen()));
-                                }),
-                              ],
-                            );
-                          }
-
-                          // Neautentificat (Afișează link-urile de marketing)
-                          return Row(
-                            children: [
-                              _navText('Proiecte', () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()))),
-                              _navText('Profesori', () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SpecializationScreen()))),
-                              _navText('De ce iMeditatii', () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()))),
-                              _navText('Prețuri', () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()))),
-                            ],
-                          );
-                        },
+                    if (widget.count > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Text("${widget.count} Profi", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                          ],
+                        ),
                       ),
                   ],
                 ),
 
-                // ----------------------------------------------------
-                // DREAPTA: LOGICĂ DE AUTENTIFICARE DINAMICĂ
-                // ----------------------------------------------------
-                StreamBuilder<User?>(
-                  stream: FirebaseAuth.instance.authStateChanges(),
-                  builder: (context, snap) {
-                    if (snap.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(
-                        width: 80,
-                        child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF3B82F6)))),
-                      );
-                    }
+                const Spacer(),
 
-                    final user = snap.data;
-
-                    // CAZ 1: Utilizatorul NU este autentificat (Afișăm Login + Contact)
-                    if (user == null) {
-                      return Row(
-                        children: [
-                          _signInBtn(context),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF3B82F6),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 4,
-                            ),
-                            child: const Text('Contact'),
-                          ),
-                        ],
-                      );
-                    }
-
-                    // CAZ 2: Utilizatorul ESTE autentificat (Afișăm acțiunile dinamice)
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(user.uid)
-                          .get(),
-                      builder: (context, userDoc) {
-                        if (userDoc.connectionState == ConnectionState.waiting) {
-                          return const SizedBox(
-                            width: 80,
-                            child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF3B82F6)))),
-                          );
-                        }
-                        String? role;
-                        if (userDoc.hasData && userDoc.data!.exists) {
-                          role = (userDoc.data!.data() as Map<String, dynamic>)['role'] as String?;
-                        }
-                        return _actionRow(
-                          isTeacher: role == 'teacher',
-                          userId: user.uid,
-                        );
-                      },
-                    );
-                  },
-                )
+                // Rândul de jos: Titlu, descriere și săgeată animată
+                Text(widget.data['name'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), letterSpacing: -0.5)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.data['desc'],
+                        style: TextStyle(fontSize: 13, color: Colors.grey.shade500, height: 1.4),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Săgeata care apare și glisează ușor spre dreapta la Hover
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: isHovered ? 1 : 0,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        transform: Matrix4.translationValues(isHovered ? 0 : -10, 0, 0),
+                        margin: const EdgeInsets.only(left: 12),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(color: primaryColor, shape: BoxShape.circle),
+                        child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // 🎯 BUILD METHOD
-  // --------------------------------------------------------------------------
-  @override
-  Widget build(BuildContext context) {
-    final filtered = searchQuery.isEmpty
-        ? specializations
-        : specializations
-        .where((s) => s['name']
-        .toString()
-        .toLowerCase()
-        .contains(searchQuery.toLowerCase()))
-        .toList();
-
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Stack(
-        children: [
-          // Conținutul principal (Lista de Specializări)
-          SafeArea(
-            child: Padding(
-              // ⚠️ MODIFICARE: Am ajustat padding-ul pentru a evita eroarea EdgeInsets.only
-              padding: const EdgeInsets.only(left: 20, top: 80, right: 20, bottom: 16),
-              child: _loadingTeachers
-                  ? const Center(child: CircularProgressIndicator())
-                  : Column(
-                children: [
-                  // Păstrat: TextField pentru căutare
-                  TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      hintText: 'Caută profesor...',
-                      prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 14),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        searchQuery = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  // Păstrat: Lista de specializări
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: filtered.length,
-                      itemBuilder: (context, index) {
-                        final spec = filtered[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                transitionDuration: const Duration(milliseconds: 400),
-                                pageBuilder: (_, __, ___) =>
-                                    TeacherListScreen(specialization: spec),
-                                transitionsBuilder: (_, animation, __, child) {
-                                  return SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(1.0, 0.0),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.08),
-                                  spreadRadius: 1,
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueAccent.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.school,
-                                    color: Colors.blueAccent,
-                                    size: 24,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        spec['name'],
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      if (spec['teachers'].isNotEmpty)
-                                        Text(
-                                          '${spec['teachers'].length} profesori disponibili',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black54),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 18,
-                                  color: Colors.blueAccent,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Navbar-ul suprapus (Glassmorphism)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: _glassNavBar(context),
-          ),
-        ],
       ),
     );
   }

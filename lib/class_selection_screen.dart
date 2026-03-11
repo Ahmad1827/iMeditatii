@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'category_screen.dart';
-import 'home_screen.dart';
+import 'package:go_router/go_router.dart'; // 🚀 Importul necesar pentru GoRouter
 
 class ClassSelectionScreen extends StatelessWidget {
   final String subject;
@@ -18,7 +17,8 @@ class ClassSelectionScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.blueAccent),
           onPressed: () {
-            Navigator.pop(context);
+            // 🚀 Înlocuit Navigator.pop(context)
+            context.pop();
           },
         ),
         title: Text(
@@ -42,12 +42,9 @@ class ClassSelectionScreen extends StatelessWidget {
               title: Text('Clasa a ${clase[i]}-a', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CategoryScreen(subject: subject, grade: clase[i]),
-                  ),
-                );
+                // 🚀 Înlocuit Navigator.push
+                // Navigăm folosind URL-ul logic creat în main.dart
+                context.go('/exercitii/$subject/${clase[i]}');
               },
             ),
           );
