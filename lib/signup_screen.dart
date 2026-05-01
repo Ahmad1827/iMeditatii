@@ -4,6 +4,132 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
+}
+
+class RetroBlock extends StatelessWidget {
+  final Widget child;
+  final Color bgColor;
+  final double padding;
+  final double shadowOffset;
+  final Color borderColor;
+
+  const RetroBlock({
+    super.key,
+    required this.child,
+    this.bgColor = Colors.white,
+    this.padding = 24.0,
+    this.shadowOffset = 6.0,
+    this.borderColor = AppColors.ink,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ink,
+            offset: Offset(shadowOffset, shadowOffset),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+
+class RetroButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color bgColor;
+  final Color textColor;
+  final bool isFullWidth;
+  final bool isLoading;
+
+  const RetroButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.bgColor = AppColors.sunset,
+    this.textColor = Colors.white,
+    this.isFullWidth = false,
+    this.isLoading = false,
+  });
+
+  @override
+  State<RetroButton> createState() => _RetroButtonState();
+}
+
+class _RetroButtonState extends State<RetroButton> {
+  bool isPressed = false;
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: GestureDetector(
+        onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
+        onTapUp: widget.isLoading ? null : (_) {
+          setState(() => isPressed = false);
+          widget.onPressed();
+        },
+        onTapCancel: () => setState(() => isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          width: widget.isFullWidth ? double.infinity : null,
+          transform: Matrix4.translationValues(
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.isLoading ? Colors.grey : widget.bgColor,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          child: widget.isLoading
+              ? const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+          )
+              : Text(
+            widget.text.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: widget.textColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SignupScreen extends StatefulWidget {
   final bool googleUser;
   final String? initialEmail;
@@ -13,8 +139,8 @@ class SignupScreen extends StatefulWidget {
     this.googleUser = false,
     this.initialEmail,
     this.initialName,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _SignupScreenState createState() => _SignupScreenState();
@@ -30,7 +156,6 @@ class _SignupScreenState extends State<SignupScreen> {
   String role = 'student';
   String? selectedSubject;
   bool loading = false;
-  bool _isHovering = false;
 
   bool _acceptedTerms = false;
   bool _acceptedPrivacy = false;
@@ -57,16 +182,28 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  void _showSnackbar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message.toUpperCase(),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+        ),
+        backgroundColor: isError ? AppColors.sunset : AppColors.forest,
+        behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.ink, width: 3),
+        ),
+      ),
+    );
+  }
+
   Future<void> _signup() async {
     if (!_formKey.currentState!.validate()) return;
 
     if (!_acceptedTerms || !_acceptedPrivacy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Trebuie să accepți Termenii și Politica de Confidențialitate!"),
-            backgroundColor: Colors.redAccent,
-          )
-      );
+      _showSnackbar('ACCEPTANCE OF TERMS & PRIVACY REQUIRED.', isError: true);
       return;
     }
 
@@ -78,7 +215,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (widget.googleUser) {
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
-          throw Exception("Utilizatorul Google nu este autentificat!");
+          throw Exception("GOOGLE USER NOT AUTHENTICATED.");
         }
         uid = user.uid;
       } else {
@@ -118,13 +255,7 @@ class _SignupScreenState extends State<SignupScreen> {
         });
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Cont creat! Așteaptă aprobarea administratorului.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 4),
-            ),
-          );
+          _showSnackbar('ACCOUNT CREATED. AWAITING ADMIN APPROVAL.');
         }
       }
 
@@ -136,9 +267,9 @@ class _SignupScreenState extends State<SignupScreen> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Înregistrare eșuată', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.redAccent));
+      _showSnackbar(e.message ?? 'REGISTRATION FAILED.', isError: true);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString(), style: const TextStyle(color: Colors.white)), backgroundColor: Colors.redAccent));
+      _showSnackbar(e.toString(), isError: true);
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -153,32 +284,97 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  Widget _buildTextField({required TextEditingController controller, required String labelText, required IconData prefixIcon, bool obscureText = false, bool readOnly = false, String? Function(String?)? validator, TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData prefixIcon,
+    bool obscureText = false,
+    bool readOnly = false,
+    String? Function(String?)? validator,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       readOnly: readOnly,
       keyboardType: keyboardType,
       validator: validator,
-      style: const TextStyle(color: Colors.black87),
+      style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
       decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: TextStyle(color: Colors.grey.shade600),
-        prefixIcon: Icon(prefixIcon, color: Colors.blueAccent),
+        labelText: labelText.toUpperCase(),
+        labelStyle: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+        prefixIcon: Icon(prefixIcon, color: AppColors.ink),
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+        fillColor: readOnly ? AppColors.cloud : Colors.white,
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.ink, width: 3),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.ink, width: 3),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.sky, width: 3),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.sunset, width: 3),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.sunset, width: 3),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleSelector(String title, String value, IconData icon) {
+    final isSelected = role == value;
+    return GestureDetector(
+      onTap: () => setState(() => role = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        transform: Matrix4.translationValues(
+          isSelected ? 4.0 : 0.0,
+          isSelected ? 4.0 : 0.0,
+          0,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.sky : Colors.white,
+          border: Border.all(color: AppColors.ink, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.ink,
+              offset: isSelected ? const Offset(0, 0) : const Offset(6, 6),
+              blurRadius: 0,
+            )
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: AppColors.ink,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.ink,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -186,257 +382,257 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth > 700 ? 700.0 : screenWidth * 0.9;
-
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade50, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      backgroundColor: AppColors.bg,
+      appBar: AppBar(
+        title: const Text(
+          'USER REGISTRATION',
+          style: TextStyle(
+            color: AppColors.ink,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2.0,
           ),
         ),
-        child: Stack(
-          children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-                child: Container(
-                  width: cardWidth,
-                  padding: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blueAccent.withOpacity(0.1),
-                        blurRadius: 25,
-                        offset: const Offset(0, 10),
+        backgroundColor: AppColors.bg,
+        iconTheme: const IconThemeData(color: AppColors.ink),
+        elevation: 0,
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(color: AppColors.ink, height: 3),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+          onPressed: () => context.go('/login'),
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 700),
+            child: RetroBlock(
+              bgColor: AppColors.cloud,
+              padding: 40,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      color: AppColors.mustard,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      child: Text(
+                        widget.googleUser ? 'FINALIZE GOOGLE REGISTRATION' : 'INITIALIZE NEW ACCOUNT',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.ink,
+                          letterSpacing: 1.5,
+                        ),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Provide required credentials to enter the system.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: AppColors.ink,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+
+                    _buildTextField(
+                      controller: nameCtrl,
+                      labelText: 'Full Name',
+                      prefixIcon: Icons.person,
+                      validator: (v) => v!.isEmpty ? 'REQUIRED FIELD' : null,
+                    ),
+                    const SizedBox(height: 24),
+
+                    _buildTextField(
+                      controller: emailCtrl,
+                      labelText: 'Email Address',
+                      prefixIcon: Icons.email,
+                      readOnly: widget.googleUser,
+                      validator: (v) => v!.contains('@') && v.contains('.') ? null : 'INVALID EMAIL FORMAT',
+                    ),
+                    const SizedBox(height: 24),
+
+                    if (!widget.googleUser) ...[
+                      _buildTextField(
+                        controller: passCtrl,
+                        labelText: 'Password',
+                        prefixIcon: Icons.lock,
+                        obscureText: true,
+                        validator: (v) => v!.length < 6 ? 'MINIMUM 6 CHARACTERS REQUIRED' : null,
+                      ),
+                      const SizedBox(height: 24),
                     ],
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
+
+                    _buildTextField(
+                      controller: phoneCtrl,
+                      labelText: 'Phone Number (Optional)',
+                      prefixIcon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                      validator: (v) => null,
+                    ),
+                    const SizedBox(height: 48),
+
+                    const Text(
+                      'ASSIGN CLASS / ROLE:',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
+                    ),
+                    const SizedBox(height: 20),
+
+                    Row(
                       children: [
-                        const Text('Creează-ți un cont', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.black87)),
-                        const SizedBox(height: 8),
-                        Text(widget.googleUser ? 'Finalizează înregistrarea pentru contul tău Google.' : 'Introdu detaliile de mai jos.', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
-                        const SizedBox(height: 30),
+                        Expanded(child: _buildRoleSelector('Player\n(Student)', 'student', Icons.gamepad)),
+                        Expanded(child: _buildRoleSelector('Master\n(Teacher)', 'teacher', Icons.admin_panel_settings)),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
 
-                        _buildTextField(
-                          controller: nameCtrl,
-                          labelText: 'Nume complet',
-                          prefixIcon: Icons.person_outline,
-                          validator: (v) => v!.isEmpty ? 'Numele este obligatoriu' : null,
-                        ),
-                        const SizedBox(height: 20),
-
-                        _buildTextField(
-                          controller: emailCtrl,
-                          labelText: 'Email',
-                          prefixIcon: Icons.email_outlined,
-                          readOnly: widget.googleUser,
-                          validator: (v) => v!.contains('@') && v.contains('.') ? null : 'Introduceți un email valid',
-                        ),
-                        const SizedBox(height: 20),
-
-                        if (!widget.googleUser)
-                          _buildTextField(
-                            controller: passCtrl,
-                            labelText: 'Parolă',
-                            prefixIcon: Icons.lock_outline,
-                            obscureText: true,
-                            validator: (v) => v!.length < 6 ? 'Parola trebuie să aibă minim 6 caractere' : null,
+                    if (role == 'teacher') ...[
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'SELECT SPECIALIZATION',
+                          labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+                          prefixIcon: Icon(Icons.book, color: AppColors.ink),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.zero,
+                            borderSide: BorderSide(color: AppColors.ink, width: 3),
                           ),
-                        if (!widget.googleUser) const SizedBox(height: 20),
-
-                        _buildTextField(
-                          controller: phoneCtrl,
-                          labelText: 'Număr de telefon (opțional)',
-                          prefixIcon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                          validator: (v) => null,
-                        ),
-                        const SizedBox(height: 30),
-
-                        const Text('Selectează rolul tău:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
-                        const SizedBox(height: 10),
-
-                        Row(
-                          children: [
-                            Expanded(child: _buildRoleSelector('Elev', 'student')),
-                            Expanded(child: _buildRoleSelector('Profesor', 'teacher')),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-
-                        if (role == 'teacher') ...[
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Selectează materia predată',
-                              prefixIcon: const Icon(Icons.school_outlined, color: Colors.blueAccent),
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5)),
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Colors.blueAccent, width: 2)),
-                            ),
-                            items: subjects.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                            value: selectedSubject,
-                            onChanged: (val) => setState(() => selectedSubject = val),
-                            validator: (v) => v == null || v.isEmpty ? 'Te rog selectează o materie' : null,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.zero,
+                            borderSide: BorderSide(color: AppColors.ink, width: 3),
                           ),
-                          const SizedBox(height: 20),
-                        ] else const SizedBox(height: 20),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade200)
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.zero,
+                            borderSide: BorderSide(color: AppColors.sky, width: 3),
                           ),
-                          child: Column(
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.zero,
+                            borderSide: BorderSide(color: AppColors.sunset, width: 3),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.zero,
+                            borderSide: BorderSide(color: AppColors.sunset, width: 3),
+                          ),
+                        ),
+                        iconEnabledColor: AppColors.ink,
+                        dropdownColor: Colors.white,
+                        items: subjects.map((s) => DropdownMenuItem(
+                            value: s,
+                            child: Text(s.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink))
+                        )).toList(),
+                        value: selectedSubject,
+                        onChanged: (val) => setState(() => selectedSubject = val),
+                        validator: (v) => v == null || v.isEmpty ? 'REQUIRED FIELD' : null,
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColors.ink, width: 3),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: _acceptedTerms,
-                                    activeColor: Colors.blueAccent,
-                                    onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
-                                  ),
-                                  Expanded(
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: 'Am citit și sunt de acord cu ',
-                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
-                                        children: [
-                                          TextSpan(
-                                            text: 'Termenii și Condițiile',
-                                            style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
-                                            recognizer: TapGestureRecognizer()..onTap = () {
-                                              context.go('/termeni-si-conditii'); // 🚀 Actualizează URL
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              Checkbox(
+                                value: _acceptedTerms,
+                                activeColor: AppColors.ink,
+                                checkColor: Colors.white,
+                                side: const BorderSide(color: AppColors.ink, width: 2),
+                                onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
                               ),
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: _acceptedPrivacy,
-                                    activeColor: Colors.blueAccent,
-                                    onChanged: (val) => setState(() => _acceptedPrivacy = val ?? false),
-                                  ),
-                                  Expanded(
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: 'Sunt de acord cu ',
-                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
-                                        children: [
-                                          TextSpan(
-                                            text: 'Politica de Confidențialitate',
-                                            style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
-                                            recognizer: TapGestureRecognizer()..onTap = () {
-                                              context.go('/politica-confidentialitate'); // 🚀 Actualizează URL
-                                            },
-                                          ),
-                                        ],
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: 'I ACKNOWLEDGE THE ',
+                                    style: const TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
+                                    children: [
+                                      TextSpan(
+                                        text: 'TERMS OF SERVICE',
+                                        style: const TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, decoration: TextDecoration.underline),
+                                        recognizer: TapGestureRecognizer()..onTap = () => context.go('/termeni-si-conditii'),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 30),
-
-                        loading
-                            ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
-                            : SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _signup,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              elevation: 8,
-                            ),
-                            child: const Text('Creează Cont', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _acceptedPrivacy,
+                                activeColor: AppColors.ink,
+                                checkColor: Colors.white,
+                                side: const BorderSide(color: AppColors.ink, width: 2),
+                                onChanged: (val) => setState(() => _acceptedPrivacy = val ?? false),
+                              ),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: 'I AGREE TO THE ',
+                                    style: const TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
+                                    children: [
+                                      TextSpan(
+                                        text: 'PRIVACY POLICY',
+                                        style: const TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, decoration: TextDecoration.underline),
+                                        recognizer: TapGestureRecognizer()..onTap = () => context.go('/politica-confidentialitate'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 10),
-
-                        Center(
-                          child: TextButton(
-                            onPressed: () => context.go('/login'),
-                            child: const Text("Ai deja cont? Autentifică-te", style: TextStyle(color: Colors.blueAccent, fontSize: 15)),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 48),
+
+                    RetroButton(
+                      text: 'INITIALIZE ACCOUNT',
+                      bgColor: AppColors.forest,
+                      isFullWidth: true,
+                      isLoading: loading,
+                      onPressed: _signup,
+                    ),
+                    const SizedBox(height: 32),
+
+                    GestureDetector(
+                      onTap: () => context.go('/login'),
+                      child: const Text(
+                        "ALREADY REGISTERED? LOG IN.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.ink,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          decoration: TextDecoration.underline,
+                          decorationThickness: 2,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-
-            Positioned(
-              top: 16,
-              left: 16,
-              child: MouseRegion(
-                onEnter: (_) => setState(() => _isHovering = true),
-                onExit: (_) => setState(() => _isHovering = false),
-                child: GestureDetector(
-                  onTap: () => context.go('/login'),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: _isHovering ? Colors.blueAccent.withOpacity(0.1) : Colors.transparent, borderRadius: BorderRadius.circular(12)),
-                    child: AnimatedScale(
-                      scale: _isHovering ? 1.15 : 1.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: const Icon(Icons.arrow_back, color: Colors.blueAccent, size: 28),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRoleSelector(String title, String value) {
-    final isSelected = role == value;
-    return GestureDetector(
-      onTap: () => setState(() => role = value),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.blueAccent : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? Colors.blueAccent : Colors.grey.shade300, width: 2),
-          boxShadow: isSelected ? [BoxShadow(color: Colors.blueAccent.withOpacity(0.2), blurRadius: 5, offset: const Offset(0, 3))] : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(value == 'teacher' ? Icons.badge : Icons.school, color: isSelected ? Colors.white : Colors.blueAccent, size: 20),
-            const SizedBox(width: 8),
-            Flexible(child: Text(title, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500))),
-          ],
+          ),
         ),
       ),
     );

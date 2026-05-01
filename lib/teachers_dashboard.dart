@@ -2,17 +2,147 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:go_router/go_router.dart'; // 🚀 Import obligatoriu pentru GoRouter
+import 'package:go_router/go_router.dart';
 import 'custom_navbar.dart';
+
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
+}
+
+class RetroBlock extends StatelessWidget {
+  final Widget child;
+  final Color bgColor;
+  final double padding;
+  final double shadowOffset;
+  final Color borderColor;
+
+  const RetroBlock({
+    super.key,
+    required this.child,
+    this.bgColor = Colors.white,
+    this.padding = 24.0,
+    this.shadowOffset = 6.0,
+    this.borderColor = AppColors.ink,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ink,
+            offset: Offset(shadowOffset, shadowOffset),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+
+class RetroButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color bgColor;
+  final Color textColor;
+  final bool isFullWidth;
+  final IconData? icon;
+
+  const RetroButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.bgColor = AppColors.sunset,
+    this.textColor = Colors.white,
+    this.isFullWidth = false,
+    this.icon,
+  });
+
+  @override
+  State<RetroButton> createState() => _RetroButtonState();
+}
+
+class _RetroButtonState extends State<RetroButton> {
+  bool isPressed = false;
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => isPressed = true),
+        onTapUp: (_) {
+          setState(() => isPressed = false);
+          widget.onPressed();
+        },
+        onTapCancel: () => setState(() => isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          width: widget.isFullWidth ? double.infinity : null,
+          transform: Matrix4.translationValues(
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.bgColor,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, color: widget.textColor, size: 20),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                widget.text.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: widget.textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class TeachersDashboard extends StatefulWidget {
-  const TeachersDashboard({Key? key}) : super(key: key);
+  const TeachersDashboard({super.key});
 
   @override
   State<TeachersDashboard> createState() => _TeachersDashboardState();
 }
 
 class _TeachersDashboardState extends State<TeachersDashboard> {
-  // Helper pentru a extrage inițialele dintr-un nume
   String _getInitials(String name) {
     if (name.isEmpty) return '?';
     List<String> names = name.split(" ");
@@ -26,159 +156,23 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     return initials;
   }
 
-  // --------------------------------------------------------------------------
-  // NAVBAR UNIVERSAL
-  // --------------------------------------------------------------------------
-  Widget _buildNavbar() {
-    return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => context.go('/'), // 🚀 Navigare către Home
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.school, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('iMeditatii', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -0.5)),
-                ],
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              TextButton(
-                  onPressed: () => context.go('/materii'), // 🚀 Navigare către Profesori
-                  child: const Text("Profesori", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600, fontSize: 15))
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                  onPressed: () => context.go('/exercitii'), // 🚀 Navigare către Exerciții
-                  child: const Text("Exerciții", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600, fontSize: 15))
-              ),
-              const SizedBox(width: 16),
-              Container(width: 1, height: 24, color: Colors.grey.shade300),
-              const SizedBox(width: 16),
-              _buildAuthActions(),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAuthActions() {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2));
-        }
-
-        final user = snapshot.data;
-
-        // Când NU este logat
-        if (user == null) {
-          return ElevatedButton(
-            onPressed: () => context.go('/login'), // 🚀 Navigare către Login
-            style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F172A),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16)
-            ),
-            child: const Text("Intră în cont", style: TextStyle(fontWeight: FontWeight.bold)),
-          );
-        }
-
-        // Când ESTE logat (Dashboard + Profil + LOGOUT)
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 1. BUTON DASHBOARD (Dezactivat vizual, deoarece deja suntem aici)
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.dashboard_customize_rounded, color: Color(0xFF3B82F6), size: 28), // Albastru ca să arate că e Activ
-              tooltip: "Panou de control",
-            ),
-
-            const SizedBox(width: 4),
-
-            // 2. BUTON PROFIL
-            IconButton(
-              onPressed: () async {
-                try {
-                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-                  if (userDoc.exists && mounted) {
-                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
-                    if (role == 'teacher') {
-                      context.go('/profesor/${user.uid}'); // 🚀 Navigare către profilul propriu
-                    } else {
-                      context.go('/elev/${user.uid}');
-                    }
-                  }
-                } catch (e) {
-                  debugPrint("Eroare profil: $e");
-                }
-              },
-              icon: const Icon(Icons.account_circle, color: Color(0xFF0F172A), size: 30),
-              tooltip: "Contul meu",
-            ),
-
-            const SizedBox(width: 4),
-
-            // 3. BUTON LOGOUT
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  if (mounted) {
-                    context.go('/'); // 🚀 Navigare către Home după deconectare
-                  }
-                },
-                icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 24),
-                tooltip: "Deconectare",
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // BUILD PRINCIPAL
-  // --------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final String teacherId = FirebaseAuth.instance.currentUser!.uid;
     final teacherFuture = FirebaseFirestore.instance.collection('teachers').doc(teacherId).get();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.bg,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/adauga-exercitiu'), // 🚀 Navigare către AddExerciseScreen
-        backgroundColor: const Color(0xFF0F172A),
-        elevation: 4,
-        icon: const Icon(Icons.add_task_rounded, color: Colors.white),
-        label: const Text("Exercițiu Nou", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        onPressed: () => context.go('/adauga-exercitiu'),
+        backgroundColor: AppColors.ink,
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.ink, width: 2),
+        ),
+        icon: const Icon(Icons.add_task, color: Colors.white),
+        label: const Text("NEW QUEST", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
       ),
       body: Column(
         children: [
@@ -188,37 +182,31 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 800), // Lățime perfectă pentru desktop
+                  constraints: const BoxConstraints(maxWidth: 850),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // --- HEADER ---
                       FutureBuilder<DocumentSnapshot>(
                         future: teacherFuture,
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData) return const SizedBox(height: 120, child: Center(child: CircularProgressIndicator()));
+                          if (!snapshot.hasData) return const SizedBox(height: 120, child: Center(child: CircularProgressIndicator(color: AppColors.sunset)));
                           final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
-                          final teacherName = data['name'] ?? 'Profesor';
+                          final teacherName = data['name'] ?? 'MASTER';
                           return _buildHeaderSection(teacherName, teacherId);
                         },
                       ),
-
-                      const SizedBox(height: 40),
-
-                      // --- TITLU SECȚIUNE ---
-                      const Row(
+                      const SizedBox(height: 48),
+                      Row(
                         children: [
-                          Icon(Icons.forum_rounded, color: Color(0xFF3B82F6), size: 28),
-                          SizedBox(width: 12),
+                          const Icon(Icons.forum, color: AppColors.ink, size: 28),
+                          const SizedBox(width: 16),
                           Text(
-                            "Mesaje de la elevi",
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -0.5),
+                            "PLAYER LOGS (MESSAGES)".toUpperCase(),
+                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
-
-                      // --- LISTA CHATURI ---
                       _buildChatList(teacherId),
                     ],
                   ),
@@ -231,52 +219,42 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  // --------------------------------------------------------------------------
-  // COMPONENTE UI
-  // --------------------------------------------------------------------------
   Widget _buildHeaderSection(String teacherName, String teacherId) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: const Color(0xFF3B82F6), // Culoarea albastră principală a aplicației
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: const Color(0xFF3B82F6).withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
-      ),
+    return RetroBlock(
+      bgColor: AppColors.sky,
+      padding: 32,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
-                child: const Text("PANOU PROFESOR", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Salut, ${teacherName.split(' ')[0]}!",
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -1),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Gestionează elevii și adaugă exerciții noi.",
-                style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
-              ),
-            ],
-          ),
-          ElevatedButton.icon(
-            onPressed: () => context.go('/profesor/$teacherId'), // 🚀 Navigare către profilul propriu
-            icon: const Icon(Icons.person),
-            label: const Text("Profilul Meu"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF3B82F6),
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  color: AppColors.ink,
+                  child: const Text("GUILD MASTER TERMINAL", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 2.0)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "GREETINGS, ${teacherName.split(' ')[0].toUpperCase()}!",
+                  style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Oversee your apprentices and initialize new quest parameters.",
+                  style: TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
+          ),
+          const SizedBox(width: 24),
+          RetroButton(
+            onPressed: () => context.go('/profesor/$teacherId'),
+            text: "PROFILE",
+            icon: Icons.person,
+            bgColor: Colors.white,
+            textColor: AppColors.ink,
           )
         ],
       ),
@@ -294,7 +272,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Column(children: List.generate(3, (index) => _chatCardSkeleton()));
         }
-        if (snapshot.hasError) return Center(child: Text('Eroare la încărcare: ${snapshot.error}'));
+        if (snapshot.hasError) return Center(child: Text('TERMINAL ERROR: ${snapshot.error}'.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)));
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _buildEmptyState();
 
         final chats = snapshot.data!.docs;
@@ -304,7 +282,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             final data = chatDoc.data()! as Map<String, dynamic>;
             final chatId = chatDoc.id;
             final studentId = data['studentId'] ?? '';
-            if (studentId.isEmpty) return const SizedBox.shrink(); // Ignorăm doc eronate
+            if (studentId.isEmpty) return const SizedBox.shrink();
 
             final lastMsg = data['lastMessage'] ?? '...';
             final timestamp = data['updatedAt'] as Timestamp?;
@@ -316,7 +294,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                 if (!userSnap.hasData || !userSnap.data!.exists) return const SizedBox.shrink();
 
                 final userData = userSnap.data!.data() as Map<String, dynamic>;
-                final userName = userData['name'] ?? 'Elev Necunoscut';
+                final userName = userData['name'] ?? 'UNKNOWN PLAYER';
                 final userAvatar = userData['image'] as String? ?? '';
 
                 return _chatCard(
@@ -324,7 +302,6 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                   avatarUrl: userAvatar,
                   lastMessage: lastMsg,
                   timestamp: timestamp,
-                  // 🚀 Navigare către Chat
                   onTap: () => context.go('/chat/$chatId', extra: userName),
                 );
               },
@@ -336,54 +313,47 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   }
 
   Widget _chatCard({required String name, required String avatarUrl, required String lastMessage, Timestamp? timestamp, required VoidCallback onTap}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Container(
-                  width: 56, height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3B82F6).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                    image: avatarUrl.isNotEmpty ? DecorationImage(image: NetworkImage(avatarUrl), fit: BoxFit.cover) : null,
-                  ),
-                  child: avatarUrl.isEmpty ? Center(child: Text(_getInitials(name), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF3B82F6), fontSize: 18))) : null,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: GestureDetector(
+        onTap: onTap,
+        child: RetroBlock(
+          bgColor: Colors.white,
+          padding: 20,
+          shadowOffset: 4,
+          child: Row(
+            children: [
+              Container(
+                width: 60, height: 60,
+                decoration: BoxDecoration(
+                  color: AppColors.cloud,
+                  border: Border.all(color: AppColors.ink, width: 2),
+                  image: avatarUrl.isNotEmpty ? DecorationImage(image: NetworkImage(avatarUrl), fit: BoxFit.cover) : null,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF0F172A))),
-                      const SizedBox(height: 4),
-                      Text(lastMessage, style: TextStyle(color: Colors.grey.shade600, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ],
-                  ),
+                child: avatarUrl.isEmpty ? Center(child: Text(_getInitials(name), style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 20))) : null,
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink, letterSpacing: 0.5)),
+                    const SizedBox(height: 6),
+                    Text(lastMessage, style: const TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
                 ),
-                if (timestamp != null)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(DateFormat('HH:mm').format(timestamp.toDate()), style: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      const Icon(Icons.chevron_right_rounded, color: Colors.grey),
-                    ],
-                  ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (timestamp != null)
+                    Text(DateFormat('HH:mm').format(timestamp.toDate()), style: const TextStyle(color: AppColors.ink, fontSize: 13, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 8),
+                  const Icon(Icons.arrow_forward, color: AppColors.ink, size: 20),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -391,43 +361,46 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   }
 
   Widget _chatCardSkeleton() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade100)),
-      child: Row(
-        children: [
-          Container(width: 56, height: 56, decoration: BoxDecoration(color: Colors.grey.shade100, shape: BoxShape.circle)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(width: 120, height: 16, decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8))),
-                const SizedBox(height: 8),
-                Container(width: double.infinity, height: 14, decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8))),
-              ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: RetroBlock(
+        bgColor: Colors.white,
+        padding: 20,
+        shadowOffset: 4,
+        child: Row(
+          children: [
+            Container(width: 60, height: 60, decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 2))),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(width: 140, height: 18, color: AppColors.cloud),
+                  const SizedBox(height: 8),
+                  Container(width: double.infinity, height: 14, color: AppColors.bg),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 60),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.grey.shade200, width: 1, style: BorderStyle.solid)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.mark_chat_unread_rounded, size: 64, color: Colors.blue.shade100),
-          const SizedBox(height: 24),
-          const Text("Inboxul tău este gol", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-          const SizedBox(height: 8),
-          Text("Când elevii te vor contacta, mesajele vor apărea aici.", style: TextStyle(fontSize: 15, color: Colors.grey.shade500)),
-        ],
+    return RetroBlock(
+      bgColor: Colors.white,
+      padding: 60,
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(Icons.speaker_notes_off, size: 80, color: AppColors.cloud),
+            const SizedBox(height: 24),
+            Text("COMMUNICATIONS CHANNEL EMPTY".toUpperCase(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
+            const SizedBox(height: 12),
+            const Text("Incoming apprentice transmissions will be logged here.", style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)),
+          ],
+        ),
       ),
     );
   }

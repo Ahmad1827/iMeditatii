@@ -1,21 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:go_router/go_router.dart'; // 🚀 Importul necesar pentru navigare
+import 'package:go_router/go_router.dart';
 import 'custom_navbar.dart';
 
-// ==========================================
-// WIDGET MAGIC PENTRU EFECT DE HOVER
-// ==========================================
-class HoverCard extends StatefulWidget {
-  final Widget child;
-  const HoverCard({super.key, required this.child});
-
-  @override
-  State<HoverCard> createState() => _HoverCardState();
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
 }
 
-class _HoverCardState extends State<HoverCard> {
+class RetroBlock extends StatelessWidget {
+  final Widget child;
+  final Color bgColor;
+  final double padding;
+  final double shadowOffset;
+  final Color borderColor;
+
+  const RetroBlock({
+    super.key,
+    required this.child,
+    this.bgColor = Colors.white,
+    this.padding = 24.0,
+    this.shadowOffset = 6.0,
+    this.borderColor = AppColors.ink,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ink,
+            offset: Offset(shadowOffset, shadowOffset),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+
+class RetroButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color bgColor;
+  final Color textColor;
+  final bool isFullWidth;
+  final IconData? icon;
+
+  const RetroButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.bgColor = AppColors.sunset,
+    this.textColor = Colors.white,
+    this.isFullWidth = false,
+    this.icon,
+  });
+
+  @override
+  State<RetroButton> createState() => _RetroButtonState();
+}
+
+class _RetroButtonState extends State<RetroButton> {
+  bool isPressed = false;
   bool isHovered = false;
 
   @override
@@ -23,49 +81,95 @@ class _HoverCardState extends State<HoverCard> {
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        transform: isHovered ? (Matrix4.identity()..translate(0.0, -6.0, 0.0)) : Matrix4.identity(),
-        child: widget.child,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => isPressed = true),
+        onTapUp: (_) {
+          setState(() => isPressed = false);
+          widget.onPressed();
+        },
+        onTapCancel: () => setState(() => isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          width: widget.isFullWidth ? double.infinity : null,
+          transform: Matrix4.translationValues(
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.bgColor,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, color: widget.textColor, size: 20),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                widget.text.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: widget.textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
-// ==========================================
 
 class TeacherListScreen extends StatefulWidget {
   final Map<String, dynamic> specialization;
 
-  const TeacherListScreen({required this.specialization, Key? key}) : super(key: key);
+  const TeacherListScreen({required this.specialization, super.key});
 
   @override
   State<TeacherListScreen> createState() => _TeacherListScreenState();
 }
 
 class _TeacherListScreenState extends State<TeacherListScreen> {
-
-  /// Gestionează click-ul pe Mesaj
   Future<void> _handleMessageTap(BuildContext context, String teacherId, String teacherName) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Trebuie să fii conectat pentru a trimite mesaje.')),
+        const SnackBar(
+          content: Text('LOGIN REQUIRED FOR COMMS.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+          backgroundColor: AppColors.sunset,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+        ),
       );
       return;
     }
 
-    // Împiedicăm profesorul să își dea mesaj singur
     if (currentUser.uid == teacherId) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Acesta este profilul tău!')),
+        const SnackBar(
+          content: Text('INVALID TARGET: SELF.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+          backgroundColor: AppColors.mustard,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+        ),
       );
       return;
     }
 
     final currentUserId = currentUser.uid;
 
-    // Caută chat-ul existent între utilizator și profesor
     final chatQuery = await FirebaseFirestore.instance
         .collection('chats')
         .where('teacherId', isEqualTo: teacherId)
@@ -78,77 +182,112 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     if (chatQuery.docs.isNotEmpty) {
       chatId = chatQuery.docs.first.id;
     } else {
-      // Dacă nu există chat, crează unul nou
       final newChat = await FirebaseFirestore.instance.collection('chats').add({
         'teacherId': teacherId,
         'teacherName': teacherName,
         'studentId': currentUser.uid,
-        'studentName': currentUser.displayName ?? 'Elev',
+        'studentName': currentUser.displayName ?? 'PLAYER',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
         'lastMessage': '',
         'isEnded': false,
         'isSessionPaid': false,
-        'isStudentAccepted': false, // Logica nouă de acceptare
+        'isStudentAccepted': false,
       });
       chatId = newChat.id;
     }
 
     if (mounted) {
-      // 🚀 Navigăm către Chat cu GoRouter
       context.go('/chat/$chatId', extra: teacherName);
     }
   }
 
-  // --------------------------------------------------------------------------
-  // NAVBAR UNIVERSAL
-  // --------------------------------------------------------------------------
   Widget _buildNavbar() {
     return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
+      height: 90,
+      decoration: const BoxDecoration(
+        color: AppColors.bg,
+        border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => context.go('/'), // 🚀 Navigăm Home
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.school, color: Colors.white, size: 20),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => context.go('/'),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.sunset,
+                            border: Border.all(color: AppColors.ink, width: 2),
+                          ),
+                          child: const Icon(Icons.school, color: Colors.white, size: 28),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'IMEDITATII',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.ink,
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  const Text('iMeditatii', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -0.5)),
-                ],
-              ),
+                ),
+                Row(
+                  children: [
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => context.go('/materii'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.mustard,
+                            border: Border.all(color: AppColors.ink, width: 2),
+                          ),
+                          child: const Text(
+                            "GUILD MASTERS",
+                            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => context.go('/exercitii'),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text(
+                            "DAILY QUESTS",
+                            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(width: 3, height: 32, color: AppColors.ink),
+                    const SizedBox(width: 16),
+                    _buildAuthActions(),
+                  ],
+                ),
+              ],
             ),
           ),
-          Row(
-            children: [
-              TextButton(
-                  onPressed: () => context.go('/materii'), // 🚀 Navigăm Profesori
-                  child: const Text("Profesori", style: TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.bold, fontSize: 15)) // Activ
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                  onPressed: () => context.go('/exercitii'), // 🚀 Navigăm Exerciții
-                  child: const Text("Exerciții", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600, fontSize: 15))
-              ),
-              const SizedBox(width: 16),
-              Container(width: 1, height: 24, color: Colors.grey.shade300),
-              const SizedBox(width: 16),
-              _buildAuthActions(),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -157,14 +296,17 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: AppColors.sunset, strokeWidth: 3));
+        }
         final user = snapshot.data;
 
         if (user == null) {
-          return ElevatedButton(
-            onPressed: () => context.go('/login'), // 🚀 Navigăm Login
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F172A), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16)),
-            child: const Text("Intră în cont", style: TextStyle(fontWeight: FontWeight.bold)),
+          return RetroButton(
+            text: 'LOG IN',
+            bgColor: Colors.white,
+            textColor: AppColors.ink,
+            onPressed: () => context.go('/login'),
           );
         }
 
@@ -178,19 +320,18 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                   if (userDoc.exists && mounted) {
                     final role = (userDoc.data() as Map<String, dynamic>)['role'];
                     if (role == 'teacher') {
-                      context.go('/panou-profesor'); // 🚀 Navigăm Dashboard
+                      context.go('/panou-profesor');
                     } else {
                       context.go('/panou-elev');
                     }
                   }
                 } catch (e) {
-                  debugPrint("Eroare dashboard: $e");
+                  debugPrint("ERROR: $e");
                 }
               },
-              icon: const Icon(Icons.dashboard_customize_rounded, color: Color(0xFF0F172A), size: 28),
-              tooltip: "Panou de control",
+              icon: const Icon(Icons.dashboard, color: AppColors.ink, size: 32),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 8),
             IconButton(
               onPressed: () async {
                 try {
@@ -198,28 +339,29 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                   if (userDoc.exists && mounted) {
                     final role = (userDoc.data() as Map<String, dynamic>)['role'];
                     if (role == 'teacher') {
-                      context.go('/profesor/${user.uid}'); // 🚀 Navigăm Profil
+                      context.go('/profesor/${user.uid}');
                     } else {
                       context.go('/elev/${user.uid}');
                     }
                   }
                 } catch (e) {
-                  debugPrint("Eroare profil: $e");
+                  debugPrint("ERROR: $e");
                 }
               },
-              icon: const Icon(Icons.account_circle, color: Color(0xFF0F172A), size: 30),
-              tooltip: "Contul meu",
+              icon: const Icon(Icons.account_box, color: AppColors.ink, size: 32),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 8),
             Container(
-              decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                color: AppColors.sunset,
+                border: Border.all(color: AppColors.ink, width: 2),
+              ),
               child: IconButton(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
-                  if (mounted) context.go('/'); // 🚀 Deconectare
+                  if (mounted) context.go('/');
                 },
-                icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 24),
-                tooltip: "Deconectare",
+                icon: const Icon(Icons.logout, color: Colors.white, size: 24),
               ),
             ),
           ],
@@ -228,78 +370,84 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     );
   }
 
-  // --------------------------------------------------------------------------
-  // HEADER SECȚIUNE
-  // --------------------------------------------------------------------------
   Widget _buildHeader(String specName, Color themeColor, IconData themeIcon) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: themeColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: themeColor.withOpacity(0.2)),
-      ),
+    return RetroBlock(
+      bgColor: AppColors.cloud,
+      padding: 40,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: themeColor, borderRadius: BorderRadius.circular(16)),
-                child: Icon(themeIcon, color: Colors.white, size: 32),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: themeColor,
+                  border: Border.all(color: AppColors.ink, width: 3),
+                ),
+                child: Icon(themeIcon, color: AppColors.ink, size: 40),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Profesori disponibili", style: TextStyle(color: themeColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                    Text(specName, style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -1)),
+                    const Text(
+                      "AVAILABLE MASTERS",
+                      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: 16),
+                    ),
+                    Text(
+                      specName.toUpperCase(),
+                      style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                    ),
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () => context.pop(), // 🚀 Înapoi (GoRouter)
-                icon: const Icon(Icons.close_rounded, size: 28),
-                tooltip: "Înapoi",
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.ink, width: 3),
+                  boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+                ),
+                child: IconButton(
+                  onPressed: () => context.pop(),
+                  icon: const Icon(Icons.close, size: 32, color: AppColors.ink),
+                ),
               )
             ],
           ),
-          const SizedBox(height: 16),
-          Text("Alege profesorul potrivit și trimite-i un mesaj pentru a programa prima ședință.", style: TextStyle(fontSize: 16, color: Colors.grey.shade700)),
+          const SizedBox(height: 24),
+          const Text(
+            "SELECT A MASTER AND INITIATE CONTACT TO SCHEDULE YOUR TRAINING.",
+            style: TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
   }
 
-  // --------------------------------------------------------------------------
-  // BUILD PRINCIPAL
-  // --------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    final specName = widget.specialization['name'] ?? 'Materie';
-    final themeColor = widget.specialization['color'] as Color? ?? const Color(0xFF3B82F6);
-    final themeIcon = widget.specialization['icon'] as IconData? ?? Icons.school_rounded;
+    final specName = widget.specialization['name'] ?? 'DISCIPLINE';
+    final themeColor = widget.specialization['color'] as Color? ?? AppColors.sky;
+    final themeIcon = widget.specialization['icon'] as IconData? ?? Icons.school;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
-          _buildNavbar(), // Aici folosim navbar-ul generat mai sus
+          _buildNavbar(),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1000), // Perfect pe Desktop
+                  constraints: const BoxConstraints(maxWidth: 1100),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildHeader(specName, themeColor, themeIcon),
-                      const SizedBox(height: 32),
-
+                      const SizedBox(height: 48),
                       StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('teachers')
@@ -307,21 +455,40 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                             .where('active', isEqualTo: true)
                             .snapshots(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: Padding(padding: EdgeInsets.all(40), child: CircularProgressIndicator()));
-                          if (snapshot.hasError) return Center(child: Text('Eroare: ${snapshot.error}'));
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(40),
+                                child: CircularProgressIndicator(color: AppColors.sunset),
+                              ),
+                            );
+                          }
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                'ERROR: ${snapshot.error}'.toUpperCase(),
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset),
+                              ),
+                            );
+                          }
 
                           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(40),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.grey.shade200)),
+                            return RetroBlock(
+                              bgColor: Colors.white,
+                              padding: 60,
                               child: Column(
-                                children: [
-                                  Icon(Icons.search_off_rounded, size: 64, color: Colors.grey.shade300),
-                                  const SizedBox(height: 16),
-                                  const Text("Niciun profesor disponibil momentan.", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
-                                  const SizedBox(height: 8),
-                                  Text("Încă nu avem profesori aprobați pentru această materie.", style: TextStyle(color: Colors.grey.shade500)),
+                                children: const [
+                                  Icon(Icons.search_off, size: 80, color: AppColors.ink),
+                                  SizedBox(height: 24),
+                                  Text(
+                                    "NO MASTERS AVAILABLE YET.",
+                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink),
+                                  ),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    "AWAITING GUILD APPROVALS FOR THIS DISCIPLINE.",
+                                    style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
                                 ],
                               ),
                             );
@@ -329,123 +496,27 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
 
                           final docs = snapshot.data!.docs;
 
-                          // Grid Responsiv
                           return GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 450, // 🚀 Ajustat puțin pentru a încăpea perfect prețul
-                              mainAxisSpacing: 20,
-                              crossAxisSpacing: 20,
-                              childAspectRatio: 1.1,
+                              maxCrossAxisExtent: 500,
+                              mainAxisSpacing: 32,
+                              crossAxisSpacing: 32,
+                              childAspectRatio: 1.0,
                             ),
                             itemCount: docs.length,
                             itemBuilder: (context, index) {
                               final data = docs[index].data()! as Map<String, dynamic>;
                               final teacherId = docs[index].id;
-
-                              // 🚀 Preluăm prețul din baza de date, setăm 50 RON default dacă nu a setat nimic
                               final price = data['price']?.toString() ?? '50';
 
-                              return HoverCard(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(color: Colors.grey.shade200),
-                                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 5))],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Partea de sus a cardului
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(24),
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 36,
-                                                backgroundColor: themeColor.withOpacity(0.1),
-                                                backgroundImage: data['image'] != null && data['image'] != '' ? NetworkImage(data['image']) : null,
-                                                child: (data['image'] == null || data['image'] == '') ? Icon(Icons.person, size: 36, color: themeColor) : null,
-                                              ),
-                                              const SizedBox(width: 16),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(data['name'] ?? 'Fără Nume', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A), letterSpacing: -0.5), maxLines: 2, overflow: TextOverflow.ellipsis),
-                                                    const SizedBox(height: 8),
-                                                    Row(
-                                                      children: [
-                                                        Icon(Icons.military_tech_rounded, size: 16, color: Colors.grey.shade500),
-                                                        const SizedBox(width: 4),
-                                                        Text('${data['experience'] ?? '0'} ani experiență', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    if (data['education'] != null)
-                                                      Row(
-                                                        children: [
-                                                          Icon(Icons.school_rounded, size: 16, color: Colors.grey.shade500),
-                                                          const SizedBox(width: 4),
-                                                          Expanded(child: Text(data['education'], style: TextStyle(fontSize: 13, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                                        ],
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-
-                                              // 🚀 AICI AM ADĂUGAT PREȚUL ÎN COLȚUL DREAPTA-SUS
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                  Text('$price RON', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A))),
-                                                  Text('/ oră', style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      Divider(height: 1, color: Colors.grey.shade100),
-
-                                      // Butoanele de jos
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextButton(
-                                                onPressed: () => context.go('/profesor/$teacherId'), // 🚀 Navigăm Profil
-                                                style: TextButton.styleFrom(foregroundColor: const Color(0xFF0F172A), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                                                child: const Text("Vezi Profil", style: TextStyle(fontWeight: FontWeight.bold)),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: ElevatedButton.icon(
-                                                onPressed: () => _handleMessageTap(context, teacherId, data['name'] ?? 'Profesor'),
-                                                icon: const Icon(Icons.send_rounded, size: 16),
-                                                label: const Text("Mesaj"),
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor: themeColor,
-                                                    foregroundColor: Colors.white,
-                                                    elevation: 0,
-                                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                              return _RetroTeacherCard(
+                                data: data,
+                                teacherId: teacherId,
+                                price: price,
+                                themeColor: themeColor,
+                                onMessageTap: () => _handleMessageTap(context, teacherId, data['name'] ?? 'MASTER'),
                               );
                             },
                           );
@@ -458,6 +529,189 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RetroTeacherCard extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final String teacherId;
+  final String price;
+  final Color themeColor;
+  final VoidCallback onMessageTap;
+
+  const _RetroTeacherCard({
+    required this.data,
+    required this.teacherId,
+    required this.price,
+    required this.themeColor,
+    required this.onMessageTap,
+  });
+
+  @override
+  State<_RetroTeacherCard> createState() => _RetroTeacherCardState();
+}
+
+class _RetroTeacherCardState extends State<_RetroTeacherCard> {
+  bool _isHovering = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = widget.data['image'] ?? '';
+    final name = widget.data['name'] ?? 'UNKNOWN';
+    final experience = widget.data['experience'] ?? '0';
+    final education = widget.data['education'] ?? '';
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          transform: Matrix4.translationValues(
+            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
+            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: _isPressed ? const Offset(0, 0) : const Offset(8, 8),
+                blurRadius: 0,
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: widget.themeColor,
+                              border: Border.all(color: AppColors.ink, width: 3),
+                              image: imageUrl.isNotEmpty
+                                  ? DecorationImage(
+                                image: NetworkImage(imageUrl),
+                                fit: BoxFit.cover,
+                              )
+                                  : null,
+                            ),
+                            child: imageUrl.isEmpty
+                                ? const Icon(Icons.person, size: 40, color: AppColors.ink)
+                                : null,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.mustard,
+                              border: Border.all(color: AppColors.ink, width: 2),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '${widget.price} RON',
+                                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink),
+                                ),
+                                const Text(
+                                  '/ HOUR',
+                                  style: TextStyle(fontSize: 12, color: AppColors.ink, fontWeight: FontWeight.w900),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        name.toString().toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 24,
+                          color: AppColors.ink,
+                          letterSpacing: 1.0,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Icon(Icons.military_tech, size: 24, color: AppColors.ink),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$experience YEARS EXP.',
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (education.isNotEmpty)
+                        Row(
+                          children: [
+                            const Icon(Icons.school, size: 24, color: AppColors.ink),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                education.toString().toUpperCase(),
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(height: 3, color: AppColors.ink),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: RetroButton(
+                        text: 'PROFILE',
+                        bgColor: AppColors.cloud,
+                        textColor: AppColors.ink,
+                        onPressed: () => context.go('/profesor/${widget.teacherId}'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: RetroButton(
+                        text: 'MESSAGE',
+                        icon: Icons.send,
+                        bgColor: widget.themeColor,
+                        onPressed: widget.onMessageTap,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

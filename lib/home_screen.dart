@@ -1,23 +1,83 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:web_smooth_scroll/web_smooth_scroll.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'custom_navbar.dart';
 
-// ==========================================
-// WIDGET PENTRU EFECT DE HOVER RAFINAT
-// ==========================================
-class HoverCard extends StatefulWidget {
-  final Widget child;
-  final double scale;
-  const HoverCard({super.key, required this.child, this.scale = 1.02});
-
-  @override
-  State<HoverCard> createState() => _HoverCardState();
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
 }
 
-class _HoverCardState extends State<HoverCard> {
+class RetroBlock extends StatelessWidget {
+  final Widget child;
+  final Color bgColor;
+  final double padding;
+  final double shadowOffset;
+  final Color borderColor;
+
+  const RetroBlock({
+    super.key,
+    required this.child,
+    this.bgColor = Colors.white,
+    this.padding = 24.0,
+    this.shadowOffset = 6.0,
+    this.borderColor = AppColors.ink,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ink,
+            offset: Offset(shadowOffset, shadowOffset),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+
+class RetroButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color bgColor;
+  final Color textColor;
+  final bool isFullWidth;
+  final double fontSize;
+  final EdgeInsets padding;
+
+  const RetroButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.bgColor = AppColors.sunset,
+    this.textColor = Colors.white,
+    this.isFullWidth = false,
+    this.fontSize = 20,
+    this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+  });
+
+  @override
+  State<RetroButton> createState() => _RetroButtonState();
+}
+
+class _RetroButtonState extends State<RetroButton> {
+  bool isPressed = false;
   bool isHovered = false;
 
   @override
@@ -25,16 +85,48 @@ class _HoverCardState extends State<HoverCard> {
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250), // Animație mai fină
-        curve: Curves.easeOutCubic,
-        transform: isHovered ? (Matrix4.identity()..translate(0.0, -8.0)) : Matrix4.identity(), // Se ridică în loc să se mărească brusc
-        child: widget.child,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => isPressed = true),
+        onTapUp: (_) {
+          setState(() => isPressed = false);
+          widget.onPressed();
+        },
+        onTapCancel: () => setState(() => isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          width: widget.isFullWidth ? double.infinity : null,
+          transform: Matrix4.translationValues(
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.bgColor,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: widget.padding,
+          child: Text(
+            widget.text.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: widget.textColor,
+              fontSize: widget.fontSize,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
       ),
     );
   }
 }
-// ==========================================
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,551 +136,441 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey _howItWorksKey = GlobalKey();
-  final GlobalKey _profesoriKey = GlobalKey();
-  final GlobalKey _preturiKey = GlobalKey();
-  final GlobalKey _faqKey = GlobalKey();
-
-  // 🚀 Acestea două lipseau:
-  final GlobalKey _testimonialsKey = GlobalKey();
-  final GlobalKey _footerKey = GlobalKey();
-
-  final ScrollController _pageScrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+  int _completedQuests = 0;
+  bool _isLoadingStats = true;
 
   @override
-  void dispose() {
-    _pageScrollController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _loadPlayerStats();
   }
 
-  void _scrollToSection(GlobalKey key) {
-    final ctx = key.currentContext;
-    if (ctx != null) {
-      Scrollable.ensureVisible(
-        ctx,
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutQuint,
-      );
+  Future<void> _loadPlayerStats() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int completed = 0;
+      final keys = prefs.getKeys();
+      for (var key in keys) {
+        if (prefs.getBool(key) == true) {
+          completed++;
+        }
+      }
+      setState(() {
+        _completedQuests = completed;
+        _isLoadingStats = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading stats: $e");
+      setState(() {
+        _isLoadingStats = false;
+      });
     }
   }
 
-  // 🚀 NOU: Container centralizat pentru a opri lățimea să o ia razna pe PC (Fix ca la MyTutor)
-  Widget _buildConstrainedSection(Widget child, {Color? bgColor, EdgeInsetsGeometry? padding}) {
+  void _startDailyQuest() {
+    // Înlocuiește 'q4_p5_id' cu un ID real de document din Firebase
+    final exerciseId = 'q4_p5_id';
+    final encodedMaterie = Uri.encodeComponent('Informatică');
+    final encodedClasa = Uri.encodeComponent('9');
+    context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
+  }
+
+  Widget _buildConstrainedSection({required Widget child, EdgeInsetsGeometry? padding}) {
     return Container(
       width: double.infinity,
-      color: bgColor ?? Colors.transparent,
-      padding: padding ?? const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1150), // Lățimea perfectă pentru Web
+          constraints: const BoxConstraints(maxWidth: 1100),
           child: child,
         ),
       ),
     );
   }
 
-  // --------------------------------------------------------------------------
-  // HERO SECTION
-  // --------------------------------------------------------------------------
-  Widget _heroSection(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 900;
-    const String backgroundImageUrl = "https://i.imgur.com/Wvoh2pk.png";
-
-    Widget visualCard = Container(
-      width: isWide ? 450 : double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 40, offset: const Offset(0, 20))],
-      ),
+  Widget _buildHeroSection(bool isMobile) {
+    // 1. The Left side (Hero Text + Buttons)
+    final leftContent = RetroBlock(
+      bgColor: AppColors.mustard,
+      padding: isMobile ? 32 : 48,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 250,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: const DecorationImage(image: NetworkImage(backgroundImageUrl), fit: BoxFit.cover),
+              color: Colors.white,
+              border: Border.all(color: AppColors.ink, width: 2),
+            ),
+            child: const Text(
+              'SYSTEM ONLINE',
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 2.0),
             ),
           ),
           const SizedBox(height: 24),
-          const Text('Învață Interactiv', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: Color(0xFF0F172A), letterSpacing: -0.5)),
-          const SizedBox(height: 8),
-          Text('Platformă cu apel video integrat, tablă virtuală și exerciții inteligente.', style: TextStyle(color: Colors.grey.shade600, fontSize: 16, height: 1.5)),
+          Text(
+            "LEVEL UP YOUR\nKNOWLEDGE.",
+            style: TextStyle(fontSize: isMobile ? 40 : 56, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.1, letterSpacing: 1.0),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            "Choose a discipline. Find a guild master. Complete daily quests to gain EXP.",
+            style: TextStyle(fontSize: isMobile ? 16 : 20, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.5),
+          ),
+          const SizedBox(height: 40),
+
+          // Safe responsive buttons
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                RetroButton(
+                  text: "FIND A MASTER",
+                  bgColor: AppColors.forest,
+                  isFullWidth: true,
+                  fontSize: 16,
+                  onPressed: () => context.go('/materii'),
+                ),
+                const SizedBox(height: 16),
+                RetroButton(
+                  text: "DAILY QUESTS",
+                  bgColor: Colors.white,
+                  textColor: AppColors.ink,
+                  isFullWidth: true,
+                  fontSize: 16,
+                  onPressed: () => context.go('/exercitii'),
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                RetroButton(
+                  text: "FIND A MASTER",
+                  bgColor: AppColors.forest,
+                  onPressed: () => context.go('/materii'),
+                ),
+                const SizedBox(width: 24),
+                RetroButton(
+                  text: "DAILY QUESTS",
+                  bgColor: Colors.white,
+                  textColor: AppColors.ink,
+                  onPressed: () => context.go('/exercitii'),
+                ),
+              ],
+            ),
         ],
       ),
     );
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF0F172A),
-        image: DecorationImage(image: NetworkImage(backgroundImageUrl), fit: BoxFit.cover, opacity: 0.03),
-      ),
-      child: _buildConstrainedSection(
-        padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
-        isWide
-            ? Row(
-          children: [
-            Expanded(flex: 11, child: _heroTextContent(isWide)),
-            const SizedBox(width: 60),
-            Expanded(flex: 9, child: visualCard),
-          ],
-        )
-            : Column(
-          children: [
-            _heroTextContent(isWide),
-            const SizedBox(height: 60),
-            visualCard,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _heroTextContent(bool isWide) {
-    return Column(
-      crossAxisAlignment: isWide ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+    // 2. The Right side (Stats + Quest)
+    final rightContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-          child: const Text('🚀 Metoda dovedită pentru note mari', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+        RetroBlock(
+          bgColor: AppColors.sky,
+          padding: 32,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text("PLAYER STATS", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
+              const SizedBox(height: 24),
+              Container(height: 3, color: AppColors.ink),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("QUESTS CLEARED:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
+                  _isLoadingStats
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: AppColors.ink, strokeWidth: 3))
+                      : Text("$_completedQuests", style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 24)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("SYSTEM STATUS:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text("OPTIMAL", style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.w900, fontSize: 16)),
+                ],
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 24),
-        Text('Meditații online\ncare îți deblochează potențialul.',
-            style: TextStyle(fontSize: isWide ? 56 : 40, fontWeight: FontWeight.w900, color: Colors.white, height: 1.15, letterSpacing: -1),
-            textAlign: isWide ? TextAlign.left : TextAlign.center),
-        const SizedBox(height: 24),
-        Text('Găsește profesorul perfect, programează-ți ședințele flexibil și învață eficient din confortul casei tale.',
-            style: TextStyle(fontSize: isWide ? 18 : 16, color: Colors.grey.shade400, height: 1.6),
-            textAlign: isWide ? TextAlign.left : TextAlign.center),
-        const SizedBox(height: 40),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
-          children: [
-            ElevatedButton(
-                onPressed: () => context.go('/materii'),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 24),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-                child: const Text('Găsește Profesor', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-            TextButton(
-                onPressed: () => _scrollToSection(_howItWorksKey),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                ),
-                child: const Text('Cum funcționează?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
-          ],
-        ),
-        const SizedBox(height: 60),
-        Wrap(
-          spacing: 32,
-          runSpacing: 20,
-          alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
-          children: [
-            _statDotDark('Profesori verificați', '100%'),
-            _statDotDark('Lecții', 'Live Video'),
-          ],
+        const SizedBox(height: 32),
+        RetroBlock(
+          bgColor: AppColors.cloud,
+          padding: 32,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text("DAILY QUEST", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
+                  Icon(Icons.star, color: AppColors.sunset, size: 28),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "SOLVE: INFORMATICĂ LVL 9",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "REWARD: +50 EXP",
+                style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.w900, fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              RetroButton(
+                text: "ACCEPT QUEST",
+                bgColor: AppColors.sunset,
+                isFullWidth: true,
+                fontSize: 16,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                onPressed: _startDailyQuest,
+              ),
+            ],
+          ),
         ),
       ],
     );
-  }
 
-  Widget _statDotDark(String title, String value) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-            width: 48, height: 48,
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withOpacity(0.15))),
-            child: Center(child: Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)))
-        ),
-        const SizedBox(width: 12),
-        Text(title, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 16))
-      ]);
-
-  // --------------------------------------------------------------------------
-  // MATERII POPULARE
-  // --------------------------------------------------------------------------
-  Widget _popularSubjectsSection() {
-    final subjects = ['Matematică', 'Limba Română', 'Engleză', 'Informatică', 'Fizică', 'Chimie'];
-
+    // 3. Render layout based on screen size
     return _buildConstrainedSection(
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
-      Column(
+      padding: EdgeInsets.fromLTRB(24, isMobile ? 32 : 60, 24, isMobile ? 32 : 40),
+      child: isMobile
+          ? Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('CELE MAI CĂUTATE MATERII', style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.5)),
-          const SizedBox(height: 24),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: subjects.map((subj) {
-              return ActionChip(
-                onPressed: () {
-                  final encoded = Uri.encodeComponent(subj);
-                  context.go('/lista-exercitii?materie=$encoded');
-                },
-                backgroundColor: Colors.white,
-                side: BorderSide(color: Colors.grey.shade300),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                label: Text(subj, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: Color(0xFF0F172A))),
-              );
-            }).toList(),
-          ),
+          leftContent,
+          const SizedBox(height: 32),
+          rightContent,
+        ],
+      )
+          : Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 3, child: leftContent),
+          const SizedBox(width: 40),
+          Expanded(flex: 2, child: rightContent),
         ],
       ),
     );
   }
 
-  // --------------------------------------------------------------------------
-  // DE CE SĂ NE ALEGI (Wrap în loc de ListView)
-  // --------------------------------------------------------------------------
-  Widget _ceOferimSection() {
-    final items = [
-      {"icon": Icons.verified_user_outlined, "title": "Profesori de top", "desc": "Doar mentori cu experiență, verificați riguros."},
-      {"icon": Icons.laptop_mac_outlined, "title": "100% Online", "desc": "Înveți din confortul casei tale, pe platforma noastră video."},
-      {"icon": Icons.auto_graph_outlined, "title": "Note mai mari", "desc": "Metode interactive care garantează progresul rapid."},
-      {"icon": Icons.schedule, "title": "Program flexibil", "desc": "Alege ziua și ora care ți se potrivesc cel mai bine."},
+  Widget _buildPathsSection(bool isMobile) {
+    final List<Map<String, dynamic>> paths = [
+      {"icon": Icons.functions, "title": "MATHEMATICS", "color": AppColors.sunset, "desc": "ALGEBRA & LOGIC"},
+      {"icon": Icons.data_object, "title": "COMP. SCIENCE", "color": AppColors.forest, "desc": "ALGORITHMS & C++"},
+      {"icon": Icons.language, "title": "LANGUAGES", "color": AppColors.sky, "desc": "ENGLISH & ROMANIAN"},
     ];
 
-    return Wrap(
-      spacing: 32,
-      runSpacing: 32,
-      alignment: WrapAlignment.center,
-      children: items.map((item) {
-        return HoverCard(
-          child: Container(
-            width: 260, // Lățime fixă pentru grilă perfectă
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.grey.shade200)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.1), borderRadius: BorderRadius.circular(16)), child: Icon(item['icon'] as IconData, color: const Color(0xFF3B82F6), size: 32)),
-              const SizedBox(height: 24),
-              Text(item['title'] as String, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-              const SizedBox(height: 12),
-              Text(item['desc'] as String, style: TextStyle(color: Colors.grey.shade600, fontSize: 15, height: 1.5)),
-            ]),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // CUM FUNCȚIONEAZĂ (Wrap)
-  // --------------------------------------------------------------------------
-  Widget _howItWorksSection() {
-    final items = [
-      {'icon': Icons.search_rounded, 'title': '1. Găsești mentorul', 'desc': 'Răsfoiește profilurile profesorilor noștri.'},
-      {'icon': Icons.calendar_month_rounded, 'title': '2. Rezervi ședința', 'desc': 'Stabiliți ora și plătești securizat.'},
-      {'icon': Icons.video_camera_front_rounded, 'title': '3. Începi să înveți', 'desc': 'Intri pe apelul video direct din cont.'},
-    ];
-
-    return Wrap(
-      spacing: 32,
-      runSpacing: 32,
-      alignment: WrapAlignment.center,
-      children: items.map((item) {
-        return Container(
-          width: 320,
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.grey.shade200)),
-          child: Column(children: [
-            Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF3B82F6).withOpacity(0.1)), child: Icon(item['icon'] as IconData, size: 36, color: const Color(0xFF3B82F6))),
-            const SizedBox(height: 24),
-            Text(item['title'] as String, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)), textAlign: TextAlign.center),
-            const SizedBox(height: 12),
-            Text(item['desc'] as String, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade600, fontSize: 16, height: 1.5)),
-          ]),
-        );
-      }).toList(),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // PROFESORI (Grilă dinamică din Firebase, limitată la 4 pe Home)
-  // --------------------------------------------------------------------------
-  Widget _profesoriSection() {
-    final query = FirebaseFirestore.instance
-        .collection('teachers')
-        .where('hasAccount', isEqualTo: true)
-        .where('active', isEqualTo: true)
-        .limit(4); // Pe Home arătăm maxim 4 pentru aspect curat
-
-    return StreamBuilder<QuerySnapshot>(
-      stream: query.snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-        final docs = snapshot.data!.docs;
-        if (docs.isEmpty) return const Center(child: Text('Nu există profesori disponibili.', style: TextStyle(fontSize: 16)));
-
-        return Column(
-          children: [
-            Wrap(
-              spacing: 24,
-              runSpacing: 24,
-              alignment: WrapAlignment.center,
-              children: docs.map((doc) {
-                final data = doc.data() as Map<String, dynamic>;
-                final teacherId = doc.id;
-                final name = data['name'] as String? ?? '';
-                final subject = data['subject'] as String? ?? '';
-                final image = data['image'] as String? ?? '';
-
-                return HoverCard(
-                  child: Container(
-                    width: 260,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 15, offset: const Offset(0, 5))],
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: const Color(0xFF3B82F6).withOpacity(0.1),
-                          backgroundImage: image.isNotEmpty ? NetworkImage(image) : null,
-                          child: image.isEmpty ? const Icon(Icons.person, size: 40, color: Color(0xFF3B82F6)) : null,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(name, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A)), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 8),
-                        Text(subject, style: const TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.bold, fontSize: 14)),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF0F172A),
-                              side: BorderSide(color: Colors.grey.shade300),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            onPressed: () => context.go('/profesor/$teacherId'),
-                            child: const Text('Vezi profil', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () => context.go('/materii'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F172A),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              child: const Text("Vezi toți profesorii", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // TESTIMONIALE (Wrap)
-  // --------------------------------------------------------------------------
-  Widget _testimonialsSection() {
-    final testimonials = [
-      {'quote': 'Datorită profesorului găsit aici, am reușit să iau nota 10 la examen. Platforma este uimitoare!', 'name': 'Andrei P.', 'subject': 'Elev', 'stars': 5},
-      {'quote': 'Foarte sigură. Îmi place că pot vedea rapoartele copilului și plățile sunt transparente.', 'name': 'Elena D.', 'subject': 'Părinte', 'stars': 5},
-      {'quote': 'Am înțeles în 3 ședințe ce nu am înțeles un semestru întreg la școală. Recomand!', 'name': 'Maria I.', 'subject': 'Elevă', 'stars': 5},
-    ];
-
-    return Wrap(
-      spacing: 24,
-      runSpacing: 24,
-      alignment: WrapAlignment.center,
-      children: testimonials.map((t) {
-        final stars = t['stars'] as int;
-        return HoverCard(
-          child: Container(
-            width: 350,
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.grey.shade200)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: List.generate(5, (index) => Icon(Icons.star_rounded, color: index < stars ? Colors.amber : Colors.grey.shade300, size: 22))),
-              const SizedBox(height: 20),
-              Text('"${t['quote']}"', style: TextStyle(fontSize: 16, color: Colors.grey.shade800, height: 1.5, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 24),
-              Row(children: [
-                CircleAvatar(radius: 22, backgroundColor: const Color(0xFF0F172A), child: Text((t['name'] as String).substring(0, 1), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
-                const SizedBox(width: 16),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(t['name'] as String, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0F172A))),
-                  Text(t['subject'] as String, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
-                ])
-              ])
-            ]),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // FAQ
-  // --------------------------------------------------------------------------
-  Widget _faqSection() {
-    final faqs = [
-      {'q': 'Cum se desfășoară o ședință?', 'a': 'Direct pe platforma noastră, prin apel video. Aveți acces la partajare de ecran și chat.'},
-      {'q': 'Sunt profesorii calificați?', 'a': 'Da, toți profesorii sunt verificați manual de echipa noastră înainte de a preda.'},
-      {'q': 'Cum se face plata?', 'a': 'Securizat prin Stripe, fix înainte de a intra în ședința video.'},
-    ];
-
-    return Column(
-      children: faqs.map((faq) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
-            child: Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                iconColor: const Color(0xFF3B82F6),
-                collapsedIconColor: Colors.grey[800],
-                title: Text(faq['q']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Color(0xFF0F172A))),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-                    child: Text(faq['a']!, style: TextStyle(color: Colors.grey.shade600, fontSize: 15, height: 1.5)),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  // MINOR UI HELPERS
-  Widget _sectionTitle(String title, {Key? key, String? subtitle}) => Padding(
-      key: key, padding: const EdgeInsets.only(bottom: 50),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Text(title, style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -1), textAlign: TextAlign.center),
-        if (subtitle != null) ...[
-          const SizedBox(height: 16),
-          Text(subtitle, style: TextStyle(fontSize: 18, color: Colors.grey.shade600), textAlign: TextAlign.center),
-        ]
-      ]));
-
-  Widget _buildFooter() {
-    return Container(
-      key: _footerKey,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 80),
-      decoration: const BoxDecoration(color: Color(0xFF0F172A)),
-      child: Center(
-        child: Column(children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    // Build the list of cards
+    final List<Widget> pathCards = paths.map((path) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: isMobile && path != paths.last ? 24 : 0,
+          right: !isMobile && path != paths.last ? 24 : 0,
+        ),
+        child: RetroBlock(
+          bgColor: Colors.white,
+          padding: 32,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(Icons.school, color: Colors.white, size: 32),
-              SizedBox(width: 12),
-              Text('iMeditatii', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white)),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: path["color"],
+                  border: Border.all(color: AppColors.ink, width: 3),
+                ),
+                child: Icon(path["icon"], size: 48, color: AppColors.ink),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                path["title"],
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: isMobile ? 20 : 24, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                path["desc"],
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+              ),
             ],
           ),
+        ),
+      );
+    }).toList();
+
+    return _buildConstrainedSection(
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 32 : 40, horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "CHOOSE YOUR PATH",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: isMobile ? 32 : 40, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "SELECT A DISCIPLINE TO BEGIN YOUR TRAINING.",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: isMobile ? 14 : 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+          ),
           const SizedBox(height: 40),
-          const Text('Platforma de încredere pentru educația ta.', style: TextStyle(color: Colors.white70, fontSize: 16), textAlign: TextAlign.center),
-          const SizedBox(height: 20),
-          const Text('© 2024 - 2025 iMeditatii. Toate drepturile rezervate.', style: TextStyle(color: Colors.white38, fontSize: 14), textAlign: TextAlign.center),
-        ]),
+          isMobile
+              ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: pathCards)
+              : Row(children: pathCards.map((card) => Expanded(child: card)).toList()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMastersSection(bool isMobile) {
+    final leftContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: AppColors.ink,
+          child: const Text("THE GUILD", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
+          style: TextStyle(fontSize: isMobile ? 36 : 48, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.1, letterSpacing: 1.0),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          "Our verified experts are ready to guide you. Initiate comms and start leveling up today.",
+          style: TextStyle(fontSize: isMobile ? 16 : 18, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.5),
+        ),
+        const SizedBox(height: 32),
+        RetroButton(
+          text: "VIEW ROSTER",
+          bgColor: AppColors.sunset,
+          isFullWidth: isMobile,
+          fontSize: 16,
+          onPressed: () => context.go('/materii'),
+        ),
+      ],
+    );
+
+    final rightContent = GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
+      childAspectRatio: 1.0,
+      children: [
+        _buildMasterAvatar(Icons.person, AppColors.sky),
+        _buildMasterAvatar(Icons.person_3, AppColors.mustard),
+        _buildMasterAvatar(Icons.person_2, AppColors.forest),
+        _buildMasterAvatar(Icons.person_4, AppColors.sunset),
+      ],
+    );
+
+    return _buildConstrainedSection(
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 32 : 60, horizontal: 24),
+      child: RetroBlock(
+        bgColor: AppColors.cloud,
+        padding: isMobile ? 32 : 48,
+        child: isMobile
+            ? Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            leftContent,
+            const SizedBox(height: 48),
+            rightContent,
+          ],
+        )
+            : Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(child: leftContent),
+            const SizedBox(width: 48),
+            Expanded(child: rightContent),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMasterAvatar(IconData icon, Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        border: Border.all(color: AppColors.ink, width: 3),
+        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+      ),
+      child: Center(
+        child: Icon(icon, size: 64, color: AppColors.ink),
+      ),
+    );
+  }
+
+  Widget _buildFooter(bool isMobile) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 40 : 60),
+      decoration: const BoxDecoration(
+        color: AppColors.ink,
+        border: Border(top: BorderSide(color: AppColors.ink, width: 3)),
+      ),
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+                'IMEDITATII',
+                style: TextStyle(fontSize: isMobile ? 32 : 40, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0)
+            ),
+            const SizedBox(height: 16),
+            Text(
+                'SYSTEM LOG: 2024 - 2025. LEVEL UP YOUR LEARNING.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.cloud, fontSize: isMobile ? 12 : 16, fontWeight: FontWeight.bold)
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.bg,
       body: Column(
-          children: [
+        children: [
           const CustomNavbar(),
-      Expanded(
-        child: Scrollbar(
-          controller: _pageScrollController,
-          // 🚀 Am scos complet WebSmoothScroll. Revenim la structura curată și stabilă.
-          child: SingleChildScrollView(
-            controller: _pageScrollController,
-            physics: const BouncingScrollPhysics(), // Oferă un efect elastic, natural
-            child: Column(
-              children: [
-                _heroSection(context),
-                _popularSubjectsSection(),
-
-                _buildConstrainedSection(
-                    Column(
-                        children: [
-                          _sectionTitle('De ce ne aleg părinții și elevii', subtitle: 'Calitate garantată, siguranță și flexibilitate totală.'),
-                          _ceOferimSection(),
-                        ]
-                    )
-                ),
-
-                    _buildConstrainedSection(
-                        bgColor: Colors.white,
-                        Column(
-                            children: [
-                              _sectionTitle('Cum găsești mentorul perfect', key: _howItWorksKey),
-                              _howItWorksSection(),
-                            ]
-                        )
-                    ),
-
-                    _buildConstrainedSection(
-                        Column(
-                            children: [
-                              _sectionTitle('Cei mai apreciați profesori', key: _profesoriKey, subtitle: 'Alege dintre cei mai buni și rezervă o ședință azi.'),
-                              _profesoriSection(),
-                            ]
-                        )
-                    ),
-
-                    _buildConstrainedSection(
-                        bgColor: const Color(0xFFF1F5F9), // Un gri foarte deschis pentru contrast vizual
-                        Column(
-                            children: [
-                              _sectionTitle('Povești de succes', key: _testimonialsKey),
-                              _testimonialsSection(),
-                            ]
-                        )
-                    ),
-
-                    _buildConstrainedSection(
-                        Column(
-                            children: [
-                              _sectionTitle('Ai întrebări?', key: _faqKey),
-                              _faqSection(),
-                            ]
-                        )
-                    ),
-
-                    _buildFooter(),
+          Expanded(
+            child: Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  children: [
+                    _buildHeroSection(isMobile),
+                    _buildPathsSection(isMobile),
+                    _buildMastersSection(isMobile),
+                    SizedBox(height: isMobile ? 24 : 40),
+                    _buildFooter(isMobile),
                   ],
                 ),
               ),
             ),
-            ),
+          ),
         ],
-    ),
+      ),
     );
-
   }
 }

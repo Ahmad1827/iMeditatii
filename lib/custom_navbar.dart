@@ -1,203 +1,343 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:go_router/go_router.dart';
+
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
+}
+
+class NavRetroButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color bgColor;
+  final Color textColor;
+  final IconData? icon;
+  final bool isFullWidth;
+
+  const NavRetroButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.bgColor = Colors.white,
+    this.textColor = AppColors.ink,
+    this.icon,
+    this.isFullWidth = false,
+  });
+
+  @override
+  State<NavRetroButton> createState() => _NavRetroButtonState();
+}
+
+class _NavRetroButtonState extends State<NavRetroButton> {
+  bool isPressed = false;
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => isPressed = true),
+        onTapUp: (_) {
+          setState(() => isPressed = false);
+          widget.onPressed();
+        },
+        onTapCancel: () => setState(() => isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          width: widget.isFullWidth ? double.infinity : null,
+          transform: Matrix4.translationValues(
+            isPressed ? 2.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 2.0 : (isHovered ? -2.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.bgColor,
+            border: Border.all(color: AppColors.ink, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, color: widget.textColor, size: 20),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                widget.text.toUpperCase(),
+                style: TextStyle(
+                  color: widget.textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NavTextLink extends StatefulWidget {
+  final String text;
+  final VoidCallback onTap;
+  final bool isMobile;
+
+  const NavTextLink({super.key, required this.text, required this.onTap, this.isMobile = false});
+
+  @override
+  State<NavTextLink> createState() => _NavTextLinkState();
+}
+
+class _NavTextLinkState extends State<NavTextLink> {
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: widget.isMobile ? double.infinity : null,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isHovered ? AppColors.mustard : Colors.transparent,
+            border: Border.all(
+              color: isHovered ? AppColors.ink : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: Text(
+            widget.text.toUpperCase(),
+            textAlign: widget.isMobile ? TextAlign.center : TextAlign.left,
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class CustomNavbar extends StatelessWidget {
   const CustomNavbar({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
+  Future<void> _handleDashboardRouting(BuildContext context, User user) async {
+    try {
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userDoc.exists && context.mounted) {
+        final role = (userDoc.data() as Map<String, dynamic>)['role'];
+        if (role == 'teacher') {
+          context.go('/panou-profesor');
+        } else {
+          context.go('/panou-elev');
+        }
+      }
+    } catch (e) {
+      debugPrint("Routing error: $e");
+    }
+  }
 
-    // 🚀 AICI E MAGIA: Verificăm pe ce pagină suntem uitându-ne în URL
-    final String currentPath = GoRouterState.of(context).uri.path;
+  Future<void> _handleProfileRouting(BuildContext context, User user) async {
+    try {
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userDoc.exists && context.mounted) {
+        final role = (userDoc.data() as Map<String, dynamic>)['role'];
+        if (role == 'teacher') {
+          context.go('/profesor/${user.uid}');
+        } else {
+          context.go('/elev/${user.uid}');
+        }
+      }
+    } catch (e) {
+      debugPrint("Routing error: $e");
+    }
+  }
 
-    final bool isProfesoriActive = currentPath.startsWith('/materii') || currentPath.startsWith('/profesor');
-    final bool isExercitiiActive = currentPath.startsWith('/exercitii') || currentPath.startsWith('/lista-exercitii') || currentPath.startsWith('/exercitiu');
-
-    return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Logo & Nume
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => context.go('/'),
-              child: Row(
+  void _showMobileMenu(BuildContext context, User? user) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.bg,
+          border: Border(top: BorderSide(color: AppColors.ink, width: 4)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.school, color: Colors.white, size: 20),
+                  const Text("SYSTEM MENU", style: TextStyle(color: AppColors.ink, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.ink, size: 32),
+                    onPressed: () => context.pop(),
                   ),
-                  if (!isMobile) ...[
-                    const SizedBox(width: 12),
-                    const Text('iMeditatii', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -0.5)),
-                  ],
                 ],
               ),
-            ),
-          ),
+              const SizedBox(height: 24),
+              NavTextLink(text: 'Guild Masters', isMobile: true, onTap: () { context.pop(); context.go('/materii'); }),
+              const SizedBox(height: 8),
+              NavTextLink(text: 'Daily Quest', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); }),
+              const SizedBox(height: 24),
+              Container(height: 3, color: AppColors.ink),
+              const SizedBox(height: 24),
 
-          // Linkuri & Auth
-          Row(
-            children: [
-              if (!isMobile) ...[
-                // Buton Profesori (Dinamic)
-                TextButton(
-                    onPressed: () => context.go('/materii'),
-                    child: Text("Profesori", style: TextStyle(
-                        color: isProfesoriActive ? const Color(0xFF3B82F6) : const Color(0xFF64748B),
-                        fontWeight: isProfesoriActive ? FontWeight.bold : FontWeight.w600,
-                        fontSize: 15
-                    ))
-                ),
-                const SizedBox(width: 8),
-                // Buton Exerciții (Dinamic)
-                TextButton(
-                    onPressed: () => context.go('/exercitii'),
-                    child: Text("Exerciții", style: TextStyle(
-                        color: isExercitiiActive ? const Color(0xFF3B82F6) : const Color(0xFF64748B),
-                        fontWeight: isExercitiiActive ? FontWeight.bold : FontWeight.w600,
-                        fontSize: 15
-                    ))
-                ),
-                const SizedBox(width: 16),
-                Container(width: 1, height: 24, color: Colors.grey.shade300),
-                const SizedBox(width: 16),
+              if (user == null) ...[
+                NavRetroButton(text: 'Log In', isFullWidth: true, bgColor: Colors.white, textColor: AppColors.ink, onPressed: () { context.pop(); context.go('/login'); }),
+                const SizedBox(height: 16),
+                NavRetroButton(text: 'Start Playing', isFullWidth: true, bgColor: AppColors.sky, textColor: AppColors.ink, onPressed: () { context.pop(); context.go('/inregistrare'); }),
               ] else ...[
-                // Iconiță Profesori (Dinamic)
-                IconButton(
-                  onPressed: () => context.go('/materii'),
-                  icon: Icon(Icons.people, color: isProfesoriActive ? const Color(0xFF3B82F6) : const Color(0xFF64748B)),
-                  tooltip: "Profesori",
+                NavRetroButton(text: 'Terminal', icon: Icons.dashboard, isFullWidth: true, bgColor: AppColors.mustard, textColor: AppColors.ink, onPressed: () { context.pop(); _handleDashboardRouting(context, user); }),
+                const SizedBox(height: 16),
+                NavRetroButton(text: 'Profile', icon: Icons.person, isFullWidth: true, bgColor: Colors.white, textColor: AppColors.ink, onPressed: () { context.pop(); _handleProfileRouting(context, user); }),
+                const SizedBox(height: 16),
+                NavRetroButton(
+                  text: 'Log Out', icon: Icons.logout, isFullWidth: true, bgColor: AppColors.sunset, textColor: Colors.white,
+                  onPressed: () async {
+                    context.pop();
+                    await FirebaseAuth.instance.signOut();
+                    if (context.mounted) context.go('/');
+                  },
                 ),
-                // Iconiță Exerciții (Dinamic)
-                IconButton(
-                  onPressed: () => context.go('/exercitii'),
-                  icon: Icon(Icons.menu_book, color: isExercitiiActive ? const Color(0xFF3B82F6) : const Color(0xFF64748B)),
-                  tooltip: "Exerciții",
-                ),
-                const SizedBox(width: 4),
-                Container(width: 1, height: 20, color: Colors.grey.shade300),
-                const SizedBox(width: 4),
               ],
-
-              _buildAuthActions(context, isMobile),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildAuthActions(BuildContext context, bool isMobile) {
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width > 900;
+
     return StreamBuilder<User?>(
-      // 🚀 MAGIA E AICI: Preia userul deja existent din memorie instant, fără delay!
-      initialData: FirebaseAuth.instance.currentUser,
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Am scos verificarea de "ConnectionState.waiting".
-        // Astfel, butoanele se randează instantaneu pe baza initialData.
-
         final user = snapshot.data;
 
-        // Când NU este logat
-        if (user == null) {
-          return isMobile
-              ? IconButton(
-            onPressed: () => context.go('/login'),
-            icon: const Icon(Icons.login, color: Color(0xFF0F172A)),
-            tooltip: "Intră în cont",
-          )
-              : ElevatedButton(
-            onPressed: () => context.go('/login'),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F172A),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16)
-            ),
-            child: const Text("Intră în cont", style: TextStyle(fontWeight: FontWeight.bold)),
-          );
-        }
+        return Container(
+          height: 90,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: AppColors.bg,
+            border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // LOGO SECTION (Scales down on mobile)
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => context.go('/'),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.sunset,
+                                border: Border.all(color: AppColors.ink, width: 2),
+                              ),
+                              child: const Icon(Icons.videogame_asset, color: Colors.white, size: 28),
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'IMEDITATII',
+                              style: TextStyle(
+                                fontSize: isDesktop ? 32 : 24, // Smaller font on phones
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.ink,
+                                letterSpacing: 2.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
 
-        // Când ESTE logat (Dashboard + Profil + LOGOUT)
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              padding: isMobile ? EdgeInsets.zero : const EdgeInsets.all(8),
-              constraints: isMobile ? const BoxConstraints() : null,
-              onPressed: () async {
-                try {
-                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-                  if (userDoc.exists && context.mounted) {
-                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
-                    if (role == 'teacher') {
-                      context.go('/panou-profesor');
-                    } else {
-                      context.go('/panou-elev');
-                    }
-                  }
-                } catch (e) {
-                  debugPrint("Eroare dashboard: $e");
-                }
-              },
-              icon: Icon(Icons.dashboard_customize_rounded, color: const Color(0xFF0F172A), size: isMobile ? 24 : 28),
-              tooltip: "Panou de control",
-            ),
-            SizedBox(width: isMobile ? 8 : 4),
-            IconButton(
-              padding: isMobile ? EdgeInsets.zero : const EdgeInsets.all(8),
-              constraints: isMobile ? const BoxConstraints() : null,
-              onPressed: () async {
-                try {
-                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-                  if (userDoc.exists && context.mounted) {
-                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
-                    if (role == 'teacher') {
-                      context.go('/profesor/${user.uid}');
-                    } else {
-                      context.go('/elev/${user.uid}');
-                    }
-                  }
-                } catch (e) {
-                  debugPrint("Eroare profil: $e");
-                }
-              },
-              icon: Icon(Icons.account_circle, color: const Color(0xFF3B82F6), size: isMobile ? 26 : 30),
-              tooltip: "Contul meu",
-            ),
-            SizedBox(width: isMobile ? 8 : 4),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                padding: isMobile ? const EdgeInsets.all(4) : const EdgeInsets.all(8),
-                constraints: isMobile ? const BoxConstraints() : null,
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  if (context.mounted) {
-                    context.go('/');
-                  }
-                },
-                icon: Icon(Icons.logout_rounded, color: Colors.redAccent, size: isMobile ? 20 : 24),
-                tooltip: "Deconectare",
+                    // DESKTOP NAVIGATION
+                    if (isDesktop) ...[
+                      Row(
+                        children: [
+                          NavTextLink(text: 'Guild Masters', onTap: () => context.go('/materii')),
+                          const SizedBox(width: 16),
+                          NavTextLink(text: 'Daily Quest', onTap: () => context.go('/exercitii')),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          if (user == null) ...[
+                            NavRetroButton(text: 'Log In', bgColor: Colors.white, textColor: AppColors.ink, onPressed: () => context.go('/login')),
+                            const SizedBox(width: 16),
+                            NavRetroButton(text: 'Start Playing', bgColor: AppColors.sky, textColor: AppColors.ink, onPressed: () => context.go('/inregistrare')),
+                          ] else ...[
+                            IconButton(icon: const Icon(Icons.dashboard, color: AppColors.ink, size: 28), onPressed: () => _handleDashboardRouting(context, user)),
+                            const SizedBox(width: 8),
+                            IconButton(icon: const Icon(Icons.person, color: AppColors.ink, size: 28), onPressed: () => _handleProfileRouting(context, user)),
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(color: AppColors.sunset, border: Border.all(color: AppColors.ink, width: 2)),
+                              child: IconButton(
+                                icon: const Icon(Icons.logout, color: Colors.white, size: 20),
+                                onPressed: () async {
+                                  await FirebaseAuth.instance.signOut();
+                                  if (context.mounted) context.go('/');
+                                },
+                              ),
+                            ),
+                          ]
+                        ],
+                      )
+                    ]
+                    // MOBILE NAVIGATION (Hamburger Menu)
+                    else ...[
+                      IconButton(
+                        icon: const Icon(Icons.menu, color: AppColors.ink, size: 36),
+                        onPressed: () => _showMobileMenu(context, user),
+                      )
+                    ]
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
         );
       },
     );

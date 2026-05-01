@@ -3,6 +3,92 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
+}
+
+class RetroBlock extends StatelessWidget {
+  final Widget child;
+  final Color bgColor;
+  final double padding;
+  final double shadowOffset;
+  final Color borderColor;
+  final bool fillWidth;
+
+  const RetroBlock({
+    super.key,
+    required this.child,
+    this.bgColor = Colors.white,
+    this.padding = 24.0,
+    this.shadowOffset = 6.0,
+    this.borderColor = AppColors.ink,
+    this.fillWidth = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: fillWidth ? double.infinity : null,
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ink,
+            offset: Offset(shadowOffset, shadowOffset),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+
+class RetroDropdown extends StatelessWidget {
+  final String? value;
+  final List<DropdownMenuItem<String>> items;
+  final Function(String?) onChanged;
+  final Color color;
+
+  const RetroDropdown({
+    super.key,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    this.color = AppColors.sky,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.ink, width: 3),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          icon: const Icon(Icons.arrow_drop_down, color: AppColors.ink, size: 32),
+          style: const TextStyle(color: AppColors.ink, fontSize: 18, fontWeight: FontWeight.bold),
+          dropdownColor: Colors.white,
+          value: value,
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+}
+
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
   final String? grade;
@@ -47,7 +133,6 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
         data['id'] = doc.id;
-
         data['grade'] = data['grade']?.toString() ?? "N/A";
         data['category'] = data['category'] ?? "General";
         data['title'] = data['title'] ?? "Fără titlu";
@@ -64,7 +149,6 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
         if (!availableGrades.contains(selectedGrade) && availableGrades.isNotEmpty) {
           selectedGrade = availableGrades.first;
         }
-
         isLoading = false;
       });
 
@@ -109,69 +193,85 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      decoration: const BoxDecoration(
+        color: AppColors.mustard,
+        border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
       ),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black87),
-              tooltip: 'Înapoi',
-              onPressed: () => context.go('/exercitii'),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Row(
             children: [
-              Text(
-                widget.subject,
-                style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF1E293B), fontSize: 24, letterSpacing: -0.5),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () => context.go('/exercitii'),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.ink, width: 3),
+                    ),
+                    child: const Icon(Icons.arrow_back, color: AppColors.ink, size: 28),
+                  ),
+                ),
               ),
-              Text("Rezolvă probleme și urmărește-ți progresul", style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+              const SizedBox(width: 24),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.subject.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.ink,
+                        fontSize: 32,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const Text(
+                      "SOLVE QUESTS AND TRACK YOUR EXP",
+                      style: TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildSidebar() {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
+    return RetroBlock(
+      bgColor: AppColors.cloud,
+      padding: 32,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
-              Icon(Icons.tune, size: 20, color: Colors.black87),
-              SizedBox(width: 8),
-              Text("Filtrează", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
+              Icon(Icons.tune, size: 28, color: AppColors.ink),
+              SizedBox(width: 12),
+              Text("DATA FILTERS", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
             ],
           ),
-          const SizedBox(height: 24),
-
+          const SizedBox(height: 32),
           if (availableGrades.isEmpty)
-            const Text("Nicio clasă disponibilă", style: TextStyle(color: Colors.redAccent))
+            const Text("NO LEVELS AVAILABLE", style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.bold))
           else ...[
-            Text("Clasa", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade500, letterSpacing: 1)),
-            const SizedBox(height: 8),
-            _modernDropdown(
+            const Text("LEVEL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5)),
+            const SizedBox(height: 12),
+            RetroDropdown(
               value: availableGrades.contains(selectedGrade) ? selectedGrade : null,
-              items: availableGrades.map((g) => DropdownMenuItem(value: g, child: Text("Clasa $g"))).toList(),
+              items: availableGrades.map((g) => DropdownMenuItem(value: g, child: Text("LEVEL $g", style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
               onChanged: (val) {
                 setState(() {
                   selectedGrade = val!;
@@ -180,13 +280,12 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               },
             ),
           ],
-
-          const SizedBox(height: 24),
-          Text("Categoria", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade500, letterSpacing: 1)),
-          const SizedBox(height: 8),
-          _modernDropdown(
+          const SizedBox(height: 32),
+          const Text("CATEGORY", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5)),
+          const SizedBox(height: 12),
+          RetroDropdown(
             value: ["Toate", ...availableCategories].contains(selectedCategory) ? selectedCategory : null,
-            items: ["Toate", ...availableCategories].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+            items: ["Toate", ...availableCategories].map((c) => DropdownMenuItem(value: c, child: Text(c.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
             onChanged: (val) {
               setState(() {
                 selectedCategory = val!;
@@ -199,62 +298,57 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     );
   }
 
-  Widget _modernDropdown({required String? value, required List<DropdownMenuItem<String>> items, required Function(String?) onChanged}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey.shade600),
-          style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
-          value: value,
-          items: items,
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.bg,
+      appBar: AppBar(
+        title: const Text('QUEST LOG', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+        backgroundColor: AppColors.bg,
+        iconTheme: const IconThemeData(color: AppColors.ink),
+        elevation: 0,
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(color: AppColors.ink, height: 3),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(),
             Expanded(
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isWide = constraints.maxWidth > 800;
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.sunset))
+                  : Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isWide = constraints.maxWidth > 800;
 
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: isWide ? 40 : 20, vertical: 30),
-                      child: isWide
-                          ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildSidebar(),
-                          const SizedBox(width: 40),
-                          Expanded(child: _buildListSection()),
-                        ],
-                      )
-                          : Column(
-                        children: [
-                          SizedBox(width: double.infinity, child: _buildSidebar()),
-                          const SizedBox(height: 24),
-                          Expanded(child: _buildListSection()),
-                        ],
-                      ),
-                    );
-                  }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                        child: isWide
+                            ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(width: 320, child: _buildSidebar()),
+                            const SizedBox(width: 40),
+                            Expanded(child: _buildListSection()),
+                          ],
+                        )
+                            : Column(
+                          children: [
+                            SizedBox(width: double.infinity, child: _buildSidebar()),
+                            const SizedBox(height: 32),
+                            Expanded(child: _buildListSection()),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ],
@@ -271,29 +365,35 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              "Probleme disponibile",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1E293B), letterSpacing: -0.5),
+              "AVAILABLE QUESTS",
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade200)),
-              child: Text("${displayedExercises.length} probleme", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(color: AppColors.ink, border: Border.all(color: AppColors.ink, width: 3)),
+              child: Text(
+                "${displayedExercises.length} QUESTS",
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1.0),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 24),
-
+        const SizedBox(height: 32),
         if (displayedExercises.isEmpty)
           Expanded(
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search_off, size: 48, color: Colors.grey.shade400),
-                  const SizedBox(height: 16),
-                  Text("Nu am găsit exerciții.", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
-                  Text("Încearcă să schimbi filtrele.", style: TextStyle(color: Colors.grey.shade500)),
-                ],
+              child: RetroBlock(
+                bgColor: AppColors.cloud,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.search_off, size: 64, color: AppColors.ink),
+                    SizedBox(height: 24),
+                    Text("NO QUESTS FOUND.", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink)),
+                    SizedBox(height: 8),
+                    Text("ADJUST FILTERS TO SEARCH AGAIN.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600, fontSize: 16)),
+                  ],
+                ),
               ),
             ),
           )
@@ -311,13 +411,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                       exercise: ex,
                       isDone: isDone,
                       onTap: () async {
-                        // 🚀 URL securizat cu ID-ul în path și parametrii codificați
                         final encodedMaterie = Uri.encodeComponent(widget.subject);
                         final encodedClasa = Uri.encodeComponent(selectedGrade);
                         final exId = ex["id"];
 
                         await context.push('/exercitiu/$exId?materie=$encodedMaterie&clasa=$encodedClasa');
-
                         if (mounted) setState(() {});
                       },
                     );
@@ -344,28 +442,20 @@ class ExerciseListItem extends StatefulWidget {
 
 class _ExerciseListItemState extends State<ExerciseListItem> {
   bool _isHovering = false;
+  bool _isPressed = false;
 
   Color _difficultyColor(String diff) {
     switch (diff.toLowerCase()) {
-      case "ușoară": return const Color(0xFF10B981);
-      case "medie": return const Color(0xFFF59E0B);
-      case "grea": return const Color(0xFFEF4444);
-      default: return Colors.blueGrey;
-    }
-  }
-
-  Color _difficultyBg(String diff) {
-    switch (diff.toLowerCase()) {
-      case "ușoară": return const Color(0xFF10B981).withOpacity(0.1);
-      case "medie": return const Color(0xFFF59E0B).withOpacity(0.1);
-      case "grea": return const Color(0xFFEF4444).withOpacity(0.1);
-      default: return Colors.grey.shade100;
+      case "ușoară": return AppColors.forest;
+      case "medie": return AppColors.mustard;
+      case "grea": return AppColors.sunset;
+      default: return AppColors.sky;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.exercise["title"] ?? "Titlu necunoscut";
+    final title = widget.exercise["title"] ?? "UNKNOWN TITLE";
     final category = widget.exercise["category"] ?? "";
     final diff = widget.exercise["difficulty"] ?? "ușoară";
 
@@ -373,53 +463,89 @@ class _ExerciseListItemState extends State<ExerciseListItem> {
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: _isHovering ? Colors.blueAccent.withOpacity(0.5) : Colors.grey.shade200,
-              width: _isHovering ? 2 : 1,
-            ),
-            boxShadow: _isHovering
-                ? [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))]
-                : [],
+          duration: const Duration(milliseconds: 100),
+          margin: const EdgeInsets.only(bottom: 24),
+          transform: Matrix4.translationValues(
+            _isPressed ? 4.0 : (_isHovering ? -2.0 : 0.0),
+            _isPressed ? 4.0 : (_isHovering ? -2.0 : 0.0),
+            0,
           ),
-          transform: _isHovering ? (Matrix4.identity()..translate(0.0, -2.0)) : Matrix4.identity(),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: widget.isDone ? Colors.green.shade50 : Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(widget.isDone ? Icons.check_circle : Icons.code, color: widget.isDone ? Colors.green : Colors.blueAccent, size: 24),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
-                    const SizedBox(height: 6),
-                    Text(category, style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: _difficultyBg(diff), borderRadius: BorderRadius.circular(20)),
-                child: Text(diff.toUpperCase(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: _difficultyColor(diff), letterSpacing: 0.5)),
-              ),
-              const SizedBox(width: 16),
-              Icon(Icons.arrow_forward_ios, size: 16, color: _isHovering ? Colors.blueAccent : Colors.grey.shade300),
+          decoration: BoxDecoration(
+            color: widget.isDone ? AppColors.cloud : Colors.white,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: _isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                blurRadius: 0,
+              )
             ],
+          ),
+          // 🚀 FIX: Wrap the Row in IntrinsicHeight here!
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  width: 80,
+                  decoration: BoxDecoration(
+                    color: widget.isDone ? AppColors.forest : AppColors.sky,
+                    border: const Border(right: BorderSide(color: AppColors.ink, width: 3)),
+                  ),
+                  child: Center(
+                    child: Icon(
+                        widget.isDone ? Icons.check_circle : Icons.code,
+                        color: widget.isDone ? Colors.white : AppColors.ink,
+                        size: 40
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                            title.toUpperCase(),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                            category.toUpperCase(),
+                            style: const TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  decoration: const BoxDecoration(
+                    border: Border(left: BorderSide(color: AppColors.ink, width: 3)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                          diff.toUpperCase(),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: _difficultyColor(diff), letterSpacing: 1.5)
+                      ),
+                      const SizedBox(height: 12),
+                      const Icon(Icons.arrow_forward_ios, size: 24, color: AppColors.ink),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

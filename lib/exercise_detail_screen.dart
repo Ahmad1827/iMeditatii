@@ -4,9 +4,133 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:go_router/go_router.dart'; // 🚀 Importul necesar pentru navigare
+import 'package:go_router/go_router.dart';
 
-import 'login_screen.dart';
+class AppColors {
+  static const Color bg = Color(0xFFF9F7F1);
+  static const Color ink = Color(0xFF2C363F);
+  static const Color sunset = Color(0xFFE75A41);
+  static const Color forest = Color(0xFF3C7A61);
+  static const Color mustard = Color(0xFFEAB334);
+  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color sky = Color(0xFF5BA8B5);
+}
+
+class RetroBlock extends StatelessWidget {
+  final Widget child;
+  final Color bgColor;
+  final double padding;
+  final double shadowOffset;
+  final Color borderColor;
+
+  const RetroBlock({
+    super.key,
+    required this.child,
+    this.bgColor = Colors.white,
+    this.padding = 24.0,
+    this.shadowOffset = 6.0,
+    this.borderColor = AppColors.ink,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ink,
+            offset: Offset(shadowOffset, shadowOffset),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+
+class RetroButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color bgColor;
+  final Color textColor;
+  final bool isFullWidth;
+  final bool isLoading;
+
+  const RetroButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.bgColor = AppColors.sunset,
+    this.textColor = Colors.white,
+    this.isFullWidth = false,
+    this.isLoading = false,
+  });
+
+  @override
+  State<RetroButton> createState() => _RetroButtonState();
+}
+
+class _RetroButtonState extends State<RetroButton> {
+  bool isPressed = false;
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: GestureDetector(
+        onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
+        onTapUp: widget.isLoading ? null : (_) {
+          setState(() => isPressed = false);
+          widget.onPressed();
+        },
+        onTapCancel: () => setState(() => isPressed = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          width: widget.isFullWidth ? double.infinity : null,
+          transform: Matrix4.translationValues(
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.isLoading ? Colors.grey : widget.bgColor,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.ink,
+                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          child: widget.isLoading
+              ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)
+          )
+              : Text(
+            widget.text.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: widget.textColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class ExerciseDetailScreen extends StatefulWidget {
   final String subject;
@@ -40,10 +164,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     super.initState();
     _loadExerciseDetailsFromFirebase();
   }
-
-  // --------------------------------------------------------------------------
-  // DATA LOADING & AUTH
-  // --------------------------------------------------------------------------
 
   Future<void> _loadExerciseDetailsFromFirebase() async {
     try {
@@ -83,39 +203,35 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Row(
-              children: const [
-                Icon(Icons.lock_outline, color: Colors.black87, size: 28),
+            backgroundColor: AppColors.bg,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+            title: const Row(
+              children: [
+                Icon(Icons.lock, color: AppColors.ink, size: 28),
                 SizedBox(width: 10),
-                Text("Autentificare necesară",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text("LOGIN REQUIRED", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
               ],
             ),
             content: const Text(
-              "Pentru a trimite soluții și a-ți salva progresul, trebuie să te conectezi în contul tău de elev.",
-              style: TextStyle(fontSize: 16, height: 1.4),
+              "You must authenticate to submit solutions and save progress.",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
             ),
-            actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            actionsPadding: const EdgeInsets.all(24),
             actions: [
-              TextButton(
-                onPressed: () => context.pop(), // 🚀 Modificat cu GoRouter
-                child: const Text("Înapoi",
-                    style: TextStyle(color: Colors.grey, fontSize: 16)),
+              RetroButton(
+                text: "CANCEL",
+                bgColor: AppColors.cloud,
+                textColor: AppColors.ink,
+                onPressed: () => context.pop(),
               ),
-              ElevatedButton(
+              const SizedBox(width: 16),
+              RetroButton(
+                text: "LOGIN",
+                bgColor: AppColors.sunset,
                 onPressed: () {
-                  context.pop(); // 🚀 Modificat cu GoRouter
-                  context.go('/login'); // 🚀 Trimitere către pagina de login
+                  context.pop();
+                  context.go('/login');
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text("Mergi la Login",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -124,28 +240,25 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }
   }
 
-  // --------------------------------------------------------------------------
-  // MAIN BUILD METHOD
-  // --------------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
     if (exerciseData == null) {
       return const Scaffold(
-        backgroundColor: Color(0xFFF8FAFC),
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppColors.bg,
+        body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
       );
     }
 
     if (exerciseData!.isEmpty) {
       return Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: AppColors.bg,
         appBar: AppBar(
-          title: const Text("Eroare", style: TextStyle(color: Colors.black)),
-          backgroundColor: Colors.white,
-          iconTheme: const IconThemeData(color: Colors.black),
+          title: const Text("ERROR", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
+          backgroundColor: AppColors.bg,
+          iconTheme: const IconThemeData(color: AppColors.ink),
+          bottom: PreferredSize(preferredSize: const Size.fromHeight(3), child: Container(color: AppColors.ink, height: 3)),
         ),
-        body: const Center(child: Text("Exercițiul nu a fost găsit.")),
+        body: const Center(child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink))),
       );
     }
 
@@ -157,108 +270,79 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       tabs.add("indicatii");
     }
 
-    final isWide = MediaQuery.of(context).size.width > 900;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         elevation: 0,
         title: const Text(
-          'iMeditatii',
+          'QUEST TERMINAL',
           style: TextStyle(
-            color: Color(0xFF1E293B),
-            fontWeight: FontWeight.w900,
-            fontSize: 20,
-            letterSpacing: -0.5,
+            color: AppColors.ink,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2.0,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
+        iconTheme: const IconThemeData(color: AppColors.ink),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: Colors.grey.shade200, height: 1.0),
+          preferredSize: const Size.fromHeight(3.0),
+          child: Container(color: AppColors.ink, height: 3.0),
         ),
       ),
       body: Center(
-        child: Container(
-          width: isWide ? 950 : double.infinity,
-          margin: EdgeInsets.symmetric(
-            vertical: isWide ? 40 : 0,
-            horizontal: isWide ? 20 : 0,
-          ),
-          padding: EdgeInsets.all(isWide ? 40 : 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(isWide ? 24 : 0),
-            border: isWide ? Border.all(color: Colors.grey.shade200) : null,
-            boxShadow: isWide
-                ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              )
-            ]
-                : null,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildModernTabs(tabs),
-              const SizedBox(height: 40),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: _buildTabContent(selectedTab),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildRetroTabs(tabs),
+                const SizedBox(height: 32),
+                Expanded(
+                  child: RetroBlock(
+                    bgColor: Colors.white,
+                    padding: 32,
+                    child: SingleChildScrollView(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: _buildTabContent(selectedTab),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // --------------------------------------------------------------------------
-  // TAB SYSTEM
-  // --------------------------------------------------------------------------
-
-  Widget _buildModernTabs(List<String> tabs) {
+  Widget _buildRetroTabs(List<String> tabs) {
     return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
       ),
       child: Wrap(
+        spacing: 8,
         children: tabs.map((tab) {
           final isActive = selectedTab == tab;
           return GestureDetector(
             onTap: () => setState(() => selectedTab = tab),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
-                color: isActive ? Colors.white : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: isActive
-                    ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  )
-                ]
-                    : [],
+                color: isActive ? AppColors.ink : AppColors.cloud,
+                border: Border.all(color: AppColors.ink, width: 3),
               ),
               child: Text(
-                tab[0].toUpperCase() + tab.substring(1),
+                tab.toUpperCase(),
                 style: TextStyle(
-                  color: isActive ? Colors.black : Colors.grey.shade600,
-                  fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-                  fontSize: 15,
+                  color: isActive ? Colors.white : AppColors.ink,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 1.2,
                 ),
               ),
             ),
@@ -283,10 +367,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }
   }
 
-  // --------------------------------------------------------------------------
-  // PROBLEM STATEMENT & SECTIONS
-  // --------------------------------------------------------------------------
-
   Widget _buildProblemStatement() {
     final tip = exerciseData!["tip_exercitiu"] ?? "cod";
 
@@ -294,33 +374,33 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _problemHeader(),
-        const SizedBox(height: 32),
-        const Text("CERINȚA",
-            style: TextStyle(
-                color: Colors.blueAccent,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 12),
-        Text(
-          exerciseData!["description"] ?? "Fără descriere.",
-          style: TextStyle(
-              fontSize: 17,
-              color: Colors.grey.shade800,
-              height: 1.6,
-              letterSpacing: 0.2),
-        ),
         const SizedBox(height: 40),
+        const Text("QUEST OBJECTIVE",
+            style: TextStyle(
+                color: AppColors.sunset,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 16),
+        Text(
+          exerciseData!["description"] ?? "No description provided.",
+          style: const TextStyle(
+              fontSize: 22,
+              color: AppColors.ink,
+              fontWeight: FontWeight.w600,
+              height: 1.4),
+        ),
+        const SizedBox(height: 48),
         if (tip == "cod") ...[
           if (exerciseData!["input"] != null)
-            _section("Date de intrare", exerciseData!["input"]),
+            _section("Input Format", exerciseData!["input"]),
           if (exerciseData!["output"] != null)
-            _section("Date de ieșire", exerciseData!["output"]),
+            _section("Output Format", exerciseData!["output"]),
           if (exerciseData!["constraints"] != null)
-            _sectionList("Restricții și precizări",
+            _sectionList("Constraints",
                 List<String>.from(exerciseData!["constraints"])),
           _exampleSection(),
-          const SizedBox(height: 40),
+          const SizedBox(height: 48),
           _uploadSolutionSectionForCode(),
         ] else if (tip == "grila") ...[
           _buildGrilaSection(),
@@ -342,36 +422,38 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                  color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
-              child: Text("Clasa ${widget.grade}",
+                  color: AppColors.sky,
+                  border: Border.all(color: AppColors.ink, width: 2)),
+              child: Text("LEVEL ${widget.grade}",
                   style: const TextStyle(
-                      color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 14)),
+                      color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 16)),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                exerciseData!["title"] ?? "Exercițiu",
+                (exerciseData!["title"] ?? "Quest").toUpperCase(),
                 style: const TextStyle(
-                    fontSize: 28,
+                    fontSize: 32,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1E293B),
-                    letterSpacing: -0.5),
+                    color: AppColors.ink,
+                    letterSpacing: 1.0),
               ),
             ),
             if (isDone)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                    color: Colors.green.shade50, borderRadius: BorderRadius.circular(20)),
-                child: Row(
+                    color: AppColors.forest,
+                    border: Border.all(color: AppColors.ink, width: 2)),
+                child: const Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green.shade600, size: 16),
-                    const SizedBox(width: 6),
-                    Text("Rezolvat",
+                    Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    SizedBox(width: 8),
+                    Text("CLEARED",
                         style: TextStyle(
-                            color: Colors.green.shade700,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 13)),
+                            fontSize: 16, letterSpacing: 1.2)),
                   ],
                 ),
               ),
@@ -381,61 +463,57 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  // --------------------------------------------------------------------------
-  // INPUT TYPES (GRILA & TEXT)
-  // --------------------------------------------------------------------------
-
   Widget _buildGrilaSection() {
     final List<String> variante = List<String>.from(exerciseData!["variante"] ?? []);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 1),
+        Container(height: 3, color: AppColors.ink),
         const SizedBox(height: 32),
-        const Text("ALEGE VARIANTA CORECTĂ",
+        const Text("SELECT CORRECT OPTION",
             style: TextStyle(
-                color: Colors.grey,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 16),
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 24),
         ...variante.map((varianta) {
           final isSelected = _selectedGrilaOption == varianta;
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: InkWell(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: GestureDetector(
               onTap: () {
                 _checkAuthAndExecute(() {
                   setState(() => _selectedGrilaOption = varianta);
                 });
               },
-              borderRadius: BorderRadius.circular(12),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 150),
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.blue.shade50 : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: isSelected ? Colors.blueAccent : Colors.grey.shade300,
-                      width: isSelected ? 2 : 1),
+                    color: isSelected ? AppColors.sky : Colors.white,
+                    border: Border.all(color: AppColors.ink, width: 3),
+                    boxShadow: [
+                      if (!isSelected) const BoxShadow(color: AppColors.ink, offset: Offset(4, 4))
+                    ]
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                      color: isSelected ? Colors.blueAccent : Colors.grey.shade400,
+                      isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                      color: AppColors.ink,
+                      size: 28,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         varianta,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: isSelected ? Colors.blueAccent.shade700 : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: AppColors.ink,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -445,23 +523,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
           );
         }).toList(),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _selectedGrilaOption == null
-                ? null
-                : () => _checkAuthAndExecute(_checkSimpleAnswer),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              disabledBackgroundColor: Colors.grey.shade200,
-            ),
-            child: const Text("Verifică Răspunsul",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
+        const SizedBox(height: 32),
+        RetroButton(
+          text: "VERIFY ANSWER",
+          isFullWidth: true,
+          bgColor: AppColors.ink,
+          onPressed: _selectedGrilaOption == null
+              ? () {}
+              : () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
         _buildResultBox(),
       ],
@@ -472,48 +541,35 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 1),
+        Container(height: 3, color: AppColors.ink),
         const SizedBox(height: 32),
-        const Text("RĂSPUNSUL TĂU",
+        const Text("YOUR SOLUTION",
             style: TextStyle(
-                color: Colors.grey,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 12),
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 16),
         TextField(
           controller: _answerController,
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink),
           decoration: InputDecoration(
-            hintText: "Scrie răspunsul aici...",
+            hintText: "Enter value...",
+            hintStyle: const TextStyle(color: Colors.black38),
             filled: true,
-            fillColor: Colors.grey.shade50,
-            contentPadding: const EdgeInsets.all(20),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300)),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300)),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.blueAccent, width: 2)),
+            fillColor: AppColors.cloud,
+            contentPadding: const EdgeInsets.all(24),
+            border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
+            enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
+            focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
           ),
         ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => _checkAuthAndExecute(_checkSimpleAnswer),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text("Verifică Răspunsul",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
+        const SizedBox(height: 32),
+        RetroButton(
+          text: "VERIFY ANSWER",
+          isFullWidth: true,
+          bgColor: AppColors.ink,
+          onPressed: () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
         _buildResultBox(),
       ],
@@ -539,87 +595,71 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     if (solutionOk) await _markExerciseAsDone();
   }
 
-  // --------------------------------------------------------------------------
-  // CODE EDITOR & JUDGE0
-  // --------------------------------------------------------------------------
-
   Widget _uploadSolutionSectionForCode() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 1),
+        Container(height: 3, color: AppColors.ink),
         const SizedBox(height: 32),
-        const Text("EDITOR DE COD (C++)",
+        const Text("CODE EDITOR (C++)",
             style: TextStyle(
-                color: Colors.grey,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 12),
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.circular(12),
+            color: AppColors.ink,
+            border: Border.all(color: AppColors.ink, width: 3),
           ),
           child: TextField(
             controller: _answerController,
             maxLines: 15,
             style: const TextStyle(
-                fontFamily: 'monospace', color: Colors.white, fontSize: 15, height: 1.5),
-            decoration: InputDecoration(
+                fontFamily: 'monospace', color: AppColors.sky, fontSize: 18, fontWeight: FontWeight.bold, height: 1.5),
+            decoration: const InputDecoration(
               hintText:
-              "// Scrie codul tău aici...\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}",
-              hintStyle: TextStyle(color: Colors.grey.shade600),
+              "// Write code here...\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}",
+              hintStyle: TextStyle(color: Colors.white38),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(20),
+              contentPadding: EdgeInsets.all(24),
             ),
           ),
         ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: isRunningCode ? null : () => _checkAuthAndExecute(_runJudge0Checker),
-            icon: isRunningCode
-                ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Icon(Icons.play_arrow),
-            label: Text(isRunningCode ? "Se evaluează..." : "Rulează și Evaluează",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
+        const SizedBox(height: 32),
+        RetroButton(
+          text: "COMPILE & RUN",
+          isFullWidth: true,
+          isLoading: isRunningCode,
+          bgColor: AppColors.forest,
+          onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
         ),
         if (debugLogs.isNotEmpty)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            margin: const EdgeInsets.only(top: 24),
+            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.only(top: 32),
             decoration: BoxDecoration(
-                color: Colors.black87, borderRadius: BorderRadius.circular(12)),
+                color: AppColors.ink, border: Border.all(color: AppColors.ink, width: 3)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("CONSOLE OUTPUT",
                     style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 11,
+                        color: AppColors.cloud,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 1)),
-                const SizedBox(height: 12),
+                        letterSpacing: 2.0)),
+                const SizedBox(height: 16),
                 ...debugLogs.map((log) => Text(log,
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontFamily: 'monospace',
-                        color: log.contains("❌") || log.contains("EȘUAT")
-                            ? Colors.redAccent
-                            : Colors.greenAccent,
+                        color: log.contains("FAIL") || log.contains("ERROR")
+                            ? AppColors.sunset
+                            : AppColors.mustard,
+                        fontWeight: FontWeight.bold,
                         height: 1.5))),
               ],
             ),
@@ -684,11 +724,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
         if (normOutput != normExpected) {
           allPassed = false;
-          debugLogs.add("❌ Testul ${i + 1} a eșuat.");
-          debugLogs.add("   Expected: $normExpected");
-          debugLogs.add("   Got:      $normOutput\n");
+          debugLogs.add("> TEST ${i + 1}: FAILED");
+          debugLogs.add("  EXPECTED: $normExpected");
+          debugLogs.add("  GOT:      $normOutput\n");
         } else {
-          debugLogs.add("✅ Testul ${i + 1} trecut cu succes.");
+          debugLogs.add("> TEST ${i + 1}: SUCCESS");
         }
         setState(() {});
       }
@@ -699,42 +739,39 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       });
       if (allPassed) await _markExerciseAsDone();
     } catch (e) {
-      debugLogs.add("❌ Eroare la Judge0: $e");
+      debugLogs.add("> ERROR: $e");
       setState(() => solutionChecked = true);
     } finally {
       setState(() => isRunningCode = false);
     }
   }
 
-  // --------------------------------------------------------------------------
-  // SECONDARY TABS & HELPERS
-  // --------------------------------------------------------------------------
-
   Widget _buildResultBox() {
     if (!solutionChecked) return const SizedBox();
     return Container(
-      margin: const EdgeInsets.only(top: 24),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(top: 32),
+      padding: const EdgeInsets.all(24),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: solutionOk ? Colors.green.shade50 : Colors.red.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: solutionOk ? Colors.green.shade200 : Colors.red.shade200),
+        color: solutionOk ? AppColors.forest : AppColors.sunset,
+        border: Border.all(color: AppColors.ink, width: 3),
+        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
       ),
       child: Row(
         children: [
           Icon(solutionOk ? Icons.check_circle : Icons.error,
-              color: solutionOk ? Colors.green : Colors.red, size: 28),
-          const SizedBox(width: 16),
+              color: Colors.white, size: 36),
+          const SizedBox(width: 24),
           Expanded(
             child: Text(
               solutionOk
-                  ? "Excelent! Răspunsul este corect."
-                  : "Răspuns incorect. Mai încearcă o dată.",
-              style: TextStyle(
-                  color: solutionOk ? Colors.green.shade800 : Colors.red.shade800,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+                  ? "QUEST CLEARED! WELL DONE."
+                  : "INCORRECT. TRY AGAIN.",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5),
             ),
           ),
         ],
@@ -745,30 +782,35 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _buildHints() {
     final hints = List<String>.from(exerciseData!["hints"] ?? []);
     if (hints.isEmpty)
-      return const Text("Nu există indicații disponibile.",
-          style: TextStyle(color: Colors.grey));
+      return const Text("NO HINTS AVAILABLE.",
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("INDICAȚII",
+        const Text("HINTS",
             style: TextStyle(
-                color: Colors.blueAccent,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 16),
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 24),
         ...hints.map((h) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("💡", style: TextStyle(fontSize: 18)),
-              const SizedBox(width: 12),
-              Expanded(
-                  child: Text(h,
-                      style: TextStyle(
-                          fontSize: 16, color: Colors.grey.shade800, height: 1.5))),
-            ],
+          padding: const EdgeInsets.only(bottom: 16),
+          child: RetroBlock(
+            bgColor: AppColors.mustard,
+            padding: 16,
+            shadowOffset: 4,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.lightbulb, color: AppColors.ink),
+                const SizedBox(width: 16),
+                Expanded(
+                    child: Text(h,
+                        style: const TextStyle(
+                            fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.4))),
+              ],
+            ),
           ),
         )),
       ],
@@ -778,17 +820,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _buildTests() {
     final tests = exerciseData?["tests"] as List<dynamic>? ?? [];
     if (tests.isEmpty)
-      return const Text("Nu există teste disponibile.", style: TextStyle(color: Colors.grey));
+      return const Text("NO TESTS AVAILABLE.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("TESTE DE EVALUARE",
+        const Text("EVALUATION TESTS",
             style: TextStyle(
-                color: Colors.blueAccent,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 16),
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 24),
         ...tests.map((t) => _testBox(t["input"]?.toString() ?? "", t["output"]?.toString() ?? "")),
       ],
     );
@@ -797,51 +839,59 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _buildOfficialSolution() {
     final sol = exerciseData!["official_solution"];
     if (sol == null)
-      return const Text("Nu există soluție oficială.", style: TextStyle(color: Colors.grey));
+      return const Text("NO OFFICIAL SOLUTION AVAILABLE.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("SOLUȚIE OFICIALĂ (${(sol["language"] ?? "Necunoscut").toString().toUpperCase()})",
+        Text("OFFICIAL SOLUTION (${(sol["language"] ?? "UNKNOWN").toString().toUpperCase()})",
             style: const TextStyle(
-                color: Colors.blueAccent,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontSize: 12)),
-        const SizedBox(height: 16),
+                letterSpacing: 2.0,
+                fontSize: 16)),
+        const SizedBox(height: 24),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E), borderRadius: BorderRadius.circular(12)),
+              color: AppColors.ink, border: Border.all(color: AppColors.ink, width: 3)),
           child: SelectableText(sol["code"] ?? "",
               style: const TextStyle(
-                  fontFamily: 'monospace', color: Colors.white, fontSize: 14, height: 1.5)),
+                  fontFamily: 'monospace', color: AppColors.sky, fontSize: 16, fontWeight: FontWeight.bold, height: 1.5)),
         ),
       ],
     );
   }
 
   Widget _section(String title, String? text) => Padding(
-    padding: const EdgeInsets.only(bottom: 24),
+    padding: const EdgeInsets.only(bottom: 32),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title.toUpperCase(),
             style: const TextStyle(
-                color: Colors.grey,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                fontSize: 12)),
-        const SizedBox(height: 8),
-        Text(text ?? "",
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87)),
+                letterSpacing: 2.0,
+                fontSize: 14)),
+        const SizedBox(height: 12),
+        RetroBlock(
+          bgColor: AppColors.cloud,
+          padding: 16,
+          shadowOffset: 4,
+          child: SizedBox(
+            width: double.infinity,
+            child: Text(text ?? "",
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.ink)),
+          ),
+        ),
       ],
     ),
   );
 
   Widget _sectionList(String title, List<String> items) =>
-      _section(title, items.isNotEmpty ? items.join("\n• ") : "Nu sunt disponibile.");
+      _section(title, items.isNotEmpty ? items.join("\n• ") : "N/A");
 
   Widget _exampleSection() {
     final example = exerciseData!["examples"];
@@ -849,13 +899,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("EXEMPLU",
+        const Text("EXAMPLE",
             style: TextStyle(
-                color: Colors.grey,
+                color: AppColors.ink,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                fontSize: 12)),
-        const SizedBox(height: 12),
+                letterSpacing: 2.0,
+                fontSize: 14)),
+        const SizedBox(height: 16),
         _testBox(example["input"]?.toString() ?? "", example["output"]?.toString() ?? ""),
       ],
     );
@@ -863,44 +913,44 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   Widget _testBox(String input, String output) => Container(
     width: double.infinity,
-    margin: const EdgeInsets.only(bottom: 12),
+    margin: const EdgeInsets.only(bottom: 16),
     decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200)),
+        color: AppColors.cloud,
+        border: Border.all(color: AppColors.ink, width: 3)),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("INPUT",
                     style: TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
-                const SizedBox(height: 8),
+                        fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5)),
+                const SizedBox(height: 12),
                 Text(input,
                     style:
-                    const TextStyle(fontFamily: 'monospace', fontSize: 14, color: Colors.black87)),
+                    const TextStyle(fontFamily: 'monospace', fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink)),
               ],
             ),
           ),
         ),
-        Container(width: 1, height: 60, color: Colors.grey.shade200),
+        Container(width: 3, color: AppColors.ink),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("OUTPUT",
                     style: TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
-                const SizedBox(height: 8),
+                        fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5)),
+                const SizedBox(height: 12),
                 Text(output,
                     style:
-                    const TextStyle(fontFamily: 'monospace', fontSize: 14, color: Colors.black87)),
+                    const TextStyle(fontFamily: 'monospace', fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink)),
               ],
             ),
           ),

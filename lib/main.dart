@@ -3,12 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart';
-// OBLIGATORIU PENTRU WEB PLUGINS
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'firebase_options.dart';
 
-// --- IMPORTURI ECRANE ---
 import 'home_screen.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
@@ -40,11 +38,6 @@ import 'add_exercise_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🛑 OPRIRE STRATEGIE PENTRU GITHUB PAGES 🛑
-  // Comentăm această linie. GoRouter va adăuga "#" în URL-uri,
-  // ceea ce face ca navigarea să funcționeze 100% corect pe hosturi statice.
-  // usePathUrlStrategy();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -52,9 +45,6 @@ void main() async {
   runApp(const IMeditatiiApp());
 }
 
-// ======================================================================
-// CONFIGURARE GO ROUTER
-// ======================================================================
 final GoRouter _router = GoRouter(
   initialLocation: '/',
   routes: [
@@ -65,7 +55,6 @@ final GoRouter _router = GoRouter(
         return ChooseRoleScreen(uid: extra['uid']!, email: extra['email']!);
       },
     ),
-    // 🚀 AICI AM PUS NoTransitionPage PENTRU ACASĂ
     GoRoute(
       path: '/',
       pageBuilder: (context, state) => const NoTransitionPage(
@@ -150,8 +139,6 @@ final GoRouter _router = GoRouter(
         );
       },
     ),
-
-    // 🚀 AICI AM PUS NoTransitionPage PENTRU PROFESORI (Materii)
     GoRoute(
       path: '/materii',
       pageBuilder: (context, state) => const NoTransitionPage(
@@ -165,10 +152,6 @@ final GoRouter _router = GoRouter(
         return TeacherListScreen(specialization: specMap);
       },
     ),
-
-    // --- 🚀 SECȚIUNEA EXERCIȚII ---
-
-    // 🚀 AICI AM PUS NoTransitionPage PENTRU EXERCIȚII
     GoRoute(
       path: '/exercitii',
       pageBuilder: (context, state) => const NoTransitionPage(
@@ -202,9 +185,6 @@ final GoRouter _router = GoRouter(
     ),
   ],
 );
-// ======================================================================
-// 🚀 COMPORTAMENT GLOBAL PENTRU SCROLL (WEB vs MOBILE)
-// ======================================================================
 
 class IMeditatiiApp extends StatelessWidget {
   const IMeditatiiApp({super.key});
@@ -215,19 +195,22 @@ class IMeditatiiApp extends StatelessWidget {
       title: 'iMeditatii',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        useMaterial3: true,
-        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3B82F6)),
-
-        // 🚀 AICI IMITĂM 100% BARA NATIVĂ DIN CHROME
+        useMaterial3: false,
+        textTheme: GoogleFonts.vt323TextTheme(Theme.of(context).textTheme),
+        scaffoldBackgroundColor: const Color(0xFFF9F7F1),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF2C363F),
+          secondary: Color(0xFFE75A41),
+        ),
+        splashFactory: NoSplash.splashFactory,
+        highlightColor: Colors.transparent,
         scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: WidgetStateProperty.all(true), // Mereu vizibilă
-          trackVisibility: WidgetStateProperty.all(true), // Arată "șina" din spate
-          thickness: WidgetStateProperty.all(14.0), // Grosimea standard din Chrome
-          radius: const Radius.circular(0), // Fără colțuri rotunjite (stil clasic desktop)
-          thumbColor: WidgetStateProperty.all(const Color(0xFFC1C1C1)), // Griul butonului de scroll din Chrome
-          trackColor: WidgetStateProperty.all(const Color(0xFFF1F1F1)), // Griul deschis al șinei din spate
+          thumbVisibility: WidgetStateProperty.all(true),
+          trackVisibility: WidgetStateProperty.all(true),
+          thickness: WidgetStateProperty.all(16.0),
+          radius: const Radius.circular(0),
+          thumbColor: WidgetStateProperty.all(const Color(0xFF2C363F)),
+          trackColor: WidgetStateProperty.all(const Color(0xFFE2DFD2)),
           interactive: true,
         ),
       ),
