@@ -56,6 +56,7 @@ dependencies:
   cloud_functions: ^5.6.2
   go_router: ^13.2.0
   web_smooth_scroll: ^2.0.0
+  flutter_dotenv: ^6.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -112,3 +113,4 @@ flutter:
     - assets/data/exercises.json
     - assets/data/exercise_details.json
     - assets/icons/
+    - .env

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 class AppColors {
   static const Color bg = Color(0xFFF9F7F1);
   static const Color ink = Color(0xFF2C363F);
@@ -174,7 +174,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   bool _hasCamera = true;
 
-  final String appId = "de8d7a237d93419b8f7b22ea3a167307";
+  final String appId = dotenv.env['AGORA_APP_ID'] ?? '';
 
   @override
   void initState() {
