@@ -169,7 +169,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startDailyQuest() {
-    // Înlocuiește 'q4_p5_id' cu un ID real de document din Firebase
     final exerciseId = 'q4_p5_id';
     final encodedMaterie = Uri.encodeComponent('Informatică');
     final encodedClasa = Uri.encodeComponent('9');
