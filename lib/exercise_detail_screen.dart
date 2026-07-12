@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -112,20 +113,19 @@ class _RetroButtonState extends State<RetroButton> {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           child: widget.isLoading
               ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)
-          )
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
               : Text(
-            widget.text.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: widget.textColor,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
-          ),
+                  widget.text.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: widget.textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
         ),
       ),
     );
@@ -156,30 +156,47 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   bool solutionChecked = false;
   bool solutionOk = false;
   bool isRunningCode = false;
-
   String? _selectedGrilaOption;
 
   @override
   void initState() {
     super.initState();
-    _loadExerciseDetailsFromFirebase();
+    _loadExerciseDetails();
   }
 
-  Future<void> _loadExerciseDetailsFromFirebase() async {
+  Future<void> _loadExerciseDetails() async {
+    try {
+      final String response = await rootBundle.loadString('assets/data/exercise_details.json');
+      final data = json.decode(response);
+
+      if (data[widget.subject] != null &&
+          data[widget.subject][widget.grade] != null &&
+          data[widget.subject][widget.grade][widget.id] != null) {
+        
+        setState(() {
+          exerciseData = data[widget.subject][widget.grade][widget.id];
+        });
+        return;
+      }
+    } catch (e) {
+      debugPrint("Eroare JSON: $e");
+    }
+
     try {
       final docSnap = await FirebaseFirestore.instance
           .collection('exercises')
           .doc(widget.id)
           .get();
+          
       if (docSnap.exists) {
         setState(() => exerciseData = docSnap.data());
-      } else {
-        setState(() => exerciseData = {});
+        return;
       }
     } catch (e) {
-      debugPrint("Eroare la încărcarea exercițiului: $e");
-      setState(() => exerciseData = {});
+      debugPrint("Eroare Firestore: $e");
     }
+    
+    setState(() => exerciseData = {});
   }
 
   Future<void> _markExerciseAsDone() async {
@@ -204,12 +221,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: AppColors.bg,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+                side: BorderSide(color: AppColors.ink, width: 3)),
             title: const Row(
               children: [
                 Icon(Icons.lock, color: AppColors.ink, size: 28),
                 SizedBox(width: 10),
-                Text("LOGIN REQUIRED", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
+                Text("LOGIN REQUIRED",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
               ],
             ),
             content: const Text(
@@ -244,228 +264,288 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget build(BuildContext context) {
     if (exerciseData == null) {
       return const Scaffold(
-        backgroundColor: AppColors.bg,
-        body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
-      );
+          backgroundColor: AppColors.bg,
+          body: Center(child: CircularProgressIndicator(color: AppColors.sunset)));
     }
 
     if (exerciseData!.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.bg,
         appBar: AppBar(
-          title: const Text("ERROR", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
           backgroundColor: AppColors.bg,
           iconTheme: const IconThemeData(color: AppColors.ink),
-          bottom: PreferredSize(preferredSize: const Size.fromHeight(3), child: Container(color: AppColors.ink, height: 3)),
+          elevation: 0,
         ),
-        body: const Center(child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink))),
+        body: const Center(
+          child: Text("QUEST NOT FOUND.",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink)),
+        ),
       );
-    }
-
-    final tip = exerciseData!["tip_exercitiu"] ?? "cod";
-    List<String> tabs = ["enunt"];
-    if (tip == "cod") {
-      tabs = ["enunt", "indicatii", "teste", "solutie"];
-    } else if (exerciseData!["hints"] != null) {
-      tabs.add("indicatii");
     }
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
+        title: Text(widget.subject.toUpperCase(),
+            style: const TextStyle(
+                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
         backgroundColor: AppColors.bg,
-        elevation: 0,
-        title: const Text(
-          'QUEST TERMINAL',
-          style: TextStyle(
-            color: AppColors.ink,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2.0,
-          ),
-        ),
         iconTheme: const IconThemeData(color: AppColors.ink),
+        elevation: 0,
+        centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3.0),
-          child: Container(color: AppColors.ink, height: 3.0),
+          preferredSize: const Size.fromHeight(3),
+          child: Container(color: AppColors.ink, height: 3),
         ),
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildRetroTabs(tabs),
-                const SizedBox(height: 32),
-                Expanded(
-                  child: RetroBlock(
-                    bgColor: Colors.white,
-                    padding: 32,
-                    child: SingleChildScrollView(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: _buildTabContent(selectedTab),
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth > 800;
+
+              return Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: isWide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 3, child: _buildContentPanel()),
+                          const SizedBox(width: 32),
+                          Expanded(flex: 2, child: _buildInteractionPanel()),
+                        ],
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildContentPanel(),
+                            const SizedBox(height: 32),
+                            _buildInteractionPanel(),
+                          ],
+                        ),
                       ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentPanel() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            _buildTab("enunt", "PROBLEM"),
+            const SizedBox(width: 8),
+            _buildTab("solutie", "SOLUTION"),
+          ],
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
+          ),
+          padding: const EdgeInsets.all(40),
+          child: selectedTab == "enunt" ? _buildEnuntContent() : _buildSolutieContent(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTab(String tabKey, String label) {
+    final isSelected = selectedTab == tabKey;
+    return GestureDetector(
+      onTap: () => setState(() => selectedTab = tabKey),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.mustard : AppColors.cloud,
+          border: const Border(
+            top: BorderSide(color: AppColors.ink, width: 3),
+            left: BorderSide(color: AppColors.ink, width: 3),
+            right: BorderSide(color: AppColors.ink, width: 3),
+            bottom: BorderSide(color: Colors.transparent, width: 0),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: AppColors.ink,
+              letterSpacing: 1.5,
+              decoration: isSelected ? TextDecoration.none : TextDecoration.underline),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnuntContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(exerciseData!["title"]?.toUpperCase() ?? "UNTITLED QUEST",
+            style: const TextStyle(
+                fontSize: 32, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2)),
+        const SizedBox(height: 32),
+        _buildSectionTitle("DESCRIPTION"),
+        Text(exerciseData!["description"] ?? "Fără descriere.",
+            style: const TextStyle(
+                fontSize: 20, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6)),
+        
+        if (exerciseData!["hint"] != null) ...[
+          const SizedBox(height: 32),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.sky.withOpacity(0.2),
+              border: Border.all(color: AppColors.sky, width: 2),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.lightbulb, color: AppColors.sky, size: 28),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    exerciseData!["hint"],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
+          )
+        ],
 
-  Widget _buildRetroTabs(List<String> tabs) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
-      ),
-      child: Wrap(
-        spacing: 8,
-        children: tabs.map((tab) {
-          final isActive = selectedTab == tab;
-          return GestureDetector(
-            onTap: () => setState(() => selectedTab = tab),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: isActive ? AppColors.ink : AppColors.cloud,
-                border: Border.all(color: AppColors.ink, width: 3),
-              ),
-              child: Text(
-                tab.toUpperCase(),
-                style: TextStyle(
-                  color: isActive ? Colors.white : AppColors.ink,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildTabContent(String tab) {
-    switch (tab) {
-      case "enunt":
-        return _buildProblemStatement();
-      case "indicatii":
-        return _buildHints();
-      case "teste":
-        return _buildTests();
-      case "solutie":
-        return _buildOfficialSolution();
-      default:
-        return const SizedBox();
-    }
-  }
-
-  Widget _buildProblemStatement() {
-    final tip = exerciseData!["tip_exercitiu"] ?? "cod";
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _problemHeader(),
-        const SizedBox(height: 40),
-        const Text("QUEST OBJECTIVE",
-            style: TextStyle(
-                color: AppColors.sunset,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
-        const SizedBox(height: 16),
-        Text(
-          exerciseData!["description"] ?? "No description provided.",
-          style: const TextStyle(
-              fontSize: 22,
-              color: AppColors.ink,
-              fontWeight: FontWeight.w600,
-              height: 1.4),
-        ),
-        const SizedBox(height: 48),
-        if (tip == "cod") ...[
-          if (exerciseData!["input"] != null)
-            _section("Input Format", exerciseData!["input"]),
-          if (exerciseData!["output"] != null)
-            _section("Output Format", exerciseData!["output"]),
-          if (exerciseData!["constraints"] != null)
-            _sectionList("Constraints",
-                List<String>.from(exerciseData!["constraints"])),
-          _exampleSection(),
+        if (exerciseData!["tip_exercitiu"] == "cod" || exerciseData!["input"] != null) ...[
           const SizedBox(height: 48),
-          _uploadSolutionSectionForCode(),
-        ] else if (tip == "grila") ...[
-          _buildGrilaSection(),
-        ] else if (tip == "text") ...[
-          _buildTextAnswerSection(),
+          Container(height: 3, color: AppColors.ink),
+          const SizedBox(height: 32),
+          _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"] ?? "-"),
+          const SizedBox(height: 24),
+          _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"] ?? "-"),
         ],
       ],
     );
   }
 
-  Widget _problemHeader() {
-    return FutureBuilder<bool>(
-      future: _isExerciseDone(),
-      builder: (context, snapshot) {
-        final isDone = snapshot.data ?? false;
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                  color: AppColors.sky,
-                  border: Border.all(color: AppColors.ink, width: 2)),
-              child: Text("LEVEL ${widget.grade}",
-                  style: const TextStyle(
-                      color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 16)),
+  Widget _buildSolutieContent() {
+    final offSol = exerciseData!["official_solution"];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("MASTER'S SOLUTION",
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.ink)),
+        const SizedBox(height: 32),
+        if (offSol != null && offSol["code"] != null)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.ink,
+              border: Border.all(color: AppColors.ink, width: 3),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                (exerciseData!["title"] ?? "Quest").toUpperCase(),
+            child: Text(offSol["code"],
                 style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.ink,
-                    letterSpacing: 1.0),
-              ),
-            ),
-            if (isDone)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                    color: AppColors.forest,
-                    border: Border.all(color: AppColors.ink, width: 2)),
-                child: const Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text("CLEARED",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16, letterSpacing: 1.2)),
-                  ],
-                ),
-              ),
-          ],
-        );
-      },
+                    fontFamily: 'monospace',
+                    color: AppColors.sky,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    height: 1.5)),
+          )
+        else
+          const Text("Acest exercițiu nu are o soluție oficială disponibilă.",
+              style: TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(title,
+          style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.sunset,
+              letterSpacing: 2.0)),
+    );
+  }
+
+  Widget _buildCodeSpecBlock(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title,
+            style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: AppColors.sky,
+                letterSpacing: 2.0)),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 2)),
+          child: Text(content,
+              style: const TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.w600)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInteractionPanel() {
+    return RetroBlock(
+      bgColor: AppColors.cloud,
+      padding: 40,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.videogame_asset, size: 36, color: AppColors.ink),
+              const SizedBox(width: 16),
+              const Text("TERMINAL",
+                  style: TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0)),
+              const Spacer(),
+              FutureBuilder<bool>(
+                future: _isExerciseDone(),
+                builder: (context, snapshot) {
+                  if (snapshot.data == true || solutionOk) {
+                    return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        color: AppColors.forest,
+                        child: const Text("CLEARED",
+                            style: TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.0)));
+                  }
+                  return const SizedBox();
+                },
+              )
+            ],
+          ),
+          if (exerciseData!["tip_exercitiu"] == "grila")
+            _buildGrilaSection()
+          else if (exerciseData!["tip_exercitiu"] == "text" || exerciseData!["raspuns_corect"] != null)
+            _buildTextAnswerSection()
+          else
+            _uploadSolutionSectionForCode(),
+        ],
+      ),
     );
   }
 
   Widget _buildGrilaSection() {
-    final List<String> variante = List<String>.from(exerciseData!["variante"] ?? []);
-
+    List<dynamic> variante = exerciseData!["variante"] ?? [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -473,10 +553,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         const SizedBox(height: 32),
         const Text("SELECT CORRECT OPTION",
             style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
+                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 16)),
         const SizedBox(height: 24),
         ...variante.map((varianta) {
           final isSelected = _selectedGrilaOption == varianta;
@@ -497,8 +574,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     border: Border.all(color: AppColors.ink, width: 3),
                     boxShadow: [
                       if (!isSelected) const BoxShadow(color: AppColors.ink, offset: Offset(4, 4))
-                    ]
-                ),
+                    ]),
                 child: Row(
                   children: [
                     Icon(
@@ -528,9 +604,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           text: "VERIFY ANSWER",
           isFullWidth: true,
           bgColor: AppColors.ink,
-          onPressed: _selectedGrilaOption == null
-              ? () {}
-              : () => _checkAuthAndExecute(_checkSimpleAnswer),
+          onPressed: _selectedGrilaOption == null ? () {} : () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
         _buildResultBox(),
       ],
@@ -545,23 +619,23 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         const SizedBox(height: 32),
         const Text("YOUR SOLUTION",
             style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
+                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 16)),
         const SizedBox(height: 16),
         TextField(
           controller: _answerController,
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: "Enter value...",
-            hintStyle: const TextStyle(color: Colors.black38),
+            hintStyle: TextStyle(color: Colors.black38),
             filled: true,
             fillColor: AppColors.cloud,
-            contentPadding: const EdgeInsets.all(24),
-            border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
-            enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
-            focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
+            contentPadding: EdgeInsets.all(24),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
           ),
         ),
         const SizedBox(height: 32),
@@ -577,8 +651,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   void _checkSimpleAnswer() async {
-    final raspunsCorect =
-    exerciseData!["raspuns_corect"]?.toString().trim().toLowerCase();
+    final raspunsCorect = exerciseData!["raspuns_corect"]?.toString().trim().toLowerCase();
     String raspunsElev = "";
 
     if (exerciseData!["tip_exercitiu"] == "grila") {
@@ -603,10 +676,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         const SizedBox(height: 32),
         const Text("CODE EDITOR (C++)",
             style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
+                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 16)),
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
@@ -617,10 +687,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             controller: _answerController,
             maxLines: 15,
             style: const TextStyle(
-                fontFamily: 'monospace', color: AppColors.sky, fontSize: 18, fontWeight: FontWeight.bold, height: 1.5),
+                fontFamily: 'monospace',
+                color: AppColors.sky,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                height: 1.5),
             decoration: const InputDecoration(
-              hintText:
-              "// Write code here...\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}",
+              hintText: "// Write code here...\n#include <iostream>\nusing namespace std;\n\nint main() {\n  return 0;\n}",
               hintStyle: TextStyle(color: Colors.white38),
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(24),
@@ -690,8 +763,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       }
       if (exerciseData?["tests"] != null) {
         for (var t in exerciseData!["tests"]) {
-          tests.add(
-              {"input": t["input"]?.toString() ?? "", "output": t["output"]?.toString() ?? ""});
+          tests.add({"input": t["input"]?.toString() ?? "", "output": t["output"]?.toString() ?? ""});
         }
       }
 
@@ -701,10 +773,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final inputData = test["input"] ?? "";
         final expectedOutput = test["output"] ?? "";
 
-        final body =
-        jsonEncode({"language_id": 52, "source_code": code, "stdin": inputData});
-        final uri =
-        Uri.parse("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true");
+        final body = jsonEncode({"language_id": 52, "source_code": code, "stdin": inputData});
+        final uri = Uri.parse("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true");
         final response = await http.post(
           uri,
           headers: {
@@ -726,7 +796,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           allPassed = false;
           debugLogs.add("> TEST ${i + 1}: FAILED");
           debugLogs.add("  EXPECTED: $normExpected");
-          debugLogs.add("  GOT:      $normOutput\n");
+          debugLogs.add("  GOT: $normOutput\n");
         } else {
           debugLogs.add("> TEST ${i + 1}: SUCCESS");
         }
@@ -759,203 +829,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       ),
       child: Row(
         children: [
-          Icon(solutionOk ? Icons.check_circle : Icons.error,
-              color: Colors.white, size: 36),
+          Icon(solutionOk ? Icons.check_circle : Icons.error, color: Colors.white, size: 36),
           const SizedBox(width: 24),
           Expanded(
             child: Text(
-              solutionOk
-                  ? "QUEST CLEARED! WELL DONE."
-                  : "INCORRECT. TRY AGAIN.",
+              solutionOk ? "QUEST CLEARED! WELL DONE." : "INCORRECT. TRY AGAIN.",
               style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5),
+                  color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildHints() {
-    final hints = List<String>.from(exerciseData!["hints"] ?? []);
-    if (hints.isEmpty)
-      return const Text("NO HINTS AVAILABLE.",
-          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("HINTS",
-            style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
-        const SizedBox(height: 24),
-        ...hints.map((h) => Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: RetroBlock(
-            bgColor: AppColors.mustard,
-            padding: 16,
-            shadowOffset: 4,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.lightbulb, color: AppColors.ink),
-                const SizedBox(width: 16),
-                Expanded(
-                    child: Text(h,
-                        style: const TextStyle(
-                            fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.4))),
-              ],
-            ),
-          ),
-        )),
-      ],
-    );
-  }
-
-  Widget _buildTests() {
-    final tests = exerciseData?["tests"] as List<dynamic>? ?? [];
-    if (tests.isEmpty)
-      return const Text("NO TESTS AVAILABLE.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("EVALUATION TESTS",
-            style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
-        const SizedBox(height: 24),
-        ...tests.map((t) => _testBox(t["input"]?.toString() ?? "", t["output"]?.toString() ?? "")),
-      ],
-    );
-  }
-
-  Widget _buildOfficialSolution() {
-    final sol = exerciseData!["official_solution"];
-    if (sol == null)
-      return const Text("NO OFFICIAL SOLUTION AVAILABLE.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("OFFICIAL SOLUTION (${(sol["language"] ?? "UNKNOWN").toString().toUpperCase()})",
-            style: const TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16)),
-        const SizedBox(height: 24),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-              color: AppColors.ink, border: Border.all(color: AppColors.ink, width: 3)),
-          child: SelectableText(sol["code"] ?? "",
-              style: const TextStyle(
-                  fontFamily: 'monospace', color: AppColors.sky, fontSize: 16, fontWeight: FontWeight.bold, height: 1.5)),
-        ),
-      ],
-    );
-  }
-
-  Widget _section(String title, String? text) => Padding(
-    padding: const EdgeInsets.only(bottom: 32),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title.toUpperCase(),
-            style: const TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 14)),
-        const SizedBox(height: 12),
-        RetroBlock(
-          bgColor: AppColors.cloud,
-          padding: 16,
-          shadowOffset: 4,
-          child: SizedBox(
-            width: double.infinity,
-            child: Text(text ?? "",
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.ink)),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _sectionList(String title, List<String> items) =>
-      _section(title, items.isNotEmpty ? items.join("\n• ") : "N/A");
-
-  Widget _exampleSection() {
-    final example = exerciseData!["examples"];
-    if (example == null) return const SizedBox();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("EXAMPLE",
-            style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 14)),
-        const SizedBox(height: 16),
-        _testBox(example["input"]?.toString() ?? "", example["output"]?.toString() ?? ""),
-      ],
-    );
-  }
-
-  Widget _testBox(String input, String output) => Container(
-    width: double.infinity,
-    margin: const EdgeInsets.only(bottom: 16),
-    decoration: BoxDecoration(
-        color: AppColors.cloud,
-        border: Border.all(color: AppColors.ink, width: 3)),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("INPUT",
-                    style: TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5)),
-                const SizedBox(height: 12),
-                Text(input,
-                    style:
-                    const TextStyle(fontFamily: 'monospace', fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink)),
-              ],
-            ),
-          ),
-        ),
-        Container(width: 3, color: AppColors.ink),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("OUTPUT",
-                    style: TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5)),
-                const SizedBox(height: 12),
-                Text(output,
-                    style:
-                    const TextStyle(fontFamily: 'monospace', fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink)),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
 }
