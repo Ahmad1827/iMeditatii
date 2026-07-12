@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
@@ -115,33 +117,67 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   void initState() {
     super.initState();
     selectedGrade = widget.grade ?? "9";
-    _loadExercisesFromFirebase();
+    _loadAllExercises();
   }
 
-  Future<void> _loadExercisesFromFirebase() async {
+  Future<void> _loadAllExercises() async {
     setState(() => isLoading = true);
+
+    List<Map<String, dynamic>> fetchedExercises = [];
+    Set<String> tempGrades = {};
+
+    try {
+      final String response = await rootBundle.loadString('assets/data/exercises.json');
+      final data = json.decode(response);
+      
+      final subjectData = data[widget.subject];
+      if (subjectData != null) {
+        (subjectData as Map<String, dynamic>).forEach((gradeKey, categoriesMap) {
+          tempGrades.add(gradeKey);
+          (categoriesMap as Map<String, dynamic>).forEach((categoryName, exercisesList) {
+            for (var ex in (exercisesList as List<dynamic>)) {
+              fetchedExercises.add({
+                'id': ex['id'],
+                'grade': gradeKey,
+                'category': categoryName,
+                'title': ex['title'] ?? "Fără titlu",
+                'difficulty': ex['difficulty'] ?? "ușoară",
+                'source': 'json',
+              });
+            }
+          });
+        });
+      }
+    } catch (e) {
+      debugPrint("Eroare la încărcarea JSON-ului local: $e");
+    }
 
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('exercises')
           .where('subject', isEqualTo: widget.subject)
+          .where('approved', isEqualTo: true)
           .get();
-
-      List<Map<String, dynamic>> fetchedExercises = [];
-      Set<String> tempGrades = {};
 
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
-        data['id'] = doc.id;
-        data['grade'] = data['grade']?.toString() ?? "N/A";
-        data['category'] = data['category'] ?? "General";
-        data['title'] = data['title'] ?? "Fără titlu";
-        data['difficulty'] = data['difficulty'] ?? "ușoară";
-
-        fetchedExercises.add(data);
-        tempGrades.add(data['grade']);
+        final gradeStr = data['grade']?.toString() ?? "N/A";
+        
+        fetchedExercises.add({
+          'id': doc.id,
+          'grade': gradeStr,
+          'category': data['category'] ?? "General",
+          'title': data['title'] ?? "Fără titlu",
+          'difficulty': data['difficulty'] ?? "ușoară",
+          'source': 'firebase',
+        });
+        tempGrades.add(gradeStr);
       }
+    } catch (e) {
+      debugPrint("Eroare la încărcarea din Firebase: $e");
+    }
 
+    if (mounted) {
       setState(() {
         allExercises = fetchedExercises;
         availableGrades = tempGrades.toList()..sort();
@@ -153,9 +189,6 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       });
 
       _updateCategoriesAndFilter();
-    } catch (e) {
-      debugPrint("Eroare la încărcarea din Firebase: $e");
-      setState(() => isLoading = false);
     }
   }
 
@@ -488,7 +521,6 @@ class _ExerciseListItemState extends State<ExerciseListItem> {
               )
             ],
           ),
-          // 🚀 FIX: Wrap the Row in IntrinsicHeight here!
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
