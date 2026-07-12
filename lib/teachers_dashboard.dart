@@ -143,6 +143,9 @@ class TeachersDashboard extends StatefulWidget {
 }
 
 class _TeachersDashboardState extends State<TeachersDashboard> {
+  bool _isAdmin = true; 
+  int _selectedIndex = 0;
+
   String _getInitials(String name) {
     if (name.isEmpty) return '?';
     List<String> names = name.split(" ");
@@ -158,7 +161,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final String teacherId = FirebaseAuth.instance.currentUser!.uid;
+    final String teacherId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final teacherFuture = FirebaseFirestore.instance.collection('teachers').doc(teacherId).get();
 
     return Scaffold(
@@ -196,18 +199,9 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                         },
                       ),
                       const SizedBox(height: 48),
-                      Row(
-                        children: [
-                          const Icon(Icons.forum, color: AppColors.ink, size: 28),
-                          const SizedBox(width: 16),
-                          Text(
-                            "PLAYER LOGS (MESSAGES)".toUpperCase(),
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      _buildChatList(teacherId),
+                      if (_isAdmin) _buildTabBar(),
+                      const SizedBox(height: 32),
+                      _selectedIndex == 0 ? _buildChatList(teacherId) : _buildPendingQuests(),
                     ],
                   ),
                 ),
@@ -215,6 +209,52 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Row(
+      children: [
+        _buildTab(0, "PLAYER LOGS", Icons.forum),
+        const SizedBox(width: 16),
+        _buildTab(1, "ADMIN PENDING", Icons.security),
+      ],
+    );
+  }
+
+  Widget _buildTab(int index, String title, IconData icon) {
+    final isSelected = _selectedIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedIndex = index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.ink : Colors.white,
+            border: Border.all(color: AppColors.ink, width: 3),
+            boxShadow: [
+              if (!isSelected) const BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: isSelected ? Colors.white : AppColors.ink, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : AppColors.ink,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -273,7 +313,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
           return Column(children: List.generate(3, (index) => _chatCardSkeleton()));
         }
         if (snapshot.hasError) return Center(child: Text('TERMINAL ERROR: ${snapshot.error}'.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)));
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _buildEmptyState();
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _buildEmptyState("COMMUNICATIONS CHANNEL EMPTY", "Incoming apprentice transmissions will be logged here.");
 
         final chats = snapshot.data!.docs;
 
@@ -305,6 +345,70 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                   onTap: () => context.go('/chat/$chatId', extra: userName),
                 );
               },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildPendingQuests() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('exercises')
+          .where('approved', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: AppColors.sunset));
+        }
+        if (snapshot.hasError) return Center(child: Text('ERROR: ${snapshot.error}'));
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildEmptyState("NO PENDING QUESTS", "All submissions have been verified and processed.");
+        }
+
+        final quests = snapshot.data!.docs;
+
+        return Column(
+          children: quests.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: RetroBlock(
+                bgColor: Colors.white,
+                padding: 24,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.ink, width: 2)),
+                      child: const Icon(Icons.pending_actions, color: AppColors.ink, size: 32),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text((data['title'] ?? 'UNKNOWN').toString().toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.ink)),
+                          const SizedBox(height: 4),
+                          Text("${data['subject']} | LVL ${data['grade']} | ${data['tip_exercitiu']}".toUpperCase(), style: const TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    RetroButton(
+                      text: "APPROVE",
+                      bgColor: AppColors.forest,
+                      onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).update({'approved': true}),
+                    ),
+                    const SizedBox(width: 16),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: AppColors.sunset, size: 32),
+                      onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).delete(),
+                    )
+                  ],
+                ),
+              ),
             );
           }).toList(),
         );
@@ -387,18 +491,18 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(String title, String subtitle) {
     return RetroBlock(
       bgColor: Colors.white,
       padding: 60,
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.speaker_notes_off, size: 80, color: AppColors.cloud),
+            const Icon(Icons.folder_off, size: 80, color: AppColors.cloud),
             const SizedBox(height: 24),
-            Text("COMMUNICATIONS CHANNEL EMPTY".toUpperCase(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
+            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
             const SizedBox(height: 12),
-            const Text("Incoming apprentice transmissions will be logged here.", style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)),
+            Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
