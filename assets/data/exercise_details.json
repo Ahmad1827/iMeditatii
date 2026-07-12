@@ -1,89 +1,176 @@
 {
-  "Matematică": {
-    "5": {
+  "Informatică": {
+    "9": {
       "1": {
-        "title": "Adunări și scăderi cu numere naturale",
-        "description": "Se dau două numere naturale. Să se afișeze suma și diferența lor.",
-        "input": "Programul citește două numere naturale a și b.",
-        "output": "Programul afișează pe prima linie suma lor, iar pe a doua diferența.",
-        "constraints": ["0 ≤ a, b ≤ 10⁶"],
-        "examples": {
-          "input": "5 3",
-          "output": "8\n2"
-        },
-        "hints": [
-          "Folosim operatorii + și - pentru calcul.",
-          "Nu este nevoie de structuri complexe."
-        ],
+        "title": "Suma a două numere",
+        "description": "Se dau două numere întregi. Să se calculeze și să se afișeze suma lor.",
+        "input": "Citirea de la tastatură a două numere întregi a și b.",
+        "output": "Afișarea pe ecran a sumei rezultate.",
+        "hint": "Folosește operatorul standard + pentru adunare.",
+        "constraints": ["-10⁹ ≤ a, b ≤ 10⁹"],
+        "examples": { "input": "5 7", "output": "12" },
         "official_solution": {
           "language": "C++",
-          "code": "#include <iostream>\nusing namespace std;\nint main(){\n int a,b; cin>>a>>b;\n cout<<a+b<<\"\\n\"<<a-b;\n return 0;\n}"
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long a, b;\n    cin >> a >> b;\n    cout << a + b;\n    return 0;\n}"
         },
         "tests": [
-          {
-            "input": "5 3",
-            "output": "8\n2",
-            "subject_solution": "suma=a+b;dif=a-b"
-          },
-          {
-            "input": "10 4",
-            "output": "14\n6",
-            "subject_solution": "suma=a+b;dif=a-b"
-          }
+          { "input": "5 7", "output": "12" },
+          { "input": "-10 4", "output": "-6" }
         ]
       },
       "2": {
-        "title": "Înmulțiri și împărțiri cu numere naturale",
-        "description": "Se dau două numere naturale. Să se afișeze produsul și câtul lor (împărțire întreagă).",
-        "input": "Programul citește două numere naturale a și b.",
-        "output": "Programul afișează produsul și câtul (doar dacă b ≠ 0).",
-        "constraints": ["0 ≤ a, b ≤ 10⁶", "b ≠ 0 pentru împărțire."],
-        "examples": {
-          "input": "6 3",
-          "output": "18\n2"
-        },
+        "title": "Schimbare valori (Swap)",
+        "description": "Se dau două numere întregi a și b. Să se inverseze valorile celor două variabile.",
+        "input": "Două numere întregi a și b.",
+        "output": "Valorile inversate separate prin spațiu.",
+        "hint": "Poți folosi o variabilă auxiliară pentru a nu pierde valoarea lui a.",
+        "constraints": ["-10⁵ ≤ a, b ≤ 10⁵"],
+        "examples": { "input": "3 9", "output": "9 3" },
         "official_solution": {
           "language": "C++",
-          "code": "#include <iostream>\nusing namespace std;\nint main(){\n int a,b; cin>>a>>b;\n cout<<a*b<<\"\\n\";\n if(b!=0) cout<<a/b;\n return 0;\n}"
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int a, b, aux;\n    cin >> a >> b;\n    aux = a;\n    a = b;\n    b = aux;\n    cout << a << \" \" << b;\n    return 0;\n}"
         },
         "tests": [
-          {
-            "input": "6 3",
-            "output": "18\n2",
-            "subject_solution": "produs=a*b;cat=a/b"
-          }
+          { "input": "3 9", "output": "9 3" },
+          { "input": "0 -5", "output": "-5 0" }
+        ]
+      },
+      "3": {
+        "title": "Media aritmetică",
+        "description": "Se dau trei numere întregi. Să se calculeze media lor aritmetică cu două zecimale.",
+        "input": "Trei numere întregi x, y și z.",
+        "output": "Media aritmetică sub formă de număr real.",
+        "hint": "Suma trebuie convertită la tipul float sau double înainte de împărțire.",
+        "constraints": ["1 ≤ x, y, z ≤ 10⁴"],
+        "examples": { "input": "2 4 5", "output": "3.67" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int x, y, z;\n    cin >> x >> y >> z;\n    double m = (x + y + z) / 3.0;\n    cout << fixed << setprecision(2) << m;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "2 4 5", "output": "3.67" },
+          { "input": "10 10 10", "output": "10.00" }
+        ]
+      },
+      "4": {
+        "title": "Maximul a două numere",
+        "description": "Se dau două numere întregi. Să se determine valoarea maximă.",
+        "input": "Două numere întregi a și b.",
+        "output": "Cel mai mare dintre cele două numere.",
+        "hint": "Folosește o structură de decizie if-else.",
+        "constraints": ["-10⁹ ≤ a, b ≤ 10⁹"],
+        "examples": { "input": "15 8", "output": "15" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long a, b;\n    cin >> a >> b;\n    if (a > b) cout << a;\n    else cout << b;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "15 8", "output": "15" },
+          { "input": "-3 -3", "output": "-3" }
+        ]
+      },
+      "5": {
+        "title": "Verificare an bisect",
+        "description": "Se dă un număr natural reprezentând un an. Să se determine dacă anul este bisect (afișează 1) sau nu (afișează 0).",
+        "input": "Un număr natural reprezentând anul.",
+        "output": "1 pentru bisect, 0 pentru nebisect.",
+        "hint": "Un an este bisect dacă este divizibil cu 4 dar nu cu 100, sau este divizibil cu 400.",
+        "constraints": ["1 ≤ an ≤ 3000"],
+        "examples": { "input": "2024", "output": "1" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n;\n    cin >> n;\n    if ((n % 4 == 0 && n % 100 != 0) || (n % 400 == 0)) cout << 1;\n    else cout << 0;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "2024", "output": "1" },
+          { "input": "1900", "output": "0" }
+        ]
+      },
+      "6": {
+        "title": "Laturi triunghi",
+        "description": "Se dau trei numere reale pozitive a, b, c. Să se verifice dacă pot reprezenta laturile unui triunghi.",
+        "input": "Trei numere reale.",
+        "output": "DA sau NU.",
+        "hint": "Fiecare latură trebuie să fie strict mai mică decât suma celorlalte două.",
+        "constraints": ["a, b, c > 0"],
+        "examples": { "input": "3 4 5", "output": "DA" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    double a, b, c;\n    cin >> a >> b >> c;\n    if (a < b + c && b < a + c && c < a + b) cout << \"DA\";\n    else cout << \"NU\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3 4 5", "output": "DA" },
+          { "input": "10 2 3", "output": "NU" }
+        ]
+      },
+      "7": {
+        "title": "Suma cifrelor",
+        "description": "Se dă un număr natural N. Să se calculeze suma cifrelor sale.",
+        "input": "Un număr natural N.",
+        "output": "Suma cifrelor lui N.",
+        "hint": "Folosește o structură repetitivă while și operatorii % 10 și / 10.",
+        "constraints": ["0 ≤ N ≤ 2*10⁹"],
+        "examples": { "input": "1234", "output": "10" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, s = 0;\n    cin >> n;\n    if (n == 0) {\n        cout << 0;\n        return 0;\n    }\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n    cout << s;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "1234", "output": "10" },
+          { "input": "0", "output": "0" }
+        ]
+      },
+      "8": {
+        "title": "Cel mai mare divizor comun",
+        "description": "Se dau două numere naturale. Să se determine cel mai mare divizor comun (CMMDC).",
+        "input": "Două numere naturale a și b.",
+        "output": "Valoarea CMMDC.",
+        "hint": "Poți folosi algoritmul lui Euclid prin scăderi repetate sau prin împărțiri (modulo).",
+        "constraints": ["1 ≤ a, b ≤ 10⁹"],
+        "examples": { "input": "18 24", "output": "6" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long a, b;\n    cin >> a >> b;\n    while (b != 0) {\n        long long r = a % b;\n        a = b;\n        b = r;\n    }\n    cout << a;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "18 24", "output": "6" },
+          { "input": "7 13", "output": "1" }
         ]
       }
-    }
-  },
-  "Informatică": {
-    "9": {
-      "2": {
-        "title": "Suma numerelor de la 1 la n",
-        "description": "Se citește un număr natural n. Să se afișeze suma numerelor de la 1 la n.",
-        "input": "Programul citește un singur număr n.",
-        "output": "Programul afișează pe o linie suma cerută.",
-        "constraints": ["1 ≤ n ≤ 10⁹"],
-        "examples": {
-          "input": "5",
-          "output": "15"
-        },
-        "hints": ["Folosește formula n*(n+1)/2 pentru eficiență."],
+    },
+    "10": {
+      "9": {
+        "title": "Suma elementelor din vector",
+        "description": "Se dă un vector cu n elemente întregi. Să se calculeze suma elementelor sale.",
+        "input": "Pe prima linie numărul n, pe a doua linie cele n elemente separate prin spații.",
+        "output": "Suma elementelor din vector.",
+        "hint": "Citește elementele pe rând într-un tablou unidimensional și adună-le într-o variabilă inițializată cu 0.",
+        "constraints": ["1 ≤ n ≤ 1000", "-10⁴ ≤ elemente ≤ 10⁴"],
+        "examples": { "input": "4\n1 2 3 4", "output": "10" },
         "official_solution": {
           "language": "C++",
-          "code": "#include <iostream>\nusing namespace std;\nint main(){\n long long n; cin>>n;\n cout<<n*(n+1)/2;\n return 0;\n}"
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, v[1000];\n    long long s = 0;\n    cin >> n;\n    for(int i = 0; i < n; i++) {\n        cin >> v[i];\n        s += v[i];\n    }\n    cout << s;\n    return 0;\n}"
         },
         "tests": [
-          {
-            "input": "5",
-            "output": "15",
-            "subject_solution": "n*(n+1)/2"
-          },
-          {
-            "input": "10",
-            "output": "55",
-            "subject_solution": "n*(n+1)/2"
-          }
+          { "input": "4\n1 2 3 4", "output": "10" },
+          { "input": "3\n-5 5 -2", "output": "-2" }
+        ]
+      },
+      "10": {
+        "title": "Validare număr prim",
+        "description": "Se dă un număr natural n. Să se verifice dacă este prim.",
+        "input": "Un număr natural n.",
+        "output": "DA sau NU.",
+        "hint": "Un număr este prim dacă nu se divide cu niciun număr cuprins între 2 și rădăcina sa pătrată.",
+        "constraints": ["1 ≤ n ≤ 2*10⁹"],
+        "examples": { "input": "17", "output": "DA" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n;\n    cin >> n;\n    if (n < 2) {\n        cout << \"NU\";\n        return 0;\n    }\n    for (long long d = 2; d * d <= n; d++) {\n        if (n % d == 0) {\n            cout << \"NU\";\n            return 0;\n        }\n    }\n    cout << \"DA\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "17", "output": "DA" },
+          { "input": "4", "output": "NU" }
         ]
       }
     }

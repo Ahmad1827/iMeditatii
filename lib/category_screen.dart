@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 class AppColors {
@@ -147,7 +148,6 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
   List<String> categories = [];
   bool isLoading = true;
-  Map<String, dynamic> classData = {};
 
   final List<Color> _tileColors = [
     AppColors.sky,
@@ -163,33 +163,47 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Future<void> _loadCategories() async {
+    Set<String> uniqueCategories = {};
+
     try {
       final String response = await rootBundle.loadString('assets/data/exercises.json');
       final data = json.decode(response);
-
       final subjectData = data[widget.subject];
+      
       if (subjectData != null) {
         final gradeData = subjectData[widget.grade.toString()];
         if (gradeData != null) {
-          setState(() {
-            categories = gradeData.keys.toList();
-            classData = gradeData;
-            isLoading = false;
-          });
-          return;
+          uniqueCategories.addAll((gradeData as Map<String, dynamic>).keys);
         }
       }
-
-      setState(() {
-        categories = [];
-        isLoading = false;
-      });
     } catch (e) {
+      debugPrint("Eroare JSON: $e");
+    }
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('exercises')
+          .where('subject', isEqualTo: widget.subject)
+          .where('grade', isEqualTo: widget.grade.toString())
+          .where('approved', isEqualTo: true)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        if (data['category'] != null) {
+          uniqueCategories.add(data['category'] as String);
+        }
+      }
+    } catch (e) {
+      debugPrint("Eroare Firestore: $e");
+    }
+
+    if (mounted) {
       setState(() {
-        categories = [];
+        categories = uniqueCategories.toList();
+        categories.sort();
         isLoading = false;
       });
-      debugPrint("Eroare la încărcarea categoriilor: $e");
     }
   }
 
@@ -221,42 +235,42 @@ class _CategoryScreenState extends State<CategoryScreen> {
           child: isLoading
               ? const Center(child: CircularProgressIndicator(color: AppColors.sunset))
               : categories.isEmpty
-              ? Center(
-            child: RetroBlock(
-              bgColor: AppColors.cloud,
-              child: const Text(
-                "NO QUEST CATEGORIES FOUND.",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.ink,
-                  letterSpacing: 1.5,
-                ),
-              ),
-            ),
-          )
-              : ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              final color = _tileColors[index % _tileColors.length];
+                  ? Center(
+                      child: RetroBlock(
+                        bgColor: AppColors.cloud,
+                        child: const Text(
+                          "NO QUEST CATEGORIES FOUND.",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.ink,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        final color = _tileColors[index % _tileColors.length];
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: CategoryTile(
-                  title: category,
-                  bgColor: color,
-                  onTap: () {
-                    context.go(
-                      '/exercitii/${widget.subject}/${widget.grade}',
-                      extra: category,
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: CategoryTile(
+                            title: category,
+                            bgColor: color,
+                            onTap: () {
+                              context.go(
+                                '/exercitii/${widget.subject}/${widget.grade}',
+                                extra: category,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
         ),
       ),
     );
