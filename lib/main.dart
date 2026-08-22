@@ -34,6 +34,7 @@ import 'exercises_screen.dart';
 import 'exercise_list_screen.dart';
 import 'exercise_detail_screen.dart';
 import 'add_exercise_screen.dart';
+import 'seed_problems.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +42,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await populeazaCele50DeProbleme();
   runApp(const IMeditatiiApp());
 }
 

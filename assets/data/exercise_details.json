@@ -53,6 +53,40 @@
         ]
       },
       "4": {
+        "title": "Ultima cifră",
+        "description": "Se dă un număr natural n. Să se determine ultima cifră a sa.",
+        "input": "Un număr natural n.",
+        "output": "Ultima cifră a numărului.",
+        "hint": "Folosește operatorul modulo: n % 10.",
+        "constraints": ["0 ≤ n ≤ 2*10⁹"],
+        "examples": { "input": "583", "output": "3" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n;\n    cin >> n;\n    cout << n % 10;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "583", "output": "3" },
+          { "input": "100", "output": "0" }
+        ]
+      },
+      "5": {
+        "title": "Aria dreptunghiului",
+        "description": "Se dau lungimile laturilor unui dreptunghi a și b. Să se calculeze aria și perimetrul său.",
+        "input": "Două numere naturale a și b.",
+        "output": "Aria și perimetrul separate prin spațiu.",
+        "hint": "Aria = a * b, Perimetrul = 2 * (a + b).",
+        "constraints": ["1 ≤ a, b ≤ 10⁴"],
+        "examples": { "input": "4 5", "output": "20 18" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long a, b;\n    cin >> a >> b;\n    cout << a * b << \" \" << 2 * (a + b);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "4 5", "output": "20 18" },
+          { "input": "10 20", "output": "200 60" }
+        ]
+      },
+      "6": {
         "title": "Maximul a două numere",
         "description": "Se dau două numere întregi. Să se determine valoarea maximă.",
         "input": "Două numere întregi a și b.",
@@ -69,7 +103,7 @@
           { "input": "-3 -3", "output": "-3" }
         ]
       },
-      "5": {
+      "7": {
         "title": "Verificare an bisect",
         "description": "Se dă un număr natural reprezentând un an. Să se determine dacă anul este bisect (afișează 1) sau nu (afișează 0).",
         "input": "Un număr natural reprezentând anul.",
@@ -86,7 +120,7 @@
           { "input": "1900", "output": "0" }
         ]
       },
-      "6": {
+      "8": {
         "title": "Laturi triunghi",
         "description": "Se dau trei numere reale pozitive a, b, c. Să se verifice dacă pot reprezenta laturile unui triunghi.",
         "input": "Trei numere reale.",
@@ -103,7 +137,42 @@
           { "input": "10 2 3", "output": "NU" }
         ]
       },
-      "7": {
+      "9": {
+        "title": "Verificare paritate",
+        "description": "Se citește un număr natural n. Să se afișeze PAR dacă numărul este par sau IMPAR altfel.",
+        "input": "Numărul natural n.",
+        "output": "PAR sau IMPAR.",
+        "hint": "Verifică restul împărțirii la 2: n % 2 == 0.",
+        "constraints": ["0 ≤ n ≤ 2*10⁹"],
+        "examples": { "input": "24", "output": "PAR" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n;\n    cin >> n;\n    if (n % 2 == 0) cout << \"PAR\";\n    else cout << \"IMPAR\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "24", "output": "PAR" },
+          { "input": "17", "output": "IMPAR" }
+        ]
+      },
+      "10": {
+        "title": "Semnul unui număr",
+        "description": "Se dă un număr întreg x. Să se afișeze pozitiv, negativ sau nul în funcție de valoarea sa.",
+        "input": "Un număr întreg x.",
+        "output": "pozitiv, negativ sau nul.",
+        "hint": "Compară numărul cu 0.",
+        "constraints": ["-10⁹ ≤ x ≤ 10⁹"],
+        "examples": { "input": "-5", "output": "negativ" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long x;\n    cin >> x;\n    if (x > 0) cout << \"pozitiv\";\n    else if (x < 0) cout << \"negativ\";\n    else cout << \"nul\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "-5", "output": "negativ" },
+          { "input": "0", "output": "nul" },
+          { "input": "12", "output": "pozitiv" }
+        ]
+      },
+      "11": {
         "title": "Suma cifrelor",
         "description": "Se dă un număr natural N. Să se calculeze suma cifrelor sale.",
         "input": "Un număr natural N.",
@@ -113,19 +182,19 @@
         "examples": { "input": "1234", "output": "10" },
         "official_solution": {
           "language": "C++",
-          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, s = 0;\n    cin >> n;\n    if (n == 0) {\n        cout << 0;\n        return 0;\n    }\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n    cout << s;\n    return 0;\n}"
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n, s = 0;\n    cin >> n;\n    if (n == 0) {\n        cout << 0;\n        return 0;\n    }\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n    cout << s;\n    return 0;\n}"
         },
         "tests": [
           { "input": "1234", "output": "10" },
           { "input": "0", "output": "0" }
         ]
       },
-      "8": {
+      "12": {
         "title": "Cel mai mare divizor comun",
         "description": "Se dau două numere naturale. Să se determine cel mai mare divizor comun (CMMDC).",
         "input": "Două numere naturale a și b.",
         "output": "Valoarea CMMDC.",
-        "hint": "Poți folosi algoritmul lui Euclid prin scăderi repetate sau prin împărțiri (modulo).",
+        "hint": "Poți folosi algoritmul lui Euclid prin împărțiri repetate.",
         "constraints": ["1 ≤ a, b ≤ 10⁹"],
         "examples": { "input": "18 24", "output": "6" },
         "official_solution": {
@@ -136,41 +205,635 @@
           { "input": "18 24", "output": "6" },
           { "input": "7 13", "output": "1" }
         ]
-      }
-    },
-    "10": {
-      "9": {
+      },
+      "13": {
+        "title": "Oglinditul unui număr",
+        "description": "Se citește un număr natural n. Să se determine oglinditul (răsturnatul) său.",
+        "input": "Numărul natural n.",
+        "output": "Oglinditul numărului.",
+        "hint": "ogl = ogl * 10 + n % 10 la fiecare pas.",
+        "constraints": ["1 ≤ n ≤ 2*10⁹"],
+        "examples": { "input": "1204", "output": "4021" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n, ogl = 0;\n    cin >> n;\n    while (n > 0) {\n        ogl = ogl * 10 + n % 10;\n        n /= 10;\n    }\n    cout << ogl;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "1204", "output": "4021" },
+          { "input": "300", "output": "3" }
+        ]
+      },
+      "14": {
+        "title": "Număr palindrom",
+        "description": "Să se verifice dacă un număr natural citit este palindrom.",
+        "input": "Numărul natural n.",
+        "output": "DA dacă este palindrom, altfel NU.",
+        "hint": "Compară numărul inițial cu oglinditul său.",
+        "constraints": ["1 ≤ n ≤ 2*10⁹"],
+        "examples": { "input": "12321", "output": "DA" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n, cn, ogl = 0;\n    cin >> n;\n    cn = n;\n    while (cn > 0) {\n        ogl = ogl * 10 + cn % 10;\n        cn /= 10;\n    }\n    if (ogl == n) cout << \"DA\";\n    else cout << \"NU\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "12321", "output": "DA" },
+          { "input": "1234", "output": "NU" }
+        ]
+      },
+      "15": {
+        "title": "Factori primi",
+        "description": "Se citește n. Să se afișeze factorii primi și puterile lor pe linii separate.",
+        "input": "Numărul natural n.",
+        "output": "Perechi factor putere separate prin spațiu.",
+        "hint": "Împarte repetat la divizorul d începând de la 2.",
+        "constraints": ["2 ≤ n ≤ 2*10⁹"],
+        "examples": { "input": "12", "output": "2 2\n3 1" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, d = 2;\n    cin >> n;\n    while (n > 1) {\n        int p = 0;\n        while (n % d == 0) { p++; n /= d; }\n        if (p > 0) cout << d << \" \" << p << \"\\n\";\n        d++;\n        if (d * d > n && n > 1) { cout << n << \" 1\\n\"; break; }\n    }\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "12", "output": "2 2\n3 1" },
+          { "input": "20", "output": "2 2\n5 1" }
+        ]
+      },
+      "16": {
         "title": "Suma elementelor din vector",
         "description": "Se dă un vector cu n elemente întregi. Să se calculeze suma elementelor sale.",
-        "input": "Pe prima linie numărul n, pe a doua linie cele n elemente separate prin spații.",
+        "input": "Pe prima linie n, pe a doua linie cele n elemente.",
         "output": "Suma elementelor din vector.",
-        "hint": "Citește elementele pe rând într-un tablou unidimensional și adună-le într-o variabilă inițializată cu 0.",
+        "hint": "Citește elementele pe rând și adună-le.",
         "constraints": ["1 ≤ n ≤ 1000", "-10⁴ ≤ elemente ≤ 10⁴"],
         "examples": { "input": "4\n1 2 3 4", "output": "10" },
         "official_solution": {
           "language": "C++",
-          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, v[1000];\n    long long s = 0;\n    cin >> n;\n    for(int i = 0; i < n; i++) {\n        cin >> v[i];\n        s += v[i];\n    }\n    cout << s;\n    return 0;\n}"
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, x;\n    long long s = 0;\n    cin >> n;\n    for(int i = 0; i < n; i++) {\n        cin >> x;\n        s += x;\n    }\n    cout << s;\n    return 0;\n}"
         },
         "tests": [
           { "input": "4\n1 2 3 4", "output": "10" },
           { "input": "3\n-5 5 -2", "output": "-2" }
         ]
       },
-      "10": {
+      "17": {
         "title": "Validare număr prim",
         "description": "Se dă un număr natural n. Să se verifice dacă este prim.",
         "input": "Un număr natural n.",
         "output": "DA sau NU.",
-        "hint": "Un număr este prim dacă nu se divide cu niciun număr cuprins între 2 și rădăcina sa pătrată.",
+        "hint": "Verifică divizorii până la radical din n.",
         "constraints": ["1 ≤ n ≤ 2*10⁹"],
         "examples": { "input": "17", "output": "DA" },
         "official_solution": {
           "language": "C++",
-          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n;\n    cin >> n;\n    if (n < 2) {\n        cout << \"NU\";\n        return 0;\n    }\n    for (long long d = 2; d * d <= n; d++) {\n        if (n % d == 0) {\n            cout << \"NU\";\n            return 0;\n        }\n    }\n    cout << \"DA\";\n    return 0;\n}"
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    long long n;\n    cin >> n;\n    if (n < 2) { cout << \"NU\"; return 0; }\n    for (long long d = 2; d * d <= n; d++) {\n        if (n % d == 0) { cout << \"NU\"; return 0; }\n    }\n    cout << \"DA\";\n    return 0;\n}"
         },
         "tests": [
           { "input": "17", "output": "DA" },
           { "input": "4", "output": "NU" }
+        ]
+      },
+      "18": {
+        "title": "Minim și Maxim în vector",
+        "description": "Să se găsească minimul și maximul dintr-un vector cu n numere.",
+        "input": "n urmat de elemente.",
+        "output": "Minimul și maximul separate prin spațiu.",
+        "hint": "Inițializează ambele variabile cu primul element.",
+        "constraints": ["1 ≤ n ≤ 1000"],
+        "examples": { "input": "5\n7 2 9 1 5", "output": "1 9" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n; cin >> n;\n    int minv, maxv, x;\n    cin >> x; minv = maxv = x;\n    for(int i = 1; i < n; i++) {\n        cin >> x;\n        if(x < minv) minv = x;\n        if(x > maxv) maxv = x;\n    }\n    cout << minv << \" \" << maxv;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "5\n7 2 9 1 5", "output": "1 9" },
+          { "input": "3\n4 4 4", "output": "4 4" }
+        ]
+      },
+      "19": {
+        "title": "Căutare binară",
+        "description": "Se dă un vector ordonat crescător cu n elemente și o valoare x. Afișați 1 dacă x se află în vector, 0 altfel.",
+        "input": "n, elementele sortate și x.",
+        "output": "1 sau 0.",
+        "hint": "Folosește algoritmul binar O(log n).",
+        "constraints": ["1 ≤ n ≤ 10⁵"],
+        "examples": { "input": "5\n1 4 7 9 12\n9", "output": "1" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, x, v[100005];\n    cin >> n;\n    for (int i = 0; i < n; i++) cin >> v[i];\n    cin >> x;\n    int st = 0, dr = n - 1, gasit = 0;\n    while (st <= dr) {\n        int m = st + (dr - st) / 2;\n        if (v[m] == x) { gasit = 1; break; }\n        else if (v[m] < x) st = m + 1;\n        else dr = m - 1;\n    }\n    cout << gasit;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "5\n1 4 7 9 12\n9", "output": "1" },
+          { "input": "5\n1 4 7 9 12\n5", "output": "0" }
+        ]
+      },
+      "20": {
+        "title": "Vector de frecvență",
+        "description": "Se dau n numere naturale < 1000. Afișați numărul care are numărul maxim de apariții.",
+        "input": "n urmat de cele n numere.",
+        "output": "Numărul cu frecvență maximă.",
+        "hint": "Construiește un vector fr[] unde fr[x] numără aparițiile lui x.",
+        "constraints": ["1 ≤ n ≤ 10⁵"],
+        "examples": { "input": "6\n4 2 4 3 4 2", "output": "4" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint fr[1005];\nint main() {\n    int n, x, maxFr = 0, valMax = 0;\n    cin >> n;\n    for (int i = 0; i < n; i++) {\n        cin >> x;\n        fr[x]++;\n        if (fr[x] > maxFr) { maxFr = fr[x]; valMax = x; }\n    }\n    cout << valMax;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "6\n4 2 4 3 4 2", "output": "4" },
+          { "input": "5\n10 10 20 20 20", "output": "20" }
+        ]
+      }
+    },
+    "10": {
+      "21": {
+        "title": "Suma pe diagonala principală",
+        "description": "Se dă o matrice pătratică de ordin n. Calculați suma elementelor de pe diagonala principală.",
+        "input": "n urmat de elementele matricei.",
+        "output": "Suma elementelor cu indice i == j.",
+        "hint": "Elementele diagonalei principale au indicii de linie și coloană egali.",
+        "constraints": ["1 ≤ n ≤ 100"],
+        "examples": { "input": "3\n1 2 3\n4 5 6\n7 8 9", "output": "15" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, x;\n    long long s = 0;\n    cin >> n;\n    for(int i = 0; i < n; i++)\n        for(int j = 0; j < n; j++) {\n            cin >> x;\n            if(i == j) s += x;\n        }\n    cout << s;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3\n1 2 3\n4 5 6\n7 8 9", "output": "15" },
+          { "input": "2\n10 20\n30 40", "output": "50" }
+        ]
+      },
+      "22": {
+        "title": "Diagonala secundară",
+        "description": "Să se calculeze produsul elementelor de pe diagonala secundară a unei matrice pătratice de ordin n.",
+        "input": "n urmat de matrice.",
+        "output": "Produsul cerut.",
+        "hint": "Elementele de pe diagonala secundară respectă i + j == n - 1 (indexare de la 0).",
+        "constraints": ["1 ≤ n ≤ 10"],
+        "examples": { "input": "3\n1 2 3\n4 2 6\n1 8 9", "output": "6" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint main() {\n    int n, x;\n    long long p = 1;\n    cin >> n;\n    for(int i = 0; i < n; i++)\n        for(int j = 0; j < n; j++) {\n            cin >> x;\n            if(i + j == n - 1) p *= x;\n        }\n    cout << p;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3\n1 2 3\n4 2 6\n1 8 9", "output": "6" }
+        ]
+      },
+      "23": {
+        "title": "Matrice transpusă",
+        "description": "Se dă o matrice cu n linii și m coloane. Să se determine și să se afișeze transpusa acesteia.",
+        "input": "n și m urmate de elementele matricei.",
+        "output": "Matricea transpusă având m linii și n coloane.",
+        "hint": "Liniile din matricea inițială devin coloane în matricea transpusă.",
+        "constraints": ["1 ≤ n, m ≤ 100"],
+        "examples": { "input": "2 3\n1 2 3\n4 5 6", "output": "1 4\n2 5\n3 6" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint a[105][105];\nint main() {\n    int n, m;\n    cin >> n >> m;\n    for(int i = 0; i < n; i++)\n        for(int j = 0; j < m; j++) cin >> a[i][j];\n    for(int j = 0; j < m; j++) {\n        for(int i = 0; i < n; i++) cout << a[i][j] << \" \";\n        cout << \"\\n\";\n    }\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "2 3\n1 2 3\n4 5 6", "output": "1 4\n2 5\n3 6" }
+        ]
+      },
+      "24": {
+        "title": "Parcurgere în spirală",
+        "description": "Se dă o matrice pătratică de ordin n. Să se afișeze elementele parcurse în spirală în sensul acelor de ceasornic.",
+        "input": "n urmat de matrice.",
+        "output": "Elementele separate prin spațiu.",
+        "hint": "Menține limitele top, bottom, left, right și micșorează-le după fiecare latură parcursă.",
+        "constraints": ["1 ≤ n ≤ 50"],
+        "examples": { "input": "3\n1 2 3\n8 9 4\n7 6 5", "output": "1 2 3 4 5 6 7 8 9" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint a[55][55];\nint main() {\n    int n; cin >> n;\n    for(int i = 0; i < n; i++) for(int j = 0; j < n; j++) cin >> a[i][j];\n    int top = 0, bottom = n - 1, left = 0, right = n - 1;\n    while (top <= bottom && left <= right) {\n        for (int j = left; j <= right; j++) cout << a[top][j] << \" \";\n        top++;\n        for (int i = top; i <= bottom; i++) cout << a[i][right] << \" \";\n        right--;\n        if (top <= bottom) {\n            for (int j = right; j >= left; j--) cout << a[bottom][j] << \" \";\n            bottom--;\n        }\n        if (left <= right) {\n            for (int i = bottom; i >= top; i--) cout << a[i][left] << \" \";\n            left++;\n        }\n    }\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3\n1 2 3\n8 9 4\n7 6 5", "output": "1 2 3 4 5 6 7 8 9" }
+        ]
+      },
+      "25": {
+        "title": "Matrice simetrică",
+        "description": "Să se verifice dacă o matrice pătratică este simetrică față de diagonala principală.",
+        "input": "n urmat de matrice.",
+        "output": "DA sau NU.",
+        "hint": "Trebuie ca a[i][j] == a[j][i] pentru orice i și j.",
+        "constraints": ["1 ≤ n ≤ 100"],
+        "examples": { "input": "3\n1 2 3\n2 5 6\n3 6 9", "output": "DA" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint a[105][105];\nint main() {\n    int n; cin >> n;\n    for(int i = 0; i < n; i++) for(int j = 0; j < n; j++) cin >> a[i][j];\n    for(int i = 0; i < n; i++)\n        for(int j = i + 1; j < n; j++)\n            if(a[i][j] != a[j][i]) { cout << \"NU\"; return 0; }\n    cout << \"DA\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3\n1 2 3\n2 5 6\n3 6 9", "output": "DA" },
+          { "input": "2\n1 2\n3 4", "output": "NU" }
+        ]
+      },
+      "26": {
+        "title": "Numărare vocale",
+        "description": "Se dă un șir de caractere. Să se determine numărul total de vocale (a, e, i, o, u).",
+        "input": "Un cuvânt cu litere mici.",
+        "output": "Numărul de vocale.",
+        "hint": "Parcurge fiecare caracter din string și verifică apartenența la mulțimea vocalelor.",
+        "constraints": ["Lungime șir ≤ 255"],
+        "examples": { "input": "informatica", "output": "5" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s;\n    cin >> s;\n    int cnt = 0;\n    for(char c : s) {\n        c = tolower(c);\n        if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') cnt++;\n    }\n    cout << cnt;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "informatica", "output": "5" },
+          { "input": "pbinfo", "output": "2" }
+        ]
+      },
+      "27": {
+        "title": "Verificare anagrame",
+        "description": "Se dau două cuvinte. Să se verifice dacă al doilea cuvânt este o anagramă a primului.",
+        "input": "Două cuvinte separate prin spațiu.",
+        "output": "1 dacă sunt anagrame, 0 altfel.",
+        "hint": "Sortează ambele șiruri și verifică dacă devin identice.",
+        "constraints": ["Lungime cuvânt ≤ 100"],
+        "examples": { "input": "arc car", "output": "1" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <algorithm>\n#include <string>\nusing namespace std;\nint main() {\n    string a, b;\n    cin >> a >> b;\n    sort(a.begin(), a.end());\n    sort(b.begin(), b.end());\n    cout << (a == b ? 1 : 0);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "arc car", "output": "1" },
+          { "input": "mama tata", "output": "0" }
+        ]
+      },
+      "28": {
+        "title": "Palindrom șir de caractere",
+        "description": "Să se verifice dacă un cuvânt citit este palindrom.",
+        "input": "Un cuvânt s.",
+        "output": "DA sau NU.",
+        "hint": "Compară literele de la capete spre mijloc.",
+        "constraints": ["Lungime s ≤ 100"],
+        "examples": { "input": "capac", "output": "DA" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s;\n    cin >> s;\n    int i = 0, j = s.size() - 1;\n    while(i < j) {\n        if(s[i] != s[j]) { cout << \"NU\"; return 0; }\n        i++; j--;\n    }\n    cout << \"DA\";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "capac", "output": "DA" },
+          { "input": "test", "output": "NU" }
+        ]
+      },
+      "29": {
+        "title": "Inversare cuvânt",
+        "description": "Se citește un cuvânt. Să se afișeze cuvântul citit de la coadă la cap.",
+        "input": "Un text fără spații.",
+        "output": "Textul inversat.",
+        "hint": "Parcurge string-ul în sens invers cu un for.",
+        "constraints": ["Lungime ≤ 100"],
+        "examples": { "input": "salut", "output": "tulas" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <string>\n#include <algorithm>\nusing namespace std;\nint main() {\n    string s;\n    cin >> s;\n    reverse(s.begin(), s.end());\n    cout << s;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "salut", "output": "tulas" }
+        ]
+      },
+      "30": {
+        "title": "Factorial recursiv",
+        "description": "Să se scrie un program care calculează recursiv valoarea n! (n factorial).",
+        "input": "Numărul natural n.",
+        "output": "Valoarea n!.",
+        "hint": "Cazul de bază: fact(0) = 1, pasul recursiv: n * fact(n-1).",
+        "constraints": ["0 ≤ n ≤ 12"],
+        "examples": { "input": "5", "output": "120" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nlong long fact(int n) {\n    if (n <= 1) return 1;\n    return n * fact(n - 1);\n}\nint main() {\n    int n; cin >> n;\n    cout << fact(n);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "5", "output": "120" },
+          { "input": "0", "output": "1" }
+        ]
+      },
+      "31": {
+        "title": "Fibonacci recursiv",
+        "description": "Determinați al n-lea termen din șirul Fibonacci prin recursivitate (F(1)=1, F(2)=1).",
+        "input": "Numărul natural n.",
+        "output": "Termenul F(n).",
+        "hint": "F(n) = F(n-1) + F(n-2).",
+        "constraints": ["1 ≤ n ≤ 40"],
+        "examples": { "input": "7", "output": "13" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint fib(int n) {\n    if (n <= 2) return 1;\n    return fib(n - 1) + fib(n - 2);\n}\nint main() {\n    int n; cin >> n;\n    cout << fib(n);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "7", "output": "13" },
+          { "input": "1", "output": "1" }
+        ]
+      },
+      "32": {
+        "title": "Turnurile din Hanoi",
+        "description": "Să se afișeze mutările necesare pentru rezolvarea jocului Turnurile din Hanoi cu n discuri de pe tija A pe C folosind tija B.",
+        "input": "Numărul n de discuri.",
+        "output": "Mutările de forma A->C, câte una pe rând.",
+        "hint": "Mută n-1 de pe A pe B, apoi discul n pe C, apoi n-1 de pe B pe C.",
+        "constraints": ["1 ≤ n ≤ 10"],
+        "examples": { "input": "2", "output": "A->B\nA->C\nB->C" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nvoid hanoi(int n, char a, char b, char c) {\n    if (n == 1) {\n        cout << a << \"->\" << c << \"\\n\";\n        return;\n    }\n    hanoi(n - 1, a, c, b);\n    cout << a << \"->\" << c << \"\\n\";\n    hanoi(n - 1, b, a, c);\n}\nint main() {\n    int n; cin >> n;\n    hanoi(n, 'A', 'B', 'C');\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "2", "output": "A->B\nA->C\nB->C" }
+        ]
+      },
+      "33": {
+        "title": "CMMDC recursiv",
+        "description": "Calculați cel mai mare divizor comun a două numere printr-o funcție recursivă.",
+        "input": "Numerele a și b.",
+        "output": "CMMDC(a,b).",
+        "hint": "CMMDC(a, b) = CMMDC(b, a % b).",
+        "constraints": ["1 ≤ a, b ≤ 10⁹"],
+        "examples": { "input": "24 36", "output": "12" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nlong long cmmdc(long long a, long long b) {\n    if (b == 0) return a;\n    return cmmdc(b, a % b);\n}\nint main() {\n    long long a, b;\n    cin >> a >> b;\n    cout << cmmdc(a, b);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "24 36", "output": "12" },
+          { "input": "7 19", "output": "1" }
+        ]
+      },
+      "34": {
+        "title": "Ridicare la putere logaritmică",
+        "description": "Calculați a^b modulo 1.000.000.007 în timp O(log b).",
+        "input": "Două numere naturale a și b.",
+        "output": "(a^b) % 1.000.000.007.",
+        "hint": "Dacă b este par: a^b = (a^(b/2))^2, altfel a * a^(b-1).",
+        "constraints": ["1 ≤ a, b ≤ 10⁹"],
+        "examples": { "input": "2 10", "output": "1024" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nlong long lgput(long long a, long long b) {\n    long long res = 1, mod = 1000000007;\n    a %= mod;\n    while (b > 0) {\n        if (b & 1) res = (res * a) % mod;\n        a = (a * a) % mod;\n        b >>= 1;\n    }\n    return res;\n}\nint main() {\n    long long a, b; cin >> a >> b;\n    cout << lgput(a, b);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "2 10", "output": "1024" },
+          { "input": "3 5", "output": "243" }
+        ]
+      },
+      "35": {
+        "title": "Merge Sort",
+        "description": "Să se sorteze crescător un vector cu n numere naturale prin Divide et Impera.",
+        "input": "n urmat de cele n numere.",
+        "output": "Vectorul sortat.",
+        "hint": "Împarte vectorul în două jumătăți, sortează-le recursiv și interclasează-le.",
+        "constraints": ["1 ≤ n ≤ 10⁵"],
+        "examples": { "input": "5\n8 3 1 7 4", "output": "1 3 4 7 8" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <algorithm>\nusing namespace std;\nint main() {\n    int n, v[100005];\n    cin >> n;\n    for(int i = 0; i < n; i++) cin >> v[i];\n    sort(v, v + n);\n    for(int i = 0; i < n; i++) cout << v[i] << \" \";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "5\n8 3 1 7 4", "output": "1 3 4 7 8" }
+        ]
+      }
+    },
+    "11": {
+      "36": {
+        "title": "Generarea permutărilor",
+        "description": "Să se genereze toate permutările mulțimii {1, 2, ..., n} în ordine lexicografică.",
+        "input": "Numărul natural n.",
+        "output": "Permutările, câte una pe rând.",
+        "hint": "Folosește vectorul uz[] pentru a marca numerele deja alese în stivă.",
+        "constraints": ["1 ≤ n ≤ 8"],
+        "examples": { "input": "3", "output": "1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint n, st[15], uz[15];\nvoid bkt(int k) {\n    if (k > n) {\n        for(int i = 1; i <= n; i++) cout << st[i] << \" \";\n        cout << \"\\n\";\n        return;\n    }\n    for(int i = 1; i <= n; i++)\n        if (!uz[i]) {\n            uz[i] = 1; st[k] = i;\n            bkt(k + 1);\n            uz[i] = 0;\n        }\n}\nint main() { cin >> n; bkt(1); return 0; }"
+        },
+        "tests": [
+          { "input": "3", "output": "1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1" }
+        ]
+      },
+      "37": {
+        "title": "Generarea combinărilor",
+        "description": "Să se genereze combinările de n elemente luate câte k în ordine lexicografică.",
+        "input": "Numerele naturale n și k.",
+        "output": "Submulțimile de k elemente generate pe linii separate.",
+        "hint": "Asigură ordinea strict crescătoare pe stivă: st[pas] > st[pas-1].",
+        "constraints": ["1 ≤ k ≤ n ≤ 15"],
+        "examples": { "input": "4 2", "output": "1 2\n1 3\n1 4\n2 3\n2 4\n3 4" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint n, k, st[20];\nvoid bkt(int pas) {\n    if (pas > k) {\n        for(int i = 1; i <= k; i++) cout << st[i] << \" \";\n        cout << \"\\n\";\n        return;\n    }\n    for(int i = st[pas - 1] + 1; i <= n; i++) {\n        st[pas] = i;\n        bkt(pas + 1);\n    }\n}\nint main() { cin >> n >> k; bkt(1); return 0; }"
+        },
+        "tests": [
+          { "input": "4 2", "output": "1 2\n1 3\n1 4\n2 3\n2 4\n3 4" }
+        ]
+      },
+      "38": {
+        "title": "Generarea aranjamentelor",
+        "description": "Să se genereze aranjamentele de n elemente luate câte k.",
+        "input": "Numerele naturale n și k.",
+        "output": "Aranjamentele pe linii distincte.",
+        "hint": "Aranjamentele sunt permutări parțiale de lungime k.",
+        "constraints": ["1 ≤ k ≤ n ≤ 8"],
+        "examples": { "input": "3 2", "output": "1 2\n1 3\n2 1\n2 3\n3 1\n3 2" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint n, k, st[15], uz[15];\nvoid bkt(int pas) {\n    if (pas > k) {\n        for(int i = 1; i <= k; i++) cout << st[i] << \" \";\n        cout << \"\\n\";\n        return;\n    }\n    for(int i = 1; i <= n; i++)\n        if (!uz[i]) {\n            uz[i] = 1; st[pas] = i;\n            bkt(pas + 1);\n            uz[i] = 0;\n        }\n}\nint main() { cin >> n >> k; bkt(1); return 0; }"
+        },
+        "tests": [
+          { "input": "3 2", "output": "1 2\n1 3\n2 1\n2 3\n3 1\n3 2" }
+        ]
+      },
+      "39": {
+        "title": "Problema Damelor (N-Queens)",
+        "description": "Determinați numărul de moduri de a plasa n dame pe o tablă n×n fără ca ele să se atace reciproc.",
+        "input": "Dimensiunea n a tablei.",
+        "output": "Numărul de soluții valide.",
+        "hint": "Verifică ca două dame să nu fie pe aceeași linie, coloană sau diagonală: abs(st[k] - st[i]) != k - i.",
+        "constraints": ["1 ≤ n ≤ 12"],
+        "examples": { "input": "4", "output": "2" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <cmath>\nusing namespace std;\nint n, cnt = 0, st[20];\nbool ok(int k) {\n    for (int i = 1; i < k; i++)\n        if (st[i] == st[k] || abs(st[k] - st[i]) == k - i) return false;\n    return true;\n}\nvoid bkt(int k) {\n    if (k > n) { cnt++; return; }\n    for (int i = 1; i <= n; i++) {\n        st[k] = i;\n        if (ok(k)) bkt(k + 1);\n    }\n}\nint main() { cin >> n; bkt(1); cout << cnt; return 0; }"
+        },
+        "tests": [
+          { "input": "4", "output": "2" },
+          { "input": "8", "output": "92" }
+        ]
+      },
+      "40": {
+        "title": "Partițiile unui număr",
+        "description": "Să se descompună numărul natural n în sumă de numere naturale în toate modurile posibile.",
+        "input": "Numărul n.",
+        "output": "Descompunerile sub forma x1+x2+...+xp.",
+        "hint": "Păstrează suma curentă și alege elemente mai mari sau egale cu cel anterior.",
+        "constraints": ["1 ≤ n ≤ 15"],
+        "examples": { "input": "4", "output": "1+1+1+1\n1+1+2\n1+3\n2+2\n4" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint n, st[30];\nvoid tipar(int k) {\n    for(int i = 1; i < k; i++) cout << st[i] << \"+\";\n    cout << st[k] << \"\\n\";\n}\nvoid bkt(int k, int s) {\n    for(int i = st[k-1]; i <= n - s; i++) {\n        st[k] = i;\n        if (s + i == n) tipar(k);\n        else bkt(k + 1, s + i);\n    }\n}\nint main() { cin >> n; st[0] = 1; bkt(1, 0); return 0; }"
+        },
+        "tests": [
+          { "input": "4", "output": "1+1+1+1\n1+1+2\n1+3\n2+2\n4" }
+        ]
+      },
+      "41": {
+        "title": "Matricea de adiacență",
+        "description": "Se dă un graf neorientat cu n noduri și m muchii. Să se construiască și să se afișeze matricea de adiacență.",
+        "input": "n, m și lista celor m muchii.",
+        "output": "Matricea n×n binară.",
+        "hint": "Setează a[u][v] = a[v][u] = 1 pentru fiecare muchie (u, v).",
+        "constraints": ["1 ≤ n ≤ 100"],
+        "examples": { "input": "3 2\n1 2\n2 3", "output": "0 1 0\n1 0 1\n0 1 0" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint a[105][105];\nint main() {\n    int n, m, u, v;\n    cin >> n >> m;\n    while (m--) {\n        cin >> u >> v;\n        a[u][v] = a[v][u] = 1;\n    }\n    for (int i = 1; i <= n; i++) {\n        for (int j = 1; j <= n; j++) cout << a[i][j] << \" \";\n        cout << \"\\n\";\n    }\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3 2\n1 2\n2 3", "output": "0 1 0\n1 0 1\n0 1 0" }
+        ]
+      },
+      "42": {
+        "title": "Gradele nodurilor",
+        "description": "Să se afișeze gradul fiecărui nod de la 1 la n într-un graf neorientat.",
+        "input": "n, m și lista muchiilor.",
+        "output": "Gradele separate prin spațiu.",
+        "hint": "Incrementează gradul pentru fiecare nod din perechea citită.",
+        "constraints": ["1 ≤ n ≤ 100"],
+        "examples": { "input": "4 3\n1 2\n1 3\n1 4", "output": "3 1 1 1" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nint grad[105];\nint main() {\n    int n, m, u, v;\n    cin >> n >> m;\n    while (m--) {\n        cin >> u >> v;\n        grad[u]++; grad[v]++;\n    }\n    for (int i = 1; i <= n; i++) cout << grad[i] << \" \";\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "4 3\n1 2\n1 3\n1 4", "output": "3 1 1 1" }
+        ]
+      },
+      "43": {
+        "title": "Parcurgere în lățime (BFS)",
+        "description": "Să se afișeze ordinea de vizitare a nodurilor unui graf prin parcurgerea BFS pornind dintr-un nod dat s.",
+        "input": "n, m, nodul sursă s și muchiile.",
+        "output": "Nodurile vizitate separate prin spațiu.",
+        "hint": "Folosește o coadă (queue) și un vector viz[] de vizitare.",
+        "constraints": ["1 ≤ n ≤ 1000"],
+        "examples": { "input": "4 3 1\n1 2\n1 3\n2 4", "output": "1 2 3 4" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <vector>\n#include <queue>\nusing namespace std;\nvector<int> adj[1005];\nbool viz[1005];\nint main() {\n    int n, m, s, u, v;\n    cin >> n >> m >> s;\n    while(m--) { cin >> u >> v; adj[u].push_back(v); adj[v].push_back(u); }\n    queue<int> q;\n    q.push(s); viz[s] = true;\n    while(!q.empty()) {\n        int nod = q.front(); q.pop();\n        cout << nod << \" \";\n        for(int vecin : adj[nod])\n            if(!viz[vecin]) { viz[vecin] = true; q.push(vecin); }\n    }\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "4 3 1\n1 2\n1 3\n2 4", "output": "1 2 3 4" }
+        ]
+      },
+      "44": {
+        "title": "Parcurgere în adâncime (DFS)",
+        "description": "Afișați ordinea de vizitare a nodurilor printr-o parcurgere recursivă DFS dintr-un nod dat.",
+        "input": "n, m, nodul sursă s și muchiile.",
+        "output": "Nodurile vizitate.",
+        "hint": "Apelează recursiv dfs(vecin) dacă vecinul nu a fost vizitat.",
+        "constraints": ["1 ≤ n ≤ 1000"],
+        "examples": { "input": "4 3 1\n1 2\n2 3\n3 4", "output": "1 2 3 4" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <vector>\nusing namespace std;\nvector<int> adj[1005];\nbool viz[1005];\nvoid dfs(int nod) {\n    viz[nod] = true;\n    cout << nod << \" \";\n    for(int vecin : adj[nod]) if(!viz[vecin]) dfs(vecin);\n}\nint main() {\n    int n, m, s, u, v;\n    cin >> n >> m >> s;\n    while(m--) { cin >> u >> v; adj[u].push_back(v); adj[v].push_back(u); }\n    dfs(s);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "4 3 1\n1 2\n2 3\n3 4", "output": "1 2 3 4" }
+        ]
+      },
+      "45": {
+        "title": "Componente conexe",
+        "description": "Să se determine numărul total de componente conexe dintr-un graf neorientat dat.",
+        "input": "n, m și lista muchiilor.",
+        "output": "Numărul de componente conexe.",
+        "hint": "Rulează DFS pentru fiecare nod nevizitat și contorizează de câte ori pornești o parcurgere nouă.",
+        "constraints": ["1 ≤ n ≤ 1000"],
+        "examples": { "input": "5 2\n1 2\n4 5", "output": "3" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <vector>\nusing namespace std;\nvector<int> adj[1005];\nbool viz[1005];\nvoid dfs(int nod) {\n    viz[nod] = true;\n    for(int v : adj[nod]) if(!viz[v]) dfs(v);\n}\nint main() {\n    int n, m, u, v;\n    cin >> n >> m;\n    while(m--) { cin >> u >> v; adj[u].push_back(v); adj[v].push_back(u); }\n    int c = 0;\n    for(int i = 1; i <= n; i++)\n        if(!viz[i]) { c++; dfs(i); }\n    cout << c;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "5 2\n1 2\n4 5", "output": "3" }
+        ]
+      },
+      "46": {
+        "title": "Problema Rucsacului (0-1)",
+        "description": "Avem n obiecte cu greutăți și valori și un rucsac de capacitate G. Să se determine valoarea maximă ce poate fi transportată.",
+        "input": "n și capacitatea G, urmate de greutatea și valoarea fiecărui obiect.",
+        "output": "Valoarea maximă obținută.",
+        "hint": "dp[j] = max(dp[j], dp[j - w] + v) parcurs descrescător de la G la w.",
+        "constraints": ["1 ≤ n ≤ 1000", "1 ≤ G ≤ 10⁴"],
+        "examples": { "input": "3 10\n4 30\n5 40\n7 60", "output": "70" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\nint dp[10005];\nint main() {\n    int n, G; cin >> n >> G;\n    for(int i = 0; i < n; i++) {\n        int w, v; cin >> w >> v;\n        for(int j = G; j >= w; j--)\n            dp[j] = max(dp[j], dp[j - w] + v);\n    }\n    cout << dp[G];\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3 10\n4 30\n5 40\n7 60", "output": "70" }
+        ]
+      },
+      "47": {
+        "title": "Cel mai lung subșir crescător (LIS)",
+        "description": "Determinați lungimea maximă a unui subșir strict crescător dintr-un vector cu n numere.",
+        "input": "n urmat de valorile din vector.",
+        "output": "Lungimea maximă a subșirului.",
+        "hint": "dp[i] = 1 + max({dp[j] | j < i și v[j] < v[i]}).",
+        "constraints": ["1 ≤ n ≤ 1000"],
+        "examples": { "input": "6\n5 2 8 6 3 7", "output": "3" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\nint main() {\n    int n; cin >> n;\n    vector<int> v(n), dp(n, 1);\n    for(int i = 0; i < n; i++) cin >> v[i];\n    int ans = 1;\n    for(int i = 0; i < n; i++) {\n        for(int j = 0; j < i; j++)\n            if(v[j] < v[i]) dp[i] = max(dp[i], dp[j] + 1);\n        ans = max(ans, dp[i]);\n    }\n    cout << ans;\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "6\n5 2 8 6 3 7", "output": "3" }
+        ]
+      },
+      "48": {
+        "title": "Traseu sumă maximă în matrice",
+        "description": "Pornind din (1,1) către (n,m) cu deplasare doar la dreapta și în jos, determinați suma maximă a traseului.",
+        "input": "n, m urmate de elementele matricei.",
+        "output": "Suma maximă a drumului.",
+        "hint": "dp[i][j] = a[i][j] + max(dp[i-1][j], dp[i][j-1]).",
+        "constraints": ["1 ≤ n, m ≤ 500"],
+        "examples": { "input": "3 3\n1 3 1\n1 5 1\n4 2 1", "output": "12" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <algorithm>\nusing namespace std;\nint a[505][505], dp[505][505];\nint main() {\n    int n, m;\n    cin >> n >> m;\n    for(int i = 1; i <= n; i++)\n        for(int j = 1; j <= m; j++) cin >> a[i][j];\n    for(int i = 1; i <= n; i++)\n        for(int j = 1; j <= m; j++)\n            dp[i][j] = a[i][j] + max(dp[i-1][j], dp[i][j-1]);\n    cout << dp[n][m];\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3 3\n1 3 1\n1 5 1\n4 2 1", "output": "12" }
+        ]
+      },
+      "49": {
+        "title": "Subșirul comun maximal (LCS)",
+        "description": "Se dau două șiruri de caractere. Să se determine lungimea celui mai lung subșir comun.",
+        "input": "Cele două șiruri pe linii separate.",
+        "output": "Lungimea LCS.",
+        "hint": "Dacă a[i]==b[j], dp[i][j] = dp[i-1][j-1] + 1, altfel max(dp[i-1][j], dp[i][j-1]).",
+        "constraints": ["Lungime șiruri ≤ 1000"],
+        "examples": { "input": "abac\nac", "output": "2" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <string>\n#include <vector>\n#include <algorithm>\nusing namespace std;\nint dp[1005][1005];\nint main() {\n    string a, b; cin >> a >> b;\n    int n = a.size(), m = b.size();\n    for(int i = 1; i <= n; i++)\n        for(int j = 1; j <= m; j++) {\n            if(a[i-1] == b[j-1]) dp[i][j] = dp[i-1][j-1] + 1;\n            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);\n        }\n    cout << dp[n][m];\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "abac\nac", "output": "2" }
+        ]
+      },
+      "50": {
+        "title": "Problema Monedelor (Restul minim)",
+        "description": "Determinați numărul minim de monede necesare pentru a achita o sumă S sau -1 dacă nu este posibil.",
+        "input": "Numărul de tipuri de monede n, valorile lor și suma S.",
+        "output": "Numărul minim de monede sau -1.",
+        "hint": "dp[i] = min(dp[i], dp[i - coin] + 1) pentru fiecare monedă.",
+        "constraints": ["1 ≤ S ≤ 10⁴"],
+        "examples": { "input": "3 6\n1 3 4", "output": "2" },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\nconst int INF = 1e9;\nint main() {\n    int n, S; cin >> n >> S;\n    vector<int> c(n), dp(S + 1, INF);\n    for(int i = 0; i < n; i++) cin >> c[i];\n    dp[0] = 0;\n    for(int i = 1; i <= S; i++)\n        for(int coin : c)\n            if(i >= coin) dp[i] = min(dp[i], dp[i - coin] + 1);\n    cout << (dp[S] >= INF ? -1 : dp[S]);\n    return 0;\n}"
+        },
+        "tests": [
+          { "input": "3 6\n1 3 4", "output": "2" }
         ]
       }
     }
