@@ -8,51 +8,100 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
+  static const Color bg = Color(0xFFF4F1EA);
   static const Color ink = Color(0xFF2C363F);
   static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
+  static const Color forest = Color(0xFF20BF6B);
   static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
+  static const Color cloud = Color(0xFFE5E0D4);
   static const Color sky = Color(0xFF5BA8B5);
+  static const Color ideBg = Color(0xFF1B242B);
+  static const Color ideGutter = Color(0xFF131A1F);
 }
 
-class RetroBlock extends StatelessWidget {
-  final Widget child;
-  final Color bgColor;
-  final double padding;
-  final double shadowOffset;
-  final Color borderColor;
+// ----------------------------------------------------
+// C++ SYNTAX HIGHLIGHTING CONTROLLER
+// ----------------------------------------------------
+class CppSyntaxController extends TextEditingController {
+  final TextStyle defaultStyle = const TextStyle(
+    fontFamily: 'monospace',
+    color: Color(0xFFECEFF4),
+    fontSize: 14.5,
+    height: 1.5,
+    fontWeight: FontWeight.w600,
+  );
 
-  const RetroBlock({
-    super.key,
-    required this.child,
-    this.bgColor = Colors.white,
-    this.padding = 24.0,
-    this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
-  });
+  CppSyntaxController({String? text}) : super(text: text);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink,
-            offset: Offset(shadowOffset, shadowOffset),
-            blurRadius: 0,
-          ),
-        ],
-      ),
-      padding: EdgeInsets.all(padding),
-      child: child,
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    final List<TextSpan> children = [];
+    final textContent = text;
+
+    final pattern = RegExp(
+      r'(//[^\n]*)' // 1: Comments
+      r'|("(\\"|[^"])*")' // 2: Strings
+      r'|(#[a-zA-Z]+)' // 4: Preprocessor
+      r'|(\b(int|long|float|double|char|bool|void|string|vector|set|map|pair|stack|queue|struct|class)\b)' // 5: Types
+      r'|(\b(cin|cout|endl|return|if|else|while|for|break|continue|switch|case|default|using|namespace|std|main)\b)' // 7: Keywords
+      r'|(\b\d+\b)' // 9: Numbers
+      r'|([{}()\[\]])' // 10: Brackets
+      r'|([+\-*/%=<>!&|]+)', // 11: Operators
     );
+
+    int lastMatchEnd = 0;
+
+    for (final match in pattern.allMatches(textContent)) {
+      if (match.start > lastMatchEnd) {
+        children.add(TextSpan(
+          text: textContent.substring(lastMatchEnd, match.start),
+          style: defaultStyle,
+        ));
+      }
+
+      final matchText = match.group(0)!;
+      TextStyle matchStyle = defaultStyle;
+
+      if (match.group(1) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFF7F8C8D), fontStyle: FontStyle.italic);
+      } else if (match.group(2) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFFF9CA24));
+      } else if (match.group(4) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFF7675), fontWeight: FontWeight.bold);
+      } else if (match.group(5) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFF55EFC4), fontWeight: FontWeight.bold);
+      } else if (match.group(7) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFF74B9FF), fontWeight: FontWeight.bold);
+      } else if (match.group(9) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFAB1A0));
+      } else if (match.group(10) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFDCB6E), fontWeight: FontWeight.w900);
+      } else if (match.group(11) != null) {
+        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFF7675));
+      }
+
+      children.add(TextSpan(text: matchText, style: matchStyle));
+      lastMatchEnd = match.end;
+    }
+
+    if (lastMatchEnd < textContent.length) {
+      children.add(TextSpan(
+        text: textContent.substring(lastMatchEnd),
+        style: defaultStyle,
+      ));
+    }
+
+    return TextSpan(style: style, children: children);
   }
 }
 
+// ----------------------------------------------------
+// RETRO BUTTON
+// ----------------------------------------------------
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
@@ -60,6 +109,7 @@ class RetroButton extends StatefulWidget {
   final Color textColor;
   final bool isFullWidth;
   final bool isLoading;
+  final IconData? icon;
 
   const RetroButton({
     super.key,
@@ -69,6 +119,7 @@ class RetroButton extends StatefulWidget {
     this.textColor = Colors.white,
     this.isFullWidth = false,
     this.isLoading = false,
+    this.icon,
   });
 
   @override
@@ -82,49 +133,65 @@ class _RetroButtonState extends State<RetroButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
         onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
-        onTapUp: widget.isLoading ? null : (_) {
-          setState(() => isPressed = false);
-          widget.onPressed();
-        },
+        onTapUp: widget.isLoading
+            ? null
+            : (_) {
+                setState(() => isPressed = false);
+                widget.onPressed();
+              },
         onTapCancel: () => setState(() => isPressed = false),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 80),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 2.5 : (isHovered ? -1.5 : 0.0),
+            isPressed ? 2.5 : (isHovered ? -1.5 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
             color: widget.isLoading ? Colors.grey : widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            border: Border.all(color: AppColors.ink, width: 2.5),
             boxShadow: [
               BoxShadow(
                 color: AppColors.ink,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           child: widget.isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-              : Text(
-                  widget.text.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: widget.textColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
+              ? const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                   ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon, size: 18, color: widget.textColor),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      widget.text.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: widget.textColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
                 ),
         ),
       ),
@@ -132,6 +199,9 @@ class _RetroButtonState extends State<RetroButton> {
   }
 }
 
+// ----------------------------------------------------
+// EXERCISE DETAIL SCREEN
+// ----------------------------------------------------
 class ExerciseDetailScreen extends StatefulWidget {
   final String subject;
   final String grade;
@@ -151,17 +221,212 @@ class ExerciseDetailScreen extends StatefulWidget {
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Map<String, dynamic>? exerciseData;
   String selectedTab = "enunt";
+  final CppSyntaxController _codeController = CppSyntaxController();
   final TextEditingController _answerController = TextEditingController();
-  List<String> debugLogs = [];
+  final FocusNode _editorFocusNode = FocusNode();
+
+  // Undo / Redo Stacks
+  final List<TextEditingValue> _undoStack = [];
+  final List<TextEditingValue> _redoStack = [];
+  bool _isUndoingOrRedoing = false;
+
+  List<Map<String, dynamic>> testResults = [];
   bool solutionChecked = false;
   bool solutionOk = false;
   bool isRunningCode = false;
+
+  bool isFullScreenCode = false;
+  bool isFullScreenProblem = false;
   String? _selectedGrilaOption;
+
+  final String defaultCppBoilerplate =
+      "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Scrie codul aici\n    \n    return 0;\n}";
 
   @override
   void initState() {
     super.initState();
+    _codeController.text = defaultCppBoilerplate;
+    _recordHistorySnapshot(_codeController.value);
+
+    _codeController.addListener(_onCodeChanged);
     _loadExerciseDetails();
+  }
+
+  @override
+  void dispose() {
+    _codeController.removeListener(_onCodeChanged);
+    _codeController.dispose();
+    _answerController.dispose();
+    _editorFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _onCodeChanged() {
+    if (!_isUndoingOrRedoing) {
+      _recordHistorySnapshot(_codeController.value);
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _recordHistorySnapshot(TextEditingValue value) {
+    if (_undoStack.isNotEmpty && _undoStack.last.text == value.text) {
+      return;
+    }
+    _undoStack.add(value);
+    if (_undoStack.length > 150) {
+      _undoStack.removeAt(0);
+    }
+    _redoStack.clear();
+  }
+
+  void _performUndo() {
+    if (_undoStack.length > 1) {
+      _isUndoingOrRedoing = true;
+      final current = _undoStack.removeLast();
+      _redoStack.add(current);
+      final previous = _undoStack.last;
+      _codeController.value = previous;
+      _isUndoingOrRedoing = false;
+      setState(() {});
+    }
+  }
+
+  void _performRedo() {
+    if (_redoStack.isNotEmpty) {
+      _isUndoingOrRedoing = true;
+      final next = _redoStack.removeLast();
+      _undoStack.add(next);
+      _codeController.value = next;
+      _isUndoingOrRedoing = false;
+      setState(() {});
+    }
+  }
+
+  int _getCurrentLine() {
+    final pos = _codeController.selection.baseOffset;
+    if (pos < 0 || pos > _codeController.text.length) return 1;
+    return '\n'.allMatches(_codeController.text.substring(0, pos)).length + 1;
+  }
+
+  int _getCurrentCol() {
+    final pos = _codeController.selection.baseOffset;
+    if (pos < 0 || pos > _codeController.text.length) return 1;
+    final lastNewline = _codeController.text.lastIndexOf('\n', pos > 0 ? pos - 1 : 0);
+    return lastNewline == -1 ? pos + 1 : pos - lastNewline;
+  }
+
+  // ----------------------------------------------------
+  // SMART KEYBOARD HANDLER (TAB, UNINDENT, '}', ENTER, CTRL+Z/Y)
+  // ----------------------------------------------------
+  KeyEventResult _handleEditorKey(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent) {
+      final isControlOrCmd = HardwareKeyboard.instance.isControlPressed || HardwareKeyboard.instance.isMetaPressed;
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+
+      // 1. Undo: Ctrl + Z
+      if (isControlOrCmd && event.logicalKey == LogicalKeyboardKey.keyZ && !isShift) {
+        _performUndo();
+        return KeyEventResult.handled;
+      }
+
+      // 2. Redo: Ctrl + Y sau Ctrl + Shift + Z
+      if ((isControlOrCmd && event.logicalKey == LogicalKeyboardKey.keyY) ||
+          (isControlOrCmd && event.logicalKey == LogicalKeyboardKey.keyZ && isShift)) {
+        _performRedo();
+        return KeyEventResult.handled;
+      }
+
+      // 3. Tab Key: Inserează 4 spații uniforme în loc să schimbe focusul
+      if (event.logicalKey == LogicalKeyboardKey.tab) {
+        final text = _codeController.text;
+        final selection = _codeController.selection;
+        final start = selection.start < 0 ? text.length : selection.start;
+        final end = selection.end < 0 ? text.length : selection.end;
+        const tabSpaces = "    ";
+
+        final newText = text.replaceRange(start, end, tabSpaces);
+        _codeController.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: start + tabSpaces.length),
+        );
+        return KeyEventResult.handled;
+      }
+
+      // 4. Smart Backspace: Unindent pe nivel de tab (4 spații) la începutul liniei
+      if (event.logicalKey == LogicalKeyboardKey.backspace) {
+        final text = _codeController.text;
+        final selection = _codeController.selection;
+        if (selection.isCollapsed && selection.baseOffset > 0) {
+          final pos = selection.baseOffset;
+          final lastNewline = text.lastIndexOf('\n', pos - 1);
+          final lineStart = lastNewline == -1 ? 0 : lastNewline + 1;
+          final beforeCursor = text.substring(lineStart, pos);
+
+          if (beforeCursor.isNotEmpty && RegExp(r'^[ ]+$').hasMatch(beforeCursor)) {
+            int spacesToDelete = beforeCursor.length % 4;
+            if (spacesToDelete == 0) spacesToDelete = 4;
+            spacesToDelete = spacesToDelete.clamp(1, beforeCursor.length);
+
+            final newText = text.replaceRange(pos - spacesToDelete, pos, '');
+            _codeController.value = TextEditingValue(
+              text: newText,
+              selection: TextSelection.collapsed(offset: pos - spacesToDelete),
+            );
+            return KeyEventResult.handled;
+          }
+        }
+      }
+
+      // 5. Smart Closing Brace '}': Dedent automat cu 4 spații pentru aliniere
+      if (event.character == '}' || event.logicalKey == LogicalKeyboardKey.braceRight) {
+        final text = _codeController.text;
+        final selection = _codeController.selection;
+        if (selection.isCollapsed && selection.baseOffset >= 0) {
+          final pos = selection.baseOffset;
+          final lastNewline = text.lastIndexOf('\n', pos > 0 ? pos - 1 : 0);
+          final lineStart = lastNewline == -1 ? 0 : lastNewline + 1;
+          final currentLine = text.substring(lineStart, pos);
+
+          if (currentLine.isNotEmpty && RegExp(r'^[ ]+$').hasMatch(currentLine) && currentLine.length >= 4) {
+            final newText = text.replaceRange(lineStart, pos, currentLine.substring(4) + "}");
+            final newPos = lineStart + currentLine.length - 4 + 1;
+            _codeController.value = TextEditingValue(
+              text: newText,
+              selection: TextSelection.collapsed(offset: newPos),
+            );
+            return KeyEventResult.handled;
+          }
+        }
+      }
+
+      // 6. Smart Enter: Auto-Indentation identică cu linia anterioară
+      if (event.logicalKey == LogicalKeyboardKey.enter) {
+        final text = _codeController.text;
+        final selection = _codeController.selection;
+        if (selection.isCollapsed && selection.baseOffset >= 0) {
+          final pos = selection.baseOffset;
+          final lastNewline = text.lastIndexOf('\n', pos > 0 ? pos - 1 : 0);
+          final lineStart = lastNewline == -1 ? 0 : lastNewline + 1;
+          final currentLine = text.substring(lineStart, pos);
+
+          final match = RegExp(r'^[ ]*').firstMatch(currentLine);
+          String indent = match != null ? match.group(0)! : "";
+
+          if (currentLine.trimRight().endsWith('{')) {
+            indent += "    ";
+          }
+
+          final insertion = "\n$indent";
+          final newText = text.replaceRange(pos, pos, insertion);
+          _codeController.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(offset: pos + insertion.length),
+          );
+          return KeyEventResult.handled;
+        }
+      }
+    }
+    return KeyEventResult.ignored;
   }
 
   Future<void> _loadExerciseDetails() async {
@@ -172,7 +437,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (data[widget.subject] != null &&
           data[widget.subject][widget.grade] != null &&
           data[widget.subject][widget.grade][widget.id] != null) {
-        
         setState(() {
           exerciseData = data[widget.subject][widget.grade][widget.id];
         });
@@ -183,11 +447,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }
 
     try {
-      final docSnap = await FirebaseFirestore.instance
-          .collection('exercises')
-          .doc(widget.id)
-          .get();
-          
+      final docSnap = await FirebaseFirestore.instance.collection('exercises').doc(widget.id).get();
       if (docSnap.exists) {
         setState(() => exerciseData = docSnap.data());
         return;
@@ -195,7 +455,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     } catch (e) {
       debugPrint("Eroare Firestore: $e");
     }
-    
+
     setState(() => exerciseData = {});
   }
 
@@ -211,6 +471,24 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return prefs.getBool(key) ?? false;
   }
 
+  void _insertSnippet(String prefix, String suffix, [int cursorOffset = 0]) {
+    final text = _codeController.text;
+    final selection = _codeController.selection;
+    final start = selection.start < 0 ? text.length : selection.start;
+    final end = selection.end < 0 ? text.length : selection.end;
+
+    final selectedText = text.substring(start, end);
+    final replacement = "$prefix$selectedText$suffix";
+
+    final newText = text.replaceRange(start, end, replacement);
+    final newCursor = start + prefix.length + cursorOffset;
+
+    _codeController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursor.clamp(0, newText.length)),
+    );
+  }
+
   void _checkAuthAndExecute(VoidCallback action) {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -222,21 +500,20 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           return AlertDialog(
             backgroundColor: AppColors.bg,
             shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
-                side: BorderSide(color: AppColors.ink, width: 3)),
+              borderRadius: BorderRadius.zero,
+              side: BorderSide(color: AppColors.ink, width: 2.5),
+            ),
             title: const Row(
               children: [
-                Icon(Icons.lock, color: AppColors.ink, size: 28),
+                Icon(Icons.lock, color: AppColors.ink, size: 24),
                 SizedBox(width: 10),
-                Text("LOGIN REQUIRED",
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
+                Text("LOGIN REQUIRED", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 16)),
               ],
             ),
             content: const Text(
-              "You must authenticate to submit solutions and save progress.",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+              "Trebuie să fii autentificat pentru a rula teste și a salva progresul.",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
             ),
-            actionsPadding: const EdgeInsets.all(24),
             actions: [
               RetroButton(
                 text: "CANCEL",
@@ -244,7 +521,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 textColor: AppColors.ink,
                 onPressed: () => context.pop(),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               RetroButton(
                 text: "LOGIN",
                 bgColor: AppColors.sunset,
@@ -264,21 +541,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget build(BuildContext context) {
     if (exerciseData == null) {
       return const Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Center(child: CircularProgressIndicator(color: AppColors.sunset)));
+        backgroundColor: AppColors.bg,
+        body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+      );
     }
 
     if (exerciseData!.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.bg,
-        appBar: AppBar(
-          backgroundColor: AppColors.bg,
-          iconTheme: const IconThemeData(color: AppColors.ink),
-          elevation: 0,
-        ),
+        appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: const IconThemeData(color: AppColors.ink), elevation: 0),
         body: const Center(
-          child: Text("QUEST NOT FOUND.",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink)),
+          child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
         ),
       );
     }
@@ -286,49 +559,211 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: Text(widget.subject.toUpperCase(),
-            style: const TextStyle(
-                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+        title: Text(
+          "${widget.subject.toUpperCase()} • CLASA ${widget.grade} • #${widget.id}",
+          style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 15),
+        ),
         backgroundColor: AppColors.bg,
         iconTheme: const IconThemeData(color: AppColors.ink),
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(color: AppColors.ink, height: 3),
+          preferredSize: const Size.fromHeight(2.5),
+          child: Container(color: AppColors.ink, height: 2.5),
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isWide = constraints.maxWidth > 800;
+      body: Stack(
+        children: [
+          // STANDARD SPLIT VIEW
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1380),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 920;
 
-              return Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: isWide
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 3, child: _buildContentPanel()),
-                          const SizedBox(width: 32),
-                          Expanded(flex: 2, child: _buildInteractionPanel()),
-                        ],
-                      )
-                    : SingleChildScrollView(
-                        child: Column(
+                  return Padding(
+                    padding: const EdgeInsets.all(22.0),
+                    child: isWide
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 5, child: SingleChildScrollView(child: _buildContentPanel())),
+                              const SizedBox(width: 24),
+                              Expanded(flex: 6, child: SingleChildScrollView(child: _buildInteractionPanel())),
+                            ],
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                _buildContentPanel(),
+                                const SizedBox(height: 24),
+                                _buildInteractionPanel(),
+                              ],
+                            ),
+                          ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // ANIMATED FULL SCREEN FOR PROBLEM
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOutCubic,
+            top: isFullScreenProblem ? 0 : MediaQuery.of(context).size.height,
+            bottom: isFullScreenProblem ? 0 : -MediaQuery.of(context).size.height,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: AppColors.bg,
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 900),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.ink, width: 3),
+                      boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
+                    ),
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            _buildContentPanel(),
-                            const SizedBox(height: 32),
-                            _buildInteractionPanel(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              color: AppColors.sunset,
+                              child: const Text("PROBLEM FOCUS MODE",
+                                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+                            ),
+                            const Spacer(),
+                            RetroButton(
+                              text: "EXIT FOCUS",
+                              icon: Icons.fullscreen_exit,
+                              bgColor: AppColors.ink,
+                              onPressed: () => setState(() => isFullScreenProblem = false),
+                            )
                           ],
                         ),
-                      ),
-              );
-            },
+                        const SizedBox(height: 20),
+                        Expanded(child: SingleChildScrollView(child: _buildEnuntContent())),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+
+          // ANIMATED FULL SCREEN FOR CODE EDITOR
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOutCubic,
+            top: isFullScreenCode ? 0 : MediaQuery.of(context).size.height,
+            bottom: isFullScreenCode ? 0 : -MediaQuery.of(context).size.height,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: AppColors.bg,
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  // Task Sidebar
+                  Container(
+                    width: 380,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.ink, width: 2.5),
+                      boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sunset)),
+                              Text("#${widget.id}", style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink)),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            exerciseData!["title"]?.toUpperCase() ?? "QUEST",
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            exerciseData!["description"] ?? "",
+                            style: const TextStyle(fontSize: 14, color: AppColors.ink, height: 1.5, fontWeight: FontWeight.w600),
+                          ),
+                          if (exerciseData!["input"] != null) ...[
+                            const SizedBox(height: 16),
+                            _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"]),
+                            const SizedBox(height: 10),
+                            _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"]),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+
+                  // Extended Code Workspace
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.cloud,
+                        border: Border.all(color: AppColors.ink, width: 2.5),
+                        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+                      ),
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        children: [
+                          _buildIdeHeader(isFullScreen: true),
+                          const SizedBox(height: 10),
+                          _buildCodeQuickActions(),
+                          const SizedBox(height: 10),
+                          Expanded(child: _buildIdeEditor()),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: RetroButton(
+                                  text: "COMPILE & RUN TESTS",
+                                  icon: Icons.play_arrow,
+                                  isLoading: isRunningCode,
+                                  bgColor: AppColors.forest,
+                                  onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              RetroButton(
+                                text: "EXIT FULLSCREEN",
+                                icon: Icons.fullscreen_exit,
+                                bgColor: AppColors.ink,
+                                onPressed: () => setState(() => isFullScreenCode = false),
+                              ),
+                            ],
+                          ),
+                          if (testResults.isNotEmpty) ...[
+                            const SizedBox(height: 14),
+                            SizedBox(height: 130, child: SingleChildScrollView(child: _buildTestCasesConsole())),
+                          ]
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -340,17 +775,35 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         Row(
           children: [
             _buildTab("enunt", "PROBLEM"),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             _buildTab("solutie", "SOLUTION"),
+            const Spacer(),
+            GestureDetector(
+              onTap: () => setState(() => isFullScreenProblem = true),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.ink, width: 2),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.fullscreen, size: 14, color: AppColors.ink),
+                    SizedBox(width: 4),
+                    Text("FOCUS BRIEF", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.ink)),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(color: AppColors.ink, width: 3),
-            boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
+            border: Border.all(color: AppColors.ink, width: 2.5),
+            boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
           ),
-          padding: const EdgeInsets.all(40),
+          padding: const EdgeInsets.all(26),
           child: selectedTab == "enunt" ? _buildEnuntContent() : _buildSolutieContent(),
         ),
       ],
@@ -362,24 +815,24 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return GestureDetector(
       onTap: () => setState(() => selectedTab = tabKey),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.mustard : AppColors.cloud,
           border: const Border(
-            top: BorderSide(color: AppColors.ink, width: 3),
-            left: BorderSide(color: AppColors.ink, width: 3),
-            right: BorderSide(color: AppColors.ink, width: 3),
-            bottom: BorderSide(color: Colors.transparent, width: 0),
+            top: BorderSide(color: AppColors.ink, width: 2.5),
+            left: BorderSide(color: AppColors.ink, width: 2.5),
+            right: BorderSide(color: AppColors.ink, width: 2.5),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: AppColors.ink,
-              letterSpacing: 1.5,
-              decoration: isSelected ? TextDecoration.none : TextDecoration.underline),
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: AppColors.ink,
+            letterSpacing: 1.0,
+            decoration: isSelected ? TextDecoration.none : TextDecoration.underline,
+          ),
         ),
       ),
     );
@@ -389,48 +842,48 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(exerciseData!["title"]?.toUpperCase() ?? "UNTITLED QUEST",
-            style: const TextStyle(
-                fontSize: 32, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2)),
-        const SizedBox(height: 32),
-        _buildSectionTitle("DESCRIPTION"),
-        Text(exerciseData!["description"] ?? "Fără descriere.",
-            style: const TextStyle(
-                fontSize: 20, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6)),
-        
+        Text(
+          exerciseData!["title"]?.toUpperCase() ?? "UNTITLED QUEST",
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          "DESCRIPTION",
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.sunset, letterSpacing: 1.5),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          exerciseData!["description"] ?? "Fără descriere disponibilă.",
+          style: const TextStyle(fontSize: 15, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6),
+        ),
         if (exerciseData!["hint"] != null) ...[
-          const SizedBox(height: 32),
+          const SizedBox(height: 20),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.sky.withOpacity(0.2),
+              color: AppColors.sky.withOpacity(0.15),
               border: Border.all(color: AppColors.sky, width: 2),
             ),
             child: Row(
               children: [
-                const Icon(Icons.lightbulb, color: AppColors.sky, size: 28),
-                const SizedBox(width: 16),
+                const Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     exerciseData!["hint"],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: AppColors.ink,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
           )
         ],
-
         if (exerciseData!["tip_exercitiu"] == "cod" || exerciseData!["input"] != null) ...[
-          const SizedBox(height: 48),
-          Container(height: 3, color: AppColors.ink),
-          const SizedBox(height: 32),
-          _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"] ?? "-"),
           const SizedBox(height: 24),
+          Container(height: 2, color: AppColors.ink),
+          const SizedBox(height: 18),
+          _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"] ?? "-"),
+          const SizedBox(height: 12),
           _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"] ?? "-"),
         ],
       ],
@@ -442,41 +895,33 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("MASTER'S SOLUTION",
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.ink)),
-        const SizedBox(height: 32),
+        const Text("MASTER'S SOLUTION", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink)),
+        const SizedBox(height: 16),
         if (offSol != null && offSol["code"] != null)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.ink,
-              border: Border.all(color: AppColors.ink, width: 3),
+              color: AppColors.ideBg,
+              border: Border.all(color: AppColors.ink, width: 2.5),
             ),
-            child: Text(offSol["code"],
-                style: const TextStyle(
-                    fontFamily: 'monospace',
-                    color: AppColors.sky,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    height: 1.5)),
+            child: Text(
+              offSol["code"],
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                color: Color(0xFF55EFC4),
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                height: 1.5,
+              ),
+            ),
           )
         else
-          const Text("Acest exercițiu nu are o soluție oficială disponibilă.",
-              style: TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold)),
+          const Text(
+            "Acest exercițiu nu are o rezolvare oficială încărcată.",
+            style: TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
+          ),
       ],
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(title,
-          style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.sunset,
-              letterSpacing: 2.0)),
     );
   }
 
@@ -484,61 +929,66 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: AppColors.sky,
-                letterSpacing: 2.0)),
-        const SizedBox(height: 12),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.sky, letterSpacing: 1.5),
+        ),
+        const SizedBox(height: 6),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 2)),
-          child: Text(content,
-              style: const TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.w600)),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 1.5)),
+          child: Text(content, style: const TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.w700)),
         ),
       ],
     );
   }
 
   Widget _buildInteractionPanel() {
-    return RetroBlock(
-      bgColor: AppColors.cloud,
-      padding: 40,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cloud,
+        border: Border.all(color: AppColors.ink, width: 2.5),
+        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+      ),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.videogame_asset, size: 36, color: AppColors.ink),
-              const SizedBox(width: 16),
-              const Text("TERMINAL",
-                  style: TextStyle(
-                      fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0)),
+              const Icon(Icons.terminal, size: 22, color: AppColors.ink),
+              const SizedBox(width: 8),
+              const Text(
+                "TERMINAL & IDE",
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
+              ),
               const Spacer(),
               FutureBuilder<bool>(
                 future: _isExerciseDone(),
                 builder: (context, snapshot) {
                   if (snapshot.data == true || solutionOk) {
                     return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        color: AppColors.forest,
-                        child: const Text("CLEARED",
-                            style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.0)));
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      color: AppColors.forest,
+                      child: const Text(
+                        "CLEARED",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 0.8, fontSize: 11),
+                      ),
+                    );
                   }
                   return const SizedBox();
                 },
               )
             ],
           ),
+          const SizedBox(height: 16),
           if (exerciseData!["tip_exercitiu"] == "grila")
             _buildGrilaSection()
           else if (exerciseData!["tip_exercitiu"] == "text" || exerciseData!["raspuns_corect"] != null)
             _buildTextAnswerSection()
           else
-            _uploadSolutionSectionForCode(),
+            _buildCodeSection(),
         ],
       ),
     );
@@ -549,48 +999,31 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(height: 3, color: AppColors.ink),
-        const SizedBox(height: 32),
-        const Text("SELECT CORRECT OPTION",
-            style: TextStyle(
-                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 16)),
-        const SizedBox(height: 24),
         ...variante.map((varianta) {
           final isSelected = _selectedGrilaOption == varianta;
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 10),
             child: GestureDetector(
               onTap: () {
                 _checkAuthAndExecute(() {
                   setState(() => _selectedGrilaOption = varianta);
                 });
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
+              child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                    color: isSelected ? AppColors.sky : Colors.white,
-                    border: Border.all(color: AppColors.ink, width: 3),
-                    boxShadow: [
-                      if (!isSelected) const BoxShadow(color: AppColors.ink, offset: Offset(4, 4))
-                    ]),
+                  color: isSelected ? AppColors.sky : Colors.white,
+                  border: Border.all(color: AppColors.ink, width: 2),
+                ),
                 child: Row(
                   children: [
-                    Icon(
-                      isSelected ? Icons.check_box : Icons.check_box_outline_blank,
-                      color: AppColors.ink,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 16),
+                    Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank, color: AppColors.ink, size: 20),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         varianta,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: AppColors.ink,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -599,7 +1032,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
           );
         }).toList(),
-        const SizedBox(height: 32),
+        const SizedBox(height: 16),
         RetroButton(
           text: "VERIFY ANSWER",
           isFullWidth: true,
@@ -615,30 +1048,18 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(height: 3, color: AppColors.ink),
-        const SizedBox(height: 32),
-        const Text("YOUR SOLUTION",
-            style: TextStyle(
-                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 16)),
-        const SizedBox(height: 16),
         TextField(
           controller: _answerController,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
           decoration: const InputDecoration(
-            hintText: "Enter value...",
-            hintStyle: TextStyle(color: Colors.black38),
+            hintText: "Introdu valoarea...",
             filled: true,
-            fillColor: AppColors.cloud,
-            contentPadding: EdgeInsets.all(24),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
+            fillColor: Colors.white,
+            contentPadding: EdgeInsets.all(14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 2)),
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 16),
         RetroButton(
           text: "VERIFY ANSWER",
           isFullWidth: true,
@@ -647,6 +1068,268 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
         _buildResultBox(),
       ],
+    );
+  }
+
+  Widget _buildIdeHeader({bool isFullScreen = false}) {
+    final line = _getCurrentLine();
+    final col = _getCurrentCol();
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          color: AppColors.ink,
+          child: const Text("C++20 (GCC)", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
+        ),
+        const SizedBox(width: 8),
+        Text("LN $line, COL $col", style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
+        const Spacer(),
+        GestureDetector(
+          onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isFullScreen ? AppColors.sunset : AppColors.ink,
+              border: Border.all(color: AppColors.ink, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Icon(isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 14, color: Colors.white),
+                const SizedBox(width: 4),
+                Text(
+                  isFullScreen ? "EXIT" : "FOCUS MODE",
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCodeQuickActions() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _snippetButton("UNDO", _performUndo),
+          const SizedBox(width: 6),
+          _snippetButton("REDO", _performRedo),
+          const SizedBox(width: 6),
+          _snippetButton("TAB", () => _insertSnippet("    ", "", 4)),
+          const SizedBox(width: 6),
+          _snippetButton("{ }", () => _insertSnippet("{\n    ", "\n}", 4)),
+          const SizedBox(width: 6),
+          _snippetButton("cin >>", () => _insertSnippet("cin >> ", ";", 7)),
+          const SizedBox(width: 6),
+          _snippetButton("cout <<", () => _insertSnippet("cout << ", " << \"\\n\";", 8)),
+          const SizedBox(width: 6),
+          _snippetButton("for loop", () => _insertSnippet("for (int i = 0; i < n; i++) {\n    ", "\n}", 28)),
+          const SizedBox(width: 6),
+          _snippetButton("RESET", () => setState(() => _codeController.text = defaultCppBoilerplate), isDanger: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _snippetButton(String label, VoidCallback onTap, {bool isDanger = false}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: isDanger ? AppColors.sunset : AppColors.ink, width: 1.5),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            color: isDanger ? AppColors.sunset : AppColors.ink,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIdeEditor() {
+    final lineCount = '\n'.allMatches(_codeController.text).length + 1;
+    final currentLine = _getCurrentLine();
+
+    const double fontSz = 14.5;
+    const double lineH = 1.5;
+    const strut = StrutStyle(
+      fontFamily: 'monospace',
+      fontSize: fontSz,
+      height: lineH,
+      forceStrutHeight: true,
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.ideBg,
+        border: Border.all(color: AppColors.ink, width: 2.5),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Gutter Line Numbers
+          Container(
+            width: 48,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: const BoxDecoration(
+              color: AppColors.ideGutter,
+              border: Border(right: BorderSide(color: Color(0xFF2C3E50), width: 1.5)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: List.generate(lineCount, (i) {
+                final lineNum = i + 1;
+                final isCurrent = lineNum == currentLine;
+
+                return Container(
+                  height: fontSz * lineH,
+                  color: isCurrent ? const Color(0xFF2C3E50) : Colors.transparent,
+                  padding: const EdgeInsets.only(right: 6),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    isCurrent ? "▶$lineNum" : "$lineNum",
+                    strutStyle: strut,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      color: isCurrent ? const Color(0xFF55EFC4) : const Color(0xFF636E72),
+                      fontSize: 12,
+                      fontWeight: isCurrent ? FontWeight.w900 : FontWeight.w600,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+
+          // Code Text Area with Highlight Selection & Smart Keyboard Handlers
+          Expanded(
+            child: Focus(
+              focusNode: _editorFocusNode,
+              onKeyEvent: _handleEditorKey,
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  textSelectionTheme: const TextSelectionThemeData(
+                    selectionColor: Color(0x6674B9FF),
+                    cursorColor: Color(0xFF55EFC4),
+                    selectionHandleColor: Color(0xFF74B9FF),
+                  ),
+                ),
+                child: TextField(
+                  controller: _codeController,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  cursorColor: const Color(0xFF55EFC4),
+                  cursorWidth: 3,
+                  strutStyle: strut,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: fontSz,
+                    height: lineH,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildIdeHeader(isFullScreen: false),
+        const SizedBox(height: 8),
+        _buildCodeQuickActions(),
+        const SizedBox(height: 8),
+        SizedBox(height: 320, child: _buildIdeEditor()),
+        const SizedBox(height: 16),
+        RetroButton(
+          text: "COMPILE & RUN",
+          icon: Icons.play_arrow,
+          isFullWidth: true,
+          isLoading: isRunningCode,
+          bgColor: AppColors.forest,
+          onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+        ),
+        if (testResults.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _buildTestCasesConsole(),
+        ],
+        _buildResultBox(),
+      ],
+    );
+  }
+
+  Widget _buildTestCasesConsole() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.ideBg,
+        border: Border.all(color: AppColors.ink, width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "TEST RESULTS & CONSOLE",
+            style: TextStyle(color: AppColors.cloud, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+          ),
+          const SizedBox(height: 10),
+          ...testResults.map((t) {
+            final passed = t["passed"] == true;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.ideGutter,
+                border: Border.all(color: passed ? AppColors.forest : AppColors.sunset, width: 1.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(passed ? Icons.check_circle : Icons.cancel, size: 16, color: passed ? AppColors.forest : AppColors.sunset),
+                      const SizedBox(width: 6),
+                      Text(
+                        "TEST ${t['index']}: ${passed ? 'PASSED (OK)' : 'FAILED'}",
+                        style: TextStyle(
+                          color: passed ? AppColors.forest : AppColors.sunset,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!passed) ...[
+                    const SizedBox(height: 6),
+                    Text("EXPECTED: ${t['expected']}", style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
+                    Text("OUTPUT:   ${t['got']}", style: const TextStyle(color: AppColors.sunset, fontSize: 11, fontFamily: 'monospace')),
+                  ]
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
@@ -668,88 +1351,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     if (solutionOk) await _markExerciseAsDone();
   }
 
-  Widget _uploadSolutionSectionForCode() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(height: 3, color: AppColors.ink),
-        const SizedBox(height: 32),
-        const Text("CODE EDITOR (C++)",
-            style: TextStyle(
-                color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 16)),
-        const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.ink,
-            border: Border.all(color: AppColors.ink, width: 3),
-          ),
-          child: TextField(
-            controller: _answerController,
-            maxLines: 15,
-            style: const TextStyle(
-                fontFamily: 'monospace',
-                color: AppColors.sky,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                height: 1.5),
-            decoration: const InputDecoration(
-              hintText: "// Write code here...\n#include <iostream>\nusing namespace std;\n\nint main() {\n  return 0;\n}",
-              hintStyle: TextStyle(color: Colors.white38),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.all(24),
-            ),
-          ),
-        ),
-        const SizedBox(height: 32),
-        RetroButton(
-          text: "COMPILE & RUN",
-          isFullWidth: true,
-          isLoading: isRunningCode,
-          bgColor: AppColors.forest,
-          onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
-        ),
-        if (debugLogs.isNotEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            margin: const EdgeInsets.only(top: 32),
-            decoration: BoxDecoration(
-                color: AppColors.ink, border: Border.all(color: AppColors.ink, width: 3)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("CONSOLE OUTPUT",
-                    style: TextStyle(
-                        color: AppColors.cloud,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2.0)),
-                const SizedBox(height: 16),
-                ...debugLogs.map((log) => Text(log,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'monospace',
-                        color: log.contains("FAIL") || log.contains("ERROR")
-                            ? AppColors.sunset
-                            : AppColors.mustard,
-                        fontWeight: FontWeight.bold,
-                        height: 1.5))),
-              ],
-            ),
-          ),
-        _buildResultBox(),
-      ],
-    );
-  }
-
   Future<void> _runJudge0Checker() async {
-    final code = _answerController.text.trim();
+    final code = _codeController.text.trim();
     if (code.isEmpty) return;
 
     setState(() {
       solutionChecked = false;
       solutionOk = false;
-      debugLogs.clear();
+      testResults.clear();
       isRunningCode = true;
     });
 
@@ -758,29 +1367,38 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (exerciseData?["examples"] != null) {
         tests.add({
           "input": exerciseData!["examples"]["input"]?.toString() ?? "",
-          "output": exerciseData!["examples"]["output"]?.toString() ?? ""
+          "output": exerciseData!["examples"]["output"]?.toString() ?? "",
         });
       }
       if (exerciseData?["tests"] != null) {
         for (var t in exerciseData!["tests"]) {
-          tests.add({"input": t["input"]?.toString() ?? "", "output": t["output"]?.toString() ?? ""});
+          tests.add({
+            "input": t["input"]?.toString() ?? "",
+            "output": t["output"]?.toString() ?? "",
+          });
         }
       }
 
       bool allPassed = true;
+
       for (int i = 0; i < tests.length; i++) {
         final test = tests[i];
         final inputData = test["input"] ?? "";
         final expectedOutput = test["output"] ?? "";
 
-        final body = jsonEncode({"language_id": 52, "source_code": code, "stdin": inputData});
+        final body = jsonEncode({
+          "language_id": 52,
+          "source_code": code,
+          "stdin": inputData,
+        });
+
         final uri = Uri.parse("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true");
         final response = await http.post(
           uri,
           headers: {
             "Content-Type": "application/json",
             "X-RapidAPI-Key": "YOUR_API_KEY",
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
           },
           body: body,
         );
@@ -792,14 +1410,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final normOutput = normalize(output);
         final normExpected = normalize(expectedOutput);
 
-        if (normOutput != normExpected) {
-          allPassed = false;
-          debugLogs.add("> TEST ${i + 1}: FAILED");
-          debugLogs.add("  EXPECTED: $normExpected");
-          debugLogs.add("  GOT: $normOutput\n");
-        } else {
-          debugLogs.add("> TEST ${i + 1}: SUCCESS");
-        }
+        final isTestOk = (normOutput == normExpected);
+        if (!isTestOk) allPassed = false;
+
+        testResults.add({
+          "index": i + 1,
+          "passed": isTestOk,
+          "expected": normExpected,
+          "got": normOutput,
+        });
+
         setState(() {});
       }
 
@@ -807,9 +1427,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         solutionChecked = true;
         solutionOk = allPassed;
       });
+
       if (allPassed) await _markExerciseAsDone();
     } catch (e) {
-      debugLogs.add("> ERROR: $e");
+      testResults.add({
+        "index": 1,
+        "passed": false,
+        "expected": "No runtime errors",
+        "got": "$e",
+      });
       setState(() => solutionChecked = true);
     } finally {
       setState(() => isRunningCode = false);
@@ -819,23 +1445,22 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _buildResultBox() {
     if (!solutionChecked) return const SizedBox();
     return Container(
-      margin: const EdgeInsets.only(top: 32),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.only(top: 18),
+      padding: const EdgeInsets.all(16),
       width: double.infinity,
       decoration: BoxDecoration(
         color: solutionOk ? AppColors.forest : AppColors.sunset,
-        border: Border.all(color: AppColors.ink, width: 3),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
+        border: Border.all(color: AppColors.ink, width: 2.5),
+        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
       ),
       child: Row(
         children: [
-          Icon(solutionOk ? Icons.check_circle : Icons.error, color: Colors.white, size: 36),
-          const SizedBox(width: 24),
+          Icon(solutionOk ? Icons.check_circle : Icons.error, color: Colors.white, size: 24),
+          const SizedBox(width: 14),
           Expanded(
             child: Text(
-              solutionOk ? "QUEST CLEARED! WELL DONE." : "INCORRECT. TRY AGAIN.",
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+              solutionOk ? "QUEST CLEARED! +50 EXP EARNED." : "TESTS FAILED. INSPECT CONSOLE.",
+              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1.0),
             ),
           ),
         ],
