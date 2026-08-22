@@ -1,45 +1,45 @@
 {
   "project_info": {
-    "project_number": "896891711392",
-    "project_id": "avochat-b6288",
-    "storage_bucket": "avochat-b6288.firebasestorage.app"
+    "project_number": "8887176167",
+    "project_id": "imeditatii",
+    "storage_bucket": "imeditatii.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:896891711392:android:344e94b2b23a1edd137ec5",
+        "mobilesdk_app_id": "1:8887176167:android:2fe257f5eab823d0c6cb42",
         "android_client_info": {
-          "package_name": "com.atod.avochat"
+          "package_name": "com.atod.imeditatii"
         }
       },
       "oauth_client": [
         {
-          "client_id": "896891711392-pdgiv6o934tsa5dkh8jm8dvfag455tv2.apps.googleusercontent.com",
+          "client_id": "8887176167-hh7dmn52n1u7k2hp7s6fe5997o8oh4lo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.atod.avochat",
+            "package_name": "com.atod.imeditatii",
             "certificate_hash": "e2074eb025e868a2a36d3fa2774e4cde681854ad"
           }
         },
         {
-          "client_id": "896891711392-hak2jcbqri8f53cbdifkghk8f5m7bp79.apps.googleusercontent.com",
+          "client_id": "8887176167-2ddkobaaegbuouond9t59abl2d0ou9a1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDRrQ1a5Xz5Qznh0ugA492WHJiE-CW2t_E"
+          "current_key": "AIzaSyASKRHG7sYndU6Klhq2B4cHexdBT37LGw8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "896891711392-hak2jcbqri8f53cbdifkghk8f5m7bp79.apps.googleusercontent.com",
+              "client_id": "8887176167-2ddkobaaegbuouond9t59abl2d0ou9a1.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "896891711392-leei0u8lemskpfma1dvmvcmhs6r5u4bo.apps.googleusercontent.com",
+              "client_id": "8887176167-o8pmg2oj6jscnp2vbt4kf9iianulrh1k.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.example.avochat"

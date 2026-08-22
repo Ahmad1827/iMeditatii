@@ -41,50 +41,50 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAbTk0OSXxpApbA9XggU5DGdgZwmDjSiqM',
-    appId: '1:896891711392:web:41d3e5e608868682137ec5',
-    messagingSenderId: '896891711392',
-    projectId: 'avochat-b6288',
-    authDomain: 'avochat-b6288.firebaseapp.com',
-    storageBucket: 'avochat-b6288.firebasestorage.app',
-    measurementId: 'G-ZZB6W4HVRC',
+    apiKey: 'AIzaSyD_IYUFXDyzXgLep4TAcm2fqGtlqpCGizo',
+    appId: '1:8887176167:web:93cc1cfb8af5f716c6cb42',
+    messagingSenderId: '8887176167',
+    projectId: 'imeditatii',
+    authDomain: 'imeditatii.firebaseapp.com',
+    storageBucket: 'imeditatii.firebasestorage.app',
+    measurementId: 'G-FDM7KLFYEQ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDRrQ1a5Xz5Qznh0ugA492WHJiE-CW2t_E',
-    appId: '1:896891711392:android:344e94b2b23a1edd137ec5',
-    messagingSenderId: '896891711392',
-    projectId: 'avochat-b6288',
-    storageBucket: 'avochat-b6288.firebasestorage.app',
+    apiKey: 'AIzaSyASKRHG7sYndU6Klhq2B4cHexdBT37LGw8',
+    appId: '1:8887176167:android:2fe257f5eab823d0c6cb42',
+    messagingSenderId: '8887176167',
+    projectId: 'imeditatii',
+    storageBucket: 'imeditatii.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC7TzUlsUtFiTtbNr5REHg_H6DO9GEJP90',
-    appId: '1:896891711392:ios:7296b67acbb7dbbf137ec5',
-    messagingSenderId: '896891711392',
-    projectId: 'avochat-b6288',
-    storageBucket: 'avochat-b6288.firebasestorage.app',
-    androidClientId: '896891711392-pdgiv6o934tsa5dkh8jm8dvfag455tv2.apps.googleusercontent.com',
-    iosClientId: '896891711392-leei0u8lemskpfma1dvmvcmhs6r5u4bo.apps.googleusercontent.com',
+    apiKey: 'AIzaSyA4EPz6OhXXgLHbZzMbidGND03wc7yHd1c',
+    appId: '1:8887176167:ios:1862fce858291cfbc6cb42',
+    messagingSenderId: '8887176167',
+    projectId: 'imeditatii',
+    storageBucket: 'imeditatii.firebasestorage.app',
+    androidClientId: '8887176167-hh7dmn52n1u7k2hp7s6fe5997o8oh4lo.apps.googleusercontent.com',
+    iosClientId: '8887176167-o8pmg2oj6jscnp2vbt4kf9iianulrh1k.apps.googleusercontent.com',
     iosBundleId: 'com.example.avochat',
   );
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyC7TzUlsUtFiTtbNr5REHg_H6DO9GEJP90',
-    appId: '1:896891711392:ios:7296b67acbb7dbbf137ec5',
-    messagingSenderId: '896891711392',
-    projectId: 'avochat-b6288',
-    storageBucket: 'avochat-b6288.firebasestorage.app',
-    androidClientId: '896891711392-pdgiv6o934tsa5dkh8jm8dvfag455tv2.apps.googleusercontent.com',
-    iosClientId: '896891711392-leei0u8lemskpfma1dvmvcmhs6r5u4bo.apps.googleusercontent.com',
+    apiKey: 'AIzaSyA4EPz6OhXXgLHbZzMbidGND03wc7yHd1c',
+    appId: '1:8887176167:ios:1862fce858291cfbc6cb42',
+    messagingSenderId: '8887176167',
+    projectId: 'imeditatii',
+    storageBucket: 'imeditatii.firebasestorage.app',
+    androidClientId: '8887176167-hh7dmn52n1u7k2hp7s6fe5997o8oh4lo.apps.googleusercontent.com',
+    iosClientId: '8887176167-o8pmg2oj6jscnp2vbt4kf9iianulrh1k.apps.googleusercontent.com',
     iosBundleId: 'com.example.avochat',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAbTk0OSXxpApbA9XggU5DGdgZwmDjSiqM',
-    appId: '1:896891711392:web:a9543caf9f1a2f47137ec5',
-    messagingSenderId: '896891711392',
-    projectId: 'avochat-b6288',
-    authDomain: 'avochat-b6288.firebaseapp.com',
-    storageBucket: 'avochat-b6288.firebasestorage.app',
-    measurementId: 'G-712W1CNSR8',
+    apiKey: 'AIzaSyCZi5_qb75yKwbh4qd0t3HMdUojKSRI2ic',
+    appId: '1:8887176167:web:c5c21e227f7e1367c6cb42',
+    messagingSenderId: '8887176167',
+    projectId: 'imeditatii',
+    authDomain: 'imeditatii.firebaseapp.com',
+    storageBucket: 'imeditatii.firebasestorage.app',
+    measurementId: 'G-HNEETEXQDK',
   );
 }

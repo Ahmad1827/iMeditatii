@@ -264,19 +264,17 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => isGoogleSigningIn = true);
 
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
+      final GoogleAuthProvider authProvider = GoogleAuthProvider();
+      authProvider.addScope('email');
+      authProvider.addScope('profile');
+
+      final userCred = await FirebaseAuth.instance.signInWithPopup(authProvider);
+
+      if (userCred.user == null) {
         setState(() => isGoogleSigningIn = false);
         return;
       }
 
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final userCred = await FirebaseAuth.instance.signInWithCredential(credential);
       final uid = userCred.user!.uid;
       final email = userCred.user!.email ?? '';
       final name = userCred.user!.displayName ?? '';
