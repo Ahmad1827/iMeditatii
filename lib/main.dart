@@ -7,6 +7,8 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 
+import 'theme_manager.dart'; // <-- Import ThemeManager
+
 import 'home_screen.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
@@ -42,6 +44,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await ThemeManager.loadTheme(); // Încarcă tema salvată
   await populeazaCele50DeProbleme();
   runApp(const IMeditatiiApp());
 }
@@ -192,30 +195,126 @@ class IMeditatiiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'iMeditatii',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: false,
-        textTheme: GoogleFonts.vt323TextTheme(Theme.of(context).textTheme),
-        scaffoldBackgroundColor: const Color(0xFFF9F7F1),
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF2C363F),
-          secondary: Color(0xFFE75A41),
-        ),
-        splashFactory: NoSplash.splashFactory,
-        highlightColor: Colors.transparent,
-        scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: WidgetStateProperty.all(true),
-          trackVisibility: WidgetStateProperty.all(true),
-          thickness: WidgetStateProperty.all(16.0),
-          radius: const Radius.circular(0),
-          thumbColor: WidgetStateProperty.all(const Color(0xFF2C363F)),
-          trackColor: WidgetStateProperty.all(const Color(0xFFE2DFD2)),
-          interactive: true,
-        ),
-      ),
-      routerConfig: _router,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, currentMode, _) {
+        final isDark = currentMode == ThemeMode.dark;
+
+        return MaterialApp.router(
+          title: 'iMeditatii',
+          debugShowCheckedModeBanner: false,
+          themeMode: currentMode,
+          
+          // TEMA LIGHT
+          theme: ThemeData(
+            useMaterial3: false,
+            brightness: Brightness.light,
+            textTheme: GoogleFonts.vt323TextTheme(ThemeData.light().textTheme),
+            scaffoldBackgroundColor: const Color(0xFFF9F7F1),
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF2C363F),
+              secondary: Color(0xFFE75A41),
+            ),
+            splashFactory: NoSplash.splashFactory,
+            highlightColor: Colors.transparent,
+            scrollbarTheme: ScrollbarThemeData(
+              thumbVisibility: WidgetStateProperty.all(true),
+              trackVisibility: WidgetStateProperty.all(true),
+              thickness: WidgetStateProperty.all(16.0),
+              radius: const Radius.circular(0),
+              thumbColor: WidgetStateProperty.all(const Color(0xFF2C363F)),
+              trackColor: WidgetStateProperty.all(const Color(0xFFE2DFD2)),
+              interactive: true,
+            ),
+          ),
+
+          // TEMA DARK
+          darkTheme: ThemeData(
+            useMaterial3: false,
+            brightness: Brightness.dark,
+            textTheme: GoogleFonts.vt323TextTheme(ThemeData.dark().textTheme),
+            scaffoldBackgroundColor: const Color(0xFF141A1F),
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF5BA8B5),
+              secondary: Color(0xFFE75A41),
+              surface: Color(0xFF1B242B),
+            ),
+            splashFactory: NoSplash.splashFactory,
+            highlightColor: Colors.transparent,
+            scrollbarTheme: ScrollbarThemeData(
+              thumbVisibility: WidgetStateProperty.all(true),
+              trackVisibility: WidgetStateProperty.all(true),
+              thickness: WidgetStateProperty.all(16.0),
+              radius: const Radius.circular(0),
+              thumbColor: WidgetStateProperty.all(const Color(0xFF5BA8B5)),
+              trackColor: WidgetStateProperty.all(const Color(0xFF1B242B)),
+              interactive: true,
+            ),
+          ),
+
+          routerConfig: _router,
+
+          // BUTONUL FLOTANT PERMANENT (LIGHT / DARK)
+          builder: (context, child) {
+            return Stack(
+              children: [
+                child ?? const SizedBox(),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => ThemeManager.toggleTheme(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1B242B) : Colors.white,
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                              width: 2.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark ? Colors.black87 : const Color(0xFF2C363F),
+                                offset: const Offset(3.5, 3.5),
+                                blurRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isDark ? Icons.light_mode : Icons.dark_mode,
+                                color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                isDark ? "LIGHT THEME" : "DARK THEME",
+                                style: TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12,
+                                  color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
