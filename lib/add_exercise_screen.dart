@@ -2,41 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -51,17 +47,19 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
+  final bool isLoading;
 
   const RetroButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
+    this.isLoading = false,
   });
 
   @override
@@ -74,15 +72,21 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveTextColor = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
-        onTapDown: (_) => setState(() => isPressed = true),
-        onTapUp: (_) {
-          setState(() => isPressed = false);
-          widget.onPressed();
-        },
+        onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
+        onTapUp: widget.isLoading
+            ? null
+            : (_) {
+                setState(() => isPressed = false);
+                widget.onPressed();
+              },
         onTapCancel: () => setState(() => isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
@@ -93,27 +97,33 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: widget.isLoading ? Colors.grey : effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
             ],
           ),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          child: Text(
-            widget.text.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: widget.textColor,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
-          ),
+          child: widget.isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                )
+              : Text(
+                  widget.text.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: effectiveTextColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
         ),
       ),
     );
@@ -159,6 +169,26 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     'grila': 'Grilă (4 variante)',
     'cod': 'Problemă de Programare',
   };
+
+  @override
+  void dispose() {
+    _categoryController.dispose();
+    _titleController.dispose();
+    _descController.dispose();
+    _correctAnswerController.dispose();
+    _varAController.dispose();
+    _varBController.dispose();
+    _varCController.dispose();
+    _varDController.dispose();
+    _inputFormatController.dispose();
+    _outputFormatController.dispose();
+    _solutionCodeController.dispose();
+    for (var tc in _testCases) {
+      tc['input']?.dispose();
+      tc['output']?.dispose();
+    }
+    super.dispose();
+  }
 
   void _addTestCase() {
     setState(() {
@@ -224,12 +254,15 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('QUEST SUBMITTED FOR ADMIN APPROVAL.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+            content: const Text(
+              'QUEST SUBMITTED FOR ADMIN APPROVAL.',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+            ),
             backgroundColor: AppColors.forest,
             behavior: SnackBarBehavior.floating,
-            shape: const RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
-              side: BorderSide(color: AppColors.ink, width: 3),
+              side: BorderSide(color: AppColors.border, width: 3),
             ),
           ),
         );
@@ -239,12 +272,15 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('ERROR: $e', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+            content: Text(
+              'ERROR: $e',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+            ),
             backgroundColor: AppColors.sunset,
             behavior: SnackBarBehavior.floating,
-            shape: const RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
-              side: BorderSide(color: AppColors.ink, width: 3),
+              side: BorderSide(color: AppColors.border, width: 3),
             ),
           ),
         );
@@ -258,25 +294,27 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     return InputDecoration(
       labelText: label.toUpperCase(),
       labelStyle: TextStyle(
-        color: isDark ? AppColors.cloud : AppColors.ink,
+        color: isDark ? const Color(0xFFECEFF4) : AppColors.ink,
         fontWeight: FontWeight.bold,
       ),
-      prefixIcon: icon != null ? Icon(icon, color: isDark ? AppColors.cloud : AppColors.ink) : null,
+      prefixIcon: icon != null ? Icon(icon, color: isDark ? const Color(0xFFECEFF4) : AppColors.ink) : null,
       filled: true,
-      fillColor: isDark ? AppColors.ink : (isSuccess ? AppColors.mustard : Colors.white),
+      fillColor: isDark
+          ? const Color(0xFF1B242B)
+          : (isSuccess ? AppColors.mustard : AppColors.inputBg),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.zero,
-        borderSide: BorderSide(color: isDark ? AppColors.cloud : AppColors.ink, width: 2),
+        borderSide: BorderSide(color: isDark ? const Color(0xFF2C3E50) : AppColors.border, width: 2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.zero,
         borderSide: BorderSide(color: isSuccess ? AppColors.sky : AppColors.sunset, width: 3),
       ),
-      errorBorder: const OutlineInputBorder(
+      errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.zero,
         borderSide: BorderSide(color: AppColors.sunset, width: 3),
       ),
-      focusedErrorBorder: const OutlineInputBorder(
+      focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.zero,
         borderSide: BorderSide(color: AppColors.sunset, width: 3),
       ),
@@ -288,7 +326,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 40),
       child: RetroBlock(
-        bgColor: AppColors.bg,
+        bgColor: AppColors.cardBg,
         padding: 0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -296,12 +334,17 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
             Container(
               color: accentColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: AppColors.border, width: 3)),
               ),
               child: Text(
                 title.toUpperCase(),
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.5),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 1.5,
+                ),
               ),
             ),
             Padding(
@@ -319,142 +362,196 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.cloud,
-      appBar: AppBar(
-        title: const Text('INITIALIZE QUEST', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
-        backgroundColor: AppColors.mustard,
-        iconTheme: const IconThemeData(color: AppColors.ink),
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(color: AppColors.ink, height: 3),
-        ),
-      ),
-      body: _isSaving
-          ? const Center(child: CircularProgressIndicator(color: AppColors.sunset))
-          : Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildRetroCard(
-                          title: 'Quest Parameters',
-                          accentColor: AppColors.sky,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            title: Text(
+              'INITIALIZE QUEST',
+              style: TextStyle(
+                color: AppColors.ink,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+              ),
+            ),
+            backgroundColor: AppColors.bg,
+            iconTheme: IconThemeData(color: AppColors.ink),
+            elevation: 0,
+            centerTitle: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(3),
+              child: Container(color: AppColors.border, height: 3),
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              onPressed: () => context.pop(),
+            ),
+          ),
+          body: _isSaving
+              ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Row(
+                            _buildRetroCard(
+                              title: 'Quest Parameters',
+                              accentColor: AppColors.sky,
                               children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: DropdownButtonFormField<String>(
-                                    decoration: _inputStyle('Discipline', icon: Icons.book),
-                                    value: _selectedSubject,
-                                    dropdownColor: Colors.white,
-                                    iconEnabledColor: AppColors.ink,
-                                    items: subjects.map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
-                                    onChanged: (val) => setState(() => _selectedSubject = val!),
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: DropdownButtonFormField<String>(
+                                        decoration: _inputStyle('Discipline', icon: Icons.book),
+                                        value: _selectedSubject,
+                                        dropdownColor: AppColors.cardBg,
+                                        iconEnabledColor: AppColors.ink,
+                                        items: subjects
+                                            .map((s) => DropdownMenuItem(
+                                                  value: s,
+                                                  child: Text(
+                                                    s.toUpperCase(),
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      color: AppColors.ink,
+                                                    ),
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        onChanged: (val) => setState(() => _selectedSubject = val!),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    Expanded(
+                                      flex: 1,
+                                      child: DropdownButtonFormField<String>(
+                                        decoration: _inputStyle('Level', icon: Icons.school),
+                                        value: _selectedGrade,
+                                        dropdownColor: AppColors.cardBg,
+                                        iconEnabledColor: AppColors.ink,
+                                        items: grades
+                                            .map((g) => DropdownMenuItem(
+                                                  value: g,
+                                                  child: Text(
+                                                    "LVL $g",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      color: AppColors.ink,
+                                                    ),
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        onChanged: (val) => setState(() => _selectedGrade = val!),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 24),
-                                Expanded(
-                                  flex: 1,
-                                  child: DropdownButtonFormField<String>(
-                                    decoration: _inputStyle('Level', icon: Icons.school),
-                                    value: _selectedGrade,
-                                    dropdownColor: Colors.white,
-                                    iconEnabledColor: AppColors.ink,
-                                    items: grades.map((g) => DropdownMenuItem(value: g, child: Text("LVL $g", style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
-                                    onChanged: (val) => setState(() => _selectedGrade = val!),
+                                const SizedBox(height: 24),
+                                TextFormField(
+                                  controller: _categoryController,
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                                  cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                                  decoration: _inputStyle('Category (e.g., Algebra)', icon: Icons.folder),
+                                  validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
+                                ),
+                              ],
+                            ),
+                            _buildRetroCard(
+                              title: 'Quest Content',
+                              accentColor: AppColors.mustard,
+                              children: [
+                                TextFormField(
+                                  controller: _titleController,
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 18),
+                                  cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                                  decoration: _inputStyle('Quest Title', icon: Icons.title),
+                                  validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
+                                ),
+                                const SizedBox(height: 24),
+                                TextFormField(
+                                  controller: _descController,
+                                  maxLines: 6,
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, height: 1.5),
+                                  cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                                  decoration: _inputStyle('Write the problem description here...'),
+                                  validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
+                                ),
+                              ],
+                            ),
+                            _buildRetroCard(
+                              title: 'Response Format',
+                              accentColor: AppColors.sunset,
+                              children: [
+                                DropdownButtonFormField<String>(
+                                  decoration: _inputStyle('Exercise Type'),
+                                  value: _selectedType,
+                                  dropdownColor: AppColors.cardBg,
+                                  iconEnabledColor: AppColors.ink,
+                                  items: types.entries
+                                      .map((e) => DropdownMenuItem(
+                                            value: e.key,
+                                            child: Text(
+                                              e.value.toUpperCase(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.ink,
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  onChanged: (val) => setState(() => _selectedType = val!),
+                                ),
+                                const SizedBox(height: 32),
+                                AnimatedSize(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: _selectedType == 'text'
+                                        ? _buildTextSection()
+                                        : _selectedType == 'grila'
+                                            ? _buildGrilaSection()
+                                            : _buildCodeSection(),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
-                            TextFormField(
-                              controller: _categoryController,
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
-                              decoration: _inputStyle('Category (e.g., Algebra)', icon: Icons.folder),
-                              validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
+                            const SizedBox(height: 16),
+                            RetroButton(
+                              text: 'SUBMIT QUEST',
+                              bgColor: AppColors.forest,
+                              textColor: Colors.white,
+                              isFullWidth: true,
+                              onPressed: _saveExercise,
                             ),
+                            const SizedBox(height: 60),
                           ],
                         ),
-
-                        _buildRetroCard(
-                          title: 'Quest Content',
-                          accentColor: AppColors.mustard,
-                          children: [
-                            TextFormField(
-                              controller: _titleController,
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 18),
-                              decoration: _inputStyle('Quest Title', icon: Icons.title),
-                              validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
-                            ),
-                            const SizedBox(height: 24),
-                            TextFormField(
-                              controller: _descController,
-                              maxLines: 6,
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, height: 1.5),
-                              decoration: _inputStyle('Write the problem description here...'),
-                              validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
-                            ),
-                          ],
-                        ),
-
-                        _buildRetroCard(
-                          title: 'Response Format',
-                          accentColor: AppColors.sunset,
-                          children: [
-                            DropdownButtonFormField<String>(
-                              decoration: _inputStyle('Exercise Type'),
-                              value: _selectedType,
-                              dropdownColor: Colors.white,
-                              iconEnabledColor: AppColors.ink,
-                              items: types.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
-                              onChanged: (val) => setState(() => _selectedType = val!),
-                            ),
-                            const SizedBox(height: 32),
-                            AnimatedSize(
-                              duration: const Duration(milliseconds: 300),
-                              child: Container(
-                                width: double.infinity,
-                                child: _selectedType == 'text'
-                                    ? _buildTextSection()
-                                    : _selectedType == 'grila'
-                                        ? _buildGrilaSection()
-                                        : _buildCodeSection(),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-                        RetroButton(
-                          text: 'SUBMIT QUEST',
-                          bgColor: AppColors.forest,
-                          textColor: Colors.white,
-                          isFullWidth: true,
-                          onPressed: _saveExercise,
-                        ),
-                        const SizedBox(height: 60),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
+        );
+      },
     );
   }
 
   Widget _buildTextSection() {
     return TextFormField(
       controller: _correctAnswerController,
-      style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 20),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+        fontSize: 20,
+      ),
+      cursorColor: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
       decoration: _inputStyle('Exact Correct Answer', icon: Icons.check_circle, isSuccess: true),
       validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
     );
@@ -464,27 +561,63 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('PROVIDE 4 OPTIONS:', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18)),
+        Text(
+          'PROVIDE 4 OPTIONS:',
+          style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18),
+        ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: TextFormField(controller: _varAController, style: const TextStyle(fontWeight: FontWeight.bold), decoration: _inputStyle('Option A'))),
+            Expanded(
+              child: TextFormField(
+                controller: _varAController,
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                decoration: _inputStyle('Option A'),
+              ),
+            ),
             const SizedBox(width: 16),
-            Expanded(child: TextFormField(controller: _varBController, style: const TextStyle(fontWeight: FontWeight.bold), decoration: _inputStyle('Option B'))),
+            Expanded(
+              child: TextFormField(
+                controller: _varBController,
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                decoration: _inputStyle('Option B'),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: TextFormField(controller: _varCController, style: const TextStyle(fontWeight: FontWeight.bold), decoration: _inputStyle('Option C'))),
+            Expanded(
+              child: TextFormField(
+                controller: _varCController,
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                decoration: _inputStyle('Option C'),
+              ),
+            ),
             const SizedBox(width: 16),
-            Expanded(child: TextFormField(controller: _varDController, style: const TextStyle(fontWeight: FontWeight.bold), decoration: _inputStyle('Option D'))),
+            Expanded(
+              child: TextFormField(
+                controller: _varDController,
+                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                decoration: _inputStyle('Option D'),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 40),
         TextFormField(
           controller: _correctAnswerController,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 20),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+            fontSize: 20,
+          ),
+          cursorColor: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
           decoration: _inputStyle('RE-TYPE CORRECT OPTION', icon: Icons.star, isSuccess: true),
           validator: (val) => val!.isEmpty ? 'REQUIRED' : null,
         ),
@@ -499,27 +632,36 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
         TextFormField(
           controller: _inputFormatController,
           maxLines: 2,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
           decoration: _inputStyle('Input Data Format'),
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _outputFormatController,
           maxLines: 2,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
           decoration: _inputStyle('Output Data Format'),
         ),
         const SizedBox(height: 32),
-        const Text('OFFICIAL SOLUTION (C++):', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18)),
+        Text(
+          'OFFICIAL SOLUTION (C++):',
+          style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18),
+        ),
         const SizedBox(height: 12),
         TextFormField(
           controller: _solutionCodeController,
           maxLines: 8,
           decoration: _inputStyle('Source code...', icon: Icons.code, isDark: true),
-          style: const TextStyle(color: AppColors.sky, fontFamily: 'monospace', fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Color(0xFF55EFC4), fontFamily: 'monospace', fontSize: 16, fontWeight: FontWeight.bold),
+          cursorColor: const Color(0xFF55EFC4),
         ),
         const SizedBox(height: 48),
-        const Text('EVALUATION TESTS (JUDGE0):', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink)),
+        Text(
+          'EVALUATION TESTS (JUDGE0):',
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink),
+        ),
         const SizedBox(height: 24),
         ..._testCases.asMap().entries.map((entry) {
           int index = entry.key;
@@ -527,7 +669,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
           return Container(
             margin: const EdgeInsets.only(bottom: 24),
             child: RetroBlock(
-              bgColor: Colors.white,
+              bgColor: AppColors.cardBg,
               padding: 24,
               shadowOffset: 4.0,
               child: Column(
@@ -536,10 +678,13 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('TEST BATCH #${index + 1}', style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18)),
+                      Text(
+                        'TEST BATCH #${index + 1}',
+                        style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18),
+                      ),
                       if (_testCases.length > 1)
                         IconButton(
-                          icon: const Icon(Icons.delete, color: AppColors.sunset, size: 28),
+                          icon: Icon(Icons.delete, color: AppColors.sunset, size: 28),
                           onPressed: () => _removeTestCase(index),
                         ),
                     ],
@@ -547,14 +692,16 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: tc['input'],
-                    style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold),
+                    style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, color: AppColors.ink),
+                    cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
                     decoration: _inputStyle('Expected Input'),
                     maxLines: 2,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: tc['output'],
-                    style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold),
+                    style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, color: AppColors.ink),
+                    cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
                     decoration: _inputStyle('Expected Output'),
                     maxLines: 2,
                   ),
@@ -562,7 +709,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
               ),
             ),
           );
-        }).toList(),
+        }),
         const SizedBox(height: 16),
         Align(
           alignment: Alignment.centerLeft,

@@ -7,17 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF4F1EA);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF20BF6B);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE5E0D4);
-  static const Color sky = Color(0xFF5BA8B5);
-  static const Color ideBg = Color(0xFF1B242B);
-  static const Color ideGutter = Color(0xFF131A1F);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 // ----------------------------------------------------
 // C++ SYNTAX HIGHLIGHTING CONTROLLER
@@ -105,8 +96,8 @@ class CppSyntaxController extends TextEditingController {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
   final bool isLoading;
   final IconData? icon;
@@ -115,8 +106,8 @@ class RetroButton extends StatefulWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
     this.isLoading = false,
     this.icon,
@@ -132,6 +123,9 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveText = widget.textColor ?? Colors.white;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
@@ -154,11 +148,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.isLoading ? Colors.grey : widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 2.5),
+            color: widget.isLoading ? Colors.grey : effectiveBg,
+            border: Border.all(color: AppColors.border, width: 2.5),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
                 blurRadius: 0,
               ),
@@ -178,14 +172,14 @@ class _RetroButtonState extends State<RetroButton> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (widget.icon != null) ...[
-                      Icon(widget.icon, size: 18, color: widget.textColor),
+                      Icon(widget.icon, size: 18, color: effectiveText),
                       const SizedBox(width: 8),
                     ],
                     Text(
                       widget.text.toUpperCase(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: widget.textColor,
+                        color: effectiveText,
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
@@ -499,18 +493,18 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: AppColors.bg,
-            shape: const RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
-              side: BorderSide(color: AppColors.ink, width: 2.5),
+              side: BorderSide(color: AppColors.border, width: 2.5),
             ),
-            title: const Row(
+            title: Row(
               children: [
                 Icon(Icons.lock, color: AppColors.ink, size: 24),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Text("LOGIN REQUIRED", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 16)),
               ],
             ),
-            content: const Text(
+            content: Text(
               "Trebuie să fii autentificat pentru a rula teste și a salva progresul.",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
             ),
@@ -539,232 +533,239 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (exerciseData == null) {
-      return const Scaffold(
-        backgroundColor: AppColors.bg,
-        body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
-      );
-    }
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        if (exerciseData == null) {
+          return Scaffold(
+            backgroundColor: AppColors.bg,
+            body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+          );
+        }
 
-    if (exerciseData!.isEmpty) {
-      return Scaffold(
-        backgroundColor: AppColors.bg,
-        appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: const IconThemeData(color: AppColors.ink), elevation: 0),
-        body: const Center(
-          child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
-        ),
-      );
-    }
+        if (exerciseData!.isEmpty) {
+          return Scaffold(
+            backgroundColor: AppColors.bg,
+            appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: IconThemeData(color: AppColors.ink), elevation: 0),
+            body: Center(
+              child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
+            ),
+          );
+        }
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        title: Text(
-          "${widget.subject.toUpperCase()} • CLASA ${widget.grade} • #${widget.id}",
-          style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 15),
-        ),
-        backgroundColor: AppColors.bg,
-        iconTheme: const IconThemeData(color: AppColors.ink),
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(2.5),
-          child: Container(color: AppColors.ink, height: 2.5),
-        ),
-      ),
-      body: Stack(
-        children: [
-          // STANDARD SPLIT VIEW
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1380),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 920;
-
-                  return Padding(
-                    padding: const EdgeInsets.all(22.0),
-                    child: isWide
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(flex: 5, child: SingleChildScrollView(child: _buildContentPanel())),
-                              const SizedBox(width: 24),
-                              Expanded(flex: 6, child: SingleChildScrollView(child: _buildInteractionPanel())),
-                            ],
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                _buildContentPanel(),
-                                const SizedBox(height: 24),
-                                _buildInteractionPanel(),
-                              ],
-                            ),
-                          ),
-                  );
-                },
-              ),
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            title: Text(
+              "${widget.subject.toUpperCase()} • CLASA ${widget.grade} • #${widget.id}",
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 15),
+            ),
+            backgroundColor: AppColors.bg,
+            iconTheme: IconThemeData(color: AppColors.ink),
+            elevation: 0,
+            centerTitle: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(2.5),
+              child: Container(color: AppColors.border, height: 2.5),
             ),
           ),
-
-          // ANIMATED FULL SCREEN FOR PROBLEM
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 280),
-            curve: Curves.easeInOutCubic,
-            top: isFullScreenProblem ? 0 : MediaQuery.of(context).size.height,
-            bottom: isFullScreenProblem ? 0 : -MediaQuery.of(context).size.height,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: AppColors.bg,
-              padding: const EdgeInsets.all(24),
-              child: Center(
+          body: Stack(
+            children: [
+              // STANDARD SPLIT VIEW
+              Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 900),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.ink, width: 3),
-                      boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
-                    ),
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                  constraints: const BoxConstraints(maxWidth: 1380),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isWide = constraints.maxWidth > 920;
+
+                      return Padding(
+                        padding: const EdgeInsets.all(22.0),
+                        child: isWide
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(flex: 5, child: SingleChildScrollView(child: _buildContentPanel())),
+                                  const SizedBox(width: 24),
+                                  Expanded(flex: 6, child: SingleChildScrollView(child: _buildInteractionPanel())),
+                                ],
+                              )
+                            : SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    _buildContentPanel(),
+                                    const SizedBox(height: 24),
+                                    _buildInteractionPanel(),
+                                  ],
+                                ),
+                              ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // ANIMATED FULL SCREEN FOR PROBLEM
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeInOutCubic,
+                top: isFullScreenProblem ? 0 : MediaQuery.of(context).size.height,
+                bottom: isFullScreenProblem ? 0 : -MediaQuery.of(context).size.height,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: AppColors.bg,
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 900),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          border: Border.all(color: AppColors.border, width: 3),
+                          boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6))],
+                        ),
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              color: AppColors.sunset,
-                              child: const Text("PROBLEM FOCUS MODE",
-                                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  color: AppColors.sunset,
+                                  child: const Text("PROBLEM FOCUS MODE",
+                                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+                                ),
+                                const Spacer(),
+                                RetroButton(
+                                  text: "EXIT FOCUS",
+                                  icon: Icons.fullscreen_exit,
+                                  bgColor: AppColors.ink,
+                                  textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                  onPressed: () => setState(() => isFullScreenProblem = false),
+                                )
+                              ],
                             ),
-                            const Spacer(),
-                            RetroButton(
-                              text: "EXIT FOCUS",
-                              icon: Icons.fullscreen_exit,
-                              bgColor: AppColors.ink,
-                              onPressed: () => setState(() => isFullScreenProblem = false),
-                            )
+                            const SizedBox(height: 20),
+                            Expanded(child: SingleChildScrollView(child: _buildEnuntContent())),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        Expanded(child: SingleChildScrollView(child: _buildEnuntContent())),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
 
-          // ANIMATED FULL SCREEN FOR CODE EDITOR
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 280),
-            curve: Curves.easeInOutCubic,
-            top: isFullScreenCode ? 0 : MediaQuery.of(context).size.height,
-            bottom: isFullScreenCode ? 0 : -MediaQuery.of(context).size.height,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: AppColors.bg,
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  // Task Sidebar
-                  Container(
-                    width: 380,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.ink, width: 2.5),
-                      boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // ANIMATED FULL SCREEN FOR CODE EDITOR
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeInOutCubic,
+                top: isFullScreenCode ? 0 : MediaQuery.of(context).size.height,
+                bottom: isFullScreenCode ? 0 : -MediaQuery.of(context).size.height,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: AppColors.bg,
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      // Task Sidebar
+                      Container(
+                        width: 380,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          border: Border.all(color: AppColors.border, width: 2.5),
+                          boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sunset)),
-                              Text("#${widget.id}", style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sunset)),
+                                  Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink)),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                exerciseData!["title"]?.toUpperCase() ?? "QUEST",
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                exerciseData!["description"] ?? "",
+                                style: TextStyle(fontSize: 14, color: AppColors.ink, height: 1.5, fontWeight: FontWeight.w600),
+                              ),
+                              if (exerciseData!["input"] != null) ...[
+                                const SizedBox(height: 16),
+                                _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"]),
+                                const SizedBox(height: 10),
+                                _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"]),
+                              ],
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            exerciseData!["title"]?.toUpperCase() ?? "QUEST",
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            exerciseData!["description"] ?? "",
-                            style: const TextStyle(fontSize: 14, color: AppColors.ink, height: 1.5, fontWeight: FontWeight.w600),
-                          ),
-                          if (exerciseData!["input"] != null) ...[
-                            const SizedBox(height: 16),
-                            _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"]),
-                            const SizedBox(height: 10),
-                            _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"]),
-                          ],
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 18),
+                      const SizedBox(width: 18),
 
-                  // Extended Code Workspace
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.cloud,
-                        border: Border.all(color: AppColors.ink, width: 2.5),
-                        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
-                      ),
-                      padding: const EdgeInsets.all(18),
-                      child: Column(
-                        children: [
-                          _buildIdeHeader(isFullScreen: true),
-                          const SizedBox(height: 10),
-                          _buildCodeQuickActions(),
-                          const SizedBox(height: 10),
-                          Expanded(child: _buildIdeEditor()),
-                          const SizedBox(height: 14),
-                          Row(
+                      // Extended Code Workspace
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.cloud,
+                            border: Border.all(color: AppColors.border, width: 2.5),
+                            boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+                          ),
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
                             children: [
-                              Expanded(
-                                child: RetroButton(
-                                  text: "COMPILE & RUN TESTS",
-                                  icon: Icons.play_arrow,
-                                  isLoading: isRunningCode,
-                                  bgColor: AppColors.forest,
-                                  onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
-                                ),
+                              _buildIdeHeader(isFullScreen: true),
+                              const SizedBox(height: 10),
+                              _buildCodeQuickActions(),
+                              const SizedBox(height: 10),
+                              Expanded(child: _buildIdeEditor()),
+                              const SizedBox(height: 14),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: RetroButton(
+                                      text: "COMPILE & RUN TESTS",
+                                      icon: Icons.play_arrow,
+                                      isLoading: isRunningCode,
+                                      bgColor: AppColors.forest,
+                                      onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  RetroButton(
+                                    text: "EXIT FULLSCREEN",
+                                    icon: Icons.fullscreen_exit,
+                                    bgColor: AppColors.ink,
+                                    textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                    onPressed: () => setState(() => isFullScreenCode = false),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 14),
-                              RetroButton(
-                                text: "EXIT FULLSCREEN",
-                                icon: Icons.fullscreen_exit,
-                                bgColor: AppColors.ink,
-                                onPressed: () => setState(() => isFullScreenCode = false),
-                              ),
+                              if (testResults.isNotEmpty) ...[
+                                const SizedBox(height: 14),
+                                SizedBox(height: 130, child: SingleChildScrollView(child: _buildTestCasesConsole())),
+                              ]
                             ],
                           ),
-                          if (testResults.isNotEmpty) ...[
-                            const SizedBox(height: 14),
-                            SizedBox(height: 130, child: SingleChildScrollView(child: _buildTestCasesConsole())),
-                          ]
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -783,13 +784,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.ink, width: 2),
+                  color: AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 2),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.fullscreen, size: 14, color: AppColors.ink),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text("FOCUS BRIEF", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.ink)),
                   ],
                 ),
@@ -799,9 +800,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: AppColors.ink, width: 2.5),
-            boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+            color: AppColors.cardBg,
+            border: Border.all(color: AppColors.border, width: 2.5),
+            boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
           ),
           padding: const EdgeInsets.all(26),
           child: selectedTab == "enunt" ? _buildEnuntContent() : _buildSolutieContent(),
@@ -818,10 +819,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.mustard : AppColors.cloud,
-          border: const Border(
-            top: BorderSide(color: AppColors.ink, width: 2.5),
-            left: BorderSide(color: AppColors.ink, width: 2.5),
-            right: BorderSide(color: AppColors.ink, width: 2.5),
+          border: Border(
+            top: BorderSide(color: AppColors.border, width: 2.5),
+            left: BorderSide(color: AppColors.border, width: 2.5),
+            right: BorderSide(color: AppColors.border, width: 2.5),
           ),
         ),
         child: Text(
@@ -829,7 +830,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w900,
-            color: AppColors.ink,
+            color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
             letterSpacing: 1.0,
             decoration: isSelected ? TextDecoration.none : TextDecoration.underline,
           ),
@@ -844,17 +845,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         Text(
           exerciseData!["title"]?.toUpperCase() ?? "UNTITLED QUEST",
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           "DESCRIPTION",
           style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.sunset, letterSpacing: 1.5),
         ),
         const SizedBox(height: 6),
         Text(
           exerciseData!["description"] ?? "Fără descriere disponibilă.",
-          style: const TextStyle(fontSize: 15, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6),
+          style: TextStyle(fontSize: 15, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6),
         ),
         if (exerciseData!["hint"] != null) ...[
           const SizedBox(height: 20),
@@ -866,12 +867,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
+                Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     exerciseData!["hint"],
-                    style: const TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -880,7 +881,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ],
         if (exerciseData!["tip_exercitiu"] == "cod" || exerciseData!["input"] != null) ...[
           const SizedBox(height: 24),
-          Container(height: 2, color: AppColors.ink),
+          Container(height: 2, color: AppColors.border),
           const SizedBox(height: 18),
           _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"] ?? "-"),
           const SizedBox(height: 12),
@@ -895,15 +896,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("MASTER'S SOLUTION", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink)),
+        Text("MASTER'S SOLUTION", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink)),
         const SizedBox(height: 16),
         if (offSol != null && offSol["code"] != null)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.ideBg,
-              border: Border.all(color: AppColors.ink, width: 2.5),
+              color: const Color(0xFF1B242B),
+              border: Border.all(color: AppColors.border, width: 2.5),
             ),
             child: Text(
               offSol["code"],
@@ -917,7 +918,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
           )
         else
-          const Text(
+          Text(
             "Acest exercițiu nu are o rezolvare oficială încărcată.",
             style: TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
           ),
@@ -931,14 +932,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.sky, letterSpacing: 1.5),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.sky, letterSpacing: 1.5),
         ),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 1.5)),
-          child: Text(content, style: const TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.w700)),
+          decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 1.5)),
+          child: Text(content, style: TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.w700)),
         ),
       ],
     );
@@ -948,8 +949,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.cloud,
-        border: Border.all(color: AppColors.ink, width: 2.5),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -957,9 +958,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.terminal, size: 22, color: AppColors.ink),
+              Icon(Icons.terminal, size: 22, color: AppColors.ink),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 "TERMINAL & IDE",
                 style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
               ),
@@ -1013,8 +1014,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.sky : Colors.white,
-                  border: Border.all(color: AppColors.ink, width: 2),
+                  color: isSelected ? AppColors.sky : AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: Row(
                   children: [
@@ -1023,7 +1024,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     Expanded(
                       child: Text(
                         varianta,
-                        style: const TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -1037,6 +1038,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           text: "VERIFY ANSWER",
           isFullWidth: true,
           bgColor: AppColors.ink,
+          textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
           onPressed: _selectedGrilaOption == null ? () {} : () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
         _buildResultBox(),
@@ -1050,13 +1052,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         TextField(
           controller: _answerController,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
-          decoration: const InputDecoration(
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+          decoration: InputDecoration(
             hintText: "Introdu valoarea...",
+            hintStyle: TextStyle(color: AppColors.textMuted),
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.all(14),
-            border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 2)),
+            fillColor: AppColors.inputBg,
+            contentPadding: const EdgeInsets.all(14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
           ),
         ),
         const SizedBox(height: 16),
@@ -1064,6 +1067,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           text: "VERIFY ANSWER",
           isFullWidth: true,
           bgColor: AppColors.ink,
+          textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
           onPressed: () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
         _buildResultBox(),
@@ -1080,10 +1084,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           color: AppColors.ink,
-          child: const Text("C++20 (GCC)", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
+          child: Text(
+            "C++20 (GCC)",
+            style: TextStyle(
+              color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ),
         const SizedBox(width: 8),
-        Text("LN $line, COL $col", style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
+        Text("LN $line, COL $col", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
         const Spacer(),
         GestureDetector(
           onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
@@ -1091,15 +1102,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isFullScreen ? AppColors.sunset : AppColors.ink,
-              border: Border.all(color: AppColors.ink, width: 1.5),
+              border: Border.all(color: AppColors.border, width: 1.5),
             ),
             child: Row(
               children: [
-                Icon(isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 14, color: Colors.white),
+                Icon(isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 14, color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)),
                 const SizedBox(width: 4),
                 Text(
                   isFullScreen ? "EXIT" : "FOCUS MODE",
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -1140,8 +1155,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: isDanger ? AppColors.sunset : AppColors.ink, width: 1.5),
+          color: AppColors.cardBg,
+          border: Border.all(color: isDanger ? AppColors.sunset : AppColors.border, width: 1.5),
         ),
         child: Text(
           label,
@@ -1170,8 +1185,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.ideBg,
-        border: Border.all(color: AppColors.ink, width: 2.5),
+        color: const Color(0xFF1B242B),
+        border: Border.all(color: AppColors.border, width: 2.5),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1181,7 +1196,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             width: 48,
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: const BoxDecoration(
-              color: AppColors.ideGutter,
+              color: Color(0xFF131A1F),
               border: Border(right: BorderSide(color: Color(0xFF2C3E50), width: 1.5)),
             ),
             child: Column(
@@ -1282,13 +1297,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.ideBg,
-        border: Border.all(color: AppColors.ink, width: 2),
+        color: const Color(0xFF1B242B),
+        border: Border.all(color: AppColors.border, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "TEST RESULTS & CONSOLE",
             style: TextStyle(color: AppColors.cloud, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5),
           ),
@@ -1299,7 +1314,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.ideGutter,
+                color: const Color(0xFF131A1F),
                 border: Border.all(color: passed ? AppColors.forest : AppColors.sunset, width: 1.5),
               ),
               child: Column(
@@ -1322,7 +1337,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   if (!passed) ...[
                     const SizedBox(height: 6),
                     Text("EXPECTED: ${t['expected']}", style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
-                    Text("OUTPUT:   ${t['got']}", style: const TextStyle(color: AppColors.sunset, fontSize: 11, fontFamily: 'monospace')),
+                    Text("OUTPUT:   ${t['got']}", style: TextStyle(color: AppColors.sunset, fontSize: 11, fontFamily: 'monospace')),
                   ]
                 ],
               ),
@@ -1450,8 +1465,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: solutionOk ? AppColors.forest : AppColors.sunset,
-        border: Border.all(color: AppColors.ink, width: 2.5),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
       ),
       child: Row(
         children: [

@@ -4,41 +4,37 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -53,8 +49,8 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
   final bool isLoading;
 
@@ -62,8 +58,8 @@ class RetroButton extends StatefulWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
     this.isLoading = false,
   });
@@ -78,15 +74,21 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveTextColor = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
         onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
-        onTapUp: widget.isLoading ? null : (_) {
-          setState(() => isPressed = false);
-          widget.onPressed();
-        },
+        onTapUp: widget.isLoading
+            ? null
+            : (_) {
+                setState(() => isPressed = false);
+                widget.onPressed();
+              },
         onTapCancel: () => setState(() => isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
@@ -97,11 +99,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.isLoading ? Colors.grey : widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: widget.isLoading ? Colors.grey : effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -110,20 +112,20 @@ class _RetroButtonState extends State<RetroButton> {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           child: widget.isLoading
               ? const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
-          )
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                )
               : Text(
-            widget.text.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: widget.textColor,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
-          ),
+                  widget.text.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: effectiveTextColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
         ),
       ),
     );
@@ -191,9 +193,9 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         backgroundColor: isError ? AppColors.sunset : AppColors.forest,
         behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
-          side: BorderSide(color: AppColors.ink, width: 3),
+          side: BorderSide(color: AppColors.border, width: 3),
         ),
       ),
     );
@@ -299,31 +301,32 @@ class _SignupScreenState extends State<SignupScreen> {
       readOnly: readOnly,
       keyboardType: keyboardType,
       validator: validator,
-      style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+      cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
       decoration: InputDecoration(
         labelText: labelText.toUpperCase(),
-        labelStyle: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+        labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
         prefixIcon: Icon(prefixIcon, color: AppColors.ink),
         filled: true,
-        fillColor: readOnly ? AppColors.cloud : Colors.white,
+        fillColor: readOnly ? AppColors.cloud : AppColors.inputBg,
         contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        border: const OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.ink, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 3),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.ink, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 3),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: AppColors.sky, width: 3),
         ),
-        errorBorder: const OutlineInputBorder(
+        errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: AppColors.sunset, width: 3),
         ),
-        focusedErrorBorder: const OutlineInputBorder(
+        focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: AppColors.sunset, width: 3),
         ),
@@ -345,11 +348,11 @@ class _SignupScreenState extends State<SignupScreen> {
           0,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.sky : Colors.white,
-          border: Border.all(color: AppColors.ink, width: 3),
+          color: isSelected ? AppColors.sky : AppColors.cardBg,
+          border: Border.all(color: AppColors.border, width: 3),
           boxShadow: [
             BoxShadow(
-              color: AppColors.ink,
+              color: AppColors.shadow,
               offset: isSelected ? const Offset(0, 0) : const Offset(6, 6),
               blurRadius: 0,
             )
@@ -360,15 +363,15 @@ class _SignupScreenState extends State<SignupScreen> {
           children: [
             Icon(
               icon,
-              color: AppColors.ink,
+              color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
               size: 48,
             ),
             const SizedBox(height: 16),
             Text(
               title.toUpperCase(),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.ink,
+              style: TextStyle(
+                color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.0,
@@ -382,259 +385,265 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        title: const Text(
-          'USER REGISTRATION',
-          style: TextStyle(
-            color: AppColors.ink,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2.0,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            title: Text(
+              'USER REGISTRATION',
+              style: TextStyle(
+                color: AppColors.ink,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2.0,
+              ),
+            ),
+            backgroundColor: AppColors.bg,
+            iconTheme: IconThemeData(color: AppColors.ink),
+            elevation: 0,
+            centerTitle: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(3),
+              child: Container(color: AppColors.border, height: 3),
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              onPressed: () => context.go('/login'),
+            ),
           ),
-        ),
-        backgroundColor: AppColors.bg,
-        iconTheme: const IconThemeData(color: AppColors.ink),
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(color: AppColors.ink, height: 3),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
-          onPressed: () => context.go('/login'),
-        ),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
-            child: RetroBlock(
-              bgColor: AppColors.cloud,
-              padding: 40,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      color: AppColors.mustard,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Text(
-                        widget.googleUser ? 'FINALIZE GOOGLE REGISTRATION' : 'INITIALIZE NEW ACCOUNT',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.ink,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Provide required credentials to enter the system.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppColors.ink,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 48),
-
-                    _buildTextField(
-                      controller: nameCtrl,
-                      labelText: 'Full Name',
-                      prefixIcon: Icons.person,
-                      validator: (v) => v!.isEmpty ? 'REQUIRED FIELD' : null,
-                    ),
-                    const SizedBox(height: 24),
-
-                    _buildTextField(
-                      controller: emailCtrl,
-                      labelText: 'Email Address',
-                      prefixIcon: Icons.email,
-                      readOnly: widget.googleUser,
-                      validator: (v) => v!.contains('@') && v.contains('.') ? null : 'INVALID EMAIL FORMAT',
-                    ),
-                    const SizedBox(height: 24),
-
-                    if (!widget.googleUser) ...[
-                      _buildTextField(
-                        controller: passCtrl,
-                        labelText: 'Password',
-                        prefixIcon: Icons.lock,
-                        obscureText: true,
-                        validator: (v) => v!.length < 6 ? 'MINIMUM 6 CHARACTERS REQUIRED' : null,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-
-                    _buildTextField(
-                      controller: phoneCtrl,
-                      labelText: 'Phone Number (Optional)',
-                      prefixIcon: Icons.phone,
-                      keyboardType: TextInputType.phone,
-                      validator: (v) => null,
-                    ),
-                    const SizedBox(height: 48),
-
-                    const Text(
-                      'ASSIGN CLASS / ROLE:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Row(
+          body: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 700),
+                child: RetroBlock(
+                  bgColor: AppColors.cloud,
+                  padding: 40,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(child: _buildRoleSelector('Player\n(Student)', 'student', Icons.gamepad)),
-                        Expanded(child: _buildRoleSelector('Master\n(Teacher)', 'teacher', Icons.admin_panel_settings)),
+                        Container(
+                          color: AppColors.mustard,
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                          child: Text(
+                            widget.googleUser ? 'FINALIZE GOOGLE REGISTRATION' : 'INITIALIZE NEW ACCOUNT',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Provide required credentials to enter the system.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 48),
+
+                        _buildTextField(
+                          controller: nameCtrl,
+                          labelText: 'Full Name',
+                          prefixIcon: Icons.person,
+                          validator: (v) => v!.isEmpty ? 'REQUIRED FIELD' : null,
+                        ),
+                        const SizedBox(height: 24),
+
+                        _buildTextField(
+                          controller: emailCtrl,
+                          labelText: 'Email Address',
+                          prefixIcon: Icons.email,
+                          readOnly: widget.googleUser,
+                          validator: (v) => v!.contains('@') && v.contains('.') ? null : 'INVALID EMAIL FORMAT',
+                        ),
+                        const SizedBox(height: 24),
+
+                        if (!widget.googleUser) ...[
+                          _buildTextField(
+                            controller: passCtrl,
+                            labelText: 'Password',
+                            prefixIcon: Icons.lock,
+                            obscureText: true,
+                            validator: (v) => v!.length < 6 ? 'MINIMUM 6 CHARACTERS REQUIRED' : null,
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+
+                        _buildTextField(
+                          controller: phoneCtrl,
+                          labelText: 'Phone Number (Optional)',
+                          prefixIcon: Icons.phone,
+                          keyboardType: TextInputType.phone,
+                          validator: (v) => null,
+                        ),
+                        const SizedBox(height: 48),
+
+                        Text(
+                          'ASSIGN CLASS / ROLE:',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
+                        ),
+                        const SizedBox(height: 20),
+
+                        Row(
+                          children: [
+                            Expanded(child: _buildRoleSelector('Player\n(Student)', 'student', Icons.gamepad)),
+                            Expanded(child: _buildRoleSelector('Master\n(Teacher)', 'teacher', Icons.admin_panel_settings)),
+                          ],
+                        ),
+                        const SizedBox(height: 40),
+
+                        if (role == 'teacher') ...[
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'SELECT SPECIALIZATION',
+                              labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+                              prefixIcon: Icon(Icons.book, color: AppColors.ink),
+                              filled: true,
+                              fillColor: AppColors.inputBg,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: BorderSide(color: AppColors.border, width: 3),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: BorderSide(color: AppColors.border, width: 3),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: BorderSide(color: AppColors.sky, width: 3),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: BorderSide(color: AppColors.sunset, width: 3),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: BorderSide(color: AppColors.sunset, width: 3),
+                              ),
+                            ),
+                            iconEnabledColor: AppColors.ink,
+                            dropdownColor: AppColors.cardBg,
+                            items: subjects.map((s) => DropdownMenuItem(
+                                value: s,
+                                child: Text(s.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink))
+                            )).toList(),
+                            value: selectedSubject,
+                            onChanged: (val) => setState(() => selectedSubject = val),
+                            validator: (v) => v == null || v.isEmpty ? 'REQUIRED FIELD' : null,
+                          ),
+                          const SizedBox(height: 40),
+                        ],
+
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBg,
+                            border: Border.all(color: AppColors.border, width: 3),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _acceptedTerms,
+                                    activeColor: AppColors.ink,
+                                    checkColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                    side: BorderSide(color: AppColors.border, width: 2),
+                                    onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
+                                  ),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'I ACKNOWLEDGE THE ',
+                                        style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
+                                        children: [
+                                          TextSpan(
+                                            text: 'TERMS OF SERVICE',
+                                            style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, decoration: TextDecoration.underline),
+                                            recognizer: TapGestureRecognizer()..onTap = () => context.go('/termeni-si-conditii'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _acceptedPrivacy,
+                                    activeColor: AppColors.ink,
+                                    checkColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                    side: BorderSide(color: AppColors.border, width: 2),
+                                    onChanged: (val) => setState(() => _acceptedPrivacy = val ?? false),
+                                  ),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'I AGREE TO THE ',
+                                        style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
+                                        children: [
+                                          TextSpan(
+                                            text: 'PRIVACY POLICY',
+                                            style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, decoration: TextDecoration.underline),
+                                            recognizer: TapGestureRecognizer()..onTap = () => context.go('/politica-confidentialitate'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 48),
+
+                        RetroButton(
+                          text: 'INITIALIZE ACCOUNT',
+                          bgColor: AppColors.forest,
+                          textColor: Colors.white,
+                          isFullWidth: true,
+                          isLoading: loading,
+                          onPressed: _signup,
+                        ),
+                        const SizedBox(height: 32),
+
+                        GestureDetector(
+                          onTap: () => context.go('/login'),
+                          child: Text(
+                            "ALREADY REGISTERED? LOG IN.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.ink,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              decoration: TextDecoration.underline,
+                              decorationThickness: 2,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 40),
-
-                    if (role == 'teacher') ...[
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'SELECT SPECIALIZATION',
-                          labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
-                          prefixIcon: Icon(Icons.book, color: AppColors.ink),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.zero,
-                            borderSide: BorderSide(color: AppColors.ink, width: 3),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.zero,
-                            borderSide: BorderSide(color: AppColors.ink, width: 3),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.zero,
-                            borderSide: BorderSide(color: AppColors.sky, width: 3),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.zero,
-                            borderSide: BorderSide(color: AppColors.sunset, width: 3),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.zero,
-                            borderSide: BorderSide(color: AppColors.sunset, width: 3),
-                          ),
-                        ),
-                        iconEnabledColor: AppColors.ink,
-                        dropdownColor: Colors.white,
-                        items: subjects.map((s) => DropdownMenuItem(
-                            value: s,
-                            child: Text(s.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink))
-                        )).toList(),
-                        value: selectedSubject,
-                        onChanged: (val) => setState(() => selectedSubject = val),
-                        validator: (v) => v == null || v.isEmpty ? 'REQUIRED FIELD' : null,
-                      ),
-                      const SizedBox(height: 40),
-                    ],
-
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.ink, width: 3),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _acceptedTerms,
-                                activeColor: AppColors.ink,
-                                checkColor: Colors.white,
-                                side: const BorderSide(color: AppColors.ink, width: 2),
-                                onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
-                              ),
-                              Expanded(
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: 'I ACKNOWLEDGE THE ',
-                                    style: const TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
-                                    children: [
-                                      TextSpan(
-                                        text: 'TERMS OF SERVICE',
-                                        style: const TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, decoration: TextDecoration.underline),
-                                        recognizer: TapGestureRecognizer()..onTap = () => context.go('/termeni-si-conditii'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _acceptedPrivacy,
-                                activeColor: AppColors.ink,
-                                checkColor: Colors.white,
-                                side: const BorderSide(color: AppColors.ink, width: 2),
-                                onChanged: (val) => setState(() => _acceptedPrivacy = val ?? false),
-                              ),
-                              Expanded(
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: 'I AGREE TO THE ',
-                                    style: const TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
-                                    children: [
-                                      TextSpan(
-                                        text: 'PRIVACY POLICY',
-                                        style: const TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, decoration: TextDecoration.underline),
-                                        recognizer: TapGestureRecognizer()..onTap = () => context.go('/politica-confidentialitate'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 48),
-
-                    RetroButton(
-                      text: 'INITIALIZE ACCOUNT',
-                      bgColor: AppColors.forest,
-                      isFullWidth: true,
-                      isLoading: loading,
-                      onPressed: _signup,
-                    ),
-                    const SizedBox(height: 32),
-
-                    GestureDetector(
-                      onTap: () => context.go('/login'),
-                      child: const Text(
-                        "ALREADY REGISTERED? LOG IN.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.ink,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          decoration: TextDecoration.underline,
-                          decorationThickness: 2,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -5,17 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF4F1EA);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE5E0D4);
-  static const Color sky = Color(0xFF5BA8B5);
-  static const Color purple = Color(0xFF8854D0);
-  static const Color orange = Color(0xFFFA8231);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
@@ -180,9 +171,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.mustard,
-        border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+      decoration: BoxDecoration(
+        color: AppColors.headerBg,
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 3)),
       ),
       child: Center(
         child: ConstrainedBox(
@@ -196,11 +187,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.ink, width: 2.5),
-                      boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(3, 3))],
+                      color: AppColors.cardBg,
+                      border: Border.all(color: AppColors.border, width: 2.5),
+                      boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
                     ),
-                    child: const Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
+                    child: Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
                   ),
                 ),
               ),
@@ -210,17 +201,17 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 children: [
                   Text(
                     widget.subject.toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: AppColors.ink,
+                      color: AppColors.isDark ? const Color(0xFFEAB334) : AppColors.ink,
                       fontSize: 24,
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const Text(
+                  Text(
                     "RESOLVE PROBLEMS • EARN XP",
                     style: TextStyle(
-                      color: AppColors.ink,
+                      color: AppColors.textMuted,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.8,
@@ -229,12 +220,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 ],
               ),
               const Spacer(),
-              // Butoane Nivel
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.ink, width: 2.5),
-                  boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(3, 3))],
+                  color: AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 2.5),
+                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
                 ),
                 child: Row(
                   children: availableGrades.map((g) {
@@ -247,12 +237,16 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                         decoration: BoxDecoration(
-                          color: isSel ? AppColors.ink : Colors.transparent,
+                          color: isSel
+                              ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
+                              : Colors.transparent,
                         ),
                         child: Text(
                           "CLASA $g",
                           style: TextStyle(
-                            color: isSel ? Colors.white : AppColors.ink,
+                            color: isSel
+                                ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                                : AppColors.ink,
                             fontWeight: FontWeight.w900,
                             fontSize: 13,
                             letterSpacing: 0.6,
@@ -276,21 +270,20 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.cloud,
-        border: Border.all(color: AppColors.ink, width: 2.5),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+        color: AppColors.sidebarBg,
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
       ),
       padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Panou Progres
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.ink, width: 2),
+              color: AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,13 +291,13 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "QUEST PROGRESS",
                       style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.ink, letterSpacing: 0.5),
                     ),
                     Text(
                       "$completedCount / $totalInGrade",
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.forest),
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.forest),
                     ),
                   ],
                 ),
@@ -313,8 +306,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   borderRadius: BorderRadius.zero,
                   child: LinearProgressIndicator(
                     value: progressPercent,
-                    backgroundColor: AppColors.cloud,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.forest),
+                    backgroundColor: AppColors.bg,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
                     minHeight: 12,
                   ),
                 ),
@@ -322,26 +315,25 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             ),
           ),
           const SizedBox(height: 22),
-
-          // Căutare
-          const Text(
+          Text(
             "SEARCH QUEST",
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
           ),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.ink, width: 2),
+              color: AppColors.inputBg,
+              border: Border.all(color: AppColors.border, width: 2),
             ),
             child: TextField(
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink),
-              decoration: const InputDecoration(
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink),
+              cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+              decoration: InputDecoration(
                 hintText: "Caută exercițiu...",
-                hintStyle: TextStyle(color: Colors.black38, fontSize: 13),
+                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13),
                 prefixIcon: Icon(Icons.search, size: 18, color: AppColors.ink),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
               ),
               onChanged: (val) {
                 searchQuery = val;
@@ -350,9 +342,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             ),
           ),
           const SizedBox(height: 22),
-
-          // Categorii
-          const Text(
+          Text(
             "CATEGORIES",
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
           ),
@@ -370,8 +360,10 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.ink : Colors.white,
-                    border: Border.all(color: AppColors.ink, width: 2),
+                    color: isSelected
+                        ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
+                        : AppColors.cardBg,
+                    border: Border.all(color: AppColors.border, width: 2),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -382,36 +374,37 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w900,
-                            color: isSelected ? Colors.white : AppColors.ink,
+                            color: isSelected
+                                ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                                : AppColors.ink,
                             letterSpacing: 0.4,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (isSelected) const Icon(Icons.arrow_right, color: Colors.white, size: 18),
+                      if (isSelected)
+                        Icon(Icons.arrow_right,
+                            color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 18),
                     ],
                   ),
                 ),
               ),
             );
           }),
-
           const SizedBox(height: 20),
-
-          // Watermark Made by Ahmad
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.ink, width: 2),
-              boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(2.5, 2.5))],
+              color: AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 2),
+              boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(2.5, 2.5))],
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.code, size: 16, color: AppColors.sunset),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
                   "MADE BY AHMAD",
                   style: TextStyle(
@@ -431,63 +424,68 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        title: const Text(
-          'QUEST LOG',
-          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.5, fontSize: 16),
-        ),
-        backgroundColor: AppColors.bg,
-        iconTheme: const IconThemeData(color: AppColors.ink),
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(2),
-          child: Container(color: AppColors.ink, height: 2),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.sunset))
-                  : Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1100),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isDesktop = constraints.maxWidth > 800;
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
-                              child: isDesktop
-                                  ? Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 330, child: _buildSidebar()),
-                                        const SizedBox(width: 28),
-                                        Expanded(child: _buildSingleColumnList()),
-                                      ],
-                                    )
-                                  : ListView(
-                                      children: [
-                                        _buildSidebar(),
-                                        const SizedBox(height: 20),
-                                        _buildSingleColumnList(),
-                                      ],
-                                    ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, currentMode, _) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            title: Text(
+              'QUEST LOG',
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.5, fontSize: 16),
             ),
-          ],
-        ),
-      ),
+            backgroundColor: AppColors.bg,
+            iconTheme: IconThemeData(color: AppColors.ink),
+            elevation: 0,
+            centerTitle: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(2),
+              child: Container(color: AppColors.border, height: 2),
+            ),
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
+                      : Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1100),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final isDesktop = constraints.maxWidth > 800;
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+                                  child: isDesktop
+                                      ? Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(width: 330, child: _buildSidebar()),
+                                            const SizedBox(width: 28),
+                                            Expanded(child: _buildSingleColumnList()),
+                                          ],
+                                        )
+                                      : ListView(
+                                          children: [
+                                            _buildSidebar(),
+                                            const SizedBox(height: 20),
+                                            _buildSingleColumnList(),
+                                          ],
+                                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -500,11 +498,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           children: [
             Text(
               "AVAILABLE QUESTS (${displayedExercises.length})",
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.6),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.6),
             ),
             Text(
               "FILTRU: ${selectedCategory.toUpperCase()}",
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.ink),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textMuted),
             ),
           ],
         ),
@@ -514,14 +512,15 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(40),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.ink, width: 2),
+              color: AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 2),
             ),
-            child: const Column(
+            child: Column(
               children: [
                 Icon(Icons.search_off, size: 40, color: AppColors.ink),
-                SizedBox(height: 12),
-                Text("NICIUN EXERCIȚIU GĂSIT", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                const SizedBox(height: 12),
+                Text("NICIUN EXERCIȚIU GĂSIT",
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
               ],
             ),
           )
@@ -533,9 +532,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               trackVisibility: true,
               thickness: 8,
               radius: Radius.zero,
-              thumbColor: AppColors.ink,
-              trackColor: AppColors.cloud,
-              trackBorderColor: AppColors.ink,
+              thumbColor: AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+              trackColor: AppColors.sidebarBg,
+              trackBorderColor: AppColors.border,
               padding: const EdgeInsets.only(left: 6),
               child: ListView.builder(
                 controller: _scrollController,
@@ -593,13 +592,13 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
   bool _isHover = false;
   bool _isPressed = false;
 
-  static const List<Color> _badgeColors = [
+  List<Color> get _badgeColors => [
     AppColors.sky,
     AppColors.orange,
     AppColors.purple,
     AppColors.mustard,
     AppColors.sunset,
-    Color(0xFF20BF6B),
+    AppColors.forest,
   ];
 
   Color _getBadgeColor() {
@@ -647,11 +646,13 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.isDone ? const Color(0xFFF0EFE9) : Colors.white,
-            border: Border.all(color: AppColors.ink, width: 2.5),
+            color: widget.isDone
+                ? (AppColors.isDark ? const Color(0xFF141C22) : const Color(0xFFF0EFE9))
+                : AppColors.cardBg,
+            border: Border.all(color: AppColors.border, width: 2.5),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: _isPressed ? const Offset(0, 0) : const Offset(4, 4),
                 blurRadius: 0,
               ),
@@ -661,12 +662,11 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Ecuson stânga cu culori dinamice
                 Container(
                   width: 68,
                   decoration: BoxDecoration(
                     color: _getBadgeColor(),
-                    border: const Border(right: BorderSide(color: AppColors.ink, width: 2.5)),
+                    border: Border(right: BorderSide(color: AppColors.border, width: 2.5)),
                   ),
                   child: Center(
                     child: Text(
@@ -680,8 +680,6 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                     ),
                   ),
                 ),
-
-                // Conținut central (Titlu & Categorie cu spațiu generos pe verticală)
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -691,7 +689,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                       children: [
                         Text(
                           title.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w900,
                             color: AppColors.ink,
@@ -705,7 +703,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                           category.toUpperCase(),
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.ink.withOpacity(0.75),
+                            color: AppColors.textMuted,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.4,
                           ),
@@ -716,12 +714,10 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                     ),
                   ),
                 ),
-
-                // Badge Dificultate & Săgeată
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: const BoxDecoration(
-                    border: Border(left: BorderSide(color: AppColors.ink, width: 2.5)),
+                  decoration: BoxDecoration(
+                    border: Border(left: BorderSide(color: AppColors.border, width: 2.5)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -729,7 +725,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: _difficultyColor(diff).withOpacity(0.15),
+                          color: _difficultyColor(diff).withOpacity(AppColors.isDark ? 0.25 : 0.15),
                           border: Border.all(color: _difficultyColor(diff), width: 1.5),
                         ),
                         child: Text(
@@ -743,7 +739,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.ink),
+                      Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.ink),
                     ],
                   ),
                 ),

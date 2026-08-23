@@ -4,43 +4,38 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'theme_manager.dart';
+import 'app_colors.dart';
 import 'custom_navbar.dart';
-
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -55,8 +50,8 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
   final double fontSize;
   final EdgeInsets padding;
@@ -65,8 +60,8 @@ class RetroButton extends StatefulWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
     this.fontSize = 20,
     this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -82,7 +77,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveText = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -101,11 +100,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -116,7 +115,7 @@ class _RetroButtonState extends State<RetroButton> {
             widget.text.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: widget.textColor,
+              color: effectiveText,
               fontSize: widget.fontSize,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
@@ -146,6 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadPlayerStats();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadPlayerStats() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -169,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startDailyQuest() {
-    final exerciseId = 'q4_p5_id';
+    final exerciseId = '1';
     final encodedMaterie = Uri.encodeComponent('Informatică');
     final encodedClasa = Uri.encodeComponent('9');
     context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
@@ -189,7 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeroSection(bool isMobile) {
-    // 1. The Left side (Hero Text + Buttons)
     final leftContent = RetroBlock(
       bgColor: AppColors.mustard,
       padding: isMobile ? 32 : 48,
@@ -199,10 +203,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.ink, width: 2),
+              color: AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 2),
             ),
-            child: const Text(
+            child: Text(
               'SYSTEM ONLINE',
               style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 2.0),
             ),
@@ -210,16 +214,25 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 24),
           Text(
             "LEVEL UP YOUR\nKNOWLEDGE.",
-            style: TextStyle(fontSize: isMobile ? 40 : 56, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.1, letterSpacing: 1.0),
+            style: TextStyle(
+              fontSize: isMobile ? 40 : 56,
+              fontWeight: FontWeight.w900,
+              color: Colors.black,
+              height: 1.1,
+              letterSpacing: 1.0,
+            ),
           ),
           const SizedBox(height: 24),
           Text(
             "Choose a discipline. Find a guild master. Complete daily quests to gain EXP.",
-            style: TextStyle(fontSize: isMobile ? 16 : 20, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.5),
+            style: TextStyle(
+              fontSize: isMobile ? 16 : 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 40),
-
-          // Safe responsive buttons
           if (isMobile)
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -234,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 16),
                 RetroButton(
                   text: "DAILY QUESTS",
-                  bgColor: Colors.white,
+                  bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   isFullWidth: true,
                   fontSize: 16,
@@ -253,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 24),
                 RetroButton(
                   text: "DAILY QUESTS",
-                  bgColor: Colors.white,
+                  bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   onPressed: () => context.go('/exercitii'),
                 ),
@@ -263,7 +276,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
 
-    // 2. The Right side (Stats + Quest)
     final rightContent = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -273,21 +285,24 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text("PLAYER STATS", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
+              Text(
+                "PLAYER STATS",
+                style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5),
+              ),
               const SizedBox(height: 24),
-              Container(height: 3, color: AppColors.ink),
+              Container(height: 3, color: AppColors.border),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("QUESTS CLEARED:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text("QUESTS CLEARED:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
                   _isLoadingStats
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: AppColors.ink, strokeWidth: 3))
-                      : Text("$_completedQuests", style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 24)),
+                      ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: AppColors.ink, strokeWidth: 3))
+                      : Text("$_completedQuests", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 24)),
                 ],
               ),
               const SizedBox(height: 16),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("SYSTEM STATUS:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
@@ -306,18 +321,18 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text("DAILY QUEST", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
                   Icon(Icons.star, color: AppColors.sunset, size: 28),
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 "SOLVE: INFORMATICĂ LVL 9",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "REWARD: +50 EXP",
                 style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.w900, fontSize: 14),
               ),
@@ -336,26 +351,25 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
 
-    // 3. Render layout based on screen size
     return _buildConstrainedSection(
       padding: EdgeInsets.fromLTRB(24, isMobile ? 32 : 60, 24, isMobile ? 32 : 40),
       child: isMobile
           ? Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          leftContent,
-          const SizedBox(height: 32),
-          rightContent,
-        ],
-      )
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                leftContent,
+                const SizedBox(height: 32),
+                rightContent,
+              ],
+            )
           : Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 3, child: leftContent),
-          const SizedBox(width: 40),
-          Expanded(flex: 2, child: rightContent),
-        ],
-      ),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 3, child: leftContent),
+                const SizedBox(width: 40),
+                Expanded(flex: 2, child: rightContent),
+              ],
+            ),
     );
   }
 
@@ -366,7 +380,6 @@ class _HomeScreenState extends State<HomeScreen> {
       {"icon": Icons.language, "title": "LANGUAGES", "color": AppColors.sky, "desc": "ENGLISH & ROMANIAN"},
     ];
 
-    // Build the list of cards
     final List<Widget> pathCards = paths.map((path) {
       return Padding(
         padding: EdgeInsets.only(
@@ -374,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
           right: !isMobile && path != paths.last ? 24 : 0,
         ),
         child: RetroBlock(
-          bgColor: Colors.white,
+          bgColor: AppColors.cardBg,
           padding: 32,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -383,21 +396,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: path["color"],
-                  border: Border.all(color: AppColors.ink, width: 3),
+                  border: Border.all(color: AppColors.border, width: 3),
                 ),
-                child: Icon(path["icon"], size: 48, color: AppColors.ink),
+                child: Icon(path["icon"], size: 48, color: Colors.white),
               ),
               const SizedBox(height: 24),
               Text(
                 path["title"],
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: isMobile ? 20 : 24, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                style: TextStyle(
+                  fontSize: isMobile ? 20 : 24,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.ink,
+                  letterSpacing: 1.0,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 path["desc"],
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -413,7 +431,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             "CHOOSE YOUR PATH",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: isMobile ? 32 : 40, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0),
+            style: TextStyle(
+              fontSize: isMobile ? 32 : 40,
+              fontWeight: FontWeight.w900,
+              color: AppColors.ink,
+              letterSpacing: 2.0,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
@@ -436,18 +459,32 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: AppColors.ink,
-          child: const Text("THE GUILD", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+          color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
+          child: Text(
+            "THE GUILD",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+          ),
         ),
         const SizedBox(height: 24),
         Text(
           isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
-          style: TextStyle(fontSize: isMobile ? 36 : 48, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.1, letterSpacing: 1.0),
+          style: TextStyle(
+            fontSize: isMobile ? 36 : 48,
+            fontWeight: FontWeight.w900,
+            color: AppColors.ink,
+            height: 1.1,
+            letterSpacing: 1.0,
+          ),
         ),
         const SizedBox(height: 24),
         Text(
           "Our verified experts are ready to guide you. Initiate comms and start leveling up today.",
-          style: TextStyle(fontSize: isMobile ? 16 : 18, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.5),
+          style: TextStyle(
+            fontSize: isMobile ? 16 : 18,
+            color: AppColors.ink,
+            fontWeight: FontWeight.bold,
+            height: 1.5,
+          ),
         ),
         const SizedBox(height: 32),
         RetroButton(
@@ -482,21 +519,21 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: isMobile ? 32 : 48,
         child: isMobile
             ? Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            leftContent,
-            const SizedBox(height: 48),
-            rightContent,
-          ],
-        )
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  leftContent,
+                  const SizedBox(height: 48),
+                  rightContent,
+                ],
+              )
             : Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(child: leftContent),
-            const SizedBox(width: 48),
-            Expanded(child: rightContent),
-          ],
-        ),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(child: leftContent),
+                  const SizedBox(width: 48),
+                  Expanded(child: rightContent),
+                ],
+              ),
       ),
     );
   }
@@ -505,8 +542,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: AppColors.ink, width: 3),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+        border: Border.all(color: AppColors.border, width: 3),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
       ),
       child: Center(
         child: Icon(icon, size: 64, color: AppColors.ink),
@@ -518,22 +555,27 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 40 : 60),
-      decoration: const BoxDecoration(
-        color: AppColors.ink,
-        border: Border(top: BorderSide(color: AppColors.ink, width: 3)),
+      decoration: BoxDecoration(
+        color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
+        border: Border(top: BorderSide(color: AppColors.border, width: 3)),
       ),
       child: Center(
         child: Column(
           children: [
             Text(
-                'IMEDITATII',
-                style: TextStyle(fontSize: isMobile ? 32 : 40, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0)
+              'IMEDITATII',
+              style: TextStyle(
+                fontSize: isMobile ? 32 : 40,
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
-                'SYSTEM LOG: 2024 - 2025. LEVEL UP YOUR LEARNING.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.cloud, fontSize: isMobile ? 12 : 16, fontWeight: FontWeight.bold)
+              'SYSTEM LOG: 2025 - 2026. LEVEL UP YOUR LEARNING.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: isMobile ? 12 : 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -545,31 +587,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Column(
-        children: [
-          const CustomNavbar(),
-          Expanded(
-            child: Scrollbar(
-              controller: _scrollController,
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const ClampingScrollPhysics(),
-                child: Column(
-                  children: [
-                    _buildHeroSection(isMobile),
-                    _buildPathsSection(isMobile),
-                    _buildMastersSection(isMobile),
-                    SizedBox(height: isMobile ? 24 : 40),
-                    _buildFooter(isMobile),
-                  ],
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: Scrollbar(
+                  controller: _scrollController,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildHeroSection(isMobile),
+                        _buildPathsSection(isMobile),
+                        _buildMastersSection(isMobile),
+                        SizedBox(height: isMobile ? 24 : 40),
+                        _buildFooter(isMobile),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

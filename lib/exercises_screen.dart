@@ -1,42 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'custom_navbar.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
+import 'custom_navbar.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -51,16 +47,16 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
 
   const RetroButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
   });
 
@@ -74,7 +70,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveText = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -93,11 +93,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -108,7 +108,7 @@ class _RetroButtonState extends State<RetroButton> {
             widget.text.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: widget.textColor,
+              color: effectiveText,
               fontSize: 20,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
@@ -167,10 +167,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.ink, width: 2),
+                      color: AppColors.cardBg,
+                      border: Border.all(color: AppColors.border, width: 2),
                     ),
-                    child: const Text(
+                    child: Text(
                       'STUDY ZONE',
                       style: TextStyle(
                         color: AppColors.ink,
@@ -192,7 +192,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     "Select a discipline to master. The system tracks your progress and validates your answers in real-time.",
                     style: TextStyle(
                       fontSize: 20,
@@ -222,12 +222,12 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                   height: 280,
                   decoration: BoxDecoration(
                     color: AppColors.cloud,
-                    border: Border.all(color: AppColors.ink, width: 4),
-                    boxShadow: const [
-                      BoxShadow(color: AppColors.ink, offset: Offset(8, 8)),
+                    border: Border.all(color: AppColors.border, width: 4),
+                    boxShadow: [
+                      BoxShadow(color: AppColors.shadow, offset: const Offset(8, 8)),
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(Icons.rocket_launch, size: 120, color: AppColors.sunset),
                   ),
                 ),
@@ -246,7 +246,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            color: AppColors.ink,
+            color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: const Text(
               "AVAILABLE PATHS",
@@ -262,7 +262,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           Text(
             title.toUpperCase(),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 40,
               fontWeight: FontWeight.w900,
               color: AppColors.ink,
@@ -309,15 +309,15 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-      decoration: const BoxDecoration(
-        color: AppColors.ink,
-        border: Border(top: BorderSide(color: AppColors.ink, width: 3)),
+      decoration: BoxDecoration(
+        color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
+        border: Border(top: BorderSide(color: AppColors.border, width: 3)),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           children: [
-            Text('IMEDITATII', style: TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16),
+            const Text('IMEDITATII', style: TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
             Text('© 2024 - 2025. Level up your learning.', style: TextStyle(color: AppColors.cloud, fontSize: 22)),
           ],
         ),
@@ -327,39 +327,44 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Column(
-        children: [
-          const CustomNavbar(),
-          Expanded(
-            child: Scrollbar(
-              controller: _pageScrollController,
-              child: SingleChildScrollView(
-                controller: _pageScrollController,
-                physics: const ClampingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _heroSection(),
-                    _buildConstrainedSection(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-                      child: Column(
-                        children: [
-                          _sectionTitle("Select Discipline"),
-                          _materiiSection(),
-                        ],
-                      ),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: Scrollbar(
+                  controller: _pageScrollController,
+                  child: SingleChildScrollView(
+                    controller: _pageScrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _heroSection(),
+                        _buildConstrainedSection(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                          child: Column(
+                            children: [
+                              _sectionTitle("Select Discipline"),
+                              _materiiSection(),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 80),
+                        _buildFooter(),
+                      ],
                     ),
-                    const SizedBox(height: 80),
-                    _buildFooter(),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -388,6 +393,7 @@ class _MaterieCardState extends State<_MaterieCard> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
@@ -407,10 +413,10 @@ class _MaterieCardState extends State<_MaterieCard> {
           ),
           decoration: BoxDecoration(
             color: widget.color,
-            border: Border.all(color: AppColors.ink, width: 3),
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: _isPressed ? const Offset(0, 0) : const Offset(8, 8),
                 blurRadius: 0,
               ),
@@ -420,13 +426,13 @@ class _MaterieCardState extends State<_MaterieCard> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                color: Colors.white,
+                color: AppColors.cardBg,
                 padding: const EdgeInsets.symmetric(vertical: 32),
                 child: Icon(widget.icon, size: 80, color: AppColors.ink),
               ),
               Container(
                 height: 3,
-                color: AppColors.ink,
+                color: AppColors.border,
               ),
               Padding(
                 padding: const EdgeInsets.all(24),
@@ -438,7 +444,7 @@ class _MaterieCardState extends State<_MaterieCard> {
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.ink,
+                        color: Colors.white,
                         letterSpacing: 1.0,
                       ),
                     ),
@@ -446,10 +452,10 @@ class _MaterieCardState extends State<_MaterieCard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.ink, width: 2),
+                        color: AppColors.cardBg,
+                        border: Border.all(color: AppColors.border, width: 2),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
@@ -461,7 +467,7 @@ class _MaterieCardState extends State<_MaterieCard> {
                               letterSpacing: 1.5,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Icon(Icons.play_arrow, size: 20, color: AppColors.ink),
                         ],
                       ),

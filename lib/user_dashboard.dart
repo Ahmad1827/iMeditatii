@@ -4,43 +4,38 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
+import 'theme_manager.dart';
+import 'app_colors.dart';
 import 'custom_navbar.dart';
-
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -55,8 +50,8 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
   final IconData? icon;
 
@@ -64,8 +59,8 @@ class RetroButton extends StatefulWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
     this.icon,
   });
@@ -80,7 +75,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveText = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -99,11 +98,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -115,14 +114,14 @@ class _RetroButtonState extends State<RetroButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: widget.textColor, size: 20),
+                Icon(widget.icon, color: effectiveText, size: 20),
                 const SizedBox(width: 8),
               ],
               Text(
                 widget.text.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: widget.textColor,
+                  color: effectiveText,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
@@ -161,64 +160,77 @@ class _UserDashboardState extends State<UserDashboard> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/materii');
-      });
-      return const Scaffold(
-        backgroundColor: AppColors.bg,
-        body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
-      );
-    }
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        if (user == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.go('/materii');
+          });
+          return Scaffold(
+            backgroundColor: AppColors.bg,
+            body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+          );
+        }
 
-    final String userId = user.uid;
+        final String userId = user.uid;
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Column(
-        children: [
-          const CustomNavbar(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 850),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FutureBuilder<DocumentSnapshot>(
-                        future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const SizedBox(height: 120, child: Center(child: CircularProgressIndicator(color: AppColors.sunset)));
-                          }
-                          final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
-                          final userName = data['name'] ?? 'PLAYER';
-                          return _buildHeaderSection(userName, userId);
-                        },
-                      ),
-                      const SizedBox(height: 48),
-                      Row(
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 850),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.forum, color: AppColors.ink, size: 28),
-                          const SizedBox(width: 16),
-                          Text(
-                            "MASTER LOGS (MESSAGES)",
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                          FutureBuilder<DocumentSnapshot>(
+                            future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return SizedBox(
+                                  height: 120,
+                                  child: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+                                );
+                              }
+                              final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+                              final userName = data['name'] ?? 'PLAYER';
+                              return _buildHeaderSection(userName, userId);
+                            },
                           ),
+                          const SizedBox(height: 48),
+                          Row(
+                            children: [
+                              Icon(Icons.forum, color: AppColors.ink, size: 28),
+                              const SizedBox(width: 16),
+                              Text(
+                                "MASTER LOGS (MESSAGES)",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.ink,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          _buildChatList(userId),
                         ],
                       ),
-                      const SizedBox(height: 24),
-                      _buildChatList(userId),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -236,9 +248,14 @@ class _UserDashboardState extends State<UserDashboard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   color: AppColors.ink,
-                  child: const Text(
+                  child: Text(
                     "PLAYER TERMINAL",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 2.0),
+                    style: TextStyle(
+                      color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      letterSpacing: 2.0,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -258,7 +275,7 @@ class _UserDashboardState extends State<UserDashboard> {
           RetroButton(
             text: "PROFILE",
             icon: Icons.person,
-            bgColor: Colors.white,
+            bgColor: AppColors.cardBg,
             textColor: AppColors.ink,
             onPressed: () => context.go('/elev/$userId'),
           ),
@@ -282,7 +299,7 @@ class _UserDashboardState extends State<UserDashboard> {
           return Center(
             child: Text(
               'TERMINAL ERROR: ${snapshot.error}'.toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset),
+              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset),
             ),
           );
         }
@@ -328,12 +345,16 @@ class _UserDashboardState extends State<UserDashboard> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: RetroBlock(
-        bgColor: Colors.white,
+        bgColor: AppColors.cardBg,
         padding: 20,
         shadowOffset: 4,
         child: Row(
           children: [
-            Container(width: 60, height: 60, decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 2))),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
+            ),
             const SizedBox(width: 20),
             Expanded(
               child: Column(
@@ -353,26 +374,27 @@ class _UserDashboardState extends State<UserDashboard> {
 
   Widget _buildEmptyState() {
     return RetroBlock(
-      bgColor: Colors.white,
+      bgColor: AppColors.cardBg,
       padding: 60,
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.speaker_notes_off, size: 80, color: AppColors.cloud),
+            Icon(Icons.speaker_notes_off, size: 80, color: AppColors.textMuted),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               "COMMS CHANNEL EMPTY",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               "NO LOGS FROM MASTERS YET.",
-              style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
             RetroButton(
               text: "SEARCH MASTERS",
               bgColor: AppColors.forest,
+              textColor: Colors.white,
               onPressed: () => context.go('/materii'),
             ),
           ],
@@ -412,6 +434,7 @@ class _RetroChatCardState extends State<_RetroChatCard> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: MouseRegion(
+        cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _isHovering = true),
         onExit: (_) => setState(() => _isHovering = false),
         child: GestureDetector(
@@ -429,11 +452,11 @@ class _RetroChatCardState extends State<_RetroChatCard> {
               0,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.ink, width: 3),
+              color: AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 3),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.ink,
+                  color: AppColors.shadow,
                   offset: _isPressed ? const Offset(0, 0) : const Offset(6, 6),
                   blurRadius: 0,
                 )
@@ -447,18 +470,18 @@ class _RetroChatCardState extends State<_RetroChatCard> {
                   height: 60,
                   decoration: BoxDecoration(
                     color: AppColors.cloud,
-                    border: Border.all(color: AppColors.ink, width: 2),
+                    border: Border.all(color: AppColors.border, width: 2),
                     image: widget.avatarUrl.isNotEmpty
                         ? DecorationImage(image: NetworkImage(widget.avatarUrl), fit: BoxFit.cover)
                         : null,
                   ),
                   child: widget.avatarUrl.isEmpty
                       ? Center(
-                    child: Text(
-                      widget.initials,
-                      style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 20),
-                    ),
-                  )
+                          child: Text(
+                            widget.initials,
+                            style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 20),
+                          ),
+                        )
                       : null,
                 ),
                 const SizedBox(width: 20),
@@ -468,12 +491,12 @@ class _RetroChatCardState extends State<_RetroChatCard> {
                     children: [
                       Text(
                         widget.name.toUpperCase(),
-                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink, letterSpacing: 0.5),
+                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink, letterSpacing: 0.5),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         widget.lastMessage,
-                        style: const TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 15, fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -487,10 +510,10 @@ class _RetroChatCardState extends State<_RetroChatCard> {
                     if (widget.timestamp != null)
                       Text(
                         DateFormat('HH:mm').format(widget.timestamp!.toDate()),
-                        style: const TextStyle(color: AppColors.ink, fontSize: 13, fontWeight: FontWeight.w900),
+                        style: TextStyle(color: AppColors.ink, fontSize: 13, fontWeight: FontWeight.w900),
                       ),
                     const SizedBox(height: 8),
-                    const Icon(Icons.arrow_forward, color: AppColors.ink, size: 20),
+                    Icon(Icons.arrow_forward, color: AppColors.ink, size: 20),
                   ],
                 ),
               ],

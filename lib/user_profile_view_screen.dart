@@ -3,41 +3,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -52,8 +48,8 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
   final IconData? icon;
 
@@ -61,8 +57,8 @@ class RetroButton extends StatefulWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
     this.icon,
   });
@@ -77,7 +73,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveTextColor = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -96,11 +96,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -112,14 +112,14 @@ class _RetroButtonState extends State<RetroButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: widget.textColor, size: 24),
+                Icon(widget.icon, color: effectiveTextColor, size: 24),
                 const SizedBox(width: 12),
               ],
               Text(
                 widget.text.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: widget.textColor,
+                  color: effectiveTextColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
@@ -193,190 +193,202 @@ class UserProfileViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        backgroundColor: AppColors.bg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(color: AppColors.ink, height: 3),
-        ),
-        title: const Text(
-          "PLAYER LOGS",
-          style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0),
-        ),
-        centerTitle: true,
-      ),
-      body: FutureBuilder<Map<String, dynamic>?>(
-        future: _getUserData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.sunset));
-          }
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            backgroundColor: AppColors.bg,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              },
+            ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(3),
+              child: Container(color: AppColors.border, height: 3),
+            ),
+            title: Text(
+              "PLAYER LOGS",
+              style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0),
+            ),
+            centerTitle: true,
+          ),
+          body: FutureBuilder<Map<String, dynamic>?>(
+            future: _getUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator(color: AppColors.sunset));
+              }
 
-          if (!snapshot.hasData || snapshot.data == null) {
-            return Center(
-              child: RetroBlock(
-                bgColor: AppColors.cloud,
-                child: const Text(
-                  "PLAYER DATA CORRUPTED OR NOT FOUND.",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 18),
-                ),
-              ),
-            );
-          }
-
-          final data = snapshot.data!;
-          final image = data['image'];
-          final name = data['name'] ?? 'UNKNOWN PLAYER';
-          final bio = data['bio'] ?? 'NO BIO LOGGED';
-          final contact = data['contact'] ?? 'UNSPECIFIED';
-          final email = data['email'] ?? 'UNKNOWN';
-
-          return Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 700),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    RetroBlock(
-                      bgColor: AppColors.cloud,
-                      padding: 40,
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: AppColors.ink, width: 4),
-                              boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(6, 6))],
-                              image: image != null
-                                  ? DecorationImage(
-                                image: NetworkImage(image),
-                                fit: BoxFit.cover,
-                              )
-                                  : null,
-                            ),
-                            child: image == null
-                                ? const Icon(Icons.person, size: 80, color: AppColors.ink)
-                                : null,
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            color: AppColors.ink,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: const Text(
-                              "PLAYER ACCOUNT",
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2.0),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            name.toString().toUpperCase(),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 40,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.ink,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: AppColors.ink, width: 2),
-                            ),
-                            child: Text(
-                              bio.toString().toUpperCase(),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.w600, height: 1.5),
-                            ),
-                          ),
-                        ],
-                      ),
+              if (!snapshot.hasData || snapshot.data == null) {
+                return Center(
+                  child: RetroBlock(
+                    bgColor: AppColors.cloud,
+                    child: Text(
+                      "PLAYER DATA CORRUPTED OR NOT FOUND.",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 18),
                     ),
-                    const SizedBox(height: 32),
-                    Row(
+                  ),
+                );
+              }
+
+              final data = snapshot.data!;
+              final image = data['image'];
+              final name = data['name'] ?? 'UNKNOWN PLAYER';
+              final bio = data['bio'] ?? 'NO BIO LOGGED';
+              final contact = data['contact'] ?? 'UNSPECIFIED';
+              final email = data['email'] ?? 'UNKNOWN';
+
+              return Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 700),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(
-                          child: _infoTile(
-                            'COMMUNICATION LINK',
-                            email,
-                            AppColors.sky,
-                            Icons.email,
+                        RetroBlock(
+                          bgColor: AppColors.cloud,
+                          padding: 40,
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 140,
+                                height: 140,
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBg,
+                                  border: Border.all(color: AppColors.border, width: 4),
+                                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6))],
+                                  image: image != null
+                                      ? DecorationImage(
+                                          image: NetworkImage(image),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null,
+                                ),
+                                child: image == null
+                                    ? Icon(Icons.person, size: 80, color: AppColors.ink)
+                                    : null,
+                              ),
+                              const SizedBox(height: 24),
+                              Container(
+                                color: AppColors.ink,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Text(
+                                  "PLAYER ACCOUNT",
+                                  style: TextStyle(
+                                    color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 2.0,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                name.toString().toUpperCase(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.ink,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBg,
+                                  border: Border.all(color: AppColors.border, width: 2),
+                                ),
+                                child: Text(
+                                  bio.toString().toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.w600, height: 1.5),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 24),
-                        Expanded(
-                          child: _infoTile(
-                            'CONTACT NODE',
-                            contact,
-                            AppColors.mustard,
-                            Icons.phone,
-                          ),
+                        const SizedBox(height: 32),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _infoTile(
+                                'COMMUNICATION LINK',
+                                email,
+                                AppColors.sky,
+                                Icons.email,
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                            Expanded(
+                              child: _infoTile(
+                                'CONTACT NODE',
+                                contact,
+                                AppColors.mustard,
+                                Icons.phone,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 48),
+                        RetroButton(
+                          text: "OPEN COMM CHANNEL",
+                          icon: Icons.chat_bubble,
+                          bgColor: AppColors.forest,
+                          textColor: Colors.white,
+                          isFullWidth: true,
+                          onPressed: () async {
+                            final chatId = await _openOrCreateChat(context, userId, name);
+                            if (context.mounted) {
+                              context.pushReplacement('/chat/$chatId', extra: name);
+                            }
+                          },
                         ),
                       ],
                     ),
-                    const SizedBox(height: 48),
-                    RetroButton(
-                      text: "OPEN COMM CHANNEL",
-                      icon: Icons.chat_bubble,
-                      bgColor: AppColors.forest,
-                      isFullWidth: true,
-                      onPressed: () async {
-                        final chatId = await _openOrCreateChat(context, userId, name);
-                        if (context.mounted) {
-                          context.pushReplacement('/chat/$chatId', extra: name);
-                        }
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
   Widget _infoTile(String title, String? value, Color bgColor, IconData icon) {
+    final textColor = AppColors.isDark && bgColor == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border.all(color: AppColors.ink, width: 3),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+        border: Border.all(color: AppColors.border, width: 3),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.ink, size: 24),
+              Icon(icon, color: textColor, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   title.toUpperCase(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w900,
-                    color: AppColors.ink,
+                    color: textColor,
                     fontSize: 14,
                     letterSpacing: 1.5,
                   ),
@@ -387,10 +399,10 @@ class UserProfileViewScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             (value ?? '-').toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.ink,
+              color: textColor,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

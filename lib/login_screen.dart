@@ -4,41 +4,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -53,16 +49,16 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
 
   const RetroButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
   });
 
@@ -76,7 +72,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveText = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -95,11 +95,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -110,7 +110,7 @@ class _RetroButtonState extends State<RetroButton> {
             widget.text.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: widget.textColor,
+              color: effectiveText,
               fontSize: 20,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
@@ -138,6 +138,7 @@ class _GoogleRetroButtonState extends State<GoogleRetroButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -156,11 +157,11 @@ class _GoogleRetroButtonState extends State<GoogleRetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: AppColors.cardBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -175,7 +176,7 @@ class _GoogleRetroButtonState extends State<GoogleRetroButton> {
                 height: 24,
               ),
               const SizedBox(width: 16),
-              const Text(
+              Text(
                 'CONTINUE WITH GOOGLE',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -207,13 +208,20 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isGoogleSigningIn = false;
   bool _showPassword = false;
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: AppColors.sunset,
         behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
       ),
     );
   }
@@ -328,24 +336,25 @@ class _LoginScreenState extends State<LoginScreen> {
       obscureText: obscureText,
       textInputAction: textInputAction,
       onSubmitted: onSubmitted,
-      style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+      cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
       decoration: InputDecoration(
         labelText: labelText.toUpperCase(),
-        labelStyle: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+        labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
         prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.ink) : null,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.inputBg,
         contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        border: const OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.ink, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 3),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.ink, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 3),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: AppColors.sky, width: 3),
         ),
@@ -355,147 +364,153 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        title: const Text(
-          'SYSTEM LOGIN',
-          style: TextStyle(
-            color: AppColors.ink,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2.0,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            title: Text(
+              'SYSTEM LOGIN',
+              style: TextStyle(
+                color: AppColors.ink,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2.0,
+              ),
+            ),
+            backgroundColor: AppColors.bg,
+            iconTheme: IconThemeData(color: AppColors.ink),
+            elevation: 0,
+            centerTitle: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(3),
+              child: Container(color: AppColors.border, height: 3),
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              onPressed: () => context.go('/'),
+            ),
           ),
-        ),
-        backgroundColor: AppColors.bg,
-        iconTheme: const IconThemeData(color: AppColors.ink),
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(color: AppColors.ink, height: 3),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
-          onPressed: () => context.go('/'),
-        ),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: RetroBlock(
-              bgColor: AppColors.cloud,
-              padding: 40,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    color: AppColors.mustard,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    child: const Text(
-                      'AUTHORIZATION REQUIRED',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.ink,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'AUTHENTICATE TO CONTINUE LEARNING',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.ink,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-
-                  _buildTextField(
-                    controller: emailController,
-                    labelText: 'Email Address',
-                    prefixIcon: Icons.email,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 24),
-
-                  _buildTextField(
-                    controller: passwordController,
-                    labelText: 'Password',
-                    prefixIcon: Icons.lock,
-                    obscureText: !_showPassword,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _login(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _showPassword ? Icons.visibility : Icons.visibility_off,
-                        color: AppColors.ink,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _showPassword = !_showPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-
-                  isLoading
-                      ? const Center(child: CircularProgressIndicator(color: AppColors.sunset))
-                      : RetroButton(
-                    text: 'INITIATE LOGIN',
-                    bgColor: AppColors.forest,
-                    isFullWidth: true,
-                    onPressed: _login,
-                  ),
-                  const SizedBox(height: 32),
-
-                  Row(
+          body: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: RetroBlock(
+                  bgColor: AppColors.cloud,
+                  padding: 40,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(child: Container(height: 3, color: AppColors.ink)),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      Container(
+                        color: AppColors.mustard,
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                         child: Text(
-                          'OR',
-                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18),
+                          'AUTHORIZATION REQUIRED',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                       ),
-                      Expanded(child: Container(height: 3, color: AppColors.ink)),
+                      const SizedBox(height: 16),
+                      Text(
+                        'AUTHENTICATE TO CONTINUE LEARNING',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 48),
+
+                      _buildTextField(
+                        controller: emailController,
+                        labelText: 'Email Address',
+                        prefixIcon: Icons.email,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 24),
+
+                      _buildTextField(
+                        controller: passwordController,
+                        labelText: 'Password',
+                        prefixIcon: Icons.lock,
+                        obscureText: !_showPassword,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _login(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _showPassword ? Icons.visibility : Icons.visibility_off,
+                            color: AppColors.ink,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showPassword = !_showPassword;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 48),
+
+                      isLoading
+                          ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
+                          : RetroButton(
+                              text: 'INITIATE LOGIN',
+                              bgColor: AppColors.forest,
+                              textColor: Colors.white,
+                              isFullWidth: true,
+                              onPressed: _login,
+                            ),
+                      const SizedBox(height: 32),
+
+                      Row(
+                        children: [
+                          Expanded(child: Container(height: 3, color: AppColors.border)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18),
+                            ),
+                          ),
+                          Expanded(child: Container(height: 3, color: AppColors.border)),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+
+                      isGoogleSigningIn
+                          ? Center(child: CircularProgressIndicator(color: AppColors.sky))
+                          : GoogleRetroButton(onPressed: _signInWithGoogle),
+                      const SizedBox(height: 32),
+
+                      GestureDetector(
+                        onTap: () => context.go('/inregistrare'),
+                        child: Text(
+                          "NO ACCOUNT? INITIATE REGISTRATION",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppColors.ink,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            decoration: TextDecoration.underline,
+                            decorationThickness: 2,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 32),
-
-                  isGoogleSigningIn
-                      ? const Center(child: CircularProgressIndicator(color: AppColors.sky))
-                      : GoogleRetroButton(onPressed: _signInWithGoogle),
-                  const SizedBox(height: 32),
-
-                  GestureDetector(
-                    onTap: () => context.go('/inregistrare'),
-                    child: const Text(
-                      "NO ACCOUNT? INITIATE REGISTRATION",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.ink,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 2,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -2,43 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'custom_navbar.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
+import 'custom_navbar.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -53,8 +49,8 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
   final IconData? icon;
 
@@ -62,8 +58,8 @@ class RetroButton extends StatefulWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
     this.icon,
   });
@@ -78,7 +74,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveText = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -97,11 +97,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -113,14 +113,14 @@ class _RetroButtonState extends State<RetroButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: widget.textColor, size: 20),
+                Icon(widget.icon, color: effectiveText, size: 20),
                 const SizedBox(width: 8),
               ],
               Text(
                 widget.text.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: widget.textColor,
+                  color: effectiveText,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.0,
@@ -148,10 +148,10 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('LOGIN REQUIRED FOR COMMS.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        SnackBar(
+          content: const Text('LOGIN REQUIRED FOR COMMS.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           backgroundColor: AppColors.sunset,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
         ),
       );
       return;
@@ -159,10 +159,10 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
 
     if (currentUser.uid == teacherId) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('INVALID TARGET: SELF.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        SnackBar(
+          content: const Text('INVALID TARGET: SELF.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           backgroundColor: AppColors.mustard,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
         ),
       );
       return;
@@ -205,9 +205,9 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
   Widget _buildNavbar() {
     return Container(
       height: 90,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.bg,
-        border: Border(bottom: BorderSide(color: AppColors.ink, width: 3)),
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 3)),
       ),
       child: Center(
         child: ConstrainedBox(
@@ -227,12 +227,12 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: AppColors.sunset,
-                            border: Border.all(color: AppColors.ink, width: 2),
+                            border: Border.all(color: AppColors.border, width: 2),
                           ),
                           child: const Icon(Icons.school, color: Colors.white, size: 28),
                         ),
                         const SizedBox(width: 16),
-                        const Text(
+                        Text(
                           'IMEDITATII',
                           style: TextStyle(
                             fontSize: 32,
@@ -255,11 +255,15 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: AppColors.mustard,
-                            border: Border.all(color: AppColors.ink, width: 2),
+                            border: Border.all(color: AppColors.border, width: 2),
                           ),
-                          child: const Text(
+                          child: Text(
                             "GUILD MASTERS",
-                            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+                            style: TextStyle(
+                              color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                       ),
@@ -269,8 +273,8 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
                         onTap: () => context.go('/exercitii'),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: Text(
                             "DAILY QUESTS",
                             style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
@@ -279,7 +283,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Container(width: 3, height: 32, color: AppColors.ink),
+                    Container(width: 3, height: 32, color: AppColors.border),
                     const SizedBox(width: 16),
                     _buildAuthActions(),
                   ],
@@ -297,14 +301,14 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: AppColors.sunset, strokeWidth: 3));
+          return SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: AppColors.sunset, strokeWidth: 3));
         }
         final user = snapshot.data;
 
         if (user == null) {
           return RetroButton(
             text: 'LOG IN',
-            bgColor: Colors.white,
+            bgColor: AppColors.cardBg,
             textColor: AppColors.ink,
             onPressed: () => context.go('/login'),
           );
@@ -329,7 +333,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                   debugPrint("ERROR: $e");
                 }
               },
-              icon: const Icon(Icons.dashboard, color: AppColors.ink, size: 32),
+              icon: Icon(Icons.dashboard, color: AppColors.ink, size: 32),
             ),
             const SizedBox(width: 8),
             IconButton(
@@ -348,13 +352,13 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                   debugPrint("ERROR: $e");
                 }
               },
-              icon: const Icon(Icons.account_box, color: AppColors.ink, size: 32),
+              icon: Icon(Icons.account_box, color: AppColors.ink, size: 32),
             ),
             const SizedBox(width: 8),
             Container(
               decoration: BoxDecoration(
                 color: AppColors.sunset,
-                border: Border.all(color: AppColors.ink, width: 2),
+                border: Border.all(color: AppColors.border, width: 2),
               ),
               child: IconButton(
                 onPressed: () async {
@@ -383,43 +387,43 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: themeColor,
-                  border: Border.all(color: AppColors.ink, width: 3),
+                  border: Border.all(color: AppColors.border, width: 3),
                 ),
-                child: Icon(themeIcon, color: AppColors.ink, size: 40),
+                child: Icon(themeIcon, color: Colors.white, size: 40),
               ),
               const SizedBox(width: 24),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "AVAILABLE MASTERS",
                       style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: 16),
                     ),
                     Text(
                       specName.toUpperCase(),
-                      style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
                     ),
                   ],
                 ),
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.ink, width: 3),
-                  boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+                  color: AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 3),
+                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
                 ),
                 child: IconButton(
                   onPressed: () => context.pop(),
-                  icon: const Icon(Icons.close, size: 32, color: AppColors.ink),
+                  icon: Icon(Icons.close, size: 32, color: AppColors.ink),
                 ),
               )
             ],
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             "SELECT A MASTER AND INITIATE CONTACT TO SCHEDULE YOUR TRAINING.",
-            style: TextStyle(fontSize: 18, color: AppColors.ink, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, color: AppColors.textMuted, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -432,104 +436,109 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     final themeColor = widget.specialization['color'] as Color? ?? AppColors.sky;
     final themeIcon = widget.specialization['icon'] as IconData? ?? Icons.school;
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Column(
-        children: [
-          _buildNavbar(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1100),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildHeader(specName, themeColor, themeIcon),
-                      const SizedBox(height: 48),
-                      StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('teachers')
-                            .where('subject', isEqualTo: specName)
-                            .where('active', isEqualTo: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(40),
-                                child: CircularProgressIndicator(color: AppColors.sunset),
-                              ),
-                            );
-                          }
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text(
-                                'ERROR: ${snapshot.error}'.toUpperCase(),
-                                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset),
-                              ),
-                            );
-                          }
-
-                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return RetroBlock(
-                              bgColor: Colors.white,
-                              padding: 60,
-                              child: Column(
-                                children: const [
-                                  Icon(Icons.search_off, size: 80, color: AppColors.ink),
-                                  SizedBox(height: 24),
-                                  Text(
-                                    "NO MASTERS AVAILABLE YET.",
-                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              _buildNavbar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1100),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildHeader(specName, themeColor, themeIcon),
+                          const SizedBox(height: 48),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('teachers')
+                                .where('subject', isEqualTo: specName)
+                                .where('active', isEqualTo: true)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(40),
+                                    child: CircularProgressIndicator(color: AppColors.sunset),
                                   ),
-                                  SizedBox(height: 12),
-                                  Text(
-                                    "AWAITING GUILD APPROVALS FOR THIS DISCIPLINE.",
-                                    style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 16),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                    'ERROR: ${snapshot.error}'.toUpperCase(),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset),
                                   ),
-                                ],
-                              ),
-                            );
-                          }
+                                );
+                              }
 
-                          final docs = snapshot.data!.docs;
+                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                return RetroBlock(
+                                  bgColor: AppColors.cardBg,
+                                  padding: 60,
+                                  child: Column(
+                                    children: [
+                                      Icon(Icons.search_off, size: 80, color: AppColors.ink),
+                                      const SizedBox(height: 24),
+                                      Text(
+                                        "NO MASTERS AVAILABLE YET.",
+                                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        "AWAITING GUILD APPROVALS FOR THIS DISCIPLINE.",
+                                        style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
 
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 500,
-                              mainAxisSpacing: 32,
-                              crossAxisSpacing: 32,
-                              childAspectRatio: 1.0,
-                            ),
-                            itemCount: docs.length,
-                            itemBuilder: (context, index) {
-                              final data = docs[index].data()! as Map<String, dynamic>;
-                              final teacherId = docs[index].id;
-                              final price = data['price']?.toString() ?? '50';
+                              final docs = snapshot.data!.docs;
 
-                              return _RetroTeacherCard(
-                                data: data,
-                                teacherId: teacherId,
-                                price: price,
-                                themeColor: themeColor,
-                                onMessageTap: () => _handleMessageTap(context, teacherId, data['name'] ?? 'MASTER'),
+                              return GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 500,
+                                  mainAxisSpacing: 32,
+                                  crossAxisSpacing: 32,
+                                  childAspectRatio: 1.0,
+                                ),
+                                itemCount: docs.length,
+                                itemBuilder: (context, index) {
+                                  final data = docs[index].data()! as Map<String, dynamic>;
+                                  final teacherId = docs[index].id;
+                                  final price = data['price']?.toString() ?? '50';
+
+                                  return _RetroTeacherCard(
+                                    data: data,
+                                    teacherId: teacherId,
+                                    price: price,
+                                    themeColor: themeColor,
+                                    onMessageTap: () => _handleMessageTap(context, teacherId, data['name'] ?? 'MASTER'),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -565,6 +574,7 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
     final education = widget.data['education'] ?? '';
 
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
@@ -579,11 +589,11 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
             0,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: AppColors.cardBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: _isPressed ? const Offset(0, 0) : const Offset(8, 8),
                 blurRadius: 0,
               )
@@ -607,34 +617,42 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
                             height: 80,
                             decoration: BoxDecoration(
                               color: widget.themeColor,
-                              border: Border.all(color: AppColors.ink, width: 3),
+                              border: Border.all(color: AppColors.border, width: 3),
                               image: imageUrl.isNotEmpty
                                   ? DecorationImage(
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                              )
+                                      image: NetworkImage(imageUrl),
+                                      fit: BoxFit.cover,
+                                    )
                                   : null,
                             ),
                             child: imageUrl.isEmpty
-                                ? const Icon(Icons.person, size: 40, color: AppColors.ink)
+                                ? Icon(Icons.person, size: 40, color: AppColors.ink)
                                 : null,
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
                               color: AppColors.mustard,
-                              border: Border.all(color: AppColors.ink, width: 2),
+                              border: Border.all(color: AppColors.border, width: 2),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
                                   '${widget.price} RON',
-                                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 18,
+                                    color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                                  ),
                                 ),
-                                const Text(
+                                Text(
                                   '/ HOUR',
-                                  style: TextStyle(fontSize: 12, color: AppColors.ink, fontWeight: FontWeight.w900),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                               ],
                             ),
@@ -644,7 +662,7 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
                       const SizedBox(height: 24),
                       Text(
                         name.toString().toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 24,
                           color: AppColors.ink,
@@ -656,11 +674,11 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          const Icon(Icons.military_tech, size: 24, color: AppColors.ink),
+                          Icon(Icons.military_tech, size: 24, color: AppColors.ink),
                           const SizedBox(width: 8),
                           Text(
                             '$experience YEARS EXP.',
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textMuted),
                           ),
                         ],
                       ),
@@ -668,12 +686,12 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
                       if (education.isNotEmpty)
                         Row(
                           children: [
-                            const Icon(Icons.school, size: 24, color: AppColors.ink),
+                            Icon(Icons.school, size: 24, color: AppColors.ink),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 education.toString().toUpperCase(),
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textMuted),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -684,7 +702,7 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
                   ),
                 ),
               ),
-              Container(height: 3, color: AppColors.ink),
+              Container(height: 3, color: AppColors.border),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -703,6 +721,7 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
                         text: 'MESSAGE',
                         icon: Icons.send,
                         bgColor: widget.themeColor,
+                        textColor: Colors.white,
                         onPressed: widget.onMessageTap,
                       ),
                     ),

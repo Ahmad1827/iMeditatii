@@ -7,41 +7,37 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
-class AppColors {
-  static const Color bg = Color(0xFFF9F7F1);
-  static const Color ink = Color(0xFF2C363F);
-  static const Color sunset = Color(0xFFE75A41);
-  static const Color forest = Color(0xFF3C7A61);
-  static const Color mustard = Color(0xFFEAB334);
-  static const Color cloud = Color(0xFFE2DFD2);
-  static const Color sky = Color(0xFF5BA8B5);
-}
+import 'theme_manager.dart';
+import 'app_colors.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
-  final Color bgColor;
+  final Color? bgColor;
   final double padding;
   final double shadowOffset;
-  final Color borderColor;
+  final Color? borderColor;
 
   const RetroBlock({
     super.key,
     required this.child,
-    this.bgColor = Colors.white,
+    this.bgColor,
     this.padding = 24.0,
     this.shadowOffset = 6.0,
-    this.borderColor = AppColors.ink,
+    this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = bgColor ?? AppColors.cardBg;
+    final effectiveBorder = borderColor ?? AppColors.border;
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor, width: 3),
+        color: effectiveBg,
+        border: Border.all(color: effectiveBorder, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink,
+            color: AppColors.shadow,
             offset: Offset(shadowOffset, shadowOffset),
             blurRadius: 0,
           ),
@@ -56,16 +52,16 @@ class RetroBlock extends StatelessWidget {
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color bgColor;
-  final Color textColor;
+  final Color? bgColor;
+  final Color? textColor;
   final bool isFullWidth;
 
   const RetroButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.bgColor = AppColors.sunset,
-    this.textColor = Colors.white,
+    this.bgColor,
+    this.textColor,
     this.isFullWidth = false,
   });
 
@@ -79,7 +75,11 @@ class _RetroButtonState extends State<RetroButton> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = widget.bgColor ?? AppColors.sunset;
+    final effectiveTextColor = widget.textColor ?? Colors.white;
+
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
@@ -98,11 +98,11 @@ class _RetroButtonState extends State<RetroButton> {
             0,
           ),
           decoration: BoxDecoration(
-            color: widget.bgColor,
-            border: Border.all(color: AppColors.ink, width: 3),
+            color: effectiveBg,
+            border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink,
+                color: AppColors.shadow,
                 offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
                 blurRadius: 0,
               ),
@@ -113,7 +113,7 @@ class _RetroButtonState extends State<RetroButton> {
             widget.text.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: widget.textColor,
+              color: effectiveTextColor,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
@@ -207,11 +207,11 @@ class _ChatScreenState extends State<ChatScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('STUDENT ACCEPTED.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              backgroundColor: AppColors.forest,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
-            )
+          SnackBar(
+            content: const Text('STUDENT ACCEPTED.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            backgroundColor: AppColors.forest,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
+          )
         );
       }
     } catch (e) {
@@ -244,9 +244,9 @@ class _ChatScreenState extends State<ChatScreen> {
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.bg,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
-            title: const Text("PAYMENT ERROR", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
-            content: Text(e.toString(), style: const TextStyle(fontWeight: FontWeight.w600)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
+            title: Text("PAYMENT ERROR", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
+            content: Text(e.toString(), style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink)),
             actions: [
               RetroButton(
                 text: "CLOSE",
@@ -271,10 +271,10 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('MANUAL OVERRIDE: SESSION UNLOCKED', style: TextStyle(fontWeight: FontWeight.bold)),
-              backgroundColor: AppColors.ink
-          )
+        SnackBar(
+          content: const Text('MANUAL OVERRIDE: SESSION UNLOCKED', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+          backgroundColor: AppColors.ink,
+        )
       );
     }
   }
@@ -298,14 +298,14 @@ class _ChatScreenState extends State<ChatScreen> {
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: AppColors.bg,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 3)),
-          title: const Text("SESSION LOCKED", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
-          content: const Text("Payment required before initiating video feed.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
+          title: Text("SESSION LOCKED", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
+          content: Text("Payment required before initiating video feed.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600)),
           actions: [
             RetroButton(
               text: "ACKNOWLEDGE",
               bgColor: AppColors.sky,
-              textColor: AppColors.ink,
+              textColor: Colors.white,
               onPressed: () => context.pop(),
             )
           ],
@@ -349,21 +349,21 @@ class _ChatScreenState extends State<ChatScreen> {
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: AppColors.bg,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.ink, width: 4)),
-              title: const Text('RATE SESSION', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 4)),
+              title: Text('RATE SESSION', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('EVALUATE MENTOR PERFORMANCE:', style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)),
+                  Text('EVALUATE MENTOR PERFORMANCE:', style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(5, (index) {
                       return GestureDetector(
-                        onTap: () => setState(() => rating = index + 1),
+                        onTap: () => setDialogState(() => rating = index + 1),
                         child: Icon(index < rating ? Icons.star : Icons.star_border, color: AppColors.sunset, size: 44),
                       );
                     }),
@@ -372,14 +372,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   TextField(
                     controller: reviewController,
                     maxLines: 3,
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
+                    cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
                     decoration: InputDecoration(
                       hintText: 'LEAVE LOG (OPTIONAL)...',
-                      hintStyle: const TextStyle(color: Colors.black38, fontWeight: FontWeight.bold),
+                      hintStyle: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold),
                       filled: true,
-                      fillColor: Colors.white,
-                      border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 2)),
-                      focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
+                      fillColor: AppColors.inputBg,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
                     ),
                   ),
                 ],
@@ -402,9 +403,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: RetroButton(
                         text: isSubmitting ? '...' : 'SUBMIT',
                         bgColor: AppColors.ink,
-                        textColor: Colors.white,
+                        textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
                         onPressed: isSubmitting ? () {} : () async {
-                          setState(() => isSubmitting = true);
+                          setDialogState(() => isSubmitting = true);
                           try {
                             await FirebaseFirestore.instance.collection('teachers').doc(teacherId).collection('reviews').add({
                               'rating': rating, 'comment': reviewController.text.trim(), 'createdAt': Timestamp.now(), 'studentId': currentUser!.uid,
@@ -413,7 +414,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('LOG SUBMITTED.')));
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ERROR: $e')));
-                            setState(() => isSubmitting = false);
+                            setDialogState(() => isSubmitting = false);
                           }
                         },
                       ),
@@ -430,314 +431,348 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        backgroundColor: AppColors.bg,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: AppColors.ink),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(3), child: Container(color: AppColors.ink, height: 3)),
-        title: GestureDetector(
-          onTap: () {
-            final currentUid = currentUser!.uid;
-            final amITeacher = currentUid == teacherId && teacherId.isNotEmpty;
-            final targetId = amITeacher ? (studentId.isNotEmpty ? studentId : null) : (teacherId.isNotEmpty ? teacherId : null);
-            if (targetId == null) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("PROFILE NOT FOUND.")));
-              return;
-            }
-            if (amITeacher) {
-              context.go('/elev/$targetId');
-            } else {
-              context.go('/profesor/$targetId');
-            }
-          },
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.cloud,
-                  border: Border.all(color: AppColors.ink, width: 2),
-                ),
-                child: Text(
-                    widget.teacherName.isNotEmpty ? widget.teacherName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18)
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        widget.teacherName.isNotEmpty ? widget.teacherName.toUpperCase() : 'CHAT',
-                        style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: 1.2),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          appBar: AppBar(
+            backgroundColor: AppColors.bg,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            iconTheme: IconThemeData(color: AppColors.ink),
+            bottom: PreferredSize(preferredSize: const Size.fromHeight(3), child: Container(color: AppColors.border, height: 3)),
+            title: GestureDetector(
+              onTap: () {
+                final currentUid = currentUser!.uid;
+                final amITeacher = currentUid == teacherId && teacherId.isNotEmpty;
+                final targetId = amITeacher ? (studentId.isNotEmpty ? studentId : null) : (teacherId.isNotEmpty ? teacherId : null);
+                if (targetId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("PROFILE NOT FOUND.")));
+                  return;
+                }
+                if (amITeacher) {
+                  context.go('/elev/$targetId');
+                } else {
+                  context.go('/profesor/$targetId');
+                }
+              },
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.cloud,
+                      border: Border.all(color: AppColors.border, width: 2),
                     ),
-                    if (!isSessionPaid && !isTeacher) const Text("COMM_LOCKED", style: TextStyle(color: AppColors.sunset, fontSize: 14, fontWeight: FontWeight.bold)),
-                    if (isSessionPaid) const Text("COMM_SECURE", style: TextStyle(color: AppColors.forest, fontSize: 14, fontWeight: FontWeight.bold)),
-                  ],
+                    child: Text(
+                      widget.teacherName.isNotEmpty ? widget.teacherName[0].toUpperCase() : '?',
+                      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.teacherName.isNotEmpty ? widget.teacherName.toUpperCase() : 'CHAT',
+                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: 1.2),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (!isSessionPaid && !isTeacher) Text("COMM_LOCKED", style: TextStyle(color: AppColors.sunset, fontSize: 14, fontWeight: FontWeight.bold)),
+                        if (isSessionPaid) Text("COMM_SECURE", style: TextStyle(color: AppColors.forest, fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              if (isTeacher || isOwner)
+                IconButton(
+                  icon: Icon(isSessionPaid ? Icons.lock_open : Icons.lock, color: isSessionPaid ? AppColors.forest : (isOwner ? AppColors.sky : AppColors.sunset), size: 28),
+                  tooltip: isSessionPaid ? "UNLOCKED" : (isOwner ? "OVERRIDE" : "AWAITING PAYMENT"),
+                  onPressed: (!isSessionPaid && isOwner) ? _unlockSessionByOwner : null,
+                ),
+              Container(
+                margin: const EdgeInsets.only(right: 16, left: 8),
+                decoration: BoxDecoration(
+                  color: isSessionPaid || isOwner ? AppColors.sky : AppColors.cloud,
+                  border: Border.all(color: AppColors.border, width: 2),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.videocam, color: isSessionPaid || isOwner ? (AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink) : AppColors.textMuted),
+                  tooltip: "INITIATE FEED",
+                  onPressed: _handleVideoCallPress,
                 ),
               ),
             ],
           ),
-        ),
-        actions: [
-          if (isTeacher || isOwner)
-            IconButton(
-              icon: Icon(isSessionPaid ? Icons.lock_open : Icons.lock, color: isSessionPaid ? AppColors.forest : (isOwner ? AppColors.sky : AppColors.sunset), size: 28),
-              tooltip: isSessionPaid ? "UNLOCKED" : (isOwner ? "OVERRIDE" : "AWAITING PAYMENT"),
-              onPressed: (!isSessionPaid && isOwner) ? _unlockSessionByOwner : null,
-            ),
-          Container(
-            margin: const EdgeInsets.only(right: 16, left: 8),
-            decoration: BoxDecoration(
-                color: isSessionPaid || isOwner ? AppColors.sky : AppColors.cloud,
-                border: Border.all(color: AppColors.ink, width: 2)
-            ),
-            child: IconButton(
-              icon: Icon(Icons.videocam, color: isSessionPaid || isOwner ? AppColors.ink : Colors.black38),
-              tooltip: "INITIATE FEED",
-              onPressed: _handleVideoCallPress,
-            ),
-          ),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: Column(
-            children: [
-              if (isTeacher && !isStudentAccepted)
-                Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.ink, width: 3)),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info, color: AppColors.ink, size: 32),
-                      const SizedBox(width: 16),
-                      const Expanded(child: Text("NEW QUEST REQUEST. ACCEPT STUDENT?", style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0))),
-                      const SizedBox(width: 16),
-                      RetroButton(
-                        text: "ACCEPT",
-                        bgColor: AppColors.sky,
-                        textColor: AppColors.ink,
-                        onPressed: _acceptStudent,
-                      ),
-                    ],
-                  ),
-                ),
-
-              if (!isTeacher && !isStudentAccepted)
-                Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.ink, width: 3)),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.hourglass_empty, color: AppColors.ink, size: 32),
-                      SizedBox(width: 16),
-                      Expanded(child: Text("AWAITING MENTOR APPROVAL TO UNLOCK SESSION PAYMENT.", style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0))),
-                    ],
-                  ),
-                ),
-
-              if (!isTeacher && isStudentAccepted && !isSessionPaid)
-                Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: AppColors.forest, border: Border.all(color: AppColors.ink, width: 3)),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.white, size: 32),
-                      const SizedBox(width: 16),
-                      const Expanded(child: Text("REQUEST APPROVED. PAY TO UNLOCK VIDEO FEED.", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0))),
-                      const SizedBox(width: 16),
-                      RetroButton(
-                        text: _isLoadingPayment ? "..." : "PAY $_teacherPrice RON",
-                        bgColor: AppColors.sunset,
-                        onPressed: _isLoadingPayment ? () {} : openPaymentPage,
-                      ),
-                    ],
-                  ),
-                ),
-
-              StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) return const SizedBox.shrink();
-                  final data = snapshot.data!.data() as Map<String, dynamic>?;
-                  final hasActiveCall = data?['activeCall'] != null;
-
-                  if (hasActiveCall) {
-                    final roomId = (data!['activeCall'] as Map<String, dynamic>)['roomId'];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: Column(
+                children: [
+                  if (isTeacher && !isStudentAccepted)
+                    Container(
+                      margin: const EdgeInsets.all(16),
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.ink, width: 3)),
+                      decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 3)),
                       child: Row(
                         children: [
-                          Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white, border: Border.all(color: AppColors.ink, width: 2)), child: const Icon(Icons.videocam, color: AppColors.ink, size: 24)),
+                          Icon(Icons.info, color: AppColors.ink, size: 32),
                           const SizedBox(width: 16),
-                          const Expanded(child: Text("VIDEO FEED ACTIVE!", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 18, letterSpacing: 1.5))),
+                          Expanded(child: Text("NEW QUEST REQUEST. ACCEPT STUDENT?", style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0))),
+                          const SizedBox(width: 16),
                           RetroButton(
-                            text: "JOIN",
-                            bgColor: Colors.white,
-                            textColor: AppColors.ink,
-                            onPressed: () async {
-                              await context.push('/video-call/$roomId');
-
-                              if (isTeacher || isOwner) {
-                                await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).update({'activeCall': FieldValue.delete(), 'isSessionPaid': false});
-                              } else {
-                                _showReviewDialog();
-                              }
-                            },
+                            text: "ACCEPT",
+                            bgColor: AppColors.sky,
+                            textColor: Colors.white,
+                            onPressed: _acceptStudent,
                           ),
                         ],
                       ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
+                    ),
 
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).collection('messages').orderBy('createdAt', descending: true).snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: AppColors.sunset));
-
-                    var firebaseMessages = snapshot.data!.docs.map((doc) {
-                      var data = doc.data() as Map<String, dynamic>;
-                      data['isSystem'] = false;
-                      return data;
-                    }).toList();
-
-                    var allMessages = [..._localSystemMessages, ...firebaseMessages];
-
-                    allMessages.sort((a, b) {
-                      Timestamp timeA = a['createdAt'] as Timestamp;
-                      Timestamp timeB = b['createdAt'] as Timestamp;
-                      return timeB.compareTo(timeA);
-                    });
-
-                    if (allMessages.isEmpty) {
-                      return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.terminal, size: 80, color: AppColors.cloud),
-                            SizedBox(height: 16),
-                            Text("AWAITING INITIAL LOG.", style: TextStyle(color: AppColors.ink, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return Scrollbar(
-                      controller: _chatScrollController,
-                      child: ListView.builder(
-                        controller: _chatScrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                        reverse: true,
-                        itemCount: allMessages.length,
-                        itemBuilder: (context, index) {
-                          final msg = allMessages[index];
-
-                          if (msg['isSystem'] == true) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 12),
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.sunset,
-                                    border: Border.all(color: AppColors.ink, width: 3),
-                                  ),
-                                  child: Text(
-                                    msg['text'],
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-
-                          final isMe = msg['senderId'] == currentUser!.uid;
-
-                          return Align(
-                            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                            child: RetroBlock(
-                              bgColor: isMe ? AppColors.cloud : Colors.white,
-                              padding: 16,
-                              shadowOffset: 4,
-                              child: Container(
-                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
-                                child: Text(
-                                    msg['text'],
-                                    style: const TextStyle(color: AppColors.ink, fontSize: 18, fontWeight: FontWeight.bold, height: 1.4)
-                                ),
+                  if (!isTeacher && !isStudentAccepted)
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 3)),
+                      child: Row(
+                        children: [
+                          Icon(Icons.hourglass_empty, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, size: 32),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              "AWAITING MENTOR APPROVAL TO UNLOCK SESSION PAYMENT.",
+                              style: TextStyle(
+                                color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, max(24, MediaQuery.of(context).padding.bottom)),
-                decoration: const BoxDecoration(color: AppColors.cloud, border: Border(top: BorderSide(color: AppColors.ink, width: 3))),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _messageController,
-                        onSubmitted: (_) => sendMessage(),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.ink),
-                        decoration: const InputDecoration(
-                          hintText: 'ENTER COMMAND...',
-                          hintStyle: TextStyle(color: Colors.black38, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.ink, width: 3)),
-                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    GestureDetector(
-                      onTap: sendMessage,
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.ink,
-                            border: Border.all(color: AppColors.ink, width: 3),
-                            boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4), blurRadius: 0)],
                           ),
-                          child: const Icon(Icons.send, color: Colors.white, size: 28),
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              )
-            ],
+
+                  if (!isTeacher && isStudentAccepted && !isSessionPaid)
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: AppColors.forest, border: Border.all(color: AppColors.border, width: 3)),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.white, size: 32),
+                          const SizedBox(width: 16),
+                          const Expanded(child: Text("REQUEST APPROVED. PAY TO UNLOCK VIDEO FEED.", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0))),
+                          const SizedBox(width: 16),
+                          RetroButton(
+                            text: _isLoadingPayment ? "..." : "PAY $_teacherPrice RON",
+                            bgColor: AppColors.sunset,
+                            textColor: Colors.white,
+                            onPressed: _isLoadingPayment ? () {} : openPaymentPage,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  StreamBuilder<DocumentSnapshot>(
+                    stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return const SizedBox.shrink();
+                      final data = snapshot.data!.data() as Map<String, dynamic>?;
+                      final hasActiveCall = data?['activeCall'] != null;
+
+                      if (hasActiveCall) {
+                        final roomId = (data!['activeCall'] as Map<String, dynamic>)['roomId'];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.border, width: 3)),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 2)),
+                                child: Icon(Icons.videocam, color: AppColors.ink, size: 24),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  "VIDEO FEED ACTIVE!",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                    fontSize: 18,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+                              RetroButton(
+                                text: "JOIN",
+                                bgColor: AppColors.cardBg,
+                                textColor: AppColors.ink,
+                                onPressed: () async {
+                                  await context.push('/video-call/$roomId');
+
+                                  if (isTeacher || isOwner) {
+                                    await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).update({'activeCall': FieldValue.delete(), 'isSessionPaid': false});
+                                  } else {
+                                    _showReviewDialog();
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+
+                  Expanded(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).collection('messages').orderBy('createdAt', descending: true).snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
+
+                        var firebaseMessages = snapshot.data!.docs.map((doc) {
+                          var data = doc.data() as Map<String, dynamic>;
+                          data['isSystem'] = false;
+                          return data;
+                        }).toList();
+
+                        var allMessages = [..._localSystemMessages, ...firebaseMessages];
+
+                        allMessages.sort((a, b) {
+                          Timestamp timeA = a['createdAt'] as Timestamp;
+                          Timestamp timeB = b['createdAt'] as Timestamp;
+                          return timeB.compareTo(timeA);
+                        });
+
+                        if (allMessages.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.terminal, size: 80, color: AppColors.textMuted),
+                                const SizedBox(height: 16),
+                                Text("AWAITING INITIAL LOG.", style: TextStyle(color: AppColors.ink, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return Scrollbar(
+                          controller: _chatScrollController,
+                          child: ListView.builder(
+                            controller: _chatScrollController,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                            reverse: true,
+                            itemCount: allMessages.length,
+                            itemBuilder: (context, index) {
+                              final msg = allMessages[index];
+
+                              if (msg['isSystem'] == true) {
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 12),
+                                  child: Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.sunset,
+                                        border: Border.all(color: AppColors.border, width: 3),
+                                      ),
+                                      child: Text(
+                                        msg['text'],
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              final isMe = msg['senderId'] == currentUser!.uid;
+
+                              return Align(
+                                alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                child: RetroBlock(
+                                  bgColor: isMe ? AppColors.cloud : AppColors.cardBg,
+                                  padding: 16,
+                                  shadowOffset: 4,
+                                  child: Container(
+                                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+                                    child: Text(
+                                      msg['text'],
+                                      style: TextStyle(color: AppColors.ink, fontSize: 18, fontWeight: FontWeight.bold, height: 1.4),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  Container(
+                    padding: EdgeInsets.fromLTRB(24, 24, 24, max(24, MediaQuery.of(context).padding.bottom)),
+                    decoration: BoxDecoration(
+                      color: AppColors.cloud,
+                      border: Border(top: BorderSide(color: AppColors.border, width: 3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _messageController,
+                            onSubmitted: (_) => sendMessage(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.ink),
+                            cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                            decoration: InputDecoration(
+                              hintText: 'ENTER COMMAND...',
+                              hintStyle: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                              filled: true,
+                              fillColor: AppColors.inputBg,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 3)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 3)),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        GestureDetector(
+                          onTap: sendMessage,
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.ink,
+                                border: Border.all(color: AppColors.border, width: 3),
+                                boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4), blurRadius: 0)],
+                              ),
+                              child: Icon(Icons.send, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 28),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
