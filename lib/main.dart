@@ -7,7 +7,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 
-import 'theme_manager.dart'; // <-- Import ThemeManager
+import 'theme_manager.dart';
 
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -40,13 +40,39 @@ import 'seed_problems.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await ThemeManager.loadTheme(); // Încarcă tema salvată
-  await populeazaCele50DeProbleme();
+  usePathUrlStrategy();
+
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("DotEnv loading warning: $e");
+  }
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Firebase init error: $e");
+  }
+
+  try {
+    await ThemeManager.loadTheme();
+  } catch (e) {
+    debugPrint("ThemeManager error: $e");
+  }
+
+  // 랜derizăm aplicația imediat pentru a preveni ecranul alb
   runApp(const IMeditatiiApp());
+
+  // Rulăm seeder-ul asincron în background cu protecție la erori de rețea/AdBlock
+  try {
+    populeazaCele50DeProbleme().catchError((e) {
+      debugPrint("Seeder warning (ignorat): $e");
+    });
+  } catch (e) {
+    debugPrint("Seeder error: $e");
+  }
 }
 
 final GoRouter _router = GoRouter(

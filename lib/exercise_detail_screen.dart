@@ -17,7 +17,7 @@ class CppSyntaxController extends TextEditingController {
   final TextStyle defaultStyle = const TextStyle(
     fontFamily: 'monospace',
     color: Color(0xFFECEFF4),
-    fontSize: 14.5,
+    fontSize: 15.0,
     height: 1.5,
     fontWeight: FontWeight.w600,
   );
@@ -219,7 +219,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   final TextEditingController _answerController = TextEditingController();
   final FocusNode _editorFocusNode = FocusNode();
 
-  // Undo / Redo Stacks
   final List<TextEditingValue> _undoStack = [];
   final List<TextEditingValue> _redoStack = [];
   bool _isUndoingOrRedoing = false;
@@ -309,28 +308,22 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return lastNewline == -1 ? pos + 1 : pos - lastNewline;
   }
 
-  // ----------------------------------------------------
-  // SMART KEYBOARD HANDLER (TAB, UNINDENT, '}', ENTER, CTRL+Z/Y)
-  // ----------------------------------------------------
   KeyEventResult _handleEditorKey(FocusNode node, KeyEvent event) {
     if (event is KeyDownEvent) {
       final isControlOrCmd = HardwareKeyboard.instance.isControlPressed || HardwareKeyboard.instance.isMetaPressed;
       final isShift = HardwareKeyboard.instance.isShiftPressed;
 
-      // 1. Undo: Ctrl + Z
       if (isControlOrCmd && event.logicalKey == LogicalKeyboardKey.keyZ && !isShift) {
         _performUndo();
         return KeyEventResult.handled;
       }
 
-      // 2. Redo: Ctrl + Y sau Ctrl + Shift + Z
       if ((isControlOrCmd && event.logicalKey == LogicalKeyboardKey.keyY) ||
           (isControlOrCmd && event.logicalKey == LogicalKeyboardKey.keyZ && isShift)) {
         _performRedo();
         return KeyEventResult.handled;
       }
 
-      // 3. Tab Key: Inserează 4 spații uniforme în loc să schimbe focusul
       if (event.logicalKey == LogicalKeyboardKey.tab) {
         final text = _codeController.text;
         final selection = _codeController.selection;
@@ -346,7 +339,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         return KeyEventResult.handled;
       }
 
-      // 4. Smart Backspace: Unindent pe nivel de tab (4 spații) la începutul liniei
       if (event.logicalKey == LogicalKeyboardKey.backspace) {
         final text = _codeController.text;
         final selection = _codeController.selection;
@@ -371,7 +363,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         }
       }
 
-      // 5. Smart Closing Brace '}': Dedent automat cu 4 spații pentru aliniere
       if (event.character == '}' || event.logicalKey == LogicalKeyboardKey.braceRight) {
         final text = _codeController.text;
         final selection = _codeController.selection;
@@ -393,7 +384,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         }
       }
 
-      // 6. Smart Enter: Auto-Indentation identică cu linia anterioară
       if (event.logicalKey == LogicalKeyboardKey.enter) {
         final text = _codeController.text;
         final selection = _codeController.selection;
@@ -506,7 +496,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
             content: Text(
               "Trebuie să fii autentificat pentru a rula teste și a salva progresul.",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.ink),
             ),
             actions: [
               RetroButton(
@@ -548,7 +538,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             backgroundColor: AppColors.bg,
             appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: IconThemeData(color: AppColors.ink), elevation: 0),
             body: Center(
-              child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
+              child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink)),
             ),
           );
         }
@@ -558,7 +548,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           appBar: AppBar(
             title: Text(
               "${widget.subject.toUpperCase()} • CLASA ${widget.grade} • #${widget.id}",
-              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 15),
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 16),
             ),
             backgroundColor: AppColors.bg,
             iconTheme: IconThemeData(color: AppColors.ink),
@@ -574,7 +564,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               // STANDARD SPLIT VIEW
               Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1380),
+                  constraints: const BoxConstraints(maxWidth: 1440),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final isWide = constraints.maxWidth > 920;
@@ -618,24 +608,24 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   padding: const EdgeInsets.all(24),
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 900),
+                      constraints: const BoxConstraints(maxWidth: 960),
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.cardBg,
                           border: Border.all(color: AppColors.border, width: 3),
                           boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6))],
                         ),
-                        padding: const EdgeInsets.all(32),
+                        padding: const EdgeInsets.all(36),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   color: AppColors.sunset,
                                   child: const Text("PROBLEM FOCUS MODE",
-                                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+                                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900)),
                                 ),
                                 const Spacer(),
                                 RetroButton(
@@ -647,7 +637,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                 )
                               ],
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 24),
                             Expanded(child: SingleChildScrollView(child: _buildEnuntContent())),
                           ],
                         ),
@@ -672,13 +662,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     children: [
                       // Task Sidebar
                       Container(
-                        width: 380,
+                        width: 420,
                         decoration: BoxDecoration(
                           color: AppColors.cardBg,
                           border: Border.all(color: AppColors.border, width: 2.5),
                           boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
                         ),
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(24),
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -686,24 +676,24 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sunset)),
-                                  Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink)),
+                                  Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.sunset)),
+                                  Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 14),
                               Text(
                                 exerciseData!["title"]?.toUpperCase() ?? "QUEST",
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink),
+                                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
                               Text(
                                 exerciseData!["description"] ?? "",
-                                style: TextStyle(fontSize: 14, color: AppColors.ink, height: 1.5, fontWeight: FontWeight.w600),
+                                style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600),
                               ),
                               if (exerciseData!["input"] != null) ...[
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 20),
                                 _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"]),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 14),
                                 _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"]),
                               ],
                             ],
@@ -782,16 +772,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             GestureDetector(
               onTap: () => setState(() => isFullScreenProblem = true),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.cardBg,
                   border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.fullscreen, size: 14, color: AppColors.ink),
-                    const SizedBox(width: 4),
-                    Text("FOCUS BRIEF", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.ink)),
+                    Icon(Icons.fullscreen, size: 16, color: AppColors.ink),
+                    const SizedBox(width: 6),
+                    Text("FOCUS BRIEF", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.ink)),
                   ],
                 ),
               ),
@@ -804,7 +794,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             border: Border.all(color: AppColors.border, width: 2.5),
             boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
           ),
-          padding: const EdgeInsets.all(26),
+          padding: const EdgeInsets.all(28),
           child: selectedTab == "enunt" ? _buildEnuntContent() : _buildSolutieContent(),
         ),
       ],
@@ -828,7 +818,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: FontWeight.w900,
             color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
             letterSpacing: 1.0,
@@ -845,34 +835,45 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         Text(
           exerciseData!["title"]?.toUpperCase() ?? "UNTITLED QUEST",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2),
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.25),
         ),
-        const SizedBox(height: 20),
-        Text(
-          "DESCRIPTION",
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.sunset, letterSpacing: 1.5),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          color: AppColors.sunset,
+          child: const Text(
+            "DESCRIPTION",
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 1.5),
+          ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
         Text(
           exerciseData!["description"] ?? "Fără descriere disponibilă.",
-          style: TextStyle(fontSize: 15, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6),
+          style: TextStyle(
+            fontSize: 18,
+            color: AppColors.ink,
+            fontWeight: FontWeight.w600,
+            height: 1.7,
+            letterSpacing: 0.2,
+          ),
         ),
         if (exerciseData!["hint"] != null) ...[
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.sky.withOpacity(0.15),
               border: Border.all(color: AppColors.sky, width: 2),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
-                const SizedBox(width: 12),
+                Icon(Icons.lightbulb, color: AppColors.ink, size: 26),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Text(
                     exerciseData!["hint"],
-                    style: TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.5),
                   ),
                 ),
               ],
@@ -880,11 +881,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           )
         ],
         if (exerciseData!["tip_exercitiu"] == "cod" || exerciseData!["input"] != null) ...[
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           Container(height: 2, color: AppColors.border),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"] ?? "-"),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"] ?? "-"),
         ],
       ],
@@ -896,12 +897,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("MASTER'S SOLUTION", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.ink)),
-        const SizedBox(height: 16),
+        Text("MASTER'S SOLUTION", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
+        const SizedBox(height: 18),
         if (offSol != null && offSol["code"] != null)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: const Color(0xFF1B242B),
               border: Border.all(color: AppColors.border, width: 2.5),
@@ -911,16 +912,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               style: const TextStyle(
                 fontFamily: 'monospace',
                 color: Color(0xFF55EFC4),
-                fontSize: 13,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
-                height: 1.5,
+                height: 1.55,
               ),
             ),
           )
         else
           Text(
             "Acest exercițiu nu are o rezolvare oficială încărcată.",
-            style: TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold),
           ),
       ],
     );
@@ -932,14 +933,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.sky, letterSpacing: 1.5),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.sky, letterSpacing: 1.5),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 1.5)),
-          child: Text(content, style: TextStyle(fontSize: 13, color: AppColors.ink, fontWeight: FontWeight.w700)),
+          child: Text(
+            content,
+            style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.w700, height: 1.5),
+          ),
         ),
       ],
     );
@@ -1012,19 +1016,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.sky : AppColors.cardBg,
                   border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: Row(
                   children: [
-                    Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank, color: AppColors.ink, size: 20),
-                    const SizedBox(width: 12),
+                    Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank, color: AppColors.ink, size: 22),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Text(
                         varianta,
-                        style: TextStyle(fontSize: 14, color: AppColors.ink, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -1052,13 +1056,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         TextField(
           controller: _answerController,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
           decoration: InputDecoration(
             hintText: "Introdu valoarea...",
-            hintStyle: TextStyle(color: AppColors.textMuted),
+            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 16),
             filled: true,
             fillColor: AppColors.inputBg,
-            contentPadding: const EdgeInsets.all(14),
+            contentPadding: const EdgeInsets.all(16),
             border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
           ),
         ),
@@ -1088,13 +1093,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             "C++20 (GCC)",
             style: TextStyle(
               color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w900,
             ),
           ),
         ),
         const SizedBox(width: 8),
-        Text("LN $line, COL $col", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
+        Text("LN $line, COL $col", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: AppColors.ink)),
         const Spacer(),
         GestureDetector(
           onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
@@ -1111,7 +1116,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 Text(
                   isFullScreen ? "EXIT" : "FOCUS MODE",
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.w900,
                     color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
                   ),
@@ -1153,7 +1158,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: AppColors.cardBg,
           border: Border.all(color: isDanger ? AppColors.sunset : AppColors.border, width: 1.5),
@@ -1161,7 +1166,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: FontWeight.w900,
             color: isDanger ? AppColors.sunset : AppColors.ink,
           ),
@@ -1174,8 +1179,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final lineCount = '\n'.allMatches(_codeController.text).length + 1;
     final currentLine = _getCurrentLine();
 
-    const double fontSz = 14.5;
-    const double lineH = 1.5;
+    const double fontSz = 15.0;
+    const double lineH = 1.55;
     const strut = StrutStyle(
       fontFamily: 'monospace',
       fontSize: fontSz,
@@ -1191,7 +1196,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Gutter Line Numbers
           Container(
             width: 48,
             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -1224,8 +1228,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               }),
             ),
           ),
-
-          // Code Text Area with Highlight Selection & Smart Keyboard Handlers
           Expanded(
             child: Focus(
               focusNode: _editorFocusNode,
@@ -1336,8 +1338,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ),
                   if (!passed) ...[
                     const SizedBox(height: 6),
-                    Text("EXPECTED: ${t['expected']}", style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
-                    Text("OUTPUT:   ${t['got']}", style: TextStyle(color: AppColors.sunset, fontSize: 11, fontFamily: 'monospace')),
+                    Text("EXPECTED: ${t['expected']}", style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace')),
+                    Text("OUTPUT:   ${t['got']}", style: TextStyle(color: AppColors.sunset, fontSize: 12, fontFamily: 'monospace')),
                   ]
                 ],
               ),
@@ -1475,7 +1477,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           Expanded(
             child: Text(
               solutionOk ? "QUEST CLEARED! +50 EXP EARNED." : "TESTS FAILED. INSPECT CONSOLE.",
-              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.0),
             ),
           ),
         ],
