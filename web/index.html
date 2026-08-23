@@ -1,28 +1,339 @@
 <!DOCTYPE html>
-<html>
+<html lang="ro">
 <head>
-  <base href="/">
-  <meta name="google-signin-client_id" content="18887176167-nb9g2b5jgk83gfpv01oncs6n2if9j6lr.apps.googleusercontent.com" />
+  <base href="$FLUTTER_BASE_HREF">
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="imeditatii">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="iMeditatii - Învață și predă cu zâmbetul pe buze.">
+
+  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="imeditatii">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="iMeditatii">
+  <meta name="theme-color" content="#5BA8B5">
+
+  <!-- Favicon SVG Pixel Art (Carte & Scânteie) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%235BA8B5'/><rect x='4' y='6' width='24' height='20' fill='%23F9F7F1'/><rect x='6' y='8' width='20' height='16' fill='%23FFFFFF'/><path d='M15 8 h2 v16 h-2 z M8 12 h5 v2 h-5 z M19 12 h5 v2 h-5 z M8 16 h4 v2 h-4 z M19 16 h4 v2 h-4 z' fill='%232C363F'/><rect x='14' y='3' width='4' height='4' fill='%23EAB334'/></svg>">
+
   <title>iMeditatii</title>
-
-  <!-- ✅ Material Icons Fonts (obligatorii pentru iconițe Flutter Web) -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&display=swap" rel="stylesheet">
-
-  <!-- Manifest -->
   <link rel="manifest" href="manifest.json">
-  <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.2.js"></script>
-  <script src="https://download.agora.io/sdk/release/iris-web-rtc_n450_w4220_0.8.6.js"></script>
-</head>
 
+  <!-- Google Fonts VT323 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #5BA8B5;
+      font-family: 'VT323', monospace;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    #retro-sky-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: linear-gradient(180deg, #74C7D5 0%, #8ED6DC 40%, #BFE7EA 70%, #5BA8B5 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+
+    /* Pixel Texture Grid */
+    .pixel-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px);
+      background-size: 16px 16px;
+      pointer-events: none;
+    }
+
+    /* Animated Floating Clouds */
+    .cloud {
+      position: absolute;
+      background: #FFFFFF;
+      border: 3px solid #2C363F;
+      box-shadow: 4px 4px 0px rgba(44, 54, 63, 0.2);
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: #FFFFFF;
+      border: 3px solid #2C363F;
+    }
+
+    .cloud-1 {
+      width: 90px;
+      height: 28px;
+      top: 15%;
+      left: -120px;
+      animation: floatLeftToRight 22s linear infinite;
+    }
+    .cloud-1::before {
+      width: 38px;
+      height: 28px;
+      top: -16px;
+      left: 16px;
+      border-bottom: none;
+    }
+    .cloud-1::after {
+      width: 28px;
+      height: 20px;
+      top: -10px;
+      left: 46px;
+      border-bottom: none;
+    }
+
+    .cloud-2 {
+      width: 120px;
+      height: 32px;
+      top: 28%;
+      left: -150px;
+      animation: floatLeftToRight 28s linear infinite 8s;
+      opacity: 0.9;
+    }
+    .cloud-2::before {
+      width: 50px;
+      height: 36px;
+      top: -20px;
+      left: 20px;
+      border-bottom: none;
+    }
+    .cloud-2::after {
+      width: 34px;
+      height: 24px;
+      top: -14px;
+      left: 64px;
+      border-bottom: none;
+    }
+
+    .cloud-3 {
+      width: 80px;
+      height: 24px;
+      top: 10%;
+      left: -100px;
+      animation: floatLeftToRight 19s linear infinite 14s;
+    }
+    .cloud-3::before {
+      width: 32px;
+      height: 24px;
+      top: -14px;
+      left: 12px;
+      border-bottom: none;
+    }
+
+    @keyframes floatLeftToRight {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(calc(100vw + 250px)); }
+    }
+
+    /* Central Retro Card */
+    .retro-card {
+      position: relative;
+      z-index: 10;
+      background-color: #F9F7F1;
+      border: 3.5px solid #2C363F;
+      box-shadow: 6px 6px 0px #2C363F;
+      padding: 36px 40px;
+      width: 90%;
+      max-width: 440px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-container {
+      background-color: #EAB334;
+      border: 3px solid #2C363F;
+      padding: 8px 24px;
+      box-shadow: 3px 3px 0px #2C363F;
+      margin-bottom: 18px;
+      transform: rotate(-1deg);
+    }
+
+    .logo-text {
+      color: #2C363F;
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .subtitle {
+      color: #2C363F;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+    }
+
+    /* Calming Retro Progress Bar */
+    .progress-bar-border {
+      width: 100%;
+      height: 24px;
+      background: #E2DFD2;
+      border: 2.5px solid #2C363F;
+      padding: 2px;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #5BA8B5, #3C7A61);
+      animation: loadSmooth 2.2s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+    }
+
+    @keyframes loadSmooth {
+      0% { width: 4%; }
+      35% { width: 45%; }
+      70% { width: 82%; }
+      100% { width: 100%; }
+    }
+
+    .loading-hint {
+      margin-top: 14px;
+      font-size: 16px;
+      color: #718093;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .dot-flashing {
+      display: inline-block;
+      animation: dots 1.4s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Animated Gentle Waves at Bottom */
+    .ocean {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background-repeat: repeat-x;
+    }
+
+    .wave-back {
+      background-image: radial-gradient(circle at 25px 0, transparent 24px, #4B98A6 25px);
+      background-size: 50px 100px;
+      opacity: 0.6;
+      animation: waveMove 8s linear infinite;
+    }
+
+    .wave-mid {
+      background-image: radial-gradient(circle at 35px 0, transparent 34px, #3B8493 35px);
+      background-size: 70px 120px;
+      opacity: 0.8;
+      bottom: -15px;
+      animation: waveMoveReverse 12s linear infinite;
+    }
+
+    .wave-front {
+      background-image: radial-gradient(circle at 45px 0, transparent 44px, #2C6B78 45px);
+      background-size: 90px 140px;
+      bottom: -30px;
+      animation: waveMove 16s linear infinite;
+    }
+
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes waveMoveReverse {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+
+    .fade-out {
+      opacity: 0 !important;
+      transform: translateY(-8px) scale(0.98);
+      pointer-events: none !important;
+    }
+  </style>
+</head>
 <body>
-<script src="flutter_bootstrap.js" async></script>
+  <div id="retro-sky-loader">
+    <div class="pixel-grid"></div>
+
+    <!-- Floating Clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+
+    <!-- Center Card -->
+    <div class="retro-card">
+      <div class="logo-container">
+        <div class="logo-text">iMEDITATII</div>
+      </div>
+      <div class="subtitle">PREGĂTIM AVENTURA TA...</div>
+      
+      <div class="progress-bar-border">
+        <div class="progress-bar-fill"></div>
+      </div>
+
+      <div class="loading-hint">SE ÎNCARCĂ LUMEA VIRTUALĂ</div>
+    </div>
+
+    <!-- Bottom Layered Waves -->
+    <div class="ocean">
+      <div class="wave wave-back"></div>
+      <div class="wave wave-mid"></div>
+      <div class="wave wave-front"></div>
+    </div>
+  </div>
+
+  <script>
+    // Asigură că ecranul plăcut durează minim 2.2 secunde înainte de tranziție
+    const minDelayPromise = new Promise(resolve => setTimeout(resolve, 2200));
+    
+    const flutterReadyPromise = new Promise(resolve => {
+      window.addEventListener('flutter-first-frame', resolve, { once: true });
+    });
+
+    Promise.all([minDelayPromise, flutterReadyPromise]).then(() => {
+      const loader = document.getElementById('retro-sky-loader');
+      if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => loader.remove(), 550);
+      }
+    });
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
