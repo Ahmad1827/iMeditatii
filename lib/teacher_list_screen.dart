@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'theme_manager.dart';
 import 'app_colors.dart';
@@ -53,6 +54,7 @@ class RetroButton extends StatefulWidget {
   final Color? textColor;
   final bool isFullWidth;
   final IconData? icon;
+  final double fontSize;
 
   const RetroButton({
     super.key,
@@ -62,6 +64,7 @@ class RetroButton extends StatefulWidget {
     this.textColor,
     this.isFullWidth = false,
     this.icon,
+    this.fontSize = 14,
   });
 
   @override
@@ -75,7 +78,7 @@ class _RetroButtonState extends State<RetroButton> {
   @override
   Widget build(BuildContext context) {
     final effectiveBg = widget.bgColor ?? AppColors.sunset;
-    final effectiveText = widget.textColor ?? Colors.white;
+    final effectiveTextColor = widget.textColor ?? Colors.white;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -92,37 +95,37 @@ class _RetroButtonState extends State<RetroButton> {
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
             color: effectiveBg,
-            border: Border.all(color: AppColors.border, width: 3),
+            border: Border.all(color: AppColors.border, width: 2.5),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: effectiveText, size: 20),
-                const SizedBox(width: 8),
+                Icon(widget.icon, color: effectiveTextColor, size: widget.fontSize + 2),
+                const SizedBox(width: 6),
               ],
               Text(
                 widget.text.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: effectiveText,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  color: effectiveTextColor,
+                  fontSize: widget.fontSize,
+                  fontWeight: FontWeight.w900,
                   letterSpacing: 1.0,
                 ),
               ),
@@ -137,156 +140,235 @@ class _RetroButtonState extends State<RetroButton> {
 class TeacherListScreen extends StatefulWidget {
   final Map<String, dynamic> specialization;
 
-  const TeacherListScreen({required this.specialization, super.key});
+  const TeacherListScreen({super.key, required this.specialization});
 
   @override
   State<TeacherListScreen> createState() => _TeacherListScreenState();
 }
 
 class _TeacherListScreenState extends State<TeacherListScreen> {
-  Future<void> _handleMessageTap(BuildContext context, String teacherId, String teacherName) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('LOGIN REQUIRED FOR COMMS.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-          backgroundColor: AppColors.sunset,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
-        ),
-      );
-      return;
-    }
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchCtrl = TextEditingController();
+  final currentUser = FirebaseAuth.instance.currentUser;
 
-    if (currentUser.uid == teacherId) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('INVALID TARGET: SELF.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-          backgroundColor: AppColors.mustard,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
-        ),
-      );
-      return;
-    }
+  String _searchFilter = '';
 
-    final currentUserId = currentUser.uid;
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
 
-    final chatQuery = await FirebaseFirestore.instance
+  String get _subjectName => widget.specialization['name']?.toString() ?? 'DISCIPLINE';
+
+  IconData _getSubjectIcon(String subject) {
+    final s = subject.toLowerCase();
+    if (s.contains('matemat')) return Icons.functions;
+    if (s.contains('info')) return Icons.data_object;
+    if (s.contains('fizic')) return Icons.bolt;
+    if (s.contains('chim')) return Icons.science;
+    if (s.contains('bio')) return Icons.eco;
+    if (s.contains('român')) return Icons.menu_book;
+    if (s.contains('englez') || s.contains('francez')) return Icons.language;
+    if (s.contains('istorie')) return Icons.account_balance;
+    if (s.contains('geograf')) return Icons.public;
+    return Icons.school;
+  }
+
+  Future<String> _openOrCreateChat(BuildContext context, String teacherId, String teacherName) async {
+    final currentUid = currentUser!.uid;
+    final firestore = FirebaseFirestore.instance;
+
+    final currentUserDoc = await firestore.collection('users').doc(currentUid).get();
+    final studentName = currentUserDoc.data()?['name'] ?? 'Elev';
+
+    final existingChats = await firestore
         .collection('chats')
         .where('teacherId', isEqualTo: teacherId)
-        .where('studentId', isEqualTo: currentUserId)
+        .where('studentId', isEqualTo: currentUid)
         .limit(1)
         .get();
 
-    String chatId;
-
-    if (chatQuery.docs.isNotEmpty) {
-      chatId = chatQuery.docs.first.id;
-    } else {
-      final newChat = await FirebaseFirestore.instance.collection('chats').add({
-        'teacherId': teacherId,
-        'teacherName': teacherName,
-        'studentId': currentUser.uid,
-        'studentName': currentUser.displayName ?? 'PLAYER',
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-        'lastMessage': '',
-        'isEnded': false,
-        'isSessionPaid': false,
-        'isStudentAccepted': false,
-      });
-      chatId = newChat.id;
+    if (existingChats.docs.isNotEmpty) {
+      return existingChats.docs.first.id;
     }
 
-    if (mounted) {
-      context.go('/chat/$chatId', extra: teacherName);
-    }
+    final newChat = await firestore.collection('chats').add({
+      'teacherId': teacherId,
+      'teacherName': teacherName,
+      'studentId': currentUid,
+      'studentName': studentName,
+      'isEnded': false,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    return newChat.id;
   }
 
-  Widget _buildNavbar() {
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 880;
+
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Scrollbar(
+                      controller: _scrollController,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        physics: const ClampingScrollPhysics(),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildHeader(isMobile),
+                                const SizedBox(height: 28),
+                                Expanded(
+                                  child: _buildTeachersList(isMobile),
+                                ),
+                                const SizedBox(height: 48),
+                                _buildFooter(isMobile),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(bool isMobile) {
     return Container(
-      height: 90,
-      decoration: BoxDecoration(
-        color: AppColors.bg,
-        border: Border(bottom: BorderSide(color: AppColors.border, width: 3)),
-      ),
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(24, isMobile ? 20 : 32, 24, 0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          constraints: const BoxConstraints(maxWidth: 1120),
+          child: RetroBlock(
+            bgColor: AppColors.mustard,
+            padding: isMobile ? 20 : 28,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => context.go('/'),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.sunset,
-                            border: Border.all(color: AppColors.border, width: 2),
-                          ),
-                          child: const Icon(Icons.school, color: Colors.white, size: 28),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          'IMEDITATII',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.ink,
-                            letterSpacing: 2.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 Row(
                   children: [
+                    // Centered Back Button
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
                         onTap: () => context.go('/materii'),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          width: 44,
+                          height: 44,
                           decoration: BoxDecoration(
-                            color: AppColors.mustard,
-                            border: Border.all(color: AppColors.border, width: 2),
+                            color: AppColors.cardBg,
+                            border: Border.all(color: AppColors.border, width: 2.5),
+                            boxShadow: [
+                              BoxShadow(color: AppColors.shadow, offset: const Offset(2.5, 2.5)),
+                            ],
                           ),
-                          child: Text(
-                            "GUILD MASTERS",
+                          alignment: Alignment.center,
+                          child: Icon(Icons.arrow_back, color: AppColors.ink, size: 22),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Subject Icon Container
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.cardBg,
+                        border: Border.all(color: AppColors.border, width: 2.5),
+                        boxShadow: [
+                          BoxShadow(color: AppColors.shadow, offset: const Offset(2.5, 2.5)),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(_getSubjectIcon(_subjectName), color: AppColors.ink, size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "AVAILABLE MASTERS",
                             style: TextStyle(
-                              color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.5,
+                              color: AppColors.isDark ? const Color(0xFF10161A).withOpacity(0.8) : AppColors.ink.withOpacity(0.8),
                             ),
                           ),
-                        ),
+                          Text(
+                            _subjectName.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: isMobile ? 22 : 30,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () => context.go('/exercitii'),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Text(
-                            "DAILY QUESTS",
-                            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Search Input inside Header
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBg,
+                    border: Border.all(color: AppColors.border, width: 2.5),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search, color: AppColors.ink, size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchCtrl,
+                          onChanged: (val) => setState(() => _searchFilter = val.trim()),
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.ink),
+                          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                          decoration: InputDecoration(
+                            hintText: "SEARCH MENTOR BY NAME...",
+                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.bold),
+                            border: InputBorder.none,
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Container(width: 3, height: 32, color: AppColors.border),
-                    const SizedBox(width: 16),
-                    _buildAuthActions(),
-                  ],
+                      if (_searchFilter.isNotEmpty)
+                        IconButton(
+                          icon: Icon(Icons.clear, color: AppColors.ink, size: 18),
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setState(() => _searchFilter = '');
+                          },
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -296,282 +378,157 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     );
   }
 
-  Widget _buildAuthActions() {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: AppColors.sunset, strokeWidth: 3));
-        }
-        final user = snapshot.data;
+  Widget _buildTeachersList(bool isMobile) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 1120),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('teachers').where('active', isEqualTo: true).snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator(color: AppColors.sunset));
+            }
 
-        if (user == null) {
-          return RetroButton(
-            text: 'LOG IN',
-            bgColor: AppColors.cardBg,
-            textColor: AppColors.ink,
-            onPressed: () => context.go('/login'),
-          );
-        }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return _buildEmptyState();
+            }
 
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              onPressed: () async {
-                try {
-                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-                  if (userDoc.exists && mounted) {
-                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
-                    if (role == 'teacher') {
-                      context.go('/panou-profesor');
-                    } else {
-                      context.go('/panou-elev');
+            final allDocs = snapshot.data!.docs;
+
+            final teachers = allDocs.where((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              final sub = data['subject']?.toString().toLowerCase() ?? '';
+              final name = data['name']?.toString().toLowerCase() ?? '';
+
+              final matchesSubject = sub.contains(_subjectName.toLowerCase()) || _subjectName.toLowerCase().contains(sub);
+              final matchesSearch = _searchFilter.isEmpty || name.contains(_searchFilter.toLowerCase());
+
+              return matchesSubject && matchesSearch;
+            }).toList();
+
+            if (teachers.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            return Wrap(
+              spacing: 24,
+              runSpacing: 24,
+              alignment: WrapAlignment.start,
+              children: teachers.map((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                return _TeacherCard(
+                  id: doc.id,
+                  data: data,
+                  onMessage: () async {
+                    if (currentUser == null) {
+                      context.go('/login');
+                      return;
                     }
-                  }
-                } catch (e) {
-                  debugPrint("ERROR: $e");
-                }
-              },
-              icon: Icon(Icons.dashboard, color: AppColors.ink, size: 32),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: () async {
-                try {
-                  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-                  if (userDoc.exists && mounted) {
-                    final role = (userDoc.data() as Map<String, dynamic>)['role'];
-                    if (role == 'teacher') {
-                      context.go('/profesor/${user.uid}');
-                    } else {
-                      context.go('/elev/${user.uid}');
+                    final name = data['name'] ?? 'Profesor';
+                    final chatId = await _openOrCreateChat(context, doc.id, name);
+                    if (context.mounted) {
+                      context.push('/chat/$chatId', extra: name);
                     }
-                  }
-                } catch (e) {
-                  debugPrint("ERROR: $e");
-                }
-              },
-              icon: Icon(Icons.account_box, color: AppColors.ink, size: 32),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.sunset,
-                border: Border.all(color: AppColors.border, width: 2),
-              ),
-              child: IconButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  if (mounted) context.go('/');
-                },
-                icon: const Icon(Icons.logout, color: Colors.white, size: 24),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildHeader(String specName, Color themeColor, IconData themeIcon) {
-    return RetroBlock(
-      bgColor: AppColors.cloud,
-      padding: 40,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: themeColor,
-                  border: Border.all(color: AppColors.border, width: 3),
-                ),
-                child: Icon(themeIcon, color: Colors.white, size: 40),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "AVAILABLE MASTERS",
-                      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: 16),
-                    ),
-                    Text(
-                      specName.toUpperCase(),
-                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  border: Border.all(color: AppColors.border, width: 3),
-                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
-                ),
-                child: IconButton(
-                  onPressed: () => context.pop(),
-                  icon: Icon(Icons.close, size: 32, color: AppColors.ink),
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            "SELECT A MASTER AND INITIATE CONTACT TO SCHEDULE YOUR TRAINING.",
-            style: TextStyle(fontSize: 18, color: AppColors.textMuted, fontWeight: FontWeight.bold),
-          ),
-        ],
+                  },
+                  onViewProfile: () {
+                    context.push('/profesor/${doc.id}');
+                  },
+                );
+              }).toList(),
+            );
+          },
+        ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final specName = widget.specialization['name'] ?? 'DISCIPLINE';
-    final themeColor = widget.specialization['color'] as Color? ?? AppColors.sky;
-    final themeIcon = widget.specialization['icon'] as IconData? ?? Icons.school;
+  Widget _buildEmptyState() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 40),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: AppColors.cloud,
+          border: Border.all(color: AppColors.border, width: 2.5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.person_off, size: 48, color: AppColors.textMuted),
+            const SizedBox(height: 14),
+            Text(
+              "NO GUILD MASTERS REGISTERED YET.",
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 16),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "Check back soon or explore other disciplines.",
+              style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
-            children: [
-              _buildNavbar(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1100),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildHeader(specName, themeColor, themeIcon),
-                          const SizedBox(height: 48),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('teachers')
-                                .where('subject', isEqualTo: specName)
-                                .where('active', isEqualTo: true)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(40),
-                                    child: CircularProgressIndicator(color: AppColors.sunset),
-                                  ),
-                                );
-                              }
-                              if (snapshot.hasError) {
-                                return Center(
-                                  child: Text(
-                                    'ERROR: ${snapshot.error}'.toUpperCase(),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset),
-                                  ),
-                                );
-                              }
-
-                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                return RetroBlock(
-                                  bgColor: AppColors.cardBg,
-                                  padding: 60,
-                                  child: Column(
-                                    children: [
-                                      Icon(Icons.search_off, size: 80, color: AppColors.ink),
-                                      const SizedBox(height: 24),
-                                      Text(
-                                        "NO MASTERS AVAILABLE YET.",
-                                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        "AWAITING GUILD APPROVALS FOR THIS DISCIPLINE.",
-                                        style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-
-                              final docs = snapshot.data!.docs;
-
-                              return GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 500,
-                                  mainAxisSpacing: 32,
-                                  crossAxisSpacing: 32,
-                                  childAspectRatio: 1.0,
-                                ),
-                                itemCount: docs.length,
-                                itemBuilder: (context, index) {
-                                  final data = docs[index].data()! as Map<String, dynamic>;
-                                  final teacherId = docs[index].id;
-                                  final price = data['price']?.toString() ?? '50';
-
-                                  return _RetroTeacherCard(
-                                    data: data,
-                                    teacherId: teacherId,
-                                    price: price,
-                                    themeColor: themeColor,
-                                    onMessageTap: () => _handleMessageTap(context, teacherId, data['name'] ?? 'MASTER'),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+  Widget _buildFooter(bool isMobile) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 28 : 36),
+      decoration: BoxDecoration(
+        color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
+        border: Border(top: BorderSide(color: AppColors.border, width: 3)),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'IMEDITATII // MASTERS',
+              style: TextStyle(fontSize: isMobile ? 24 : 30, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'LEVEL UP YOUR KNOWLEDGE WITH 1-ON-1 SESSIONS.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 12 : 14, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class _RetroTeacherCard extends StatefulWidget {
+class _TeacherCard extends StatefulWidget {
+  final String id;
   final Map<String, dynamic> data;
-  final String teacherId;
-  final String price;
-  final Color themeColor;
-  final VoidCallback onMessageTap;
+  final VoidCallback onMessage;
+  final VoidCallback onViewProfile;
 
-  const _RetroTeacherCard({
+  const _TeacherCard({
+    required this.id,
     required this.data,
-    required this.teacherId,
-    required this.price,
-    required this.themeColor,
-    required this.onMessageTap,
+    required this.onMessage,
+    required this.onViewProfile,
   });
 
   @override
-  State<_RetroTeacherCard> createState() => _RetroTeacherCardState();
+  State<_TeacherCard> createState() => _TeacherCardState();
 }
 
-class _RetroTeacherCardState extends State<_RetroTeacherCard> {
+class _TeacherCardState extends State<_TeacherCard> {
   bool _isHovering = false;
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = widget.data['image'] ?? '';
-    final name = widget.data['name'] ?? 'UNKNOWN';
-    final experience = widget.data['experience'] ?? '0';
-    final education = widget.data['education'] ?? '';
+    final name = widget.data['name'] ?? 'PROFESOR';
+    final image = widget.data['image'] as String?;
+    final exp = widget.data['experience']?.toString() ?? '1';
+    final price = widget.data['price']?.toString() ?? '50';
+    final subject = widget.data['subject']?.toString() ?? 'GENERAL';
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -579,13 +536,17 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
       onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
         onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          widget.onViewProfile();
+        },
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
+          width: 340,
           transform: Matrix4.translationValues(
-            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
-            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
+            _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
+            _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -594,140 +555,141 @@ class _RetroTeacherCardState extends State<_RetroTeacherCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(8, 8),
+                offset: _isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
-              )
+              ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+              // Avatar & Details Header
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        color: AppColors.cloud,
+                        border: Border.all(color: AppColors.border, width: 2.5),
+                        image: image != null && image.isNotEmpty
+                            ? DecorationImage(image: CachedNetworkImageProvider(image), fit: BoxFit.cover)
+                            : null,
+                      ),
+                      child: image == null || image.isEmpty
+                          ? Icon(Icons.person, size: 40, color: AppColors.ink)
+                          : null,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: widget.themeColor,
-                              border: Border.all(color: AppColors.border, width: 3),
-                              image: imageUrl.isNotEmpty
-                                  ? DecorationImage(
-                                      image: NetworkImage(imageUrl),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                            child: imageUrl.isEmpty
-                                ? Icon(Icons.person, size: 40, color: AppColors.ink)
-                                : null,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppColors.mustard,
-                              border: Border.all(color: AppColors.border, width: 2),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  '${widget.price} RON',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 18,
-                                    color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                                  ),
-                                ),
-                                Text(
-                                  '/ HOUR',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        name.toString().toUpperCase(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 24,
-                          color: AppColors.ink,
-                          letterSpacing: 1.0,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Icon(Icons.military_tech, size: 24, color: AppColors.ink),
-                          const SizedBox(width: 8),
-                          Text(
-                            '$experience YEARS EXP.',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (education.isNotEmpty)
-                        Row(
-                          children: [
-                            Icon(Icons.school, size: 24, color: AppColors.ink),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                education.toString().toUpperCase(),
-                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            color: AppColors.sky,
+                            child: Text(
+                              subject.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                letterSpacing: 0.8,
                               ),
                             ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(height: 3, color: AppColors.border),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: RetroButton(
-                        text: 'PROFILE',
-                        bgColor: AppColors.cloud,
-                        textColor: AppColors.ink,
-                        onPressed: () => context.go('/profesor/${widget.teacherId}'),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: RetroButton(
-                        text: 'MESSAGE',
-                        icon: Icons.send,
-                        bgColor: widget.themeColor,
-                        textColor: Colors.white,
-                        onPressed: widget.onMessageTap,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            name.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.ink,
+                              letterSpacing: 0.8,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.military_tech, size: 16, color: AppColors.sunset),
+                              const SizedBox(width: 4),
+                              Text(
+                                "$exp ${int.tryParse(exp) == 1 ? 'AN' : 'ANI'} EXPERIENȚĂ",
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
+              Container(height: 2, color: AppColors.border),
+              // Hourly Rate Strip
+              Container(
+                color: AppColors.cloud,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "HOURLY BOUNTY:",
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 1.0),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.mustard,
+                        border: Border.all(color: AppColors.border, width: 1.5),
+                      ),
+                      child: Text(
+                        "$price RON / HR",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(height: 2, color: AppColors.border),
+              // Actions
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: RetroButton(
+                        text: "PROFILE",
+                        bgColor: AppColors.cardBg,
+                        textColor: AppColors.ink,
+                        fontSize: 12,
+                        onPressed: widget.onViewProfile,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      flex: 2,
+                      child: RetroButton(
+                        text: "INITIATE COMMS",
+                        icon: Icons.send,
+                        bgColor: AppColors.forest,
+                        textColor: Colors.white,
+                        fontSize: 12,
+                        onPressed: widget.onMessage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

@@ -50,6 +50,7 @@ class RetroButton extends StatefulWidget {
   final Color? bgColor;
   final Color? textColor;
   final bool isFullWidth;
+  final IconData? icon;
 
   const RetroButton({
     super.key,
@@ -58,6 +59,7 @@ class RetroButton extends StatefulWidget {
     this.bgColor,
     this.textColor,
     this.isFullWidth = false,
+    this.icon,
   });
 
   @override
@@ -88,8 +90,8 @@ class _RetroButtonState extends State<RetroButton> {
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -2.0 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -98,21 +100,31 @@ class _RetroButtonState extends State<RetroButton> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          child: Text(
-            widget.text.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: effectiveText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, color: effectiveText, size: 18),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                widget.text.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: effectiveText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -139,10 +151,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget _buildConstrainedSection({required Widget child, EdgeInsetsGeometry? padding}) {
     return Container(
       width: double.infinity,
-      padding: padding ?? const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: const BoxConstraints(maxWidth: 1120),
           child: child,
         ),
       ),
@@ -150,120 +162,216 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   }
 
   Widget _heroSection() {
-    final isWide = MediaQuery.of(context).size.width > 800;
+    final isWide = MediaQuery.of(context).size.width > 880;
 
     return _buildConstrainedSection(
-      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
       child: RetroBlock(
         bgColor: AppColors.mustard,
-        padding: isWide ? 60 : 32,
-        child: Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        padding: isWide ? 36 : 24,
+        child: isWide
+            ? IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(flex: 3, child: _heroLeftContent(isWide)),
+                    const SizedBox(width: 32),
+                    Expanded(flex: 2, child: _buildRegistryCard()),
+                  ],
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBg,
-                      border: Border.all(color: AppColors.border, width: 2),
-                    ),
-                    child: Text(
-                      'STUDY ZONE',
-                      style: TextStyle(
-                        color: AppColors.ink,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        letterSpacing: 2.0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    "PRACTICE SMART.\nLEVEL UP DAILY.",
-                    style: TextStyle(
-                      fontSize: isWide ? 56 : 40,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.ink,
-                      height: 1.1,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
+                  _heroLeftContent(isWide),
                   const SizedBox(height: 24),
-                  Text(
-                    "Select a discipline to master. The system tracks your progress and validates your answers in real-time.",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: AppColors.ink,
-                      fontWeight: FontWeight.bold,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  RetroButton(
-                    text: "INITIATE MATHEMATICS",
-                    bgColor: AppColors.forest,
-                    textColor: Colors.white,
-                    onPressed: () {
-                      final encodedSubj = Uri.encodeComponent("Matematică");
-                      context.go('/lista-exercitii?materie=$encodedSubj');
-                    },
-                  ),
+                  _buildRegistryCard(),
                 ],
               ),
-            ),
-            if (isWide) ...[
-              const SizedBox(width: 60),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 280,
+      ),
+    );
+  }
+
+  Widget _heroLeftContent(bool isWide) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   decoration: BoxDecoration(
-                    color: AppColors.cloud,
-                    border: Border.all(color: AppColors.border, width: 4),
-                    boxShadow: [
-                      BoxShadow(color: AppColors.shadow, offset: const Offset(8, 8)),
+                    color: AppColors.cardBg,
+                    border: Border.all(color: AppColors.border, width: 2),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      Text(
+                        'TRAINING ARENA',
+                        style: TextStyle(
+                          color: AppColors.ink,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                     ],
                   ),
-                  child: Center(
-                    child: Icon(Icons.rocket_launch, size: 120, color: AppColors.sunset),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  color: AppColors.sunset,
+                  child: const Text(
+                    "+50 EXP BOOST",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.0),
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "PRACTICE SMART.\nLEVEL UP DAILY.",
+              style: TextStyle(
+                fontSize: isWide ? 44 : 32,
+                fontWeight: FontWeight.w900,
+                color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                height: 1.1,
+                letterSpacing: 1.0,
               ),
-            ]
+            ),
+            const SizedBox(height: 14),
+            Text(
+              "Selectează o disciplină. Suita automată de teste îți validează codul C++ și răspunsurile în timp real.",
+              style: TextStyle(
+                fontSize: isWide ? 16 : 15,
+                color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                fontWeight: FontWeight.bold,
+                height: 1.5,
+              ),
+            ),
           ],
         ),
+        const SizedBox(height: 28),
+        RetroButton(
+          text: "QUICK START: INFORMATICĂ",
+          icon: Icons.code,
+          bgColor: AppColors.forest,
+          textColor: Colors.white,
+          onPressed: () {
+            final encodedSubj = Uri.encodeComponent("Informatică");
+            context.go('/lista-exercitii?materie=$encodedSubj');
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegistryCard() {
+    return RetroBlock(
+      bgColor: AppColors.cardBg,
+      padding: 24,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "ARENA REGISTRY",
+                    style: TextStyle(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  Icon(Icons.shield, color: AppColors.forest, size: 22),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.cloud,
+                  border: Border.all(color: AppColors.border, width: 2),
+                ),
+                child: Column(
+                  children: [
+                    _registryRow("ACTIVE QUESTS", "50+ PROBLEMS"),
+                    const SizedBox(height: 8),
+                    _registryRow("EVALUATION", "JUDGE0 (C++20)"),
+                    const SizedBox(height: 8),
+                    _registryRow("FEEDBACK", "INSTANT (TESTS)"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, color: AppColors.forest, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  "READY FOR EVALUATION",
+                  style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _registryRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(value, style: TextStyle(color: AppColors.ink, fontSize: 12, fontWeight: FontWeight.w900)),
+      ],
     );
   }
 
   Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 40),
+      padding: const EdgeInsets.only(bottom: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
             child: const Text(
-              "AVAILABLE PATHS",
+              "TRAINING TRACKS",
               style: TextStyle(
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+                fontSize: 12,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Text(
             title.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 40,
+              fontSize: 32,
               fontWeight: FontWeight.w900,
               color: AppColors.ink,
               letterSpacing: 1.5,
@@ -276,25 +384,26 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
 
   Widget _materiiSection() {
     final List<Map<String, dynamic>> materii = [
-      {"icon": Icons.functions, "title": "Matematică", "color": AppColors.sunset},
-      {"icon": Icons.menu_book, "title": "Limba Română", "color": AppColors.sky},
-      {"icon": Icons.language, "title": "Engleză", "color": AppColors.mustard},
-      {"icon": Icons.data_object, "title": "Informatică", "color": AppColors.forest},
-      {"icon": Icons.bolt, "title": "Fizică", "color": AppColors.sunset},
-      {"icon": Icons.science, "title": "Chimie", "color": AppColors.sky},
+      {"icon": Icons.functions, "title": "Matematică", "color": AppColors.sunset, "tag": "ALGEBRĂ & GEOMETRIE"},
+      {"icon": Icons.menu_book, "title": "Limba Română", "color": AppColors.sky, "tag": "GRAMATICĂ & LITERATURĂ"},
+      {"icon": Icons.language, "title": "Engleză", "color": AppColors.mustard, "tag": "GRAMMAR & VOCAB"},
+      {"icon": Icons.data_object, "title": "Informatică", "color": AppColors.forest, "tag": "ALGORITMI & C++"},
+      {"icon": Icons.bolt, "title": "Fizică", "color": AppColors.sunset, "tag": "MECANICĂ & OPTICĂ"},
+      {"icon": Icons.science, "title": "Chimie", "color": AppColors.sky, "tag": "ANORGANICĂ & ORGANICĂ"},
     ];
 
     return _buildConstrainedSection(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
       child: Wrap(
-        spacing: 32,
-        runSpacing: 32,
+        spacing: 24,
+        runSpacing: 24,
         alignment: WrapAlignment.center,
         children: materii.map((m) {
           return _MaterieCard(
             title: m["title"] as String,
             icon: m["icon"] as IconData,
             color: m["color"] as Color,
+            tag: m["tag"] as String,
             onTap: () {
               final encodedSubj = Uri.encodeComponent(m["title"] as String);
               context.go('/lista-exercitii?materie=$encodedSubj');
@@ -308,7 +417,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget _buildFooter() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 44),
       decoration: BoxDecoration(
         color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
         border: Border(top: BorderSide(color: AppColors.border, width: 3)),
@@ -316,9 +425,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
       child: Center(
         child: Column(
           children: [
-            const Text('IMEDITATII', style: TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Text('© 2024 - 2025. Level up your learning.', style: TextStyle(color: AppColors.cloud, fontSize: 22)),
+            const Text('IMEDITATII // ARENA', style: TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
+            const SizedBox(height: 8),
+            Text('LEVEL UP YOUR LOGIC. CONQUER THE CURRICULUM.', style: TextStyle(color: AppColors.cloud, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
           ],
         ),
       ),
@@ -346,7 +455,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                       children: [
                         _heroSection(),
                         _buildConstrainedSection(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                           child: Column(
                             children: [
                               _sectionTitle("Select Discipline"),
@@ -354,7 +463,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 80),
+                        const SizedBox(height: 48),
                         _buildFooter(),
                       ],
                     ),
@@ -373,12 +482,14 @@ class _MaterieCard extends StatefulWidget {
   final String title;
   final IconData icon;
   final Color color;
+  final String tag;
   final VoidCallback onTap;
 
   const _MaterieCard({
     required this.title,
     required this.icon,
     required this.color,
+    required this.tag,
     required this.onTap,
   });
 
@@ -392,6 +503,9 @@ class _MaterieCardState extends State<_MaterieCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isMustard = widget.color == AppColors.mustard;
+    final cardTextColor = isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovering = true),
@@ -405,10 +519,10 @@ class _MaterieCardState extends State<_MaterieCard> {
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          width: 280,
+          width: 310,
           transform: Matrix4.translationValues(
-            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
-            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
+            _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
+            _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -417,7 +531,7 @@ class _MaterieCardState extends State<_MaterieCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(8, 8),
+                offset: _isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
               ),
             ],
@@ -427,30 +541,46 @@ class _MaterieCardState extends State<_MaterieCard> {
             children: [
               Container(
                 color: AppColors.cardBg,
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Icon(widget.icon, size: 80, color: AppColors.ink),
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.cloud,
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: Icon(widget.icon, size: 48, color: AppColors.ink),
+                  ),
+                ),
               ),
-              Container(
-                height: 3,
-                color: AppColors.border,
-              ),
+              Container(height: 2.5, color: AppColors.border),
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.title.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 24,
+                      widget.tag,
+                      style: TextStyle(
+                        fontSize: 10,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: isMustard && AppColors.isDark ? const Color(0xFF10161A).withOpacity(0.7) : Colors.white70,
                         letterSpacing: 1.0,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.title.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: cardTextColor,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.cardBg,
                         border: Border.all(color: AppColors.border, width: 2),
@@ -459,16 +589,16 @@ class _MaterieCardState extends State<_MaterieCard> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            "START",
+                            "ENTER ARENA",
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
                               color: AppColors.ink,
-                              letterSpacing: 1.5,
+                              letterSpacing: 1.0,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Icon(Icons.play_arrow, size: 20, color: AppColors.ink),
+                          const SizedBox(width: 6),
+                          Icon(Icons.play_arrow, size: 14, color: AppColors.ink),
                         ],
                       ),
                     ),

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,7 +56,10 @@ class RetroButton extends StatefulWidget {
   final Color? bgColor;
   final Color? textColor;
   final bool isFullWidth;
+  final bool isLoading;
   final IconData? icon;
+  final double fontSize;
+  final EdgeInsets padding;
 
   const RetroButton({
     super.key,
@@ -67,7 +68,10 @@ class RetroButton extends StatefulWidget {
     this.bgColor,
     this.textColor,
     this.isFullWidth = false,
+    this.isLoading = false,
     this.icon,
+    this.fontSize = 14,
+    this.padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
   });
 
   @override
@@ -88,52 +92,60 @@ class _RetroButtonState extends State<RetroButton> {
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
-        onTapDown: (_) => setState(() => isPressed = true),
-        onTapUp: (_) {
-          setState(() => isPressed = false);
-          widget.onPressed();
-        },
+        onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
+        onTapUp: widget.isLoading
+            ? null
+            : (_) {
+                setState(() => isPressed = false);
+                widget.onPressed();
+              },
         onTapCancel: () => setState(() => isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
-            color: effectiveBg,
-            border: Border.all(color: AppColors.border, width: 3),
+            color: widget.isLoading ? Colors.grey : effectiveBg,
+            border: Border.all(color: AppColors.border, width: 2.5),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.icon != null) ...[
-                Icon(widget.icon, color: effectiveTextColor, size: 20),
-                const SizedBox(width: 8),
-              ],
-              Text(
-                widget.text.toUpperCase(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: effectiveTextColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+          padding: widget.padding,
+          child: widget.isLoading
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon, color: effectiveTextColor, size: widget.fontSize + 2),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      widget.text.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: effectiveTextColor,
+                        fontSize: widget.fontSize,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -145,13 +157,14 @@ class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key, required this.userId});
 
   @override
-  _UserProfileScreenState createState() => _UserProfileScreenState();
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   final _picker = ImagePicker();
+  final ScrollController _scrollController = ScrollController();
 
   bool _uploading = false;
   bool _loading = false;
@@ -166,6 +179,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _loadUserProfile();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _showSnackbar(String message, {bool isError = false}) {
@@ -211,7 +230,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (doc.exists) {
       final data = doc.data()!;
       _name = data['name'] ?? 'PLAYER';
-      _bio = data['bio'] ?? 'NO BIO PROVIDED.';
+      _bio = data['bio'] ?? 'Gata să cucerească quest-urile zilnice și să acumuleze EXP.';
       _contact = data['contact'] ?? 'N/A';
       _imageUrl = data['image'];
     }
@@ -296,7 +315,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             text: 'CONFIRM',
             bgColor: AppColors.sky,
             textColor: Colors.white,
-            onPressed: () { if (formKey.currentState!.validate()) context.pop(true); },
+            onPressed: () {
+              if (formKey.currentState!.validate()) context.pop(true);
+            },
           ),
         ],
       ),
@@ -314,176 +335,296 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Widget _buildHeroCard(bool isCurrentUser, bool isMobile) {
-    return RetroBlock(
-      bgColor: AppColors.cardBg,
-      padding: isMobile ? 24 : 32,
-      child: isMobile
-          ? Column(
-              children: [
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: AppColors.cloud,
-                        border: Border.all(color: AppColors.border, width: 3),
-                        image: _imageUrl != null && _imageUrl!.isNotEmpty ? DecorationImage(image: CachedNetworkImageProvider(_imageUrl!), fit: BoxFit.cover) : null,
-                      ),
-                      child: _imageUrl == null || _imageUrl!.isEmpty ? Icon(Icons.person, size: 60, color: AppColors.ink) : null,
-                    ),
-                    if (isCurrentUser)
-                      GestureDetector(
-                        onTap: _uploading ? null : _pickImage,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: AppColors.ink, border: Border.all(color: AppColors.border, width: 2)),
-                          child: _uploading
-                              ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                              : Icon(Icons.camera_alt, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 14),
+  IconData _getSubjectIcon(String subject) {
+    final s = subject.toLowerCase();
+    if (s.contains('matemat')) return Icons.functions;
+    if (s.contains('info')) return Icons.data_object;
+    if (s.contains('fizic')) return Icons.bolt;
+    if (s.contains('chim')) return Icons.science;
+    if (s.contains('român')) return Icons.menu_book;
+    if (s.contains('englez')) return Icons.language;
+    return Icons.school;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isCurrentUser = widget.userId == _auth.currentUser?.uid;
+    final isMobile = MediaQuery.of(context).size.width < 900;
+
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeManager.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: _loading
+                    ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
+                    : Scrollbar(
+                        controller: _scrollController,
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          physics: const ClampingScrollPhysics(),
+                          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 32),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 1080),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (!isMobile)
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Left Column: Player Identity Card
+                                        SizedBox(
+                                          width: 330,
+                                          child: _buildIdentityCard(isCurrentUser),
+                                        ),
+                                        const SizedBox(width: 24),
+                                        // Right Column: Progression & Security
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            children: [
+                                              _buildStatsHUD(),
+                                              const SizedBox(height: 20),
+                                              _buildProgressSection(),
+                                              if (isCurrentUser) ...[
+                                                const SizedBox(height: 20),
+                                                _buildSettingsSection(),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        _buildIdentityCard(isCurrentUser),
+                                        const SizedBox(height: 20),
+                                        _buildStatsHUD(),
+                                        const SizedBox(height: 20),
+                                        _buildProgressSection(),
+                                        if (isCurrentUser) ...[
+                                          const SizedBox(height: 20),
+                                          _buildSettingsSection(),
+                                        ],
+                                      ],
+                                    ),
+                                  const SizedBox(height: 48),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      color: AppColors.forest,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      child: const Text("PLAYER ACCOUNT", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5)),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(_name?.toUpperCase() ?? 'UNKNOWN PLAYER', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
-                    const SizedBox(height: 4),
-                    Text(_email?.toUpperCase() ?? 'N/A', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                if (isCurrentUser)
-                  RetroButton(
-                    text: "EDIT DATA",
-                    icon: Icons.edit,
-                    bgColor: AppColors.cloud,
-                    textColor: AppColors.ink,
-                    isFullWidth: true,
-                    onPressed: _openEditDialog,
-                  )
-              ],
-            )
-          : Row(
-              children: [
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: AppColors.cloud,
-                        border: Border.all(color: AppColors.border, width: 3),
-                        image: _imageUrl != null && _imageUrl!.isNotEmpty ? DecorationImage(image: CachedNetworkImageProvider(_imageUrl!), fit: BoxFit.cover) : null,
-                      ),
-                      child: _imageUrl == null || _imageUrl!.isEmpty ? Icon(Icons.person, size: 60, color: AppColors.ink) : null,
-                    ),
-                    if (isCurrentUser)
-                      GestureDetector(
-                        onTap: _uploading ? null : _pickImage,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: AppColors.ink, border: Border.all(color: AppColors.border, width: 2)),
-                          child: _uploading
-                              ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                              : Icon(Icons.camera_alt, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 14),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(width: 32),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        color: AppColors.forest,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        child: const Text("PLAYER ACCOUNT", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5)),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(_name?.toUpperCase() ?? 'UNKNOWN PLAYER', textAlign: TextAlign.left, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
-                      const SizedBox(height: 4),
-                      Text(_email?.toUpperCase() ?? 'N/A', textAlign: TextAlign.left, style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                if (isCurrentUser)
-                  RetroButton(
-                    text: "EDIT DATA",
-                    icon: Icons.edit,
-                    bgColor: AppColors.cloud,
-                    textColor: AppColors.ink,
-                    isFullWidth: false,
-                    onPressed: _openEditDialog,
-                  )
-              ],
-            ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildBentoInfoGrid(bool isMobile) {
-    return isMobile
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget _buildIdentityCard(bool isCurrentUser) {
+    return RetroBlock(
+      bgColor: AppColors.cardBg,
+      padding: 24,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Avatar
+          Stack(
+            alignment: Alignment.bottomRight,
             children: [
-              _bentoBox(Icons.info, "BIO DATA", _bio ?? 'NO BIO LOGGED', AppColors.mustard),
-              const SizedBox(height: 16),
-              _bentoBox(Icons.phone, "COMMS", _contact ?? 'N/A', AppColors.sky),
+              Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  color: AppColors.cloud,
+                  border: Border.all(color: AppColors.border, width: 3),
+                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
+                  image: _imageUrl != null && _imageUrl!.isNotEmpty
+                      ? DecorationImage(image: CachedNetworkImageProvider(_imageUrl!), fit: BoxFit.cover)
+                      : null,
+                ),
+                child: _imageUrl == null || _imageUrl!.isEmpty ? Icon(Icons.person, size: 54, color: AppColors.ink) : null,
+              ),
+              if (isCurrentUser)
+                GestureDetector(
+                  onTap: _uploading ? null : _pickImage,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.ink,
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: _uploading
+                        ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Icon(Icons.camera_alt, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 14),
+                  ),
+                ),
             ],
-          )
-        : Row(
+          ),
+          const SizedBox(height: 16),
+          // Badges
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            alignment: WrapAlignment.center,
             children: [
-              Expanded(child: _bentoBox(Icons.info, "BIO DATA", _bio ?? 'NO BIO LOGGED', AppColors.mustard)),
-              const SizedBox(width: 16),
-              Expanded(child: _bentoBox(Icons.phone, "COMMS", _contact ?? 'N/A', AppColors.sky)),
+              Container(
+                color: AppColors.forest,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                child: const Text("PLAYER ACCOUNT", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0)),
+              ),
+              Container(
+                color: AppColors.mustard,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                child: Text("APPRENTICE", style: TextStyle(color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 0.8)),
+              ),
             ],
-          );
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _name?.toUpperCase() ?? 'UNKNOWN PLAYER',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, height: 1.1, color: AppColors.ink),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _email ?? 'N/A',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+          ),
+          const SizedBox(height: 16),
+          // Bio Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.cloud,
+              border: Border.all(color: AppColors.border, width: 2),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("BIO & LORE:", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 0.8)),
+                const SizedBox(height: 4),
+                Text(
+                  _bio ?? 'NO BIO LOGGED.',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.ink, height: 1.4),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Comms Contact
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.cloud,
+              border: Border.all(color: AppColors.border, width: 2),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.phone, size: 16, color: AppColors.ink),
+                const SizedBox(width: 8),
+                Text(
+                  _contact?.toUpperCase() ?? 'N/A',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.ink),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (isCurrentUser)
+            RetroButton(
+              text: "EDIT PROFILE DATA",
+              icon: Icons.edit,
+              isFullWidth: true,
+              bgColor: AppColors.cloud,
+              textColor: AppColors.ink,
+              onPressed: _openEditDialog,
+            ),
+        ],
+      ),
+    );
   }
 
-  Widget _bentoBox(IconData icon, String title, String value, Color color) {
-    return RetroBlock(
-      bgColor: color,
-      padding: 24,
-      shadowOffset: 4,
+  Widget _buildStatsHUD() {
+    return FutureBuilder<Map<String, int>>(
+      future: _getProgressPerSubject(),
+      builder: (context, snapshot) {
+        int totalCleared = 0;
+        if (snapshot.hasData) {
+          totalCleared = snapshot.data!.values.fold(0, (sum, count) => sum + count);
+        }
+
+        final expGained = totalCleared * 50;
+        final rankTitle = totalCleared > 10 ? "GOLD VANGUARD" : (totalCleared > 3 ? "SILVER RANK" : "NOVICE APPRENTICE");
+
+        return Row(
+          children: [
+            Expanded(child: _buildStatTile("QUESTS CLEARED", "$totalCleared SOLVED", Icons.check_circle, AppColors.forest)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildStatTile("EXP ACCUMULATED", "$expGained XP", Icons.bolt, AppColors.sunset)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildStatTile("GUILD RANK", rankTitle, Icons.military_tech, AppColors.mustard)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatTile(String label, String value, IconData icon, Color color) {
+    final isMustard = color == AppColors.mustard;
+    final textColor = isMustard && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [
+          BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3)),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink, size: 28),
-              const SizedBox(width: 12),
-              Text(
-                title.toUpperCase(),
-                style: TextStyle(
-                  color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color,
+                  border: Border.all(color: AppColors.border, width: 1.5),
+                ),
+                child: Icon(icon, size: 16, color: isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 0.8),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Text(
             value.toUpperCase(),
-            style: TextStyle(
-              color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-            maxLines: 3,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: textColor),
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -494,67 +635,85 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildProgressSection() {
     return RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: 32,
+      padding: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("QUEST PROGRESSION", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
-          const SizedBox(height: 8),
-          Text("TRACK YOUR COMPLETED CHALLENGES HERE.", style: TextStyle(color: AppColors.textMuted, fontSize: 16, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "SKILL & QUEST PROGRESSION",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink),
+              ),
+              GestureDetector(
+                onTap: () => context.go('/exercitii'),
+                child: Text(
+                  "ENTER ARENA >",
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.sunset, decoration: TextDecoration.underline),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
           FutureBuilder<Map<String, int>>(
             future: _getProgressPerSubject(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
-                  child: Row(
-                    children: [
-                      Icon(Icons.warning, color: AppColors.ink),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text("NO COMPLETED QUESTS YET. ACCESS THE DAILY QUESTS MENU.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
-                      )
-                    ],
-                  ),
-                );
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator(color: AppColors.sunset));
               }
 
-              final progress = snapshot.data!;
+              final progress = snapshot.data ?? {};
+              final defaultSubjects = ['Matematică', 'Informatică', 'Fizică', 'Chimie', 'Limba Română', 'Engleză'];
+
               return Column(
-                children: progress.entries.map((e) => Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.cloud,
-                    border: Border.all(color: AppColors.border, width: 2),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.check_circle, color: AppColors.forest),
-                          const SizedBox(width: 12),
-                          Text(e.key.toUpperCase(), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.ink)),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        color: AppColors.ink,
-                        child: Text(
-                          "${e.value} CLEARED",
-                          style: TextStyle(
-                            color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                            fontWeight: FontWeight.bold,
+                children: defaultSubjects.map((subj) {
+                  final cleared = progress[subj] ?? 0;
+                  final icon = _getSubjectIcon(subj);
+                  final progressPercent = (cleared / 10.0).clamp(0.0, 1.0);
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.cloud,
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(icon, size: 18, color: AppColors.ink),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                subj.toUpperCase(),
+                                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.ink),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              color: cleared > 0 ? AppColors.forest : AppColors.border,
+                              child: Text(
+                                "$cleared / 10 SOLVED",
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          child: LinearProgressIndicator(
+                            value: progressPercent,
+                            backgroundColor: AppColors.border.withOpacity(0.2),
+                            valueColor: AlwaysStoppedAnimation<Color>(cleared > 0 ? AppColors.forest : AppColors.textMuted),
+                            minHeight: 6,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                )).toList(),
+                      ],
+                    ),
+                  );
+                }).toList(),
               );
             },
           ),
@@ -563,57 +722,41 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildSettingsSection(bool isMobile) {
+  Widget _buildSettingsSection() {
     return RetroBlock(
       bgColor: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
-      padding: 32,
-      child: isMobile
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+      padding: 20,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text("SYSTEM SECURITY", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-                    SizedBox(height: 8),
-                    Text("UPDATE YOUR ACCESS KEY TO SECURE ACCOUNT DATA.", style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
-                  ],
+                const Text(
+                  "SYSTEM SECURITY CONSOLE",
+                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 1.2),
                 ),
-                const SizedBox(height: 16),
-                RetroButton(
-                  text: "CHANGE KEY",
-                  icon: Icons.lock_reset,
-                  bgColor: AppColors.cardBg,
-                  textColor: AppColors.ink,
-                  isFullWidth: true,
-                  onPressed: _changePassword,
-                ),
-              ],
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text("SYSTEM SECURITY", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-                      SizedBox(height: 8),
-                      Text("UPDATE YOUR ACCESS KEY TO SECURE ACCOUNT DATA.", style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                RetroButton(
-                  text: "CHANGE KEY",
-                  icon: Icons.lock_reset,
-                  bgColor: AppColors.cardBg,
-                  textColor: AppColors.ink,
-                  isFullWidth: false,
-                  onPressed: _changePassword,
+                const SizedBox(height: 4),
+                const Text(
+                  "UPDATE YOUR SECRET ACCESS KEY TO SECURE REPUTATION.",
+                  style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
+          ),
+          const SizedBox(width: 14),
+          RetroButton(
+            text: "CHANGE KEY",
+            icon: Icons.lock_reset,
+            bgColor: AppColors.cardBg,
+            textColor: AppColors.ink,
+            fontSize: 12,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            onPressed: _changePassword,
+          ),
+        ],
+      ),
     );
   }
 
@@ -635,8 +778,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _styledInput(nameCtrl, 'FULL NAME'),
-                _styledInput(bioCtrl, 'BIO DATA', maxLines: 3),
-                _styledInput(contactCtrl, 'COMMS NUMBER'),
+                _styledInput(bioCtrl, 'BIO LORE', maxLines: 3),
+                _styledInput(contactCtrl, 'COMMS PHONE'),
               ],
             ),
           ),
@@ -659,7 +802,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Widget _styledInput(TextEditingController c, String label, {int maxLines = 1, bool isPassword = false}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: c,
         maxLines: maxLines,
@@ -668,59 +811,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 12),
+          labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 11),
           filled: true,
           fillColor: AppColors.inputBg,
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 2.5)),
         ),
         validator: (v) => v!.isEmpty ? 'REQUIRED FIELD' : null,
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isCurrentUser = widget.userId == _auth.currentUser?.uid;
-    final isMobile = MediaQuery.of(context).size.width < 800;
-
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: _loading
-                    ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
-                    : SingleChildScrollView(
-                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 850),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildHeroCard(isCurrentUser, isMobile),
-                                const SizedBox(height: 32),
-                                _buildBentoInfoGrid(isMobile),
-                                const SizedBox(height: 32),
-                                _buildProgressSection(),
-                                if (isCurrentUser) const SizedBox(height: 32),
-                                if (isCurrentUser) _buildSettingsSection(isMobile),
-                                const SizedBox(height: 60),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

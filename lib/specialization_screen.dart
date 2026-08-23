@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
@@ -54,97 +53,141 @@ class SpecializationScreen extends StatefulWidget {
 }
 
 class _SpecializationScreenState extends State<SpecializationScreen> {
-  List<Map<String, dynamic>> get specializations => [
-    {'name': 'Matematică', 'icon': Icons.functions, 'color': AppColors.sunset, 'desc': 'Algebră, Geometrie, Analiză și Bacalaureat.'},
-    {'name': 'Fizică', 'icon': Icons.bolt, 'color': AppColors.mustard, 'desc': 'Mecanică, Termodinamică, Electricitate și Optică.'},
-    {'name': 'Chimie', 'icon': Icons.science, 'color': AppColors.sky, 'desc': 'Chimie Organică, Anorganică și admitere Medicină.'},
-    {'name': 'Informatică', 'icon': Icons.data_object, 'color': AppColors.forest, 'desc': 'Algoritmi, C++, Python și pregătire olimpiade.'},
-    {'name': 'Limba Română', 'icon': Icons.menu_book, 'color': AppColors.sunset, 'desc': 'Eseuri, Gramatică, pregătire Evaluare și BAC.'},
-    {'name': 'Engleză', 'icon': Icons.language, 'color': AppColors.mustard, 'desc': 'Gramatică, Vocabular, Conversație și Cambridge.'},
-    {'name': 'Franceză', 'icon': Icons.tour, 'color': AppColors.sky, 'desc': 'Nivel A1-C1, atestate DELF și conversație.'},
-    {'name': 'Istorie', 'icon': Icons.account_balance, 'color': AppColors.forest, 'desc': 'Istoria Românilor, Istorie Universală și BAC.'},
-    {'name': 'Geografie', 'icon': Icons.public, 'color': AppColors.sunset, 'desc': 'Geografia Europei, României și cartografie.'},
+  final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  String _selectedCategory = 'TOATE';
+  String _searchQuery = '';
+
+  final List<Map<String, dynamic>> _disciplines = [
+    {
+      "name": "Matematică",
+      "category": "REAL",
+      "icon": Icons.functions,
+      "color": AppColors.sunset,
+      "desc": "Algebră, Geometrie, Analiză & Bacalaureat",
+      "tag": "BAC & GIMNAZIU",
+    },
+    {
+      "name": "Informatică",
+      "category": "REAL",
+      "icon": Icons.data_object,
+      "color": AppColors.forest,
+      "desc": "Algoritmi C++, Structuri de Date & Olimpiadă",
+      "tag": "C++ & ALGORITMI",
+    },
+    {
+      "name": "Fizică",
+      "category": "REAL",
+      "icon": Icons.bolt,
+      "color": AppColors.sunset,
+      "desc": "Mecanică, Termodinamică, Electricitate & Optică",
+      "tag": "REAL & TEHNIC",
+    },
+    {
+      "name": "Chimie",
+      "category": "REAL",
+      "icon": Icons.science,
+      "color": AppColors.sky,
+      "desc": "Chimie Organică, Anorganică & Admitere Medicină",
+      "tag": "MEDICINĂ & BAC",
+    },
+    {
+      "name": "Biologie",
+      "category": "REAL",
+      "icon": Icons.eco,
+      "color": AppColors.forest,
+      "desc": "Anatomie, Genetică & Biologie Vegetală",
+      "tag": "MEDICINĂ & BAC",
+    },
+    {
+      "name": "Limba Română",
+      "category": "UMAN",
+      "icon": Icons.menu_book,
+      "color": AppColors.sky,
+      "desc": "Gramatică, Eseuri Literatură & Bacalaureat",
+      "tag": "BAC & EVALUARE",
+    },
+    {
+      "name": "Engleză",
+      "category": "UMAN",
+      "icon": Icons.language,
+      "color": AppColors.mustard,
+      "desc": "Grammar, Conversație, Cambridge & TOEFL",
+      "tag": "CAMBRIDGE & IELTS",
+    },
+    {
+      "name": "Franceză",
+      "category": "UMAN",
+      "icon": Icons.translate,
+      "color": AppColors.mustard,
+      "desc": "Grammaire, Vocabulaire & DELF/DALF",
+      "tag": "DELF / DALF",
+    },
+    {
+      "name": "Istorie",
+      "category": "UMAN",
+      "icon": Icons.account_balance,
+      "color": AppColors.sunset,
+      "desc": "Istoria Românilor, Istorie Universală & Bac",
+      "tag": "BACALAUREAT",
+    },
+    {
+      "name": "Geografie",
+      "category": "UMAN",
+      "icon": Icons.public,
+      "color": AppColors.sky,
+      "desc": "Geografia României, a Europei & a Lumii",
+      "tag": "BACALAUREAT",
+    },
   ];
 
-  String searchQuery = '';
-  bool _loadingTeachers = true;
-  Map<String, int> teacherCounts = {};
-
   @override
-  void initState() {
-    super.initState();
-    _loadTeacherData();
+  void dispose() {
+    _searchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
-  Future<void> _loadTeacherData() async {
-    try {
-      final snapshot = await FirebaseFirestore.instance.collection('teachers')
-          .where('active', isEqualTo: true)
-          .get();
-
-      Map<String, int> counts = {};
-      for (var doc in snapshot.docs) {
-        final subject = doc.data()['subject'] ?? '';
-        counts[subject] = (counts[subject] ?? 0) + 1;
-      }
-
-      setState(() {
-        teacherCounts = counts;
-        _loadingTeachers = false;
-      });
-    } catch (e) {
-      debugPrint("ERROR: $e");
-      if (mounted) setState(() => _loadingTeachers = false);
-    }
+  List<Map<String, dynamic>> get _filteredDisciplines {
+    return _disciplines.where((d) {
+      final matchesCat = _selectedCategory == 'TOATE' || d['category'] == _selectedCategory;
+      final matchesQuery = _searchQuery.isEmpty ||
+          d['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          d['desc'].toString().toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          d['tag'].toString().toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesCat && matchesQuery;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 880;
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
-        final filtered = specializations.where((s) =>
-            s['name'].toString().toLowerCase().contains(searchQuery.toLowerCase())).toList();
-
         return Scaffold(
           backgroundColor: AppColors.bg,
           body: Column(
             children: [
               const CustomNavbar(),
               Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-                      sliver: SliverToBoxAdapter(
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 1100),
-                            child: _buildHeaderAndSearch(),
-                          ),
-                        ),
-                      ),
+                child: Scrollbar(
+                  controller: _scrollController,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildHeroSearch(isMobile),
+                        _buildCategoryFilter(),
+                        const SizedBox(height: 28),
+                        _buildDisciplinesGrid(isMobile),
+                        const SizedBox(height: 60),
+                        _buildFooter(isMobile),
+                      ],
                     ),
-                    if (_loadingTeachers)
-                      SliverFillRemaining(
-                        child: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
-                      )
-                    else
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                        sliver: SliverToBoxAdapter(
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 1100),
-                              child: _buildBentoGrid(filtered),
-                            ),
-                          ),
-                        ),
-                      ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: 80),
-                    )
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -154,148 +197,241 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
     );
   }
 
-  Widget _buildHeaderAndSearch() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          color: AppColors.sky,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            "GUILD ROSTER",
-            style: TextStyle(
-              color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2.0,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          "SELECT DISCIPLINE",
-          style: TextStyle(
-            fontSize: 48,
-            fontWeight: FontWeight.w900,
-            color: AppColors.ink,
-            letterSpacing: 1.0,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          "OVER 100 MASTERS AWAIT TO BEGIN YOUR TRAINING.",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textMuted,
-          ),
-        ),
-        const SizedBox(height: 48),
-        Container(
-          width: 600,
-          decoration: BoxDecoration(
-            color: AppColors.cardBg,
-            border: Border.all(color: AppColors.border, width: 3),
-            boxShadow: [
-              BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6)),
+  Widget _buildHeroSearch(bool isMobile) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(24, isMobile ? 24 : 40, 24, 20),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1120),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
+                child: const Text(
+                  "GUILD ROSTER",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: 12),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                "SELECT DISCIPLINE",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isMobile ? 32 : 44,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.ink,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "GĂSEȘTE MENTORUL POTRIVIT ȘI PROGRAMEAZĂ-ȚI ANTRENAMENTUL 1-LA-1.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: isMobile ? 13 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+              ),
+              const SizedBox(height: 24),
+              // Retro Search Input
+              Container(
+                constraints: const BoxConstraints(maxWidth: 680),
+                decoration: BoxDecoration(
+                  color: AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 3),
+                  boxShadow: [
+                    BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4), blurRadius: 0),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: AppColors.ink, size: 24),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+                        cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+                        decoration: InputDecoration(
+                          hintText: "SEARCH DISCIPLINE OR KEYWORD...",
+                          hintStyle: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.0),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    if (_searchQuery.isNotEmpty)
+                      IconButton(
+                        icon: Icon(Icons.clear, color: AppColors.ink, size: 20),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
-          child: TextField(
-            onChanged: (v) => setState(() => searchQuery = v),
-            style: TextStyle(
-              color: AppColors.ink,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-            cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
-            decoration: InputDecoration(
-              hintText: "SEARCH DISCIPLINE...",
-              hintStyle: TextStyle(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-              ),
-              prefixIcon: Icon(Icons.search, color: AppColors.ink, size: 28),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            ),
-          ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildBentoGrid(List<Map<String, dynamic>> data) {
-    if (data.isEmpty) {
-      return RetroBlock(
-        bgColor: AppColors.cloud,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
+  Widget _buildCategoryFilter() {
+    final categories = ["TOATE", "REAL", "UMAN"];
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      alignment: WrapAlignment.center,
+      children: categories.map((cat) {
+        final isSelected = _selectedCategory == cat;
+        return GestureDetector(
+          onTap: () => setState(() => _selectedCategory = cat),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? (AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink) : AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  offset: isSelected ? const Offset(1, 1) : const Offset(3, 3),
+                ),
+              ],
+            ),
             child: Text(
-              "NO DISCIPLINES FOUND.",
+              cat,
               style: TextStyle(
-                color: AppColors.ink,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+                color: isSelected ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white) : AppColors.ink,
               ),
             ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDisciplinesGrid(bool isMobile) {
+    final list = _filteredDisciplines;
+
+    if (list.isEmpty) {
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 40),
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: AppColors.cloud,
+            border: Border.all(color: AppColors.border, width: 2),
+          ),
+          child: Column(
+            children: [
+              Icon(Icons.search_off, size: 48, color: AppColors.textMuted),
+              const SizedBox(height: 12),
+              Text(
+                "NO DISCIPLINES MATCH YOUR SEARCH.",
+                style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 16),
+              ),
+            ],
           ),
         ),
       );
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 380,
-        mainAxisSpacing: 32,
-        crossAxisSpacing: 32,
-        childAspectRatio: 1.2,
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 1120),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('teachers').where('active', isEqualTo: true).snapshots(),
+        builder: (context, snapshot) {
+          final teacherDocs = snapshot.data?.docs ?? [];
+
+          return Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            alignment: WrapAlignment.center,
+            children: list.map((d) {
+              final count = teacherDocs.where((doc) {
+                final sub = (doc.data() as Map<String, dynamic>)['subject']?.toString().toLowerCase() ?? '';
+                return sub.contains(d['name'].toString().toLowerCase());
+              }).length;
+
+              return _SpecializationCard(
+                data: d,
+                teacherCount: count,
+                onTap: () {
+                  final name = d['name'] as String;
+                  context.go('/materii/${Uri.encodeComponent(name)}', extra: d);
+                },
+              );
+            }).toList(),
+          );
+        },
       ),
-      itemCount: data.length,
-      itemBuilder: (context, index) {
-        final spec = data[index];
-        final count = teacherCounts[spec['name']] ?? 0;
-        return RetroCategoryCard(
-          data: spec,
-          count: count,
-          onTap: () {
-            context.go(
-              '/materii/${Uri.encodeComponent(spec['name'])}',
-              extra: spec,
-            );
-          },
-        );
-      },
+    );
+  }
+
+  Widget _buildFooter(bool isMobile) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 32 : 44),
+      decoration: BoxDecoration(
+        color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
+        border: Border(top: BorderSide(color: AppColors.border, width: 3)),
+      ),
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+              'IMEDITATII // ROSTER',
+              style: TextStyle(fontSize: isMobile ? 26 : 32, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'CHOOSE A DISCIPLINE. CONNECT DIRECTLY WITH GUILD MASTERS.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 12 : 14, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class RetroCategoryCard extends StatefulWidget {
+class _SpecializationCard extends StatefulWidget {
   final Map<String, dynamic> data;
-  final int count;
+  final int teacherCount;
   final VoidCallback onTap;
 
-  const RetroCategoryCard({
-    super.key,
+  const _SpecializationCard({
     required this.data,
-    required this.count,
+    required this.teacherCount,
     required this.onTap,
   });
 
   @override
-  State<RetroCategoryCard> createState() => _RetroCategoryCardState();
+  State<_SpecializationCard> createState() => _SpecializationCardState();
 }
 
-class _RetroCategoryCardState extends State<RetroCategoryCard> {
+class _SpecializationCardState extends State<_SpecializationCard> {
   bool _isHovering = false;
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = widget.data['color'];
+    final name = widget.data['name'] as String;
+    final icon = widget.data['icon'] as IconData;
+    final color = widget.data['color'] as Color;
+    final desc = widget.data['desc'] as String;
+    final tag = widget.data['tag'] as String;
+    final count = widget.teacherCount;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -310,10 +446,10 @@ class _RetroCategoryCardState extends State<RetroCategoryCard> {
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          padding: const EdgeInsets.all(24),
+          width: 320,
           transform: Matrix4.translationValues(
-            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
-            _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
+            _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
+            _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -322,66 +458,108 @@ class _RetroCategoryCardState extends State<RetroCategoryCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(8, 8),
+                offset: _isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
-              )
+              ),
             ],
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      border: Border.all(color: AppColors.border, width: 3),
-                    ),
-                    child: Icon(widget.data['icon'], color: Colors.white, size: 36),
-                  ),
-                  if (widget.count > 0)
+              // Header Banner with Icon & Count
+              Container(
+                color: AppColors.cloud,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.cloud,
+                        color: color,
                         border: Border.all(color: AppColors.border, width: 2),
+                        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(2.5, 2.5))],
                       ),
-                      child: Text(
-                        "${widget.count} MASTERS",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.ink,
-                          letterSpacing: 1.0,
-                        ),
+                      child: Icon(icon, size: 32, color: Colors.white),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: count > 0 ? AppColors.forest : AppColors.sunset,
+                        border: Border.all(color: AppColors.border, width: 1.5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: count > 0 ? const Color(0xFF55EFC4) : Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "$count ${count == 1 ? 'MASTER' : 'MASTERS'}",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 0.5),
+                          ),
+                        ],
                       ),
                     ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                widget.data['name'].toUpperCase(),
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.ink,
-                  letterSpacing: 1.0,
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                widget.data['desc'].toUpperCase(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.bold,
-                  height: 1.4,
+              Container(height: 2.5, color: AppColors.border),
+              // Body
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tag,
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.sunset, letterSpacing: 1.0),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      name.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.ink,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      desc,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "VIEW MASTERS",
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(color: AppColors.ink),
+                          child: Icon(Icons.arrow_forward, size: 14, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

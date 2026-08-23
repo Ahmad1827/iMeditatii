@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,6 +60,8 @@ class RetroButton extends StatefulWidget {
   final bool isFullWidth;
   final bool isLoading;
   final IconData? icon;
+  final double fontSize;
+  final EdgeInsets padding;
 
   const RetroButton({
     super.key,
@@ -71,6 +72,8 @@ class RetroButton extends StatefulWidget {
     this.isFullWidth = false,
     this.isLoading = false,
     this.icon,
+    this.fontSize = 15,
+    this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
   });
 
   @override
@@ -103,33 +106,45 @@ class _RetroButtonState extends State<RetroButton> {
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -2.0 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
             color: widget.isLoading ? Colors.grey : effectiveBg,
-            border: Border.all(color: AppColors.border, width: 3),
+            border: Border.all(color: AppColors.border, width: 2.5),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: widget.padding,
           child: widget.isLoading
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (widget.icon != null) ...[Icon(widget.icon, color: effectiveTextColor, size: 20), const SizedBox(width: 8)],
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon, color: effectiveTextColor, size: widget.fontSize + 3),
+                      const SizedBox(width: 8),
+                    ],
                     Text(
                       widget.text.toUpperCase(),
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: effectiveTextColor, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                      style: TextStyle(
+                        color: effectiveTextColor,
+                        fontSize: widget.fontSize,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ],
                 ),
@@ -152,6 +167,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   final _fire = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
   final _picker = ImagePicker();
+  final ScrollController _scrollController = ScrollController();
 
   bool _uploading = false;
   bool _isLoadingStripe = false;
@@ -163,6 +179,12 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   void initState() {
     super.initState();
     _checkRealStripeStatus();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkRealStripeStatus() async {
@@ -225,7 +247,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   }
 
   Future<void> _changePhoto(String uid) async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     if (picked == null) return;
     setState(() => _uploading = true);
     try {
@@ -272,74 +294,168 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
+  IconData _getSubjectIcon(String subject) {
+    final s = subject.toLowerCase();
+    if (s.contains('matemat')) return Icons.calculate;
+    if (s.contains('info') || s.contains('programare')) return Icons.terminal;
+    if (s.contains('fizic')) return Icons.bolt;
+    if (s.contains('chim')) return Icons.science;
+    if (s.contains('român') || s.contains('literat')) return Icons.menu_book;
+    if (s.contains('englez') || s.contains('francez')) return Icons.language;
+    if (s.contains('istorie')) return Icons.account_balance;
+    if (s.contains('geograf')) return Icons.public;
+    return Icons.school;
+  }
+
+  Future<String> _openOrCreateChat(BuildContext context, String teacherId, String teacherName) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      context.go('/login');
+      return '';
+    }
+
+    final currentUid = currentUser.uid;
+    final currentUserDoc = await _fire.collection('users').doc(currentUid).get();
+    final studentName = currentUserDoc.data()?['name'] ?? 'Elev';
+
+    final existingChats = await _fire
+        .collection('chats')
+        .where('teacherId', isEqualTo: teacherId)
+        .where('studentId', isEqualTo: currentUid)
+        .limit(1)
+        .get();
+
+    if (existingChats.docs.isNotEmpty) {
+      return existingChats.docs.first.id;
+    }
+
+    final newChat = await _fire.collection('chats').add({
+      'teacherId': teacherId,
+      'teacherName': teacherName,
+      'studentId': currentUid,
+      'studentName': studentName,
+      'isEnded': false,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    return newChat.id;
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUserId = _auth.currentUser?.uid;
     final bool isMyProfile = currentUserId == widget.teacherId;
-    final isMobile = MediaQuery.of(context).size.width < 800;
+    final isMobile = MediaQuery.of(context).size.width < 960;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
         return Scaffold(
           backgroundColor: AppColors.bg,
-          appBar: AppBar(
-            title: Text('MASTER PROFILE', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
-            backgroundColor: AppColors.bg,
-            iconTheme: IconThemeData(color: AppColors.ink),
-            elevation: 0,
-            centerTitle: true,
-            bottom: PreferredSize(preferredSize: const Size.fromHeight(3), child: Container(color: AppColors.border, height: 3)),
-            leading: IconButton(icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 28), onPressed: () => context.go('/')),
-          ),
-          body: StreamBuilder<DocumentSnapshot>(
-            stream: _fire.collection('users').doc(widget.teacherId).snapshots(),
-            builder: (context, userSnap) {
-              if (!userSnap.hasData) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
-              if (!userSnap.data!.exists) return Center(child: Text('LOG ERROR: PROFILE NOT FOUND.', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)));
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: _fire.collection('users').doc(widget.teacherId).snapshots(),
+                  builder: (context, userSnap) {
+                    if (!userSnap.hasData) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
+                    if (!userSnap.data!.exists) return Center(child: Text('LOG ERROR: PROFILE NOT FOUND.', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)));
 
-              final userData = userSnap.data!.data() as Map<String, dynamic>;
-              final bool hasStripeId = userData.containsKey('stripeAccountId') && userData['stripeAccountId'] != null && userData['stripeAccountId'].toString().isNotEmpty;
-              final bool isStripeReady = userData['isStripeActive'] == true;
+                    final userData = userSnap.data!.data() as Map<String, dynamic>;
+                    final bool hasStripeId = userData.containsKey('stripeAccountId') && userData['stripeAccountId'] != null && userData['stripeAccountId'].toString().isNotEmpty;
+                    final bool isStripeReady = userData['isStripeActive'] == true;
 
-              return FutureBuilder<DocumentSnapshot>(
-                future: _fire.collection('teachers').doc(widget.teacherId).get(),
-                builder: (context, teacherSnap) {
-                  final teacherData = (teacherSnap.data?.data() as Map<String, dynamic>?) ?? {};
-                  final image = teacherData['image'] ?? userData['image'] ?? '';
-                  final name = teacherData['name'] ?? userData['name'] ?? 'MASTER UNKNOWN';
-                  final email = teacherData['email'] ?? userData['email'] ?? 'N/A';
-                  final subject = teacherData['subject'] ?? 'N/A';
-                  final experience = teacherData['experience']?.toString() ?? '0';
-                  final contact = teacherData['contact'] ?? 'N/A';
-                  final price = teacherData['price']?.toString() ?? '50';
-                  final bool isApproved = teacherData['active'] == true;
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: _fire.collection('teachers').doc(widget.teacherId).get(),
+                      builder: (context, teacherSnap) {
+                        final teacherData = (teacherSnap.data?.data() as Map<String, dynamic>?) ?? {};
+                        final image = teacherData['image'] ?? userData['image'] ?? '';
+                        final name = teacherData['name'] ?? userData['name'] ?? 'MASTER UNKNOWN';
+                        final email = teacherData['email'] ?? userData['email'] ?? 'N/A';
+                        final subject = teacherData['subject'] ?? 'GENERAL';
+                        final experience = teacherData['experience']?.toString() ?? '0';
+                        final contact = teacherData['contact'] ?? 'N/A';
+                        final price = teacherData['price']?.toString() ?? '50';
+                        final bio = teacherData['bio'] ?? 'Mentor dedicat pregătirii interactive și aprofundate. Sesiuni 1-la-1 personalizate cu tablă interactivă live.';
+                        final bool isApproved = teacherData['active'] == true;
 
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 850),
-                        child: Column(
-                          children: [
-                            if (isOwner) _buildAdminPanel(isMobile),
-                            if (isMyProfile && !isApproved) _buildPendingBanner(),
-                            _buildHeroCard(name, email, image, subject, isMyProfile, currentUserId ?? '', isMobile),
-                            const SizedBox(height: 32),
-                            _buildInfoGrid(subject, experience, contact, price, isMobile),
-                            const SizedBox(height: 32),
-                            if (isMyProfile) _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
-                            const SizedBox(height: 32),
-                            _ratingSection(widget.teacherId, isMobile),
-                            const SizedBox(height: 60),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+                        return Scrollbar(
+                          controller: _scrollController,
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            physics: const ClampingScrollPhysics(),
+                            padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 36),
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 1140),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (isOwner) _buildAdminPanel(),
+                                    if (isMyProfile && !isApproved) _buildPendingBanner(),
+                                    
+                                    // Main Two-Column Character Sheet
+                                    if (!isMobile)
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Left Column: Identity & Actions
+                                          SizedBox(
+                                            width: 360,
+                                            child: _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? ''),
+                                          ),
+                                          const SizedBox(width: 28),
+                                          // Right Column: Stats, Bio, Stripe & Reviews
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                                              children: [
+                                                _buildStatsGrid(subject, experience, price),
+                                                const SizedBox(height: 24),
+                                                _buildLoreAndFeaturesBlock(bio, subject),
+                                                const SizedBox(height: 24),
+                                                if (isMyProfile) ...[
+                                                  _buildFinancialDashboard(hasStripeId, isStripeReady, email),
+                                                  const SizedBox(height: 24),
+                                                ],
+                                                _ratingSection(widget.teacherId),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    else
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? ''),
+                                          const SizedBox(height: 24),
+                                          _buildStatsGrid(subject, experience, price),
+                                          const SizedBox(height: 24),
+                                          _buildLoreAndFeaturesBlock(bio, subject),
+                                          const SizedBox(height: 24),
+                                          if (isMyProfile) ...[
+                                            _buildFinancialDashboard(hasStripeId, isStripeReady, email),
+                                            const SizedBox(height: 24),
+                                          ],
+                                          _ratingSection(widget.teacherId),
+                                        ],
+                                      ),
+                                    const SizedBox(height: 60),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -348,18 +464,18 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
 
   Widget _buildPendingBanner() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 32),
+      margin: const EdgeInsets.only(bottom: 24),
       child: RetroBlock(
         bgColor: AppColors.mustard,
-        padding: 20,
+        padding: 18,
         child: Row(
           children: [
-            Icon(Icons.hourglass_empty, size: 32, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
-            const SizedBox(width: 16),
+            Icon(Icons.hourglass_empty, size: 28, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
+            const SizedBox(width: 14),
             Expanded(
               child: Text(
-                "SYSTEM AUTHORIZATION PENDING. PROFILE HIDDEN FROM PUBLIC REGISTRY.",
-                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
+                "SYSTEM AUTHORIZATION PENDING. PROFILE HIDDEN FROM PUBLIC GUILD ROSTER.",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, letterSpacing: 0.5),
               ),
             ),
           ],
@@ -368,268 +484,271 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _buildAdminPanel(bool isMobile) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 32),
-      child: RetroBlock(
-        bgColor: AppColors.sky,
-        padding: 32,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.admin_panel_settings, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, size: 32),
-                const SizedBox(width: 12),
-                Text(
-                  "ADMIN TERMINAL",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
-                    color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            StreamBuilder<QuerySnapshot>(
-              stream: _fire.collection('teachers').where('active', isEqualTo: false).snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Text(
-                    "NO PENDING AUTHORIZATIONS.",
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
-                  );
-                }
-                return Column(
-                  children: snapshot.data!.docs.map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 2)),
-                      padding: const EdgeInsets.all(12),
-                      child: isMobile
-                          ? Column(
-                              children: [
-                                Text(
-                                  "${data['name']} [${data['subject']}]".toUpperCase(),
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.ink),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    IconButton(icon: Icon(Icons.check_circle, color: AppColors.forest), onPressed: () => _approveTeacher(doc.id)),
-                                    IconButton(icon: Icon(Icons.cancel, color: AppColors.sunset), onPressed: () => _rejectTeacher(doc.id)),
-                                  ],
-                                )
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "${data['name']} [${data['subject']}]".toUpperCase(),
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.ink),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(icon: Icon(Icons.check_circle, color: AppColors.forest), onPressed: () => _approveTeacher(doc.id)),
-                                    IconButton(icon: Icon(Icons.cancel, color: AppColors.sunset), onPressed: () => _rejectTeacher(doc.id)),
-                                  ],
-                                )
-                              ],
-                            ),
-                    );
-                  }).toList(),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget _buildAdminPanel() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _fire.collection('teachers').where('active', isEqualTo: false).snapshots(),
+      builder: (context, snapshot) {
+        final pendingDocs = snapshot.data?.docs ?? [];
+        if (pendingDocs.isEmpty) return const SizedBox.shrink();
 
-  Widget _buildHeroCard(String name, String email, String image, String subject, bool isMyProfile, String uid, bool isMobile) {
-    return RetroBlock(
-      bgColor: AppColors.cardBg,
-      padding: isMobile ? 24 : 32,
-      child: isMobile
-          ? Column(
+        return Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          child: RetroBlock(
+            bgColor: AppColors.sky,
+            padding: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Stack(
-                  alignment: Alignment.bottomRight,
+                Row(
                   children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: AppColors.cloud,
-                        border: Border.all(color: AppColors.border, width: 3),
-                        image: image.isNotEmpty ? DecorationImage(image: CachedNetworkImageProvider(image), fit: BoxFit.cover) : null,
-                      ),
-                      child: image.isEmpty ? Icon(Icons.person, size: 60, color: AppColors.ink) : null,
-                    ),
-                    if (isMyProfile)
-                      GestureDetector(
-                        onTap: _uploading ? null : () => _changePhoto(uid),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: AppColors.ink, border: Border.all(color: AppColors.border, width: 2)),
-                          child: _uploading
-                              ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                              : Icon(Icons.camera_alt, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 14),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      color: AppColors.sky,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      child: Text(
-                        subject.toUpperCase(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 12,
-                          letterSpacing: 1.5,
-                          color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    Icon(Icons.admin_panel_settings, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 26),
+                    const SizedBox(width: 10),
                     Text(
-                      name.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, height: 1.0, color: AppColors.ink),
+                      "ADMIN SECURITY QUEUE (${pendingDocs.length})",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                        color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(email, textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
                   ],
                 ),
-                const SizedBox(height: 24),
-                if (isMyProfile)
-                  RetroButton(text: "EDIT", icon: Icons.edit, isFullWidth: true, bgColor: AppColors.cloud, textColor: AppColors.ink, onPressed: () => _openEditDialog(uid)),
-              ],
-            )
-          : Row(
-              children: [
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: AppColors.cloud,
-                        border: Border.all(color: AppColors.border, width: 3),
-                        image: image.isNotEmpty ? DecorationImage(image: CachedNetworkImageProvider(image), fit: BoxFit.cover) : null,
-                      ),
-                      child: image.isEmpty ? Icon(Icons.person, size: 60, color: AppColors.ink) : null,
+                const SizedBox(height: 14),
+                ...pendingDocs.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBg,
+                      border: Border.all(color: AppColors.border, width: 2),
                     ),
-                    if (isMyProfile)
-                      GestureDetector(
-                        onTap: _uploading ? null : () => _changePhoto(uid),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: AppColors.ink, border: Border.all(color: AppColors.border, width: 2)),
-                          child: _uploading
-                              ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                              : Icon(Icons.camera_alt, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 14),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(width: 32),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        color: AppColors.sky,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        child: Text(
-                          subject.toUpperCase(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 12,
-                            letterSpacing: 1.5,
-                            color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "${data['name']} [${data['subject']}]".toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.ink),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(name.toUpperCase(), textAlign: TextAlign.left, style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, height: 1.0, color: AppColors.ink)),
-                      const SizedBox(height: 8),
-                      Text(email, textAlign: TextAlign.left, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
-                    ],
-                  ),
-                ),
-                if (isMyProfile)
-                  RetroButton(text: "EDIT", icon: Icons.edit, isFullWidth: false, bgColor: AppColors.cloud, textColor: AppColors.ink, onPressed: () => _openEditDialog(uid)),
+                        IconButton(
+                          icon: Icon(Icons.check_circle, color: AppColors.forest, size: 26),
+                          tooltip: "APPROVE",
+                          onPressed: () => _approveTeacher(doc.id),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.cancel, color: AppColors.sunset, size: 26),
+                          tooltip: "REJECT",
+                          onPressed: () => _rejectTeacher(doc.id),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ],
             ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildInfoGrid(String subject, String exp, String contact, String price, bool isMobile) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: isMobile ? 1 : 2,
-      crossAxisSpacing: 20,
-      mainAxisSpacing: 20,
-      childAspectRatio: isMobile ? 3.5 : 2.2,
-      children: [
-        _bentoBox(Icons.menu_book, "DISCIPLINE", subject, AppColors.cloud),
-        _bentoBox(Icons.military_tech, "EXP LEVEL", "$exp YEARS", AppColors.mustard),
-        _bentoBox(Icons.phone, "COMMS", contact, AppColors.cloud),
-        _bentoBox(Icons.payments, "RATE", "$price RON / HR", AppColors.sky),
-      ],
-    );
-  }
-
-  Widget _bentoBox(IconData icon, String title, String value, Color color) {
+  Widget _buildIdentityCard(String name, String email, String image, String subject, String contact, bool isMyProfile, String uid) {
     return RetroBlock(
-      bgColor: color,
-      padding: 16,
-      shadowOffset: 4,
+      bgColor: AppColors.cardBg,
+      padding: 28,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
+          // Avatar
+          Stack(
+            alignment: Alignment.bottomRight,
             children: [
-              Icon(icon, size: 18, color: AppColors.ink),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                  color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink,
+              Container(
+                width: 130,
+                height: 130,
+                decoration: BoxDecoration(
+                  color: AppColors.cloud,
+                  border: Border.all(color: AppColors.border, width: 3.5),
+                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+                  image: image.isNotEmpty ? DecorationImage(image: CachedNetworkImageProvider(image), fit: BoxFit.cover) : null,
+                ),
+                child: image.isEmpty ? Icon(_getSubjectIcon(subject), size: 64, color: AppColors.ink) : null,
+              ),
+              if (isMyProfile)
+                GestureDetector(
+                  onTap: _uploading ? null : () => _changePhoto(uid),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.ink,
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: _uploading
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Icon(Icons.camera_alt, color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 16),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Badges
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: [
+              Container(
+                color: AppColors.sky,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                child: Text(
+                  subject.toUpperCase(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 11,
+                    letterSpacing: 1.0,
+                    color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                  ),
+                ),
+              ),
+              Container(
+                color: AppColors.forest,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                child: const Text(
+                  "VERIFIED GUILD MASTER",
+                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 14),
+          Text(
+            name.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, height: 1.1, color: AppColors.ink),
+          ),
           const SizedBox(height: 6),
           Text(
-            value.toUpperCase(),
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink,
+            email,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+          ),
+          const SizedBox(height: 20),
+          // Comms Contact Box
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.cloud,
+              border: Border.all(color: AppColors.border, width: 2),
             ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.phone, size: 18, color: AppColors.ink),
+                const SizedBox(width: 8),
+                Text(
+                  contact.toUpperCase(),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.5),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Action Deck
+          if (isMyProfile)
+            RetroButton(
+              text: "EDIT PROFILE DATA",
+              icon: Icons.edit,
+              isFullWidth: true,
+              bgColor: AppColors.cloud,
+              textColor: AppColors.ink,
+              onPressed: () => _openEditDialog(uid),
+            )
+          else ...[
+            RetroButton(
+              text: "TRIMITE MESAJ / CHAT",
+              icon: Icons.chat,
+              isFullWidth: true,
+              bgColor: AppColors.forest,
+              textColor: Colors.white,
+              onPressed: () async {
+                final chatId = await _openOrCreateChat(context, widget.teacherId, name);
+                if (context.mounted && chatId.isNotEmpty) {
+                  context.push('/chat/$chatId', extra: name);
+                }
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid(String subject, String exp, String price) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _fire.collection('teachers').doc(widget.teacherId).collection('reviews').snapshots(),
+      builder: (context, snap) {
+        final docs = snap.data?.docs ?? [];
+        double avg = 5.0;
+        if (docs.isNotEmpty) {
+          avg = docs.map((d) => (d['rating'] as num).toDouble()).reduce((a, b) => a + b) / docs.length;
+        }
+
+        return Row(
+          children: [
+            Expanded(child: _buildStatTile("HOURLY RATE", "$price RON / HR", Icons.payments, AppColors.forest)),
+            const SizedBox(width: 14),
+            Expanded(child: _buildStatTile("EXPERIENCE", "$exp YEARS", Icons.military_tech, AppColors.mustard)),
+            const SizedBox(width: 14),
+            Expanded(child: _buildStatTile("REPUTATION", "${avg.toStringAsFixed(1)} ★", Icons.star, AppColors.sunset)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatTile(String label, String value, IconData icon, Color color) {
+    final isMustard = color == AppColors.mustard;
+    final textColor = isMustard && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [
+          BoxShadow(color: AppColors.shadow, offset: const Offset(3.5, 3.5)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color,
+                  border: Border.all(color: AppColors.border, width: 2),
+                ),
+                child: Icon(icon, size: 20, color: isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 1.0),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            value.toUpperCase(),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: textColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -638,135 +757,176 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _buildFinancialDashboard(bool hasStripeId, bool isStripeReady, String email, bool isMobile) {
+  Widget _buildLoreAndFeaturesBlock(String bio, String subject) {
+    final features = [
+      {"label": "TABLĂ INTERACTIVĂ LIVE", "icon": Icons.draw, "color": AppColors.sky},
+      {"label": "PREGĂTIRE BACALAUREAT", "icon": Icons.school, "color": AppColors.forest},
+      {"label": "REZOLVARE TEME & QUESTS", "icon": Icons.quiz, "color": AppColors.mustard},
+      {"label": "FEEDBACK 1-ON-1", "icon": Icons.verified, "color": AppColors.sunset},
+    ];
+
+    return RetroBlock(
+      bgColor: AppColors.cardBg,
+      padding: 24,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.history_edu, size: 24, color: AppColors.sunset),
+              const SizedBox(width: 10),
+              Text(
+                "DESPRE MENTOR & METODOLOGIE",
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            bio,
+            style: TextStyle(fontSize: 15, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6),
+          ),
+          const SizedBox(height: 20),
+          Container(height: 2, color: AppColors.border),
+          const SizedBox(height: 18),
+          Text(
+            "CAPABILITĂȚI SESIUNE:",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 1.0),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: features.map((f) {
+              final col = f['color'] as Color;
+              final isMustard = col == AppColors.mustard;
+              final txtCol = isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white;
+
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: col,
+                  border: Border.all(color: AppColors.border, width: 2),
+                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(2, 2))],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(f['icon'] as IconData, size: 16, color: txtCol),
+                    const SizedBox(width: 8),
+                    Text(
+                      f['label'] as String,
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: txtCol, letterSpacing: 0.8),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialDashboard(bool hasStripeId, bool isStripeReady, String email) {
     return RetroBlock(
       bgColor: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
-      padding: 32,
+      padding: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(child: Text("FINANCIAL CORE (STRIPE)", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5))),
+              const Text(
+                "STRIPE FINANCIAL CORE",
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+              ),
               if (_isCheckingStatus) const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), border: Border.all(color: Colors.white24, width: 2)),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              border: Border.all(color: Colors.white24, width: 1.5),
+            ),
             child: Row(
               children: [
-                Icon(isStripeReady ? Icons.check_circle : Icons.warning, color: isStripeReady ? Colors.greenAccent : AppColors.mustard),
-                const SizedBox(width: 16),
+                Icon(isStripeReady ? Icons.check_circle : Icons.warning, color: isStripeReady ? const Color(0xFF55EFC4) : AppColors.mustard, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    isStripeReady ? "PAYMENT TUNNEL SECURE. READY FOR TRANSACTIONS." : "INCOMPLETE CONFIGURATION. REVENUE STREAMS DISABLED.",
+                    isStripeReady ? "PAYMENT TUNNEL SECURE. READY FOR REVENUE." : "INCOMPLETE CONFIGURATION. REVENUE DISABLED.",
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
-          isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (!hasStripeId)
-                      RetroButton(text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, isFullWidth: true, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
-                    else if (hasStripeId && !isStripeReady)
-                      RetroButton(text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, isFullWidth: true, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
-                    else
-                      RetroButton(text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, isFullWidth: true, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () async {
-                        await _auth.sendPasswordResetEmail(email: email);
-                        _showToast("RESET LOG TRANSMITTED.");
-                      },
-                      child: const Text("RESET ACCESS KEY", style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
-                    )
-                  ],
-                )
-              : Row(
-                  children: [
-                    if (!hasStripeId)
-                      RetroButton(text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, isFullWidth: false, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
-                    else if (hasStripeId && !isStripeReady)
-                      RetroButton(text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, isFullWidth: false, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
-                    else
-                      RetroButton(text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, isFullWidth: false, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () async {
-                        await _auth.sendPasswordResetEmail(email: email);
-                        _showToast("RESET LOG TRANSMITTED.");
-                      },
-                      child: const Text("RESET ACCESS KEY", style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
-                    )
-                  ],
-                )
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              if (!hasStripeId)
+                RetroButton(text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+              else if (hasStripeId && !isStripeReady)
+                RetroButton(text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+              else
+                RetroButton(text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
+              const Spacer(),
+              TextButton(
+                onPressed: () async {
+                  await _auth.sendPasswordResetEmail(email: email);
+                  _showToast("RESET LOG TRANSMITTED.");
+                },
+                child: const Text("RESET KEY", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _ratingSection(String teacherId, bool isMobile) {
+  Widget _ratingSection(String teacherId) {
     return StreamBuilder<QuerySnapshot>(
       stream: _fire.collection('teachers').doc(teacherId).collection('reviews').orderBy('createdAt', descending: true).snapshots(),
       builder: (context, snap) {
         if (!snap.hasData) return const SizedBox.shrink();
         final docs = snap.data!.docs;
-        double avg = 0;
-        if (docs.isNotEmpty) avg = docs.map((d) => (d['rating'] as num).toDouble()).reduce((a, b) => a + b) / docs.length;
 
         return RetroBlock(
           bgColor: AppColors.cardBg,
-          padding: 32,
+          padding: 24,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              isMobile
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("PLAYER REVIEWS", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink)),
-                        const SizedBox(height: 12),
-                        if (docs.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 2)),
-                            child: Text(
-                              "AVG: ${avg.toStringAsFixed(1)} ★",
-                              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
-                            ),
-                          ),
-                      ],
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("PLAYER REVIEWS", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink)),
-                        if (docs.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 2)),
-                            child: Text(
-                              "AVG: ${avg.toStringAsFixed(1)} ★",
-                              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
-                            ),
-                          ),
-                      ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("PLAYER FEEDBACK & REVIEWS", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink)),
+                  if (docs.isNotEmpty)
+                    Text(
+                      "${docs.length} REVIEWS",
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.textMuted),
                     ),
-              const SizedBox(height: 24),
-              if (docs.isEmpty) Text("NO REVIEWS LOGGED IN SYSTEM.", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textMuted)),
-              ...docs.take(2).map((d) {
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (docs.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
+                  child: Center(
+                    child: Text("NO REVIEWS LOGGED IN SYSTEM YET.", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMuted)),
+                  ),
+                ),
+              ...docs.take(3).map((d) {
                 final rData = d.data() as Map<String, dynamic>;
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -778,8 +938,14 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   ),
                 );
               }),
-              if (docs.length > 2)
-                TextButton(onPressed: () => context.go('/toate-recenziile/$teacherId'), child: Text("ACCESS FULL REVIEW LOG →", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.sky))),
+              if (docs.length > 3)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: TextButton(
+                    onPressed: () => context.push('/toate-recenziile/$teacherId'),
+                    child: Text("ACCESS ALL REVIEWS (${docs.length}) →", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sky)),
+                  ),
+                ),
             ],
           ),
         );
@@ -789,21 +955,24 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
 
   Future<void> _openEditDialog(String uid) async {
     final doc = await _fire.collection('teachers').doc(uid).get();
-    final data = doc.data() as Map<String, dynamic>;
+    final data = (doc.data() as Map<String, dynamic>?) ?? {};
     final nameCtrl = TextEditingController(text: data['name'] ?? '');
     final subjectCtrl = TextEditingController(text: data['subject'] ?? '');
     final expCtrl = TextEditingController(text: '${data['experience'] ?? ''}');
     final contactCtrl = TextEditingController(text: data['contact'] ?? '');
     final priceCtrl = TextEditingController(text: '${data['price'] ?? 50}');
+    final bioCtrl = TextEditingController(text: data['bio'] ?? '');
+
+    if (!mounted) return;
 
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.bg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 4)),
-        title: Text('UPDATE SYSTEM DATA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: AppColors.ink)),
+        title: Text('UPDATE MASTER DATA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: AppColors.ink)),
         content: SizedBox(
-          width: 450,
+          width: 480,
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -811,8 +980,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 _styledInput(nameCtrl, 'FULL NAME'),
                 _styledInput(subjectCtrl, 'DISCIPLINE'),
                 _styledInput(expCtrl, 'EXP YEARS', type: TextInputType.number),
-                _styledInput(contactCtrl, 'CONTACT LINK'),
+                _styledInput(contactCtrl, 'CONTACT LINK / PHONE'),
                 _styledInput(priceCtrl, 'HOURLY RATE (RON)', type: TextInputType.number),
+                _styledInput(bioCtrl, 'DESPRE MENTOR / BIO', maxLines: 3),
               ],
             ),
           ),
@@ -824,13 +994,14 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             bgColor: AppColors.sunset,
             textColor: Colors.white,
             onPressed: () async {
-              await _fire.collection('teachers').doc(uid).update({
+              await _fire.collection('teachers').doc(uid).set({
                 'name': nameCtrl.text.trim(),
                 'subject': subjectCtrl.text.trim(),
                 'experience': int.tryParse(expCtrl.text.trim()) ?? 0,
                 'contact': contactCtrl.text.trim(),
-                'price': int.tryParse(priceCtrl.text.trim()) ?? 50
-              });
+                'price': int.tryParse(priceCtrl.text.trim()) ?? 50,
+                'bio': bioCtrl.text.trim(),
+              }, SetOptions(merge: true));
               await _fire.collection('users').doc(uid).set({'name': nameCtrl.text.trim()}, SetOptions(merge: true));
               if (mounted) context.pop();
             },
@@ -840,12 +1011,13 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _styledInput(TextEditingController c, String label, {TextInputType type = TextInputType.text}) {
+  Widget _styledInput(TextEditingController c, String label, {TextInputType type = TextInputType.text, int maxLines = 1}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 14),
       child: TextField(
         controller: c,
         keyboardType: type,
+        maxLines: maxLines,
         style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
         cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
         decoration: InputDecoration(
@@ -854,7 +1026,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           filled: true,
           fillColor: AppColors.inputBg,
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 2.5)),
         ),
       ),
     );

@@ -55,6 +55,7 @@ class RetroButton extends StatefulWidget {
   final bool isFullWidth;
   final double fontSize;
   final EdgeInsets padding;
+  final IconData? icon;
 
   const RetroButton({
     super.key,
@@ -63,8 +64,9 @@ class RetroButton extends StatefulWidget {
     this.bgColor,
     this.textColor,
     this.isFullWidth = false,
-    this.fontSize = 20,
-    this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+    this.fontSize = 16,
+    this.padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+    this.icon,
   });
 
   @override
@@ -95,8 +97,8 @@ class _RetroButtonState extends State<RetroButton> {
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -2.0 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -105,21 +107,31 @@ class _RetroButtonState extends State<RetroButton> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
               ),
             ],
           ),
           padding: widget.padding,
-          child: Text(
-            widget.text.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: effectiveText,
-              fontSize: widget.fontSize,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, color: effectiveText, size: widget.fontSize + 2),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                widget.text.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: effectiveText,
+                  fontSize: widget.fontSize,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -174,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startDailyQuest() {
-    final exerciseId = '1';
+    const exerciseId = '1';
     final encodedMaterie = Uri.encodeComponent('Informatică');
     final encodedClasa = Uri.encodeComponent('9');
     context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
@@ -183,10 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildConstrainedSection({required Widget child, EdgeInsetsGeometry? padding}) {
     return Container(
       width: double.infinity,
-      padding: padding ?? const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: const BoxConstraints(maxWidth: 1120),
           child: child,
         ),
       ),
@@ -196,61 +208,86 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHeroSection(bool isMobile) {
     final leftContent = RetroBlock(
       bgColor: AppColors.mustard,
-      padding: isMobile ? 32 : 48,
+      padding: isMobile ? 24 : 36,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              border: Border.all(color: AppColors.border, width: 2),
-            ),
-            child: Text(
-              'SYSTEM ONLINE',
-              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 2.0),
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBg,
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'SYSTEM OPERATIONAL',
+                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1.2),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    color: AppColors.sunset,
+                    child: const Text(
+                      "SEASON 1",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.0),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "LEVEL UP YOUR\nKNOWLEDGE.",
+                style: TextStyle(
+                  fontSize: isMobile ? 36 : 48,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                  height: 1.1,
+                  letterSpacing: 1.0,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Alege o materie. Găsește un mentor verificat și rezolvă quest-uri interactive pentru a avansa în nivel.",
+                style: TextStyle(
+                  fontSize: isMobile ? 15 : 17,
+                  color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                  fontWeight: FontWeight.bold,
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 24),
-          Text(
-            "LEVEL UP YOUR\nKNOWLEDGE.",
-            style: TextStyle(
-              fontSize: isMobile ? 40 : 56,
-              fontWeight: FontWeight.w900,
-              color: Colors.black,
-              height: 1.1,
-              letterSpacing: 1.0,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            "Choose a discipline. Find a guild master. Complete daily quests to gain EXP.",
-            style: TextStyle(
-              fontSize: isMobile ? 16 : 20,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 32),
           if (isMobile)
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 RetroButton(
                   text: "FIND A MASTER",
+                  icon: Icons.search,
                   bgColor: AppColors.forest,
                   isFullWidth: true,
-                  fontSize: 16,
                   onPressed: () => context.go('/materii'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 RetroButton(
                   text: "DAILY QUESTS",
+                  icon: Icons.track_changes,
                   bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   isFullWidth: true,
-                  fontSize: 16,
                   onPressed: () => context.go('/exercitii'),
                 ),
               ],
@@ -260,12 +297,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 RetroButton(
                   text: "FIND A MASTER",
+                  icon: Icons.search,
                   bgColor: AppColors.forest,
                   onPressed: () => context.go('/materii'),
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: 16),
                 RetroButton(
                   text: "DAILY QUESTS",
+                  icon: Icons.track_changes,
                   bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   onPressed: () => context.go('/exercitii'),
@@ -276,155 +315,185 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
 
-    final rightContent = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        RetroBlock(
-          bgColor: AppColors.sky,
-          padding: 32,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                "PLAYER STATS",
-                style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5),
-              ),
-              const SizedBox(height: 24),
-              Container(height: 3, color: AppColors.border),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("QUESTS CLEARED:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
-                  _isLoadingStats
-                      ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: AppColors.ink, strokeWidth: 3))
-                      : Text("$_completedQuests", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 24)),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("SYSTEM STATUS:", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text("OPTIMAL", style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.w900, fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        RetroBlock(
-          bgColor: AppColors.cloud,
-          padding: 32,
-          child: Column(
+    final rightContent = RetroBlock(
+      bgColor: AppColors.cardBg,
+      padding: isMobile ? 24 : 32,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("DAILY QUEST", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
-                  Icon(Icons.star, color: AppColors.sunset, size: 28),
+                  Text(
+                    "YOUR PROGRESS",
+                    style: TextStyle(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.border, width: 2)),
+                    child: Text(
+                      _completedQuests > 10 ? "GOLD GUILD" : (_completedQuests > 3 ? "SILVER RANK" : "NOVICE"),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
-              Text(
-                "SOLVE: INFORMATICĂ LVL 9",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.cloud,
+                  border: Border.all(color: AppColors.border, width: 2),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("QUESTS CLEARED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 13)),
+                        _isLoadingStats
+                            ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                            : Text("$_completedQuests SOLVED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 14)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      child: LinearProgressIndicator(
+                        value: (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0,
+                        backgroundColor: AppColors.border.withOpacity(0.2),
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
+                        minHeight: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("DAILY BOUNTY", style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 1.0)),
+                  Icon(Icons.star, color: AppColors.mustard, size: 20),
+                ],
               ),
               const SizedBox(height: 8),
               Text(
-                "REWARD: +50 EXP",
-                style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.w900, fontSize: 14),
+                "INFORMATICĂ // CLASA A 9-A",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.ink),
               ),
-              const SizedBox(height: 24),
-              RetroButton(
-                text: "ACCEPT QUEST",
-                bgColor: AppColors.sunset,
-                isFullWidth: true,
-                fontSize: 16,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                onPressed: _startDailyQuest,
+              const SizedBox(height: 4),
+              Text(
+                "RECOMPENSĂ: +50 EXP // AUTO-CHECK",
+                style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 12),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 24),
+          RetroButton(
+            text: "ACCEPT BOUNTY",
+            icon: Icons.play_arrow,
+            bgColor: AppColors.sunset,
+            isFullWidth: true,
+            fontSize: 15,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            onPressed: _startDailyQuest,
+          ),
+        ],
+      ),
     );
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.fromLTRB(24, isMobile ? 32 : 60, 24, isMobile ? 32 : 40),
+      padding: EdgeInsets.fromLTRB(24, isMobile ? 24 : 36, 24, isMobile ? 24 : 28),
       child: isMobile
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 leftContent,
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
                 rightContent,
               ],
             )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 3, child: leftContent),
-                const SizedBox(width: 40),
-                Expanded(flex: 2, child: rightContent),
-              ],
+          : IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(flex: 3, child: leftContent),
+                  const SizedBox(width: 24),
+                  Expanded(flex: 2, child: rightContent),
+                ],
+              ),
             ),
     );
   }
 
   Widget _buildPathsSection(bool isMobile) {
     final List<Map<String, dynamic>> paths = [
-      {"icon": Icons.functions, "title": "MATHEMATICS", "color": AppColors.sunset, "desc": "ALGEBRA & LOGIC"},
-      {"icon": Icons.data_object, "title": "COMP. SCIENCE", "color": AppColors.forest, "desc": "ALGORITHMS & C++"},
-      {"icon": Icons.language, "title": "LANGUAGES", "color": AppColors.sky, "desc": "ENGLISH & ROMANIAN"},
+      {"icon": Icons.functions, "title": "MATEMATICĂ", "color": AppColors.sunset, "desc": "ALGEBRĂ & GEOMETRIE", "route": "Matematică"},
+      {"icon": Icons.data_object, "title": "INFORMATICĂ", "color": AppColors.forest, "desc": "ALGORITMI & C++", "route": "Informatică"},
+      {"icon": Icons.language, "title": "LIMBI STRĂINE", "color": AppColors.sky, "desc": "ENGLEZĂ & ROMÂNĂ", "route": "Engleză"},
     ];
 
     final List<Widget> pathCards = paths.map((path) {
       return Padding(
         padding: EdgeInsets.only(
-          bottom: isMobile && path != paths.last ? 24 : 0,
-          right: !isMobile && path != paths.last ? 24 : 0,
+          bottom: isMobile && path != paths.last ? 16 : 0,
+          right: !isMobile && path != paths.last ? 20 : 0,
         ),
-        child: RetroBlock(
-          bgColor: AppColors.cardBg,
-          padding: 32,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: path["color"],
-                  border: Border.all(color: AppColors.border, width: 3),
+        child: GestureDetector(
+          onTap: () {
+            final encoded = Uri.encodeComponent(path["route"] as String);
+            context.go('/lista-exercitii?materie=$encoded');
+          },
+          child: RetroBlock(
+            bgColor: AppColors.cardBg,
+            padding: 24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: path["color"],
+                    border: Border.all(color: AppColors.border, width: 2.5),
+                    boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
+                  ),
+                  child: Icon(path["icon"], size: 36, color: Colors.white),
                 ),
-                child: Icon(path["icon"], size: 48, color: Colors.white),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                path["title"],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: isMobile ? 20 : 24,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.ink,
-                  letterSpacing: 1.0,
+                const SizedBox(height: 16),
+                Text(
+                  path["title"],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: isMobile ? 18 : 20,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.ink,
+                    letterSpacing: 1.0,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                path["desc"],
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-              ),
-            ],
+                const SizedBox(height: 6),
+                Text(
+                  path["desc"],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }).toList();
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 32 : 40, horizontal: 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 20 : 28, horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -432,19 +501,19 @@ class _HomeScreenState extends State<HomeScreen> {
             "CHOOSE YOUR PATH",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: isMobile ? 32 : 40,
+              fontSize: isMobile ? 26 : 34,
               fontWeight: FontWeight.w900,
               color: AppColors.ink,
-              letterSpacing: 2.0,
+              letterSpacing: 1.5,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Text(
-            "SELECT A DISCIPLINE TO BEGIN YOUR TRAINING.",
+            "SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: isMobile ? 14 : 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+            style: TextStyle(fontSize: isMobile ? 13 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 28),
           isMobile
               ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: pathCards)
               : Row(children: pathCards.map((card) => Expanded(child: card)).toList()),
@@ -458,40 +527,41 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
-          child: Text(
-            "THE GUILD",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2.0),
+          child: const Text(
+            "GUILD ROSTER",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 11),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         Text(
           isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
           style: TextStyle(
-            fontSize: isMobile ? 36 : 48,
+            fontSize: isMobile ? 30 : 40,
             fontWeight: FontWeight.w900,
             color: AppColors.ink,
             height: 1.1,
             letterSpacing: 1.0,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 14),
         Text(
-          "Our verified experts are ready to guide you. Initiate comms and start leveling up today.",
+          "Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
           style: TextStyle(
-            fontSize: isMobile ? 16 : 18,
+            fontSize: isMobile ? 14 : 16,
             color: AppColors.ink,
             fontWeight: FontWeight.bold,
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         RetroButton(
-          text: "VIEW ROSTER",
+          text: "EXPLOREAZĂ PROFESORII",
+          icon: Icons.groups,
           bgColor: AppColors.sunset,
           isFullWidth: isMobile,
-          fontSize: 16,
+          fontSize: 15,
           onPressed: () => context.go('/materii'),
         ),
       ],
@@ -501,28 +571,28 @@ class _HomeScreenState extends State<HomeScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 1.0,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 1.1,
       children: [
-        _buildMasterAvatar(Icons.person, AppColors.sky),
-        _buildMasterAvatar(Icons.person_3, AppColors.mustard),
-        _buildMasterAvatar(Icons.person_2, AppColors.forest),
-        _buildMasterAvatar(Icons.person_4, AppColors.sunset),
+        _buildMasterAvatar(Icons.calculate, "MATH", AppColors.sky),
+        _buildMasterAvatar(Icons.terminal, "CODE", AppColors.mustard),
+        _buildMasterAvatar(Icons.bolt, "PHYSICS", AppColors.forest),
+        _buildMasterAvatar(Icons.science, "CHEM", AppColors.sunset),
       ],
     );
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 32 : 60, horizontal: 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 20 : 36, horizontal: 24),
       child: RetroBlock(
         bgColor: AppColors.cloud,
-        padding: isMobile ? 32 : 48,
+        padding: isMobile ? 20 : 36,
         child: isMobile
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   leftContent,
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 28),
                   rightContent,
                 ],
               )
@@ -530,7 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(child: leftContent),
-                  const SizedBox(width: 48),
+                  const SizedBox(width: 36),
                   Expanded(child: rightContent),
                 ],
               ),
@@ -538,15 +608,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMasterAvatar(IconData icon, Color color) {
+  Widget _buildMasterAvatar(IconData icon, String label, Color color) {
     return Container(
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: AppColors.border, width: 3),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
       ),
-      child: Center(
-        child: Icon(icon, size: 64, color: AppColors.ink),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 36, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            color: AppColors.ink,
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -554,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFooter(bool isMobile) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 40 : 60),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 32 : 44),
       decoration: BoxDecoration(
         color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
         border: Border(top: BorderSide(color: AppColors.border, width: 3)),
@@ -563,19 +645,19 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Text(
-              'IMEDITATII',
+              'IMEDITATII // GUILD',
               style: TextStyle(
-                fontSize: isMobile ? 32 : 40,
+                fontSize: isMobile ? 26 : 32,
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2.0,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Text(
-              'SYSTEM LOG: 2025 - 2026. LEVEL UP YOUR LEARNING.',
+              'SYSTEM LOG: LEVEL UP YOUR LEARNING IN 2026.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: isMobile ? 12 : 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 12 : 14, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -585,7 +667,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 800;
+    final isMobile = MediaQuery.of(context).size.width < 880;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
@@ -606,7 +688,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildHeroSection(isMobile),
                         _buildPathsSection(isMobile),
                         _buildMastersSection(isMobile),
-                        SizedBox(height: isMobile ? 24 : 40),
+                        SizedBox(height: isMobile ? 16 : 28),
                         _buildFooter(isMobile),
                       ],
                     ),
