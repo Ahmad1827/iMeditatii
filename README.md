@@ -1,4 +1,4 @@
-# 🎮 iMeditatii
+# iMeditatii
 
 > **Live Deployment:** [https://ahmad1827.github.io/](https://ahmad1827.github.io/)
 
