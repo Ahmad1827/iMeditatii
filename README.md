@@ -6,7 +6,7 @@ A gamified, retro-terminal styled tutoring platform designed to level up the lea
 
 ---
 
-## ⚡ Quick Preview
+## Quick Preview
 
 <p align="center">
   <img src="assets/gifiMeditatii.gif" alt="iMeditatii Gameplay & Walkthrough Demo" width="100%"/>
@@ -14,7 +14,7 @@ A gamified, retro-terminal styled tutoring platform designed to level up the lea
 
 ---
 
-## 🕹️ Features
+## Features
 
 * **Retro UI/UX**: Terminal-inspired aesthetic with Bento-box layouts and high-contrast color palettes.
 * **Role-Based Access**: Dedicated dashboards and profiles for Players (Students) and Guild Masters (Teachers).
@@ -26,7 +26,7 @@ A gamified, retro-terminal styled tutoring platform designed to level up the lea
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Frontend**: Flutter (Mobile & Web Support)
 * **Backend / Database**: Firebase Firestore & Firebase Auth
@@ -38,7 +38,7 @@ A gamified, retro-terminal styled tutoring platform designed to level up the lea
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1. Clone the repository:
    ```bash
@@ -73,7 +73,7 @@ A gamified, retro-terminal styled tutoring platform designed to level up the lea
 
 ---
 
-## 🤝 How to Contribute (Join the Guild)
+## How to Contribute (Join the Guild)
 
 Contributions, bug fixes, and feature suggestions are highly encouraged! If you want to help improve the system or add new quests, here is how you can join the party:
 
@@ -85,7 +85,7 @@ Contributions, bug fixes, and feature suggestions are highly encouraged! If you 
 
 ---
 
-## 🛑 Copyright & Usage
+## Copyright & Usage
 
 While I absolutely welcome contributions and encourage you to look at the code to learn, **this codebase is NOT open-source for commercial reuse, redistribution, or white-labeling.**
 
