@@ -1,155 +1,215 @@
+require("dotenv").config();
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const stripe = require("stripe")("sk_test_51Rv1VdQ9CsoeqYGKIK1oocRS0bkZjnCxNUbLwllrxWBCc8ZeH75H3XE1Y1VkfOVSmWy11ZdtH5QAuoDVeAoSvIls00gBhRe2Ni");
-const cors = require('cors')({origin: true});
+const cors = require("cors")({ origin: true });
+
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
+const stripePublishable = process.env.STRIPE_PUBLISHABLE_KEY;
+const stripe = require("stripe")(stripeSecret);
 
 if (!admin.apps.length) {
-    admin.initializeApp();
+  admin.initializeApp();
 }
 
-// --- 1. WEBHOOK: Deblochează automat chat-ul când plata e finalizată ---
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
-    const event = req.body;
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        const chatId = session.client_reference_id;
-        if (chatId) {
-            try {
-                await admin.firestore().collection('chats').doc(chatId).update({
-                    isSessionPaid: true
-                });
-                console.log(`✅ Sesiunea ${chatId} deblocată.`);
-            } catch (error) {
-                console.error("❌ Eroare Firestore:", error);
-            }
+// --- 1. PIPER GATEWAY: Create PaymentIntent with Connect Split ---
+exports.createPaymentIntent = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { chatId, teacherId, amount, studentId } = req.body;
+
+      if (!stripeSecret) {
+        return res.status(500).send({
+          error: "STRIPE_SECRET_KEY is missing on server. Check functions/.env",
+        });
+      }
+
+      if (!chatId || !teacherId || !amount) {
+        return res.status(400).send({
+          error: "Missing required parameters (chatId, teacherId, amount).",
+        });
+      }
+
+      // Check teacher's Stripe account status
+      const teacherDoc = await admin.firestore().collection("users").doc(teacherId).get();
+      const stripeAccountId = teacherDoc.data()?.stripeAccountId;
+
+      const sessionId = "sess_" + Date.now();
+      const appFee = Math.round(amount * 0.10); // 10% Platform fee
+
+      const paymentIntentParams = {
+        amount: Math.round(amount),
+        currency: "ron",
+        metadata: {
+          chatId: chatId,
+          teacherId: teacherId,
+          studentId: studentId || "anonymous",
+          sessionId: sessionId,
+        },
+      };
+
+      // If the teacher has a connected Stripe account, route the 90% payout to them
+      if (stripeAccountId && stripeAccountId.startsWith("acct_")) {
+        paymentIntentParams.application_fee_amount = appFee;
+        paymentIntentParams.transfer_data = {
+          destination: stripeAccountId,
+        };
+      }
+
+      let paymentIntent;
+      try {
+        paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
+      } catch (stripeError) {
+        console.error("Stripe API error:", stripeError);
+
+        // Catch invalid or non-existent destination account IDs
+        if (
+          stripeError.message &&
+          (stripeError.message.includes("No such destination") ||
+            stripeError.code === "resource_missing" ||
+            stripeError.raw?.code === "resource_missing")
+        ) {
+          return res.status(400).send({
+            error:
+              "Profesorul nu are contul Stripe configurat sau este invalid. Roagă profesorul să își configureze contul bancar din panoul său de profil.",
+          });
         }
+
+        return res.status(400).send({ error: stripeError.message });
+      }
+
+      // Initialize session in Firestore as pending
+      await admin.firestore().collection("chats").doc(chatId).set(
+        {
+          activeSession: {
+            sessionId: sessionId,
+            status: "pending_payment",
+            isPaid: false,
+            amount: amount / 100,
+            studentId: studentId,
+            teacherId: teacherId,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+        },
+        { merge: true }
+      );
+
+      return res.status(200).send({
+        clientSecret: paymentIntent.client_secret,
+        publishableKey: stripePublishable,
+        sessionId: sessionId,
+      });
+    } catch (error) {
+      console.error("PaymentIntent server error:", error);
+      return res.status(500).send({ error: error.message });
     }
-    res.status(200).send("OK");
+  });
 });
 
-// --- 2. ONBOARDING: Profesorul își leagă contul bancar ---
+// --- 2. WEBHOOK: Listens for Piper (PaymentIntent) ---
+exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+  const event = req.body;
+  try {
+    if (event.type === "payment_intent.succeeded") {
+      const pi = event.data.object;
+      const chatId = pi.metadata?.chatId;
+      const sessionId = pi.metadata?.sessionId;
+
+      if (chatId) {
+        await admin.firestore().collection("chats").doc(chatId).set(
+          {
+            activeSession: {
+              sessionId: sessionId,
+              isPaid: true,
+              status: "active",
+              paidAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            isSessionPaid: true,
+          },
+          { merge: true }
+        );
+        console.log(`✅ Piper PaymentIntent succeeded for chat: ${chatId}`);
+      }
+    }
+  } catch (error) {
+    console.error("Webhook error:", error);
+  }
+  res.status(200).send("OK");
+});
+
+// --- 3. ONBOARDING: Teacher connects Stripe Express ---
 exports.createStripeAccount = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-        try {
-            const uid = req.body.uid;
-            if (!uid) return res.status(400).send({ error: "UID lipsă" });
+  cors(req, res, async () => {
+    try {
+      const uid = req.body.uid;
+      if (!uid) return res.status(400).send({ error: "UID lipsă" });
 
-            const userRef = admin.firestore().collection('users').doc(uid);
-            const userDoc = await userRef.get();
-            let stripeAccountId = userDoc.data()?.stripeAccountId;
+      const userRef = admin.firestore().collection("users").doc(uid);
+      const userDoc = await userRef.get();
+      let stripeAccountId = userDoc.data()?.stripeAccountId;
 
-            if (!stripeAccountId) {
-                const account = await stripe.accounts.create({ type: 'express' });
-                stripeAccountId = account.id;
-                await userRef.update({ stripeAccountId: stripeAccountId });
-            }
+      if (!stripeAccountId) {
+        const account = await stripe.accounts.create({ type: "express" });
+        stripeAccountId = account.id;
+        await userRef.update({ stripeAccountId: stripeAccountId });
+      }
 
-            const accountLink = await stripe.accountLinks.create({
-                account: stripeAccountId,
-                refresh_url: 'https://imeditatii.web.app/success.html',
-                return_url: 'https://imeditatii.web.app/success.html',
-                type: 'account_onboarding',
-            });
+      const accountLink = await stripe.accountLinks.create({
+        account: stripeAccountId,
+        refresh_url: "https://ahmad1827.github.io/#/panou-profesor",
+        return_url: "https://ahmad1827.github.io/#/panou-profesor",
+        type: "account_onboarding",
+      });
 
-            return res.status(200).send({ url: accountLink.url });
-        } catch (error) {
-            return res.status(500).send({ error: error.message });
-        }
-    });
+      return res.status(200).send({ url: accountLink.url });
+    } catch (error) {
+      return res.status(500).send({ error: error.message });
+    }
+  });
 });
 
-// --- 3. PLATA: Elevul plătește (Acum convertită la HTTP super-sigur) ---
-exports.createCheckoutSession = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-        try {
-            // Prelucrăm datele primite de la aplicația Flutter
-            const { chatId, teacherId, amount } = req.body;
-
-            // Protecție: Dacă nu am primit ID-ul, ne oprim aici și returnăm eroarea
-            if (!teacherId) {
-                return res.status(400).send({ error: "Eroare de comunicare: Nu am primit ID-ul profesorului pe server." });
-            }
-
-            const teacherDoc = await admin.firestore().collection('users').doc(teacherId).get();
-            const stripeAccountId = teacherDoc.data()?.stripeAccountId;
-
-            if (!stripeAccountId) {
-                return res.status(400).send({ error: "Acest profesor nu a terminat configurarea contului Stripe." });
-            }
-
-            const appFee = Math.round(amount * 0.10);
-
-            const session = await stripe.checkout.sessions.create({
-                payment_method_types: ['card'],
-                line_items: [{
-                    price_data: {
-                        currency: 'ron',
-                        product_data: { name: 'Ședință Meditație' },
-                        unit_amount: amount,
-                    },
-                    quantity: 1,
-                }],
-                mode: 'payment',
-                client_reference_id: chatId,
-                success_url: 'https://imeditatii.web.app/success.html',
-                cancel_url: 'https://imeditatii.web.app/cancel.html',
-                payment_intent_data: {
-                    application_fee_amount: appFee,
-                    transfer_data: {
-                        destination: stripeAccountId,
-                    },
-                },
-            });
-
-            return res.status(200).send({ url: session.url });
-        } catch (error) {
-            console.error("Eroare Checkout Session:", error);
-            return res.status(500).send({ error: error.message });
-        }
-    });
-});
-
-// --- 4. DASHBOARD LINK: Generează link-ul securizat pentru portofelul Stripe ---
+// --- 4. DASHBOARD LINK: Direct login to Stripe Express portal ---
 exports.createStripeDashboardLink = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-        try {
-            const uid = req.body.uid;
-            if (!uid) return res.status(400).send({ error: "UID lipsă" });
+  cors(req, res, async () => {
+    try {
+      const uid = req.body.uid;
+      if (!uid) return res.status(400).send({ error: "UID lipsă" });
 
-            const userDoc = await admin.firestore().collection('users').doc(uid).get();
-            const stripeAccountId = userDoc.data()?.stripeAccountId;
+      const userDoc = await admin.firestore().collection("users").doc(uid).get();
+      const stripeAccountId = userDoc.data()?.stripeAccountId;
 
-            if (!stripeAccountId) return res.status(400).send({ error: "Profesorul nu are un cont Stripe activ." });
+      if (!stripeAccountId) {
+        return res.status(400).send({ error: "Profesorul nu are un cont Stripe activ." });
+      }
 
-            const loginLink = await stripe.accounts.createLoginLink(stripeAccountId);
-            return res.status(200).send({ url: loginLink.url });
-        } catch (error) {
-            return res.status(500).send({ error: error.message });
-        }
-    });
+      const loginLink = await stripe.accounts.createLoginLink(stripeAccountId);
+      return res.status(200).send({ url: loginLink.url });
+    } catch (error) {
+      return res.status(500).send({ error: error.message });
+    }
+  });
 });
 
-// --- 5. VERIFICARE STATUS STRIPE ---
+// --- 5. VERIFY STRIPE STATUS: Checks onboarding readiness ---
 exports.verifyStripeStatus = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-        try {
-            const uid = req.body.uid;
-            if (!uid) return res.status(400).send({ error: "UID lipsă" });
+  cors(req, res, async () => {
+    try {
+      const uid = req.body.uid;
+      if (!uid) return res.status(400).send({ error: "UID lipsă" });
 
-            const userRef = admin.firestore().collection('users').doc(uid);
-            const userDoc = await userRef.get();
-            const stripeAccountId = userDoc.data()?.stripeAccountId;
+      const userRef = admin.firestore().collection("users").doc(uid);
+      const userDoc = await userRef.get();
+      const stripeAccountId = userDoc.data()?.stripeAccountId;
 
-            if (!stripeAccountId) return res.status(200).send({ isReady: false });
+      if (!stripeAccountId) return res.status(200).send({ isReady: false });
 
-            const account = await stripe.accounts.retrieve(stripeAccountId);
-            const isReady = account.details_submitted && account.charges_enabled;
+      const account = await stripe.accounts.retrieve(stripeAccountId);
+      const isReady = account.details_submitted && account.charges_enabled;
 
-            await userRef.update({ isStripeActive: isReady });
+      await userRef.update({ isStripeActive: isReady });
 
-            return res.status(200).send({ isReady: isReady });
-        } catch (error) {
-            return res.status(500).send({ error: error.message });
-        }
-    });
+      return res.status(200).send({ isReady: isReady });
+    } catch (error) {
+      return res.status(500).send({ error: error.message });
+    }
+  });
 });

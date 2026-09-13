@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:cloud_functions/cloud_functions.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
@@ -158,16 +159,18 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isChatEnded = false;
   String teacherId = '';
   String studentId = '';
-  bool isSessionPaid = false;
   bool isStudentAccepted = false;
   bool _isLoadingPayment = false;
   bool _isUploadingImage = false;
 
+  Map<String, dynamic>? activeSession;
   int _teacherPrice = 50;
   final String ownerEmail = 'ahmadarnaoute1896@gmail.com';
 
   bool get isOwner => currentUser?.email == ownerEmail;
   bool get isTeacher => currentUser?.uid == teacherId;
+  bool get isSessionPaid =>
+      activeSession != null && activeSession!['isPaid'] == true && activeSession!['status'] == 'active';
 
   final List<Map<String, dynamic>> _localSystemMessages = [];
 
@@ -176,6 +179,10 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     markMessagesAsRead();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPaymentReturn();
+    });
+
     FirebaseFirestore.instance.collection('chats').doc(widget.chatId).snapshots().listen((snapshot) {
       final data = snapshot.data();
       if (data != null && mounted) {
@@ -183,8 +190,8 @@ class _ChatScreenState extends State<ChatScreen> {
           isChatEnded = data['isEnded'] == true;
           teacherId = data['teacherId'] ?? '';
           studentId = data['studentId'] ?? '';
-          isSessionPaid = data['isSessionPaid'] == true;
           isStudentAccepted = data['isStudentAccepted'] == true;
+          activeSession = data['activeSession'] as Map<String, dynamic>?;
         });
 
         if (teacherId.isNotEmpty) {
@@ -198,6 +205,45 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  void _checkPaymentReturn() async {
+    final uri = Uri.base;
+    final paymentStatus = uri.queryParameters['payment'];
+    final sessionId = uri.queryParameters['sessionId'];
+
+    if (paymentStatus == 'success' && sessionId != null) {
+      await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).set({
+        'activeSession': {
+          'sessionId': sessionId,
+          'isPaid': true,
+          'status': 'active',
+          'paidAt': FieldValue.serverTimestamp(),
+          'paidBy': currentUser?.uid,
+        },
+        'isSessionPaid': true,
+      }, SetOptions(merge: true));
+
+      if (kIsWeb) {
+        final cleanUrl = uri.path;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(cleanUrl);
+          context.push('/video-call/${widget.chatId}');
+        });
+      }
+    } else if (paymentStatus == 'cancelled') {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              "PAYMENT CANCELLED. ACCESS RESTRICTED.",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            backgroundColor: AppColors.sunset,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
@@ -209,7 +255,10 @@ class _ChatScreenState extends State<ChatScreen> {
     if (currentUser == null) return;
     final chatRef = FirebaseFirestore.instance.collection('chats').doc(widget.chatId);
     final msgRef = chatRef.collection('messages');
-    final unread = await msgRef.where('senderId', isNotEqualTo: currentUser!.uid).where('isRead', isEqualTo: false).get();
+    final unread = await msgRef
+        .where('senderId', isNotEqualTo: currentUser!.uid)
+        .where('isRead', isEqualTo: false)
+        .get();
 
     for (var doc in unread.docs) {
       await doc.reference.update({'isRead': true});
@@ -321,39 +370,102 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Future<void> openPaymentPage() async {
-    if (teacherId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ERROR: Mentor missing.')));
+  Future<void> _startOrJoinCall() async {
+    if (teacherId.isEmpty) return;
+
+    if (isTeacher || isOwner) {
+      final existingSessionId = activeSession?['sessionId'];
+      final sessionId = existingSessionId ?? 'sess_${DateTime.now().millisecondsSinceEpoch}';
+
+      if (existingSessionId == null) {
+        await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).set({
+          'activeSession': {
+            'sessionId': sessionId,
+            'status': 'active',
+            'isPaid': false,
+            'createdAt': FieldValue.serverTimestamp(),
+          },
+          'activeCall': {'roomId': widget.chatId, 'startedBy': currentUser!.uid, 'startedAt': Timestamp.now()}
+        }, SetOptions(merge: true));
+      }
+
+      if (mounted) {
+        await context.push('/video-call/${widget.chatId}');
+      }
       return;
     }
+
+    if (isSessionPaid) {
+      await context.push('/video-call/${widget.chatId}');
+      return;
+    }
+
     setState(() => _isLoadingPayment = true);
 
     try {
-      final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('createCheckoutSession');
       final amountInCents = _teacherPrice * 100;
-      final result = await callable.call({'chatId': widget.chatId, 'teacherId': teacherId, 'amount': amountInCents});
-      final String stripeUrl = result.data['url'];
-      final Uri url = Uri.parse(stripeUrl);
 
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
-        throw 'Cannot launch payment gateway.';
+      final response = await http.post(
+        Uri.parse('https://us-central1-imeditatii.cloudfunctions.net/createPaymentIntent'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'chatId': widget.chatId,
+          'teacherId': teacherId,
+          'studentId': currentUser?.uid ?? '',
+          'amount': amountInCents,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode != 200 || data['error'] != null) {
+        throw data['error'] ?? 'Eroare necunoscută la inițializarea plății.';
       }
+
+      final clientSecret = data['clientSecret'];
+      final publishableKey = data['publishableKey'];
+      final sessionId = data['sessionId'];
+
+      final piperUrl = Uri.parse(
+        '/piper/index.html'
+        '?pk=$publishableKey'
+        '&client_secret=$clientSecret'
+        '&chatId=${widget.chatId}'
+        '&sessionId=$sessionId'
+        '&amount=${_teacherPrice.toStringAsFixed(2)}+RON'
+        '&item=${Uri.encodeComponent("SESIUNE: ${widget.teacherName}")}'
+      );
+
+      await launchUrl(piperUrl, mode: LaunchMode.platformDefault);
     } catch (e) {
+      String rawMessage = e.toString();
+      String friendlyMessage = rawMessage;
+
+      // Translate destination and Stripe account errors into an actionable message
+      if (rawMessage.contains("No such destination") ||
+          rawMessage.contains("stripeAccountId") ||
+          rawMessage.contains("nu are contul Stripe") ||
+          rawMessage.contains("destination")) {
+        friendlyMessage =
+            "TEACHER SETUP REQUIRED:\nPlease ask ${widget.teacherName} to set up their Stripe bank account in their profile before initiating paid sessions.";
+      }
+
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.bg,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
-            title: Text("PAYMENT ERROR", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
-            content: Text(e.toString(), style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink)),
+            title: Text("PAYMENT NOTICE", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
+            content: Text(
+              friendlyMessage,
+              style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.4),
+            ),
             actions: [
               RetroButton(
-                text: "CLOSE",
-                bgColor: AppColors.cloud,
-                textColor: AppColors.ink,
+                text: "UNDERSTOOD",
+                bgColor: AppColors.ink,
+                textColor: Colors.white,
                 onPressed: () => context.pop(),
               )
             ],
@@ -367,50 +479,22 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _unlockSessionByOwner() async {
     if (!isOwner) return;
-    await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).update({
+    await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).set({
+      'activeSession': {
+        'sessionId': 'override_${DateTime.now().millisecondsSinceEpoch}',
+        'isPaid': true,
+        'status': 'active',
+        'paidAt': FieldValue.serverTimestamp(),
+      },
       'isSessionPaid': true,
       'isStudentAccepted': true,
-    });
+    }, SetOptions(merge: true));
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('MANUAL OVERRIDE: SESSION UNLOCKED', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           backgroundColor: AppColors.ink,
-        ),
-      );
-    }
-  }
-
-  Future<void> _handleVideoCallPress() async {
-    if (isSessionPaid || isOwner) {
-      final chatRef = FirebaseFirestore.instance.collection('chats').doc(widget.chatId);
-      await chatRef.update({'activeCall': {'roomId': widget.chatId, 'startedBy': currentUser!.uid, 'startedAt': Timestamp.now()}});
-
-      if (mounted) {
-        await context.push('/video-call/${widget.chatId}');
-
-        if (isTeacher || isOwner) {
-          await chatRef.update({'activeCall': FieldValue.delete(), 'isSessionPaid': false});
-        } else {
-          _showReviewDialog();
-        }
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: AppColors.bg,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
-          title: Text("SESSION LOCKED", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.sunset)),
-          content: Text("Payment required before initiating video feed.", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600)),
-          actions: [
-            RetroButton(
-              text: "ACKNOWLEDGE",
-              bgColor: AppColors.sky,
-              textColor: Colors.white,
-              onPressed: () => context.pop(),
-            )
-          ],
         ),
       );
     }
@@ -439,101 +523,6 @@ class _ChatScreenState extends State<ChatScreen> {
     await chatRef.set({'lastMessage': text, 'updatedAt': Timestamp.now()}, SetOptions(merge: true));
 
     _messageController.clear();
-  }
-
-  Future<void> _showReviewDialog() async {
-    int rating = 5;
-    final TextEditingController reviewController = TextEditingController();
-    bool isSubmitting = false;
-
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: AppColors.bg,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 4)),
-              title: Text('RATE SESSION', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0)),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('EVALUATE MENTOR PERFORMANCE:', style: TextStyle(fontSize: 16, color: AppColors.ink, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      return GestureDetector(
-                        onTap: () => setDialogState(() => rating = index + 1),
-                        child: Icon(index < rating ? Icons.star : Icons.star_border, color: AppColors.sunset, size: 44),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: reviewController,
-                    maxLines: 3,
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink),
-                    cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
-                    decoration: InputDecoration(
-                      hintText: 'LEAVE LOG (OPTIONAL)...',
-                      hintStyle: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold),
-                      filled: true,
-                      fillColor: AppColors.inputBg,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 3)),
-                    ),
-                  ),
-                ],
-              ),
-              actionsPadding: const EdgeInsets.all(24),
-              actions: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: RetroButton(
-                        text: 'SKIP',
-                        bgColor: AppColors.cloud,
-                        textColor: AppColors.ink,
-                        onPressed: () => context.pop(),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: RetroButton(
-                        text: isSubmitting ? '...' : 'SUBMIT',
-                        bgColor: AppColors.ink,
-                        textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                        onPressed: isSubmitting
-                            ? () {}
-                            : () async {
-                                setDialogState(() => isSubmitting = true);
-                                try {
-                                  await FirebaseFirestore.instance.collection('teachers').doc(teacherId).collection('reviews').add({
-                                    'rating': rating,
-                                    'comment': reviewController.text.trim(),
-                                    'createdAt': Timestamp.now(),
-                                    'studentId': currentUser!.uid,
-                                  });
-                                  if (mounted) context.pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('LOG SUBMITTED.')));
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ERROR: $e')));
-                                  setDialogState(() => isSubmitting = false);
-                                }
-                              },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 
   DateTime _getDateTime(dynamic timestamp) {
@@ -621,7 +610,37 @@ class _ChatScreenState extends State<ChatScreen> {
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             iconTheme: IconThemeData(color: AppColors.ink),
-            bottom: PreferredSize(preferredSize: const Size.fromHeight(3), child: Container(color: AppColors.border, height: 3)),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(3),
+              child: Container(color: AppColors.border, height: 3),
+            ),
+            // Custom Neobrutalist Back Button
+            leadingWidth: 54,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 12.0, top: 10.0, bottom: 10.0),
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(isTeacher ? '/panou-profesor' : '/panou-elev');
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.cloud,
+                      border: Border.all(color: AppColors.border, width: 2),
+                      boxShadow: [
+                        BoxShadow(color: AppColors.shadow, offset: const Offset(2, 2)),
+                      ],
+                    ),
+                    child: Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
+                  ),
+                ),
+              ),
+            ),
             title: GestureDetector(
               onTap: () {
                 final currentUid = currentUser!.uid;
@@ -711,17 +730,21 @@ class _ChatScreenState extends State<ChatScreen> {
               Container(
                 margin: const EdgeInsets.only(right: 16, left: 6),
                 decoration: BoxDecoration(
-                  color: isSessionPaid || isOwner ? AppColors.sky : AppColors.cloud,
+                  color: isSessionPaid || isTeacher || isOwner ? AppColors.sky : AppColors.cloud,
                   border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: IconButton(
-                  icon: Icon(
-                    Icons.videocam,
-                    color: isSessionPaid || isOwner ? (AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink) : AppColors.textMuted,
-                    size: 22,
-                  ),
+                  icon: _isLoadingPayment
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Icon(
+                          Icons.videocam,
+                          color: (isSessionPaid || isTeacher || isOwner)
+                              ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                              : AppColors.textMuted,
+                          size: 22,
+                        ),
                   tooltip: "INITIATE VIDEO FEED",
-                  onPressed: _handleVideoCallPress,
+                  onPressed: _isLoadingPayment ? null : _startOrJoinCall,
                 ),
               ),
             ],
@@ -816,71 +839,56 @@ class _ChatScreenState extends State<ChatScreen> {
                               text: _isLoadingPayment ? "..." : "PAY $_teacherPrice RON",
                               bgColor: AppColors.sunset,
                               textColor: Colors.white,
-                              onPressed: _isLoadingPayment ? () {} : openPaymentPage,
+                              onPressed: _isLoadingPayment ? () {} : _startOrJoinCall,
                             ),
                           ],
                         ),
                       ),
 
-                    StreamBuilder<DocumentSnapshot>(
-                      stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) return const SizedBox.shrink();
-                        final data = snapshot.data!.data() as Map<String, dynamic>?;
-                        final hasActiveCall = data?['activeCall'] != null;
-
-                        if (hasActiveCall) {
-                          final roomId = (data!['activeCall'] as Map<String, dynamic>)['roomId'];
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: AppColors.sky,
-                              border: Border(bottom: BorderSide(color: AppColors.border, width: 2.5)),
+                    if (activeSession != null && activeSession!['status'] == 'active')
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.sky,
+                          border: Border(bottom: BorderSide(color: AppColors.border, width: 2.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 2)),
+                              child: Icon(Icons.videocam, color: AppColors.ink, size: 20),
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 2)),
-                                  child: Icon(Icons.videocam, color: AppColors.ink, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                isSessionPaid ? "SESSION ACTIVE (PAID) // RECONNECT READY" : "SESSION ACTIVE // PAYMENT REQUIRED",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                  fontSize: 14,
+                                  letterSpacing: 1.0,
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    "LIVE FEED TRANSMITTING!",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                                      fontSize: 15,
-                                      letterSpacing: 1.2,
-                                    ),
-                                  ),
-                                ),
-                                RetroButton(
-                                  text: "JOIN",
-                                  bgColor: AppColors.cardBg,
-                                  textColor: AppColors.ink,
-                                  onPressed: () async {
-                                    await context.push('/video-call/$roomId');
-
-                                    if (isTeacher || isOwner) {
-                                      await FirebaseFirestore.instance.collection('chats').doc(widget.chatId).update({'activeCall': FieldValue.delete(), 'isSessionPaid': false});
-                                    } else {
-                                      _showReviewDialog();
-                                    }
-                                  },
-                                ),
-                              ],
+                              ),
                             ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
+                            RetroButton(
+                              text: isSessionPaid || isTeacher || isOwner ? "JOIN" : "PAY & JOIN",
+                              bgColor: AppColors.cardBg,
+                              textColor: AppColors.ink,
+                              onPressed: _startOrJoinCall,
+                            ),
+                          ],
+                        ),
+                      ),
 
                     Expanded(
                       child: StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).collection('messages').orderBy('createdAt', descending: true).snapshots(),
+                        stream: FirebaseFirestore.instance
+                            .collection('chats')
+                            .doc(widget.chatId)
+                            .collection('messages')
+                            .orderBy('createdAt', descending: true)
+                            .snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
 
@@ -1021,7 +1029,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                                       Text(
                                                         isMe ? "[PLAYER] YOU" : "[MASTER] ${widget.teacherName.toUpperCase()}",
                                                         style: TextStyle(
-                                                          color: isMe ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white) : (AppColors.isDark ? Colors.white : AppColors.cloud),
+                                                          color: isMe
+                                                              ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                                                              : (AppColors.isDark ? Colors.white : AppColors.cloud),
                                                           fontSize: 10,
                                                           fontWeight: FontWeight.w900,
                                                           letterSpacing: 1.0,
@@ -1031,7 +1041,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                                       Text(
                                                         timeStr,
                                                         style: TextStyle(
-                                                          color: isMe ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white70) : (AppColors.isDark ? Colors.white70 : AppColors.cloud),
+                                                          color: isMe
+                                                              ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white70)
+                                                              : (AppColors.isDark ? Colors.white70 : AppColors.cloud),
                                                           fontSize: 10,
                                                           fontWeight: FontWeight.bold,
                                                           fontFamily: 'monospace',

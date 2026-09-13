@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -238,16 +239,63 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   bool _hasCamera = true;
   final String appId = dotenv.env['AGORA_APP_ID'] ?? '';
 
-  // Whiteboard properties
   List<DrawingPoint> _whiteboardPoints = [];
   Color _selectedDrawColor = const Color(0xFF55EFC4);
   double _strokeWidth = 3.5;
 
+  bool _isAuthorized = false;
+  bool _isTeacher = false;
+  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
   @override
   void initState() {
     super.initState();
-    initAgora();
+    _verifyAccessAndInit();
     _listenToWhiteboard();
+    _listenToSessionStatus();
+  }
+
+  void _listenToSessionStatus() {
+    FirebaseFirestore.instance.collection('chats').doc(widget.roomId).snapshots().listen((doc) {
+      if (!doc.exists) return;
+      final data = doc.data() ?? {};
+      final session = data['activeSession'] as Map<String, dynamic>?;
+      if (session != null && session['status'] == 'ended' && mounted) {
+        context.go('/chat/${widget.roomId}');
+      }
+    });
+  }
+
+  Future<void> _verifyAccessAndInit() async {
+    final chatDoc = await FirebaseFirestore.instance.collection('chats').doc(widget.roomId).get();
+    if (!chatDoc.exists) {
+      if (mounted) context.go('/chat/${widget.roomId}');
+      return;
+    }
+
+    final data = chatDoc.data() ?? {};
+    final teacherId = data['teacherId'];
+    final session = data['activeSession'] as Map<String, dynamic>?;
+
+    _isTeacher = currentUserId == teacherId;
+    final isOwner = FirebaseAuth.instance.currentUser?.email == 'ahmadarnaoute1896@gmail.com';
+    final isPaid = session != null && session['isPaid'] == true && session['status'] == 'active';
+
+    if (!_isTeacher && !isOwner && !isPaid) {
+      if (mounted) {
+        context.go('/chat/${widget.roomId}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("ACCESS DENIED: SESSION UNPAID."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isAuthorized = true);
+    initAgora();
   }
 
   void _listenToWhiteboard() {
@@ -330,7 +378,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         await _engine.startPreview(sourceType: VideoSourceType.videoSourceCamera);
         _hasCamera = true;
       } catch (e) {
-        debugPrint("Cameră indisponibilă: $e");
         _hasCamera = false;
       }
 
@@ -383,19 +430,69 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       }
       setState(() => _isScreenShared = !_isScreenShared);
     } catch (e) {
-      debugPrint("Eroare la screen share: $e");
+      debugPrint("Screen share error: $e");
+    }
+  }
+
+  Future<void> _handleHangup() async {
+    if (_isTeacher) {
+      final shouldEndSession = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.bg,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 3)),
+          title: Text("TERMINATE SESSION?", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
+          content: Text(
+            "Do you want to close this paid session completely, or just leave temporarily?",
+            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            RetroButton(
+              text: "LEAVE ONLY",
+              bgColor: AppColors.cloud,
+              textColor: AppColors.ink,
+              onPressed: () => ctx.pop(false),
+            ),
+            RetroButton(
+              text: "END SESSION",
+              bgColor: AppColors.sunset,
+              textColor: Colors.white,
+              onPressed: () => ctx.pop(true),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldEndSession == true) {
+        await FirebaseFirestore.instance.collection('chats').doc(widget.roomId).update({
+          'activeSession.status': 'ended',
+        });
+      }
+    }
+
+    if (mounted) {
+      context.pop();
     }
   }
 
   @override
   void dispose() {
-    _engine.leaveChannel();
-    _engine.release();
+    if (_isAuthorized) {
+      _engine.leaveChannel();
+      _engine.release();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isAuthorized) {
+      return Scaffold(
+        backgroundColor: AppColors.bg,
+        body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+      );
+    }
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
@@ -403,7 +500,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           backgroundColor: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
           body: Stack(
             children: [
-              // Main Video Stream (Remote)
               Center(
                 child: _remoteUid != null
                     ? AgoraVideoView(
@@ -432,7 +528,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
               ),
 
-              // Interactive Whiteboard Overlay
               if (_isWhiteboardOpen)
                 Positioned.fill(
                   child: Container(
@@ -505,7 +600,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                 ),
 
-              // Local User Picture-in-Picture Video
               if (_localUserJoined)
                 Positioned(
                   bottom: 120,
@@ -536,7 +630,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                 ),
 
-              // Bottom Action Buttons Toolbar
               Positioned(
                 bottom: 32,
                 left: 0,
@@ -562,7 +655,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       icon: Icons.call_end,
                       bgColor: AppColors.sunset,
                       iconColor: Colors.white,
-                      onPressed: () => context.pop(),
+                      onPressed: _handleHangup,
                     ),
                   ],
                 ),
