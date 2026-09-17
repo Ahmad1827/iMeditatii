@@ -62,7 +62,7 @@ void main() async {
     debugPrint("ThemeManager error: $e");
   }
 
-  // 랜derizăm aplicația imediat pentru a preveni ecranul alb
+  // Randăm aplicația imediat pentru a preveni ecranul alb
   runApp(const IMeditatiiApp());
 
   // Rulăm seeder-ul asincron în background cu protecție la erori de rețea/AdBlock
@@ -280,14 +280,16 @@ class IMeditatiiApp extends StatelessWidget {
 
           routerConfig: _router,
 
-          // BUTONUL FLOTANT PERMANENT (LIGHT / DARK)
+          // BUTONUL FLOTANT PERMANENT (RESPONSIVE: ROTUND PE MOBIL, DREPTUNGHIULAR PE DESKTOP)
           builder: (context, child) {
+            final isMobile = MediaQuery.of(context).size.width < 750;
+
             return Stack(
               children: [
                 child ?? const SizedBox(),
                 Positioned(
-                  bottom: 20,
-                  left: 20,
+                  bottom: isMobile ? 14 : 20,
+                  left: isMobile ? 14 : 20,
                   child: Material(
                     color: Colors.transparent,
                     child: MouseRegion(
@@ -295,42 +297,54 @@ class IMeditatiiApp extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () => ThemeManager.toggleTheme(),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          width: isMobile ? 42 : null,
+                          height: isMobile ? 42 : null,
+                          padding: isMobile
+                              ? EdgeInsets.zero
+                              : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: isDark ? const Color(0xFF1B242B) : Colors.white,
+                            shape: isMobile ? BoxShape.circle : BoxShape.rectangle,
                             border: Border.all(
                               color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
-                              width: 2.5,
+                              width: isMobile ? 2.0 : 2.5,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: isDark ? Colors.black87 : const Color(0xFF2C363F),
-                                offset: const Offset(3.5, 3.5),
+                                offset: isMobile ? const Offset(2.5, 2.5) : const Offset(3.5, 3.5),
                                 blurRadius: 0,
                               ),
                             ],
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                isDark ? Icons.light_mode : Icons.dark_mode,
-                                color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
-                                size: 18,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                isDark ? "LIGHT THEME" : "DARK THEME",
-                                style: TextStyle(
-                                  fontFamily: 'monospace',
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 12,
-                                  color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
-                                  letterSpacing: 0.8,
+                          alignment: Alignment.center,
+                          child: isMobile
+                              ? Icon(
+                                  isDark ? Icons.light_mode : Icons.dark_mode,
+                                  color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
+                                  size: 20,
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isDark ? Icons.light_mode : Icons.dark_mode,
+                                      color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      isDark ? "LIGHT THEME" : "DARK THEME",
+                                      style: TextStyle(
+                                        fontFamily: 'monospace',
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 12,
+                                        color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
                         ),
                       ),
                     ),
