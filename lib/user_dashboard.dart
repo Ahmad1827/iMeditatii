@@ -159,6 +159,7 @@ class _UserDashboardState extends State<UserDashboard> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final isMobile = MediaQuery.of(context).size.width < 750;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
@@ -182,7 +183,7 @@ class _UserDashboardState extends State<UserDashboard> {
               const CustomNavbar(),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 850),
@@ -200,18 +201,18 @@ class _UserDashboardState extends State<UserDashboard> {
                               }
                               final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
                               final userName = data['name'] ?? 'PLAYER';
-                              return _buildHeaderSection(userName, userId);
+                              return _buildHeaderSection(userName, userId, isMobile);
                             },
                           ),
-                          const SizedBox(height: 48),
+                          SizedBox(height: isMobile ? 32 : 48),
                           Row(
                             children: [
-                              Icon(Icons.forum, color: AppColors.ink, size: 28),
-                              const SizedBox(width: 16),
+                              Icon(Icons.forum, color: AppColors.ink, size: isMobile ? 24 : 28),
+                              const SizedBox(width: 12),
                               Text(
                                 "MASTER LOGS (MESSAGES)",
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: isMobile ? 18 : 22,
                                   fontWeight: FontWeight.w900,
                                   color: AppColors.ink,
                                   letterSpacing: 1.0,
@@ -219,8 +220,8 @@ class _UserDashboardState extends State<UserDashboard> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 24),
-                          _buildChatList(userId),
+                          SizedBox(height: isMobile ? 16 : 24),
+                          _buildChatList(userId, isMobile),
                         ],
                       ),
                     ),
@@ -234,7 +235,52 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _buildHeaderSection(String userName, String userId) {
+  Widget _buildHeaderSection(String userName, String userId, bool isMobile) {
+    if (isMobile) {
+      return RetroBlock(
+        bgColor: AppColors.forest,
+        padding: 20,
+        shadowOffset: 4,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              color: AppColors.ink,
+              child: Text(
+                "PLAYER TERMINAL",
+                style: TextStyle(
+                  color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              "GREETINGS, ${userName.split(' ')[0].toUpperCase()}!",
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.8),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "ACCESS YOUR COMMS AND TRACK QUEST PROGRESS.",
+              style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            RetroButton(
+              text: "PROFILE",
+              icon: Icons.person,
+              isFullWidth: true,
+              bgColor: AppColors.cardBg,
+              textColor: AppColors.ink,
+              onPressed: () => context.go('/elev/$userId'),
+            ),
+          ],
+        ),
+      );
+    }
+
     return RetroBlock(
       bgColor: AppColors.forest,
       padding: 32,
@@ -284,7 +330,7 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _buildChatList(String userId) {
+  Widget _buildChatList(String userId, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('chats')
@@ -293,7 +339,7 @@ class _UserDashboardState extends State<UserDashboard> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Column(children: List.generate(3, (index) => _chatCardSkeleton()));
+          return Column(children: List.generate(3, (index) => _chatCardSkeleton(isMobile)));
         }
         if (snapshot.hasError) {
           return Center(
@@ -303,7 +349,7 @@ class _UserDashboardState extends State<UserDashboard> {
             ),
           );
         }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _buildEmptyState();
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _buildEmptyState(isMobile);
 
         final chats = snapshot.data!.docs;
 
@@ -318,7 +364,7 @@ class _UserDashboardState extends State<UserDashboard> {
             return FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance.collection('teachers').doc(teacherId).get(),
               builder: (context, teacherSnap) {
-                if (teacherSnap.connectionState == ConnectionState.waiting) return _chatCardSkeleton();
+                if (teacherSnap.connectionState == ConnectionState.waiting) return _chatCardSkeleton(isMobile);
                 if (!teacherSnap.hasData || !teacherSnap.data!.exists) return const SizedBox.shrink();
 
                 final teacherData = teacherSnap.data!.data() as Map<String, dynamic>;
@@ -330,6 +376,7 @@ class _UserDashboardState extends State<UserDashboard> {
                   avatarUrl: teacherAvatar,
                   lastMessage: lastMsg,
                   timestamp: timestamp,
+                  isMobile: isMobile,
                   initials: _getInitials(teacherName),
                   onTap: () => context.go('/chat/$chatId', extra: teacherName),
                 );
@@ -341,28 +388,28 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _chatCardSkeleton() {
+  Widget _chatCardSkeleton(bool isMobile) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 16),
       child: RetroBlock(
         bgColor: AppColors.cardBg,
-        padding: 20,
-        shadowOffset: 4,
+        padding: isMobile ? 14 : 20,
+        shadowOffset: isMobile ? 3 : 4,
         child: Row(
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: isMobile ? 48 : 60,
+              height: isMobile ? 48 : 60,
               decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: isMobile ? 12 : 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: 140, height: 18, color: AppColors.cloud),
+                  Container(width: 140, height: 16, color: AppColors.cloud),
                   const SizedBox(height: 8),
-                  Container(width: double.infinity, height: 14, color: AppColors.bg),
+                  Container(width: double.infinity, height: 12, color: AppColors.bg),
                 ],
               ),
             ),
@@ -372,25 +419,28 @@ class _UserDashboardState extends State<UserDashboard> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isMobile) {
     return RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: 60,
+      padding: isMobile ? 32 : 60,
+      shadowOffset: isMobile ? 4 : 6,
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.speaker_notes_off, size: 80, color: AppColors.textMuted),
-            const SizedBox(height: 24),
+            Icon(Icons.speaker_notes_off, size: isMobile ? 54 : 80, color: AppColors.textMuted),
+            const SizedBox(height: 18),
             Text(
               "COMMS CHANNEL EMPTY",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: isMobile ? 17 : 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               "NO LOGS FROM MASTERS YET.",
-              style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.textMuted, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             RetroButton(
               text: "SEARCH MASTERS",
               bgColor: AppColors.forest,
@@ -410,6 +460,7 @@ class _RetroChatCard extends StatefulWidget {
   final String lastMessage;
   final Timestamp? timestamp;
   final String initials;
+  final bool isMobile;
   final VoidCallback onTap;
 
   const _RetroChatCard({
@@ -418,6 +469,7 @@ class _RetroChatCard extends StatefulWidget {
     required this.lastMessage,
     required this.timestamp,
     required this.initials,
+    required this.isMobile,
     required this.onTap,
   });
 
@@ -432,7 +484,7 @@ class _RetroChatCardState extends State<_RetroChatCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 16),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _isHovering = true),
@@ -447,8 +499,8 @@ class _RetroChatCardState extends State<_RetroChatCard> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 100),
             transform: Matrix4.translationValues(
-              _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
-              _isPressed ? 4.0 : (_isHovering ? -4.0 : 0.0),
+              _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
+              _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
               0,
             ),
             decoration: BoxDecoration(
@@ -457,17 +509,17 @@ class _RetroChatCardState extends State<_RetroChatCard> {
               boxShadow: [
                 BoxShadow(
                   color: AppColors.shadow,
-                  offset: _isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                  offset: _isPressed ? const Offset(0, 0) : Offset(widget.isMobile ? 4 : 6, widget.isMobile ? 4 : 6),
                   blurRadius: 0,
                 )
               ],
             ),
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(widget.isMobile ? 14 : 20),
             child: Row(
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: widget.isMobile ? 48 : 60,
+                  height: widget.isMobile ? 48 : 60,
                   decoration: BoxDecoration(
                     color: AppColors.cloud,
                     border: Border.all(color: AppColors.border, width: 2),
@@ -479,41 +531,43 @@ class _RetroChatCardState extends State<_RetroChatCard> {
                       ? Center(
                           child: Text(
                             widget.initials,
-                            style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 20),
+                            style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: widget.isMobile ? 16 : 20),
                           ),
                         )
                       : null,
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: widget.isMobile ? 12 : 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         widget.name.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink, letterSpacing: 0.5),
+                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: widget.isMobile ? 15 : 18, color: AppColors.ink, letterSpacing: 0.5),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(
                         widget.lastMessage,
-                        style: TextStyle(color: AppColors.textMuted, fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: AppColors.textMuted, fontSize: widget.isMobile ? 13 : 15, fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (widget.timestamp != null)
                       Text(
                         DateFormat('HH:mm').format(widget.timestamp!.toDate()),
-                        style: TextStyle(color: AppColors.ink, fontSize: 13, fontWeight: FontWeight.w900),
+                        style: TextStyle(color: AppColors.ink, fontSize: widget.isMobile ? 11 : 13, fontWeight: FontWeight.w900),
                       ),
-                    const SizedBox(height: 8),
-                    Icon(Icons.arrow_forward, color: AppColors.ink, size: 20),
+                    const SizedBox(height: 6),
+                    Icon(Icons.arrow_forward, color: AppColors.ink, size: widget.isMobile ? 16 : 20),
                   ],
                 ),
               ],

@@ -395,29 +395,26 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                   children: [
                                     if (isOwner) _buildAdminPanel(),
                                     if (isMyProfile && !isApproved) _buildPendingBanner(),
-                                    
-                                    // Main Two-Column Character Sheet
+
                                     if (!isMobile)
                                       Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          // Left Column: Identity & Actions
                                           SizedBox(
                                             width: 360,
-                                            child: _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? ''),
+                                            child: _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
                                           ),
                                           const SizedBox(width: 28),
-                                          // Right Column: Stats, Bio, Stripe & Reviews
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.stretch,
                                               children: [
-                                                _buildStatsGrid(subject, experience, price),
+                                                _buildStatsGrid(subject, experience, price, isMobile),
                                                 const SizedBox(height: 24),
                                                 _buildLoreAndFeaturesBlock(bio, subject),
                                                 const SizedBox(height: 24),
                                                 if (isMyProfile) ...[
-                                                  _buildFinancialDashboard(hasStripeId, isStripeReady, email),
+                                                  _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
                                                   const SizedBox(height: 24),
                                                 ],
                                                 _ratingSection(widget.teacherId),
@@ -430,20 +427,20 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
-                                          _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? ''),
-                                          const SizedBox(height: 24),
-                                          _buildStatsGrid(subject, experience, price),
-                                          const SizedBox(height: 24),
+                                          _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
+                                          const SizedBox(height: 20),
+                                          _buildStatsGrid(subject, experience, price, isMobile),
+                                          const SizedBox(height: 20),
                                           _buildLoreAndFeaturesBlock(bio, subject),
-                                          const SizedBox(height: 24),
+                                          const SizedBox(height: 20),
                                           if (isMyProfile) ...[
-                                            _buildFinancialDashboard(hasStripeId, isStripeReady, email),
-                                            const SizedBox(height: 24),
+                                            _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
+                                            const SizedBox(height: 20),
                                           ],
                                           _ratingSection(widget.teacherId),
                                         ],
                                       ),
-                                    const SizedBox(height: 60),
+                                    SizedBox(height: isMobile ? 32 : 60),
                                   ],
                                 ),
                               ),
@@ -554,27 +551,27 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _buildIdentityCard(String name, String email, String image, String subject, String contact, bool isMyProfile, String uid) {
+  Widget _buildIdentityCard(String name, String email, String image, String subject, String contact, bool isMyProfile, String uid, bool isMobile) {
     return RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: 28,
+      padding: isMobile ? 20 : 28,
+      shadowOffset: isMobile ? 4 : 6,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Avatar
           Stack(
             alignment: Alignment.bottomRight,
             children: [
               Container(
-                width: 130,
-                height: 130,
+                width: isMobile ? 110 : 130,
+                height: isMobile ? 110 : 130,
                 decoration: BoxDecoration(
                   color: AppColors.cloud,
                   border: Border.all(color: AppColors.border, width: 3.5),
                   boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
                   image: image.isNotEmpty ? DecorationImage(image: CachedNetworkImageProvider(image), fit: BoxFit.cover) : null,
                 ),
-                child: image.isEmpty ? Icon(_getSubjectIcon(subject), size: 64, color: AppColors.ink) : null,
+                child: image.isEmpty ? Icon(_getSubjectIcon(subject), size: isMobile ? 48 : 64, color: AppColors.ink) : null,
               ),
               if (isMyProfile)
                 GestureDetector(
@@ -592,8 +589,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Badges
+          const SizedBox(height: 18),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -626,7 +622,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           Text(
             name.toUpperCase(),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, height: 1.1, color: AppColors.ink),
+            style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w900, height: 1.1, color: AppColors.ink),
           ),
           const SizedBox(height: 6),
           Text(
@@ -634,8 +630,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 20),
-          // Comms Contact Box
+          const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -654,8 +649,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          // Action Deck
+          const SizedBox(height: 20),
           if (isMyProfile)
             RetroButton(
               text: "EDIT PROFILE DATA",
@@ -663,7 +657,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               isFullWidth: true,
               bgColor: AppColors.cloud,
               textColor: AppColors.ink,
-              onPressed: () => _openEditDialog(uid),
+              onPressed: () => _openEditDialog(uid, isMobile),
             )
           else ...[
             RetroButton(
@@ -685,7 +679,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _buildStatsGrid(String subject, String exp, String price) {
+  Widget _buildStatsGrid(String subject, String exp, String price, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: _fire.collection('teachers').doc(widget.teacherId).collection('reviews').snapshots(),
       builder: (context, snap) {
@@ -697,28 +691,28 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
 
         return Row(
           children: [
-            Expanded(child: _buildStatTile("HOURLY RATE", "$price RON / HR", Icons.payments, AppColors.forest)),
-            const SizedBox(width: 14),
-            Expanded(child: _buildStatTile("EXPERIENCE", "$exp YEARS", Icons.military_tech, AppColors.mustard)),
-            const SizedBox(width: 14),
-            Expanded(child: _buildStatTile("REPUTATION", "${avg.toStringAsFixed(1)} ★", Icons.star, AppColors.sunset)),
+            Expanded(child: _buildStatTile("RATE", "$price RON", Icons.payments, AppColors.forest, isMobile)),
+            SizedBox(width: isMobile ? 8 : 14),
+            Expanded(child: _buildStatTile("EXP", "$exp YRS", Icons.military_tech, AppColors.mustard, isMobile)),
+            SizedBox(width: isMobile ? 8 : 14),
+            Expanded(child: _buildStatTile("RATING", "${avg.toStringAsFixed(1)} ★", Icons.star, AppColors.sunset, isMobile)),
           ],
         );
       },
     );
   }
 
-  Widget _buildStatTile(String label, String value, IconData icon, Color color) {
+  Widget _buildStatTile(String label, String value, IconData icon, Color color, bool isMobile) {
     final isMustard = color == AppColors.mustard;
     final textColor = isMustard && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 18, vertical: isMobile ? 12 : 18),
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         border: Border.all(color: AppColors.border, width: 2.5),
         boxShadow: [
-          BoxShadow(color: AppColors.shadow, offset: const Offset(3.5, 3.5)),
+          BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 2.5 : 3.5, isMobile ? 2.5 : 3.5)),
         ],
       ),
       child: Column(
@@ -727,28 +721,28 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(isMobile ? 5 : 8),
                 decoration: BoxDecoration(
                   color: color,
                   border: Border.all(color: AppColors.border, width: 2),
                 ),
-                child: Icon(icon, size: 20, color: isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+                child: Icon(icon, size: isMobile ? 16 : 20, color: isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: isMobile ? 6 : 10),
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 1.0),
+                  style: TextStyle(fontSize: isMobile ? 9 : 11, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 0.8),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: isMobile ? 8 : 14),
           Text(
             value.toUpperCase(),
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: textColor),
+            style: TextStyle(fontSize: isMobile ? 15 : 20, fontWeight: FontWeight.w900, color: textColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -828,10 +822,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _buildFinancialDashboard(bool hasStripeId, bool isStripeReady, String email) {
+  Widget _buildFinancialDashboard(bool hasStripeId, bool isStripeReady, String email, bool isMobile) {
     return RetroBlock(
       bgColor: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
-      padding: 24,
+      padding: isMobile ? 18 : 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -866,24 +860,47 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              if (!hasStripeId)
-                RetroButton(text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
-              else if (hasStripeId && !isStripeReady)
-                RetroButton(text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
-              else
-                RetroButton(text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
-              const Spacer(),
-              TextButton(
-                onPressed: () async {
-                  await _auth.sendPasswordResetEmail(email: email);
-                  _showToast("RESET LOG TRANSMITTED.");
-                },
-                child: const Text("RESET KEY", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
-              ),
-            ],
-          ),
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (!hasStripeId)
+                  RetroButton(text: "INITIALIZE WALLET", isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                else if (hasStripeId && !isStripeReady)
+                  RetroButton(text: "COMPLETE SETUP", isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                else
+                  RetroButton(text: "OPEN DASHBOARD", isFullWidth: true, bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton(
+                    onPressed: () async {
+                      await _auth.sendPasswordResetEmail(email: email);
+                      _showToast("RESET LOG TRANSMITTED.");
+                    },
+                    child: const Text("RESET ACCESS KEY", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
+                  ),
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                if (!hasStripeId)
+                  RetroButton(text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                else if (hasStripeId && !isStripeReady)
+                  RetroButton(text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                else
+                  RetroButton(text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
+                const Spacer(),
+                TextButton(
+                  onPressed: () async {
+                    await _auth.sendPasswordResetEmail(email: email);
+                    _showToast("RESET LOG TRANSMITTED.");
+                  },
+                  child: const Text("RESET KEY", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -905,7 +922,14 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("PLAYER FEEDBACK & REVIEWS", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink)),
+                  Expanded(
+                    child: Text(
+                      "PLAYER FEEDBACK & REVIEWS",
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   if (docs.isNotEmpty)
                     Text(
                       "${docs.length} REVIEWS",
@@ -953,7 +977,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Future<void> _openEditDialog(String uid) async {
+  Future<void> _openEditDialog(String uid, bool isMobile) async {
     final doc = await _fire.collection('teachers').doc(uid).get();
     final data = (doc.data() as Map<String, dynamic>?) ?? {};
     final nameCtrl = TextEditingController(text: data['name'] ?? '');
@@ -972,7 +996,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 4)),
         title: Text('UPDATE MASTER DATA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: AppColors.ink)),
         content: SizedBox(
-          width: 480,
+          width: isMobile ? MediaQuery.of(context).size.width * 0.9 : 480,
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,

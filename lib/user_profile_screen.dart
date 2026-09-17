@@ -381,7 +381,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         // Left Column: Player Identity Card
                                         SizedBox(
                                           width: 330,
-                                          child: _buildIdentityCard(isCurrentUser),
+                                          child: _buildIdentityCard(isCurrentUser, isMobile),
                                         ),
                                         const SizedBox(width: 24),
                                         // Right Column: Progression & Security
@@ -389,12 +389,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.stretch,
                                             children: [
-                                              _buildStatsHUD(),
+                                              _buildStatsHUD(isMobile),
                                               const SizedBox(height: 20),
                                               _buildProgressSection(),
                                               if (isCurrentUser) ...[
                                                 const SizedBox(height: 20),
-                                                _buildSettingsSection(),
+                                                _buildSettingsSection(isMobile),
                                               ],
                                             ],
                                           ),
@@ -405,18 +405,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        _buildIdentityCard(isCurrentUser),
+                                        _buildIdentityCard(isCurrentUser, isMobile),
                                         const SizedBox(height: 20),
-                                        _buildStatsHUD(),
+                                        _buildStatsHUD(isMobile),
                                         const SizedBox(height: 20),
                                         _buildProgressSection(),
                                         if (isCurrentUser) ...[
                                           const SizedBox(height: 20),
-                                          _buildSettingsSection(),
+                                          _buildSettingsSection(isMobile),
                                         ],
                                       ],
                                     ),
-                                  const SizedBox(height: 48),
+                                  SizedBox(height: isMobile ? 28 : 48),
                                 ],
                               ),
                             ),
@@ -431,10 +431,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildIdentityCard(bool isCurrentUser) {
+  Widget _buildIdentityCard(bool isCurrentUser, bool isMobile) {
     return RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: 24,
+      padding: isMobile ? 20 : 24,
+      shadowOffset: isMobile ? 4 : 6,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -443,8 +444,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             alignment: Alignment.bottomRight,
             children: [
               Container(
-                width: 110,
-                height: 110,
+                width: isMobile ? 96 : 110,
+                height: isMobile ? 96 : 110,
                 decoration: BoxDecoration(
                   color: AppColors.cloud,
                   border: Border.all(color: AppColors.border, width: 3),
@@ -453,7 +454,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ? DecorationImage(image: CachedNetworkImageProvider(_imageUrl!), fit: BoxFit.cover)
                       : null,
                 ),
-                child: _imageUrl == null || _imageUrl!.isEmpty ? Icon(Icons.person, size: 54, color: AppColors.ink) : null,
+                child: _imageUrl == null || _imageUrl!.isEmpty ? Icon(Icons.person, size: isMobile ? 48 : 54, color: AppColors.ink) : null,
               ),
               if (isCurrentUser)
                 GestureDetector(
@@ -494,7 +495,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           Text(
             _name?.toUpperCase() ?? 'UNKNOWN PLAYER',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, height: 1.1, color: AppColors.ink),
+            style: TextStyle(fontSize: isMobile ? 22 : 24, fontWeight: FontWeight.w900, height: 1.1, color: AppColors.ink),
           ),
           const SizedBox(height: 4),
           Text(
@@ -551,14 +552,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               isFullWidth: true,
               bgColor: AppColors.cloud,
               textColor: AppColors.ink,
-              onPressed: _openEditDialog,
+              onPressed: () => _openEditDialog(isMobile),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsHUD() {
+  Widget _buildStatsHUD(bool isMobile) {
     return FutureBuilder<Map<String, int>>(
       future: _getProgressPerSubject(),
       builder: (context, snapshot) {
@@ -570,30 +571,42 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         final expGained = totalCleared * 50;
         final rankTitle = totalCleared > 10 ? "GOLD VANGUARD" : (totalCleared > 3 ? "SILVER RANK" : "NOVICE APPRENTICE");
 
+        if (isMobile) {
+          return Row(
+            children: [
+              Expanded(child: _buildStatTile("CLEARED", "$totalCleared", Icons.check_circle, AppColors.forest, isMobile)),
+              const SizedBox(width: 8),
+              Expanded(child: _buildStatTile("EXP", "$expGained XP", Icons.bolt, AppColors.sunset, isMobile)),
+              const SizedBox(width: 8),
+              Expanded(child: _buildStatTile("RANK", totalCleared > 10 ? "GOLD" : (totalCleared > 3 ? "SILVER" : "NOVICE"), Icons.military_tech, AppColors.mustard, isMobile)),
+            ],
+          );
+        }
+
         return Row(
           children: [
-            Expanded(child: _buildStatTile("QUESTS CLEARED", "$totalCleared SOLVED", Icons.check_circle, AppColors.forest)),
+            Expanded(child: _buildStatTile("QUESTS CLEARED", "$totalCleared SOLVED", Icons.check_circle, AppColors.forest, isMobile)),
             const SizedBox(width: 12),
-            Expanded(child: _buildStatTile("EXP ACCUMULATED", "$expGained XP", Icons.bolt, AppColors.sunset)),
+            Expanded(child: _buildStatTile("EXP ACCUMULATED", "$expGained XP", Icons.bolt, AppColors.sunset, isMobile)),
             const SizedBox(width: 12),
-            Expanded(child: _buildStatTile("GUILD RANK", rankTitle, Icons.military_tech, AppColors.mustard)),
+            Expanded(child: _buildStatTile("GUILD RANK", rankTitle, Icons.military_tech, AppColors.mustard, isMobile)),
           ],
         );
       },
     );
   }
 
-  Widget _buildStatTile(String label, String value, IconData icon, Color color) {
+  Widget _buildStatTile(String label, String value, IconData icon, Color color, bool isMobile) {
     final isMustard = color == AppColors.mustard;
     final textColor = isMustard && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 12 : 14),
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         border: Border.all(color: AppColors.border, width: 2.5),
         boxShadow: [
-          BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3)),
+          BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 2.5 : 3, isMobile ? 2.5 : 3)),
         ],
       ),
       child: Column(
@@ -602,28 +615,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: EdgeInsets.all(isMobile ? 4 : 6),
                 decoration: BoxDecoration(
                   color: color,
                   border: Border.all(color: AppColors.border, width: 1.5),
                 ),
-                child: Icon(icon, size: 16, color: isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+                child: Icon(icon, size: isMobile ? 14 : 16, color: isMustard && AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: isMobile ? 6 : 8),
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 0.8),
+                  style: TextStyle(fontSize: isMobile ? 9 : 10, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 0.8),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: isMobile ? 8 : 10),
           Text(
             value.toUpperCase(),
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: textColor),
+            style: TextStyle(fontSize: isMobile ? 14 : 16, fontWeight: FontWeight.w900, color: textColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -722,7 +735,40 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildSettingsSection() {
+  Widget _buildSettingsSection(bool isMobile) {
+    if (isMobile) {
+      return RetroBlock(
+        bgColor: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
+        padding: 16,
+        shadowOffset: 4,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              "SYSTEM SECURITY CONSOLE",
+              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              "UPDATE YOUR SECRET ACCESS KEY TO SECURE REPUTATION.",
+              style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 14),
+            RetroButton(
+              text: "CHANGE KEY",
+              icon: Icons.lock_reset,
+              bgColor: AppColors.cardBg,
+              textColor: AppColors.ink,
+              fontSize: 12,
+              isFullWidth: true,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              onPressed: _changePassword,
+            ),
+          ],
+        ),
+      );
+    }
+
     return RetroBlock(
       bgColor: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
       padding: 20,
@@ -760,7 +806,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Future<void> _openEditDialog() async {
+  Future<void> _openEditDialog(bool isMobile) async {
     final nameCtrl = TextEditingController(text: _name);
     final bioCtrl = TextEditingController(text: _bio);
     final contactCtrl = TextEditingController(text: _contact);
@@ -772,7 +818,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 4)),
         title: Text('EDIT PROFILE DATA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: AppColors.ink)),
         content: SizedBox(
-          width: 400,
+          width: isMobile ? MediaQuery.of(context).size.width * 0.9 : 400,
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,

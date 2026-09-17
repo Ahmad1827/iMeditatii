@@ -106,21 +106,21 @@ class _RetroButtonState extends State<RetroButton> {
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: effectiveTextColor, size: 24),
-                const SizedBox(width: 12),
+                Icon(widget.icon, color: effectiveTextColor, size: 22),
+                const SizedBox(width: 10),
               ],
               Text(
                 widget.text.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: effectiveTextColor,
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
                 ),
@@ -193,6 +193,8 @@ class UserProfileViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 750;
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
@@ -202,7 +204,7 @@ class UserProfileViewScreen extends StatelessWidget {
             backgroundColor: AppColors.bg,
             elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 26 : 32),
               onPressed: () {
                 if (context.canPop()) {
                   context.pop();
@@ -217,7 +219,7 @@ class UserProfileViewScreen extends StatelessWidget {
             ),
             title: Text(
               "PLAYER LOGS",
-              style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 2.0),
+              style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: isMobile ? 18 : 22, letterSpacing: 2.0),
             ),
             centerTitle: true,
           ),
@@ -249,7 +251,7 @@ class UserProfileViewScreen extends StatelessWidget {
 
               return Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 60),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 700),
                     child: Column(
@@ -257,12 +259,13 @@ class UserProfileViewScreen extends StatelessWidget {
                       children: [
                         RetroBlock(
                           bgColor: AppColors.cloud,
-                          padding: 40,
+                          padding: isMobile ? 24 : 40,
+                          shadowOffset: isMobile ? 4 : 6,
                           child: Column(
                             children: [
                               Container(
-                                width: 140,
-                                height: 140,
+                                width: isMobile ? 110 : 140,
+                                height: isMobile ? 110 : 140,
                                 decoration: BoxDecoration(
                                   color: AppColors.cardBg,
                                   border: Border.all(color: AppColors.border, width: 4),
@@ -275,34 +278,35 @@ class UserProfileViewScreen extends StatelessWidget {
                                       : null,
                                 ),
                                 child: image == null
-                                    ? Icon(Icons.person, size: 80, color: AppColors.ink)
+                                    ? Icon(Icons.person, size: isMobile ? 64 : 80, color: AppColors.ink)
                                     : null,
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 20),
                               Container(
                                 color: AppColors.ink,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                 child: Text(
                                   "PLAYER ACCOUNT",
                                   style: TextStyle(
                                     color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                     letterSpacing: 2.0,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 20),
                               Text(
                                 name.toString().toUpperCase(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 40,
+                                  fontSize: isMobile ? 28 : 40,
                                   fontWeight: FontWeight.w900,
                                   color: AppColors.ink,
                                   letterSpacing: 1.0,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 14),
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
@@ -312,35 +316,31 @@ class UserProfileViewScreen extends StatelessWidget {
                                 child: Text(
                                   bio.toString().toUpperCase(),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.w600, height: 1.5),
+                                  style: TextStyle(color: AppColors.ink, fontSize: isMobile ? 14 : 16, fontWeight: FontWeight.w600, height: 1.5),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _infoTile(
-                                'COMMUNICATION LINK',
-                                email,
-                                AppColors.sky,
-                                Icons.email,
+                        SizedBox(height: isMobile ? 20 : 32),
+                        if (isMobile) ...[
+                          _infoTile('COMMUNICATION LINK', email, AppColors.sky, Icons.email, isMobile),
+                          const SizedBox(height: 14),
+                          _infoTile('CONTACT NODE', contact, AppColors.mustard, Icons.phone, isMobile),
+                        ] else ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _infoTile('COMMUNICATION LINK', email, AppColors.sky, Icons.email, isMobile),
                               ),
-                            ),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: _infoTile(
-                                'CONTACT NODE',
-                                contact,
-                                AppColors.mustard,
-                                Icons.phone,
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: _infoTile('CONTACT NODE', contact, AppColors.mustard, Icons.phone, isMobile),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 48),
+                            ],
+                          ),
+                        ],
+                        SizedBox(height: isMobile ? 28 : 48),
                         RetroButton(
                           text: "OPEN COMM CHANNEL",
                           icon: Icons.chat_bubble,
@@ -366,41 +366,41 @@ class UserProfileViewScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoTile(String title, String? value, Color bgColor, IconData icon) {
+  Widget _infoTile(String title, String? value, Color bgColor, IconData icon, bool isMobile) {
     final textColor = AppColors.isDark && bgColor == AppColors.mustard ? const Color(0xFF10161A) : AppColors.ink;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
         color: bgColor,
         border: Border.all(color: AppColors.border, width: 3),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: textColor, size: 24),
-              const SizedBox(width: 12),
+              Icon(icon, color: textColor, size: isMobile ? 20 : 24),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title.toUpperCase(),
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     color: textColor,
-                    fontSize: 14,
+                    fontSize: isMobile ? 12 : 14,
                     letterSpacing: 1.5,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             (value ?? '-').toUpperCase(),
             style: TextStyle(
-              fontSize: 16,
+              fontSize: isMobile ? 15 : 16,
               fontWeight: FontWeight.bold,
               color: textColor,
             ),

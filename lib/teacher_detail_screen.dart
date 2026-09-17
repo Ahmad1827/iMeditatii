@@ -105,21 +105,21 @@ class _RetroButtonState extends State<RetroButton> {
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: effectiveText, size: 24),
-                const SizedBox(width: 12),
+                Icon(widget.icon, color: effectiveText, size: 22),
+                const SizedBox(width: 10),
               ],
               Text(
                 widget.text.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: effectiveText,
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
                 ),
@@ -140,6 +140,7 @@ class TeacherDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final docRef = FirebaseFirestore.instance.collection('teachers').doc(teacherId);
+    final isMobile = MediaQuery.of(context).size.width < 750;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
@@ -152,6 +153,7 @@ class TeacherDetailScreen extends StatelessWidget {
               style: TextStyle(
                 color: AppColors.ink,
                 fontWeight: FontWeight.bold,
+                fontSize: isMobile ? 18 : 22,
                 letterSpacing: 2.0,
               ),
             ),
@@ -164,7 +166,7 @@ class TeacherDetailScreen extends StatelessWidget {
               child: Container(color: AppColors.border, height: 3),
             ),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 26 : 32),
               onPressed: () {
                 if (context.canPop()) {
                   context.pop();
@@ -186,7 +188,7 @@ class TeacherDetailScreen extends StatelessWidget {
                     bgColor: AppColors.cloud,
                     child: Text(
                       'MASTER DATA CORRUPTED OR NOT FOUND.',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.ink),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink),
                     ),
                   ),
                 );
@@ -198,7 +200,7 @@ class TeacherDetailScreen extends StatelessWidget {
 
               return Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 800),
                     child: Column(
@@ -206,12 +208,13 @@ class TeacherDetailScreen extends StatelessWidget {
                         // PROFILE HEADER
                         RetroBlock(
                           bgColor: AppColors.mustard,
-                          padding: 40,
+                          padding: isMobile ? 24 : 40,
+                          shadowOffset: isMobile ? 4 : 6,
                           child: Column(
                             children: [
                               Container(
-                                width: 140,
-                                height: 140,
+                                width: isMobile ? 110 : 140,
+                                height: isMobile ? 110 : 140,
                                 decoration: BoxDecoration(
                                   color: AppColors.cardBg,
                                   border: Border.all(color: AppColors.border, width: 4),
@@ -224,28 +227,29 @@ class TeacherDetailScreen extends StatelessWidget {
                                       : null,
                                 ),
                                 child: imageUrl.isEmpty
-                                    ? Icon(Icons.person, size: 80, color: AppColors.ink)
+                                    ? Icon(Icons.person, size: isMobile ? 64 : 80, color: AppColors.ink)
                                     : null,
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 20),
                               Container(
                                 color: AppColors.ink,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                 child: Text(
                                   "VERIFIED MASTER",
                                   style: TextStyle(
                                     color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                     letterSpacing: 2.0,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 14),
                               Text(
                                 (data['name'] ?? 'UNKNOWN').toString().toUpperCase(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 40,
+                                  fontSize: isMobile ? 28 : 40,
                                   fontWeight: FontWeight.w900,
                                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                                   letterSpacing: 1.0,
@@ -256,7 +260,7 @@ class TeacherDetailScreen extends StatelessWidget {
                                 specialization.toString().toUpperCase(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: isMobile ? 16 : 20,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                                   letterSpacing: 1.5,
@@ -265,48 +269,31 @@ class TeacherDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: isMobile ? 20 : 32),
 
                         // STATS & INFO
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _infoTile(
-                                'EXPERIENCE',
-                                '${data['experience'] ?? 0} YEARS',
-                                AppColors.sky,
-                                Icons.star,
+                        if (isMobile) ...[
+                          _infoTile('EXPERIENCE', '${data['experience'] ?? 0} YEARS', AppColors.sky, Icons.star, isMobile),
+                          const SizedBox(height: 14),
+                          _infoTile('EDUCATION', data['education'] ?? 'NOT SPECIFIED', AppColors.cloud, Icons.school, isMobile),
+                        ] else ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _infoTile('EXPERIENCE', '${data['experience'] ?? 0} YEARS', AppColors.sky, Icons.star, isMobile),
                               ),
-                            ),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: _infoTile(
-                                'EDUCATION',
-                                data['education'] ?? 'NOT SPECIFIED',
-                                AppColors.cloud,
-                                Icons.school,
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: _infoTile('EDUCATION', data['education'] ?? 'NOT SPECIFIED', AppColors.cloud, Icons.school, isMobile),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        _infoTile(
-                          'COMMUNICATION LINK',
-                          data['email'] ?? 'UNKNOWN',
-                          AppColors.cardBg,
-                          Icons.email,
-                          isFullWidth: true,
-                        ),
-                        const SizedBox(height: 24),
-                        _infoTile(
-                          'SYSTEM UID',
-                          teacherId,
-                          AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
-                          Icons.fingerprint,
-                          isFullWidth: true,
-                          textColor: Colors.white,
-                        ),
-                        const SizedBox(height: 48),
+                            ],
+                          ),
+                        ],
+                        SizedBox(height: isMobile ? 14 : 24),
+                        _infoTile('COMMUNICATION LINK', data['email'] ?? 'UNKNOWN', AppColors.cardBg, Icons.email, isMobile, isFullWidth: true),
+                        SizedBox(height: isMobile ? 14 : 24),
+                        _infoTile('SYSTEM UID', teacherId, AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink, Icons.fingerprint, isMobile, isFullWidth: true, textColor: Colors.white),
+                        SizedBox(height: isMobile ? 28 : 48),
 
                         // ACTIONS
                         RetroButton(
@@ -332,8 +319,7 @@ class TeacherDetailScreen extends StatelessWidget {
                             );
                           },
                         ),
-                        const SizedBox(height: 24),
-
+                        const SizedBox(height: 16),
                         RetroButton(
                           text: 'VIEW PLAYER REVIEWS',
                           icon: Icons.rate_review,
@@ -356,43 +342,45 @@ class TeacherDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoTile(String title, String? value, Color bgColor, IconData icon, {bool isFullWidth = false, Color? textColor}) {
+  Widget _infoTile(String title, String? value, Color bgColor, IconData icon, bool isMobile, {bool isFullWidth = false, Color? textColor}) {
     final effectiveTextColor = textColor ?? AppColors.ink;
 
     return Container(
       width: isFullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
         color: bgColor,
         border: Border.all(color: AppColors.border, width: 3),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: effectiveTextColor, size: 24),
-              const SizedBox(width: 12),
+              Icon(icon, color: effectiveTextColor, size: isMobile ? 20 : 24),
+              const SizedBox(width: 10),
               Text(
                 title.toUpperCase(),
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   color: effectiveTextColor,
-                  fontSize: 14,
+                  fontSize: isMobile ? 12 : 14,
                   letterSpacing: 1.5,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             (value ?? '-').toUpperCase(),
             style: TextStyle(
-              fontSize: 18,
+              fontSize: isMobile ? 16 : 18,
               fontWeight: FontWeight.bold,
               color: effectiveTextColor,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

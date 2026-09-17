@@ -163,6 +163,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   Widget build(BuildContext context) {
     final String teacherId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final teacherFuture = FirebaseFirestore.instance.collection('teachers').doc(teacherId).get();
+    final isMobile = MediaQuery.of(context).size.width < 750;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
@@ -192,7 +193,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
               const CustomNavbar(),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 850),
@@ -210,13 +211,13 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                               }
                               final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
                               final teacherName = data['name'] ?? 'MASTER';
-                              return _buildHeaderSection(teacherName, teacherId);
+                              return _buildHeaderSection(teacherName, teacherId, isMobile);
                             },
                           ),
-                          const SizedBox(height: 48),
-                          if (_isAdmin) _buildTabBar(),
-                          const SizedBox(height: 32),
-                          _selectedIndex == 0 ? _buildChatList(teacherId) : _buildPendingQuests(),
+                          SizedBox(height: isMobile ? 32 : 48),
+                          if (_isAdmin) _buildTabBar(isMobile),
+                          SizedBox(height: isMobile ? 24 : 32),
+                          _selectedIndex == 0 ? _buildChatList(teacherId, isMobile) : _buildPendingQuests(isMobile),
                         ],
                       ),
                     ),
@@ -230,17 +231,17 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(bool isMobile) {
     return Row(
       children: [
-        _buildTab(0, "PLAYER LOGS", Icons.forum),
-        const SizedBox(width: 16),
-        _buildTab(1, "ADMIN PENDING", Icons.security),
+        _buildTab(0, "PLAYER LOGS", Icons.forum, isMobile),
+        SizedBox(width: isMobile ? 10 : 16),
+        _buildTab(1, "ADMIN PENDING", Icons.security, isMobile),
       ],
     );
   }
 
-  Widget _buildTab(int index, String title, IconData icon) {
+  Widget _buildTab(int index, String title, IconData icon, bool isMobile) {
     final isSelected = _selectedIndex == index;
     return Expanded(
       child: GestureDetector(
@@ -251,10 +252,10 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             color: isSelected ? AppColors.ink : AppColors.cardBg,
             border: Border.all(color: AppColors.border, width: 3),
             boxShadow: [
-              if (!isSelected) BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4), blurRadius: 0),
+              if (!isSelected) BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4), blurRadius: 0),
             ],
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -263,9 +264,9 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                 color: isSelected
                     ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
                     : AppColors.ink,
-                size: 20,
+                size: isMobile ? 18 : 20,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: isMobile ? 6 : 8),
               Text(
                 title,
                 style: TextStyle(
@@ -273,7 +274,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                       ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
                       : AppColors.ink,
                   fontWeight: FontWeight.w900,
-                  fontSize: 16,
+                  fontSize: isMobile ? 13 : 16,
                   letterSpacing: 1.0,
                 ),
               ),
@@ -284,7 +285,61 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _buildHeaderSection(String teacherName, String teacherId) {
+  Widget _buildHeaderSection(String teacherName, String teacherId, bool isMobile) {
+    if (isMobile) {
+      return RetroBlock(
+        bgColor: AppColors.sky,
+        padding: 20,
+        shadowOffset: 4,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              color: AppColors.ink,
+              child: Text(
+                "GUILD MASTER TERMINAL",
+                style: TextStyle(
+                  color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              "GREETINGS, ${teacherName.split(' ')[0].toUpperCase()}!",
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                letterSpacing: 0.8,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Oversee your apprentices and initialize new quest parameters.",
+              style: TextStyle(
+                fontSize: 15,
+                color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            RetroButton(
+              onPressed: () => context.go('/profesor/$teacherId'),
+              text: "PROFILE",
+              icon: Icons.person,
+              isFullWidth: true,
+              bgColor: AppColors.cardBg,
+              textColor: AppColors.ink,
+            )
+          ],
+        ),
+      );
+    }
+
     return RetroBlock(
       bgColor: AppColors.sky,
       padding: 32,
@@ -343,7 +398,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _buildChatList(String teacherId) {
+  Widget _buildChatList(String teacherId, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('chats')
@@ -352,7 +407,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Column(children: List.generate(3, (index) => _chatCardSkeleton()));
+          return Column(children: List.generate(3, (index) => _chatCardSkeleton(isMobile)));
         }
         if (snapshot.hasError) {
           return Center(
@@ -363,7 +418,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
           );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return _buildEmptyState("COMMUNICATIONS CHANNEL EMPTY", "Incoming apprentice transmissions will be logged here.");
+          return _buildEmptyState("COMMUNICATIONS CHANNEL EMPTY", "Incoming apprentice transmissions will be logged here.", isMobile);
         }
 
         final chats = snapshot.data!.docs;
@@ -381,7 +436,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             return FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance.collection('users').doc(studentId).get(),
               builder: (context, userSnap) {
-                if (userSnap.connectionState == ConnectionState.waiting) return _chatCardSkeleton();
+                if (userSnap.connectionState == ConnectionState.waiting) return _chatCardSkeleton(isMobile);
                 if (!userSnap.hasData || !userSnap.data!.exists) return const SizedBox.shrink();
 
                 final userData = userSnap.data!.data() as Map<String, dynamic>;
@@ -393,6 +448,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                   avatarUrl: userAvatar,
                   lastMessage: lastMsg,
                   timestamp: timestamp,
+                  isMobile: isMobile,
                   onTap: () => context.go('/chat/$chatId', extra: userName),
                 );
               },
@@ -403,7 +459,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _buildPendingQuests() {
+  Widget _buildPendingQuests(bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('exercises')
@@ -415,7 +471,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
         }
         if (snapshot.hasError) return Center(child: Text('ERROR: ${snapshot.error}', style: TextStyle(color: AppColors.sunset)));
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return _buildEmptyState("NO PENDING QUESTS", "All submissions have been verified and processed.");
+          return _buildEmptyState("NO PENDING QUESTS", "All submissions have been verified and processed.", isMobile);
         }
 
         final quests = snapshot.data!.docs;
@@ -427,45 +483,95 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
               padding: const EdgeInsets.only(bottom: 20),
               child: RetroBlock(
                 bgColor: AppColors.cardBg,
-                padding: 24,
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 2)),
-                      child: Icon(Icons.pending_actions, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, size: 32),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                padding: isMobile ? 16 : 24,
+                shadowOffset: isMobile ? 4 : 6,
+                child: isMobile
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            (data['title'] ?? 'UNKNOWN').toString().toUpperCase(),
-                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.ink),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 2)),
+                                child: Icon(Icons.pending_actions, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, size: 24),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      (data['title'] ?? 'UNKNOWN').toString().toUpperCase(),
+                                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.ink),
+                                    ),
+                                    Text(
+                                      "${data['subject']} | LVL ${data['grade']}".toUpperCase(),
+                                      style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "${data['subject']} | LVL ${data['grade']} | ${data['tip_exercitiu']}".toUpperCase(),
-                            style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: RetroButton(
+                                  text: "APPROVE",
+                                  bgColor: AppColors.forest,
+                                  textColor: Colors.white,
+                                  onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).update({'approved': true}),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: AppColors.sunset, size: 28),
+                                onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).delete(),
+                              )
+                            ],
+                          )
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 2)),
+                            child: Icon(Icons.pending_actions, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, size: 32),
                           ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  (data['title'] ?? 'UNKNOWN').toString().toUpperCase(),
+                                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.ink),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "${data['subject']} | LVL ${data['grade']} | ${data['tip_exercitiu']}".toUpperCase(),
+                                  style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          RetroButton(
+                            text: "APPROVE",
+                            bgColor: AppColors.forest,
+                            textColor: Colors.white,
+                            onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).update({'approved': true}),
+                          ),
+                          const SizedBox(width: 16),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: AppColors.sunset, size: 32),
+                            onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).delete(),
+                          )
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    RetroButton(
-                      text: "APPROVE",
-                      bgColor: AppColors.forest,
-                      textColor: Colors.white,
-                      onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).update({'approved': true}),
-                    ),
-                    const SizedBox(width: 16),
-                    IconButton(
-                      icon: Icon(Icons.delete, color: AppColors.sunset, size: 32),
-                      onPressed: () => FirebaseFirestore.instance.collection('exercises').doc(doc.id).delete(),
-                    )
-                  ],
-                ),
               ),
             );
           }).toList(),
@@ -474,59 +580,68 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _chatCard({required String name, required String avatarUrl, required String lastMessage, Timestamp? timestamp, required VoidCallback onTap}) {
+  Widget _chatCard({
+    required String name,
+    required String avatarUrl,
+    required String lastMessage,
+    Timestamp? timestamp,
+    required bool isMobile,
+    required VoidCallback onTap,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 16),
       child: GestureDetector(
         onTap: onTap,
         child: RetroBlock(
           bgColor: AppColors.cardBg,
-          padding: 20,
-          shadowOffset: 4,
+          padding: isMobile ? 14 : 20,
+          shadowOffset: isMobile ? 3 : 4,
           child: Row(
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: isMobile ? 48 : 60,
+                height: isMobile ? 48 : 60,
                 decoration: BoxDecoration(
                   color: AppColors.cloud,
                   border: Border.all(color: AppColors.border, width: 2),
                   image: avatarUrl.isNotEmpty ? DecorationImage(image: NetworkImage(avatarUrl), fit: BoxFit.cover) : null,
                 ),
                 child: avatarUrl.isEmpty
-                    ? Center(child: Text(_getInitials(name), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 20)))
+                    ? Center(child: Text(_getInitials(name), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: isMobile ? 16 : 20)))
                     : null,
               ),
-              const SizedBox(width: 20),
+              SizedBox(width: isMobile ? 12 : 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name.toUpperCase(),
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink, letterSpacing: 0.5),
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: isMobile ? 15 : 18, color: AppColors.ink, letterSpacing: 0.5),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
                       lastMessage,
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: isMobile ? 13 : 15, fontWeight: FontWeight.w600),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (timestamp != null)
                     Text(
                       DateFormat('HH:mm').format(timestamp.toDate()),
-                      style: TextStyle(color: AppColors.ink, fontSize: 13, fontWeight: FontWeight.w900),
+                      style: TextStyle(color: AppColors.ink, fontSize: isMobile ? 11 : 13, fontWeight: FontWeight.w900),
                     ),
-                  const SizedBox(height: 8),
-                  Icon(Icons.arrow_forward, color: AppColors.ink, size: 20),
+                  const SizedBox(height: 6),
+                  Icon(Icons.arrow_forward, color: AppColors.ink, size: isMobile ? 16 : 20),
                 ],
               ),
             ],
@@ -536,24 +651,24 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _chatCardSkeleton() {
+  Widget _chatCardSkeleton(bool isMobile) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 16),
       child: RetroBlock(
         bgColor: AppColors.cardBg,
-        padding: 20,
-        shadowOffset: 4,
+        padding: isMobile ? 14 : 20,
+        shadowOffset: isMobile ? 3 : 4,
         child: Row(
           children: [
-            Container(width: 60, height: 60, decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2))),
-            const SizedBox(width: 20),
+            Container(width: isMobile ? 48 : 60, height: isMobile ? 48 : 60, decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2))),
+            SizedBox(width: isMobile ? 12 : 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: 140, height: 18, color: AppColors.cloud),
+                  Container(width: 140, height: 16, color: AppColors.cloud),
                   const SizedBox(height: 8),
-                  Container(width: double.infinity, height: 14, color: AppColors.bg),
+                  Container(width: double.infinity, height: 12, color: AppColors.bg),
                 ],
               ),
             ),
@@ -563,24 +678,26 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
     );
   }
 
-  Widget _buildEmptyState(String title, String subtitle) {
+  Widget _buildEmptyState(String title, String subtitle, bool isMobile) {
     return RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: 60,
+      padding: isMobile ? 32 : 60,
+      shadowOffset: isMobile ? 4 : 6,
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.folder_off, size: 80, color: AppColors.textMuted),
-            const SizedBox(height: 24),
+            Icon(Icons.folder_off, size: isMobile ? 54 : 80, color: AppColors.textMuted),
+            const SizedBox(height: 16),
             Text(
               title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.textMuted, fontWeight: FontWeight.bold),
             ),
           ],
         ),
