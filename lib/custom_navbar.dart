@@ -238,7 +238,9 @@ class CustomNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 900;
+    final isCompactPhone = screenWidth < 380;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
@@ -249,7 +251,7 @@ class CustomNavbar extends StatelessWidget {
             final user = snapshot.data;
 
             return Container(
-              height: 90,
+              height: isDesktop ? 90 : 78,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: AppColors.bg,
@@ -259,7 +261,7 @@ class CustomNavbar extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1100),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -271,21 +273,21 @@ class CustomNavbar extends StatelessWidget {
                             child: Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(8),
+                                  padding: EdgeInsets.all(isDesktop ? 8 : 6),
                                   decoration: BoxDecoration(
                                     color: AppColors.sunset,
                                     border: Border.all(color: AppColors.border, width: 2),
                                   ),
-                                  child: const Icon(Icons.videogame_asset, color: Colors.white, size: 28),
+                                  child: Icon(Icons.videogame_asset, color: Colors.white, size: isDesktop ? 28 : 22),
                                 ),
-                                const SizedBox(width: 16),
+                                SizedBox(width: isDesktop ? 16 : 10),
                                 Text(
                                   'IMEDITATII',
                                   style: TextStyle(
-                                    fontSize: isDesktop ? 32 : 24,
+                                    fontSize: isDesktop ? 32 : (isCompactPhone ? 20 : 24),
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.ink,
-                                    letterSpacing: 2.0,
+                                    letterSpacing: isDesktop ? 2.0 : 1.2,
                                   ),
                                 ),
                               ],
@@ -330,7 +332,7 @@ class CustomNavbar extends StatelessWidget {
                         // MOBILE NAVIGATION
                         else ...[
                           IconButton(
-                            icon: Icon(Icons.menu, color: AppColors.ink, size: 36),
+                            icon: Icon(Icons.menu, color: AppColors.ink, size: 32),
                             onPressed: () => _showMobileMenu(context, user),
                           )
                         ]

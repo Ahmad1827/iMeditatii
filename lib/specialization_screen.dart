@@ -200,7 +200,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
   Widget _buildHeroSearch(bool isMobile) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(24, isMobile ? 24 : 40, 24, 20),
+      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 24 : 40, isMobile ? 16 : 24, 20),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1120),
@@ -219,7 +219,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
                 "SELECT DISCIPLINE",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isMobile ? 32 : 44,
+                  fontSize: isMobile ? 30 : 44,
                   fontWeight: FontWeight.w900,
                   color: AppColors.ink,
                   letterSpacing: 1.5,
@@ -229,7 +229,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
               Text(
                 "GĂSEȘTE MENTORUL POTRIVIT ȘI PROGRAMEAZĂ-ȚI ANTRENAMENTUL 1-LA-1.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: isMobile ? 13 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                style: TextStyle(fontSize: isMobile ? 12 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
               ),
               const SizedBox(height: 24),
               // Retro Search Input
@@ -239,7 +239,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
                   color: AppColors.cardBg,
                   border: Border.all(color: AppColors.border, width: 3),
                   boxShadow: [
-                    BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4), blurRadius: 0),
+                    BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4), blurRadius: 0),
                   ],
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -255,7 +255,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
                         cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
                         decoration: InputDecoration(
                           hintText: "SEARCH DISCIPLINE OR KEYWORD...",
-                          hintStyle: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.0),
+                          hintStyle: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold, fontSize: isMobile ? 12 : 14, letterSpacing: 1.0),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         ),
@@ -346,15 +346,15 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
 
     return Container(
       constraints: const BoxConstraints(maxWidth: 1120),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24),
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('teachers').where('active', isEqualTo: true).snapshots(),
         builder: (context, snapshot) {
           final teacherDocs = snapshot.data?.docs ?? [];
 
           return Wrap(
-            spacing: 24,
-            runSpacing: 24,
+            spacing: isMobile ? 16 : 24,
+            runSpacing: isMobile ? 16 : 24,
             alignment: WrapAlignment.center,
             children: list.map((d) {
               final count = teacherDocs.where((doc) {
@@ -365,6 +365,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
               return _SpecializationCard(
                 data: d,
                 teacherCount: count,
+                isMobile: isMobile,
                 onTap: () {
                   final name = d['name'] as String;
                   context.go('/materii/${Uri.encodeComponent(name)}', extra: d);
@@ -408,11 +409,13 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
 class _SpecializationCard extends StatefulWidget {
   final Map<String, dynamic> data;
   final int teacherCount;
+  final bool isMobile;
   final VoidCallback onTap;
 
   const _SpecializationCard({
     required this.data,
     required this.teacherCount,
+    required this.isMobile,
     required this.onTap,
   });
 
@@ -446,7 +449,7 @@ class _SpecializationCardState extends State<_SpecializationCard> {
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          width: 320,
+          width: widget.isMobile ? double.infinity : 320,
           transform: Matrix4.translationValues(
             _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
             _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
@@ -458,7 +461,7 @@ class _SpecializationCardState extends State<_SpecializationCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(5, 5),
+                offset: _isPressed ? const Offset(0, 0) : Offset(widget.isMobile ? 4 : 5, widget.isMobile ? 4 : 5),
                 blurRadius: 0,
               ),
             ],

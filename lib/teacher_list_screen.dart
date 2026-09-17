@@ -234,11 +234,11 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 _buildHeader(isMobile),
-                                const SizedBox(height: 28),
+                                SizedBox(height: isMobile ? 18 : 28),
                                 Expanded(
                                   child: _buildTeachersList(isMobile),
                                 ),
-                                const SizedBox(height: 48),
+                                SizedBox(height: isMobile ? 32 : 48),
                                 _buildFooter(isMobile),
                               ],
                             ),
@@ -259,19 +259,19 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
   Widget _buildHeader(bool isMobile) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(24, isMobile ? 20 : 32, 24, 0),
+      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 16 : 32, isMobile ? 16 : 24, 0),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1120),
           child: RetroBlock(
             bgColor: AppColors.mustard,
-            padding: isMobile ? 20 : 28,
+            padding: isMobile ? 16 : 28,
+            shadowOffset: isMobile ? 4.0 : 6.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
-                    // Centered Back Button
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
@@ -292,7 +292,6 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Subject Icon Container
                     Container(
                       width: 44,
                       height: 44,
@@ -306,7 +305,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                       alignment: Alignment.center,
                       child: Icon(_getSubjectIcon(_subjectName), color: AppColors.ink, size: 24),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,13 +327,15 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                               color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                               letterSpacing: 1.0,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
                 // Search Input inside Header
                 Container(
                   decoration: BoxDecoration(
@@ -354,7 +355,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                           cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
                           decoration: InputDecoration(
                             hintText: "SEARCH MENTOR BY NAME...",
-                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.bold),
+                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: isMobile ? 12 : 13, fontWeight: FontWeight.bold),
                             border: InputBorder.none,
                           ),
                         ),
@@ -382,7 +383,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 1120),
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('teachers').where('active', isEqualTo: true).snapshots(),
           builder: (context, snapshot) {
@@ -412,14 +413,15 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
             }
 
             return Wrap(
-              spacing: 24,
-              runSpacing: 24,
-              alignment: WrapAlignment.start,
+              spacing: isMobile ? 16 : 24,
+              runSpacing: isMobile ? 16 : 24,
+              alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
               children: teachers.map((doc) {
                 final data = doc.data() as Map<String, dynamic>;
                 return _TeacherCard(
                   id: doc.id,
                   data: data,
+                  isMobile: isMobile,
                   onMessage: () async {
                     if (currentUser == null) {
                       context.go('/login');
@@ -504,12 +506,14 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
 class _TeacherCard extends StatefulWidget {
   final String id;
   final Map<String, dynamic> data;
+  final bool isMobile;
   final VoidCallback onMessage;
   final VoidCallback onViewProfile;
 
   const _TeacherCard({
     required this.id,
     required this.data,
+    required this.isMobile,
     required this.onMessage,
     required this.onViewProfile,
   });
@@ -543,7 +547,7 @@ class _TeacherCardState extends State<_TeacherCard> {
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          width: 340,
+          width: widget.isMobile ? double.infinity : 340,
           transform: Matrix4.translationValues(
             _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
             _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
@@ -555,7 +559,7 @@ class _TeacherCardState extends State<_TeacherCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(5, 5),
+                offset: _isPressed ? const Offset(0, 0) : Offset(widget.isMobile ? 4 : 5, widget.isMobile ? 4 : 5),
                 blurRadius: 0,
               ),
             ],

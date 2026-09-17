@@ -208,7 +208,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHeroSection(bool isMobile) {
     final leftContent = RetroBlock(
       bgColor: AppColors.mustard,
-      padding: isMobile ? 24 : 36,
+      padding: isMobile ? 20 : 36,
+      shadowOffset: isMobile ? 4.0 : 6.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -216,7 +217,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -225,6 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: Border.all(color: AppColors.border, width: 2),
                     ),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
                         const SizedBox(width: 8),
@@ -235,7 +240,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     color: AppColors.sunset,
@@ -250,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 "LEVEL UP YOUR\nKNOWLEDGE.",
                 style: TextStyle(
-                  fontSize: isMobile ? 36 : 48,
+                  fontSize: isMobile ? 32 : 48,
                   fontWeight: FontWeight.w900,
                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                   height: 1.1,
@@ -269,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
           if (isMobile)
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -317,7 +321,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final rightContent = RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: isMobile ? 24 : 32,
+      padding: isMobile ? 20 : 32,
+      shadowOffset: isMobile ? 4.0 : 6.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -412,13 +417,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.fromLTRB(24, isMobile ? 24 : 36, 24, isMobile ? 24 : 28),
+      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 20 : 36, isMobile ? 16 : 24, isMobile ? 20 : 28),
       child: isMobile
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 leftContent,
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 rightContent,
               ],
             )
@@ -445,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> pathCards = paths.map((path) {
       return Padding(
         padding: EdgeInsets.only(
-          bottom: isMobile && path != paths.last ? 16 : 0,
+          bottom: isMobile && path != paths.last ? 14 : 0,
           right: !isMobile && path != paths.last ? 20 : 0,
         ),
         child: GestureDetector(
@@ -455,20 +460,21 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: RetroBlock(
             bgColor: AppColors.cardBg,
-            padding: 24,
+            padding: isMobile ? 20 : 24,
+            shadowOffset: isMobile ? 4.0 : 6.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: EdgeInsets.all(isMobile ? 14 : 18),
                   decoration: BoxDecoration(
                     color: path["color"],
                     border: Border.all(color: AppColors.border, width: 2.5),
                     boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
                   ),
-                  child: Icon(path["icon"], size: 36, color: Colors.white),
+                  child: Icon(path["icon"], size: isMobile ? 30 : 36, color: Colors.white),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Text(
                   path["title"],
                   textAlign: TextAlign.center,
@@ -493,7 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 20 : 28, horizontal: 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 16 : 28, horizontal: isMobile ? 16 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -511,9 +517,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             "SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: isMobile ? 13 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+            style: TextStyle(fontSize: isMobile ? 12 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
           isMobile
               ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: pathCards)
               : Row(children: pathCards.map((card) => Expanded(child: card)).toList()),
@@ -538,7 +544,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
           style: TextStyle(
-            fontSize: isMobile ? 30 : 40,
+            fontSize: isMobile ? 28 : 40,
             fontWeight: FontWeight.w900,
             color: AppColors.ink,
             height: 1.1,
@@ -555,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 22),
         RetroButton(
           text: "EXPLOREAZĂ PROFESORII",
           icon: Icons.groups,
@@ -573,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisCount: 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.1,
+      childAspectRatio: isMobile ? 1.25 : 1.1,
       children: [
         _buildMasterAvatar(Icons.calculate, "MATH", AppColors.sky),
         _buildMasterAvatar(Icons.terminal, "CODE", AppColors.mustard),
@@ -583,16 +589,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 20 : 36, horizontal: 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 16 : 36, horizontal: isMobile ? 16 : 24),
       child: RetroBlock(
         bgColor: AppColors.cloud,
         padding: isMobile ? 20 : 36,
+        shadowOffset: isMobile ? 4.0 : 6.0,
         child: isMobile
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   leftContent,
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
                   rightContent,
                 ],
               )
@@ -618,7 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 36, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
+          Icon(icon, size: 34, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
           const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
