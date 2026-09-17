@@ -52,6 +52,8 @@ class RetroButton extends StatefulWidget {
   final Color? bgColor;
   final Color? textColor;
   final bool isFullWidth;
+  final double fontSize;
+  final EdgeInsets padding;
 
   const RetroButton({
     super.key,
@@ -60,6 +62,8 @@ class RetroButton extends StatefulWidget {
     this.bgColor,
     this.textColor,
     this.isFullWidth = false,
+    this.fontSize = 18,
+    this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
   });
 
   @override
@@ -90,8 +94,8 @@ class _RetroButtonState extends State<RetroButton> {
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -100,20 +104,20 @@ class _RetroButtonState extends State<RetroButton> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: widget.padding,
           child: Text(
             widget.text.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: effectiveText,
-              fontSize: 20,
+              fontSize: widget.fontSize,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              letterSpacing: 1.2,
             ),
           ),
         ),
@@ -124,8 +128,9 @@ class _RetroButtonState extends State<RetroButton> {
 
 class GoogleRetroButton extends StatefulWidget {
   final VoidCallback onPressed;
+  final bool isMobile;
 
-  const GoogleRetroButton({super.key, required this.onPressed});
+  const GoogleRetroButton({super.key, required this.onPressed, this.isMobile = false});
 
   @override
   State<GoogleRetroButton> createState() => _GoogleRetroButtonState();
@@ -152,8 +157,8 @@ class _GoogleRetroButtonState extends State<GoogleRetroButton> {
           duration: const Duration(milliseconds: 100),
           width: double.infinity,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -162,26 +167,26 @@ class _GoogleRetroButtonState extends State<GoogleRetroButton> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 18 : 32, vertical: widget.isMobile ? 13 : 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.network(
                 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png',
-                height: 24,
+                height: widget.isMobile ? 20 : 24,
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: widget.isMobile ? 10 : 16),
               Text(
                 'CONTINUE WITH GOOGLE',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.ink,
-                  fontSize: 18,
+                  fontSize: widget.isMobile ? 15 : 18,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.0,
                 ),
@@ -325,6 +330,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
+    required bool isMobile,
     IconData? prefixIcon,
     bool obscureText = false,
     Widget? suffixIcon,
@@ -336,27 +342,27 @@ class _LoginScreenState extends State<LoginScreen> {
       obscureText: obscureText,
       textInputAction: textInputAction,
       onSubmitted: onSubmitted,
-      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: isMobile ? 15 : 18),
       cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
       decoration: InputDecoration(
         labelText: labelText.toUpperCase(),
-        labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.ink) : null,
+        labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: isMobile ? 13 : 15),
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.ink, size: isMobile ? 18 : 22) : null,
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: AppColors.inputBg,
-        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 20, horizontal: isMobile ? 14 : 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.border, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 2.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.border, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 2.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.sky, width: 3),
+          borderSide: BorderSide(color: AppColors.sky, width: 2.5),
         ),
       ),
     );
@@ -364,6 +370,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
@@ -376,6 +384,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: AppColors.ink,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2.0,
+                fontSize: isMobile ? 18 : 22,
               ),
             ),
             backgroundColor: AppColors.bg,
@@ -387,60 +396,63 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(color: AppColors.border, height: 3),
             ),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 26 : 32),
               onPressed: () => context.go('/'),
             ),
           ),
           body: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 60),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: RetroBlock(
                   bgColor: AppColors.cloud,
-                  padding: 40,
+                  padding: isMobile ? 20 : 40,
+                  shadowOffset: isMobile ? 4 : 6,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         color: AppColors.mustard,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        padding: EdgeInsets.symmetric(vertical: isMobile ? 10 : 12, horizontal: isMobile ? 12 : 16),
                         child: Text(
                           'AUTHORIZATION REQUIRED',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: isMobile ? 18 : 24,
                             fontWeight: FontWeight.w900,
                             color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                            letterSpacing: 1.5,
+                            letterSpacing: 1.2,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: isMobile ? 10 : 16),
                       Text(
                         'AUTHENTICATE TO CONTINUE LEARNING',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: isMobile ? 13 : 16,
                           color: AppColors.textMuted,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 48),
+                      SizedBox(height: isMobile ? 28 : 48),
 
                       _buildTextField(
                         controller: emailController,
                         labelText: 'Email Address',
                         prefixIcon: Icons.email,
+                        isMobile: isMobile,
                         textInputAction: TextInputAction.next,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: isMobile ? 16 : 24),
 
                       _buildTextField(
                         controller: passwordController,
                         labelText: 'Password',
                         prefixIcon: Icons.lock,
+                        isMobile: isMobile,
                         obscureText: !_showPassword,
                         textInputAction: TextInputAction.done,
                         onSubmitted: (_) => _login(),
@@ -448,6 +460,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: Icon(
                             _showPassword ? Icons.visibility : Icons.visibility_off,
                             color: AppColors.ink,
+                            size: isMobile ? 20 : 24,
                           ),
                           onPressed: () {
                             setState(() {
@@ -456,7 +469,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 48),
+                      SizedBox(height: isMobile ? 28 : 48),
 
                       isLoading
                           ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
@@ -465,29 +478,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               bgColor: AppColors.forest,
                               textColor: Colors.white,
                               isFullWidth: true,
+                              fontSize: isMobile ? 15 : 18,
+                              padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
                               onPressed: _login,
                             ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: isMobile ? 20 : 32),
 
                       Row(
                         children: [
-                          Expanded(child: Container(height: 3, color: AppColors.border)),
+                          Expanded(child: Container(height: 2.5, color: AppColors.border)),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
                             child: Text(
                               'OR',
-                              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 18),
+                              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: isMobile ? 15 : 18),
                             ),
                           ),
-                          Expanded(child: Container(height: 3, color: AppColors.border)),
+                          Expanded(child: Container(height: 2.5, color: AppColors.border)),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: isMobile ? 20 : 32),
 
                       isGoogleSigningIn
                           ? Center(child: CircularProgressIndicator(color: AppColors.sky))
-                          : GoogleRetroButton(onPressed: _signInWithGoogle),
-                      const SizedBox(height: 32),
+                          : GoogleRetroButton(onPressed: _signInWithGoogle, isMobile: isMobile),
+                      SizedBox(height: isMobile ? 20 : 32),
 
                       GestureDetector(
                         onTap: () => context.go('/inregistrare'),
@@ -496,7 +511,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppColors.ink,
-                            fontSize: 16,
+                            fontSize: isMobile ? 13 : 16,
                             fontWeight: FontWeight.w900,
                             decoration: TextDecoration.underline,
                             decorationThickness: 2,

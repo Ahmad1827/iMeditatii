@@ -208,8 +208,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHeroSection(bool isMobile) {
     final leftContent = RetroBlock(
       bgColor: AppColors.mustard,
-      padding: isMobile ? 20 : 36,
-      shadowOffset: isMobile ? 4.0 : 6.0,
+      padding: isMobile ? 18 : 36,
+      shadowOffset: isMobile ? 3.5 : 6.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.cardBg,
                       border: Border.all(color: AppColors.border, width: 2),
@@ -235,45 +235,45 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 8),
                         Text(
                           'SYSTEM OPERATIONAL',
-                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1.2),
+                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: isMobile ? 11 : 12, letterSpacing: 1.2),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     color: AppColors.sunset,
                     child: const Text(
                       "SEASON 1",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.0),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: isMobile ? 14 : 20),
               Text(
                 "LEVEL UP YOUR\nKNOWLEDGE.",
                 style: TextStyle(
-                  fontSize: isMobile ? 32 : 48,
+                  fontSize: isMobile ? 26 : 48,
                   fontWeight: FontWeight.w900,
                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                   height: 1.1,
                   letterSpacing: 1.0,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: isMobile ? 10 : 16),
               Text(
                 "Alege o materie. Găsește un mentor verificat și rezolvă quest-uri interactive pentru a avansa în nivel.",
                 style: TextStyle(
-                  fontSize: isMobile ? 15 : 17,
+                  fontSize: isMobile ? 14 : 17,
                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                   fontWeight: FontWeight.bold,
-                  height: 1.5,
+                  height: 1.45,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: isMobile ? 20 : 28),
           if (isMobile)
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -281,14 +281,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 RetroButton(
                   text: "FIND A MASTER",
                   icon: Icons.search,
+                  fontSize: 14,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   bgColor: AppColors.forest,
                   isFullWidth: true,
                   onPressed: () => context.go('/materii'),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 RetroButton(
                   text: "DAILY QUESTS",
                   icon: Icons.track_changes,
+                  fontSize: 14,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   isFullWidth: true,
@@ -321,8 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final rightContent = RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: isMobile ? 20 : 32,
-      shadowOffset: isMobile ? 4.0 : 6.0,
+      padding: isMobile ? 18 : 32,
+      shadowOffset: isMobile ? 3.5 : 6.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -338,23 +342,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       color: AppColors.ink,
                       fontWeight: FontWeight.w900,
-                      fontSize: 16,
+                      fontSize: isMobile ? 14 : 16,
                       letterSpacing: 1.2,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.border, width: 2)),
                     child: Text(
                       _completedQuests > 10 ? "GOLD GUILD" : (_completedQuests > 3 ? "SILVER RANK" : "NOVICE"),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.cloud,
                   border: Border.all(color: AppColors.border, width: 2),
@@ -364,52 +368,52 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("QUESTS CLEARED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text("QUESTS CLEARED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12)),
                         _isLoadingStats
-                            ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                            : Text("$_completedQuests SOLVED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 14)),
+                            ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
+                            : Text("$_completedQuests SOLVED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 13)),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     ClipRRect(
                       child: LinearProgressIndicator(
                         value: (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0,
                         backgroundColor: AppColors.border.withOpacity(0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
-                        minHeight: 10,
+                        minHeight: 8,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("DAILY BOUNTY", style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 1.0)),
-                  Icon(Icons.star, color: AppColors.mustard, size: 20),
+                  Text("DAILY BOUNTY", style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 1.0)),
+                  Icon(Icons.star, color: AppColors.mustard, size: 18),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 "INFORMATICĂ // CLASA A 9-A",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.ink),
+                style: TextStyle(fontSize: isMobile ? 14 : 15, fontWeight: FontWeight.w900, color: AppColors.ink),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
               Text(
                 "RECOMPENSĂ: +50 EXP // AUTO-CHECK",
-                style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 12),
+                style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 11),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: isMobile ? 16 : 24),
           RetroButton(
             text: "ACCEPT BOUNTY",
             icon: Icons.play_arrow,
             bgColor: AppColors.sunset,
             isFullWidth: true,
-            fontSize: 15,
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            fontSize: 14,
+            padding: const EdgeInsets.symmetric(vertical: 10),
             onPressed: _startDailyQuest,
           ),
         ],
@@ -417,13 +421,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 20 : 36, isMobile ? 16 : 24, isMobile ? 20 : 28),
+      padding: EdgeInsets.fromLTRB(isMobile ? 14 : 24, isMobile ? 16 : 36, isMobile ? 14 : 24, isMobile ? 16 : 28),
       child: isMobile
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 leftContent,
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 rightContent,
               ],
             )
@@ -450,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> pathCards = paths.map((path) {
       return Padding(
         padding: EdgeInsets.only(
-          bottom: isMobile && path != paths.last ? 14 : 0,
+          bottom: isMobile && path != paths.last ? 12 : 0,
           right: !isMobile && path != paths.last ? 20 : 0,
         ),
         child: GestureDetector(
@@ -460,36 +464,36 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: RetroBlock(
             bgColor: AppColors.cardBg,
-            padding: isMobile ? 20 : 24,
-            shadowOffset: isMobile ? 4.0 : 6.0,
+            padding: isMobile ? 16 : 24,
+            shadowOffset: isMobile ? 3.5 : 6.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.all(isMobile ? 14 : 18),
+                  padding: EdgeInsets.all(isMobile ? 12 : 18),
                   decoration: BoxDecoration(
                     color: path["color"],
                     border: Border.all(color: AppColors.border, width: 2.5),
                     boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
                   ),
-                  child: Icon(path["icon"], size: isMobile ? 30 : 36, color: Colors.white),
+                  child: Icon(path["icon"], size: isMobile ? 26 : 36, color: Colors.white),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Text(
                   path["title"],
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: isMobile ? 18 : 20,
+                    fontSize: isMobile ? 16 : 20,
                     fontWeight: FontWeight.w900,
                     color: AppColors.ink,
                     letterSpacing: 1.0,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   path["desc"],
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                  style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -499,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 16 : 28, horizontal: isMobile ? 16 : 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 28, horizontal: isMobile ? 14 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -507,19 +511,19 @@ class _HomeScreenState extends State<HomeScreen> {
             "CHOOSE YOUR PATH",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: isMobile ? 26 : 34,
+              fontSize: isMobile ? 22 : 34,
               fontWeight: FontWeight.w900,
               color: AppColors.ink,
               letterSpacing: 1.5,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             "SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: isMobile ? 12 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+            style: TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: isMobile ? 18 : 24),
           isMobile
               ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: pathCards)
               : Row(children: pathCards.map((card) => Expanded(child: card)).toList()),
@@ -533,41 +537,42 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
           child: const Text(
             "GUILD ROSTER",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 11),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 10),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Text(
           isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
           style: TextStyle(
-            fontSize: isMobile ? 28 : 40,
+            fontSize: isMobile ? 24 : 40,
             fontWeight: FontWeight.w900,
             color: AppColors.ink,
             height: 1.1,
             letterSpacing: 1.0,
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
         Text(
           "Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
           style: TextStyle(
-            fontSize: isMobile ? 14 : 16,
+            fontSize: isMobile ? 13 : 16,
             color: AppColors.ink,
             fontWeight: FontWeight.bold,
-            height: 1.5,
+            height: 1.45,
           ),
         ),
-        const SizedBox(height: 22),
+        SizedBox(height: isMobile ? 16 : 22),
         RetroButton(
           text: "EXPLOREAZĂ PROFESORII",
           icon: Icons.groups,
           bgColor: AppColors.sunset,
           isFullWidth: isMobile,
-          fontSize: 15,
+          fontSize: 14,
+          padding: const EdgeInsets.symmetric(vertical: 12),
           onPressed: () => context.go('/materii'),
         ),
       ],
@@ -577,8 +582,8 @@ class _HomeScreenState extends State<HomeScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
       childAspectRatio: isMobile ? 1.25 : 1.1,
       children: [
         _buildMasterAvatar(Icons.calculate, "MATH", AppColors.sky),
@@ -589,17 +594,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return _buildConstrainedSection(
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 16 : 36, horizontal: isMobile ? 16 : 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 36, horizontal: isMobile ? 14 : 24),
       child: RetroBlock(
         bgColor: AppColors.cloud,
-        padding: isMobile ? 20 : 36,
-        shadowOffset: isMobile ? 4.0 : 6.0,
+        padding: isMobile ? 16 : 36,
+        shadowOffset: isMobile ? 3.5 : 6.0,
         child: isMobile
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   leftContent,
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   rightContent,
                 ],
               )
@@ -625,14 +630,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 34, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
-          const SizedBox(height: 6),
+          Icon(icon, size: 30, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
+          const SizedBox(height: 5),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             color: AppColors.ink,
             child: Text(
               label,
-              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+              style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
             ),
           ),
         ],
@@ -643,7 +648,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFooter(bool isMobile) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 32 : 44),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 26 : 44),
       decoration: BoxDecoration(
         color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
         border: Border(top: BorderSide(color: AppColors.border, width: 3)),
@@ -654,17 +659,17 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               'IMEDITATII // GUILD',
               style: TextStyle(
-                fontSize: isMobile ? 26 : 32,
+                fontSize: isMobile ? 22 : 32,
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2.0,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               'SYSTEM LOG: LEVEL UP YOUR LEARNING IN 2026.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 12 : 14, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 11 : 14, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -695,7 +700,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildHeroSection(isMobile),
                         _buildPathsSection(isMobile),
                         _buildMastersSection(isMobile),
-                        SizedBox(height: isMobile ? 16 : 28),
+                        SizedBox(height: isMobile ? 14 : 28),
                         _buildFooter(isMobile),
                       ],
                     ),

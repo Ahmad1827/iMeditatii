@@ -168,9 +168,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     return prefs.getBool(key) ?? false;
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isMobile) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 32, vertical: isMobile ? 12 : 16),
       decoration: BoxDecoration(
         color: AppColors.headerBg,
         border: Border(bottom: BorderSide(color: AppColors.border, width: 3)),
@@ -178,93 +178,169 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1100),
-          child: Row(
-            children: [
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () => context.go('/exercitii'),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBg,
-                      border: Border.all(color: AppColors.border, width: 2.5),
-                      boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
-                    ),
-                    child: Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.subject.toUpperCase(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.isDark ? const Color(0xFFEAB334) : AppColors.ink,
-                      fontSize: 24,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  Text(
-                    "RESOLVE PROBLEMS • EARN XP",
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  border: Border.all(color: AppColors.border, width: 2.5),
-                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
-                ),
-                child: Row(
-                  children: availableGrades.map((g) {
-                    final isSel = g == selectedGrade;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() => selectedGrade = g);
-                        _updateCategoriesAndFilter();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: isSel
-                              ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
-                              : Colors.transparent,
-                        ),
-                        child: Text(
-                          "CLASA $g",
-                          style: TextStyle(
-                            color: isSel
-                                ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
-                                : AppColors.ink,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                            letterSpacing: 0.6,
+          child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => context.go('/exercitii'),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.cardBg,
+                                border: Border.all(color: AppColors.border, width: 2),
+                                boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(2, 2))],
+                              ),
+                              child: Icon(Icons.arrow_back, color: AppColors.ink, size: 18),
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            widget.subject.toUpperCase(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.isDark ? const Color(0xFFEAB334) : AppColors.ink,
+                              fontSize: 18,
+                              letterSpacing: 1.0,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          border: Border.all(color: AppColors.border, width: 2),
+                        ),
+                        child: Row(
+                          children: availableGrades.map((g) {
+                            final isSel = g == selectedGrade;
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() => selectedGrade = g);
+                                _updateCategoriesAndFilter();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                color: isSel
+                                    ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
+                                    : Colors.transparent,
+                                child: Text(
+                                  "CLASA $g",
+                                  style: TextStyle(
+                                    color: isSel
+                                        ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                                        : AppColors.ink,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 11.5,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => context.go('/exercitii'),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBg,
+                            border: Border.all(color: AppColors.border, width: 2.5),
+                            boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
+                          ),
+                          child: Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.subject.toUpperCase(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.isDark ? const Color(0xFFEAB334) : AppColors.ink,
+                            fontSize: 24,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          "RESOLVE PROBLEMS • EARN XP",
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.cardBg,
+                        border: Border.all(color: AppColors.border, width: 2.5),
+                        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
+                      ),
+                      child: Row(
+                        children: availableGrades.map((g) {
+                          final isSel = g == selectedGrade;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() => selectedGrade = g);
+                              _updateCategoriesAndFilter();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isSel
+                                    ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
+                                    : Colors.transparent,
+                              ),
+                              child: Text(
+                                "CLASA $g",
+                                style: TextStyle(
+                                  color: isSel
+                                      ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                                      : AppColors.ink,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 
-  Widget _buildSidebar() {
+  Widget _buildSidebar(bool isMobile) {
     final totalInGrade = allExercises.where((e) => e['grade'] == selectedGrade).length;
     final progressPercent = totalInGrade > 0 ? (completedCount / totalInGrade) : 0.0;
 
@@ -272,15 +348,15 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       decoration: BoxDecoration(
         color: AppColors.sidebarBg,
         border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4))],
       ),
-      padding: const EdgeInsets.all(22),
+      padding: EdgeInsets.all(isMobile ? 16 : 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppColors.cardBg,
               border: Border.all(color: AppColors.border, width: 2),
@@ -293,33 +369,33 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   children: [
                     Text(
                       "QUEST PROGRESS",
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.ink, letterSpacing: 0.5),
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: isMobile ? 12 : 13, color: AppColors.ink, letterSpacing: 0.5),
                     ),
                     Text(
                       "$completedCount / $totalInGrade",
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.forest),
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: isMobile ? 12 : 14, color: AppColors.forest),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.zero,
                   child: LinearProgressIndicator(
                     value: progressPercent,
                     backgroundColor: AppColors.bg,
                     valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
-                    minHeight: 12,
+                    minHeight: isMobile ? 10 : 12,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 22),
+          SizedBox(height: isMobile ? 14 : 22),
           Text(
             "SEARCH QUEST",
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
               color: AppColors.inputBg,
@@ -330,10 +406,10 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
               decoration: InputDecoration(
                 hintText: "Caută exercițiu...",
-                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 13),
-                prefixIcon: Icon(Icons.search, size: 18, color: AppColors.ink),
+                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                prefixIcon: Icon(Icons.search, size: 16, color: AppColors.ink),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               ),
               onChanged: (val) {
                 searchQuery = val;
@@ -341,34 +417,33 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               },
             ),
           ),
-          const SizedBox(height: 22),
+          SizedBox(height: isMobile ? 14 : 22),
           Text(
             "CATEGORIES",
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
           ),
-          const SizedBox(height: 10),
-          ...["Toate", ...availableCategories].map((cat) {
-            final isSelected = cat == selectedCategory;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: InkWell(
-                onTap: () {
-                  setState(() => selectedCategory = cat);
-                  _updateCategoriesAndFilter();
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
-                        : AppColors.cardBg,
-                    border: Border.all(color: AppColors.border, width: 2),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
+          const SizedBox(height: 8),
+          if (isMobile)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: ["Toate", ...availableCategories].map((cat) {
+                  final isSelected = cat == selectedCategory;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() => selectedCategory = cat);
+                        _updateCategoriesAndFilter();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
+                              : AppColors.cardBg,
+                          border: Border.all(color: AppColors.border, width: 2),
+                        ),
                         child: Text(
                           cat.toUpperCase(),
                           style: TextStyle(
@@ -377,46 +452,59 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                             color: isSelected
                                 ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
                                 : AppColors.ink,
-                            letterSpacing: 0.4,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (isSelected)
-                        Icon(Icons.arrow_right,
-                            color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 18),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          }),
-          const SizedBox(height: 20),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              border: Border.all(color: AppColors.border, width: 2),
-              boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(2.5, 2.5))],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.code, size: 16, color: AppColors.sunset),
-                const SizedBox(width: 8),
-                Text(
-                  "MADE BY AHMAD",
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.ink,
-                    letterSpacing: 1.2,
+            )
+          else
+            ...["Toate", ...availableCategories].map((cat) {
+              final isSelected = cat == selectedCategory;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: InkWell(
+                  onTap: () {
+                    setState(() => selectedCategory = cat);
+                    _updateCategoriesAndFilter();
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (AppColors.isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F))
+                          : AppColors.cardBg,
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            cat.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: isSelected
+                                  ? (AppColors.isDark ? const Color(0xFF10161A) : Colors.white)
+                                  : AppColors.ink,
+                              letterSpacing: 0.4,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (isSelected)
+                          Icon(Icons.arrow_right,
+                              color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white, size: 18),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ),
+              );
+            }),
         ],
       ),
     );
@@ -424,6 +512,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, currentMode, _) {
@@ -432,7 +522,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           appBar: AppBar(
             title: Text(
               'QUEST LOG',
-              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.5, fontSize: 16),
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: isMobile ? 15 : 16),
             ),
             backgroundColor: AppColors.bg,
             iconTheme: IconThemeData(color: AppColors.ink),
@@ -446,37 +536,31 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           body: SafeArea(
             child: Column(
               children: [
-                _buildHeader(),
+                _buildHeader(isMobile),
                 Expanded(
                   child: isLoading
                       ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
                       : Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 1100),
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final isDesktop = constraints.maxWidth > 800;
-
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
-                                  child: isDesktop
-                                      ? Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(width: 330, child: _buildSidebar()),
-                                            const SizedBox(width: 28),
-                                            Expanded(child: _buildSingleColumnList()),
-                                          ],
-                                        )
-                                      : ListView(
-                                          children: [
-                                            _buildSidebar(),
-                                            const SizedBox(height: 20),
-                                            _buildSingleColumnList(),
-                                          ],
-                                        ),
-                                );
-                              },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 24, vertical: isMobile ? 16 : 22),
+                              child: isMobile
+                                  ? ListView(
+                                      children: [
+                                        _buildSidebar(isMobile),
+                                        const SizedBox(height: 18),
+                                        _buildSingleColumnList(isMobile),
+                                      ],
+                                    )
+                                  : Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 330, child: _buildSidebar(isMobile)),
+                                        const SizedBox(width: 28),
+                                        Expanded(child: _buildSingleColumnList(isMobile)),
+                                      ],
+                                    ),
                             ),
                           ),
                         ),
@@ -489,7 +573,55 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     );
   }
 
-  Widget _buildSingleColumnList() {
+  Widget _buildSingleColumnList(bool isMobile) {
+    final listWidget = displayedExercises.isEmpty
+        ? Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: AppColors.cardBg,
+              border: Border.all(color: AppColors.border, width: 2),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.search_off, size: 36, color: AppColors.ink),
+                const SizedBox(height: 10),
+                Text("NICIUN EXERCIȚIU GĂSIT",
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.ink)),
+              ],
+            ),
+          )
+        : ListView.builder(
+            controller: _scrollController,
+            shrinkWrap: isMobile,
+            physics: isMobile ? const NeverScrollableScrollPhysics() : const ClampingScrollPhysics(),
+            padding: EdgeInsets.only(right: isMobile ? 0 : 14, bottom: 24),
+            itemCount: displayedExercises.length,
+            itemBuilder: (context, index) {
+              final ex = displayedExercises[index];
+              return FutureBuilder<bool>(
+                future: _isExerciseDone(ex["id"]),
+                builder: (context, snapshot) {
+                  final isDone = snapshot.data ?? false;
+                  return SingleColumnQuestCard(
+                    index: index,
+                    exercise: ex,
+                    isDone: isDone,
+                    isMobile: isMobile,
+                    onTap: () async {
+                      final encodedMaterie = Uri.encodeComponent(widget.subject);
+                      final encodedClasa = Uri.encodeComponent(selectedGrade);
+                      final exId = ex["id"];
+
+                      await context.push('/exercitiu/$exId?materie=$encodedMaterie&clasa=$encodedClasa');
+                      if (mounted) _updateCategoriesAndFilter();
+                    },
+                  );
+                },
+              );
+            },
+          );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -498,32 +630,17 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           children: [
             Text(
               "AVAILABLE QUESTS (${displayedExercises.length})",
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.6),
+              style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.6),
             ),
             Text(
               "FILTRU: ${selectedCategory.toUpperCase()}",
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textMuted),
+              style: TextStyle(fontSize: isMobile ? 10 : 11, fontWeight: FontWeight.w800, color: AppColors.textMuted),
             ),
           ],
         ),
-        const SizedBox(height: 14),
-        if (displayedExercises.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(40),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              border: Border.all(color: AppColors.border, width: 2),
-            ),
-            child: Column(
-              children: [
-                Icon(Icons.search_off, size: 40, color: AppColors.ink),
-                const SizedBox(height: 12),
-                Text("NICIUN EXERCIȚIU GĂSIT",
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
-              ],
-            ),
-          )
+        const SizedBox(height: 12),
+        if (isMobile)
+          listWidget
         else
           Expanded(
             child: RawScrollbar(
@@ -536,33 +653,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               trackColor: AppColors.sidebarBg,
               trackBorderColor: AppColors.border,
               padding: const EdgeInsets.only(left: 6),
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.only(right: 14, bottom: 24),
-                itemCount: displayedExercises.length,
-                itemBuilder: (context, index) {
-                  final ex = displayedExercises[index];
-                  return FutureBuilder<bool>(
-                    future: _isExerciseDone(ex["id"]),
-                    builder: (context, snapshot) {
-                      final isDone = snapshot.data ?? false;
-                      return SingleColumnQuestCard(
-                        index: index,
-                        exercise: ex,
-                        isDone: isDone,
-                        onTap: () async {
-                          final encodedMaterie = Uri.encodeComponent(widget.subject);
-                          final encodedClasa = Uri.encodeComponent(selectedGrade);
-                          final exId = ex["id"];
-
-                          await context.push('/exercitiu/$exId?materie=$encodedMaterie&clasa=$encodedClasa');
-                          if (mounted) _updateCategoriesAndFilter();
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
+              child: listWidget,
             ),
           ),
       ],
@@ -574,6 +665,7 @@ class SingleColumnQuestCard extends StatefulWidget {
   final int index;
   final Map<String, dynamic> exercise;
   final bool isDone;
+  final bool isMobile;
   final VoidCallback onTap;
 
   const SingleColumnQuestCard({
@@ -581,6 +673,7 @@ class SingleColumnQuestCard extends StatefulWidget {
     required this.index,
     required this.exercise,
     required this.isDone,
+    required this.isMobile,
     required this.onTap,
   });
 
@@ -639,7 +732,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 90),
-          margin: const EdgeInsets.only(bottom: 16),
+          margin: const EdgeInsets.only(bottom: 12),
           transform: Matrix4.translationValues(
             _isPressed ? 2.5 : (_isHover ? -2.0 : 0.0),
             _isPressed ? 2.5 : (_isHover ? -2.0 : 0.0),
@@ -653,7 +746,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(4, 4),
+                offset: _isPressed ? const Offset(0, 0) : Offset(widget.isMobile ? 3 : 4, widget.isMobile ? 3 : 4),
                 blurRadius: 0,
               ),
             ],
@@ -663,7 +756,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  width: 68,
+                  width: widget.isMobile ? 54 : 68,
                   decoration: BoxDecoration(
                     color: _getBadgeColor(),
                     border: Border(right: BorderSide(color: AppColors.border, width: 2.5)),
@@ -671,10 +764,10 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                   child: Center(
                     child: Text(
                       widget.isDone ? "✓" : "#$id",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: widget.isMobile ? 14 : 16,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -682,7 +775,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                    padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 12 : 18, vertical: widget.isMobile ? 12 : 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -690,19 +783,19 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                         Text(
                           title.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: widget.isMobile ? 13.5 : 15,
                             fontWeight: FontWeight.w900,
                             color: AppColors.ink,
-                            letterSpacing: 0.6,
+                            letterSpacing: 0.5,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
                           category.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: widget.isMobile ? 11 : 12,
                             color: AppColors.textMuted,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.4,
@@ -715,7 +808,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 10 : 16),
                   decoration: BoxDecoration(
                     border: Border(left: BorderSide(color: AppColors.border, width: 2.5)),
                   ),
@@ -723,7 +816,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 7 : 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: _difficultyColor(diff).withOpacity(AppColors.isDark ? 0.25 : 0.15),
                           border: Border.all(color: _difficultyColor(diff), width: 1.5),
@@ -731,15 +824,15 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                         child: Text(
                           diff.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: widget.isMobile ? 9.5 : 11,
                             fontWeight: FontWeight.w900,
                             color: _difficultyColor(diff),
-                            letterSpacing: 0.8,
+                            letterSpacing: 0.6,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.ink),
+                      const SizedBox(width: 8),
+                      Icon(Icons.arrow_forward_ios, size: widget.isMobile ? 13 : 16, color: AppColors.ink),
                     ],
                   ),
                 ),

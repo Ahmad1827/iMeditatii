@@ -53,6 +53,8 @@ class RetroButton extends StatefulWidget {
   final Color? textColor;
   final bool isFullWidth;
   final bool isLoading;
+  final double fontSize;
+  final EdgeInsets padding;
 
   const RetroButton({
     super.key,
@@ -62,6 +64,8 @@ class RetroButton extends StatefulWidget {
     this.textColor,
     this.isFullWidth = false,
     this.isLoading = false,
+    this.fontSize = 18,
+    this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
   });
 
   @override
@@ -94,8 +98,8 @@ class _RetroButtonState extends State<RetroButton> {
           duration: const Duration(milliseconds: 100),
           width: widget.isFullWidth ? double.infinity : null,
           transform: Matrix4.translationValues(
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 4.0 : (isHovered ? -2.0 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
+            isPressed ? 3.0 : (isHovered ? -1.5 : 0.0),
             0,
           ),
           decoration: BoxDecoration(
@@ -104,26 +108,28 @@ class _RetroButtonState extends State<RetroButton> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(6, 6),
+                offset: isPressed ? const Offset(0, 0) : const Offset(5, 5),
                 blurRadius: 0,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: widget.padding,
           child: widget.isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+              ? const Center(
+                  child: SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                  ),
                 )
               : Text(
                   widget.text.toUpperCase(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: effectiveTextColor,
-                    fontSize: 20,
+                    fontSize: widget.fontSize,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
+                    letterSpacing: 1.2,
                   ),
                 ),
         ),
@@ -290,6 +296,7 @@ class _SignupScreenState extends State<SignupScreen> {
     required TextEditingController controller,
     required String labelText,
     required IconData prefixIcon,
+    required bool isMobile,
     bool obscureText = false,
     bool readOnly = false,
     String? Function(String?)? validator,
@@ -301,59 +308,59 @@ class _SignupScreenState extends State<SignupScreen> {
       readOnly: readOnly,
       keyboardType: keyboardType,
       validator: validator,
-      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 18),
+      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: isMobile ? 15 : 18),
       cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
       decoration: InputDecoration(
         labelText: labelText.toUpperCase(),
-        labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
-        prefixIcon: Icon(prefixIcon, color: AppColors.ink),
+        labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: isMobile ? 12 : 14),
+        prefixIcon: Icon(prefixIcon, color: AppColors.ink, size: isMobile ? 18 : 22),
         filled: true,
         fillColor: readOnly ? AppColors.cloud : AppColors.inputBg,
-        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 20, horizontal: isMobile ? 14 : 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.border, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 2.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.border, width: 3),
+          borderSide: BorderSide(color: AppColors.border, width: 2.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.sky, width: 3),
+          borderSide: BorderSide(color: AppColors.sky, width: 2.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.sunset, width: 3),
+          borderSide: BorderSide(color: AppColors.sunset, width: 2.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppColors.sunset, width: 3),
+          borderSide: BorderSide(color: AppColors.sunset, width: 2.5),
         ),
       ),
     );
   }
 
-  Widget _buildRoleSelector(String title, String value, IconData icon) {
+  Widget _buildRoleSelector(String title, String value, IconData icon, bool isMobile) {
     final isSelected = role == value;
     return GestureDetector(
       onTap: () => setState(() => role = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        margin: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
+        padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 20, horizontal: isMobile ? 10 : 16),
         transform: Matrix4.translationValues(
-          isSelected ? 4.0 : 0.0,
-          isSelected ? 4.0 : 0.0,
+          isSelected ? 3.0 : 0.0,
+          isSelected ? 3.0 : 0.0,
           0,
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.sky : AppColors.cardBg,
-          border: Border.all(color: AppColors.border, width: 3),
+          border: Border.all(color: AppColors.border, width: 2.5),
           boxShadow: [
             BoxShadow(
               color: AppColors.shadow,
-              offset: isSelected ? const Offset(0, 0) : const Offset(6, 6),
+              offset: isSelected ? const Offset(0, 0) : Offset(isMobile ? 3 : 5, isMobile ? 3 : 5),
               blurRadius: 0,
             )
           ],
@@ -364,17 +371,17 @@ class _SignupScreenState extends State<SignupScreen> {
             Icon(
               icon,
               color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-              size: 48,
+              size: isMobile ? 34 : 48,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isMobile ? 8 : 14),
             Text(
               title.toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                fontSize: 18,
+                fontSize: isMobile ? 13 : 16,
                 fontWeight: FontWeight.w900,
-                letterSpacing: 1.0,
+                letterSpacing: 0.8,
               ),
             ),
           ],
@@ -385,6 +392,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
@@ -397,6 +406,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 color: AppColors.ink,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2.0,
+                fontSize: isMobile ? 18 : 22,
               ),
             ),
             backgroundColor: AppColors.bg,
@@ -408,18 +418,19 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Container(color: AppColors.border, height: 3),
             ),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
+              icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 26 : 32),
               onPressed: () => context.go('/login'),
             ),
           ),
           body: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 60),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 700),
                 child: RetroBlock(
                   bgColor: AppColors.cloud,
-                  padding: 40,
+                  padding: isMobile ? 18 : 40,
+                  shadowOffset: isMobile ? 4 : 6,
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -428,128 +439,133 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         Container(
                           color: AppColors.mustard,
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                          padding: EdgeInsets.symmetric(vertical: isMobile ? 10 : 12, horizontal: isMobile ? 12 : 16),
                           child: Text(
-                            widget.googleUser ? 'FINALIZE GOOGLE REGISTRATION' : 'INITIALIZE NEW ACCOUNT',
+                            widget.googleUser ? 'FINALIZE GOOGLE SIGNUP' : 'INITIALIZE NEW ACCOUNT',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 24,
+                              fontSize: isMobile ? 18 : 24,
                               fontWeight: FontWeight.w900,
                               color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                              letterSpacing: 1.5,
+                              letterSpacing: 1.2,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: isMobile ? 10 : 16),
                         Text(
                           'Provide required credentials to enter the system.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: isMobile ? 13 : 16,
                             color: AppColors.textMuted,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 48),
+                        SizedBox(height: isMobile ? 24 : 48),
 
                         _buildTextField(
                           controller: nameCtrl,
                           labelText: 'Full Name',
                           prefixIcon: Icons.person,
+                          isMobile: isMobile,
                           validator: (v) => v!.isEmpty ? 'REQUIRED FIELD' : null,
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: isMobile ? 16 : 24),
 
                         _buildTextField(
                           controller: emailCtrl,
                           labelText: 'Email Address',
                           prefixIcon: Icons.email,
+                          isMobile: isMobile,
                           readOnly: widget.googleUser,
                           validator: (v) => v!.contains('@') && v.contains('.') ? null : 'INVALID EMAIL FORMAT',
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: isMobile ? 16 : 24),
 
                         if (!widget.googleUser) ...[
                           _buildTextField(
                             controller: passCtrl,
                             labelText: 'Password',
                             prefixIcon: Icons.lock,
+                            isMobile: isMobile,
                             obscureText: true,
                             validator: (v) => v!.length < 6 ? 'MINIMUM 6 CHARACTERS REQUIRED' : null,
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: isMobile ? 16 : 24),
                         ],
 
                         _buildTextField(
                           controller: phoneCtrl,
                           labelText: 'Phone Number (Optional)',
                           prefixIcon: Icons.phone,
+                          isMobile: isMobile,
                           keyboardType: TextInputType.phone,
                           validator: (v) => null,
                         ),
-                        const SizedBox(height: 48),
+                        SizedBox(height: isMobile ? 24 : 48),
 
                         Text(
                           'ASSIGN CLASS / ROLE:',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.2),
+                          style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: isMobile ? 12 : 20),
 
                         Row(
                           children: [
-                            Expanded(child: _buildRoleSelector('Player\n(Student)', 'student', Icons.gamepad)),
-                            Expanded(child: _buildRoleSelector('Master\n(Teacher)', 'teacher', Icons.admin_panel_settings)),
+                            Expanded(child: _buildRoleSelector('Player\n(Student)', 'student', Icons.gamepad, isMobile)),
+                            Expanded(child: _buildRoleSelector('Master\n(Teacher)', 'teacher', Icons.admin_panel_settings, isMobile)),
                           ],
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: isMobile ? 24 : 40),
 
                         if (role == 'teacher') ...[
                           DropdownButtonFormField<String>(
                             decoration: InputDecoration(
                               labelText: 'SELECT SPECIALIZATION',
-                              labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
-                              prefixIcon: Icon(Icons.book, color: AppColors.ink),
+                              labelStyle: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: isMobile ? 12 : 14),
+                              prefixIcon: Icon(Icons.book, color: AppColors.ink, size: isMobile ? 18 : 22),
                               filled: true,
                               fillColor: AppColors.inputBg,
+                              contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 18, horizontal: 16),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(color: AppColors.border, width: 3),
+                                borderSide: BorderSide(color: AppColors.border, width: 2.5),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(color: AppColors.border, width: 3),
+                                borderSide: BorderSide(color: AppColors.border, width: 2.5),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(color: AppColors.sky, width: 3),
+                                borderSide: BorderSide(color: AppColors.sky, width: 2.5),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(color: AppColors.sunset, width: 3),
+                                borderSide: BorderSide(color: AppColors.sunset, width: 2.5),
                               ),
                               focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(color: AppColors.sunset, width: 3),
+                                borderSide: BorderSide(color: AppColors.sunset, width: 2.5),
                               ),
                             ),
                             iconEnabledColor: AppColors.ink,
                             dropdownColor: AppColors.cardBg,
                             items: subjects.map((s) => DropdownMenuItem(
                                 value: s,
-                                child: Text(s.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink))
+                                child: Text(s.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: isMobile ? 13 : 15))
                             )).toList(),
                             value: selectedSubject,
                             onChanged: (val) => setState(() => selectedSubject = val),
                             validator: (v) => v == null || v.isEmpty ? 'REQUIRED FIELD' : null,
                           ),
-                          const SizedBox(height: 40),
+                          SizedBox(height: isMobile ? 24 : 40),
                         ],
 
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all(isMobile ? 14 : 20),
                           decoration: BoxDecoration(
                             color: AppColors.cardBg,
-                            border: Border.all(color: AppColors.border, width: 3),
+                            border: Border.all(color: AppColors.border, width: 2.5),
                           ),
                           child: Column(
                             children: [
@@ -566,7 +582,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     child: RichText(
                                       text: TextSpan(
                                         text: 'I ACKNOWLEDGE THE ',
-                                        style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: AppColors.ink, fontSize: isMobile ? 13 : 16, fontWeight: FontWeight.bold),
                                         children: [
                                           TextSpan(
                                             text: 'TERMS OF SERVICE',
@@ -579,7 +595,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: isMobile ? 8 : 12),
                               Row(
                                 children: [
                                   Checkbox(
@@ -593,7 +609,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     child: RichText(
                                       text: TextSpan(
                                         text: 'I AGREE TO THE ',
-                                        style: TextStyle(color: AppColors.ink, fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: AppColors.ink, fontSize: isMobile ? 13 : 16, fontWeight: FontWeight.bold),
                                         children: [
                                           TextSpan(
                                             text: 'PRIVACY POLICY',
@@ -609,7 +625,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 48),
+                        SizedBox(height: isMobile ? 24 : 48),
 
                         RetroButton(
                           text: 'INITIALIZE ACCOUNT',
@@ -617,9 +633,11 @@ class _SignupScreenState extends State<SignupScreen> {
                           textColor: Colors.white,
                           isFullWidth: true,
                           isLoading: loading,
+                          fontSize: isMobile ? 15 : 18,
+                          padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
                           onPressed: _signup,
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: isMobile ? 20 : 32),
 
                         GestureDetector(
                           onTap: () => context.go('/login'),
@@ -628,7 +646,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: AppColors.ink,
-                              fontSize: 16,
+                              fontSize: isMobile ? 13 : 16,
                               fontWeight: FontWeight.w900,
                               decoration: TextDecoration.underline,
                               decorationThickness: 2,

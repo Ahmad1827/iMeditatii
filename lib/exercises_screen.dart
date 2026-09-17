@@ -51,6 +51,8 @@ class RetroButton extends StatefulWidget {
   final Color? textColor;
   final bool isFullWidth;
   final IconData? icon;
+  final double fontSize;
+  final EdgeInsets padding;
 
   const RetroButton({
     super.key,
@@ -60,6 +62,8 @@ class RetroButton extends StatefulWidget {
     this.textColor,
     this.isFullWidth = false,
     this.icon,
+    this.fontSize = 16,
+    this.padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
   });
 
   @override
@@ -105,13 +109,13 @@ class _RetroButtonState extends State<RetroButton> {
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: widget.padding,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: effectiveText, size: 18),
+                Icon(widget.icon, color: effectiveText, size: widget.fontSize + 2),
                 const SizedBox(width: 8),
               ],
               Text(
@@ -119,7 +123,7 @@ class _RetroButtonState extends State<RetroButton> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: effectiveText,
-                  fontSize: 16,
+                  fontSize: widget.fontSize,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.2,
                 ),
@@ -161,38 +165,37 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     );
   }
 
-  Widget _heroSection() {
-    final isWide = MediaQuery.of(context).size.width > 880;
-
+  Widget _heroSection(bool isMobile) {
     return _buildConstrainedSection(
-      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 18 : 36, horizontal: isMobile ? 16 : 24),
       child: RetroBlock(
         bgColor: AppColors.mustard,
-        padding: isWide ? 36 : 24,
-        child: isWide
-            ? IntrinsicHeight(
+        padding: isMobile ? 18 : 36,
+        shadowOffset: isMobile ? 3.5 : 6.0,
+        child: isMobile
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _heroLeftContent(isMobile),
+                  const SizedBox(height: 18),
+                  _buildRegistryCard(isMobile),
+                ],
+              )
+            : IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(flex: 3, child: _heroLeftContent(isWide)),
+                    Expanded(flex: 3, child: _heroLeftContent(isMobile)),
                     const SizedBox(width: 32),
-                    Expanded(flex: 2, child: _buildRegistryCard()),
+                    Expanded(flex: 2, child: _buildRegistryCard(isMobile)),
                   ],
                 ),
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _heroLeftContent(isWide),
-                  const SizedBox(height: 24),
-                  _buildRegistryCard(),
-                ],
               ),
       ),
     );
   }
 
-  Widget _heroLeftContent(bool isWide) {
+  Widget _heroLeftContent(bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,15 +203,18 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.cardBg,
                     border: Border.all(color: AppColors.border, width: 2),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
                       const SizedBox(width: 8),
@@ -217,51 +223,53 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         style: TextStyle(
                           color: AppColors.ink,
                           fontWeight: FontWeight.w900,
-                          fontSize: 12,
+                          fontSize: isMobile ? 11 : 12,
                           letterSpacing: 1.2,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   color: AppColors.sunset,
                   child: const Text(
                     "+50 EXP BOOST",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.0),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: isMobile ? 14 : 20),
             Text(
               "PRACTICE SMART.\nLEVEL UP DAILY.",
               style: TextStyle(
-                fontSize: isWide ? 44 : 32,
+                fontSize: isMobile ? 26 : 44,
                 fontWeight: FontWeight.w900,
                 color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                 height: 1.1,
                 letterSpacing: 1.0,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: isMobile ? 10 : 14),
             Text(
               "Selectează o disciplină. Suita automată de teste îți validează codul C++ și răspunsurile în timp real.",
               style: TextStyle(
-                fontSize: isWide ? 16 : 15,
+                fontSize: isMobile ? 13 : 16,
                 color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                 fontWeight: FontWeight.bold,
-                height: 1.5,
+                height: 1.45,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 28),
+        SizedBox(height: isMobile ? 18 : 28),
         RetroButton(
           text: "QUICK START: INFORMATICĂ",
           icon: Icons.code,
+          isFullWidth: isMobile,
+          fontSize: isMobile ? 13 : 15,
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 12 : 14),
           bgColor: AppColors.forest,
           textColor: Colors.white,
           onPressed: () {
@@ -273,10 +281,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     );
   }
 
-  Widget _buildRegistryCard() {
+  Widget _buildRegistryCard(bool isMobile) {
     return RetroBlock(
       bgColor: AppColors.cardBg,
-      padding: 24,
+      padding: isMobile ? 16 : 24,
+      shadowOffset: isMobile ? 3 : 5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,14 +301,14 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     style: TextStyle(
                       color: AppColors.ink,
                       fontWeight: FontWeight.w900,
-                      fontSize: 16,
+                      fontSize: isMobile ? 14 : 16,
                       letterSpacing: 1.2,
                     ),
                   ),
-                  Icon(Icons.shield, color: AppColors.forest, size: 22),
+                  Icon(Icons.shield, color: AppColors.forest, size: 20),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -309,16 +318,16 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 child: Column(
                   children: [
                     _registryRow("ACTIVE QUESTS", "50+ PROBLEMS"),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     _registryRow("EVALUATION", "JUDGE0 (C++20)"),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     _registryRow("FEEDBACK", "INSTANT (TESTS)"),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -327,7 +336,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 const SizedBox(width: 6),
                 Text(
                   "READY FOR EVALUATION",
-                  style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 12),
+                  style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 11),
                 ),
               ],
             ),
@@ -341,40 +350,40 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.bold)),
-        Text(value, style: TextStyle(color: AppColors.ink, fontSize: 12, fontWeight: FontWeight.w900)),
+        Text(label, style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold)),
+        Text(value, style: TextStyle(color: AppColors.ink, fontSize: 11, fontWeight: FontWeight.w900)),
       ],
     );
   }
 
-  Widget _sectionTitle(String title) {
+  Widget _sectionTitle(String title, bool isMobile) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 28),
+      padding: EdgeInsets.only(bottom: isMobile ? 18 : 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             child: const Text(
               "TRAINING TRACKS",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.5,
-                fontSize: 12,
+                fontSize: 10.5,
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             title.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 32,
+              fontSize: isMobile ? 22 : 32,
               fontWeight: FontWeight.w900,
               color: AppColors.ink,
-              letterSpacing: 1.5,
+              letterSpacing: 1.2,
             ),
           ),
         ],
@@ -382,7 +391,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     );
   }
 
-  Widget _materiiSection() {
+  Widget _materiiSection(bool isMobile) {
     final List<Map<String, dynamic>> materii = [
       {"icon": Icons.functions, "title": "Matematică", "color": AppColors.sunset, "tag": "ALGEBRĂ & GEOMETRIE"},
       {"icon": Icons.menu_book, "title": "Limba Română", "color": AppColors.sky, "tag": "GRAMATICĂ & LITERATURĂ"},
@@ -393,10 +402,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     ];
 
     return _buildConstrainedSection(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: 0),
       child: Wrap(
-        spacing: 24,
-        runSpacing: 24,
+        spacing: isMobile ? 14 : 24,
+        runSpacing: isMobile ? 14 : 24,
         alignment: WrapAlignment.center,
         children: materii.map((m) {
           return _MaterieCard(
@@ -404,6 +413,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             icon: m["icon"] as IconData,
             color: m["color"] as Color,
             tag: m["tag"] as String,
+            isMobile: isMobile,
             onTap: () {
               final encodedSubj = Uri.encodeComponent(m["title"] as String);
               context.go('/lista-exercitii?materie=$encodedSubj');
@@ -414,10 +424,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(bool isMobile) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 44),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 28 : 44),
       decoration: BoxDecoration(
         color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
         border: Border(top: BorderSide(color: AppColors.border, width: 3)),
@@ -425,9 +435,21 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
       child: Center(
         child: Column(
           children: [
-            const Text('IMEDITATII // ARENA', style: TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
-            const SizedBox(height: 8),
-            Text('LEVEL UP YOUR LOGIC. CONQUER THE CURRICULUM.', style: TextStyle(color: AppColors.cloud, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+            Text(
+              'IMEDITATII // ARENA',
+              style: TextStyle(
+                fontSize: isMobile ? 22 : 28,
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'LEVEL UP YOUR LOGIC. CONQUER THE CURRICULUM.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.cloud, fontSize: isMobile ? 11 : 14, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+            ),
           ],
         ),
       ),
@@ -436,6 +458,8 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 880;
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
@@ -453,18 +477,18 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _heroSection(),
+                        _heroSection(isMobile),
                         _buildConstrainedSection(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                          padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 24, vertical: isMobile ? 14 : 24),
                           child: Column(
                             children: [
-                              _sectionTitle("Select Discipline"),
-                              _materiiSection(),
+                              _sectionTitle("Select Discipline", isMobile),
+                              _materiiSection(isMobile),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 48),
-                        _buildFooter(),
+                        SizedBox(height: isMobile ? 28 : 48),
+                        _buildFooter(isMobile),
                       ],
                     ),
                   ),
@@ -483,6 +507,7 @@ class _MaterieCard extends StatefulWidget {
   final IconData icon;
   final Color color;
   final String tag;
+  final bool isMobile;
   final VoidCallback onTap;
 
   const _MaterieCard({
@@ -490,6 +515,7 @@ class _MaterieCard extends StatefulWidget {
     required this.icon,
     required this.color,
     required this.tag,
+    required this.isMobile,
     required this.onTap,
   });
 
@@ -519,7 +545,7 @@ class _MaterieCardState extends State<_MaterieCard> {
         onTapCancel: () => setState(() => _isPressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          width: 310,
+          width: widget.isMobile ? double.infinity : 310,
           transform: Matrix4.translationValues(
             _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
             _isPressed ? 3.0 : (_isHovering ? -3.0 : 0.0),
@@ -531,7 +557,7 @@ class _MaterieCardState extends State<_MaterieCard> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
-                offset: _isPressed ? const Offset(0, 0) : const Offset(5, 5),
+                offset: _isPressed ? const Offset(0, 0) : Offset(widget.isMobile ? 3.5 : 5, widget.isMobile ? 3.5 : 5),
                 blurRadius: 0,
               ),
             ],
@@ -541,28 +567,28 @@ class _MaterieCardState extends State<_MaterieCard> {
             children: [
               Container(
                 color: AppColors.cardBg,
-                padding: const EdgeInsets.symmetric(vertical: 24),
+                padding: EdgeInsets.symmetric(vertical: widget.isMobile ? 18 : 24),
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: AppColors.cloud,
                       border: Border.all(color: AppColors.border, width: 2),
                     ),
-                    child: Icon(widget.icon, size: 48, color: AppColors.ink),
+                    child: Icon(widget.icon, size: widget.isMobile ? 36 : 48, color: AppColors.ink),
                   ),
                 ),
               ),
               Container(height: 2.5, color: AppColors.border),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(widget.isMobile ? 14 : 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       widget.tag,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w900,
                         color: isMustard && AppColors.isDark ? const Color(0xFF10161A).withOpacity(0.7) : Colors.white70,
                         letterSpacing: 1.0,
@@ -572,13 +598,13 @@ class _MaterieCardState extends State<_MaterieCard> {
                     Text(
                       widget.title.toUpperCase(),
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: widget.isMobile ? 18 : 20,
                         fontWeight: FontWeight.w900,
                         color: cardTextColor,
                         letterSpacing: 1.0,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
@@ -591,7 +617,7 @@ class _MaterieCardState extends State<_MaterieCard> {
                           Text(
                             "ENTER ARENA",
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               fontWeight: FontWeight.w900,
                               color: AppColors.ink,
                               letterSpacing: 1.0,
