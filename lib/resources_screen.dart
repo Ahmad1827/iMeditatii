@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'theme_manager.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
+import 'resources_data.dart';
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
@@ -62,170 +63,6 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   final Map<String, GlobalKey> _moduleKeys = {};
 
-  final List<Map<String, dynamic>> _builtInArticles = [
-    // ---------------- PYTHON (CLASA A 9-A) ----------------
-    {
-      "id": "py-intro",
-      "subject": "PYTHON",
-      "grade": "9",
-      "module": "1. ELEMENTE DE BAZĂ & SINTAXĂ",
-      "title": "Introducere în Python & Scurt Istoric",
-      "desc": "Arhitectura interpretorului, compilare vs interpretare, tipare dinamică și funcția print().",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "4 MIN",
-      "color": AppColors.forest,
-      "tag": "INTRO",
-    },
-    {
-      "id": "py-vars",
-      "subject": "PYTHON",
-      "grade": "9",
-      "module": "1. ELEMENTE DE BAZĂ & SINTAXĂ",
-      "title": "Variabile, Tipuri Primitive & input()",
-      "desc": "Tipuri fundamentale (int, float, str, bool), conversii de tip și citirea cu input().",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "6 MIN",
-      "color": AppColors.sky,
-      "tag": "SINTAXĂ",
-    },
-    {
-      "id": "py-if",
-      "subject": "PYTHON",
-      "grade": "9",
-      "module": "2. STRUCTURI DE CONTROL",
-      "title": "Instrucțiunea Decizională: if, elif, else",
-      "desc": "Ramificări condiționale, operatori de comparare, operatori logici și indentarea PEP 8.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "5 MIN",
-      "color": AppColors.mustard,
-      "tag": "CONTROL FLOW",
-    },
-    {
-      "id": "py-loops",
-      "subject": "PYTHON",
-      "grade": "9",
-      "module": "2. STRUCTURI DE CONTROL",
-      "title": "Structuri Repetitive: while & for range()",
-      "desc": "Bucle cu număr cunoscut sau necunoscut de pași. Utilizarea funcției range(), break și continue.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "7 MIN",
-      "color": AppColors.sunset,
-      "tag": "BUCLE",
-    },
-    {
-      "id": "py-lists",
-      "subject": "PYTHON",
-      "grade": "9",
-      "module": "3. TABLOURI & COLECȚII (LISTS)",
-      "title": "Liste în Python: Indexare, Slicing & Metode",
-      "desc": "Echivalentul vectorilor din C++. Adăugare (append), inserare, sortare și parcurgere rapidă.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "8 MIN",
-      "color": AppColors.forest,
-      "tag": "LISTE",
-    },
-
-    // ---------------- C++ (CLASA A 9-A) ----------------
-    {
-      "id": "cpp-intro",
-      "subject": "C++",
-      "grade": "9",
-      "module": "1. ELEMENTE DE BAZĂ C++",
-      "title": "Directiva #include, iostream & cin/cout",
-      "desc": "Structura de bază a unui program C++, fluxuri standard de intrare/ieșire și spațiul std.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "5 MIN",
-      "color": AppColors.sky,
-      "tag": "C++ I/O",
-    },
-    {
-      "id": "cpp-ops",
-      "subject": "C++",
-      "grade": "9",
-      "module": "1. ELEMENTE DE BAZĂ C++",
-      "title": "Operatori Aritmetici, Modulo (%) & Cod ASCII",
-      "desc": "Împărțirea întreagă vs reală, operatorul rest (%), prioritatea operatorilor și tipul char.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "6 MIN",
-      "color": AppColors.mustard,
-      "tag": "OPERATORI",
-    },
-    {
-      "id": "cpp-vectors",
-      "subject": "C++",
-      "grade": "9",
-      "module": "2. TABLOURI UNIDIMENSIONALE (VECTORI)",
-      "title": "Vectori în C++: Declarare & Parcurgere",
-      "desc": "Declarare statică, indexare de la 0 la n-1, găsirea maximului/minimului și inserări.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "7 MIN",
-      "color": AppColors.forest,
-      "tag": "VECTORI",
-    },
-
-    // ---------------- C++ (CLASA A 10-A) ----------------
-    {
-      "id": "cpp-matrix",
-      "subject": "C++",
-      "grade": "10",
-      "module": "1. TABLOURI BIDIMENSIONALE (MATRICE)",
-      "title": "Matrice în C++: Linii, Coloane & Diagonale",
-      "desc": "Parcurgere pe linii și coloane, diagonala principală vs secundară și simetria în matrice.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "8 MIN",
-      "color": AppColors.sunset,
-      "tag": "MATRICE",
-    },
-
-    // ---------------- MATEMATICĂ ----------------
-    {
-      "id": "mat-sets",
-      "subject": "MATEMATICĂ",
-      "grade": "9",
-      "module": "1. MULȚIMI & ELEMENTE DE COMBINATORICĂ",
-      "title": "Mulțimi de Numere & Modulul (Valoarea Absolută)",
-      "desc": "Proprietățile modulului, intervale reale, operații cu mulțimi și rezolvarea inecuațiilor.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "5 MIN",
-      "color": AppColors.forest,
-      "tag": "ALGEBRĂ",
-    },
-    {
-      "id": "mat-quad",
-      "subject": "MATEMATICĂ",
-      "grade": "9",
-      "module": "2. FUNCȚIA DE GRADUL AL II-LEA",
-      "title": "Ecuația de Gradul II, Delta & Relațiile lui Viète",
-      "desc": "Calculul discriminantului (Δ), semnele rădăcinilor și formarea ecuației cu suma și produsul.",
-      "author": "Ahmad Arnaoute",
-      "authorRole": "FOUNDER & ADMIN",
-      "date": "18.09.2026",
-      "readTime": "6 MIN",
-      "color": AppColors.sky,
-      "tag": "ALGEBRĂ",
-    },
-  ];
-
   @override
   void dispose() {
     _scrollController.dispose();
@@ -264,7 +101,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                       .where('approved', isEqualTo: true)
                       .snapshots(),
                   builder: (context, snapshot) {
-                    List<Map<String, dynamic>> allArticles = List.from(_builtInArticles);
+                    List<Map<String, dynamic>> allArticles = List.from(ResourcesData.allArticles);
 
                     if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
                       for (var doc in snapshot.data!.docs) {
@@ -288,9 +125,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                     for (var art in filtered) {
                       final mod = art['module']?.toString().toUpperCase() ?? "GENERAL";
                       groupedModules.putIfAbsent(mod, () => []).add(art);
-                      if (!_moduleKeys.containsKey(mod)) {
-                        _moduleKeys[mod] = GlobalKey();
-                      }
+                      _moduleKeys.putIfAbsent(mod, () => GlobalKey());
                     }
 
                     return Scrollbar(
@@ -709,8 +544,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   Widget _buildArticleCard(Map<String, dynamic> article, bool isMobile) {
     final Color tagColor = (article['color'] as Color?) ?? AppColors.forest;
-    final String author = article['author'] ?? "Ahmad Arnaoute";
-    final String date = article['date'] ?? "18.09.2026";
+    final String author = article['author'] ?? ResourcesData.defaultAuthor;
+    final String date = article['date'] ?? ResourcesData.defaultDate;
     final String readTime = article['readTime'] ?? "5 MIN";
 
     return GestureDetector(
