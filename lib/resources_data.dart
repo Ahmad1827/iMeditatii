@@ -19,7 +19,7 @@ class ResourcesData {
       "desc": "Arhitectura interpretorului, compilare vs. interpretare, tipare dinamică și funcția print().",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "4 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.forest,
       "tag": "INTRO",
     },
@@ -32,7 +32,7 @@ class ResourcesData {
       "desc": "Tipuri fundamentale (int, float, str, bool), conversii de tip (type casting) și citirea cu input().",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "SINTAXĂ",
     },
@@ -45,7 +45,7 @@ class ResourcesData {
       "desc": "Împărțirea întreagă (//), modulo (%), exponențierea (**) și operatorii logici and, or, not.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.mustard,
       "tag": "OPERATORI",
     },
@@ -58,7 +58,7 @@ class ResourcesData {
       "desc": "Ramificări condiționale, operatori de comparare și indentarea obligatorie conform PEP 8.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sunset,
       "tag": "CONTROL",
     },
@@ -71,7 +71,7 @@ class ResourcesData {
       "desc": "Bucle cu număr cunoscut sau necunoscut de pași. Utilizarea funcției range(), break și continue.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "BUCLE",
     },
@@ -84,7 +84,7 @@ class ResourcesData {
       "desc": "Structura unui program C++, spațiul de nume std și fluxurile de intrare/ieșire din bibliotecă.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "4 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.sky,
       "tag": "C++ I/O",
     },
@@ -97,7 +97,7 @@ class ResourcesData {
       "desc": "Tipul char, conversii implicite/explicite, împărțirea întreagă și operatorul modulo (%).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "SINTAXĂ",
     },
@@ -110,7 +110,7 @@ class ResourcesData {
       "desc": "Evaluarea condițiilor compuse, acoladele ca delimitator de bloc și instrucțiunea switch-case.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sunset,
       "tag": "CONTROL",
     },
@@ -123,7 +123,7 @@ class ResourcesData {
       "desc": "Structuri cu test inițial vs test final. Cum prevenim buclele infinite și când folosim break/continue.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "BUCLE",
     },
@@ -136,7 +136,7 @@ class ResourcesData {
       "desc": "Descompunerea cifrelor cu % 10 și / 10, construirea oglinditului și verificarea palindroamelor.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sky,
       "tag": "ALGORITMI",
     },
@@ -149,7 +149,7 @@ class ResourcesData {
       "desc": "Determinarea divizorilor în O(sqrt(N)), testul de primalitate și descompunerea în factori primi.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.mustard,
       "tag": "ALGORITMI",
     },
@@ -162,7 +162,7 @@ class ResourcesData {
       "desc": "Algoritmul prin scăderi repetate vs algoritmul rapid prin împărțiri, calculul CMMMC.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "4 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.sunset,
       "tag": "ALGORITMI",
     },
@@ -175,7 +175,7 @@ class ResourcesData {
       "desc": "Indexare de la 0 la n-1, determinarea maximului/minimului și inversarea elementelor.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "VECTORI",
     },
@@ -188,7 +188,7 @@ class ResourcesData {
       "desc": "Metode clasice de sortare în O(N^2), interschimbarea valorilor și căutarea binară pe vector sortat.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "9 MIN",
       "color": AppColors.sky,
       "tag": "SORTARE",
     },
@@ -201,7 +201,7 @@ class ResourcesData {
       "desc": "Calculul discriminantului (Δ), semnele rădăcinilor, formarea ecuației și studiul monotoniei parabolei.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.mustard,
       "tag": "ALGEBRĂ",
     },
@@ -218,7 +218,7 @@ class ResourcesData {
       "desc": "Indexare cu linii (i) și coloane (j), citirea tablourilor bidimensionale și parcurgerea pe contur.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.forest,
       "tag": "MATRICE",
     },
@@ -231,7 +231,7 @@ class ResourcesData {
       "desc": "Zone delimitate de diagonale (Nord, Sud, Est, Vest), simetria față de axele principale.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sky,
       "tag": "MATRICE",
     },
@@ -244,7 +244,7 @@ class ResourcesData {
       "desc": "Caractere terminale '\\0', funcții esențiale: strlen, strcpy, strcat, strcmp, strstr și strtok.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "8 MIN",
+      "readTime": "9 MIN",
       "color": AppColors.mustard,
       "tag": "ȘIRURI",
     },
@@ -257,7 +257,7 @@ class ResourcesData {
       "desc": "Operații native cu operatorul +, metodele length(), find(), substr(), erase() și getline().",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sunset,
       "tag": "ȘIRURI",
     },
@@ -270,7 +270,7 @@ class ResourcesData {
       "desc": "Modularizarea codului, tipul returnat de funcție, instrucțiunea return și variabile locale vs globale.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.forest,
       "tag": "FUNCȚII",
     },
@@ -283,7 +283,7 @@ class ResourcesData {
       "desc": "Cum modificăm variabilele din apelant, transmiterea vectorilor ca parametri în funcții.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "FUNCȚII",
     },
@@ -296,7 +296,7 @@ class ResourcesData {
       "desc": "Stiva de apeluri (Call Stack), condiția de oprire (cazul de bază) și riscul de Stack Overflow.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "RECURSIVITATE",
     },
@@ -306,10 +306,10 @@ class ResourcesData {
       "grade": "10",
       "module": "4. RECURSIVITATE",
       "title": "Algoritmi Clasici Recursivi: Factorial, CMMDC, Fibonacci",
-      "desc": "Transformarea algoritmilor iterativi în funcții recursive directe.",
+      "desc": "Transformarea algoritmilor iterativi în funcții recursive directe și analiza eficienței.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sunset,
       "tag": "RECURSIVITATE",
     },
@@ -322,7 +322,7 @@ class ResourcesData {
       "desc": "Descompunerea problemei în subprobleme similare, căutarea binară recursivă în O(log N).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.forest,
       "tag": "D&I",
     },
@@ -335,7 +335,7 @@ class ResourcesData {
       "desc": "Divizarea tabloului, interclasarea a doi vectori ordonați și complexitatea stabilă O(N log N).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sky,
       "tag": "SORTARE",
     },
@@ -348,7 +348,7 @@ class ResourcesData {
       "desc": "Alegerea pivotului, partiționarea vectorului și analiza cazului favorabil vs nefavorabil.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.mustard,
       "tag": "SORTARE",
     },
@@ -361,7 +361,7 @@ class ResourcesData {
       "desc": "Definirea tipurilor de date proprii, vectori de structuri și accesarea câmpurilor cu operatorul punct (.).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.sunset,
       "tag": "STRUCT",
     },
@@ -374,7 +374,7 @@ class ResourcesData {
       "desc": "Proprietățile logaritmilor, schimbarea de bază, ecuații exponențiale și logaritmice pentru bac.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "ALGEBRĂ",
     },
@@ -387,7 +387,7 @@ class ResourcesData {
       "desc": "Unitatea imaginară i (i^2 = -1), conjugatul unui număr complex, modulul |z| și ecuații în C.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "ALGEBRĂ",
     },
@@ -400,7 +400,7 @@ class ResourcesData {
       "desc": "Formule de calcul factorial, binomul lui Newton și calculul probabilităților clasice (fav/pos).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "COMBINATORICĂ",
     },
@@ -417,7 +417,7 @@ class ResourcesData {
       "desc": "Reprezentarea soluțiilor sub formă de vector stivă, condiții de validare și condiții de final.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.forest,
       "tag": "BACKTRACKING",
     },
@@ -430,7 +430,7 @@ class ResourcesData {
       "desc": "Algoritmul clasic de generare a tuturor permutărilor mulțimii {1, 2, ..., n}.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "BACKTRACKING",
     },
@@ -443,7 +443,7 @@ class ResourcesData {
       "desc": "Optimizarea condițiilor de validare pentru a evita soluțiile duplicate și a genera aranjamente.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "BACKTRACKING",
     },
@@ -456,7 +456,7 @@ class ResourcesData {
       "desc": "Reprezentarea prin matrice binară simetrică, gradul unui vârf, numărul de muchii și lema strângerilor de mână.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sunset,
       "tag": "GRAFURI",
     },
@@ -469,7 +469,7 @@ class ResourcesData {
       "desc": "Determinarea celor mai scurte drumuri în graf neponderat folosind o coadă (queue).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "PARCURGERE",
     },
@@ -482,7 +482,7 @@ class ResourcesData {
       "desc": "Parcurgerea recursivă a vârfurilor nevizitate și detecția ciclurilor în graf.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "PARCURGERE",
     },
@@ -495,7 +495,7 @@ class ResourcesData {
       "desc": "Algoritm de numărare a componentelor conexe și adăugarea numărului minim de muchii pentru conexitate.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "GRAFURI",
     },
@@ -508,7 +508,7 @@ class ResourcesData {
       "desc": "Grad interior vs. grad exterior, circuite, drumuri orientate și reprezentare în memorie.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sunset,
       "tag": "GRAFURI",
     },
@@ -521,7 +521,7 @@ class ResourcesData {
       "desc": "Proprietățile arborelui (N noduri, N-1 muchii, aciclic și conex), determinarea rădăcinii și a frunzelor.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.forest,
       "tag": "ARBORI",
     },
@@ -534,7 +534,7 @@ class ResourcesData {
       "desc": "Diferența față de divide et impera: memorarea stărilor calculate pentru a evita recalculările inutile.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sky,
       "tag": "DINAMICĂ",
     },
@@ -547,7 +547,7 @@ class ResourcesData {
       "desc": "Construirea relației de recurență dp[i] și reconstituirea soluției optime în O(N^2).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.mustard,
       "tag": "DINAMICĂ",
     },
@@ -560,7 +560,7 @@ class ResourcesData {
       "desc": "Maximizarea valorii fără a depăși greutatea maximă folosind o matrice de stări dp[i][w].",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "8 MIN",
+      "readTime": "9 MIN",
       "color": AppColors.sunset,
       "tag": "DINAMICĂ",
     },
@@ -573,7 +573,7 @@ class ResourcesData {
       "desc": "Adunarea matricelor, înmulțirea cu scalar și produsul matricial linie pe coloană.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.forest,
       "tag": "ALGEBRĂ",
     },
@@ -586,7 +586,7 @@ class ResourcesData {
       "desc": "Calculul determinanților, proprietăți esențiale (linii nule, comutativitate) și dezvoltarea după o linie.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sky,
       "tag": "ALGEBRĂ",
     },
@@ -599,7 +599,7 @@ class ResourcesData {
       "desc": "Eliminarea cazurilor 0/0, infinit/infinit, limite fundamentale și regula lui l'Hospital.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.mustard,
       "tag": "ANALIZĂ",
     },
@@ -616,7 +616,7 @@ class ResourcesData {
       "desc": "Diferența dintre clasă și instanță, specificatorii public, private și protected, metode membre.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.forest,
       "tag": "OOP",
     },
@@ -629,7 +629,7 @@ class ResourcesData {
       "desc": "Constructorul implicit, constructorul de copiere, lista de inițializare și eliberarea resurselor.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "OOP",
     },
@@ -642,7 +642,7 @@ class ResourcesData {
       "desc": "Clasa de bază și clasa derivată, reutilizarea codului și accesul la membrii protejați.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "OOP",
     },
@@ -655,7 +655,7 @@ class ResourcesData {
       "desc": "Legarea dinamică la execuție, clase abstracte și suprascrierea metodelor (override).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sunset,
       "tag": "OOP",
     },
@@ -668,7 +668,7 @@ class ResourcesData {
       "desc": "Concepte de cheie primară (PRIMARY KEY), cheie străină (FOREIGN KEY) și tipuri de date SQL.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.forest,
       "tag": "SQL",
     },
@@ -681,7 +681,7 @@ class ResourcesData {
       "desc": "Filtrarea cu WHERE, clauzele LIKE, BETWEEN, ordonarea cu ORDER BY și eliminarea duplicatelor (DISTINCT).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "SQL",
     },
@@ -694,7 +694,7 @@ class ResourcesData {
       "desc": "Manipularea înregistrărilor din tabele, importanța condiției WHERE la actualizare și ștergere.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "5 MIN",
+      "readTime": "6 MIN",
       "color": AppColors.mustard,
       "tag": "SQL",
     },
@@ -707,7 +707,7 @@ class ResourcesData {
       "desc": "Evaluarea expresiilor logice C++, operatori pe biți, matrice și recurențe fără greșeală.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sunset,
       "tag": "BAC",
     },
@@ -717,10 +717,10 @@ class ResourcesData {
       "grade": "12",
       "module": "3. PREGĂTIRE BACALAUREAT (INFORMATICĂ)",
       "title": "Bacalaureat: Rezolvarea Eficientă a Subiectului II",
-      "desc": "Manipularea șirurilor de caractere, declararea structurilor `struct` și algoritmi pe grafuri/arbori.",
+      "desc": "Manipularea șirurilor de caractere, declararea structurilor struct și algoritmi pe grafuri/arbori.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "BAC",
     },
@@ -733,7 +733,7 @@ class ResourcesData {
       "desc": "Scrierea algoritmilor eficienți ca memorie și timp de execuție: complexitate O(N) și memorie O(1).",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "8 MIN",
+      "readTime": "9 MIN",
       "color": AppColors.sky,
       "tag": "BAC",
     },
@@ -746,7 +746,7 @@ class ResourcesData {
       "desc": "Parte stabilă, comutativitate, asociativitate, element neutru și elemente simetrizabile.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.mustard,
       "tag": "ALGEBRĂ",
     },
@@ -759,7 +759,7 @@ class ResourcesData {
       "desc": "Axiomele de grup, ecuații într-un grup, noțiunea de izomorfism de grupuri.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.sunset,
       "tag": "ALGEBRĂ",
     },
@@ -772,7 +772,7 @@ class ResourcesData {
       "desc": "Împărțirea polinoamelor, schema lui Horner, rădăcini multiple și descompunerea în factori ireductibili.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "7 MIN",
+      "readTime": "8 MIN",
       "color": AppColors.forest,
       "tag": "ALGEBRĂ",
     },
@@ -785,7 +785,7 @@ class ResourcesData {
       "desc": "Tabelul integralelor imediate, proprietatea de liniaritate a integralei nedefinite.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "6 MIN",
+      "readTime": "7 MIN",
       "color": AppColors.sky,
       "tag": "INTEGRALE",
     },
@@ -794,296 +794,237 @@ class ResourcesData {
       "subject": "MATEMATICĂ",
       "grade": "12",
       "module": "5. MATEMATICĂ (CALCUL INTEGRAL)",
-      "title": "Integrala Definită: Formula Leibniz-Newton & Integrarea prin Părți",
+      "title": "Integrala Definită: Formula Leibniz-Newton & Părți",
       "desc": "Calculul integralelor definite, metoda schimbării de variabilă și calculul ariilor suprafețelor plane.",
       "author": defaultAuthor,
       "date": defaultDate,
-      "readTime": "8 MIN",
+      "readTime": "9 MIN",
       "color": AppColors.mustard,
       "tag": "INTEGRALE",
     },
   ];
 
-  // Specific lectures content dictionary
+  // Specific high-depth lecture dictionary
   static final Map<String, Map<String, dynamic>> curatedLectures = {
     // ---------------- PYTHON 9 ----------------
     "py-9-intro": {
       "tag": "INFORMATICĂ // CLASA A 9-A // PYTHON",
       "title": "Introducere în limbajul Python",
-      "subtitle": "Ghidul de start conform noii programe de liceu pentru clasa a 9-a.",
+      "subtitle": "Ghid complet de start conform noii programe de liceu pentru clasa a 9-a.",
       "author": defaultAuthor,
       "date": defaultDate,
       "sections": [
         {
-          "heading": "1. De ce Python în liceu?",
-          "text": "Spre deosebire de C++, care impune o sintaxă rigidă cu acolade, punct și virgulă și specificarea strictă a tipurilor de date, Python oferă o sintaxă curată, apropiată de limba engleză. În clasa a 9-a, Python este utilizat pentru a înțelege structura algoritmilor fără barieră sintactică.",
+          "heading": "1. De ce Python în programa de liceu?",
+          "text": "Spre deosebire de C++, care impune de la primul program noțiuni de compilare, directiva preprocesor #include, spații de nume și acolade rigide, Python a fost conceput pe principiul lizibilității ('Readability Counts'). În clasa a 9-a, elevii învață mai întâi logica algoritmilor (pașii decizionali, repetitivi și manipularea datelor) fără a fi blocați de erori de sintaxă sau punct și virgulă uitat la sfârșitul fiecărei linii.",
         },
         {
-          "heading": "2. Compilare vs. Interpretare",
-          "text": "În C++, codul sursă este compilat direct în binar executabil pe procesor. În Python, fișierele .py sunt interpretate linie cu linie de către interpretorul Python, permițând testare rapidă și prototipare dinamică.",
-          "code": "# Primul tău program în Python:\nprint(\"Nivelul 1 a început!\")\n\n# Citire de la tastatură:\nnume = input(\"Introdu numele tău de aventurier: \")\nprint(f\"Bun venit în breaslă, {nume}!\")",
+          "heading": "2. Arhitectura de execuție: Compilat vs. Interpretat",
+          "text": "C++ este un limbaj compilat: codul tău sursă (.cpp) este transformat de către compilator (ex: g++) direct în limbaj mașină (fișier binar executabil .exe sau ELF) specific procesorului tău. Execuția este ultrarapidă, dar necesită o etapă separată de compilare.\n\nPython este un limbaj interpretat: codul sursă (.py) este compilat 'la cald' într-un format intermediar numit Bytecode (.pyc), care este apoi executat linie cu linie de către o mașină virtuală (Python Virtual Machine - PVM). Avantajul major este testarea imediată și portabilitatea totală între sisteme de operare.",
+          "code": "# Primul tău program în Python:\nprint(\"Nivelul 1 în breaslă a început!\")\n\n# Citire de date de la consolă:\nnume = input(\"Introdu numele tău de ucenic: \")\nprint(f\"Bine ai venit în arenă, {nume}!\")\n\n# Afișare cu separatori personalizați:\nprint(\"Python\", \"este\", \"ușor\", sep=\" -> \", end=\" [SFÂRȘIT]\\n\")",
           "lang": "python"
         },
         {
           "heading": "3. Regula de Aur: Indentarea PEP 8",
-          "text": "În Python NU există acolade { } pentru delimitarea blocurilor! Structurile (if, for, while, funcții) sunt definite exclusiv prin indentare (exact 4 spații). O aliniere incorectă generează un IndentationError.",
-          "callout": "ATENȚIE:\nNu amesteca tab-urile cu spațiile! Folosește întotdeauna 4 spații pentru fiecare nivel de indentare conform standardului oficial PEP 8."
+          "text": "În Python NU există acolade { } pentru a delimita blocurile de instrucțiuni (cum ar fi corpul unui if sau al unui for)! Structura ierarhică este dată exclusiv de nivelul de indentare (aliniere la dreapta). Conform standardului oficial PEP 8, un nivel de indentare este egal cu exact 4 spații albe.",
+          "callout": "EROARE CRITICĂ (IndentationError):\nDacă aliniezi o linie cu 3 spații și următoarea cu 4 spații, sau amesteci tasta TAB cu tasta SPACE, Python va refuza să execute codul și va afișa 'IndentationError: unexpected indent'."
         },
       ]
     },
+
     "py-9-vars": {
       "tag": "INFORMATICĂ // CLASA A 9-A // PYTHON",
       "title": "Variabile, Tipuri Primitive & input()",
-      "subtitle": "Cum stocăm și manipulăm datele în memoria programului.",
+      "subtitle": "Cum stocăm, convertim și manipulăm datele în memoria RAM a calculatorului.",
       "author": defaultAuthor,
       "date": defaultDate,
       "sections": [
         {
-          "heading": "1. Tipare dinamică în Python",
-          "text": "Nu este nevoie să declari tipul unei variabile în avans (ca în C++: int x;). Python asociază tipul automat în funcție de valoarea atribuită.",
-        },
-        {
-          "heading": "2. Tipuri fundamentale de date",
-          "text": "• int: Numere întregi pozitive sau negative (fără limită fixă de 32 de biți ca în C++).\n• float: Numere cu virgulă mobilă (reale).\n• str: Șiruri de caractere delimitate prin ghilimele simple sau duble.\n• bool: Valori de adevăr (True sau False).",
-          "code": "varsta = 15          # int\ninaltime = 1.75      # float\nnume = \"Alex\"        # str\neste_elev = True     # bool",
+          "heading": "1. Ce este o variabilă în Python? (Tipare Dinamică)",
+          "text": "În C++, o variabilă este o zonă fixă de memorie cu un tip strict definit la compilare (int x = 5;). În Python, variabilele sunt doar etichete (referințe) atașate obiectelor din memorie. Tipul variabilei este determinat automat la atribuire și se poate schimba oricând (tipare dinamică).",
+          "code": "x = 42             # x referă un întreg (int)\nprint(type(x))     # <class 'int'>\n\nx = \"Salutare\"     # acum x referă un text (str)\nprint(type(x))     # <class 'str'>",
           "lang": "python"
         },
         {
-          "heading": "3. Funcția input() și conversia de tip (Casting)",
-          "text": "Funcția input() returnează întotdeauna un șir de caractere (str). Pentru a face calcule matematice, este obligatoriu să convertim rezultatul cu int() sau float().",
-          "code": "a = int(input(\"Introdu a: \"))\nb = int(input(\"Introdu b: \"))\nsuma = a + b\nprint(\"Suma este:\", suma)",
+          "heading": "2. Tipuri fundamentale de date în clasa a 9-a",
+          "text": "• int: Numere întregi de dimensiune nelimitată (nu dau overflow la 2 miliarde ca în C++!).\n• float: Numere reale cu virgulă mobilă (reprezentate conform IEEE 754 pe 64 de biți).\n• str: Șiruri de caractere imutabile, delimitate prin ghilimele simple sau duble.\n• bool: Valori logice booleene: True sau False (Atenție: cu majusculă!).",
+        },
+        {
+          "heading": "3. Citirea cu input() și conversia de tip (Type Casting)",
+          "text": "Funcția input() citește o linie de la consolă și returnează întotdeauna un șir de caractere (str). Dacă vrem să facem operații matematice, trebuie să convertim explicit valoarea folosind int() sau float().",
+          "code": "# Program care calculează perimetrul și aria unui dreptunghi:\nlungime = float(input(\"Introdu lungimea: \"))\nlatime = float(input(\"Introdu lățimea: \"))\n\nperimetru = 2 * (lungime + latime)\naria = lungime * latime\n\nprint(f\"Perimetrul dreptunghiului: {perimetru}\")\nprint(f\"Aria dreptunghiului: {aria}\")",
           "lang": "python",
-          "callout": "EROARE FRECVENTĂ:\nDacă scrii `a = input()` și `b = input()`, `a + b` va concatena textele (ex: '3' + '5' = '35'), în loc să adune valorile!"
+          "callout": "CAPCANĂ CLASICĂ LA EXAMEN:\nDacă scrii `a = input()` și `b = input()` introducând numerele 7 și 3, expresia `a + b` va fi '73' (concatenare de caractere) și NU 10!"
         }
       ]
     },
-    "py-9-operators": {
-      "tag": "INFORMATICĂ // CLASA A 9-A // PYTHON",
-      "title": "Operatori Aritmetici & Logici în Python",
-      "subtitle": "Calcul numeric și evaluarea expresiilor booleene.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Operatori Aritmetici Speciali",
-          "text": "În Python există doi operatori esențiali diferiți de majoritatea limbajelor:\n• `/` : Împărțire reală (întotdeauna returnează float, ex: 7 / 2 = 3.5)\n• `//` : Împărțire întreagă (ex: 7 // 2 = 3)\n• `%` : Restul împărțirii (modulo, ex: 7 % 2 = 1)\n• `**` : Ridicare la putere (ex: 2 ** 5 = 32)",
-          "code": "print(10 // 3)   # Afișează 3\nprint(10 % 3)    # Afișează 1\nprint(2 ** 10)   # Afișează 1024",
-          "lang": "python"
-        },
-        {
-          "heading": "2. Operatori Logici: and, or, not",
-          "text": "Spre deosebire de C++ (&&, ||, !), în Python operatorii logici sunt cuvinte englezești clare.",
-          "code": "x = 15\nif x >= 10 and x <= 20:\n    print(\"Numărul este în intervalul [10, 20]\")",
-          "lang": "python"
-        }
-      ]
-    },
-    "py-9-if": {
-      "tag": "INFORMATICĂ // CLASA A 9-A // PYTHON",
-      "title": "Instrucțiunea Decizională: if, elif & else",
-      "subtitle": "Cum controlăm fluxul programului folosind decizii logice.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Structura if - elif - else",
-          "text": "Permite executarea diferitelor blocuri de instrucțiuni în funcție de evaluarea unei expresii booleene.",
-          "code": "nota = int(input(\"Introdu nota obținută: \"))\n\nif nota >= 9:\n    print(\"Excelent! Rang aur.\")\nelif nota >= 7:\n    print(\"Bun! Rang argint.\")\nelif nota >= 5:\n    print(\"Ai trecut examenul.\")\nelse:\n    print(\"Trebuie să reiei quest-ul!\")",
-          "lang": "python"
-        }
-      ]
-    },
+
     "py-9-loops": {
       "tag": "INFORMATICĂ // CLASA A 9-A // PYTHON",
       "title": "Structuri Repetitive: while & for range()",
-      "subtitle": "Automatizarea execuției prin cicluri determinate și nedeterminate.",
+      "subtitle": "Cum automatizăm execuția calculelor repetitive și a algoritmilor cu pași multipli.",
       "author": defaultAuthor,
       "date": defaultDate,
       "sections": [
         {
-          "heading": "1. Bucla for cu funcția range()",
-          "text": "Funcția `range(start, stop, step)` generează o secvență de numere de la `start` până la `stop - 1`.",
-          "code": "# Numerele de la 1 la 10:\nfor i in range(1, 11):\n    print(i, end=' ')\n\n# Numărare descrescătoare:\nfor i in range(10, 0, -1):\n    print(i, end=' ')",
+          "heading": "1. Bucla for cu generatorul range()",
+          "text": "Bucla for în Python iterează peste o secvență de valori. Funcția range() generează secvențe numerice sub trei forme:\n• range(stop): numere de la 0 la stop - 1\n• range(start, stop): numere de la start la stop - 1\n• range(start, stop, step): numere din pas în pas",
+          "code": "# Afișarea primelor 5 numere pare pozitive:\nfor i in range(2, 12, 2):\n    print(i, end=' ')  # Afișează: 2 4 6 8 10\nprint()\n\n# Numărare descrescătoare (de la 5 la 1):\nfor i in range(5, 0, -1):\n    print(i, end=' ')  # Afișează: 5 4 3 2 1",
           "lang": "python"
         },
         {
-          "heading": "2. Bucla while",
-          "text": "Se execută atâta timp cât condiția specificată rămâne adevărată.",
-          "code": "n = int(input())\nwhile n > 0:\n    print(n % 10)\n    n //= 10",
+          "heading": "2. Bucla while (cu test inițial)",
+          "text": "Instrucțiunea while se execută repetat atâta timp cât o condiție rămâne True. Este folosită când numărul de pași nu este cunoscut dinainte (de exemplu, la descompunerea cifrelor unui număr).",
+          "code": "# Calculul sumei cifrelor unui număr natural n:\nn = int(input(\"Introdu numărul: \"))\nsuma_cifre = 0\n\nwhile n > 0:\n    cifra = n % 10          # extragem ultima cifră\n    suma_cifre += cifra     # o adunăm la sumă\n    n = n // 10             # tăiem ultima cifră (împărțire întreagă)\n\nprint(f\"Suma cifrelor este: {suma_cifre}\")",
+          "lang": "python"
+        },
+        {
+          "heading": "3. Instrucțiunile break și continue",
+          "text": "• `break`: Întrerupe imediat execuția buclei curente și sare la prima instrucțiune de după ea.\n• `continue`: Oprește iterația curentă și trece direct la verificarea condiției pentru pasul următor.",
+          "code": "# Căutarea primului număr divizibil cu 7 din interval:\nfor x in range(20, 50):\n    if x % 7 == 0:\n        print(f\"Găsit: {x}\")\n        break  # Oprește căutarea imediat",
           "lang": "python"
         }
       ]
     },
 
     // ---------------- C++ 9 ----------------
-    "cpp-9-intro": {
-      "tag": "INFORMATICĂ // CLASA A 9-A // C++",
-      "title": "Structura unui Program C++ & iostream",
-      "subtitle": "Directiva #include, funcția main() și fluxurile de intrare/ieșire.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Scheletul programului",
-          "text": "Fiecare program C++ începe cu includerea bibliotecilor necesare și definirea funcției `main()`, punctul de pornire al execuției.",
-          "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Nivel 1 C++ activat!\" << endl;\n    return 0;\n}",
-          "lang": "cpp"
-        },
-        {
-          "heading": "2. Fluxul cin și cout",
-          "text": "Pentru afișare folosim operatorul de inserție `<<` cu `cout`, iar pentru citire operatorul de extracție `>>` cu `cin`.",
-          "code": "int x, y;\ncin >> x >> y;\ncout << \"Produsul este: \" << x * y << \"\\n\";",
-          "lang": "cpp"
-        }
-      ]
-    },
     "alg-9-digits": {
       "tag": "INFORMATICĂ // CLASA A 9-A // C++",
       "title": "Prelucrarea Cifrelor unui Număr",
-      "subtitle": "Algoritmul fundamental de izolare și procesare a cifrelor în baza 10.",
+      "subtitle": "Algoritmul fundamental de izolare, numărare, inversare și verificare de palindrom.",
       "author": defaultAuthor,
       "date": defaultDate,
       "sections": [
         {
-          "heading": "1. Izolarea și tăierea ultimei cifre",
-          "text": "• `n % 10` : Oferă ultima cifră a numărului.\n• `n = n / 10` : Elimină ultima cifră din număr.",
-          "code": "int n;\ncin >> n;\nint suma = 0;\n\nwhile (n > 0) {\n    int cifra = n % 10;\n    suma += cifra;\n    n /= 10;\n}\ncout << \"Suma cifrelor este: \" << suma;",
+          "heading": "1. Mecanismul de bază: % 10 și / 10",
+          "text": "În baza 10, orice număr întreg pozitiv poate fi descompus de la dreapta la stânga folosind doi operatori fundamentali:\n• `n % 10` : Extrage ultima cifră (cifra unităților)\n• `n / 10` : Elimină ultima cifră prin trunchiere întreagă",
+          "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cout << \"Introdu numărul: \";\n    cin >> n;\n    \n    int suma = 0, nr_cifre = 0;\n    int copie = n;\n    \n    if (n == 0) {\n        nr_cifre = 1;\n    } else {\n        while (n > 0) {\n            int c = n % 10;\n            suma += c;\n            nr_cifre++;\n            n /= 10;\n        }\n    }\n    \n    cout << \"Numărul de cifre: \" << nr_cifre << \"\\n\";\n    cout << \"Suma cifrelor: \" << suma << \"\\n\";\n    return 0;\n}",
           "lang": "cpp"
         },
         {
-          "heading": "2. Construirea Oglinditului (Inversului)",
-          "text": "Înmulțim oglinditul parțial cu 10 și adăugăm noua cifră extrasă.",
-          "code": "int oglindit = 0;\nwhile (n > 0) {\n    oglindit = oglindit * 10 + n % 10;\n    n /= 10;\n}",
-          "lang": "cpp"
-        }
-      ]
-    },
-    "cpp-9-vectors-basic": {
-      "tag": "INFORMATICĂ // CLASA A 9-A // C++",
-      "title": "Tablouri Unidimensionale (Vectori)",
-      "subtitle": "Gestiunea colecțiilor omogene de date indexate de la 0 la n-1.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Ce este un vector?",
-          "text": "Un vector este o zonă contiguă de memorie ce conține elemente de același tip. În C++, elementele sunt numerotate începând cu indicele 0.",
-          "code": "int v[100]; // declarăm un vector cu maximum 100 de elemente\nint n;\ncin >> n;   // numărul real de elemente\n\nfor (int i = 0; i < n; i++) {\n    cin >> v[i];\n}",
-          "lang": "cpp"
-        },
-        {
-          "heading": "2. Maximul dintr-un vector",
-          "text": "Inițializăm maximul cu primul element și comparăm secvențial cu restul elementelor.",
-          "code": "int maxim = v[0];\nfor (int i = 1; i < n; i++) {\n    if (v[i] > maxim) {\n        maxim = v[i];\n    }\n}\ncout << \"Maximul este: \" << maxim;",
+          "heading": "2. Construirea Oglinditului (Inversului unui Număr)",
+          "text": "Pentru a inversa un număr, inițializăm oglinditul cu 0. La fiecare pas înmulțim oglinditul anterior cu 10 (pentru a deplasa cifrele spre stânga) și adăugăm noua cifră extrasă.",
+          "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    int copie = n;\n    int oglindit = 0;\n    \n    while (n > 0) {\n        oglindit = oglindit * 10 + (n % 10);\n        n /= 10;\n    }\n    \n    cout << \"Oglindit: \" << oglindit << \"\\n\";\n    if (copie == oglindit)\n        cout << \"Numărul este PALINDROM!\\n\";\n    else\n        cout << \"Numărul NU este palindrom.\\n\";\n        \n    return 0;\n}",
           "lang": "cpp",
-          "callout": "SFAT DE COD:\nNu inițializa niciodată maximul cu 0 dacă vectorul poate conține și numere negative! Folosește primul element `v[0]`."
+          "callout": "CAPCANĂ FRECVENTĂ:\nCând procesezi un număr prin `while (n > 0)`, valoarea lui `n` devine 0 la finalul buclei! Dacă mai ai nevoie de valoarea originală (ex: pentru a o compara cu oglinditul), salveaz-o înainte într-o copie: `int copie = n;`."
         }
       ]
     },
 
-    // ---------------- CLASA A 10-A ----------------
-    "cpp-10-matrix-basics": {
-      "tag": "INFORMATICĂ // CLASA A 10-A // C++",
-      "title": "Tablouri Bidimensionale (Matrice)",
-      "subtitle": "Tabele structurate pe linii și coloane.",
+    "alg-9-divisors": {
+      "tag": "INFORMATICĂ // CLASA A 9-A // C++",
+      "title": "Divizibilitate, Numere Prime & Descompunere",
+      "subtitle": "Optimizarea de la algoritmul naiv O(N) la O(sqrt(N)) și ciurul lui Eratostene.",
       "author": defaultAuthor,
       "date": defaultDate,
       "sections": [
         {
-          "heading": "1. Declarare și Parcurgere",
-          "text": "O matrice are nevoie de doi indici: primul pentru linie (i) și al doilea pentru coloană (j).",
-          "code": "int a[100][100];\nint n, m;\ncin >> n >> m; // n linii, m coloane\n\nfor (int i = 0; i < n; i++) {\n    for (int j = 0; j < m; j++) {\n        cin >> a[i][j];\n    }\n}",
+          "heading": "1. Testul optimizat de primalitate în O(√N)",
+          "text": "Un număr întreg n > 1 este prim dacă nu are alți divizori în afară de 1 și el însuși. Verificarea naivă până la n este ineficientă pentru numere mari (ex: n = 10^9). Dacă un număr are un divizor d > √n, atunci are în mod obligatoriu și un divizor pereche n / d < √n. Prin urmare, este suficient să căutăm divizori până la d * d <= n.",
+          "code": "#include <iostream>\nusing namespace std;\n\nbool estePrim(int n) {\n    if (n < 2) return false;\n    if (n == 2) return true;\n    if (n % 2 == 0) return false;\n    \n    for (int d = 3; d * d <= n; d += 2) {\n        if (n % d == 0) return false;\n    }\n    return true;\n}\n\nint main() {\n    int x;\n    cin >> x;\n    if (estePrim(x))\n        cout << x << \" este NUMĂR PRIM!\\n\";\n    else\n        cout << x << \" este NUMĂR COMPUS.\\n\";\n    return 0;\n}",
           "lang": "cpp"
         },
         {
-          "heading": "2. Diagonalele unei matrice pătratice (n == m)",
-          "text": "• Diagonala principală: elementele unde `i == j`\n• Diagonala secundară: elementele unde `i + j == n - 1`",
-          "code": "for (int i = 0; i < n; i++) {\n    cout << a[i][i] << \" \"; // Afișează diagonala principală\n}",
-          "lang": "cpp"
-        }
-      ]
-    },
-    "cpp-10-strings-cstring": {
-      "tag": "INFORMATICĂ // CLASA A 10-A // C++",
-      "title": "Șiruri de caractere în stil C (cstring)",
-      "subtitle": "Tablouri de caractere terminate cu '\\0'.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Funcții esențiale din <cstring>",
-          "text": "• `strlen(s)`: Calculează lungimea efectivă a șirului fără '\\0'.\n• `strcpy(dest, src)`: Copiază șirul src în dest.\n• `strcat(dest, src)`: Concatenează src la sfârșitul dest.\n• `strcmp(s1, s2)`: Compară alfabetic două șiruri (0 dacă sunt identice).",
-          "code": "#include <iostream>\n#include <cstring>\nusing namespace std;\n\nint main() {\n    char s[100];\n    cin.getline(s, 100);\n    cout << \"Lungime: \" << strlen(s) << endl;\n    return 0;\n}",
+          "heading": "2. Descompunerea în factori primi",
+          "text": "Orice număr natural compus poate fi scris unic ca produs de puteri de numere prime. Împărțim numărul la fiecare factor prim posibil atâta timp cât se divide.",
+          "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    \n    int d = 2;\n    while (n > 1) {\n        int p = 0;\n        while (n % d == 0) {\n            p++;\n            n /= d;\n        }\n        if (p > 0) {\n            cout << d << \"^\" << p << \" \";\n        }\n        d++;\n        if (d * d > n && n > 1) {\n            // Cazul în care ce a rămas din n este prim\n            cout << n << \"^1 \";\n            break;\n        }\n    }\n    return 0;\n}",
           "lang": "cpp"
         }
       ]
     },
 
-    // ---------------- CLASA A 11-A ----------------
-    "cpp-11-backtracking-perm": {
-      "tag": "INFORMATICĂ // CLASA A 11-A // C++",
-      "title": "Generarea Permutărilor cu Backtracking",
-      "subtitle": "Modelul clasic al algoritmului de căutare recursivă pe stivă.",
+    // ---------------- MATEMATICĂ 9 ----------------
+    "mat-9-quad": {
+      "tag": "MATEMATICĂ // CLASA A 9-A // ALGEBRĂ",
+      "title": "Funcția de Gradul al II-lea, Delta & Viète",
+      "subtitle": "Studiul ecuației ax² + bx + c = 0, parabolei și relațiilor dintre rădăcini.",
       "author": defaultAuthor,
       "date": defaultDate,
       "sections": [
         {
-          "heading": "1. Structura algoritmului",
-          "text": "Fiecare nivel `k` reprezintă o poziție în permutare. Încercăm toate valorile de la 1 la n și validăm dacă valoarea a mai fost folosită.",
-          "code": "int st[20], n;\n\nbool valid(int k) {\n    for (int i = 1; i < k; i++)\n        if (st[i] == st[k]) return false;\n    return true;\n}\n\nvoid bkt(int k) {\n    for (int v = 1; v <= n; v++) {\n        st[k] = v;\n        if (valid(k)) {\n            if (k == n) {\n                for (int i = 1; i <= n; i++) cout << st[i] << \" \";\n                cout << \"\\n\";\n            } else {\n                bkt(k + 1);\n            }\n        }\n    }\n}",
-          "lang": "cpp"
-        }
-      ]
-    },
-    "cpp-11-graphs-bfs": {
-      "tag": "INFORMATICĂ // CLASA A 11-A // C++",
-      "title": "Parcurgerea în Lățime a Grafurilor (BFS)",
-      "subtitle": "Găsirea distanțelor minime folosind structura de coadă (std::queue).",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Implementarea BFS",
-          "text": "Nodul de start este adăugat în coadă și marcat ca vizitat. Cât timp coada nu este vidă, extragem vârful curent și explorăm toți vecinii nevizitați.",
-          "code": "void bfs(int start) {\n    queue<int> q;\n    q.push(start);\n    viz[start] = 1;\n    \n    while (!q.empty()) {\n        int nod = q.front();\n        q.pop();\n        cout << nod << \" \";\n        \n        for (int vecin = 1; vecin <= n; vecin++) {\n            if (a[nod][vecin] == 1 && !viz[vecin]) {\n                viz[vecin] = 1;\n                q.push(vecin);\n            }\n        }\n    }\n}",
-          "lang": "cpp"
-        }
-      ]
-    },
-
-    // ---------------- CLASA A 12-A ----------------
-    "cpp-12-oop-classes": {
-      "tag": "INFORMATICĂ // CLASA A 12-A // C++",
-      "title": "Programare Orientată pe Obiecte: Clase & Obiecte",
-      "subtitle": "Trecerea de la programarea procedurală la arhitectura bazată pe obiecte.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Definirea unei clase",
-          "text": "O clasă este un tipar care grupează date (atribute) și funcții (metode) ce operează pe acele date.",
-          "code": "class Player {\nprivate:\n    string nume;\n    int exp;\n\npublic:\n    Player(string n) {\n        nume = n;\n        exp = 0;\n    }\n    void addExp(int puncte) {\n        exp += puncte;\n    }\n    void afisare() {\n        cout << nume << \" are \" << exp << \" EXP\\n\";\n    }\n};",
-          "lang": "cpp"
-        }
-      ]
-    },
-    "bac-12-info-sub3": {
-      "tag": "INFORMATICĂ // CLASA A 12-A // BAC",
-      "title": "Algoritmi Eficienți la Subiectul III (Problema 3)",
-      "subtitle": "Cum obții punctajul maxim pentru eficiență: O(N) timp și O(1) spațiu.",
-      "author": defaultAuthor,
-      "date": defaultDate,
-      "sections": [
-        {
-          "heading": "1. Regula de Aur pentru Subiectul III.3",
-          "text": "Pentru a obține punctajul complet (10 puncte la eficiență), nu este permisă memorarea tuturor numerelor din fișier într-un vector! Datele trebuie procesate direct în timpul citirii (algoritm online / 'on-the-fly').",
-          "callout": "IMPORTANT LA BAC:\nExplică întotdeauna algoritmul în cuvinte înaintea codului! Dacă algoritmul este corect dar lipsește justificarea eficienței în limbaj natural, pierzi 2-3 puncte din oficiu."
+          "heading": "1. Definiție și Discriminantul Delta (Δ)",
+          "text": "Fie funcția f : ℝ → ℝ, f(x) = ax² + bx + c, cu a, b, c ∈ ℝ și a ≠ 0.\n\nRezolvarea ecuației f(x) = 0 depinde exclusiv de valoarea discriminantului Δ = b² - 4ac:\n\n• Cazul 1: Dacă Δ > 0, ecuația are două rădăcini reale distincte:\n  x₁,₂ = (-b ± √Δ) / (2a)\n  Graficul funcției intersectează axa Ox în două puncte distincte.\n\n• Cazul 2: Dacă Δ = 0, ecuația are două rădăcini reale egale (rădăcină dublă):\n  x₁ = x₂ = -b / (2a)\n  Graficul funcției este tangent axei Ox.\n\n• Cazul 3: Dacă Δ < 0, ecuația nu are rădăcini reale (rădăcinile sunt complexe conjugate din ℂ \\ ℝ).\n  Graficul funcției nu atinge axa Ox (se află în întregime strict deasupra sau strict dedesubtul axei Ox).",
         },
         {
-          "heading": "2. Exemplu tipic: Vectori de frecvență",
-          "text": "Când valorile din fișier sunt mici (ex: numere naturale de cel mult 2-3 cifre), folosim un vector de apariții alocat static.",
-          "code": "int fr[1000] = {0};\nint x;\nwhile (fin >> x) {\n    if (x >= 10 && x <= 99)\n        fr[x]++;\n}",
-          "lang": "cpp"
+          "heading": "2. Relațiile lui Viète",
+          "text": "Dacă x₁ și x₂ sunt rădăcinile ecuației ax² + bx + c = 0, atunci fără a calcula efectiv valorile rădăcinilor, avem relațiile fundamentale:\n\n• Suma rădăcinilor: S = x₁ + x₂ = -b / a\n• Produsul rădăcinilor: P = x₁ · x₂ = c / a\n\nFormarea ecuației de gradul II cunoscând suma S și produsul P:\nx² - S·x + P = 0\n\nFormule utile deduse frecvent cerute la Bacalaureat:\n• x₁² + x₂² = (x₁ + x₂)² - 2x₁x₂ = S² - 2P\n• 1/x₁ + 1/x₂ = (x₁ + x₂) / (x₁ · x₂) = S / P",
+        },
+        {
+          "heading": "3. Coordonatele Vârfului Parabolei & Semnul Funcției",
+          "text": "Graficul funcției de gradul II este o parabolă cu vârful în punctul V:\nV( -b / (2a) , -Δ / (4a) )\n\n• Dacă a > 0: ramurile parabolei sunt orientate în sus (parabolă convexă). Funcția admite un punct de MINIM în V, cu valoarea minimă y_min = -Δ / (4a).\n• Dacă a < 0: ramurile sunt orientate în jos (parabolă concavă). Funcția admite un punct de MAXIM în V, cu valoarea maximă y_max = -Δ / (4a).\n\nRegula semnelor pentru f(x):\n• În afara rădăcinilor: semnul lui a\n• Între rădăcini: semnul contrar lui a\n• Dacă Δ < 0: funcția păstrează semnul lui a pe tot domeniul ℝ.",
+          "callout": "PROBLEMĂ TIPICĂ DE BACALAUREAT:\nSă se determine m ∈ ℝ astfel încât f(x) = x² - 2mx + m + 2 să fie strict pozitivă pentru orice x ∈ ℝ.\nRezolvare:\nCondiția ca f(x) > 0 ∀x ∈ ℝ impune două cerințe:\n1) a > 0 (aici a = 1 > 0, verificat)\n2) Δ < 0\nCalculăm Δ = (-2m)² - 4(1)(m + 2) = 4m² - 4m - 8 < 0.\nÎmpărțim la 4: m² - m - 2 < 0. Rădăcinile sunt m₁ = -1, m₂ = 2.\nSemnul contrar lui a impune m ∈ (-1, 2)."
+        }
+      ]
+    },
+
+    // ---------------- MATEMATICĂ 10 ----------------
+    "mat-10-powers": {
+      "tag": "MATEMATICĂ // CLASA A 10-A // ALGEBRĂ",
+      "title": "Logaritmi: Definiție, Proprietăți & Ecuații",
+      "subtitle": "Studiul funcției logaritmice, domeniul de existență și rezolvarea ecuațiilor pentru Bac.",
+      "author": defaultAuthor,
+      "date": defaultDate,
+      "sections": [
+        {
+          "heading": "1. Definiția Logaritmului și Condiții de Existență",
+          "text": "Fie a > 0, a ≠ 1 și x > 0. Numim logaritm al numărului pozitiv x în baza a exponentul la care trebuie ridicată baza a pentru a obține x:\nlog_a(x) = y  ⟺  a^y = x\n\nCondiții de existență obligatorii la orice ecuație cu logaritmi:\n1) Baza: a > 0 și a ≠ 1\n2) Argumentul: x > 0",
+        },
+        {
+          "heading": "2. Proprietățile Fundamentale ale Logaritmilor",
+          "text": "• log_a(1) = 0 și log_a(a) = 1\n• log_a(x · y) = log_a(x) + log_a(y) (Logaritmul produsului este suma logaritmilor)\n• log_a(x / y) = log_a(x) - log_a(y) (Logaritmul raportului este diferența logaritmilor)\n• log_a(x^k) = k · log_a(x)\n• Formula de schimbare a bazei: log_a(x) = log_b(x) / log_b(a)\n• Logaritmi speciali:\n  - ln(x) reprezintă logaritmul natural (în baza e ≈ 2.718)\n  - lg(x) reprezintă logaritmul zecimal (în baza 10)",
+        },
+        {
+          "heading": "3. Rezolvarea Ecuațiilor Logaritmice (Model de Bac)",
+          "text": "Exemplu: Să se rezolve în ℝ ecuația log₂(x + 3) + log₂(x - 1) = 5.\n\nPasul 1: Condiții de existență (D.E.):\n• x + 3 > 0 ⟹ x > -3\n• x - 1 > 0 ⟹ x > 1\nIntersectând: x ∈ (1, ∞).\n\nPasul 2: Aplicăm proprietatea de adunare a logaritmilor:\nlog₂((x + 3)(x - 1)) = 5\n\nPasul 3: Trecem la forma exponențială:\n(x + 3)(x - 1) = 2^5\nx² + 2x - 3 = 32\nx² + 2x - 35 = 0\n\nPasul 4: Calculăm rădăcinile ecuației de gradul II:\nΔ = 2² - 4(1)(-35) = 4 + 140 = 144 = 12²\nx₁ = (-2 + 12) / 2 = 5\nx₂ = (-2 - 12) / 2 = -7\n\nPasul 5: Verificarea cu domeniul de existență:\n• x₁ = 5 ∈ (1, ∞) ⟹ SOLUȚIE VALIDĂ\n• x₂ = -7 ∉ (1, ∞) ⟹ SOLUȚIE REPRINSĂ\nSoluția ecuației: S = {5}.",
+          "callout": "ATENȚIE MAXIMĂ LA EXAMEN:\nOmiterea stabilirii domeniului de existență (D.E.) este sancționată automat la corectură cu pierderea a 2 puncte din cele 5 alocate exercițiului!"
+        }
+      ]
+    },
+
+    // ---------------- MATEMATICĂ 11 ----------------
+    "mat-11-determinants": {
+      "tag": "MATEMATICĂ // CLASA A 11-A // ALGEBRĂ",
+      "title": "Determinanți de Ordin 2 & 3: Regula lui Sarrus",
+      "subtitle": "Calculul matricial, proprietățile determinanților și matrice inversabile.",
+      "author": defaultAuthor,
+      "date": defaultDate,
+      "sections": [
+        {
+          "heading": "1. Determinantul de Ordinul 2",
+          "text": "Fie matricea A = [ [a, b], [c, d] ] ∈ M₂(ℝ).\nDeterminantul său este calculat prin produsul elementelor de pe diagonala principală minus produsul elementelor de pe diagonala secundară:\ndet(A) = a·d - b·c",
+        },
+        {
+          "heading": "2. Determinantul de Ordinul 3 și Regula lui Sarrus",
+          "text": "Fie matricea A ∈ M₃(ℝ). Pentru a calcula determinantul prin Regula lui Sarrus:\n1. Copiem primele două linii sub determinant.\n2. Adunăm produsele elementelor de pe cele 3 diagonale paralele cu diagonala principală.\n3. Scădem produsele elementelor de pe cele 3 diagonale paralele cu diagonala secundară.\n\ndet(A) = a₁₁a₂₂a₃₃ + a₂₁a₃₂a₁₃ + a₃₁a₁₂a₂₃ - (a₁₃a₂₂a₃₁ + a₂₃a₃₂a₁₁ + a₃₃a₁₂a₂₁)",
+        },
+        {
+          "heading": "3. Matrice Inversabilă și Formula Inversei",
+          "text": "O matrice pătratică A ∈ M_n(ℝ) este inversabilă dacă și numai dacă det(A) ≠ 0 (matrice nesingulară).\n\nFormula de calcul a inversei A⁻¹:\nA⁻¹ = (1 / det(A)) · A*\n\nUnde A* este matricea adjunctă, obținută prin transpunerea lui A (A^t) și înlocuirea fiecărui element cu complementul său algebric:\nδ_ij = (-1)^(i+j) · d_ij",
+          "callout": "PROPRIETĂȚI UTILE LA CALCUL:\n• det(A · B) = det(A) · det(B)\n• det(A^t) = det(A)\n• Dacă o matrice are o linie (sau coloană) de zerouri, determinantul este 0.\n• Dacă două linii sunt egale sau proporționale, determinantul este 0."
+        }
+      ]
+    },
+
+    // ---------------- MATEMATICĂ 12 ----------------
+    "mat-12-definite": {
+      "tag": "MATEMATICĂ // CLASA A 12-A // CALCUL INTEGRAL",
+      "title": "Integrala Definită: Leibniz-Newton & Integrarea prin Părți",
+      "subtitle": "Calculul ariei de sub curbe, formula fundamentală și tehnici de integrare.",
+      "author": defaultAuthor,
+      "date": defaultDate,
+      "sections": [
+        {
+          "heading": "1. Formula Fundamentală Leibniz - Newton",
+          "text": "Dacă f : [a, b] → ℝ este o funcție continuă și F este o primitivă a sa pe [a, b] (adică F'(x) = f(x)), atunci:\n\n∫_a^b f(x) dx = F(x) |_a^b = F(b) - F(a)\n\nInterpretare geometrică: Dacă f(x) ≥ 0 pe [a, b], valoarea integralei definite reprezintă exact aria suprafeței plane cuprinse între graficul funcției f, axa Ox și dreptele verticale x = a și x = b.",
+        },
+        {
+          "heading": "2. Formula Integrării prin Părți",
+          "text": "Dacă u, v : [a, b] → ℝ sunt funcții derivabile cu derivate continue pe [a, b], atunci:\n\n∫_a^b u(x) · v'(x) dx = (u(x) · v(x)) |_a^b - ∫_a^b u'(x) · v(x) dx\n\nStrategia de alegere a funcției u(x) conform regulii LIATE:\n1. L - Logaritmice (ln x)\n2. I - Inverse trigonometrice (arctg x, arcsin x)\n3. A - Algebrice / Polinoame (x, x² + 1)\n4. T - Trigonometrice (sin x, cos x)\n5. E - Exponențiale (e^x)",
+        },
+        {
+          "heading": "3. Aplicație practică pas cu pas (Model Bac Subiectul III.2)",
+          "text": "Să se calculeze integrala I = ∫_1^e x · ln(x) dx.\n\nAlegem funcțiile conform regulii LIATE:\n• u(x) = ln(x) ⟹ u'(x) = 1/x\n• v'(x) = x    ⟹ v(x) = x² / 2\n\nAplicăm formula integrării prin părți:\nI = (ln(x) · x² / 2) |_1^e - ∫_1^e (1/x · x² / 2) dx\nI = (ln(e) · e² / 2 - ln(1) · 1² / 2) - 1/2 · ∫_1^e x dx\n\nȘtiind că ln(e) = 1 și ln(1) = 0:\nI = e² / 2 - 1/2 · (x² / 2) |_1^e\nI = e² / 2 - 1/4 · (e² - 1)\nI = 2e² / 4 - (e² - 1) / 4\nI = (e² + 1) / 4.",
+          "callout": "PRO-TIP BACALAUREAT:\nVerifică întotdeauna dacă integrala din dreapta este mai simplă decât cea inițială! Dacă devine mai complicată, înseamnă că ai ales greșit funcția u(x)."
         }
       ]
     },

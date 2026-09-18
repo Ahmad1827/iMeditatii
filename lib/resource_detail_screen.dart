@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'theme_manager.dart';
 import 'app_colors.dart';
-import 'resources_data.dart'; // <--- Import centralized dataset
+import 'resources_data.dart';
 
 class ResourceDetailScreen extends StatefulWidget {
   final String articleId;
@@ -50,18 +50,20 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   }
 
   Map<String, dynamic>? _getArticleData() {
-    // 1. Direct match in curated lecture text
+    // 1. Direct match in curated high-depth lecture dictionary
     if (ResourcesData.curatedLectures.containsKey(widget.articleId)) {
       return ResourcesData.curatedLectures[widget.articleId];
     }
 
-    // 2. Generate structured lecture layout from metadata
+    // 2. Fallback: structured generation from curriculum catalog
     final meta = ResourcesData.allArticles.firstWhere(
       (a) => a['id'] == widget.articleId,
       orElse: () => {},
     );
 
     if (meta.isNotEmpty) {
+      final bool isMath = meta['subject'] == 'MATEMATICĂ';
+
       return {
         "tag": "${meta['subject']} // CLASA A ${meta['grade']}-A // ${meta['module']}",
         "title": meta['title'],
@@ -70,21 +72,28 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
         "date": meta['date'] ?? ResourcesData.defaultDate,
         "sections": [
           {
-            "heading": "1. Concepte Fundamentale",
-            "text": "${meta['desc']} Această secțiune detaliază principiile teoretice conform cerințelor programei naționale de liceu pentru clasa a ${meta['grade']}-a.",
+            "heading": "1. Concepte Fundamentale & Teorie",
+            "text": "${meta['desc']}\n\nConform programei oficiale pentru clasa a ${meta['grade']}-a, aprofundarea acestui subiect dezvoltă raționamentul logic și pregătirea pentru examenele naționale. În această etapă de învățare, este vital să stăpânești terminologia de bază și structurile standard de rezolvare.",
           },
           {
-            "heading": "2. Structură & Implementare",
-            "text": "Studiul aprofundat al noțiunii de ${meta['title']} implică respectarea standardelor de eficiență algoritmică și scrierea unui cod lizibil.",
-            "code": meta['subject'] == 'PYTHON'
-                ? "# Implementare în Python\ndef rezolvare():\n    print(\"Exemplu demonstrativ pentru: ${meta['title']}\")\n\nrezolvare()"
-                : "// Implementare în C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Studiu: ${meta['title']}\" << endl;\n    return 0;\n}",
-            "lang": meta['subject'] == 'PYTHON' ? 'python' : 'cpp',
+            "heading": "2. Analiză Detaliată & Aplicații Practice",
+            "text": isMath
+                ? "În matematică, fiecare pas al deducției trebuie argumentat riguros:\n• Pasul 1: Identificarea ipotezei și stabilirea domeniului de definiție.\n• Pasul 2: Aplicarea formulelor fundamentale și a teoremelor specifice.\n• Pasul 3: Verificarea soluțiilor obținute și eliminarea soluțiilor străine."
+                : "În programare, implementarea corectă presupune respectarea normelor de eficiență algoritmică (atât ca timp de execuție, cât și ca memorie utilizată) și lizibilitatea codului.",
+            // NO CODE FOR MATH!
+            "code": isMath
+                ? null
+                : meta['subject'] == 'PYTHON'
+                    ? "# Exemplu de implementare în Python\ndef rezolvare_problema():\n    print(\"--- Execuție algoritm: ${meta['title']} ---\")\n    # Scrie logica de rezolvare aici\n    valoare = 100\n    return valoare * 2\n\nrezultat = rezolvare_problema()\nprint(f\"Rezultat calculat: {rezultat}\")"
+                    : "// Exemplu de implementare în C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"--- Studiu: ${meta['title']} ---\" << endl;\n    // Logica specifică algoritmului\n    int valoare = 100;\n    cout << \"Rezultat calculat: \" << valoare * 2 << \"\\n\";\n    return 0;\n}",
+            "lang": isMath ? null : (meta['subject'] == 'PYTHON' ? 'python' : 'cpp'),
           },
           {
-            "heading": "3. Recomandări de Studiu",
-            "text": "Pentru a consolida aceste cunoștințe, rezolvă problemele dedicate din arena noastră interactivă.",
-            "callout": "SFAT DE ANTRENAMENT:\nExersează scrierea codului direct în compilator fără să copiezi rezolvarea pentru a-ți fixa logica de programare."
+            "heading": "3. Recomandări & Sinteză de Examen",
+            "text": "Pentru a reține pe termen lung aceste cunoștințe, nu te baza doar pe memorarea formulelor. Încearcă să le deduci singur și rezolvă probleme similare din lista noastră de exerciții.",
+            "callout": isMath
+                ? "REGULĂ DE AUR LA MATEMATICĂ:\nScrie întotdeauna formulele în forma lor generală înainte de a înlocui valorile numerice! La corectură se acordă punctaj parțial pentru cunoașterea teoriei, chiar dacă intervine o greșeală minoră de calcul aritmetic."
+                : "SFAT PENTRU COD:\nTestează întotdeauna codul pe cazuri particulare (valori de frontieră): numere negative, valoarea zero sau tablouri cu un singur element!"
           }
         ]
       };
@@ -102,7 +111,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
         if (lecture == null) {
-          // Check Firestore
           return FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance.collection('resources').doc(widget.articleId).get(),
             builder: (context, snap) {
@@ -137,9 +145,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     final List<dynamic> sections = data['sections'] ?? [];
 
     for (int i = 0; i < sections.length; i++) {
-      if (!_sectionKeys.containsKey(i)) {
-        _sectionKeys[i] = GlobalKey();
-      }
+      _sectionKeys.putIfAbsent(i, () => GlobalKey());
     }
 
     final String author = data['author'] ?? ResourcesData.defaultAuthor;
@@ -150,7 +156,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
       appBar: AppBar(
         title: Text(
           "CODEX // LECȚIE",
-          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: isMobile ? 15 : 17),
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: isMobile ? 15 : 18),
         ),
         backgroundColor: AppColors.bg,
         iconTheme: IconThemeData(color: AppColors.ink),
@@ -167,30 +173,32 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: const BoxConstraints(maxWidth: 1140),
           child: isMobile
               ? SingleChildScrollView(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   child: _buildLectureContent(data, sections, isMobile, author, date),
                 )
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Sticky Table of Contents
                     SizedBox(
-                      width: 280,
+                      width: 290,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        padding: const EdgeInsets.symmetric(vertical: 28),
                         child: _buildTableOfContents(sections),
                       ),
                     ),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: 28),
+                    // Main Article Reading View
                     Expanded(
                       child: Scrollbar(
                         controller: _scrollController,
                         child: SingleChildScrollView(
                           controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 8),
                           child: _buildLectureContent(data, sections, isMobile, author, date),
                         ),
                       ),
@@ -204,11 +212,11 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
 
   Widget _buildTableOfContents(List<dynamic> sections) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cloud,
         border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3.5, 3.5))],
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,22 +224,22 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.list_alt, size: 18, color: AppColors.ink),
+              Icon(Icons.list_alt, size: 20, color: AppColors.ink),
               const SizedBox(width: 8),
               Text(
                 "CUPRINS LECȚIE",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.ink, letterSpacing: 1.0),
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.ink, letterSpacing: 1.0),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             "Apasă pentru salt la secțiune:",
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
           const SizedBox(height: 14),
           Container(height: 2, color: AppColors.border),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ...List.generate(sections.length, (i) {
             final heading = sections[i]['heading'] ?? "Secțiunea ${i + 1}";
             return Padding(
@@ -240,20 +248,20 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                 onTap: () => _scrollToSection(i),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppColors.cardBg,
                     border: Border.all(color: AppColors.border, width: 1.5),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.arrow_right, size: 16, color: AppColors.sunset),
+                      Icon(Icons.arrow_right, size: 18, color: AppColors.sunset),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           heading,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w800,
                             color: AppColors.ink,
                           ),
@@ -276,52 +284,71 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Topic Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           color: AppColors.forest,
           child: Text(
             data['tag'] ?? "RESURSĂ TEORETICĂ",
-            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+            style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
+        // Title (Bigger Text)
         Text(
           data['title'] ?? 'LECTURE',
-          style: TextStyle(fontSize: isMobile ? 24 : 32, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.15),
+          style: TextStyle(
+            fontSize: isMobile ? 26 : 38,
+            fontWeight: FontWeight.w900,
+            color: AppColors.ink,
+            height: 1.15,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 8),
+        // Subtitle (Bigger Text)
         Text(
           data['subtitle'] ?? '',
-          style: TextStyle(fontSize: isMobile ? 13 : 15, color: AppColors.textMuted, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: isMobile ? 14 : 17,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.bold,
+            height: 1.45,
+          ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
 
+        // Author & Date
         Row(
           children: [
             Container(
-              width: 24,
-              height: 24,
+              width: 26,
+              height: 26,
               decoration: BoxDecoration(
                 color: AppColors.mustard,
                 border: Border.all(color: AppColors.border, width: 1.5),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: Text(author[0].toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.black)),
+              child: Text(
+                author.isNotEmpty ? author[0].toUpperCase() : 'A',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.black),
+              ),
             ),
             const SizedBox(width: 8),
-            Text("AUTOR: ${author.toUpperCase()}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: AppColors.ink)),
+            Text("AUTOR: ${author.toUpperCase()}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.ink)),
             const SizedBox(width: 14),
-            Icon(Icons.event_note, size: 14, color: AppColors.textMuted),
+            Icon(Icons.event_note, size: 15, color: AppColors.textMuted),
             const SizedBox(width: 4),
-            Text(date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: AppColors.textMuted)),
+            Text(date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textMuted)),
           ],
         ),
 
-        const SizedBox(height: 18),
-        Container(height: 2, color: AppColors.border),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
+        Container(height: 2.5, color: AppColors.border),
+        const SizedBox(height: 20),
 
+        // Dynamic Section Renderer
         ...List.generate(sections.length, (i) {
           final s = sections[i];
           final heading = s['heading'] ?? '';
@@ -332,23 +359,26 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
 
           return Container(
             key: _sectionKeys[i],
-            margin: const EdgeInsets.only(bottom: 24),
+            margin: const EdgeInsets.only(bottom: 28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (heading.isNotEmpty) _buildSectionHeader(heading),
-                if (text.isNotEmpty) _buildParagraph(text),
-                if (code != null && code.toString().isNotEmpty) _buildCodeBlock(code, lang),
-                if (callout != null && callout.toString().isNotEmpty) _buildCallout(callout, AppColors.sunset),
+                if (heading.isNotEmpty) _buildSectionHeader(heading, isMobile),
+                if (text.isNotEmpty) _buildParagraph(text, isMobile),
+                // Render code ONLY IF PRESENT (Informatics has code, Math does not)
+                if (code != null && code.toString().isNotEmpty) _buildCodeBlock(code, lang, isMobile),
+                if (callout != null && callout.toString().isNotEmpty) _buildCallout(callout, AppColors.sunset, isMobile),
               ],
             ),
           );
         }),
 
         const SizedBox(height: 20),
+
+        // Bottom Action Banner
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppColors.mustard,
             border: Border.all(color: AppColors.border, width: 2.5),
@@ -358,28 +388,26 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "VERIFICĂ-ȚI CUNOȘTINȚELE",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
+                "APLICĂ TEORIA ÎN PRACTICĂ",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
               ),
               const SizedBox(height: 6),
               Text(
-                "Ai înțeles conceptele? Intră în arenă și rezolvă primele exerciții interactive pentru această disciplină.",
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
+                "Fixează-ți conceptele teoretice rezolvând exercițiile interactive din arena de antrenament.",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.ink,
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
-                icon: const Icon(Icons.play_arrow, size: 18),
-                label: const Text("ANTRENEAZĂ-TE ÎN ARENĂ", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.8)),
-                onPressed: () {
-                  context.go('/exercitii');
-                },
+                icon: const Icon(Icons.play_arrow, size: 20),
+                label: const Text("DESCHIDE ARENA DE EXERCIȚII", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.8)),
+                onPressed: () => context.go('/exercitii'),
               ),
             ],
           ),
@@ -388,53 +416,75 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, bool isMobile) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      padding: const EdgeInsets.only(top: 10, bottom: 12),
       child: Text(
         title,
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink),
+        style: TextStyle(
+          fontSize: isMobile ? 21 : 26,
+          fontWeight: FontWeight.w900,
+          color: AppColors.ink,
+          letterSpacing: 0.4,
+        ),
       ),
     );
   }
 
-  Widget _buildParagraph(String text) {
+  Widget _buildParagraph(String text, bool isMobile) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(fontSize: 15, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.6),
+        style: TextStyle(
+          fontSize: isMobile ? 16 : 18.5,
+          color: AppColors.ink,
+          fontWeight: FontWeight.w600,
+          height: 1.75,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
 
-  Widget _buildCodeBlock(String code, String language) {
+  Widget _buildCodeBlock(String code, String language, bool isMobile) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
+      margin: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
         color: const Color(0xFF1B242B),
         border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3.5, 3.5))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
             color: const Color(0xFF141A1F),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  language.toUpperCase(),
-                  style: const TextStyle(color: Color(0xFF55EFC4), fontSize: 11, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
+                Row(
+                  children: [
+                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
+                    const SizedBox(width: 12),
+                    Text(
+                      language.toUpperCase(),
+                      style: const TextStyle(color: Color(0xFF55EFC4), fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
+                    ),
+                  ],
                 ),
                 GestureDetector(
                   onTap: () => _copyToClipboard(code),
                   child: Row(
                     children: const [
-                      Icon(Icons.copy, size: 14, color: Colors.white70),
+                      Icon(Icons.copy, size: 15, color: Colors.white70),
                       SizedBox(width: 4),
-                      Text("COPY", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                      Text("COPIAZĂ CODUL", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -442,14 +492,15 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(14),
-            child: Text(
+            padding: EdgeInsets.all(isMobile ? 14 : 18),
+            child: SelectableText(
               code,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 14,
-                color: Color(0xFFECEFF4),
-                height: 1.5,
+                fontSize: isMobile ? 14 : 15.5,
+                color: const Color(0xFFECEFF4),
+                height: 1.55,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -458,17 +509,22 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     );
   }
 
-  Widget _buildCallout(String text, Color accentColor) {
+  Widget _buildCallout(String text, Color accentColor, bool isMobile) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.symmetric(vertical: 14),
+      padding: EdgeInsets.all(isMobile ? 14 : 18),
       decoration: BoxDecoration(
         color: accentColor.withOpacity(0.12),
-        border: Border(left: BorderSide(color: accentColor, width: 4)),
+        border: Border(left: BorderSide(color: accentColor, width: 4.5)),
       ),
       child: Text(
         text,
-        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: AppColors.ink, height: 1.5),
+        style: TextStyle(
+          fontSize: isMobile ? 14.5 : 16.5,
+          fontWeight: FontWeight.bold,
+          color: AppColors.ink,
+          height: 1.55,
+        ),
       ),
     );
   }
