@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
 import 'theme_manager.dart';
@@ -61,7 +60,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   String _selectedGrade = '9'; // 9, 10, 11, 12
   String _searchQuery = '';
 
-  // Built-in curated curriculum library
+  final Map<String, GlobalKey> _moduleKeys = {};
+
   final List<Map<String, dynamic>> _builtInArticles = [
     // ---------------- PYTHON (CLASA A 9-A) ----------------
     {
@@ -84,7 +84,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "grade": "9",
       "module": "1. ELEMENTE DE BAZĂ & SINTAXĂ",
       "title": "Variabile, Tipuri Primitive & input()",
-      "desc": "Tipuri fundamentale (int, float, str, bool), conversii de tip (type casting) și citirea cu input().",
+      "desc": "Tipuri fundamentale (int, float, str, bool), conversii de tip și citirea cu input().",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -98,7 +98,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "grade": "9",
       "module": "2. STRUCTURI DE CONTROL",
       "title": "Instrucțiunea Decizională: if, elif, else",
-      "desc": "Ramificări condiționale, operatori de comparare, operatori logici (and, or, not) și indentarea PEP 8.",
+      "desc": "Ramificări condiționale, operatori de comparare, operatori logici și indentarea PEP 8.",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -156,7 +156,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "grade": "9",
       "module": "1. ELEMENTE DE BAZĂ C++",
       "title": "Operatori Aritmetici, Modulo (%) & Cod ASCII",
-      "desc": "Împărțirea întreagă vs reală, operatorul rest (%), prioritatea operatorilor și tipul char în ASCII.",
+      "desc": "Împărțirea întreagă vs reală, operatorul rest (%), prioritatea operatorilor și tipul char.",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -170,7 +170,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "grade": "9",
       "module": "2. TABLOURI UNIDIMENSIONALE (VECTORI)",
       "title": "Vectori în C++: Declarare & Parcurgere",
-      "desc": "Declarare statică, indexare de la 0 la n-1, găsirea maximului/minimului și inversarea unui tablou.",
+      "desc": "Declarare statică, indexare de la 0 la n-1, găsirea maximului/minimului și inserări.",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -178,13 +178,15 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "color": AppColors.forest,
       "tag": "VECTORI",
     },
+
+    // ---------------- C++ (CLASA A 10-A) ----------------
     {
       "id": "cpp-matrix",
       "subject": "C++",
       "grade": "10",
       "module": "1. TABLOURI BIDIMENSIONALE (MATRICE)",
       "title": "Matrice în C++: Linii, Coloane & Diagonale",
-      "desc": "Parcurgere pe linii și coloane, diagonala principală vs secundară și simetria în matrice pătratice.",
+      "desc": "Parcurgere pe linii și coloane, diagonala principală vs secundară și simetria în matrice.",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -200,7 +202,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "grade": "9",
       "module": "1. MULȚIMI & ELEMENTE DE COMBINATORICĂ",
       "title": "Mulțimi de Numere & Modulul (Valoarea Absolută)",
-      "desc": "Proprietățile modulului, intervale reale, operații cu mulțimi și rezolvarea inecuațiilor cu modul.",
+      "desc": "Proprietățile modulului, intervale reale, operații cu mulțimi și rezolvarea inecuațiilor.",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -214,7 +216,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       "grade": "9",
       "module": "2. FUNCȚIA DE GRADUL AL II-LEA",
       "title": "Ecuația de Gradul II, Delta & Relațiile lui Viète",
-      "desc": "Calculul discriminantului (Δ), semnele rădăcinilor, formarea ecuației când se cunosc suma și produsul.",
+      "desc": "Calculul discriminantului (Δ), semnele rădăcinilor și formarea ecuației cu suma și produsul.",
       "author": "Ahmad Arnaoute",
       "authorRole": "FOUNDER & ADMIN",
       "date": "18.09.2026",
@@ -231,9 +233,21 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     super.dispose();
   }
 
+  void _scrollToModule(String module) {
+    final key = _moduleKeys[module];
+    if (key != null && key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeInOutCubic,
+        alignment: 0.05,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 880;
+    final isMobile = MediaQuery.of(context).size.width < 900;
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
@@ -274,6 +288,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                     for (var art in filtered) {
                       final mod = art['module']?.toString().toUpperCase() ?? "GENERAL";
                       groupedModules.putIfAbsent(mod, () => []).add(art);
+                      if (!_moduleKeys.containsKey(mod)) {
+                        _moduleKeys[mod] = GlobalKey();
+                      }
                     }
 
                     return Scrollbar(
@@ -284,7 +301,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 18 : 36),
                         child: Center(
                           child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 1120),
+                            constraints: const BoxConstraints(maxWidth: 1140),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -299,10 +316,34 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
                                 if (groupedModules.isEmpty)
                                   _buildEmptyState(isMobile)
-                                else
+                                else if (!isMobile)
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // LEFT SIDEBAR: Cuprins Capitole (Chapter Navigator)
+                                      SizedBox(
+                                        width: 280,
+                                        child: _buildChapterNavigator(groupedModules.keys.toList()),
+                                      ),
+                                      const SizedBox(width: 24),
+                                      // RIGHT MAIN FEED
+                                      Expanded(
+                                        child: Column(
+                                          children: groupedModules.entries.map((entry) {
+                                            return _buildModuleSection(entry.key, entry.value, isMobile);
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else ...[
+                                  // MOBILE: Horizontal quick jump strip
+                                  _buildMobileChapterChips(groupedModules.keys.toList()),
+                                  const SizedBox(height: 18),
                                   ...groupedModules.entries.map((entry) {
                                     return _buildModuleSection(entry.key, entry.value, isMobile);
                                   }),
+                                ],
 
                                 SizedBox(height: isMobile ? 24 : 48),
                                 _buildFooter(isMobile),
@@ -319,6 +360,98 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildChapterNavigator(List<String> modules) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cloud,
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+      ),
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.menu_book, color: AppColors.ink, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                "CUPRINS CAPITOLE",
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "Apasă pe un capitol pentru a naviga direct la secțiune:",
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+          ),
+          const SizedBox(height: 16),
+          Container(height: 2, color: AppColors.border),
+          const SizedBox(height: 14),
+          ...modules.map((mod) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: InkWell(
+                onTap: () => _scrollToModule(mod),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBg,
+                    border: Border.all(color: AppColors.border, width: 1.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.arrow_right, color: AppColors.sunset, size: 18),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          mod,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.ink,
+                            letterSpacing: 0.5,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileChapterChips(List<String> modules) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: modules.map((mod) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ActionChip(
+              backgroundColor: AppColors.cardBg,
+              side: BorderSide(color: AppColors.border, width: 2),
+              avatar: Icon(Icons.arrow_downward, size: 14, color: AppColors.ink),
+              label: Text(
+                mod,
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.ink),
+              ),
+              onPressed: () => _scrollToModule(mod),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -533,7 +666,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   }
 
   Widget _buildModuleSection(String moduleTitle, List<Map<String, dynamic>> articles, bool isMobile) {
-    return Padding(
+    return Container(
+      key: _moduleKeys[moduleTitle],
       padding: const EdgeInsets.only(bottom: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,11 +694,12 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
+          Column(
             children: articles.map((article) {
-              return _buildArticleCard(article, isMobile);
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: _buildArticleCard(article, isMobile),
+              );
             }).toList(),
           ),
         ],
@@ -581,7 +716,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     return GestureDetector(
       onTap: () => context.go('/resurse/${article['id']}'),
       child: Container(
-        width: isMobile ? double.infinity : 540,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.cardBg,
           border: Border.all(color: AppColors.border, width: 2.5),
@@ -596,7 +731,6 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top badges
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -646,7 +780,6 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             Container(height: 1.5, color: AppColors.border.withOpacity(0.4)),
             const SizedBox(height: 10),
 
-            // Author & Date Bottom Strip
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
