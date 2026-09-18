@@ -39,6 +39,8 @@ import 'exercise_detail_screen.dart';
 import 'add_exercise_screen.dart';
 import 'seed_problems.dart';
 
+import 'add_article_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
@@ -122,6 +124,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/panou-elev',
       builder: (context, state) => const UserDashboard(),
+    ),
+    GoRoute(
+      path: '/adauga-articol',
+      builder: (context, state) => const AddArticleScreen(),
     ),
     GoRoute(
       path: '/panou-profesor',

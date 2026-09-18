@@ -26,3 +26,9 @@ class AppColors {
   static Color get purple => const Color(0xFF8854D0);
   static Color get orange => const Color(0xFFFA8231);
 }
+
+class AdminConfig {
+  static const String ownerEmail = 'ahmadarnaoute1896@gmail.com';
+
+  static bool isOwner(String? email) => email == ownerEmail;
+}
