@@ -204,9 +204,11 @@ class CustomNavbar extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              NavTextLink(text: 'Guild Masters', isMobile: true, onTap: () { context.pop(); context.go('/materii'); }),
+              NavTextLink(text: 'Teachers', isMobile: true, onTap: () { context.pop(); context.go('/materii'); }),
               const SizedBox(height: 8),
-              NavTextLink(text: 'Daily Quest', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); }),
+              NavTextLink(text: 'Exercises', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); }),
+              const SizedBox(height: 8),
+              NavTextLink(text: 'Resources', isMobile: true, onTap: () { context.pop(); context.go('/resurse'); }),
               const SizedBox(height: 24),
               Container(height: 3, color: AppColors.border),
               const SizedBox(height: 24),
@@ -299,9 +301,11 @@ class CustomNavbar extends StatelessWidget {
                         if (isDesktop) ...[
                           Row(
                             children: [
-                              NavTextLink(text: 'Guild Masters', onTap: () => context.go('/materii')),
+                              NavTextLink(text: 'Teachers', onTap: () => context.go('/materii')),
                               const SizedBox(width: 16),
-                              NavTextLink(text: 'Daily Quest', onTap: () => context.go('/exercitii')),
+                              NavTextLink(text: 'Exercises', onTap: () => context.go('/exercitii')),
+                              const SizedBox(width: 14),
+                              NavTextLink(text: 'Resources', onTap: () => context.go('/resurse')),
                             ],
                           ),
                           Row(

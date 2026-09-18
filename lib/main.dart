@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
-
+import 'resources_screen.dart';
+import 'resource_detail_screen.dart';
 import 'theme_manager.dart';
 
 import 'home_screen.dart';
@@ -187,6 +188,19 @@ final GoRouter _router = GoRouter(
       pageBuilder: (context, state) => const NoTransitionPage(
         child: ExercisesScreen(),
       ),
+    ),
+    GoRoute(
+      path: '/resurse',
+      pageBuilder: (context, state) => const NoTransitionPage(
+        child: ResourcesScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/resurse/:articleId',
+      builder: (context, state) {
+        final articleId = state.pathParameters['articleId']!;
+        return ResourceDetailScreen(articleId: articleId);
+      },
     ),
     GoRoute(
       path: '/lista-exercitii',
