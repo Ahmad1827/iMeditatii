@@ -10,6 +10,9 @@ import 'package:go_router/go_router.dart';
 import 'theme_manager.dart';
 import 'app_colors.dart';
 
+// ----------------------------------------------------
+// C++ SYNTAX HIGHLIGHTING CONTROLLER
+// ----------------------------------------------------
 class CppSyntaxController extends TextEditingController {
   final TextStyle defaultStyle = const TextStyle(
     fontFamily: 'monospace',
@@ -87,6 +90,9 @@ class CppSyntaxController extends TextEditingController {
   }
 }
 
+// ----------------------------------------------------
+// RETRO BUTTON
+// ----------------------------------------------------
 class RetroButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
@@ -187,6 +193,9 @@ class _RetroButtonState extends State<RetroButton> {
   }
 }
 
+// ----------------------------------------------------
+// EXERCISE DETAIL SCREEN
+// ----------------------------------------------------
 class ExerciseDetailScreen extends StatefulWidget {
   final String subject;
   final String grade;
@@ -509,6 +518,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
           body: Stack(
             children: [
+              // STANDARD SPLIT VIEW
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1440),
@@ -539,6 +549,205 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ),
                 ),
               ),
+
+              // ANIMATED FULLSCREEN FOR PROBLEM FOCUS
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeInOutCubic,
+                top: isFullScreenProblem ? 0 : MediaQuery.of(context).size.height,
+                bottom: isFullScreenProblem ? 0 : -MediaQuery.of(context).size.height,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: AppColors.bg,
+                  padding: EdgeInsets.all(isMobile ? 14 : 24),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 960),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          border: Border.all(color: AppColors.border, width: 3),
+                          boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6))],
+                        ),
+                        padding: EdgeInsets.all(isMobile ? 18 : 36),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  color: AppColors.sunset,
+                                  child: const Text(
+                                    "PROBLEM FOCUS MODE",
+                                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900),
+                                  ),
+                                ),
+                                const Spacer(),
+                                RetroButton(
+                                  text: "EXIT FOCUS",
+                                  icon: Icons.fullscreen_exit,
+                                  bgColor: AppColors.ink,
+                                  textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                  onPressed: () => setState(() => isFullScreenProblem = false),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: isMobile ? 16 : 24),
+                            Expanded(child: SingleChildScrollView(child: _buildEnuntContent(isMobile))),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // ANIMATED FULLSCREEN FOR CODE FOCUS
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeInOutCubic,
+                top: isFullScreenCode ? 0 : MediaQuery.of(context).size.height,
+                bottom: isFullScreenCode ? 0 : -MediaQuery.of(context).size.height,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: AppColors.bg,
+                  padding: EdgeInsets.all(isMobile ? 12 : 20),
+                  child: !isMobile
+                      ? Row(
+                          children: [
+                            // Task Sidebar
+                            Container(
+                              width: 420,
+                              decoration: BoxDecoration(
+                                color: AppColors.cardBg,
+                                border: Border.all(color: AppColors.border, width: 2.5),
+                                boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+                              ),
+                              padding: const EdgeInsets.all(24),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.sunset)),
+                                        Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 14),
+                                    Text(
+                                      exerciseData!["title"]?.toUpperCase() ?? "QUEST",
+                                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      exerciseData!["description"] ?? "",
+                                      style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600),
+                                    ),
+                                    if (exerciseData!["input"] != null) ...[
+                                      const SizedBox(height: 20),
+                                      _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"], isMobile),
+                                      const SizedBox(height: 14),
+                                      _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"], isMobile),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 18),
+
+                            // Extended Code Workspace
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.cloud,
+                                  border: Border.all(color: AppColors.border, width: 2.5),
+                                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+                                ),
+                                padding: const EdgeInsets.all(18),
+                                child: Column(
+                                  children: [
+                                    _buildIdeHeader(isFullScreen: true, isMobile: isMobile),
+                                    const SizedBox(height: 10),
+                                    _buildCodeQuickActions(),
+                                    const SizedBox(height: 10),
+                                    Expanded(child: _buildIdeEditor(isMobile)),
+                                    const SizedBox(height: 14),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: RetroButton(
+                                            text: "COMPILE & RUN TESTS",
+                                            icon: Icons.play_arrow,
+                                            isLoading: isRunningCode,
+                                            bgColor: AppColors.forest,
+                                            onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 14),
+                                        RetroButton(
+                                          text: "EXIT FULLSCREEN",
+                                          icon: Icons.fullscreen_exit,
+                                          bgColor: AppColors.ink,
+                                          textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                          onPressed: () => setState(() => isFullScreenCode = false),
+                                        ),
+                                      ],
+                                    ),
+                                    if (testResults.isNotEmpty) ...[
+                                      const SizedBox(height: 14),
+                                      SizedBox(height: 130, child: SingleChildScrollView(child: _buildTestCasesConsole())),
+                                    ]
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.cloud,
+                            border: Border.all(color: AppColors.border, width: 2.5),
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              _buildIdeHeader(isFullScreen: true, isMobile: isMobile),
+                              const SizedBox(height: 8),
+                              _buildCodeQuickActions(),
+                              const SizedBox(height: 8),
+                              Expanded(child: _buildIdeEditor(isMobile)),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: RetroButton(
+                                      text: "RUN",
+                                      icon: Icons.play_arrow,
+                                      isLoading: isRunningCode,
+                                      bgColor: AppColors.forest,
+                                      onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  RetroButton(
+                                    text: "EXIT",
+                                    icon: Icons.fullscreen_exit,
+                                    bgColor: AppColors.ink,
+                                    textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                                    onPressed: () => setState(() => isFullScreenCode = false),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              ),
             ],
           ),
         );
@@ -555,6 +764,28 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             _buildTab("enunt", "PROBLEM", isMobile),
             const SizedBox(width: 6),
             _buildTab("solutie", "SOLUTION", isMobile),
+            const Spacer(),
+            // RESTORED ZOOM FEATURE: Focus Brief
+            GestureDetector(
+              onTap: () => setState(() => isFullScreenProblem = true),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 6 : 8),
+                decoration: BoxDecoration(
+                  color: AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.fullscreen, size: isMobile ? 14 : 16, color: AppColors.ink),
+                    SizedBox(width: isMobile ? 4 : 6),
+                    Text(
+                      isMobile ? "FOCUS" : "FOCUS BRIEF",
+                      style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w900, color: AppColors.ink),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
         Container(
@@ -849,7 +1080,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildIdeHeader({bool isFullScreen = false}) {
+  Widget _buildIdeHeader({bool isFullScreen = false, bool isMobile = false}) {
     final line = _getCurrentLine();
     final col = _getCurrentCol();
 
@@ -869,6 +1100,36 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
         const SizedBox(width: 8),
         Text("L$line:C$col", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
+        const Spacer(),
+        // RESTORED ZOOM FEATURE: Focus Mode (Fullscreen Code)
+        GestureDetector(
+          onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isFullScreen ? AppColors.sunset : AppColors.ink,
+              border: Border.all(color: AppColors.border, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                  size: 14,
+                  color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  isFullScreen ? "EXIT" : (isMobile ? "FOCUS" : "FOCUS MODE"),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -1013,7 +1274,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildIdeHeader(isFullScreen: false),
+        _buildIdeHeader(isFullScreen: false, isMobile: isMobile),
         const SizedBox(height: 6),
         _buildCodeQuickActions(),
         const SizedBox(height: 8),
