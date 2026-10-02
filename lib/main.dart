@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
-import 'resources_screen.dart';
-import 'resource_detail_screen.dart';
+
 import 'theme_manager.dart';
+import 'app_colors.dart';
 
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -37,9 +36,10 @@ import 'exercises_screen.dart';
 import 'exercise_list_screen.dart';
 import 'exercise_detail_screen.dart';
 import 'add_exercise_screen.dart';
-import 'seed_problems.dart';
-
+import 'resources_screen.dart';
+import 'resource_detail_screen.dart';
 import 'add_article_screen.dart';
+import 'seed_problems.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,10 +65,8 @@ void main() async {
     debugPrint("ThemeManager error: $e");
   }
 
-  // Randăm aplicația imediat pentru a preveni ecranul alb
   runApp(const IMeditatiiApp());
 
-  // Rulăm seeder-ul asincron în background cu protecție la erori de rețea/AdBlock
   try {
     populeazaCele50DeProbleme().catchError((e) {
       debugPrint("Seeder warning (ignorat): $e");
@@ -124,10 +122,6 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/panou-elev',
       builder: (context, state) => const UserDashboard(),
-    ),
-    GoRoute(
-      path: '/adauga-articol',
-      builder: (context, state) => const AddArticleScreen(),
     ),
     GoRoute(
       path: '/panou-profesor',
@@ -196,19 +190,6 @@ final GoRouter _router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/resurse',
-      pageBuilder: (context, state) => const NoTransitionPage(
-        child: ResourcesScreen(),
-      ),
-    ),
-    GoRoute(
-      path: '/resurse/:articleId',
-      builder: (context, state) {
-        final articleId = state.pathParameters['articleId']!;
-        return ResourceDetailScreen(articleId: articleId);
-      },
-    ),
-    GoRoute(
       path: '/lista-exercitii',
       builder: (context, state) {
         final materie = state.uri.queryParameters['materie'] ?? 'Matematică';
@@ -233,6 +214,20 @@ final GoRouter _router = GoRouter(
       path: '/adauga-exercitiu',
       builder: (context, state) => const AddExerciseScreen(),
     ),
+    GoRoute(
+      path: '/resurse',
+      pageBuilder: (context, state) => const NoTransitionPage(
+        child: ResourcesScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/resurse/:articleId',
+      builder: (context, state) => ResourceDetailScreen(articleId: state.pathParameters['articleId']!),
+    ),
+    GoRoute(
+      path: '/adauga-articol',
+      builder: (context, state) => const AddArticleScreen(),
+    ),
   ],
 );
 
@@ -241,66 +236,58 @@ class IMeditatiiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, currentMode, _) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier]),
+      builder: (context, _) {
+        final currentMode = ThemeManager.themeNotifier.value;
+        final currentStyle = ThemeManager.styleNotifier.value;
         final isDark = currentMode == ThemeMode.dark;
+        final isRetro = currentStyle == AppStyleMode.retro;
+
+        TextTheme getTextTheme(Brightness brightness) {
+          final base = brightness == Brightness.dark 
+              ? ThemeData.dark().textTheme 
+              : ThemeData.light().textTheme;
+          return isRetro ? GoogleFonts.vt323TextTheme(base) : GoogleFonts.interTextTheme(base);
+        }
 
         return MaterialApp.router(
           title: 'iMeditatii',
           debugShowCheckedModeBanner: false,
           themeMode: currentMode,
-          
+
           // TEMA LIGHT
           theme: ThemeData(
             useMaterial3: false,
             brightness: Brightness.light,
-            textTheme: GoogleFonts.vt323TextTheme(ThemeData.light().textTheme),
+            textTheme: getTextTheme(Brightness.light),
             scaffoldBackgroundColor: const Color(0xFFF9F7F1),
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF2C363F),
               secondary: Color(0xFFE75A41),
             ),
-            splashFactory: NoSplash.splashFactory,
+            splashFactory: isRetro ? NoSplash.splashFactory : null,
             highlightColor: Colors.transparent,
-            scrollbarTheme: ScrollbarThemeData(
-              thumbVisibility: WidgetStateProperty.all(true),
-              trackVisibility: WidgetStateProperty.all(true),
-              thickness: WidgetStateProperty.all(16.0),
-              radius: const Radius.circular(0),
-              thumbColor: WidgetStateProperty.all(const Color(0xFF2C363F)),
-              trackColor: WidgetStateProperty.all(const Color(0xFFE2DFD2)),
-              interactive: true,
-            ),
           ),
 
           // TEMA DARK
           darkTheme: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
-            textTheme: GoogleFonts.vt323TextTheme(ThemeData.dark().textTheme),
+            textTheme: getTextTheme(Brightness.dark),
             scaffoldBackgroundColor: const Color(0xFF141A1F),
             colorScheme: const ColorScheme.dark(
               primary: Color(0xFF5BA8B5),
               secondary: Color(0xFFE75A41),
               surface: Color(0xFF1B242B),
             ),
-            splashFactory: NoSplash.splashFactory,
+            splashFactory: isRetro ? NoSplash.splashFactory : null,
             highlightColor: Colors.transparent,
-            scrollbarTheme: ScrollbarThemeData(
-              thumbVisibility: WidgetStateProperty.all(true),
-              trackVisibility: WidgetStateProperty.all(true),
-              thickness: WidgetStateProperty.all(16.0),
-              radius: const Radius.circular(0),
-              thumbColor: WidgetStateProperty.all(const Color(0xFF5BA8B5)),
-              trackColor: WidgetStateProperty.all(const Color(0xFF1B242B)),
-              interactive: true,
-            ),
           ),
 
           routerConfig: _router,
 
-          // BUTONUL FLOTANT PERMANENT (RESPONSIVE: ROTUND PE MOBIL, DREPTUNGHIULAR PE DESKTOP)
+          // DUAL FLOATING CONTROL DECK: THEME + STYLE TOGGLES
           builder: (context, child) {
             final isMobile = MediaQuery.of(context).size.width < 750;
 
@@ -312,61 +299,120 @@ class IMeditatiiApp extends StatelessWidget {
                   left: isMobile ? 14 : 20,
                   child: Material(
                     color: Colors.transparent,
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () => ThemeManager.toggleTheme(),
-                        child: Container(
-                          width: isMobile ? 42 : null,
-                          height: isMobile ? 42 : null,
-                          padding: isMobile
-                              ? EdgeInsets.zero
-                              : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF1B242B) : Colors.white,
-                            shape: isMobile ? BoxShape.circle : BoxShape.rectangle,
-                            border: Border.all(
-                              color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
-                              width: isMobile ? 2.0 : 2.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark ? Colors.black87 : const Color(0xFF2C363F),
-                                offset: isMobile ? const Offset(2.5, 2.5) : const Offset(3.5, 3.5),
-                                blurRadius: 0,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 1. Theme Button (Dark/Light)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => ThemeManager.toggleTheme(),
+                            child: Container(
+                              width: isMobile ? 40 : null,
+                              height: isMobile ? 40 : null,
+                              padding: isMobile ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1B242B) : Colors.white,
+                                shape: isMobile ? BoxShape.circle : BoxShape.rectangle,
+                                borderRadius: isMobile ? null : (isRetro ? BorderRadius.zero : BorderRadius.circular(8)),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                  width: isRetro ? 2.5 : 1.2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isDark ? Colors.black87 : const Color(0xFF2C363F).withOpacity(isRetro ? 1.0 : 0.1),
+                                    offset: Offset(isMobile ? 2.5 : 3.5, isMobile ? 2.5 : 3.5),
+                                    blurRadius: isRetro ? 0 : 6,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: isMobile
-                              ? Icon(
-                                  isDark ? Icons.light_mode : Icons.dark_mode,
-                                  color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
-                                  size: 20,
-                                )
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
+                              alignment: Alignment.center,
+                              child: isMobile
+                                  ? Icon(
                                       isDark ? Icons.light_mode : Icons.dark_mode,
                                       color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
                                       size: 18,
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          isDark ? Icons.light_mode : Icons.dark_mode,
+                                          color: isDark ? const Color(0xFFF9CA24) : const Color(0xFF2C363F),
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          isDark ? "LIGHT" : "DARK",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 11,
+                                            color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      isDark ? "LIGHT THEME" : "DARK THEME",
-                                      style: TextStyle(
-                                        fontFamily: 'monospace',
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 12,
-                                        color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
-                                        letterSpacing: 0.8,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+
+                        // 2. Style Button (Retro / Clean)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => ThemeManager.toggleStyle(),
+                            child: Container(
+                              width: isMobile ? 40 : null,
+                              height: isMobile ? 40 : null,
+                              padding: isMobile ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isRetro ? AppColors.mustard : AppColors.sky,
+                                shape: isMobile ? BoxShape.circle : BoxShape.rectangle,
+                                borderRadius: isMobile ? null : (isRetro ? BorderRadius.zero : BorderRadius.circular(8)),
+                                border: Border.all(
+                                  color: AppColors.border,
+                                  width: isRetro ? 2.5 : 1.2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.shadow.withOpacity(isRetro ? 1.0 : 0.1),
+                                    offset: Offset(isMobile ? 2.5 : 3.5, isMobile ? 2.5 : 3.5),
+                                    blurRadius: isRetro ? 0 : 6,
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: isMobile
+                                  ? Icon(
+                                      isRetro ? Icons.videogame_asset : Icons.auto_stories,
+                                      color: Colors.white,
+                                      size: 18,
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          isRetro ? Icons.videogame_asset : Icons.auto_stories,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          isRetro ? "STYLE: RETRO" : "STYLE: CLEAN",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 11,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
