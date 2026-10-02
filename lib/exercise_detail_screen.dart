@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import 'theme_manager.dart';
 import 'app_colors.dart';
+import 'ui_components.dart';
 
 // ----------------------------------------------------
 // C++ SYNTAX HIGHLIGHTING CONTROLLER
@@ -87,109 +88,6 @@ class CppSyntaxController extends TextEditingController {
     }
 
     return TextSpan(style: style, children: children);
-  }
-}
-
-// ----------------------------------------------------
-// RETRO BUTTON
-// ----------------------------------------------------
-class RetroButton extends StatefulWidget {
-  final String text;
-  final VoidCallback onPressed;
-  final Color? bgColor;
-  final Color? textColor;
-  final bool isFullWidth;
-  final bool isLoading;
-  final IconData? icon;
-
-  const RetroButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-    this.bgColor,
-    this.textColor,
-    this.isFullWidth = false,
-    this.isLoading = false,
-    this.icon,
-  });
-
-  @override
-  State<RetroButton> createState() => _RetroButtonState();
-}
-
-class _RetroButtonState extends State<RetroButton> {
-  bool isPressed = false;
-  bool isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final effectiveBg = widget.bgColor ?? AppColors.sunset;
-    final effectiveText = widget.textColor ?? Colors.white;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
-        onTapDown: widget.isLoading ? null : (_) => setState(() => isPressed = true),
-        onTapUp: widget.isLoading
-            ? null
-            : (_) {
-                setState(() => isPressed = false);
-                widget.onPressed();
-              },
-        onTapCancel: () => setState(() => isPressed = false),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 80),
-          width: widget.isFullWidth ? double.infinity : null,
-          transform: Matrix4.translationValues(
-            isPressed ? 2.5 : (isHovered ? -1.5 : 0.0),
-            isPressed ? 2.5 : (isHovered ? -1.5 : 0.0),
-            0,
-          ),
-          decoration: BoxDecoration(
-            color: widget.isLoading ? Colors.grey : effectiveBg,
-            border: Border.all(color: AppColors.border, width: 2.5),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
-                blurRadius: 0,
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          child: widget.isLoading
-              ? const Center(
-                  child: SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                  ),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.icon != null) ...[
-                      Icon(widget.icon, size: 18, color: effectiveText),
-                      const SizedBox(width: 8),
-                    ],
-                    Text(
-                      widget.text.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: effectiveText,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
-    );
   }
 }
 
@@ -518,7 +416,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
           body: Stack(
             children: [
-              // STANDARD SPLIT VIEW
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1440),
@@ -550,7 +447,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 ),
               ),
 
-              // ANIMATED FULLSCREEN FOR PROBLEM FOCUS
+              // Fullscreen Problem Focus Modal
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 280),
                 curve: Curves.easeInOutCubic,
@@ -564,13 +461,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 960),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.cardBg,
-                          border: Border.all(color: AppColors.border, width: 3),
-                          boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6))],
-                        ),
-                        padding: EdgeInsets.all(isMobile ? 18 : 36),
+                      child: RetroBlock(
+                        padding: isMobile ? 18 : 36,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -604,7 +496,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 ),
               ),
 
-              // ANIMATED FULLSCREEN FOR CODE FOCUS
+              // Fullscreen Code Focus Workspace
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 280),
                 curve: Curves.easeInOutCubic,
@@ -618,57 +510,47 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   child: !isMobile
                       ? Row(
                           children: [
-                            // Task Sidebar
-                            Container(
+                            SizedBox(
                               width: 420,
-                              decoration: BoxDecoration(
-                                color: AppColors.cardBg,
-                                border: Border.all(color: AppColors.border, width: 2.5),
-                                boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
-                              ),
-                              padding: const EdgeInsets.all(24),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.sunset)),
-                                        Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 14),
-                                    Text(
-                                      exerciseData!["title"]?.toUpperCase() ?? "QUEST",
-                                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      exerciseData!["description"] ?? "",
-                                      style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600),
-                                    ),
-                                    if (exerciseData!["input"] != null) ...[
-                                      const SizedBox(height: 20),
-                                      _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"], isMobile),
+                              child: RetroBlock(
+                                padding: 24,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.sunset)),
+                                          Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
+                                        ],
+                                      ),
                                       const SizedBox(height: 14),
-                                      _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"], isMobile),
+                                      Text(
+                                        exerciseData!["title"]?.toUpperCase() ?? "QUEST",
+                                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        exerciseData!["description"] ?? "",
+                                        style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600),
+                                      ),
+                                      if (exerciseData!["input"] != null) ...[
+                                        const SizedBox(height: 20),
+                                        _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"], isMobile),
+                                        const SizedBox(height: 14),
+                                        _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"], isMobile),
+                                      ],
                                     ],
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 18),
-
-                            // Extended Code Workspace
                             Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.cloud,
-                                  border: Border.all(color: AppColors.border, width: 2.5),
-                                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
-                                ),
-                                padding: const EdgeInsets.all(18),
+                              child: RetroBlock(
+                                bgColor: AppColors.cloud,
+                                padding: 18,
                                 child: Column(
                                   children: [
                                     _buildIdeHeader(isFullScreen: true, isMobile: isMobile),
@@ -708,12 +590,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                             ),
                           ],
                         )
-                      : Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.cloud,
-                            border: Border.all(color: AppColors.border, width: 2.5),
-                          ),
-                          padding: const EdgeInsets.all(12),
+                      : RetroBlock(
+                          bgColor: AppColors.cloud,
+                          padding: 12,
                           child: Column(
                             children: [
                               _buildIdeHeader(isFullScreen: true, isMobile: isMobile),
@@ -765,13 +644,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             const SizedBox(width: 6),
             _buildTab("solutie", "SOLUTION", isMobile),
             const Spacer(),
-            // RESTORED ZOOM FEATURE: Focus Brief
             GestureDetector(
               onTap: () => setState(() => isFullScreenProblem = true),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 6 : 8),
                 decoration: BoxDecoration(
                   color: AppColors.cardBg,
+                  borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
                   border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: Row(
@@ -788,13 +667,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
           ],
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.cardBg,
-            border: Border.all(color: AppColors.border, width: 2.5),
-            boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4))],
-          ),
-          padding: EdgeInsets.all(isMobile ? 18 : 28),
+        RetroBlock(
+          padding: isMobile ? 18 : 28,
+          shadowOffset: isMobile ? 3 : 4,
           child: selectedTab == "enunt" ? _buildEnuntContent(isMobile) : _buildSolutieContent(isMobile),
         ),
       ],
@@ -803,16 +678,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   Widget _buildTab(String tabKey, String label, bool isMobile) {
     final isSelected = selectedTab == tabKey;
+    final isClean = ThemeManager.isClean;
+
     return GestureDetector(
       onTap: () => setState(() => selectedTab = tabKey),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: isMobile ? 8 : 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.mustard : AppColors.cloud,
+          borderRadius: isClean ? const BorderRadius.vertical(top: Radius.circular(6)) : BorderRadius.zero,
           border: Border(
-            top: BorderSide(color: AppColors.border, width: 2.5),
-            left: BorderSide(color: AppColors.border, width: 2.5),
-            right: BorderSide(color: AppColors.border, width: 2.5),
+            top: BorderSide(color: isClean ? Colors.transparent : AppColors.border, width: 2.5),
+            left: BorderSide(color: isClean ? Colors.transparent : AppColors.border, width: 2.5),
+            right: BorderSide(color: isClean ? Colors.transparent : AppColors.border, width: 2.5),
           ),
         ),
         child: Text(
@@ -840,7 +718,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         SizedBox(height: isMobile ? 14 : 24),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          color: AppColors.sunset,
+          decoration: BoxDecoration(
+            color: AppColors.sunset,
+            borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
+          ),
           child: const Text(
             "DESCRIPTION",
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 1.2),
@@ -863,6 +744,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppColors.sky.withOpacity(0.15),
+              borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
               border: Border.all(color: AppColors.sky, width: 2),
             ),
             child: Row(
@@ -905,6 +787,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: const Color(0xFF1B242B),
+              borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
               border: Border.all(color: AppColors.border, width: 2.5),
             ),
             child: Text(
@@ -939,7 +822,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 14, vertical: isMobile ? 10 : 14),
-          decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 1.5)),
+          decoration: BoxDecoration(
+            color: AppColors.cloud,
+            borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
+            border: Border.all(color: ThemeManager.isClean ? Colors.grey.withOpacity(0.2) : AppColors.border, width: ThemeManager.isClean ? 1 : 1.5),
+          ),
           child: Text(
             content,
             style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.w700, height: 1.4),
@@ -950,13 +837,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   Widget _buildInteractionPanel(bool isMobile) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cloud,
-        border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 3 : 4, isMobile ? 3 : 4))],
-      ),
-      padding: EdgeInsets.all(isMobile ? 14 : 20),
+    return RetroBlock(
+      bgColor: AppColors.cloud,
+      padding: isMobile ? 14 : 20,
+      shadowOffset: isMobile ? 3 : 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -975,7 +859,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   if (snapshot.data == true || solutionOk) {
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      color: AppColors.forest,
+                      decoration: BoxDecoration(
+                        color: AppColors.forest,
+                        borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
+                      ),
                       child: const Text(
                         "CLEARED",
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 0.8, fontSize: 10),
@@ -1019,6 +906,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 14, vertical: isMobile ? 12 : 16),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.sky : AppColors.cardBg,
+                  borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
                   border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: Row(
@@ -1064,7 +952,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             filled: true,
             fillColor: AppColors.inputBg,
             contentPadding: const EdgeInsets.all(14),
-            border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border, width: 2)),
+            border: OutlineInputBorder(
+              borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
+              borderSide: BorderSide(color: AppColors.border, width: 2),
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -1088,7 +979,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-          color: AppColors.ink,
+          decoration: BoxDecoration(
+            color: AppColors.ink,
+            borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
+          ),
           child: Text(
             "C++20",
             style: TextStyle(
@@ -1101,13 +995,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         const SizedBox(width: 8),
         Text("L$line:C$col", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
         const Spacer(),
-        // RESTORED ZOOM FEATURE: Focus Mode (Fullscreen Code)
         GestureDetector(
           onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isFullScreen ? AppColors.sunset : AppColors.ink,
+              borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
               border: Border.all(color: AppColors.border, width: 1.5),
             ),
             child: Row(
@@ -1164,6 +1058,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
         decoration: BoxDecoration(
           color: AppColors.cardBg,
+          borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
           border: Border.all(color: isDanger ? AppColors.sunset : AppColors.border, width: 1.5),
         ),
         child: Text(
@@ -1194,7 +1089,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1B242B),
-        border: Border.all(color: AppColors.border, width: 2.5),
+        borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
+        border: Border.all(
+          color: ThemeManager.isClean ? Colors.white.withOpacity(0.08) : AppColors.border,
+          width: ThemeManager.isClean ? 1.2 : 2.5,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1202,9 +1101,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           Container(
             width: isMobile ? 38 : 48,
             padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: const BoxDecoration(
-              color: Color(0xFF131A1F),
-              border: Border(right: BorderSide(color: Color(0xFF2C3E50), width: 1.5)),
+            decoration: BoxDecoration(
+              color: const Color(0xFF131A1F),
+              borderRadius: ThemeManager.isClean ? const BorderRadius.horizontal(left: Radius.circular(7)) : BorderRadius.zero,
+              border: const Border(right: BorderSide(color: Color(0xFF2C3E50), width: 1.5)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1303,6 +1203,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFF1B242B),
+        borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
         border: Border.all(color: AppColors.border, width: 2),
       ),
       child: Column(
@@ -1320,6 +1221,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: const Color(0xFF131A1F),
+                borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
                 border: Border.all(color: passed ? AppColors.forest : AppColors.sunset, width: 1.5),
               ),
               child: Column(
@@ -1470,6 +1372,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: solutionOk ? AppColors.forest : AppColors.sunset,
+        borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
         border: Border.all(color: AppColors.border, width: 2.5),
         boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
       ),
