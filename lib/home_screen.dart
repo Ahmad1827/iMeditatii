@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
 import 'custom_navbar.dart';
+import 'resources_data.dart';
 import 'ui_components.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   int _completedQuests = 0;
   bool _isLoadingStats = true;
+  bool _showNotice = true;
 
   // Progress keys look like "<materie>_<clasa>_<id>" (see ExerciseDetailScreen).
   static final RegExp _progressKey = RegExp(r'^.+_\d+_.+$');
@@ -36,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadPlayerStats() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // prefs.get() instead of getBool(): getBool throws on String keys (e.g. 'app_style').
+      // prefs.get(), not getBool(): getBool throws on String values (e.g. 'app_style').
       final completed = prefs.getKeys().where((k) => _progressKey.hasMatch(k) && prefs.get(k) == true).length;
       if (!mounted) return;
       setState(() {
@@ -56,61 +58,332 @@ class _HomeScreenState extends State<HomeScreen> {
     context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
   }
 
-  Widget _buildConstrainedSection({required Widget child, EdgeInsetsGeometry? padding}) {
+  void _openSubject(String route) {
+    context.go('/lista-exercitii?materie=${Uri.encodeComponent(route)}');
+  }
+
+  double get _progressValue =>
+      (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return StyleBuilder(
+      builder: (context, s) {
+        return s.isClean
+            ? _buildClean(MediaQuery.of(context).size.width < 900)
+            : _buildRetro(MediaQuery.of(context).size.width < 880);
+      },
+    );
+  }
+
+  // ===========================================================================
+  // CLEAN — pbinfo-style homepage
+  // ===========================================================================
+  Widget _buildClean(bool isMobile) {
+    final sidebar = [
+      _cleanProgressCard(),
+      const SizedBox(height: 20),
+      _cleanDailyCard(),
+      const SizedBox(height: 20),
+      _cleanSubjectsCard(),
+    ];
+
+    final posts = [
+      _PbPost(
+        title: 'Lecții noi pentru clasele IX–XII',
+        author: ResourcesData.defaultAuthor,
+        date: ResourcesData.defaultDate,
+        body: 'Am adăugat lecții de Python, C++ și matematică, organizate pe clase și module după programa de liceu. '
+            'Fiecare lecție are exemple de cod și greșelile care apar cel mai des la Bacalaureat.',
+        linkText: 'Vezi lecțiile',
+        onLink: () => context.go('/resurse'),
+      ),
+      const SizedBox(height: 20),
+      _PbPost(
+        title: 'Probleme cu evaluare automată',
+        author: ResourcesData.defaultAuthor,
+        date: ResourcesData.defaultDate,
+        body: 'Scrii soluția direct în browser, iar codul este compilat și rulat pe teste. '
+            'Vezi imediat ce teste au trecut și ce rezultat era așteptat.',
+        linkText: 'Începe să rezolvi',
+        onLink: () => context.go('/exercitii'),
+      ),
+      const SizedBox(height: 20),
+      _PbPost(
+        title: 'Lecții 1-la-1 cu profesori verificați',
+        author: ResourcesData.defaultAuthor,
+        date: ResourcesData.defaultDate,
+        body: 'Lucrezi cu profesorul pe tablă interactivă, prin apel video. '
+            'Alege materia și vezi profesorii disponibili.',
+        linkText: 'Vezi profesorii',
+        onLink: () => context.go('/materii'),
+      ),
+    ];
+
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _cleanHero(isMobile),
+                    if (_showNotice) _cleanNotice(),
+                    const SizedBox(height: 32),
+                    PbContainer(
+                      child: isMobile
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [...sidebar, const SizedBox(height: 20), ...posts],
+                            )
+                          : Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 400,
+                                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: sidebar),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: posts),
+                                ),
+                              ],
+                            ),
+                    ),
+                    const SizedBox(height: 48),
+                    _cleanFooter(isMobile),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cleanHero(bool isMobile) {
     return Container(
-      width: double.infinity,
-      padding: padding ?? const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1120),
-          child: child,
+      color: Pb.hero,
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 40 : 76),
+      child: PbContainer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'iMeditații',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isMobile ? 42 : 62,
+                fontWeight: FontWeight.w700,
+                height: 1.05,
+                shadows: [Shadow(color: Colors.black.withOpacity(0.35), offset: const Offset(2, 2))],
+              ),
+            ),
+            SizedBox(height: isMobile ? 14 : 22),
+            Text(
+              'Aici înveți! Probleme, lecții și profesori pentru liceu.',
+              style: TextStyle(color: Colors.white, fontSize: isMobile ? 20 : 30, fontWeight: FontWeight.w300, height: 1.3),
+            ),
+            SizedBox(height: isMobile ? 22 : 30),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                PbButton(
+                  text: 'Vezi problemele',
+                  variant: PbVariant.light,
+                  size: PbSize.lg,
+                  onPressed: () => context.go('/exercitii'),
+                ),
+                PbButton(
+                  text: 'Găsește un profesor',
+                  variant: PbVariant.outlineLight,
+                  size: PbSize.lg,
+                  onPressed: () => context.go('/materii'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // HERO
-  // ---------------------------------------------------------------------------
-  Widget _buildRetroStatusChips(bool isMobile) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.cardBg,
-            border: Border.all(color: AppColors.border, width: 2),
+  Widget _cleanNotice() {
+    return Container(
+      color: Pb.infoStrip,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Text(
+              'Lecțiile pentru clasele IX–XII sunt disponibile în secțiunea Lecții.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Pb.infoStripText, fontSize: 16),
+            ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
-              const SizedBox(width: 8),
-              Text(
-                'SYSTEM OPERATIONAL',
-                style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: isMobile ? 11 : 12, letterSpacing: 1.2),
-              ),
-            ],
+          const SizedBox(width: 16),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => setState(() => _showNotice = false),
+              child: Icon(Icons.close, size: 22, color: Pb.infoStripText),
+            ),
           ),
-        ),
-        AppBadge(text: "SEASON 1", color: AppColors.sunset, fontSize: 10),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildHeroSection(AppStyle s, bool isMobile) {
-    final heroInk = s.heroInk;
+  Widget _cleanProgressCard() {
+    final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
+    final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
 
-    final findTeacher = s.pick("FIND A MASTER", "Găsește un profesor");
-    final seeExercises = s.pick("DAILY QUESTS", "Vezi exercițiile");
+    return PbCard(
+      title: 'Progresul tău',
+      footer: Text(
+        'Progresul se salvează pe acest dispozitiv.',
+        style: TextStyle(color: Pb.muted, fontSize: 14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text('Probleme rezolvate', style: Pb.body())),
+              _isLoadingStats
+                  ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Text('$_completedQuests', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          PbProgress(value: _progressValue, label: '$inLevel / 5'),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(child: Text('Nivel', style: Pb.body())),
+              PbBadge(text: rank, color: Pb.primary),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cleanDailyCard() {
+    return PbCard(
+      title: 'Problema zilei',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              PbBadge(text: '#1', color: Pb.primary, fontSize: 13),
+              const SizedBox(width: 10),
+              Flexible(child: PbLink(text: 'Informatică, clasa a IX-a', onTap: _startDailyQuest, fontSize: 17)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Problemă de programare în C++, evaluată automat pe teste.',
+            style: TextStyle(color: Pb.muted, fontSize: 15, height: 1.5),
+          ),
+          const SizedBox(height: 14),
+          PbButton(text: 'Rezolvă problema', onPressed: _startDailyQuest),
+        ],
+      ),
+    );
+  }
+
+  Widget _cleanSubjectsCard() {
+    return PbCard(
+      title: 'Materii',
+      padding: EdgeInsets.zero,
+      child: PbListGroup(
+        flush: true,
+        items: [
+          PbListItem('Matematică', icon: Icons.functions, onTap: () => _openSubject('Matematică')),
+          PbListItem('Informatică', icon: Icons.data_object, onTap: () => _openSubject('Informatică')),
+          PbListItem('Limbi străine', icon: Icons.language, onTap: () => _openSubject('Engleză')),
+        ],
+      ),
+    );
+  }
+
+  Widget _cleanFooter(bool isMobile) {
+    final links = [
+      PbLink(text: 'Termeni și condiții', fontSize: 15, onTap: () => context.go('/termeni-si-conditii')),
+      PbLink(text: 'Politica de confidențialitate', fontSize: 15, onTap: () => context.go('/politica-confidentialitate')),
+    ];
+    final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 15));
+
+    return Container(
+      decoration: BoxDecoration(color: Pb.cardHeader, border: Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: PbContainer(
+        child: isMobile
+            ? Column(children: [copy, const SizedBox(height: 10), Wrap(spacing: 18, runSpacing: 8, alignment: WrapAlignment.center, children: links)])
+            : Row(children: [copy, const Spacer(), ...links.expand((l) => [const SizedBox(width: 22), l])]),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
+  Widget _buildRetro(bool isMobile) {
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  children: [
+                    _retroHero(isMobile),
+                    _retroPaths(isMobile),
+                    _retroMasters(isMobile),
+                    SizedBox(height: isMobile ? 14 : 28),
+                    _retroFooter(isMobile),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _retroSection({required Widget child, EdgeInsetsGeometry? padding}) {
+    return Container(
+      width: double.infinity,
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+      child: Center(
+        child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1120), child: child),
+      ),
+    );
+  }
+
+  Widget _retroHero(bool isMobile) {
+    final heroInk = AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
 
     final leftContent = RetroBlock(
-      bgColor: s.heroBg,
-      preserveColor: true,
-      padding: isMobile ? 18 : (s.isClean ? 40 : 36),
+      bgColor: AppColors.mustard,
+      padding: isMobile ? 18 : 36,
       shadowOffset: isMobile ? 3.5 : 6.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,30 +392,41 @@ class _HomeScreenState extends State<HomeScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (s.isRetro)
-                _buildRetroStatusChips(isMobile)
-              else
-                AppBadge(text: 'Pregătire pentru Bacalaureat', color: AppColors.sky, icon: Icons.school_outlined, fontSize: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 2)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                        const SizedBox(width: 8),
+                        Text('SYSTEM OPERATIONAL',
+                            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: isMobile ? 11 : 12, letterSpacing: 1.2)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    color: AppColors.sunset,
+                    child: const Text("SEASON 1",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0)),
+                  ),
+                ],
+              ),
               SizedBox(height: isMobile ? 14 : 20),
               Text(
-                s.pick("LEVEL UP YOUR\nKNOWLEDGE.", "Învață, exersează\nși vezi cât ai progresat."),
-                style: s.display(isMobile ? s.pick(26.0, 28.0) : s.pick(48.0, 44.0), color: heroInk),
+                "LEVEL UP YOUR\nKNOWLEDGE.",
+                style: TextStyle(fontSize: isMobile ? 26 : 48, fontWeight: FontWeight.w900, color: heroInk, height: 1.1, letterSpacing: 1.0),
               ),
               SizedBox(height: isMobile ? 10 : 16),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Text(
-                  s.pick(
-                    "Alege o materie. Găsește un mentor verificat și rezolvă quest-uri interactive pentru a avansa în nivel.",
-                    "Alege o materie, lucrează cu un profesor verificat și rezolvă probleme cu evaluare automată, pe programa de liceu.",
-                  ),
-                  style: s.body(
-                    isMobile ? 14 : 17,
-                    color: s.isClean ? AppColors.textMuted : heroInk,
-                    height: 1.5,
-                    retroWeight: FontWeight.bold,
-                  ),
-                ),
+              Text(
+                "Alege o materie. Găsește un mentor verificat și rezolvă quest-uri interactive pentru a avansa în nivel.",
+                style: TextStyle(fontSize: isMobile ? 14 : 17, color: heroInk, fontWeight: FontWeight.bold, height: 1.45),
               ),
             ],
           ),
@@ -152,19 +436,18 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 RetroButton(
-                  text: findTeacher,
+                  text: "FIND A MASTER",
                   icon: Icons.search,
                   fontSize: 14,
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  bgColor: s.primaryFill(AppColors.forest),
-                  textColor: s.primaryText(Colors.white),
+                  bgColor: AppColors.forest,
                   isFullWidth: true,
                   onPressed: () => context.go('/materii'),
                 ),
                 const SizedBox(height: 10),
                 RetroButton(
-                  text: seeExercises,
-                  icon: s.pick(Icons.track_changes, Icons.code),
+                  text: "DAILY QUESTS",
+                  icon: Icons.track_changes,
                   fontSize: 14,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   bgColor: AppColors.cardBg,
@@ -177,17 +460,11 @@ class _HomeScreenState extends State<HomeScreen> {
           else
             Row(
               children: [
+                RetroButton(text: "FIND A MASTER", icon: Icons.search, bgColor: AppColors.forest, onPressed: () => context.go('/materii')),
+                const SizedBox(width: 16),
                 RetroButton(
-                  text: findTeacher,
-                  icon: Icons.search,
-                  bgColor: s.primaryFill(AppColors.forest),
-                  textColor: s.primaryText(Colors.white),
-                  onPressed: () => context.go('/materii'),
-                ),
-                SizedBox(width: s.pick(16.0, 12.0)),
-                RetroButton(
-                  text: seeExercises,
-                  icon: s.pick(Icons.track_changes, Icons.code),
+                  text: "DAILY QUESTS",
+                  icon: Icons.track_changes,
                   bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   onPressed: () => context.go('/exercitii'),
@@ -197,12 +474,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-
-    final rank = _completedQuests > 10
-        ? s.pick("GOLD GUILD", "Avansat")
-        : (_completedQuests > 3 ? s.pick("SILVER RANK", "Intermediar") : s.pick("NOVICE", "Începător"));
-
-    final progressValue = (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0;
 
     final rightContent = RetroBlock(
       bgColor: AppColors.cardBg,
@@ -218,47 +489,40 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    s.pick("YOUR PROGRESS", "Progresul tău"),
-                    style: s.isClean ? s.heading(isMobile ? 15 : 17) : s.overline(isMobile ? 14 : 16),
+                  Text("YOUR PROGRESS",
+                      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: isMobile ? 14 : 16, letterSpacing: 1.2)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.border, width: 2)),
+                    child: Text(
+                      _completedQuests > 10 ? "GOLD GUILD" : (_completedQuests > 3 ? "SILVER RANK" : "NOVICE"),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10),
+                    ),
                   ),
-                  AppBadge(text: rank, color: AppColors.sky, outlined: true, fontSize: 10),
                 ],
               ),
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: s.insetBox(),
+                decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          s.pick("QUESTS CLEARED", "Probleme rezolvate"),
-                          style: s.isClean
-                              ? TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w500, fontSize: 13)
-                              : TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12),
-                        ),
+                        Text("QUESTS CLEARED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12)),
                         _isLoadingStats
                             ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
-                            : Text(
-                                s.pick("$_completedQuests SOLVED", "$_completedQuests"),
-                                style: s.isClean
-                                    ? TextStyle(color: AppColors.ink, fontWeight: FontWeight.w700, fontSize: 15)
-                                    : TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 13),
-                              ),
+                            : Text("$_completedQuests SOLVED",
+                                style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 13)),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(s.isClean ? 4 : 0),
-                      child: LinearProgressIndicator(
-                        value: progressValue,
-                        backgroundColor: s.isClean ? s.line : AppColors.border.withOpacity(0.2),
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
-                        minHeight: s.isClean ? 6 : 8,
-                      ),
+                    LinearProgressIndicator(
+                      value: _progressValue,
+                      backgroundColor: AppColors.border.withOpacity(0.2),
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
+                      minHeight: 8,
                     ),
                   ],
                 ),
@@ -267,63 +531,43 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    s.pick("DAILY BOUNTY", "Problema zilei"),
-                    style: s.isClean
-                        ? s.overline(13)
-                        : TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 1.0),
-                  ),
-                  if (s.isRetro) Icon(Icons.star, color: AppColors.mustard, size: 18),
+                  Text("DAILY BOUNTY",
+                      style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 1.0)),
+                  Icon(Icons.star, color: AppColors.mustard, size: 18),
                 ],
               ),
               const SizedBox(height: 6),
-              Text(
-                s.pick("INFORMATICĂ // CLASA A 9-A", "Informatică, clasa a IX-a"),
-                style: s.isClean
-                    ? s.heading(isMobile ? 15 : 16)
-                    : TextStyle(fontSize: isMobile ? 14 : 15, fontWeight: FontWeight.w900, color: AppColors.ink),
-              ),
+              Text("INFORMATICĂ // CLASA A 9-A",
+                  style: TextStyle(fontSize: isMobile ? 14 : 15, fontWeight: FontWeight.w900, color: AppColors.ink)),
               const SizedBox(height: 3),
-              Text(
-                s.pick("RECOMPENSĂ: +50 EXP // AUTO-CHECK", "Problemă de programare cu evaluare automată"),
-                style: s.isClean
-                    ? s.muted(13)
-                    : TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 11),
-              ),
+              Text("RECOMPENSĂ: +50 EXP // AUTO-CHECK",
+                  style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 11)),
             ],
           ),
           SizedBox(height: isMobile ? 16 : 24),
           RetroButton(
-            text: s.pick("ACCEPT BOUNTY", "Rezolvă problema"),
-            icon: s.pick(Icons.play_arrow, null),
-            bgColor: s.primaryFill(AppColors.sunset),
-            textColor: s.primaryText(Colors.white),
+            text: "ACCEPT BOUNTY",
+            icon: Icons.play_arrow,
+            bgColor: AppColors.sunset,
             isFullWidth: true,
             fontSize: 14,
-            padding: EdgeInsets.symmetric(vertical: s.pick(10.0, 12.0)),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             onPressed: _startDailyQuest,
           ),
         ],
       ),
     );
 
-    return _buildConstrainedSection(
+    return _retroSection(
       padding: EdgeInsets.fromLTRB(isMobile ? 14 : 24, isMobile ? 16 : 36, isMobile ? 14 : 24, isMobile ? 16 : 28),
       child: isMobile
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                leftContent,
-                const SizedBox(height: 14),
-                rightContent,
-              ],
-            )
+          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [leftContent, const SizedBox(height: 14), rightContent])
           : IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(flex: 3, child: leftContent),
-                  SizedBox(width: s.pick(24.0, 20.0)),
+                  const SizedBox(width: 24),
                   Expanded(flex: 2, child: rightContent),
                 ],
               ),
@@ -331,105 +575,59 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // PATHS
-  // ---------------------------------------------------------------------------
-  Widget _buildPathsSection(AppStyle s, bool isMobile) {
-    final paths = <Map<String, dynamic>>[
-      {
-        "icon": Icons.functions,
-        "title": s.pick("MATEMATICĂ", "Matematică"),
-        "desc": s.pick("ALGEBRĂ & GEOMETRIE", "Algebră, geometrie, analiză"),
-        "color": AppColors.sunset,
-        "route": "Matematică",
-      },
-      {
-        "icon": Icons.data_object,
-        "title": s.pick("INFORMATICĂ", "Informatică"),
-        "desc": s.pick("ALGORITMI & C++", "Algoritmi în C++ și Python"),
-        "color": AppColors.forest,
-        "route": "Informatică",
-      },
-      {
-        "icon": Icons.language,
-        "title": s.pick("LIMBI STRĂINE", "Limbi străine"),
-        "desc": s.pick("ENGLEZĂ & ROMÂNĂ", "Engleză și română"),
-        "color": AppColors.sky,
-        "route": "Engleză",
-      },
+  Widget _retroPaths(bool isMobile) {
+    final List<Map<String, dynamic>> paths = [
+      {"icon": Icons.functions, "title": "MATEMATICĂ", "color": AppColors.sunset, "desc": "ALGEBRĂ & GEOMETRIE", "route": "Matematică"},
+      {"icon": Icons.data_object, "title": "INFORMATICĂ", "color": AppColors.forest, "desc": "ALGORITMI & C++", "route": "Informatică"},
+      {"icon": Icons.language, "title": "LIMBI STRĂINE", "color": AppColors.sky, "desc": "ENGLEZĂ & ROMÂNĂ", "route": "Engleză"},
     ];
 
-    final pathCards = <Widget>[];
-    for (var i = 0; i < paths.length; i++) {
-      final path = paths[i];
-      final isLast = i == paths.length - 1;
-      pathCards.add(
-        Padding(
-          padding: EdgeInsets.only(
-            bottom: isMobile && !isLast ? 12 : 0,
-            right: !isMobile && !isLast ? s.pick(20.0, 16.0) : 0,
-          ),
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () {
-                final encoded = Uri.encodeComponent(path["route"] as String);
-                context.go('/lista-exercitii?materie=$encoded');
-              },
-              child: RetroBlock(
-                bgColor: AppColors.cardBg,
-                padding: isMobile ? 16 : 24,
-                shadowOffset: isMobile ? 3.5 : 6.0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AppIconTile(
-                      icon: path["icon"] as IconData,
-                      color: path["color"] as Color,
-                      iconSize: isMobile ? 26 : s.pick(36.0, 30.0),
-                      padding: isMobile ? 12 : s.pick(18.0, 16.0),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      path["title"] as String,
-                      textAlign: TextAlign.center,
-                      style: s.heading(isMobile ? 16 : s.pick(20.0, 18.0)),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      path["desc"] as String,
-                      textAlign: TextAlign.center,
-                      style: s.isClean
-                          ? s.muted(isMobile ? 13 : 14)
-                          : TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-                    ),
-                  ],
+    final List<Widget> pathCards = paths.map((path) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: isMobile && path != paths.last ? 12 : 0,
+          right: !isMobile && path != paths.last ? 20 : 0,
+        ),
+        child: GestureDetector(
+          onTap: () => _openSubject(path["route"] as String),
+          child: RetroBlock(
+            bgColor: AppColors.cardBg,
+            padding: isMobile ? 16 : 24,
+            shadowOffset: isMobile ? 3.5 : 6.0,
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(isMobile ? 12 : 18),
+                  decoration: BoxDecoration(
+                    color: path["color"],
+                    border: Border.all(color: AppColors.border, width: 2.5),
+                    boxShadow: AppStyle.hardShadow(3),
+                  ),
+                  child: Icon(path["icon"], size: isMobile ? 26 : 36, color: Colors.white),
                 ),
-              ),
+                const SizedBox(height: 12),
+                Text(path["title"], textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0)),
+                const SizedBox(height: 4),
+                Text(path["desc"], textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
+              ],
             ),
           ),
         ),
       );
-    }
+    }).toList();
 
-    return _buildConstrainedSection(
+    return _retroSection(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 28, horizontal: isMobile ? 14 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            s.pick("CHOOSE YOUR PATH", "Alege materia"),
-            textAlign: TextAlign.center,
-            style: s.display(isMobile ? 22 : s.pick(34.0, 30.0)),
-          ),
+          Text("CHOOSE YOUR PATH", textAlign: TextAlign.center,
+              style: TextStyle(fontSize: isMobile ? 22 : 34, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.5)),
           const SizedBox(height: 6),
-          Text(
-            s.pick("SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.", "Vezi problemele disponibile pentru fiecare disciplină."),
-            textAlign: TextAlign.center,
-            style: s.isClean
-                ? s.muted(isMobile ? 14 : 16)
-                : TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-          ),
+          Text("SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.", textAlign: TextAlign.center,
+              style: TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
           SizedBox(height: isMobile ? 18 : 24),
           isMobile
               ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: pathCards)
@@ -439,40 +637,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // MASTERS
-  // ---------------------------------------------------------------------------
-  Widget _buildMastersSection(AppStyle s, bool isMobile) {
+  Widget _retroMasters(bool isMobile) {
     final leftContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppBadge(
-          text: s.pick("GUILD ROSTER", "Profesori"),
-          color: s.pick(AppColors.isDark ? AppColors.sunset : AppColors.ink, AppColors.sky),
-          fontSize: 10,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
+          child: const Text("GUILD ROSTER",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 10)),
         ),
         const SizedBox(height: 12),
-        Text(
-          s.pick(
-            isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
-            isMobile ? "Lecții 1-la-1 cu profesori verificați." : "Lecții 1-la-1 cu\nprofesori verificați.",
-          ),
-          style: s.display(isMobile ? 24 : s.pick(40.0, 34.0)),
-        ),
+        Text(isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
+            style: TextStyle(fontSize: isMobile ? 24 : 40, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.1, letterSpacing: 1.0)),
         const SizedBox(height: 10),
-        Text(
-          s.pick(
-            "Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
-            "Fiecare profesor e verificat înainte de a preda. Lecțiile au loc online, cu tablă interactivă și apel video.",
-          ),
-          style: s.body(isMobile ? 13 : 16, color: s.isClean ? AppColors.textMuted : AppColors.ink, height: 1.5, retroWeight: FontWeight.bold),
-        ),
+        Text("Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
+            style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.45)),
         SizedBox(height: isMobile ? 16 : 22),
         RetroButton(
-          text: s.pick("EXPLOREAZĂ PROFESORII", "Vezi profesorii"),
-          icon: s.pick(Icons.groups, Icons.groups_outlined),
-          bgColor: s.primaryFill(AppColors.sunset),
-          textColor: s.primaryText(Colors.white),
+          text: "EXPLOREAZĂ PROFESORII",
+          icon: Icons.groups,
+          bgColor: AppColors.sunset,
           isFullWidth: isMobile,
           fontSize: 14,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -480,6 +665,27 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
     );
+
+    Widget avatar(IconData icon, String label, Color color) => Container(
+          decoration: BoxDecoration(color: color, border: Border.all(color: AppColors.border, width: 2.5), boxShadow: AppStyle.hardShadow(3)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 30, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
+              const SizedBox(height: 5),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                color: AppColors.ink,
+                child: Text(label,
+                    style: TextStyle(
+                        color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0)),
+              ),
+            ],
+          ),
+        );
 
     final rightContent = GridView.count(
       shrinkWrap: true,
@@ -489,111 +695,27 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSpacing: 10,
       childAspectRatio: isMobile ? 1.25 : 1.1,
       children: [
-        _buildMasterAvatar(s, Icons.calculate, s.pick("MATH", "Matematică"), AppColors.sky),
-        _buildMasterAvatar(s, Icons.terminal, s.pick("CODE", "Informatică"), AppColors.mustard),
-        _buildMasterAvatar(s, Icons.bolt, s.pick("PHYSICS", "Fizică"), AppColors.forest),
-        _buildMasterAvatar(s, Icons.science, s.pick("CHEM", "Chimie"), AppColors.sunset),
+        avatar(Icons.calculate, "MATH", AppColors.sky),
+        avatar(Icons.terminal, "CODE", AppColors.mustard),
+        avatar(Icons.bolt, "PHYSICS", AppColors.forest),
+        avatar(Icons.science, "CHEM", AppColors.sunset),
       ],
     );
 
-    return _buildConstrainedSection(
+    return _retroSection(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 36, horizontal: isMobile ? 14 : 24),
       child: RetroBlock(
         bgColor: AppColors.cloud,
         padding: isMobile ? 16 : 36,
         shadowOffset: isMobile ? 3.5 : 6.0,
         child: isMobile
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  leftContent,
-                  const SizedBox(height: 20),
-                  rightContent,
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(child: leftContent),
-                  const SizedBox(width: 36),
-                  Expanded(child: rightContent),
-                ],
-              ),
+            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [leftContent, const SizedBox(height: 20), rightContent])
+            : Row(children: [Expanded(child: leftContent), const SizedBox(width: 36), Expanded(child: rightContent)]),
       ),
     );
   }
 
-  Widget _buildMasterAvatar(AppStyle s, IconData icon, String label, Color color) {
-    if (s.isClean) {
-      return Container(
-        decoration: BoxDecoration(
-          color: s.inset,
-          borderRadius: s.rTile,
-          border: Border.all(color: s.line),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AppIconTile(icon: icon, color: color, iconSize: 22, padding: 12),
-            const SizedBox(height: 10),
-            Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: s.hardShadow(3),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 30, color: AppColors.isDark && color == AppColors.mustard ? const Color(0xFF10161A) : Colors.white),
-          const SizedBox(height: 5),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            color: AppColors.ink,
-            child: Text(
-              label,
-              style: TextStyle(color: s.onInk, fontSize: 8.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // FOOTER
-  // ---------------------------------------------------------------------------
-  Widget _buildFooter(AppStyle s, bool isMobile) {
-    if (s.isClean) {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 24 : 36),
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          border: Border(top: BorderSide(color: s.line)),
-        ),
-        child: Center(
-          child: Column(
-            children: [
-              Text('iMeditații', style: s.heading(isMobile ? 18 : 20)),
-              const SizedBox(height: 6),
-              Text(
-                '© 2026 iMeditații. Pregătire pentru liceu și Bacalaureat.',
-                textAlign: TextAlign.center,
-                style: s.muted(isMobile ? 12.5 : 14),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
+  Widget _retroFooter(bool isMobile) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 26 : 44),
@@ -604,55 +726,130 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Center(
         child: Column(
           children: [
-            Text(
-              'IMEDITATII // GUILD',
-              style: TextStyle(fontSize: isMobile ? 22 : 32, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0),
-            ),
+            Text('IMEDITATII // GUILD',
+                style: TextStyle(fontSize: isMobile ? 22 : 32, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
             const SizedBox(height: 6),
-            Text(
-              'SYSTEM LOG: LEVEL UP YOUR LEARNING IN 2026.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 11 : 14, fontWeight: FontWeight.bold),
-            ),
+            Text('SYSTEM LOG: LEVEL UP YOUR LEARNING IN 2026.', textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, fontSize: isMobile ? 11 : 14, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
     );
   }
+}
+
+// =============================================================================
+// pbinfo-style news post (collapsible)
+// =============================================================================
+class _PbPost extends StatefulWidget {
+  final String title;
+  final String author;
+  final String date;
+  final String body;
+  final String linkText;
+  final VoidCallback onLink;
+
+  const _PbPost({
+    required this.title,
+    required this.author,
+    required this.date,
+    required this.body,
+    required this.linkText,
+    required this.onLink,
+  });
+
+  @override
+  State<_PbPost> createState() => _PbPostState();
+}
+
+class _PbPostState extends State<_PbPost> {
+  bool _open = true;
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 880;
+    final line = Container(height: 1, color: Pb.border);
+    final metaStyle = TextStyle(fontSize: 14, color: Pb.text);
 
-    return StyleBuilder(
-      builder: (context, s) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: Scrollbar(
-                  controller: _scrollController,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    physics: const ClampingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        _buildHeroSection(s, isMobile),
-                        _buildPathsSection(s, isMobile),
-                        _buildMastersSection(s, isMobile),
-                        SizedBox(height: isMobile ? 14 : 28),
-                        _buildFooter(s, isMobile),
-                      ],
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            color: Pb.cardHeader,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _open = !_open),
+                    child: AnimatedRotation(
+                      turns: _open ? 0 : -0.25,
+                      duration: const Duration(milliseconds: 150),
+                      child: Icon(Icons.expand_circle_down, size: 26, color: Pb.text),
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 10),
+                Expanded(child: PbLink(text: widget.title, onTap: widget.onLink, fontSize: 24)),
+              ],
+            ),
           ),
-        );
-      },
+          line,
+          Container(
+            color: Pb.postMeta,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                Text('Postat de', style: metaStyle),
+                CircleAvatar(
+                  radius: 10,
+                  backgroundColor: Pb.secondary,
+                  child: Text(widget.author.isNotEmpty ? widget.author[0] : 'A',
+                      style: const TextStyle(fontSize: 11, color: Colors.white)),
+                ),
+                Text(widget.author, style: metaStyle.copyWith(color: Pb.link, fontWeight: FontWeight.w700)),
+                Text('•', style: metaStyle),
+                Icon(Icons.event, size: 15, color: Pb.text),
+                Text(widget.date, style: metaStyle.copyWith(fontWeight: FontWeight.w700)),
+              ],
+            ),
+          ),
+          if (_open) ...[
+            line,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.body, style: Pb.body(16)),
+                  const SizedBox(height: 16),
+                  PbLink(text: widget.linkText, onTap: widget.onLink, underline: true),
+                ],
+              ),
+            ),
+            line,
+            Container(
+              color: Pb.cardHeader,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.event, size: 15, color: Pb.text),
+                  const SizedBox(width: 4),
+                  Text(widget.date, style: metaStyle.copyWith(fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

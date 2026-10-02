@@ -5,22 +5,21 @@ import 'app_colors.dart';
 import 'theme_manager.dart';
 
 // =============================================================================
-// DESIGN SYSTEM
-// The ONLY place where Retro vs Clean is decided. Every token keeps both
-// variants side by side, so one tweak here propagates to every screen.
-// AppColors is never touched: Clean only derives tints/hairlines from it.
+// STYLE SWITCH
+// Retro keeps AppColors + VT323 exactly as before.
+// Clean is a separate design language (pbinfo / Bootstrap): own palette [Pb],
+// own font (Ubuntu), own components (Pb* in ui_components.dart) and its own
+// screen layouts. AppColors is never touched.
 // =============================================================================
-
 class AppStyle {
   final bool isClean;
   final bool isDark;
 
   const AppStyle._(this.isClean, this.isDark);
 
-  /// Static access (same pattern as AppColors).
   static AppStyle get current => AppStyle._(ThemeManager.isClean, AppColors.isDark);
 
-  /// Same tokens + registers a rebuild dependency on [AppStyleScope].
+  /// Same as [current] + rebuild dependency on [AppStyleScope].
   static AppStyle of(BuildContext context) {
     context.dependOnInheritedWidgetOfExactType<_AppStyleInherited>();
     return current;
@@ -28,274 +27,115 @@ class AppStyle {
 
   bool get isRetro => !isClean;
 
-  /// `s.pick(retroValue, cleanValue)` — use for copy, icons, sizes.
   T pick<T>(T retro, T clean) => isClean ? clean : retro;
 
-  /// Retro shouts in caps, Clean keeps text as written.
-  String caps(String text) => isClean ? text : text.toUpperCase();
+  /// Clean font. Used by main.dart (getTextTheme).
+  static TextTheme cleanTextTheme(TextTheme base) => GoogleFonts.ubuntuTextTheme(base);
 
-  /// "CALCUL INTEGRAL" -> "Calcul integral" (only touches all-caps strings).
+  /// "CALCUL INTEGRAL" -> "Calcul integral". Leaves mixed-case text alone.
   static String sentence(String t) {
-    final trimmed = t.trim();
-    if (trimmed.isEmpty || trimmed != trimmed.toUpperCase()) return trimmed;
-    final lower = trimmed.toLowerCase();
+    final s = t.trim();
+    if (s.isEmpty || s != s.toUpperCase() || s == s.toLowerCase()) return s;
+    final lower = s.toLowerCase();
     return lower[0].toUpperCase() + lower.substring(1);
   }
 
-  // ---------------------------------------------------------------------------
-  // COLORS (derived only — no new palette)
-  // ---------------------------------------------------------------------------
-  static const Color codeBg = Color(0xFF1B242B);
-  static const Color codeGutter = Color(0xFF131A1F);
-  static const Color codeGutterLine = Color(0xFF2C3E50);
-  static const Color codeText = Color(0xFFECEFF4);
-  static const Color codeMuted = Color(0xFF636E72);
-  static const Color codeAccent = Color(0xFF55EFC4);
-
-  /// Structural line: hairline (Clean) / ink outline (Retro).
-  Color get line => isClean
-      ? (isDark ? Colors.white.withOpacity(0.08) : AppColors.ink.withOpacity(0.10))
-      : AppColors.border;
-
-  Color get lineStrong => isClean
-      ? (isDark ? Colors.white.withOpacity(0.16) : AppColors.ink.withOpacity(0.20))
-      : AppColors.border;
-
-  /// Recessed area inside a card (spec labels, progress tracks, tables).
-  Color get inset => isClean ? AppColors.bg : AppColors.cloud;
-
-  /// Hero / feature fill.
-  Color get heroBg => isClean ? AppColors.cardBg : AppColors.mustard;
-
-  /// Text on [heroBg].
-  Color get heroInk => isClean ? AppColors.ink : (isDark ? const Color(0xFF10161A) : AppColors.ink);
-
-  /// Text on a solid AppColors.ink fill (ink flips with light/dark).
-  Color get onInk => isDark ? const Color(0xFF10161A) : Colors.white;
-
-  /// Main call-to-action: Retro keeps the per-button accent, Clean uses ink.
-  Color primaryFill(Color retro) => isClean ? AppColors.ink : retro;
-  Color primaryText(Color retro) => isClean ? onInk : retro;
-
-  Color tint(Color c) => c.withOpacity(isDark ? 0.18 : 0.11);
-
-  Color accentText(Color c) =>
-      isDark ? Color.lerp(c, Colors.white, 0.22)! : Color.lerp(c, Colors.black, 0.32)!;
-
-  bool isSurface(Color c) =>
-      c == AppColors.cardBg || c == AppColors.cloud || c == AppColors.bg || c == AppColors.inputBg;
-
-  /// Clean drops the loud block fills (mustard / beige) to plain surfaces.
-  Color surfaceFor(Color requested) {
-    if (isRetro) return requested;
-    if (requested == AppColors.mustard ||
-        requested == AppColors.cloud ||
-        requested == AppColors.headerBg) {
-      return AppColors.cardBg;
-    }
-    return requested;
-  }
-
-  Color buttonFill(Color requested) {
-    if (isRetro) return requested;
-    if (requested == AppColors.mustard || requested == AppColors.cloud) return AppColors.cardBg;
-    return requested;
-  }
-
-  // ---------------------------------------------------------------------------
-  // SHAPE
-  // ---------------------------------------------------------------------------
-  BorderRadius get rCard => BorderRadius.circular(isClean ? 12 : 0);
-  BorderRadius get rButton => BorderRadius.circular(isClean ? 8 : 0);
-  BorderRadius get rInset => BorderRadius.circular(isClean ? 8 : 0);
-  BorderRadius get rChip => BorderRadius.circular(isClean ? 6 : 0);
-  BorderRadius get rTile => BorderRadius.circular(isClean ? 12 : 0);
-
-  // ---------------------------------------------------------------------------
-  // ELEVATION
-  // ---------------------------------------------------------------------------
-  List<BoxShadow> hardShadow(double offset) => [
+  static List<BoxShadow> hardShadow(double offset) => [
         BoxShadow(color: AppColors.shadow, offset: Offset(offset, offset), blurRadius: 0),
       ];
-
-  List<BoxShadow> softShadow([int level = 1]) {
-    final a = isDark ? 0.32 : 0.045;
-    switch (level) {
-      case 0:
-        return const [];
-      case 1:
-        return [
-          BoxShadow(color: Colors.black.withOpacity(a), blurRadius: 2, offset: const Offset(0, 1)),
-          BoxShadow(color: Colors.black.withOpacity(a * 0.9), blurRadius: 14, offset: const Offset(0, 4)),
-        ];
-      default:
-        return [
-          BoxShadow(color: Colors.black.withOpacity(a * 1.3), blurRadius: 4, offset: const Offset(0, 2)),
-          BoxShadow(color: Colors.black.withOpacity(a * 1.3), blurRadius: 28, offset: const Offset(0, 12)),
-        ];
-    }
-  }
-
-  List<BoxShadow> shadow({double retroOffset = 4, int cleanLevel = 1}) =>
-      isClean ? softShadow(cleanLevel) : hardShadow(retroOffset);
-
-  // ---------------------------------------------------------------------------
-  // DECORATIONS
-  // ---------------------------------------------------------------------------
-  BoxDecoration card({Color? bg, double retroShadow = 6, Color? retroBorder, int cleanLevel = 1}) {
-    final color = bg ?? AppColors.cardBg;
-    if (isClean) {
-      return BoxDecoration(
-        color: color,
-        borderRadius: rCard,
-        border: Border.all(color: line, width: 1),
-        boxShadow: softShadow(cleanLevel),
-      );
-    }
-    return BoxDecoration(
-      color: color,
-      border: Border.all(color: retroBorder ?? AppColors.border, width: 3),
-      boxShadow: hardShadow(retroShadow),
-    );
-  }
-
-  BoxDecoration insetBox({Color? bg, double retroBorder = 2}) => BoxDecoration(
-        color: bg ?? inset,
-        borderRadius: rInset,
-        border: Border.all(color: isClean ? line : AppColors.border, width: isClean ? 1 : retroBorder),
-      );
-
-  BoxDecoration button({required Color bg, bool pressed = false, bool hovered = false}) {
-    if (isClean) {
-      final surface = isSurface(bg);
-      final target = surface ? AppColors.ink : (isDark ? Colors.white : Colors.black);
-      var fill = bg;
-      if (pressed) {
-        fill = Color.lerp(bg, target, surface ? 0.09 : 0.16)!;
-      } else if (hovered) {
-        fill = Color.lerp(bg, target, surface ? 0.05 : 0.09)!;
-      }
-      return BoxDecoration(
-        color: fill,
-        borderRadius: rButton,
-        border: Border.all(color: surface ? lineStrong : Colors.transparent, width: 1),
-        boxShadow: pressed
-            ? const []
-            : [BoxShadow(color: Colors.black.withOpacity(isDark ? 0.25 : 0.06), blurRadius: 2, offset: const Offset(0, 1))],
-      );
-    }
-    return BoxDecoration(
-      color: bg,
-      border: Border.all(color: AppColors.border, width: 2.5),
-      boxShadow: [
-        BoxShadow(color: AppColors.shadow, offset: pressed ? Offset.zero : const Offset(4, 4), blurRadius: 0),
-      ],
-    );
-  }
-
-  Matrix4 buttonTransform({required bool pressed, required bool hovered}) {
-    if (isClean) {
-      final scale = pressed ? 0.985 : 1.0;
-      return Matrix4.diagonal3Values(scale, scale, 1.0);
-    }
-    final o = pressed ? 3.0 : (hovered ? -1.5 : 0.0);
-    return Matrix4.translationValues(o, o, 0);
-  }
-
-  /// Dark code surface (editor, solution, console, lecture snippets).
-  BoxDecoration codeSurface({double retroBorder = 2.5, bool withShadow = false}) => BoxDecoration(
-        color: codeBg,
-        borderRadius: rInset,
-        border: Border.all(
-          color: isClean ? (isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.12)) : AppColors.border,
-          width: isClean ? 1 : retroBorder,
-        ),
-        boxShadow: withShadow ? (isClean ? softShadow(1) : hardShadow(3.5)) : null,
-      );
-
-  InputDecoration input({String? hint}) {
-    OutlineInputBorder b(Color c, double w) =>
-        OutlineInputBorder(borderRadius: rButton, borderSide: BorderSide(color: c, width: w));
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
-      filled: true,
-      fillColor: AppColors.inputBg,
-      contentPadding: const EdgeInsets.all(14),
-      border: b(isClean ? lineStrong : AppColors.border, isClean ? 1 : 2),
-      enabledBorder: b(isClean ? lineStrong : AppColors.border, isClean ? 1 : 2),
-      focusedBorder: b(isClean ? AppColors.sky : AppColors.border, isClean ? 1.5 : 2.5),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // TYPOGRAPHY  (font family comes from the ThemeData: VT323 / Inter)
-  // ---------------------------------------------------------------------------
-  TextStyle display(double size, {Color? color}) => TextStyle(
-        fontSize: size,
-        color: color ?? AppColors.ink,
-        fontWeight: isClean ? FontWeight.w700 : FontWeight.w900,
-        height: isClean ? 1.12 : 1.1,
-        letterSpacing: isClean ? -size * 0.025 : 1.0,
-      );
-
-  TextStyle heading(double size, {Color? color}) => TextStyle(
-        fontSize: size,
-        color: color ?? AppColors.ink,
-        fontWeight: isClean ? FontWeight.w600 : FontWeight.w900,
-        height: 1.25,
-        letterSpacing: isClean ? -size * 0.012 : 1.0,
-      );
-
-  /// Small label above content. Clean: muted, sentence case, no tracking.
-  TextStyle overline(double size, {Color? color}) => TextStyle(
-        fontSize: size,
-        color: color ?? (isClean ? AppColors.textMuted : AppColors.ink),
-        fontWeight: isClean ? FontWeight.w500 : FontWeight.w900,
-        letterSpacing: isClean ? 0 : 1.2,
-      );
-
-  TextStyle body(double size, {Color? color, double height = 1.55, FontWeight retroWeight = FontWeight.w600}) =>
-      TextStyle(
-        fontSize: size,
-        color: color ?? AppColors.ink,
-        fontWeight: isClean ? FontWeight.w400 : retroWeight,
-        height: height,
-        letterSpacing: isClean ? 0 : 0.2,
-      );
-
-  TextStyle muted(double size, {double height = 1.5}) => TextStyle(
-        fontSize: size,
-        color: AppColors.textMuted,
-        fontWeight: isClean ? FontWeight.w400 : FontWeight.bold,
-        height: height,
-      );
-
-  TextStyle buttonText(Color color, double size) => isClean
-      ? TextStyle(color: color, fontSize: size - 1, fontWeight: FontWeight.w600, letterSpacing: 0)
-      : TextStyle(color: color, fontSize: size, fontWeight: FontWeight.w900, letterSpacing: 1.0);
-
-  /// Code font: JetBrains Mono in Clean, system monospace in Retro.
-  TextStyle mono(double size, {Color? color, FontWeight? weight, double? height}) {
-    final base = TextStyle(
-      fontSize: size,
-      color: color,
-      height: height,
-      fontWeight: weight ?? (isClean ? FontWeight.w400 : FontWeight.w600),
-    );
-    return isClean ? GoogleFonts.jetBrainsMono(textStyle: base) : base.copyWith(fontFamily: 'monospace');
-  }
 }
 
-extension AppStyleContext on BuildContext {
-  AppStyle get ds => AppStyle.of(this);
+// =============================================================================
+// Pb — CLEAN PALETTE (pbinfo / Bootstrap 5). Light + dark variants.
+// Tweak the Clean look here; every Pb* component and clean layout reads it.
+// =============================================================================
+class Pb {
+  static bool get _d => AppColors.isDark;
+
+  // Layout
+  static const double containerMax = 1296;
+  static const BorderRadius radius = BorderRadius.all(Radius.circular(6));
+
+  // Surfaces
+  static Color get page => _d ? const Color(0xFF212529) : Colors.white;
+  static Color get surface => _d ? const Color(0xFF2B3035) : Colors.white;
+  static Color get cardHeader => _d ? const Color(0xFF343A40) : const Color(0xFFF7F7F7);
+  static Color get gray => _d ? const Color(0xFF343A40) : const Color(0xFFE9ECEF);
+  static Color get hoverBg => _d ? const Color(0xFF343A40) : const Color(0xFFF8F9FA);
+  static Color get tableStripe => _d ? const Color(0xFF30353B) : const Color(0xFFF2F2F2);
+  static Color get border => _d ? const Color(0xFF495057) : const Color(0xFFDEE2E6);
+  static Color get inputBorder => _d ? const Color(0xFF495057) : const Color(0xFFCED4DA);
+
+  // Text
+  static Color get text => _d ? const Color(0xFFDEE2E6) : const Color(0xFF212529);
+  static Color get muted => _d ? const Color(0xFFADB5BD) : const Color(0xFF6C757D);
+  static Color get link => _d ? const Color(0xFF6EA8FE) : const Color(0xFF0D6EFD);
+
+  /// Orange statement headings ("Cerința", "Exemplu").
+  static Color get heading => _d ? const Color(0xFFF5A04A) : const Color(0xFFF0861E);
+  static Color get inlineCode => _d ? const Color(0xFFE685B5) : const Color(0xFFD63384);
+
+  // Chrome
+  static Color get navbar => _d ? const Color(0xFF1A1D20) : const Color(0xFF343A40);
+  static Color get hero => _d ? const Color(0xFF1F4F7D) : const Color(0xFF3C87C8);
+  static Color get infoStrip => _d ? const Color(0xFF087990) : const Color(0xFF0DCAF0);
+  static Color get infoStripText => _d ? Colors.white : const Color(0xFF062C33);
+  static Color get postMeta => _d ? const Color(0xFF032830) : const Color(0xFFCFF4FC);
+
+  // Code
+  static Color get codeBg => _d ? const Color(0xFF1E2226) : const Color(0xFFF8F9FA);
+  static Color get editorBg => _d ? const Color(0xFF1E2226) : Colors.white;
+  static Color get editorGutter => _d ? const Color(0xFF25292E) : const Color(0xFFF0F0F0);
+  static Color get editorActiveLine => _d ? const Color(0xFF343A40) : const Color(0xFFDCDCDC);
+
+  // Semantic (Bootstrap)
+  static const Color primary = Color(0xFF0D6EFD);
+  static const Color secondary = Color(0xFF6C757D);
+  static const Color success = Color(0xFF198754);
+  static const Color danger = Color(0xFFDC3545);
+
+  static Color get successBg => _d ? const Color(0xFF051B11) : const Color(0xFFD1E7DD);
+  static Color get successText => _d ? const Color(0xFF75B798) : const Color(0xFF0F5132);
+  static Color get successBorder => _d ? const Color(0xFF0F5132) : const Color(0xFFBADBCC);
+  static Color get dangerBg => _d ? const Color(0xFF2C0B0E) : const Color(0xFFF8D7DA);
+  static Color get dangerText => _d ? const Color(0xFFEA868F) : const Color(0xFF842029);
+  static Color get dangerBorder => _d ? const Color(0xFF842029) : const Color(0xFFF5C2C7);
+  static Color get infoBg => _d ? const Color(0xFF032830) : const Color(0xFFCFF4FC);
+  static Color get infoText => _d ? const Color(0xFF6EDFF6) : const Color(0xFF055160);
+  static Color get infoBorder => _d ? const Color(0xFF087990) : const Color(0xFFB6EFFB);
+  static Color get warningBg => _d ? const Color(0xFF332701) : const Color(0xFFFFF3CD);
+  static Color get warningText => _d ? const Color(0xFFFFDA6A) : const Color(0xFF664D03);
+  static Color get warningBorder => _d ? const Color(0xFF997404) : const Color(0xFFFFECB5);
+  static Color get secondaryBg => _d ? const Color(0xFF343A40) : const Color(0xFFE2E3E5);
+  static Color get secondaryText => _d ? const Color(0xFFDEE2E6) : const Color(0xFF41464B);
+  static Color get secondaryBorder => _d ? const Color(0xFF495057) : const Color(0xFFD3D6D8);
+
+  // Type helpers (font family comes from the theme: Ubuntu)
+  static TextStyle body([double size = 16]) => TextStyle(fontSize: size, color: text, height: 1.6);
+
+  static TextStyle mono(double size, {Color? color, double height = 1.5}) =>
+      GoogleFonts.sourceCodePro(fontSize: size, color: color ?? text, height: height);
+
+  static InputDecoration input({String? hint}) {
+    OutlineInputBorder b(Color c) => OutlineInputBorder(borderRadius: radius, borderSide: BorderSide(color: c));
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: muted, fontSize: 16),
+      filled: true,
+      fillColor: surface,
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      border: b(inputBorder),
+      enabledBorder: b(inputBorder),
+      focusedBorder: b(const Color(0xFF86B7FE)),
+    );
+  }
 }
 
 // =============================================================================
 // SCOPE — mount once in MaterialApp.builder.
-// AppColors / ThemeManager are static getters (not context-bound), so a style
-// or theme change marks the whole subtree dirty once. State (scroll positions,
-// editor text, form input) is preserved; nothing is remounted.
+// AppColors / ThemeManager are static getters, so a toggle marks the whole
+// subtree dirty once. State (scroll, editor text, inputs) is preserved.
 // =============================================================================
 class AppStyleScope extends StatefulWidget {
   final Widget child;

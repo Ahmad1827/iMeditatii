@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'custom_navbar.dart';
 import 'resources_data.dart';
 import 'ui_components.dart';
 
@@ -19,141 +20,366 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   final Map<int, GlobalKey> _sectionKeys = {};
 
-  static const Map<String, String> _langLabels = {'cpp': 'C++', 'python': 'Python', 'code': 'Cod'};
-
-  void _copyToClipboard(String code) {
-    final s = AppStyle.current;
-    Clipboard.setData(ClipboardData(text: code));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          s.pick("COD COPIAT ÎN CLIPBOARD!", "Codul a fost copiat."),
-          style: TextStyle(fontWeight: s.pick(FontWeight.bold, FontWeight.w500), color: Colors.white),
-        ),
-        backgroundColor: s.pick(AppColors.forest, AppStyle.codeBg),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: s.rButton,
-          side: s.isClean ? BorderSide.none : BorderSide(color: AppColors.border, width: 2),
-        ),
-      ),
-    );
-  }
-
-  void _scrollToSection(int index) {
-    final key = _sectionKeys[index];
-    if (key != null && key.currentContext != null) {
-      Scrollable.ensureVisible(
-        key.currentContext!,
-        duration: const Duration(milliseconds: 320),
-        curve: Curves.easeInOutCubic,
-        alignment: 0.08,
-      );
-    }
-  }
-
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
+  void _copyToClipboard(String code) {
+    Clipboard.setData(ClipboardData(text: code));
+    final clean = AppStyle.current.isClean;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          clean ? 'Codul a fost copiat.' : 'COD COPIAT ÎN CLIPBOARD!',
+          style: TextStyle(fontWeight: clean ? FontWeight.w400 : FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: clean ? const Color(0xFF212529) : AppColors.forest,
+        behavior: SnackBarBehavior.floating,
+        shape: clean
+            ? const RoundedRectangleBorder(borderRadius: Pb.radius)
+            : RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 2)),
+      ),
+    );
+  }
+
+  void _scrollToSection(int index) {
+    final key = _sectionKeys[index];
+    if (key?.currentContext != null) {
+      Scrollable.ensureVisible(
+        key!.currentContext!,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeInOutCubic,
+        alignment: 0.05,
+      );
+    }
+  }
+
   Map<String, dynamic>? _getArticleData() {
-    // 1. Direct match in curated high-depth lecture dictionary
     if (ResourcesData.curatedLectures.containsKey(widget.articleId)) {
       return ResourcesData.curatedLectures[widget.articleId];
     }
 
-    // 2. Fallback: structured generation from curriculum catalog
-    final meta = ResourcesData.allArticles.firstWhere(
-      (a) => a['id'] == widget.articleId,
-      orElse: () => {},
-    );
+    final meta = ResourcesData.allArticles.firstWhere((a) => a['id'] == widget.articleId, orElse: () => {});
+    if (meta.isEmpty) return null;
 
-    if (meta.isNotEmpty) {
-      final bool isMath = meta['subject'] == 'MATEMATICĂ';
-
-      return {
-        "tag": "${meta['subject']} // CLASA A ${meta['grade']}-A // ${meta['module']}",
-        "title": meta['title'],
-        "subtitle": meta['desc'],
-        "author": meta['author'] ?? ResourcesData.defaultAuthor,
-        "date": meta['date'] ?? ResourcesData.defaultDate,
-        "sections": [
-          {
-            "heading": "1. Concepte Fundamentale & Teorie",
-            "text": "${meta['desc']}\n\nConform programei oficiale pentru clasa a ${meta['grade']}-a, aprofundarea acestui subiect dezvoltă raționamentul logic și pregătirea pentru examenele naționale. În această etapă de învățare, este vital să stăpânești terminologia de bază și structurile standard de rezolvare.",
-          },
-          {
-            "heading": "2. Analiză Detaliată & Aplicații Practice",
-            "text": isMath
-                ? "În matematică, fiecare pas al deducției trebuie argumentat riguros:\n• Pasul 1: Identificarea ipotezei și stabilirea domeniului de definiție.\n• Pasul 2: Aplicarea formulelor fundamentale și a teoremelor specifice.\n• Pasul 3: Verificarea soluțiilor obținute și eliminarea soluțiilor străine."
-                : "În programare, implementarea corectă presupune respectarea normelor de eficiență algoritmică (atât ca timp de execuție, cât și ca memorie utilizată) și lizibilitatea codului.",
-            "code": isMath
-                ? null
-                : meta['subject'] == 'PYTHON'
-                    ? "# Exemplu de implementare în Python\ndef rezolvare_problema():\n    print(\"--- Execuție algoritm: ${meta['title']} ---\")\n    # Scrie logica de rezolvare aici\n    valoare = 100\n    return valoare * 2\n\nrezultat = rezolvare_problema()\nprint(f\"Rezultat calculat: {rezultat}\")"
-                    : "// Exemplu de implementare în C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"--- Studiu: ${meta['title']} ---\" << endl;\n    // Logica specifică algoritmului\n    int valoare = 100;\n    cout << \"Rezultat calculat: \" << valoare * 2 << \"\\n\";\n    return 0;\n}",
-            "lang": isMath ? null : (meta['subject'] == 'PYTHON' ? 'python' : 'cpp'),
-          },
-          {
-            "heading": "3. Recomandări & Sinteză de Examen",
-            "text": "Pentru a reține pe termen lung aceste cunoștințe, nu te baza doar pe memorarea formulelor. Încearcă să le deduci singur și rezolvă probleme similare din lista noastră de exerciții.",
-            "callout": isMath
-                ? "REGULĂ DE AUR LA MATEMATICĂ:\nScrie întotdeauna formulele în forma lor generală înainte de a înlocui valorile numerice! La corectură se acordă punctaj parțial pentru cunoașterea teoriei, chiar dacă intervine o greșeală minoră de calcul aritmetic."
-                : "SFAT PENTRU COD:\nTestează întotdeauna codul pe cazuri particulare (valori de frontieră): numere negative, valoarea zero sau tablouri cu un singur element!"
-          }
-        ]
-      };
-    }
-
-    return null;
+    final bool isMath = meta['subject'] == 'MATEMATICĂ';
+    return {
+      "tag": "${meta['subject']} // CLASA A ${meta['grade']}-A // ${meta['module']}",
+      "title": meta['title'],
+      "subtitle": meta['desc'],
+      "author": meta['author'] ?? ResourcesData.defaultAuthor,
+      "date": meta['date'] ?? ResourcesData.defaultDate,
+      "sections": [
+        {
+          "heading": "1. Concepte Fundamentale & Teorie",
+          "text": "${meta['desc']}\n\nConform programei oficiale pentru clasa a ${meta['grade']}-a, aprofundarea acestui subiect dezvoltă raționamentul logic și pregătirea pentru examenele naționale. În această etapă de învățare, este vital să stăpânești terminologia de bază și structurile standard de rezolvare.",
+        },
+        {
+          "heading": "2. Analiză Detaliată & Aplicații Practice",
+          "text": isMath
+              ? "În matematică, fiecare pas al deducției trebuie argumentat riguros:\n• Pasul 1: Identificarea ipotezei și stabilirea domeniului de definiție.\n• Pasul 2: Aplicarea formulelor fundamentale și a teoremelor specifice.\n• Pasul 3: Verificarea soluțiilor obținute și eliminarea soluțiilor străine."
+              : "În programare, implementarea corectă presupune respectarea normelor de eficiență algoritmică (atât ca timp de execuție, cât și ca memorie utilizată) și lizibilitatea codului.",
+          "code": isMath
+              ? null
+              : meta['subject'] == 'PYTHON'
+                  ? "# Exemplu de implementare în Python\ndef rezolvare_problema():\n    print(\"--- Execuție algoritm: ${meta['title']} ---\")\n    # Scrie logica de rezolvare aici\n    valoare = 100\n    return valoare * 2\n\nrezultat = rezolvare_problema()\nprint(f\"Rezultat calculat: {rezultat}\")"
+                  : "// Exemplu de implementare în C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"--- Studiu: ${meta['title']} ---\" << endl;\n    // Logica specifică algoritmului\n    int valoare = 100;\n    cout << \"Rezultat calculat: \" << valoare * 2 << \"\\n\";\n    return 0;\n}",
+          "lang": isMath ? null : (meta['subject'] == 'PYTHON' ? 'python' : 'cpp'),
+        },
+        {
+          "heading": "3. Recomandări & Sinteză de Examen",
+          "text": "Pentru a reține pe termen lung aceste cunoștințe, nu te baza doar pe memorarea formulelor. Încearcă să le deduci singur și rezolvă probleme similare din lista noastră de exerciții.",
+          "callout": isMath
+              ? "REGULĂ DE AUR LA MATEMATICĂ:\nScrie întotdeauna formulele în forma lor generală înainte de a înlocui valorile numerice! La corectură se acordă punctaj parțial pentru cunoașterea teoriei, chiar dacă intervine o greșeală minoră de calcul aritmetic."
+              : "SFAT PENTRU COD:\nTestează întotdeauna codul pe cazuri particulare (valori de frontieră): numere negative, valoarea zero sau tablouri cu un singur element!"
+        }
+      ]
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 900;
     final lecture = _getArticleData();
 
     return StyleBuilder(
       builder: (context, s) {
-        if (lecture == null) {
-          return FutureBuilder<DocumentSnapshot>(
-            future: FirebaseFirestore.instance.collection('resources').doc(widget.articleId).get(),
-            builder: (context, snap) {
-              if (snap.connectionState == ConnectionState.waiting) {
+        final width = MediaQuery.of(context).size.width;
+        Widget render(Map<String, dynamic> data) =>
+            s.isClean ? _buildClean(data, width < 900) : _buildRetro(data, width < 900);
+
+        if (lecture != null) return render(lecture);
+
+        return FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance.collection('resources').doc(widget.articleId).get(),
+          builder: (context, snap) {
+            if (snap.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                backgroundColor: s.isClean ? Pb.page : AppColors.bg,
+                body: Center(child: CircularProgressIndicator(color: s.isClean ? Pb.primary : AppColors.sunset)),
+              );
+            }
+            if (!snap.hasData || !snap.data!.exists) {
+              if (s.isClean) {
                 return Scaffold(
-                  backgroundColor: AppColors.bg,
-                  body: Center(child: CircularProgressIndicator(color: s.pick(AppColors.sunset, AppColors.sky))),
-                );
-              }
-              if (!snap.hasData || !snap.data!.exists) {
-                return Scaffold(
-                  backgroundColor: AppColors.bg,
-                  appBar: AppBar(backgroundColor: AppColors.bg, elevation: 0, iconTheme: IconThemeData(color: AppColors.ink)),
-                  body: Center(
-                    child: Text(s.pick("LECȚIE NEIDENTIFICATĂ ÎN CODEX.", "Lecția nu a fost găsită."), style: s.heading(18)),
+                  backgroundColor: Pb.page,
+                  body: Column(
+                    children: [
+                      const CustomNavbar(),
+                      const SizedBox(height: 24),
+                      PbContainer(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const PbAlert(type: PbAlertType.danger, text: 'Lecția nu a fost găsită.'),
+                            const SizedBox(height: 12),
+                            PbLink(text: 'Înapoi la lecții', underline: true, onTap: () => context.go('/resurse')),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }
-
-              final data = snap.data!.data() as Map<String, dynamic>;
-              return _buildScreenBody(s, data, isMobile);
-            },
-          );
-        }
-
-        return _buildScreenBody(s, lecture, isMobile);
+              return Scaffold(
+                backgroundColor: AppColors.bg,
+                appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: IconThemeData(color: AppColors.ink)),
+                body: Center(
+                  child: Text("LECȚIE NEIDENTIFICATĂ ÎN CODEX.",
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink)),
+                ),
+              );
+            }
+            return render(snap.data!.data() as Map<String, dynamic>);
+          },
+        );
       },
     );
   }
 
-  Widget _buildScreenBody(AppStyle s, Map<String, dynamic> data, bool isMobile) {
-    final List<dynamic> sections = data['sections'] ?? [];
-
+  void _ensureKeys(List<dynamic> sections) {
     for (int i = 0; i < sections.length; i++) {
       _sectionKeys.putIfAbsent(i, () => GlobalKey());
     }
+  }
+
+  // ===========================================================================
+  // CLEAN — pbinfo-style article
+  // ===========================================================================
+  Widget _buildClean(Map<String, dynamic> data, bool isMobile) {
+    final List<dynamic> sections = data['sections'] ?? [];
+    _ensureKeys(sections);
+
+    final tagParts = (data['tag']?.toString() ?? '')
+        .split('//')
+        .map(AppStyle.sentence)
+        .where((p) => p.isNotEmpty)
+        .toList();
+    final title = data['title']?.toString() ?? 'Lecție';
+
+    final toc = PbCard(
+      title: 'Cuprins',
+      padding: EdgeInsets.zero,
+      child: PbListGroup(
+        flush: true,
+        items: [
+          for (var i = 0; i < sections.length; i++)
+            PbListItem(
+              (sections[i]['heading']?.toString() ?? 'Secțiunea ${i + 1}').replaceFirst(RegExp(r'^\d+\.\s*'), ''),
+              onTap: () => _scrollToSection(i),
+            ),
+        ],
+      ),
+    );
+
+    final practice = PbCard(
+      title: 'Exersează',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Rezolvă probleme pe aceeași temă, evaluate automat.', style: TextStyle(color: Pb.muted, fontSize: 15, height: 1.5)),
+          const SizedBox(height: 12),
+          PbButton(text: 'Deschide problemele', fullWidth: true, onPressed: () => context.go('/exercitii')),
+        ],
+      ),
+    );
+
+    final article = _cleanArticle(data, sections, tagParts, title, isMobile, mobileToc: isMobile ? toc : null);
+
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: PbContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+                        child: PbBreadcrumb(items: [
+                          PbCrumb('Lecții', () => context.go('/resurse')),
+                          if (tagParts.isNotEmpty) PbCrumb(tagParts.first, () => context.go('/resurse')),
+                          if (tagParts.length > 1) PbCrumb(tagParts[1], () => context.go('/resurse')),
+                          PbCrumb(title),
+                        ]),
+                      ),
+                      const SizedBox(height: 24),
+                      if (isMobile) ...[
+                        article,
+                        const SizedBox(height: 24),
+                        practice,
+                      ] else
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: article),
+                            const SizedBox(width: 28),
+                            SizedBox(
+                              width: 320,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [toc, const SizedBox(height: 20), practice],
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cleanArticle(
+    Map<String, dynamic> data,
+    List<dynamic> sections,
+    List<String> tagParts,
+    String title,
+    bool isMobile, {
+    Widget? mobileToc,
+  }) {
+    final author = data['author']?.toString() ?? ResourcesData.defaultAuthor;
+    final date = data['date']?.toString() ?? ResourcesData.defaultDate;
+    final meta = TextStyle(fontSize: 14, color: Pb.text);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(title, style: TextStyle(fontSize: isMobile ? 28 : 38, color: Pb.text, height: 1.2)),
+        const SizedBox(height: 10),
+        Text(
+          data['subtitle']?.toString() ?? '',
+          style: TextStyle(fontSize: isMobile ? 17 : 20, color: Pb.muted, fontWeight: FontWeight.w300, height: 1.45),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(color: Pb.postMeta, borderRadius: Pb.radius),
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6,
+            runSpacing: 4,
+            children: [
+              Text('Scris de', style: meta),
+              CircleAvatar(
+                radius: 10,
+                backgroundColor: Pb.secondary,
+                child: Text(author.isNotEmpty ? author[0] : 'A', style: const TextStyle(fontSize: 11, color: Colors.white)),
+              ),
+              Text(author, style: meta.copyWith(color: Pb.link, fontWeight: FontWeight.w700)),
+              Text('•', style: meta),
+              Icon(Icons.event, size: 15, color: Pb.text),
+              Text(date, style: meta.copyWith(fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ),
+        if (tagParts.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [for (final t in tagParts) PbBadge(text: t, fontSize: 12.5)],
+          ),
+        ],
+        if (mobileToc != null) ...[const SizedBox(height: 20), mobileToc],
+        const SizedBox(height: 8),
+        ...List.generate(sections.length, (i) {
+          final sec = sections[i];
+          final heading = (sec['heading']?.toString() ?? '').replaceFirst(RegExp(r'^\d+\.\s*'), '');
+          final text = sec['text']?.toString() ?? '';
+          final code = sec['code']?.toString();
+          final lang = sec['lang']?.toString() ?? 'cpp';
+          final callout = sec['callout']?.toString();
+
+          return Container(
+            key: _sectionKeys[i],
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (heading.isNotEmpty) PbHeading(heading, size: isMobile ? 24 : 28),
+                if (text.isNotEmpty) PbRichText(text, fontSize: isMobile ? 16 : 17, height: 1.7),
+                if (code != null && code.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  PbCodeBlock(code: code, lang: lang, onCopy: () => _copyToClipboard(code)),
+                ],
+                if (callout != null && callout.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  _cleanCallout(callout),
+                ],
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  /// "TITLU:\ncorp" -> bold sentence-case title + body, as a Bootstrap warning alert.
+  Widget _cleanCallout(String raw) {
+    String? title;
+    var body = raw;
+    final nl = raw.indexOf('\n');
+    if (nl > 0 && raw.substring(0, nl).trim().endsWith(':')) {
+      final first = raw.substring(0, nl).trim();
+      title = AppStyle.sentence(first.substring(0, first.length - 1));
+      body = raw.substring(nl + 1).trim();
+    }
+    return PbAlert(
+      type: PbAlertType.warning,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16.5)),
+            const SizedBox(height: 4),
+          ],
+          PbRichText(body, fontSize: 16, height: 1.6, color: Pb.warningText),
+        ],
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
+  Widget _buildRetro(Map<String, dynamic> data, bool isMobile) {
+    final List<dynamic> sections = data['sections'] ?? [];
+    _ensureKeys(sections);
 
     final String author = data['author'] ?? ResourcesData.defaultAuthor;
     final String date = data['date'] ?? ResourcesData.defaultDate;
@@ -161,22 +387,15 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: Text(
-          s.pick("CODEX // LECȚIE", "Lecții"),
-          style: s.isClean
-              ? TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600, fontSize: isMobile ? 15 : 16)
-              : TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: isMobile ? 15 : 18),
-        ),
-        backgroundColor: s.pick(AppColors.bg, AppColors.cardBg),
+        title: Text("CODEX // LECȚIE",
+            style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: isMobile ? 15 : 18)),
+        backgroundColor: AppColors.bg,
         iconTheme: IconThemeData(color: AppColors.ink),
         elevation: 0,
         centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(s.isClean ? 1 : 2.5),
-          child: Container(color: s.line, height: s.isClean ? 1 : 2.5),
-        ),
+        bottom: PreferredSize(preferredSize: const Size.fromHeight(2.5), child: Container(color: AppColors.border, height: 2.5)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 22 : s.pick(28.0, 24.0)),
+          icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 22 : 28),
           onPressed: () => context.go('/resurse'),
         ),
       ),
@@ -187,17 +406,14 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
               ? SingleChildScrollView(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                  child: _buildLectureContent(s, data, sections, isMobile, author, date),
+                  child: _retroContent(data, sections, isMobile, author, date),
                 )
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
                       width: 290,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 28),
-                        child: _buildTableOfContents(s, sections),
-                      ),
+                      child: Padding(padding: const EdgeInsets.symmetric(vertical: 28), child: _retroToc(sections)),
                     ),
                     const SizedBox(width: 28),
                     Expanded(
@@ -206,16 +422,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 8),
-                          child: s.isClean
-                              // Clean keeps a readable line length.
-                              ? Align(
-                                  alignment: Alignment.topLeft,
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 760),
-                                    child: _buildLectureContent(s, data, sections, isMobile, author, date),
-                                  ),
-                                )
-                              : _buildLectureContent(s, data, sections, isMobile, author, date),
+                          child: _retroContent(data, sections, isMobile, author, date),
                         ),
                       ),
                     ),
@@ -226,69 +433,13 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // TABLE OF CONTENTS
-  // ---------------------------------------------------------------------------
-  Widget _buildTableOfContents(AppStyle s, List<dynamic> sections) {
-    if (s.isClean) {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
-        decoration: s.card(cleanLevel: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text("Cuprins", style: s.heading(15)),
-            ),
-            const SizedBox(height: 10),
-            Material(
-              type: MaterialType.transparency,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: List.generate(sections.length, (i) {
-                  final raw = sections[i]['heading']?.toString() ?? "Secțiunea ${i + 1}";
-                  final label = raw.replaceFirst(RegExp(r'^\d+\.\s*'), '');
-                  return InkWell(
-                    borderRadius: s.rButton,
-                    hoverColor: AppColors.ink.withOpacity(AppColors.isDark ? 0.08 : 0.05),
-                    onTap: () => _scrollToSection(i),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: 22,
-                            child: Text("${i + 1}", style: s.muted(13.5)),
-                          ),
-                          Expanded(
-                            child: Text(
-                              label,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: AppColors.ink, height: 1.4),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
+  Widget _retroToc(List<dynamic> sections) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cloud,
         border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: s.hardShadow(4),
+        boxShadow: AppStyle.hardShadow(4),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +455,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
           const SizedBox(height: 6),
           Text("Apasă pentru salt la secțiune:", style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
           const SizedBox(height: 14),
-          const AppDivider(),
+          Container(height: 2, color: AppColors.border),
           const SizedBox(height: 14),
           ...List.generate(sections.length, (i) {
             final heading = sections[i]['heading'] ?? "Secțiunea ${i + 1}";
@@ -315,21 +466,16 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBg,
-                    border: Border.all(color: AppColors.border, width: 1.5),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 1.5)),
                   child: Row(
                     children: [
                       Icon(Icons.arrow_right, size: 18, color: AppColors.sunset),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: Text(
-                          heading,
-                          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: AppColors.ink),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        child: Text(heading,
+                            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: AppColors.ink),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis),
                       ),
                     ],
                   ),
@@ -342,272 +488,158 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // LECTURE
-  // ---------------------------------------------------------------------------
-  Widget _buildTags(AppStyle s, String? tag) {
-    if (s.isRetro) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        color: AppColors.forest,
-        child: Text(
-          tag ?? "RESURSĂ TEORETICĂ",
-          style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
-        ),
-      );
-    }
-    final parts = (tag ?? "Resursă teoretică").split('//').map(AppStyle.sentence).where((p) => p.isNotEmpty).toList();
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: [
-        for (var i = 0; i < parts.length; i++)
-          AppBadge(text: parts[i], color: i == 0 ? AppColors.forest : AppColors.sky, fontSize: 11.5),
-      ],
-    );
-  }
+  Widget _retroContent(Map<String, dynamic> data, List<dynamic> sections, bool isMobile, String author, String date) {
+    final bannerInk = AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
 
-  Widget _buildLectureContent(
-    AppStyle s,
-    Map<String, dynamic> data,
-    List<dynamic> sections,
-    bool isMobile,
-    String author,
-    String date,
-  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTags(s, data['tag']?.toString()),
-        SizedBox(height: s.pick(14.0, 16.0)),
-        Text(
-          data['title'] ?? 'Lecție',
-          style: s.display(isMobile ? s.pick(26.0, 26.0) : s.pick(38.0, 34.0)),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          color: AppColors.forest,
+          child: Text(data['tag'] ?? "RESURSĂ TEORETICĂ",
+              style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w900, letterSpacing: 1.0)),
         ),
+        const SizedBox(height: 14),
+        Text(data['title'] ?? 'LECTURE',
+            style: TextStyle(fontSize: isMobile ? 26 : 38, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.15, letterSpacing: 0.5)),
         const SizedBox(height: 8),
-        Text(
-          data['subtitle'] ?? '',
-          style: s.isClean
-              ? s.muted(isMobile ? 15 : 18, height: 1.5)
-              : TextStyle(fontSize: isMobile ? 14 : 17, color: AppColors.textMuted, fontWeight: FontWeight.bold, height: 1.45),
-        ),
+        Text(data['subtitle'] ?? '',
+            style: TextStyle(fontSize: isMobile ? 14 : 17, color: AppColors.textMuted, fontWeight: FontWeight.bold, height: 1.45)),
         const SizedBox(height: 16),
-
-        // Author & date
         Row(
           children: [
             Container(
               width: 26,
               height: 26,
-              decoration: BoxDecoration(
-                color: s.isClean ? s.tint(AppColors.sky) : AppColors.mustard,
-                border: s.isClean ? null : Border.all(color: AppColors.border, width: 1.5),
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: AppColors.mustard, border: Border.all(color: AppColors.border, width: 1.5), shape: BoxShape.circle),
               alignment: Alignment.center,
-              child: Text(
-                author.isNotEmpty ? author[0].toUpperCase() : 'A',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: s.pick(FontWeight.w900, FontWeight.w600),
-                  color: s.isClean ? s.accentText(AppColors.sky) : Colors.black,
-                ),
-              ),
+              child: Text(author.isNotEmpty ? author[0].toUpperCase() : 'A',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.black)),
             ),
             const SizedBox(width: 8),
-            Text(
-              s.pick("AUTOR: ${author.toUpperCase()}", author),
-              style: s.isClean
-                  ? TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, color: AppColors.ink)
-                  : TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.ink),
-            ),
+            Text("AUTOR: ${author.toUpperCase()}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.ink)),
             const SizedBox(width: 14),
-            Icon(s.pick(Icons.event_note, Icons.calendar_today_outlined), size: s.pick(15.0, 13.0), color: AppColors.textMuted),
-            const SizedBox(width: 5),
-            Text(date, style: s.isClean ? s.muted(13) : TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textMuted)),
+            Icon(Icons.event_note, size: 15, color: AppColors.textMuted),
+            const SizedBox(width: 4),
+            Text(date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textMuted)),
           ],
         ),
-
         const SizedBox(height: 20),
-        const AppDivider(retroThickness: 2.5),
+        Container(height: 2.5, color: AppColors.border),
         const SizedBox(height: 20),
-
         ...List.generate(sections.length, (i) {
           final sec = sections[i];
           final heading = sec['heading']?.toString() ?? '';
           final text = sec['text']?.toString() ?? '';
-          final code = sec['code'];
+          final code = sec['code']?.toString();
           final lang = sec['lang']?.toString() ?? 'code';
-          final callout = sec['callout'];
+          final callout = sec['callout']?.toString();
 
           return Container(
             key: _sectionKeys[i],
-            margin: EdgeInsets.only(bottom: s.pick(28.0, 32.0)),
+            margin: const EdgeInsets.only(bottom: 28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (heading.isNotEmpty) _buildSectionHeader(s, heading, isMobile),
-                if (text.isNotEmpty) _buildParagraph(s, text, isMobile),
-                if (code != null && code.toString().isNotEmpty) _buildCodeBlock(s, code.toString(), lang, isMobile),
-                if (callout != null && callout.toString().isNotEmpty)
+                if (heading.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: AppCallout(
-                      text: callout.toString(),
-                      color: AppColors.sunset,
-                      icon: s.isClean ? Icons.info_outline : null,
-                      fontSize: isMobile ? s.pick(14.5, 15.0) : s.pick(16.5, 16.0),
+                    padding: const EdgeInsets.only(top: 10, bottom: 12),
+                    child: Text(heading,
+                        style: TextStyle(fontSize: isMobile ? 21 : 26, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.4)),
+                  ),
+                if (text.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Text(text,
+                        style: TextStyle(
+                            fontSize: isMobile ? 16 : 18.5, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.75, letterSpacing: 0.2)),
+                  ),
+                if (code != null && code.isNotEmpty) _retroCodeBlock(code, lang, isMobile),
+                if (callout != null && callout.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.all(isMobile ? 14 : 18),
+                    decoration: BoxDecoration(
+                      color: AppColors.sunset.withOpacity(0.12),
+                      border: Border(left: BorderSide(color: AppColors.sunset, width: 4.5)),
                     ),
+                    child: Text(callout,
+                        style: TextStyle(fontSize: isMobile ? 14.5 : 16.5, fontWeight: FontWeight.bold, color: AppColors.ink, height: 1.55)),
                   ),
               ],
             ),
           );
         }),
-
         const SizedBox(height: 20),
-        _buildBottomBanner(s),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.mustard,
+            border: Border.all(color: AppColors.border, width: 2.5),
+            boxShadow: AppStyle.hardShadow(4),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("APLICĂ TEORIA ÎN PRACTICĂ", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: bannerInk)),
+              const SizedBox(height: 6),
+              Text("Fixează-ți conceptele teoretice rezolvând exercițiile interactive din arena de antrenament.",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: bannerInk)),
+              const SizedBox(height: 16),
+              RetroButton(
+                text: "DESCHIDE ARENA DE EXERCIȚII",
+                icon: Icons.play_arrow,
+                bgColor: AppColors.ink,
+                textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+                fontSize: 13,
+                onPressed: () => context.go('/exercitii'),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildBottomBanner(AppStyle s) {
-    final title = s.pick("APLICĂ TEORIA ÎN PRACTICĂ", "Exersează ce ai citit");
-    final text = s.pick(
-      "Fixează-ți conceptele teoretice rezolvând exercițiile interactive din arena de antrenament.",
-      "Rezolvă probleme pe aceeași temă. Fiecare soluție e verificată automat.",
-    );
-
-    if (s.isClean) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: s.card(cleanLevel: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: s.heading(18)),
-            const SizedBox(height: 6),
-            Text(text, style: s.muted(15)),
-            const SizedBox(height: 16),
-            RetroButton(
-              text: "Deschide exercițiile",
-              bgColor: s.primaryFill(AppColors.ink),
-              textColor: s.primaryText(Colors.white),
-              fontSize: 14,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              onPressed: () => context.go('/exercitii'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final bannerInk = AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.mustard,
-        border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: s.hardShadow(4),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: bannerInk)),
-          const SizedBox(height: 6),
-          Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: bannerInk)),
-          const SizedBox(height: 16),
-          RetroButton(
-            text: "DESCHIDE ARENA DE EXERCIȚII",
-            icon: Icons.play_arrow,
-            bgColor: AppColors.ink,
-            textColor: s.onInk,
-            fontSize: 13,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            onPressed: () => context.go('/exercitii'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(AppStyle s, String title, bool isMobile) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 12),
-      child: Text(
-        title,
-        style: s.isClean
-            ? s.heading(isMobile ? 20 : 24)
-            : TextStyle(fontSize: isMobile ? 21 : 26, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.4),
-      ),
-    );
-  }
-
-  Widget _buildParagraph(AppStyle s, String text, bool isMobile) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Text(
-        text,
-        style: s.isClean
-            ? s.body(isMobile ? 16 : 17, height: 1.75)
-            : TextStyle(fontSize: isMobile ? 16 : 18.5, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.75, letterSpacing: 0.2),
-      ),
-    );
-  }
-
-  Widget _buildCodeBlock(AppStyle s, String code, String language, bool isMobile) {
-    final label = s.pick(language.toUpperCase(), _langLabels[language] ?? language);
-
+  Widget _retroCodeBlock(String code, String language, bool isMobile) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 14),
-      clipBehavior: Clip.antiAlias,
-      decoration: s.codeSurface(withShadow: s.isRetro),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B242B),
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: AppStyle.hardShadow(3.5),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            color: AppStyle.codeGutter,
+            color: const Color(0xFF141A1F),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    if (s.isRetro) ...[
-                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
-                      const SizedBox(width: 6),
-                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
-                      const SizedBox(width: 6),
-                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
-                      const SizedBox(width: 12),
-                    ],
-                    Text(
-                      label,
-                      style: s.isClean
-                          ? const TextStyle(color: Colors.white70, fontSize: 12.5, fontWeight: FontWeight.w500)
-                          : const TextStyle(color: AppStyle.codeAccent, fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
-                    ),
+                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
+                    const SizedBox(width: 12),
+                    Text(language.toUpperCase(),
+                        style: const TextStyle(color: Color(0xFF55EFC4), fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
                   ],
                 ),
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => _copyToClipboard(code),
-                    child: Row(
-                      children: [
-                        Icon(s.pick(Icons.copy, Icons.content_copy_outlined), size: s.pick(15.0, 14.0), color: Colors.white70),
-                        const SizedBox(width: 5),
-                        Text(
-                          s.pick("COPIAZĂ CODUL", "Copiază"),
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: s.pick(11.0, 12.5),
-                            fontWeight: s.pick(FontWeight.bold, FontWeight.w500),
-                          ),
-                        ),
-                      ],
-                    ),
+                GestureDetector(
+                  onTap: () => _copyToClipboard(code),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.copy, size: 15, color: Colors.white70),
+                      SizedBox(width: 4),
+                      Text("COPIAZĂ CODUL", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ),
               ],
@@ -617,10 +649,12 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             padding: EdgeInsets.all(isMobile ? 14 : 18),
             child: SelectableText(
               code,
-              style: s.mono(
-                isMobile ? s.pick(14.0, 13.5) : s.pick(15.5, 14.5),
-                color: AppStyle.codeText,
-                height: 1.6,
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: isMobile ? 14 : 15.5,
+                color: const Color(0xFFECEFF4),
+                height: 1.55,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
