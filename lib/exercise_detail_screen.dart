@@ -7,23 +7,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
 import 'ui_components.dart';
 
 // ----------------------------------------------------
 // C++ SYNTAX HIGHLIGHTING CONTROLLER
+// Font family/size come from the TextField style, so the
+// editor follows the design system (and mobile sizes).
 // ----------------------------------------------------
 class CppSyntaxController extends TextEditingController {
-  final TextStyle defaultStyle = const TextStyle(
-    fontFamily: 'monospace',
-    color: Color(0xFFECEFF4),
-    fontSize: 14.5,
-    height: 1.5,
-    fontWeight: FontWeight.w600,
-  );
+  CppSyntaxController({super.text});
 
-  CppSyntaxController({String? text}) : super(text: text);
+  static final RegExp _pattern = RegExp(
+    r'(//[^\n]*)'
+    r'|("(\\"|[^"])*")'
+    r'|(#[a-zA-Z]+)'
+    r'|(\b(int|long|float|double|char|bool|void|string|vector|set|map|pair|stack|queue|struct|class)\b)'
+    r'|(\b(cin|cout|endl|return|if|else|while|for|break|continue|switch|case|default|using|namespace|std|main)\b)'
+    r'|(\b\d+\b)'
+    r'|([{}()\[\]])'
+    r'|([+\-*/%=<>!&|]+)',
+  );
 
   @override
   TextSpan buildTextSpan({
@@ -31,63 +35,33 @@ class CppSyntaxController extends TextEditingController {
     TextStyle? style,
     required bool withComposing,
   }) {
-    final List<TextSpan> children = [];
-    final textContent = text;
+    final base = (style ?? const TextStyle()).copyWith(color: AppStyle.codeText);
+    final children = <TextSpan>[];
+    var last = 0;
 
-    final pattern = RegExp(
-      r'(//[^\n]*)'
-      r'|("(\\"|[^"])*")'
-      r'|(#[a-zA-Z]+)'
-      r'|(\b(int|long|float|double|char|bool|void|string|vector|set|map|pair|stack|queue|struct|class)\b)'
-      r'|(\b(cin|cout|endl|return|if|else|while|for|break|continue|switch|case|default|using|namespace|std|main)\b)'
-      r'|(\b\d+\b)'
-      r'|([{}()\[\]])'
-      r'|([+\-*/%=<>!&|]+)',
-    );
-
-    int lastMatchEnd = 0;
-
-    for (final match in pattern.allMatches(textContent)) {
-      if (match.start > lastMatchEnd) {
-        children.add(TextSpan(
-          text: textContent.substring(lastMatchEnd, match.start),
-          style: defaultStyle,
-        ));
+    for (final m in _pattern.allMatches(text)) {
+      if (m.start > last) {
+        children.add(TextSpan(text: text.substring(last, m.start), style: base));
       }
-
-      final matchText = match.group(0)!;
-      TextStyle matchStyle = defaultStyle;
-
-      if (match.group(1) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFF7F8C8D), fontStyle: FontStyle.italic);
-      } else if (match.group(2) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFFF9CA24));
-      } else if (match.group(4) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFF7675), fontWeight: FontWeight.bold);
-      } else if (match.group(5) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFF55EFC4), fontWeight: FontWeight.bold);
-      } else if (match.group(7) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFF74B9FF), fontWeight: FontWeight.bold);
-      } else if (match.group(9) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFAB1A0));
-      } else if (match.group(10) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFDCB6E), fontWeight: FontWeight.w900);
-      } else if (match.group(11) != null) {
-        matchStyle = defaultStyle.copyWith(color: const Color(0xFFFF7675));
-      }
-
-      children.add(TextSpan(text: matchText, style: matchStyle));
-      lastMatchEnd = match.end;
+      children.add(TextSpan(text: m.group(0), style: _styleFor(m, base)));
+      last = m.end;
     }
-
-    if (lastMatchEnd < textContent.length) {
-      children.add(TextSpan(
-        text: textContent.substring(lastMatchEnd),
-        style: defaultStyle,
-      ));
+    if (last < text.length) {
+      children.add(TextSpan(text: text.substring(last), style: base));
     }
+    return TextSpan(style: base, children: children);
+  }
 
-    return TextSpan(style: style, children: children);
+  TextStyle _styleFor(RegExpMatch m, TextStyle base) {
+    if (m.group(1) != null) return base.copyWith(color: const Color(0xFF7F8C8D), fontStyle: FontStyle.italic);
+    if (m.group(2) != null) return base.copyWith(color: const Color(0xFFF9CA24));
+    if (m.group(4) != null) return base.copyWith(color: const Color(0xFFFF7675), fontWeight: FontWeight.bold);
+    if (m.group(5) != null) return base.copyWith(color: const Color(0xFF55EFC4), fontWeight: FontWeight.bold);
+    if (m.group(7) != null) return base.copyWith(color: const Color(0xFF74B9FF), fontWeight: FontWeight.bold);
+    if (m.group(9) != null) return base.copyWith(color: const Color(0xFFFAB1A0));
+    if (m.group(10) != null) return base.copyWith(color: const Color(0xFFFDCB6E), fontWeight: FontWeight.w900);
+    if (m.group(11) != null) return base.copyWith(color: const Color(0xFFFF7675));
+    return base;
   }
 }
 
@@ -125,6 +99,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   bool solutionChecked = false;
   bool solutionOk = false;
   bool isRunningCode = false;
+  bool _alreadyDone = false;
 
   bool isFullScreenCode = false;
   bool isFullScreenProblem = false;
@@ -141,6 +116,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     _codeController.addListener(_onCodeChanged);
     _loadExerciseDetails();
+    _isExerciseDone().then((done) {
+      if (mounted && done) setState(() => _alreadyDone = true);
+    });
   }
 
   @override
@@ -152,6 +130,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     super.dispose();
   }
 
+  /// "grila" | "text" | "cod"
+  String get _kind {
+    final t = exerciseData?["tip_exercitiu"];
+    if (t == "grila") return "grila";
+    if (t == "text" || exerciseData?["raspuns_corect"] != null) return "text";
+    return "cod";
+  }
+
+  // ---------------------------------------------------------------- EDITOR LOGIC
   void _onCodeChanged() {
     if (!_isUndoingOrRedoing) {
       _recordHistorySnapshot(_codeController.value);
@@ -160,13 +147,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   void _recordHistorySnapshot(TextEditingValue value) {
-    if (_undoStack.isNotEmpty && _undoStack.last.text == value.text) {
-      return;
-    }
+    if (_undoStack.isNotEmpty && _undoStack.last.text == value.text) return;
     _undoStack.add(value);
-    if (_undoStack.length > 150) {
-      _undoStack.removeAt(0);
-    }
+    if (_undoStack.length > 150) _undoStack.removeAt(0);
     _redoStack.clear();
   }
 
@@ -175,8 +158,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       _isUndoingOrRedoing = true;
       final current = _undoStack.removeLast();
       _redoStack.add(current);
-      final previous = _undoStack.last;
-      _codeController.value = previous;
+      _codeController.value = _undoStack.last;
       _isUndoingOrRedoing = false;
       setState(() {});
     }
@@ -248,10 +230,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
           final match = RegExp(r'^[ ]*').firstMatch(currentLine);
           String indent = match != null ? match.group(0)! : "";
-
-          if (currentLine.trimRight().endsWith('{')) {
-            indent += "    ";
-          }
+          if (currentLine.trimRight().endsWith('{')) indent += "    ";
 
           final insertion = "\n$indent";
           final newText = text.replaceRange(pos, pos, insertion);
@@ -266,6 +245,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return KeyEventResult.ignored;
   }
 
+  // ---------------------------------------------------------------- DATA
   Future<void> _loadExerciseDetails() async {
     try {
       final String response = await rootBundle.loadString('assets/data/exercise_details.json');
@@ -274,9 +254,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (data[widget.subject] != null &&
           data[widget.subject][widget.grade] != null &&
           data[widget.subject][widget.grade][widget.id] != null) {
-        setState(() {
-          exerciseData = data[widget.subject][widget.grade][widget.id];
-        });
+        if (!mounted) return;
+        setState(() => exerciseData = data[widget.subject][widget.grade][widget.id]);
         return;
       }
     } catch (e) {
@@ -286,6 +265,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     try {
       final docSnap = await FirebaseFirestore.instance.collection('exercises').doc(widget.id).get();
       if (docSnap.exists) {
+        if (!mounted) return;
         setState(() => exerciseData = docSnap.data());
         return;
       }
@@ -293,19 +273,20 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       debugPrint("Eroare Firestore: $e");
     }
 
-    setState(() => exerciseData = {});
+    if (mounted) setState(() => exerciseData = {});
   }
 
   Future<void> _markExerciseAsDone() async {
     final prefs = await SharedPreferences.getInstance();
     final key = "${widget.subject}_${widget.grade}_${widget.id}";
     await prefs.setBool(key, true);
+    if (mounted) setState(() => _alreadyDone = true);
   }
 
   Future<bool> _isExerciseDone() async {
     final prefs = await SharedPreferences.getInstance();
     final key = "${widget.subject}_${widget.grade}_${widget.id}";
-    return prefs.getBool(key) ?? false;
+    return prefs.get(key) == true;
   }
 
   void _insertSnippet(String prefix, String suffix, [int cursorOffset = 0]) {
@@ -327,64 +308,72 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   void _checkAuthAndExecute(VoidCallback action) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    if (FirebaseAuth.instance.currentUser != null) {
       action();
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: AppColors.bg,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-              side: BorderSide(color: AppColors.border, width: 2.5),
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.lock, color: AppColors.ink, size: 22),
-                const SizedBox(width: 8),
-                Text("LOGIN REQUIRED", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 15)),
-              ],
-            ),
-            content: Text(
-              "Trebuie să fii autentificat pentru a rula teste și a salva progresul.",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
-            ),
-            actions: [
-              RetroButton(
-                text: "CANCEL",
-                bgColor: AppColors.cloud,
-                textColor: AppColors.ink,
-                onPressed: () => context.pop(),
-              ),
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final s = AppStyle.of(dialogContext);
+        return AlertDialog(
+          backgroundColor: s.pick(AppColors.bg, AppColors.cardBg),
+          shape: RoundedRectangleBorder(
+            borderRadius: s.rCard,
+            side: BorderSide(color: s.isClean ? s.line : AppColors.border, width: s.isClean ? 1 : 2.5),
+          ),
+          title: Row(
+            children: [
+              Icon(s.pick(Icons.lock, Icons.lock_outline), color: AppColors.ink, size: 22),
               const SizedBox(width: 8),
-              RetroButton(
-                text: "LOGIN",
-                bgColor: AppColors.sunset,
-                onPressed: () {
-                  context.pop();
-                  context.go('/login');
-                },
+              Text(
+                s.pick("LOGIN REQUIRED", "Autentificare necesară"),
+                style: s.isClean ? s.heading(17) : TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 15),
               ),
             ],
-          );
-        },
-      );
-    }
+          ),
+          content: Text(
+            s.pick(
+              "Trebuie să fii autentificat pentru a rula teste și a salva progresul.",
+              "Intră în cont ca să poți rula testele și să îți salvezi progresul.",
+            ),
+            style: s.body(14, retroWeight: FontWeight.bold),
+          ),
+          actions: [
+            RetroButton(
+              text: s.pick("CANCEL", "Renunță"),
+              bgColor: AppColors.cloud,
+              textColor: AppColors.ink,
+              onPressed: () => dialogContext.pop(),
+            ),
+            const SizedBox(width: 8),
+            RetroButton(
+              text: s.pick("LOGIN", "Intră în cont"),
+              bgColor: s.primaryFill(AppColors.sunset),
+              textColor: s.primaryText(Colors.white),
+              onPressed: () {
+                dialogContext.pop();
+                context.go('/login');
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
+  // ---------------------------------------------------------------- BUILD
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 920;
 
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
+    return StyleBuilder(
+      builder: (context, s) {
         if (exerciseData == null) {
           return Scaffold(
             backgroundColor: AppColors.bg,
-            body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+            body: Center(child: CircularProgressIndicator(color: s.pick(AppColors.sunset, AppColors.sky))),
           );
         }
 
@@ -393,240 +382,44 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             backgroundColor: AppColors.bg,
             appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: IconThemeData(color: AppColors.ink), elevation: 0),
             body: Center(
-              child: Text("QUEST NOT FOUND.", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
+              child: Text(s.pick("QUEST NOT FOUND.", "Problema nu a fost găsită."), style: s.heading(20)),
             ),
           );
         }
 
         return Scaffold(
           backgroundColor: AppColors.bg,
-          appBar: AppBar(
-            title: Text(
-              "${widget.subject.toUpperCase()} • C${widget.grade} • #${widget.id}",
-              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: isMobile ? 14 : 16),
-            ),
-            backgroundColor: AppColors.bg,
-            iconTheme: IconThemeData(color: AppColors.ink),
-            elevation: 0,
-            centerTitle: true,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(2.5),
-              child: Container(color: AppColors.border, height: 2.5),
-            ),
-          ),
+          appBar: _buildAppBar(s, isMobile),
           body: Stack(
             children: [
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1440),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Padding(
-                        padding: EdgeInsets.all(isMobile ? 14.0 : 22.0),
-                        child: !isMobile
-                            ? Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(flex: 5, child: SingleChildScrollView(child: _buildContentPanel(isMobile))),
-                                  const SizedBox(width: 24),
-                                  Expanded(flex: 6, child: SingleChildScrollView(child: _buildInteractionPanel(isMobile))),
-                                ],
-                              )
-                            : SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    _buildContentPanel(isMobile),
-                                    const SizedBox(height: 18),
-                                    _buildInteractionPanel(isMobile),
-                                  ],
-                                ),
-                              ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              // Fullscreen Problem Focus Modal
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeInOutCubic,
-                top: isFullScreenProblem ? 0 : MediaQuery.of(context).size.height,
-                bottom: isFullScreenProblem ? 0 : -MediaQuery.of(context).size.height,
-                left: 0,
-                right: 0,
-                child: Container(
-                  color: AppColors.bg,
-                  padding: EdgeInsets.all(isMobile ? 14 : 24),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 960),
-                      child: RetroBlock(
-                        padding: isMobile ? 18 : 36,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                  child: Padding(
+                    padding: EdgeInsets.all(isMobile ? 14.0 : 22.0),
+                    child: !isMobile
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 5, child: SingleChildScrollView(child: _buildContentPanel(s, isMobile))),
+                              const SizedBox(width: 24),
+                              Expanded(flex: 6, child: SingleChildScrollView(child: _buildInteractionPanel(s, isMobile))),
+                            ],
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                  color: AppColors.sunset,
-                                  child: const Text(
-                                    "PROBLEM FOCUS MODE",
-                                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900),
-                                  ),
-                                ),
-                                const Spacer(),
-                                RetroButton(
-                                  text: "EXIT FOCUS",
-                                  icon: Icons.fullscreen_exit,
-                                  bgColor: AppColors.ink,
-                                  textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                                  onPressed: () => setState(() => isFullScreenProblem = false),
-                                )
+                                _buildContentPanel(s, isMobile),
+                                const SizedBox(height: 18),
+                                _buildInteractionPanel(s, isMobile),
                               ],
                             ),
-                            SizedBox(height: isMobile ? 16 : 24),
-                            Expanded(child: SingleChildScrollView(child: _buildEnuntContent(isMobile))),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
                   ),
                 ),
               ),
-
-              // Fullscreen Code Focus Workspace
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeInOutCubic,
-                top: isFullScreenCode ? 0 : MediaQuery.of(context).size.height,
-                bottom: isFullScreenCode ? 0 : -MediaQuery.of(context).size.height,
-                left: 0,
-                right: 0,
-                child: Container(
-                  color: AppColors.bg,
-                  padding: EdgeInsets.all(isMobile ? 12 : 20),
-                  child: !isMobile
-                      ? Row(
-                          children: [
-                            SizedBox(
-                              width: 420,
-                              child: RetroBlock(
-                                padding: 24,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("QUEST BRIEF", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.sunset)),
-                                          Text("#${widget.id}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink)),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 14),
-                                      Text(
-                                        exerciseData!["title"]?.toUpperCase() ?? "QUEST",
-                                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        exerciseData!["description"] ?? "",
-                                        style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600),
-                                      ),
-                                      if (exerciseData!["input"] != null) ...[
-                                        const SizedBox(height: 20),
-                                        _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"], isMobile),
-                                        const SizedBox(height: 14),
-                                        _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"], isMobile),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 18),
-                            Expanded(
-                              child: RetroBlock(
-                                bgColor: AppColors.cloud,
-                                padding: 18,
-                                child: Column(
-                                  children: [
-                                    _buildIdeHeader(isFullScreen: true, isMobile: isMobile),
-                                    const SizedBox(height: 10),
-                                    _buildCodeQuickActions(),
-                                    const SizedBox(height: 10),
-                                    Expanded(child: _buildIdeEditor(isMobile)),
-                                    const SizedBox(height: 14),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: RetroButton(
-                                            text: "COMPILE & RUN TESTS",
-                                            icon: Icons.play_arrow,
-                                            isLoading: isRunningCode,
-                                            bgColor: AppColors.forest,
-                                            onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 14),
-                                        RetroButton(
-                                          text: "EXIT FULLSCREEN",
-                                          icon: Icons.fullscreen_exit,
-                                          bgColor: AppColors.ink,
-                                          textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                                          onPressed: () => setState(() => isFullScreenCode = false),
-                                        ),
-                                      ],
-                                    ),
-                                    if (testResults.isNotEmpty) ...[
-                                      const SizedBox(height: 14),
-                                      SizedBox(height: 130, child: SingleChildScrollView(child: _buildTestCasesConsole())),
-                                    ]
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : RetroBlock(
-                          bgColor: AppColors.cloud,
-                          padding: 12,
-                          child: Column(
-                            children: [
-                              _buildIdeHeader(isFullScreen: true, isMobile: isMobile),
-                              const SizedBox(height: 8),
-                              _buildCodeQuickActions(),
-                              const SizedBox(height: 8),
-                              Expanded(child: _buildIdeEditor(isMobile)),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: RetroButton(
-                                      text: "RUN",
-                                      icon: Icons.play_arrow,
-                                      isLoading: isRunningCode,
-                                      bgColor: AppColors.forest,
-                                      onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  RetroButton(
-                                    text: "EXIT",
-                                    icon: Icons.fullscreen_exit,
-                                    bgColor: AppColors.ink,
-                                    textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-                                    onPressed: () => setState(() => isFullScreenCode = false),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-              ),
+              _buildProblemFocusOverlay(s, isMobile),
+              _buildCodeFocusOverlay(s, isMobile),
             ],
           ),
         );
@@ -634,209 +427,379 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildContentPanel(bool isMobile) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            _buildTab("enunt", "PROBLEM", isMobile),
-            const SizedBox(width: 6),
-            _buildTab("solutie", "SOLUTION", isMobile),
-            const Spacer(),
-            GestureDetector(
-              onTap: () => setState(() => isFullScreenProblem = true),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 6 : 8),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
-                  border: Border.all(color: AppColors.border, width: 2),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.fullscreen, size: isMobile ? 14 : 16, color: AppColors.ink),
-                    SizedBox(width: isMobile ? 4 : 6),
-                    Text(
-                      isMobile ? "FOCUS" : "FOCUS BRIEF",
-                      style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w900, color: AppColors.ink),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        RetroBlock(
-          padding: isMobile ? 18 : 28,
-          shadowOffset: isMobile ? 3 : 4,
-          child: selectedTab == "enunt" ? _buildEnuntContent(isMobile) : _buildSolutieContent(isMobile),
-        ),
-      ],
+  PreferredSizeWidget _buildAppBar(AppStyle s, bool isMobile) {
+    final title = s.pick(
+      "${widget.subject.toUpperCase()} • C${widget.grade} • #${widget.id}",
+      "${widget.subject}, clasa a ${widget.grade}-a, problema #${widget.id}",
+    );
+    return AppBar(
+      title: Text(
+        title,
+        style: s.isClean
+            ? TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600, fontSize: isMobile ? 14 : 16)
+            : TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: isMobile ? 14 : 16),
+      ),
+      backgroundColor: s.pick(AppColors.bg, AppColors.cardBg),
+      iconTheme: IconThemeData(color: AppColors.ink),
+      elevation: 0,
+      centerTitle: true,
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(s.isClean ? 1 : 2.5),
+        child: Container(color: s.line, height: s.isClean ? 1 : 2.5),
+      ),
     );
   }
 
-  Widget _buildTab(String tabKey, String label, bool isMobile) {
-    final isSelected = selectedTab == tabKey;
-    final isClean = ThemeManager.isClean;
-
-    return GestureDetector(
-      onTap: () => setState(() => selectedTab = tabKey),
+  // ---------------------------------------------------------------- OVERLAYS
+  Widget _buildProblemFocusOverlay(AppStyle s, bool isMobile) {
+    final h = MediaQuery.of(context).size.height;
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeInOutCubic,
+      top: isFullScreenProblem ? 0 : h,
+      bottom: isFullScreenProblem ? 0 : -h,
+      left: 0,
+      right: 0,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: isMobile ? 8 : 10),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.mustard : AppColors.cloud,
-          borderRadius: isClean ? const BorderRadius.vertical(top: Radius.circular(6)) : BorderRadius.zero,
-          border: Border(
-            top: BorderSide(color: isClean ? Colors.transparent : AppColors.border, width: 2.5),
-            left: BorderSide(color: isClean ? Colors.transparent : AppColors.border, width: 2.5),
-            right: BorderSide(color: isClean ? Colors.transparent : AppColors.border, width: 2.5),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: isMobile ? 12 : 14,
-            fontWeight: FontWeight.w900,
-            color: isSelected && AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-            letterSpacing: 1.0,
-            decoration: isSelected ? TextDecoration.none : TextDecoration.underline,
+        color: AppColors.bg,
+        padding: EdgeInsets.all(isMobile ? 14 : 24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 960),
+            child: RetroBlock(
+              padding: isMobile ? 18 : 36,
+              elevation: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (s.isRetro) AppBadge(text: "PROBLEM FOCUS MODE", color: AppColors.sunset, fontSize: 12),
+                      const Spacer(),
+                      RetroButton(
+                        text: s.pick("EXIT FOCUS", "Închide"),
+                        icon: s.pick(Icons.fullscreen_exit, Icons.close),
+                        bgColor: s.pick(AppColors.ink, AppColors.cardBg),
+                        textColor: s.pick(s.onInk, AppColors.ink),
+                        fontSize: 14,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        onPressed: () => setState(() => isFullScreenProblem = false),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: isMobile ? 16 : 24),
+                  Expanded(child: SingleChildScrollView(child: _buildEnuntContent(s, isMobile))),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildEnuntContent(bool isMobile) {
+  Widget _buildCodeFocusOverlay(AppStyle s, bool isMobile) {
+    final h = MediaQuery.of(context).size.height;
+
+    final runButton = RetroButton(
+      text: isMobile ? s.pick("RUN", "Rulează") : s.pick("COMPILE & RUN TESTS", "Rulează testele"),
+      icon: Icons.play_arrow,
+      isLoading: isRunningCode,
+      bgColor: AppColors.forest,
+      onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+    );
+
+    final exitButton = RetroButton(
+      text: isMobile ? s.pick("EXIT", "Ieși") : s.pick("EXIT FULLSCREEN", "Ieși din ecran complet"),
+      icon: s.pick(Icons.fullscreen_exit, Icons.close_fullscreen),
+      bgColor: s.pick(AppColors.ink, AppColors.cardBg),
+      textColor: s.pick(s.onInk, AppColors.ink),
+      onPressed: () => setState(() => isFullScreenCode = false),
+    );
+
+    final spec = ProblemSpec.fromData(exerciseData!, isMobile: isMobile);
+
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeInOutCubic,
+      top: isFullScreenCode ? 0 : h,
+      bottom: isFullScreenCode ? 0 : -h,
+      left: 0,
+      right: 0,
+      child: Container(
+        color: AppColors.bg,
+        padding: EdgeInsets.all(isMobile ? 12 : 20),
+        child: !isMobile
+            ? Row(
+                children: [
+                  SizedBox(
+                    width: 420,
+                    child: RetroBlock(
+                      padding: 24,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  s.pick("QUEST BRIEF", "Enunț"),
+                                  style: s.isClean
+                                      ? s.overline(13)
+                                      : TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.sunset),
+                                ),
+                                Text(
+                                  "#${widget.id}",
+                                  style: s.isClean ? s.muted(13) : TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.ink),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Text(_title(s), style: s.heading(22)),
+                            const SizedBox(height: 16),
+                            Text(
+                              exerciseData!["description"]?.toString() ?? "",
+                              style: s.body(s.pick(16.0, 15.0), height: 1.6),
+                            ),
+                            if (!spec.isEmpty) ...[
+                              const SizedBox(height: 20),
+                              ProblemSpec.fromData(exerciseData!, isMobile: true),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                    child: RetroBlock(
+                      bgColor: AppColors.cloud,
+                      padding: 18,
+                      child: Column(
+                        children: [
+                          _buildIdeHeader(s, isFullScreen: true, isMobile: isMobile),
+                          const SizedBox(height: 10),
+                          _buildCodeQuickActions(s),
+                          const SizedBox(height: 10),
+                          Expanded(child: _buildIdeEditor(s, isMobile)),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(child: runButton),
+                              const SizedBox(width: 14),
+                              exitButton,
+                            ],
+                          ),
+                          if (testResults.isNotEmpty) ...[
+                            const SizedBox(height: 14),
+                            SizedBox(height: 130, child: SingleChildScrollView(child: _buildTestCasesConsole(s))),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : RetroBlock(
+                bgColor: AppColors.cloud,
+                padding: 12,
+                child: Column(
+                  children: [
+                    _buildIdeHeader(s, isFullScreen: true, isMobile: isMobile),
+                    const SizedBox(height: 8),
+                    _buildCodeQuickActions(s),
+                    const SizedBox(height: 8),
+                    Expanded(child: _buildIdeEditor(s, isMobile)),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: runButton),
+                        const SizedBox(width: 8),
+                        exitButton,
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  String _title(AppStyle s) {
+    final raw = exerciseData!["title"]?.toString();
+    if (raw == null || raw.isEmpty) return s.pick("UNTITLED QUEST", "Problemă fără titlu");
+    return s.isClean ? raw : raw.toUpperCase();
+  }
+
+  // ---------------------------------------------------------------- LEFT PANEL
+  Widget _buildContentPanel(AppStyle s, bool isMobile) {
+    final focusChip = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => setState(() => isFullScreenProblem = true),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 6 : s.pick(8.0, 7.0)),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg,
+            borderRadius: s.rButton,
+            border: Border.all(color: s.isClean ? s.lineStrong : AppColors.border, width: s.isClean ? 1 : 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(s.pick(Icons.fullscreen, Icons.open_in_full), size: isMobile ? 14 : 16, color: AppColors.ink),
+              SizedBox(width: isMobile ? 4 : 6),
+              Text(
+                s.pick(isMobile ? "FOCUS" : "FOCUS BRIEF", isMobile ? "Extinde" : "Citește pe tot ecranul"),
+                style: s.isClean
+                    ? TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.ink)
+                    : TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w900, color: AppColors.ink),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final tabs = Row(
+      crossAxisAlignment: s.isClean ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+      children: [
+        AppTab(
+          label: s.pick("PROBLEM", "Enunț"),
+          selected: selectedTab == "enunt",
+          isMobile: isMobile,
+          onTap: () => setState(() => selectedTab = "enunt"),
+        ),
+        SizedBox(width: s.pick(6.0, 2.0)),
+        AppTab(
+          label: s.pick("SOLUTION", "Soluție"),
+          selected: selectedTab == "solutie",
+          isMobile: isMobile,
+          onTap: () => setState(() => selectedTab = "solutie"),
+        ),
+        const Spacer(),
+        focusChip,
+      ],
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (s.isClean)
+          Container(
+            margin: const EdgeInsets.only(bottom: 14),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: s.line))),
+            child: tabs,
+          )
+        else
+          tabs,
+        RetroBlock(
+          padding: isMobile ? 18 : 28,
+          shadowOffset: isMobile ? 3 : 4,
+          child: selectedTab == "enunt" ? _buildEnuntContent(s, isMobile) : _buildSolutieContent(s, isMobile),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEnuntContent(AppStyle s, bool isMobile) {
+    final spec = ProblemSpec.fromData(exerciseData!, isMobile: isMobile);
+    final hint = exerciseData!["hint"]?.toString();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          exerciseData!["title"]?.toUpperCase() ?? "UNTITLED QUEST",
-          style: TextStyle(fontSize: isMobile ? 20 : 26, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2),
-        ),
-        SizedBox(height: isMobile ? 14 : 24),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: AppColors.sunset,
-            borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-          ),
-          child: const Text(
-            "DESCRIPTION",
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 1.2),
-          ),
-        ),
+        Text(_title(s), style: s.heading(isMobile ? 20 : s.pick(26.0, 24.0))),
+        SizedBox(height: isMobile ? 14 : s.pick(24.0, 20.0)),
+        if (s.isRetro)
+          AppBadge(text: "DESCRIPTION", color: AppColors.sunset, fontSize: 11)
+        else
+          Text("Cerință", style: s.heading(15)),
         const SizedBox(height: 10),
         Text(
-          exerciseData!["description"] ?? "Fără descriere disponibilă.",
-          style: TextStyle(
-            fontSize: isMobile ? 15 : 18,
-            color: AppColors.ink,
-            fontWeight: FontWeight.w600,
-            height: 1.55,
-            letterSpacing: 0.2,
-          ),
+          exerciseData!["description"]?.toString() ?? "Fără descriere disponibilă.",
+          style: s.body(isMobile ? 15 : s.pick(18.0, 16.0), height: s.pick(1.55, 1.65)),
         ),
-        if (exerciseData!["hint"] != null) ...[
+        if (hint != null && hint.isNotEmpty) ...[
           SizedBox(height: isMobile ? 16 : 24),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppColors.sky.withOpacity(0.15),
-              borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
-              border: Border.all(color: AppColors.sky, width: 2),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    exerciseData!["hint"],
-                    style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.4),
+          if (s.isClean)
+            AppCallout(text: hint, color: AppColors.sky, icon: Icons.lightbulb_outline, fontSize: isMobile ? 14 : 15)
+          else
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.sky.withOpacity(0.15),
+                border: Border.all(color: AppColors.sky, width: 2),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      hint,
+                      style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.4),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          )
         ],
-        if (exerciseData!["tip_exercitiu"] == "cod" || exerciseData!["input"] != null) ...[
-          SizedBox(height: isMobile ? 18 : 28),
-          Container(height: 2, color: AppColors.border),
-          SizedBox(height: isMobile ? 14 : 20),
-          _buildCodeSpecBlock("INPUT FORMAT", exerciseData!["input"] ?? "-", isMobile),
-          const SizedBox(height: 12),
-          _buildCodeSpecBlock("OUTPUT FORMAT", exerciseData!["output"] ?? "-", isMobile),
+        if (!spec.isEmpty) ...[
+          SizedBox(height: isMobile ? 18 : s.pick(28.0, 24.0)),
+          if (s.isRetro) ...[
+            const AppDivider(),
+            SizedBox(height: isMobile ? 14 : 20),
+          ],
+          spec,
         ],
       ],
     );
   }
 
-  Widget _buildSolutieContent(bool isMobile) {
+  Widget _buildSolutieContent(AppStyle s, bool isMobile) {
     final offSol = exerciseData!["official_solution"];
+    final code = offSol is Map ? offSol["code"]?.toString() : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("MASTER'S SOLUTION", style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.w900, color: AppColors.ink)),
+        Text(s.pick("MASTER'S SOLUTION", "Soluția oficială"), style: s.heading(isMobile ? 16 : 20)),
         const SizedBox(height: 14),
-        if (offSol != null && offSol["code"] != null)
+        if (code != null)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1B242B),
-              borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
-              border: Border.all(color: AppColors.border, width: 2.5),
-            ),
-            child: Text(
-              offSol["code"],
-              style: TextStyle(
-                fontFamily: 'monospace',
-                color: const Color(0xFF55EFC4),
-                fontSize: isMobile ? 13 : 15,
-                fontWeight: FontWeight.bold,
+            decoration: s.codeSurface(),
+            child: SelectableText(
+              code,
+              style: s.mono(
+                isMobile ? 13 : s.pick(15.0, 14.0),
+                color: s.pick(AppStyle.codeAccent, AppStyle.codeText),
+                weight: s.pick(FontWeight.bold, FontWeight.w400),
                 height: 1.5,
               ),
             ),
           )
         else
           Text(
-            "Acest exercițiu nu are o rezolvare oficială încărcată.",
-            style: TextStyle(fontSize: isMobile ? 14 : 16, color: AppColors.ink, fontWeight: FontWeight.bold),
+            s.pick("Acest exercițiu nu are o rezolvare oficială încărcată.", "Problema nu are încă o soluție oficială."),
+            style: s.body(isMobile ? 14 : 16, retroWeight: FontWeight.bold),
           ),
       ],
     );
   }
 
-  Widget _buildCodeSpecBlock(String title, String content, bool isMobile) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: isMobile ? 11 : 13, fontWeight: FontWeight.w900, color: AppColors.sky, letterSpacing: 1.2),
-        ),
-        const SizedBox(height: 6),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: isMobile ? 10 : 14),
-          decoration: BoxDecoration(
-            color: AppColors.cloud,
-            borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
-            border: Border.all(color: ThemeManager.isClean ? Colors.grey.withOpacity(0.2) : AppColors.border, width: ThemeManager.isClean ? 1 : 1.5),
-          ),
-          child: Text(
-            content,
-            style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.w700, height: 1.4),
-          ),
-        ),
-      ],
-    );
-  }
+  // ---------------------------------------------------------------- RIGHT PANEL
+  Widget _buildInteractionPanel(AppStyle s, bool isMobile) {
+    final done = _alreadyDone || solutionOk;
+    final kind = _kind;
 
-  Widget _buildInteractionPanel(bool isMobile) {
+    final cleanTitle = kind == "grila" ? "Alege răspunsul" : (kind == "text" ? "Răspunsul tău" : "Editor de cod");
+    final cleanIcon = kind == "grila" ? Icons.checklist : (kind == "text" ? Icons.edit_outlined : Icons.code);
+
     return RetroBlock(
       bgColor: AppColors.cloud,
       padding: isMobile ? 14 : 20,
@@ -846,181 +809,187 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.terminal, size: 20, color: AppColors.ink),
+              Icon(s.pick(Icons.terminal, cleanIcon), size: 20, color: AppColors.ink),
               const SizedBox(width: 8),
               Text(
-                "TERMINAL & IDE",
-                style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
+                s.pick("TERMINAL & IDE", cleanTitle),
+                style: s.isClean
+                    ? s.heading(isMobile ? 15 : 17)
+                    : TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 1.0),
               ),
               const Spacer(),
-              FutureBuilder<bool>(
-                future: _isExerciseDone(),
-                builder: (context, snapshot) {
-                  if (snapshot.data == true || solutionOk) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.forest,
-                        borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-                      ),
-                      child: const Text(
-                        "CLEARED",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 0.8, fontSize: 10),
-                      ),
-                    );
-                  }
-                  return const SizedBox();
-                },
-              )
+              if (done)
+                AppBadge(
+                  text: s.pick("CLEARED", "Rezolvată"),
+                  color: AppColors.forest,
+                  icon: s.isClean ? Icons.check : null,
+                  fontSize: 10,
+                ),
             ],
           ),
           SizedBox(height: isMobile ? 12 : 16),
-          if (exerciseData!["tip_exercitiu"] == "grila")
-            _buildGrilaSection(isMobile)
-          else if (exerciseData!["tip_exercitiu"] == "text" || exerciseData!["raspuns_corect"] != null)
-            _buildTextAnswerSection(isMobile)
+          if (kind == "grila")
+            _buildGrilaSection(s, isMobile)
+          else if (kind == "text")
+            _buildTextAnswerSection(s, isMobile)
           else
-            _buildCodeSection(isMobile),
+            _buildCodeSection(s, isMobile),
         ],
       ),
     );
   }
 
-  Widget _buildGrilaSection(bool isMobile) {
-    List<dynamic> variante = exerciseData!["variante"] ?? [];
+  Widget _buildGrilaSection(AppStyle s, bool isMobile) {
+    final List<dynamic> variante = exerciseData!["variante"] ?? [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...variante.map((varianta) {
-          final isSelected = _selectedGrilaOption == varianta;
+        ...variante.map((v) {
+          final text = v.toString();
+          final isSelected = _selectedGrilaOption == text;
+
+          final decoration = s.isClean
+              ? BoxDecoration(
+                  color: isSelected ? s.tint(AppColors.sky) : AppColors.cardBg,
+                  borderRadius: s.rButton,
+                  border: Border.all(color: isSelected ? AppColors.sky : s.lineStrong, width: 1),
+                )
+              : BoxDecoration(
+                  color: isSelected ? AppColors.sky : AppColors.cardBg,
+                  border: Border.all(color: AppColors.border, width: 2),
+                );
+
+          final icon = s.isClean
+              ? (isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked)
+              : (isSelected ? Icons.check_box : Icons.check_box_outline_blank);
+
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: GestureDetector(
-              onTap: () {
-                _checkAuthAndExecute(() {
-                  setState(() => _selectedGrilaOption = varianta);
-                });
-              },
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 14, vertical: isMobile ? 12 : 16),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.sky : AppColors.cardBg,
-                  borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
-                  border: Border.all(color: AppColors.border, width: 2),
-                ),
-                child: Row(
-                  children: [
-                    Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank, color: AppColors.ink, size: 20),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        varianta,
-                        style: TextStyle(fontSize: isMobile ? 14 : 16, color: AppColors.ink, fontWeight: FontWeight.bold),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => _checkAuthAndExecute(() => setState(() => _selectedGrilaOption = text)),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 120),
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: isMobile ? 12 : s.pick(16.0, 14.0)),
+                  decoration: decoration,
+                  child: Row(
+                    children: [
+                      Icon(
+                        icon,
+                        color: s.isClean && isSelected ? s.accentText(AppColors.sky) : (s.isClean ? AppColors.textMuted : AppColors.ink),
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          text,
+                          style: s.isClean
+                              ? TextStyle(fontSize: isMobile ? 14 : 15, color: AppColors.ink, fontWeight: FontWeight.w500)
+                              : TextStyle(fontSize: isMobile ? 14 : 16, color: AppColors.ink, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           );
-        }).toList(),
+        }),
         const SizedBox(height: 14),
         RetroButton(
-          text: "VERIFY ANSWER",
+          text: s.pick("VERIFY ANSWER", "Verifică răspunsul"),
           isFullWidth: true,
           bgColor: AppColors.ink,
-          textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+          textColor: s.onInk,
           onPressed: _selectedGrilaOption == null ? () {} : () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
-        _buildResultBox(),
+        _buildResultBox(s),
       ],
     );
   }
 
-  Widget _buildTextAnswerSection(bool isMobile) {
+  Widget _buildTextAnswerSection(AppStyle s, bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
           controller: _answerController,
-          style: TextStyle(fontSize: isMobile ? 15 : 18, fontWeight: FontWeight.bold, color: AppColors.ink),
-          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
-          decoration: InputDecoration(
-            hintText: "Introdu valoarea...",
-            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
-            filled: true,
-            fillColor: AppColors.inputBg,
-            contentPadding: const EdgeInsets.all(14),
-            border: OutlineInputBorder(
-              borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
-              borderSide: BorderSide(color: AppColors.border, width: 2),
-            ),
-          ),
+          style: s.isClean
+              ? TextStyle(fontSize: isMobile ? 15 : 16, fontWeight: FontWeight.w500, color: AppColors.ink)
+              : TextStyle(fontSize: isMobile ? 15 : 18, fontWeight: FontWeight.bold, color: AppColors.ink),
+          cursorColor: AppColors.isDark ? AppStyle.codeAccent : AppColors.ink,
+          decoration: s.input(hint: s.pick("Introdu valoarea...", "Scrie răspunsul aici")),
         ),
         const SizedBox(height: 14),
         RetroButton(
-          text: "VERIFY ANSWER",
+          text: s.pick("VERIFY ANSWER", "Verifică răspunsul"),
           isFullWidth: true,
           bgColor: AppColors.ink,
-          textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
+          textColor: s.onInk,
           onPressed: () => _checkAuthAndExecute(_checkSimpleAnswer),
         ),
-        _buildResultBox(),
+        _buildResultBox(s),
       ],
     );
   }
 
-  Widget _buildIdeHeader({bool isFullScreen = false, bool isMobile = false}) {
+  // ---------------------------------------------------------------- IDE
+  Widget _buildIdeHeader(AppStyle s, {bool isFullScreen = false, bool isMobile = false}) {
     final line = _getCurrentLine();
     final col = _getCurrentCol();
 
+    final toggleLabel = isFullScreen
+        ? s.pick("EXIT", "Ieși")
+        : (isMobile ? s.pick("FOCUS", "Extinde") : s.pick("FOCUS MODE", "Ecran complet"));
+
+    final toggleFg = s.isClean ? AppColors.ink : (isFullScreen ? Colors.white : s.onInk);
+
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-          decoration: BoxDecoration(
-            color: AppColors.ink,
-            borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-          ),
-          child: Text(
-            "C++20",
-            style: TextStyle(
-              color: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
-              fontSize: 10.5,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
+        AppBadge(text: "C++20", color: s.pick(AppColors.ink, AppColors.sky), textColor: s.onInk, fontSize: 10.5),
+        const SizedBox(width: 10),
+        Text(
+          s.pick("L$line:C$col", "Linia $line, coloana $col"),
+          style: s.isClean
+              ? TextStyle(fontSize: 12.5, color: AppColors.textMuted)
+              : TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink),
         ),
-        const SizedBox(width: 8),
-        Text("L$line:C$col", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.ink)),
         const Spacer(),
-        GestureDetector(
-          onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: isFullScreen ? AppColors.sunset : AppColors.ink,
-              borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
-              border: Border.all(color: AppColors.border, width: 1.5),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
-                  size: 14,
-                  color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  isFullScreen ? "EXIT" : (isMobile ? "FOCUS" : "FOCUS MODE"),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    color: isFullScreen ? Colors.white : (AppColors.isDark ? const Color(0xFF10161A) : Colors.white),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () => setState(() => isFullScreenCode = !isFullScreenCode),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: s.isClean
+                  ? BoxDecoration(color: AppColors.cardBg, borderRadius: s.rButton, border: Border.all(color: s.lineStrong))
+                  : BoxDecoration(
+                      color: isFullScreen ? AppColors.sunset : AppColors.ink,
+                      border: Border.all(color: AppColors.border, width: 1.5),
+                    ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    s.isClean
+                        ? (isFullScreen ? Icons.close_fullscreen : Icons.open_in_full)
+                        : (isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen),
+                    size: 14,
+                    color: toggleFg,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 5),
+                  Text(
+                    toggleLabel,
+                    style: TextStyle(
+                      fontSize: s.pick(11.0, 12.5),
+                      fontWeight: s.pick(FontWeight.w900, FontWeight.w500),
+                      color: toggleFg,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1028,160 +997,183 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildCodeQuickActions() {
+  Widget _buildCodeQuickActions(AppStyle s) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _snippetButton("UNDO", _performUndo),
+          _snippetButton(s, s.pick("UNDO", "Anulează"), _performUndo),
           const SizedBox(width: 6),
-          _snippetButton("REDO", _performRedo),
+          _snippetButton(s, s.pick("REDO", "Refă"), _performRedo),
           const SizedBox(width: 6),
-          _snippetButton("TAB", () => _insertSnippet("    ", "", 4)),
+          _snippetButton(s, s.pick("TAB", "Tab"), () => _insertSnippet("    ", "", 4)),
           const SizedBox(width: 6),
-          _snippetButton("{ }", () => _insertSnippet("{\n    ", "\n}", 4)),
+          _snippetButton(s, "{ }", () => _insertSnippet("{\n    ", "\n}", 4), isCode: true),
           const SizedBox(width: 6),
-          _snippetButton("cin >>", () => _insertSnippet("cin >> ", ";", 7)),
+          _snippetButton(s, "cin >>", () => _insertSnippet("cin >> ", ";", 7), isCode: true),
           const SizedBox(width: 6),
-          _snippetButton("cout <<", () => _insertSnippet("cout << ", " << \"\\n\";", 8)),
+          _snippetButton(s, "cout <<", () => _insertSnippet("cout << ", " << \"\\n\";", 8), isCode: true),
           const SizedBox(width: 6),
-          _snippetButton("RESET", () => setState(() => _codeController.text = defaultCppBoilerplate), isDanger: true),
+          _snippetButton(
+            s,
+            s.pick("RESET", "Resetează codul"),
+            () => setState(() {
+              _codeController.text = defaultCppBoilerplate;
+            }),
+            isDanger: true,
+          ),
         ],
       ),
     );
   }
 
-  Widget _snippetButton(String label, VoidCallback onTap, {bool isDanger = false}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          borderRadius: ThemeManager.isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-          border: Border.all(color: isDanger ? AppColors.sunset : AppColors.border, width: 1.5),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 10.5,
-            fontWeight: FontWeight.w900,
-            color: isDanger ? AppColors.sunset : AppColors.ink,
+  Widget _snippetButton(AppStyle s, String label, VoidCallback onTap, {bool isDanger = false, bool isCode = false}) {
+    final fg = isDanger ? (s.isClean ? s.accentText(AppColors.sunset) : AppColors.sunset) : AppColors.ink;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: s.pick(9.0, 10.0), vertical: s.pick(4.0, 5.0)),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg,
+            borderRadius: s.rChip,
+            border: Border.all(
+              color: isDanger ? (s.isClean ? AppColors.sunset.withOpacity(0.45) : AppColors.sunset) : s.lineStrong,
+              width: s.isClean ? 1 : 1.5,
+            ),
+          ),
+          child: Text(
+            label,
+            style: s.isClean
+                ? (isCode ? s.mono(12, color: fg, weight: FontWeight.w500) : TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: fg))
+                : TextStyle(fontSize: 10.5, fontWeight: FontWeight.w900, color: fg),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildIdeEditor(bool isMobile) {
+  Widget _buildIdeEditor(AppStyle s, bool isMobile) {
     final lineCount = '\n'.allMatches(_codeController.text).length + 1;
     final currentLine = _getCurrentLine();
 
     final double fontSz = isMobile ? 13.0 : 14.5;
     const double lineH = 1.55;
-    final strut = StrutStyle(
-      fontFamily: 'monospace',
-      fontSize: fontSz,
-      height: lineH,
-      forceStrutHeight: true,
-    );
+    final double gutterW = isMobile ? 38 : 48;
+
+    final codeStyle = s.mono(fontSz, height: lineH);
+    final strut = StrutStyle.fromTextStyle(codeStyle, forceStrutHeight: true);
 
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1B242B),
-        borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
-        border: Border.all(
-          color: ThemeManager.isClean ? Colors.white.withOpacity(0.08) : AppColors.border,
-          width: ThemeManager.isClean ? 1.2 : 2.5,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: isMobile ? 38 : 48,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF131A1F),
-              borderRadius: ThemeManager.isClean ? const BorderRadius.horizontal(left: Radius.circular(7)) : BorderRadius.zero,
-              border: const Border(right: BorderSide(color: Color(0xFF2C3E50), width: 1.5)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: List.generate(lineCount, (i) {
-                final lineNum = i + 1;
-                final isCurrent = lineNum == currentLine;
-
-                return Container(
-                  height: fontSz * lineH,
-                  color: isCurrent ? const Color(0xFF2C3E50) : Colors.transparent,
-                  padding: const EdgeInsets.only(right: 4),
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    isCurrent ? "▶$lineNum" : "$lineNum",
-                    strutStyle: strut,
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      color: isCurrent ? const Color(0xFF55EFC4) : const Color(0xFF636E72),
-                      fontSize: isMobile ? 10.5 : 12,
-                      fontWeight: isCurrent ? FontWeight.w900 : FontWeight.w600,
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-          Expanded(
-            child: Focus(
-              focusNode: _editorFocusNode,
-              onKeyEvent: _handleEditorKey,
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  textSelectionTheme: const TextSelectionThemeData(
-                    selectionColor: Color(0x6674B9FF),
-                    cursorColor: Color(0xFF55EFC4),
-                    selectionHandleColor: Color(0xFF74B9FF),
-                  ),
-                ),
-                child: TextField(
-                  controller: _codeController,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  cursorColor: const Color(0xFF55EFC4),
-                  cursorWidth: 2.5,
-                  strutStyle: strut,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: fontSz,
-                    height: lineH,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      clipBehavior: Clip.antiAlias,
+      decoration: s.codeSurface(),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final minH = box.maxHeight.isFinite ? box.maxHeight : 0.0;
+          return Stack(
+            children: [
+              // Gutter background stays put while the code scrolls.
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: gutterW,
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppStyle.codeGutter,
+                    border: Border(right: BorderSide(color: AppStyle.codeGutterLine, width: 1.5)),
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
+              SingleChildScrollView(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: gutterW,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: List.generate(lineCount, (i) {
+                            final lineNum = i + 1;
+                            final isCurrent = lineNum == currentLine;
+                            return Container(
+                              height: fontSz * lineH,
+                              color: isCurrent
+                                  ? s.pick(AppStyle.codeGutterLine, Colors.white.withOpacity(0.06))
+                                  : Colors.transparent,
+                              padding: EdgeInsets.only(right: s.pick(4.0, 8.0)),
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                s.isRetro && isCurrent ? "▶$lineNum" : "$lineNum",
+                                strutStyle: strut,
+                                style: s.mono(
+                                  isMobile ? 10.5 : 12,
+                                  color: isCurrent ? s.pick(AppStyle.codeAccent, AppStyle.codeText) : AppStyle.codeMuted,
+                                  weight: isCurrent ? s.pick(FontWeight.w900, FontWeight.w600) : s.pick(FontWeight.w600, FontWeight.w400),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: minH),
+                        child: Focus(
+                          focusNode: _editorFocusNode,
+                          onKeyEvent: _handleEditorKey,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textSelectionTheme: const TextSelectionThemeData(
+                                selectionColor: Color(0x6674B9FF),
+                                cursorColor: AppStyle.codeAccent,
+                                selectionHandleColor: Color(0xFF74B9FF),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: _codeController,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              cursorColor: AppStyle.codeAccent,
+                              cursorWidth: s.pick(2.5, 2.0),
+                              strutStyle: strut,
+                              style: codeStyle,
+                              decoration: const InputDecoration(
+                                isDense: true,
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildCodeSection(bool isMobile) {
+  Widget _buildCodeSection(AppStyle s, bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildIdeHeader(isFullScreen: false, isMobile: isMobile),
-        const SizedBox(height: 6),
-        _buildCodeQuickActions(),
+        _buildIdeHeader(s, isFullScreen: false, isMobile: isMobile),
         const SizedBox(height: 8),
-        SizedBox(height: isMobile ? 260 : 320, child: _buildIdeEditor(isMobile)),
+        _buildCodeQuickActions(s),
+        const SizedBox(height: 8),
+        SizedBox(height: isMobile ? 260 : 320, child: _buildIdeEditor(s, isMobile)),
         const SizedBox(height: 14),
         RetroButton(
-          text: "COMPILE & RUN",
+          text: s.pick("COMPILE & RUN", "Rulează testele"),
           icon: Icons.play_arrow,
           isFullWidth: true,
           isLoading: isRunningCode,
@@ -1190,62 +1182,72 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
         if (testResults.isNotEmpty) ...[
           const SizedBox(height: 14),
-          _buildTestCasesConsole(),
+          _buildTestCasesConsole(s),
         ],
-        _buildResultBox(),
+        _buildResultBox(s),
       ],
     );
   }
 
-  Widget _buildTestCasesConsole() {
+  Widget _buildTestCasesConsole(AppStyle s) {
+    final passedCount = testResults.where((t) => t["passed"] == true).length;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1B242B),
-        borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
-        border: Border.all(color: AppColors.border, width: 2),
-      ),
+      decoration: s.codeSurface(retroBorder: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "TEST RESULTS & CONSOLE",
-            style: TextStyle(color: AppColors.cloud, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            s.pick("TEST RESULTS & CONSOLE", "Rezultate: $passedCount din ${testResults.length} teste trecute"),
+            style: s.isClean
+                ? const TextStyle(color: Colors.white70, fontSize: 12.5, fontWeight: FontWeight.w600)
+                : TextStyle(color: AppColors.cloud, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.2),
           ),
           const SizedBox(height: 8),
           ...testResults.map((t) {
             final passed = t["passed"] == true;
+            final accent = passed ? AppColors.forest : AppColors.sunset;
             return Container(
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF131A1F),
-                borderRadius: ThemeManager.isClean ? BorderRadius.circular(6) : BorderRadius.zero,
-                border: Border.all(color: passed ? AppColors.forest : AppColors.sunset, width: 1.5),
+                color: AppStyle.codeGutter,
+                borderRadius: s.rChip,
+                border: Border.all(color: s.isClean ? accent.withOpacity(0.5) : accent, width: s.isClean ? 1 : 1.5),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(passed ? Icons.check_circle : Icons.cancel, size: 14, color: passed ? AppColors.forest : AppColors.sunset),
+                      Icon(passed ? Icons.check_circle : Icons.cancel, size: 14, color: accent),
                       const SizedBox(width: 6),
                       Text(
-                        "TEST ${t['index']}: ${passed ? 'PASSED (OK)' : 'FAILED'}",
+                        s.pick(
+                          "TEST ${t['index']}: ${passed ? 'PASSED (OK)' : 'FAILED'}",
+                          "Testul ${t['index']}: ${passed ? 'corect' : 'greșit'}",
+                        ),
                         style: TextStyle(
-                          color: passed ? AppColors.forest : AppColors.sunset,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 11,
+                          color: accent,
+                          fontWeight: s.pick(FontWeight.w900, FontWeight.w600),
+                          fontSize: s.pick(11.0, 12.5),
                         ),
                       ),
                     ],
                   ),
                   if (!passed) ...[
                     const SizedBox(height: 4),
-                    Text("EXPECTED: ${t['expected']}", style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
-                    Text("OUTPUT:   ${t['got']}", style: TextStyle(color: AppColors.sunset, fontSize: 11, fontFamily: 'monospace')),
-                  ]
+                    Text(
+                      "${s.pick('EXPECTED:', 'Așteptat:')} ${t['expected']}",
+                      style: s.mono(11.5, color: Colors.white70),
+                    ),
+                    Text(
+                      "${s.pick('OUTPUT:  ', 'Obținut: ')} ${t['got']}",
+                      style: s.mono(11.5, color: AppColors.sunset),
+                    ),
+                  ],
                 ],
               ),
             );
@@ -1255,9 +1257,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
+  // ---------------------------------------------------------------- CHECKERS
   void _checkSimpleAnswer() async {
     final raspunsCorect = exerciseData!["raspuns_corect"]?.toString().trim().toLowerCase();
-    String raspunsElev = "";
+    String raspunsElev;
 
     if (exerciseData!["tip_exercitiu"] == "grila") {
       raspunsElev = _selectedGrilaOption?.trim().toLowerCase() ?? "";
@@ -1342,9 +1345,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           "got": normOutput,
         });
 
-        setState(() {});
+        if (mounted) setState(() {});
       }
 
+      if (!mounted) return;
       setState(() {
         solutionChecked = true;
         solutionOk = allPassed;
@@ -1358,23 +1362,39 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         "expected": "No runtime errors",
         "got": "$e",
       });
-      setState(() => solutionChecked = true);
+      if (mounted) setState(() => solutionChecked = true);
     } finally {
-      setState(() => isRunningCode = false);
+      if (mounted) setState(() => isRunningCode = false);
     }
   }
 
-  Widget _buildResultBox() {
+  Widget _buildResultBox(AppStyle s) {
     if (!solutionChecked) return const SizedBox();
+
+    if (s.isClean) {
+      final isCode = _kind == "cod";
+      final msg = solutionOk
+          ? (isCode ? "Toate testele au trecut. Problema e rezolvată." : "Răspuns corect. Problema e rezolvată.")
+          : (isCode ? "Unele teste nu au trecut. Compară rezultatul obținut cu cel așteptat." : "Răspuns greșit. Mai încearcă.");
+      return Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: AppCallout(
+          text: msg,
+          color: solutionOk ? AppColors.forest : AppColors.sunset,
+          icon: solutionOk ? Icons.check_circle_outline : Icons.error_outline,
+          fontSize: 14,
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(top: 14),
       padding: const EdgeInsets.all(14),
       width: double.infinity,
       decoration: BoxDecoration(
         color: solutionOk ? AppColors.forest : AppColors.sunset,
-        borderRadius: ThemeManager.isClean ? BorderRadius.circular(8) : BorderRadius.zero,
         border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
+        boxShadow: s.hardShadow(3),
       ),
       child: Row(
         children: [

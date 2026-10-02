@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'ui_components.dart';
@@ -20,7 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   int _completedQuests = 0;
   bool _isLoadingStats = true;
-  String _academicGrade = "9"; // 9, 10, 11, 12
+
+  // Progress keys look like "<materie>_<clasa>_<id>" (see ExerciseDetailScreen).
+  static final RegExp _progressKey = RegExp(r'^.+_\d+_.+$');
 
   @override
   void initState() {
@@ -37,22 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadPlayerStats() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      int completed = 0;
-      final keys = prefs.getKeys();
-      for (var key in keys) {
-        if (prefs.getBool(key) == true) {
-          completed++;
-        }
-      }
+      // prefs.get() instead of getBool(): getBool throws on String keys (e.g. 'app_style').
+      final completed = prefs.getKeys().where((k) => _progressKey.hasMatch(k) && prefs.get(k) == true).length;
+      if (!mounted) return;
       setState(() {
         _completedQuests = completed;
         _isLoadingStats = false;
       });
     } catch (e) {
       debugPrint("Error loading stats: $e");
-      setState(() {
-        _isLoadingStats = false;
-      });
+      if (mounted) setState(() => _isLoadingStats = false);
     }
   }
 
@@ -61,427 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final encodedMaterie = Uri.encodeComponent('Informatică');
     final encodedClasa = Uri.encodeComponent('9');
     context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 880;
-
-    return ValueListenableBuilder<AppStyleMode>(
-      valueListenable: ThemeManager.styleNotifier,
-      builder: (context, currentStyle, _) {
-        final isClean = currentStyle == AppStyleMode.clean;
-
-        return Scaffold(
-          backgroundColor: isClean
-              ? (AppColors.isDark ? const Color(0xFF141A1F) : const Color(0xFFF8F9FA))
-              : AppColors.bg,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: Scrollbar(
-                  controller: _scrollController,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    physics: const ClampingScrollPhysics(),
-                    child: isClean
-                        ? _buildAcademicDirectoryView(isMobile)
-                        : _buildRetroArcadeView(isMobile),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // =========================================================================
-  // VIEW 1: AUTHENTIC PBINFO-STYLE ACADEMIC DIRECTORY (CLEAN MODE)
-  // =========================================================================
-  Widget _buildAcademicDirectoryView(bool isMobile) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1140),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 36),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Clean Breadcrumb & Notice
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.isDark ? const Color(0xFF1E252B) : Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.school, size: 20, color: Color(0xFF20BF6B)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        "Portal educațional de informatică și matematică conform programei școlare naționale 2026.",
-                        style: TextStyle(
-                          fontSize: isMobile ? 12 : 13.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.ink,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Grade Tabs (Clasa a IX-a – Clasa a XII-a)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _academicGradeTab("9", "Clasa a IX-a (Python & C++)"),
-                    const SizedBox(width: 8),
-                    _academicGradeTab("10", "Clasa a X-a (Recursivitate & Matrice)"),
-                    const SizedBox(width: 8),
-                    _academicGradeTab("11", "Clasa a XI-a (Grafuri & Dinamică)"),
-                    const SizedBox(width: 8),
-                    _academicGradeTab("12", "Clasa a XII-a (OOP, SQL & Bacalaureat)"),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Academic Curriculum Grid
-              if (!isMobile)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: _buildCurriculumColumnA()),
-                    const SizedBox(width: 24),
-                    Expanded(child: _buildCurriculumColumnB()),
-                  ],
-                )
-              else
-                Column(
-                  children: [
-                    _buildCurriculumColumnA(),
-                    const SizedBox(height: 18),
-                    _buildCurriculumColumnB(),
-                  ],
-                ),
-
-              const SizedBox(height: 36),
-
-              // Clean Quick Practice Section
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.isDark ? const Color(0xFF1E252B) : Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Vrei să exersezi direct în arenă?",
-                            style: TextStyle(fontSize: isMobile ? 16 : 18, fontWeight: FontWeight.w800, color: AppColors.ink),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Rezolvă probleme cu evaluator automat C++ și teste live.",
-                            style: TextStyle(fontSize: isMobile ? 12.5 : 14, color: AppColors.textMuted),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF20BF6B),
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                        elevation: 0,
-                      ),
-                      onPressed: () => context.go('/exercitii'),
-                      child: const Text("Deschide Probleme", style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-              _buildAcademicFooter(isMobile),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _academicGradeTab(String grade, String title) {
-    final isSelected = _academicGrade == grade;
-    return InkWell(
-      onTap: () => setState(() => _academicGrade = grade),
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF20BF6B)
-              : (AppColors.isDark ? const Color(0xFF1E252B) : Colors.white),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: isSelected ? Colors.transparent : (AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
-          ),
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.ink,
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-            fontSize: 13,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCurriculumColumnA() {
-    if (_academicGrade == "9") {
-      return Column(
-        children: [
-          _academicDirectoryCard(
-            title: "Elemente de bază ale limbajului Python",
-            badge: "NOU ÎN PROGRAMĂ",
-            badgeColor: const Color(0xFF20BF6B),
-            topics: [
-              {"title": "Introducere în Python & Scurt Istoric", "route": "/resurse/py-9-intro"},
-              {"title": "Variabile, Tipuri Primitive & input()", "route": "/resurse/py-9-vars"},
-              {"title": "Operatori Aritmetici & Logici", "route": "/resurse/py-9-operators"},
-            ],
-          ),
-          const SizedBox(height: 18),
-          _academicDirectoryCard(
-            title: "Structuri de control Python",
-            badge: "PYTHON 3",
-            badgeColor: const Color(0xFF45AAF2),
-            topics: [
-              {"title": "Instrucțiunea Decizională: if, elif, else", "route": "/resurse/py-9-if"},
-              {"title": "Structuri Repetitive: while & for range()", "route": "/resurse/py-9-loops"},
-            ],
-          ),
-        ],
-      );
-    } else if (_academicGrade == "10") {
-      return _academicDirectoryCard(
-        title: "Tablouri Bidimensionale (Matrice)",
-        badge: "C++",
-        badgeColor: const Color(0xFF45AAF2),
-        topics: [
-          {"title": "Matrice în C++: Declarare & Parcurgere", "route": "/resurse/cpp-10-matrix-basics"},
-          {"title": "Diagonala Principală & Secundară", "route": "/resurse/cpp-10-matrix-diagonals"},
-        ],
-      );
-    } else if (_academicGrade == "11") {
-      return _academicDirectoryCard(
-        title: "Tehnica Backtracking",
-        badge: "ALGORITMICĂ",
-        badgeColor: const Color(0xFF8854D0),
-        topics: [
-          {"title": "Backtracking: Căutare cu Revenire", "route": "/resurse/cpp-11-backtracking-intro"},
-          {"title": "Generarea Permutărilor", "route": "/resurse/cpp-11-backtracking-perm"},
-          {"title": "Generarea Combinărilor & Aranjamentelor", "route": "/resurse/cpp-11-backtracking-comb"},
-        ],
-      );
-    } else {
-      return _academicDirectoryCard(
-        title: "Programare Orientată pe Obiecte (OOP)",
-        badge: "C++",
-        badgeColor: const Color(0xFF45AAF2),
-        topics: [
-          {"title": "Clase, Obiecte & Modificatori de Acces", "route": "/resurse/cpp-12-oop-classes"},
-          {"title": "Constructori & Destructori", "route": "/resurse/cpp-12-oop-constructors"},
-          {"title": "Moștenire & Polimorfism", "route": "/resurse/cpp-12-oop-inheritance"},
-        ],
-      );
-    }
-  }
-
-  Widget _buildCurriculumColumnB() {
-    if (_academicGrade == "9") {
-      return Column(
-        children: [
-          _academicDirectoryCard(
-            title: "Elemente de bază ale limbajului C++",
-            badge: "CURRICULUM",
-            badgeColor: const Color(0xFFFA8231),
-            topics: [
-              {"title": "Directiva #include, iostream & cin/cout", "route": "/resurse/cpp-9-intro"},
-              {"title": "Tipuri de Date, Operatori & Codul ASCII", "route": "/resurse/cpp-9-types"},
-              {"title": "Buclele while, do-while și for", "route": "/resurse/cpp-9-loops"},
-            ],
-          ),
-          const SizedBox(height: 18),
-          _academicDirectoryCard(
-            title: "Algoritmi Elementari & Vectori",
-            badge: "OLIMPIADĂ & BAC",
-            badgeColor: const Color(0xFF20BF6B),
-            topics: [
-              {"title": "Prelucrarea Cifrelor unui Număr", "route": "/resurse/alg-9-digits"},
-              {"title": "Divizibilitate, Numere Prime & Descompunere", "route": "/resurse/alg-9-divisors"},
-              {"title": "Vectori în C++: Declarare & Parcurgere", "route": "/resurse/cpp-9-vectors-basic"},
-            ],
-          ),
-        ],
-      );
-    } else if (_academicGrade == "10") {
-      return _academicDirectoryCard(
-        title: "Recursivitate & Divide et Impera",
-        badge: "ALGORITMICĂ",
-        badgeColor: const Color(0xFF20BF6B),
-        topics: [
-          {"title": "Recursivitate: Stiva de apeluri", "route": "/resurse/cpp-10-recursion-intro"},
-          {"title": "Divide et Impera & Căutarea Binară", "route": "/resurse/cpp-10-d&i-intro"},
-          {"title": "MergeSort & QuickSort", "route": "/resurse/cpp-10-d&i-mergesort"},
-        ],
-      );
-    } else if (_academicGrade == "11") {
-      return _academicDirectoryCard(
-        title: "Grafuri Neorientate & Dinamică",
-        badge: "CLASA A XI-A",
-        badgeColor: const Color(0xFF20BF6B),
-        topics: [
-          {"title": "Matricea de Adiacență & Conexitate", "route": "/resurse/cpp-11-graphs-matrix"},
-          {"title": "Parcurgerile BFS și DFS", "route": "/resurse/cpp-11-graphs-bfs"},
-          {"title": "Programare Dinamică: Recurență & LIS", "route": "/resurse/cpp-11-dp-subseq"},
-        ],
-      );
-    } else {
-      return _academicDirectoryCard(
-        title: "Pregătire Bacalaureat Informatică",
-        badge: "EXAMEN BAC",
-        badgeColor: const Color(0xFFE75A41),
-        topics: [
-          {"title": "Strategii pentru Subiectul I (Grile)", "route": "/resurse/bac-12-info-sub1"},
-          {"title": "Rezolvarea Subiectului II (Șiruri & Struct)", "route": "/resurse/bac-12-info-sub2"},
-          {"title": "Subiectul III.3: Algoritmi Eficienți O(N) și O(1)", "route": "/resurse/bac-12-info-sub3"},
-        ],
-      );
-    }
-  }
-
-  Widget _academicDirectoryCard({
-    required String title,
-    required String badge,
-    required Color badgeColor,
-    required List<Map<String, String>> topics,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.isDark ? const Color(0xFF1E252B) : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: badgeColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  badge,
-                  style: TextStyle(color: badgeColor, fontSize: 10.5, fontWeight: FontWeight.w800),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Divider(height: 1, color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.06)),
-          const SizedBox(height: 12),
-          ...topics.map((t) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: InkWell(
-                onTap: () => context.go(t['route']!),
-                child: Row(
-                  children: [
-                    const Icon(Icons.arrow_right, size: 18, color: Color(0xFF20BF6B)),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        t['title']!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.ink,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAcademicFooter(bool isMobile) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08))),
-      ),
-      child: Center(
-        child: Text(
-          "iMeditatii • Platformă educațională deschisă • Conform programei Ministerului Educației",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12.5, color: AppColors.textMuted, fontWeight: FontWeight.w500),
-        ),
-      ),
-    );
-  }
-
-  // =========================================================================
-  // VIEW 2: ORIGINAL 8-BIT RETRO GAMING VIEW
-  // =========================================================================
-  Widget _buildRetroArcadeView(bool isMobile) {
-    return Column(
-      children: [
-        _buildHeroSection(isMobile),
-        _buildPathsSection(isMobile),
-        _buildMastersSection(isMobile),
-        SizedBox(height: isMobile ? 14 : 28),
-        _buildRetroFooter(isMobile),
-      ],
-    );
   }
 
   Widget _buildConstrainedSection({required Widget child, EdgeInsetsGeometry? padding}) {
@@ -497,10 +69,48 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeroSection(bool isMobile) {
+  // ---------------------------------------------------------------------------
+  // HERO
+  // ---------------------------------------------------------------------------
+  Widget _buildRetroStatusChips(bool isMobile) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg,
+            border: Border.all(color: AppColors.border, width: 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              Text(
+                'SYSTEM OPERATIONAL',
+                style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: isMobile ? 11 : 12, letterSpacing: 1.2),
+              ),
+            ],
+          ),
+        ),
+        AppBadge(text: "SEASON 1", color: AppColors.sunset, fontSize: 10),
+      ],
+    );
+  }
+
+  Widget _buildHeroSection(AppStyle s, bool isMobile) {
+    final heroInk = s.heroInk;
+
+    final findTeacher = s.pick("FIND A MASTER", "Găsește un profesor");
+    final seeExercises = s.pick("DAILY QUESTS", "Vezi exercițiile");
+
     final leftContent = RetroBlock(
-      bgColor: AppColors.mustard,
-      padding: isMobile ? 18 : 36,
+      bgColor: s.heroBg,
+      preserveColor: true,
+      padding: isMobile ? 18 : (s.isClean ? 40 : 36),
       shadowOffset: isMobile ? 3.5 : 6.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,63 +119,29 @@ class _HomeScreenState extends State<HomeScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBg,
-                      border: Border.all(color: AppColors.border, width: 2),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
-                        const SizedBox(width: 8),
-                        Text(
-                          'SYSTEM OPERATIONAL',
-                          style: TextStyle(
-                            color: AppColors.ink,
-                            fontWeight: FontWeight.w900,
-                            fontSize: isMobile ? 11 : 12,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    color: AppColors.sunset,
-                    child: const Text(
-                      "SEASON 1",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0),
-                    ),
-                  ),
-                ],
-              ),
+              if (s.isRetro)
+                _buildRetroStatusChips(isMobile)
+              else
+                AppBadge(text: 'Pregătire pentru Bacalaureat', color: AppColors.sky, icon: Icons.school_outlined, fontSize: 12),
               SizedBox(height: isMobile ? 14 : 20),
               Text(
-                "LEVEL UP YOUR\nKNOWLEDGE.",
-                style: TextStyle(
-                  fontSize: isMobile ? 26 : 48,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                  height: 1.1,
-                  letterSpacing: 1.0,
-                ),
+                s.pick("LEVEL UP YOUR\nKNOWLEDGE.", "Învață, exersează\nși vezi cât ai progresat."),
+                style: s.display(isMobile ? s.pick(26.0, 28.0) : s.pick(48.0, 44.0), color: heroInk),
               ),
               SizedBox(height: isMobile ? 10 : 16),
-              Text(
-                "Alege o materie. Găsește un mentor verificat și rezolvă quest-uri interactive pentru a avansa în nivel.",
-                style: TextStyle(
-                  fontSize: isMobile ? 14 : 17,
-                  color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                  fontWeight: FontWeight.bold,
-                  height: 1.45,
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Text(
+                  s.pick(
+                    "Alege o materie. Găsește un mentor verificat și rezolvă quest-uri interactive pentru a avansa în nivel.",
+                    "Alege o materie, lucrează cu un profesor verificat și rezolvă probleme cu evaluare automată, pe programa de liceu.",
+                  ),
+                  style: s.body(
+                    isMobile ? 14 : 17,
+                    color: s.isClean ? AppColors.textMuted : heroInk,
+                    height: 1.5,
+                    retroWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -576,18 +152,19 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 RetroButton(
-                  text: "FIND A MASTER",
+                  text: findTeacher,
                   icon: Icons.search,
                   fontSize: 14,
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  bgColor: AppColors.forest,
+                  bgColor: s.primaryFill(AppColors.forest),
+                  textColor: s.primaryText(Colors.white),
                   isFullWidth: true,
                   onPressed: () => context.go('/materii'),
                 ),
                 const SizedBox(height: 10),
                 RetroButton(
-                  text: "DAILY QUESTS",
-                  icon: Icons.track_changes,
+                  text: seeExercises,
+                  icon: s.pick(Icons.track_changes, Icons.code),
                   fontSize: 14,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   bgColor: AppColors.cardBg,
@@ -601,15 +178,16 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 RetroButton(
-                  text: "FIND A MASTER",
+                  text: findTeacher,
                   icon: Icons.search,
-                  bgColor: AppColors.forest,
+                  bgColor: s.primaryFill(AppColors.forest),
+                  textColor: s.primaryText(Colors.white),
                   onPressed: () => context.go('/materii'),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: s.pick(16.0, 12.0)),
                 RetroButton(
-                  text: "DAILY QUESTS",
-                  icon: Icons.track_changes,
+                  text: seeExercises,
+                  icon: s.pick(Icons.track_changes, Icons.code),
                   bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   onPressed: () => context.go('/exercitii'),
@@ -619,6 +197,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+
+    final rank = _completedQuests > 10
+        ? s.pick("GOLD GUILD", "Avansat")
+        : (_completedQuests > 3 ? s.pick("SILVER RANK", "Intermediar") : s.pick("NOVICE", "Începător"));
+
+    final progressValue = (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0;
 
     final rightContent = RetroBlock(
       bgColor: AppColors.cardBg,
@@ -635,49 +219,45 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "YOUR PROGRESS",
-                    style: TextStyle(
-                      color: AppColors.ink,
-                      fontWeight: FontWeight.w900,
-                      fontSize: isMobile ? 14 : 16,
-                      letterSpacing: 1.2,
-                    ),
+                    s.pick("YOUR PROGRESS", "Progresul tău"),
+                    style: s.isClean ? s.heading(isMobile ? 15 : 17) : s.overline(isMobile ? 14 : 16),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.border, width: 2)),
-                    child: Text(
-                      _completedQuests > 10 ? "GOLD GUILD" : (_completedQuests > 3 ? "SILVER RANK" : "NOVICE"),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10),
-                    ),
-                  ),
+                  AppBadge(text: rank, color: AppColors.sky, outlined: true, fontSize: 10),
                 ],
               ),
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.cloud,
-                  border: Border.all(color: AppColors.border, width: 2),
-                ),
+                decoration: s.insetBox(),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("QUESTS CLEARED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12)),
+                        Text(
+                          s.pick("QUESTS CLEARED", "Probleme rezolvate"),
+                          style: s.isClean
+                              ? TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w500, fontSize: 13)
+                              : TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
                         _isLoadingStats
                             ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
-                            : Text("$_completedQuests SOLVED", style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 13)),
+                            : Text(
+                                s.pick("$_completedQuests SOLVED", "$_completedQuests"),
+                                style: s.isClean
+                                    ? TextStyle(color: AppColors.ink, fontWeight: FontWeight.w700, fontSize: 15)
+                                    : TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, fontSize: 13),
+                              ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     ClipRRect(
+                      borderRadius: BorderRadius.circular(s.isClean ? 4 : 0),
                       child: LinearProgressIndicator(
-                        value: (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0,
-                        backgroundColor: AppColors.border.withOpacity(0.2),
+                        value: progressValue,
+                        backgroundColor: s.isClean ? s.line : AppColors.border.withOpacity(0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(AppColors.forest),
-                        minHeight: 8,
+                        minHeight: s.isClean ? 6 : 8,
                       ),
                     ),
                   ],
@@ -687,30 +267,40 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("DAILY BOUNTY", style: TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 1.0)),
-                  Icon(Icons.star, color: AppColors.mustard, size: 18),
+                  Text(
+                    s.pick("DAILY BOUNTY", "Problema zilei"),
+                    style: s.isClean
+                        ? s.overline(13)
+                        : TextStyle(color: AppColors.sunset, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 1.0),
+                  ),
+                  if (s.isRetro) Icon(Icons.star, color: AppColors.mustard, size: 18),
                 ],
               ),
               const SizedBox(height: 6),
               Text(
-                "INFORMATICĂ // CLASA A 9-A",
-                style: TextStyle(fontSize: isMobile ? 14 : 15, fontWeight: FontWeight.w900, color: AppColors.ink),
+                s.pick("INFORMATICĂ // CLASA A 9-A", "Informatică, clasa a IX-a"),
+                style: s.isClean
+                    ? s.heading(isMobile ? 15 : 16)
+                    : TextStyle(fontSize: isMobile ? 14 : 15, fontWeight: FontWeight.w900, color: AppColors.ink),
               ),
               const SizedBox(height: 3),
               Text(
-                "RECOMPENSĂ: +50 EXP // AUTO-CHECK",
-                style: TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 11),
+                s.pick("RECOMPENSĂ: +50 EXP // AUTO-CHECK", "Problemă de programare cu evaluare automată"),
+                style: s.isClean
+                    ? s.muted(13)
+                    : TextStyle(color: AppColors.forest, fontWeight: FontWeight.bold, fontSize: 11),
               ),
             ],
           ),
           SizedBox(height: isMobile ? 16 : 24),
           RetroButton(
-            text: "ACCEPT BOUNTY",
-            icon: Icons.play_arrow,
-            bgColor: AppColors.sunset,
+            text: s.pick("ACCEPT BOUNTY", "Rezolvă problema"),
+            icon: s.pick(Icons.play_arrow, null),
+            bgColor: s.primaryFill(AppColors.sunset),
+            textColor: s.primaryText(Colors.white),
             isFullWidth: true,
             fontSize: 14,
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: EdgeInsets.symmetric(vertical: s.pick(10.0, 12.0)),
             onPressed: _startDailyQuest,
           ),
         ],
@@ -733,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(flex: 3, child: leftContent),
-                  const SizedBox(width: 24),
+                  SizedBox(width: s.pick(24.0, 20.0)),
                   Expanded(flex: 2, child: rightContent),
                 ],
               ),
@@ -741,63 +331,86 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPathsSection(bool isMobile) {
-    final List<Map<String, dynamic>> paths = [
-      {"icon": Icons.functions, "title": "MATEMATICĂ", "color": AppColors.sunset, "desc": "ALGEBRĂ & GEOMETRIE", "route": "Matematică"},
-      {"icon": Icons.data_object, "title": "INFORMATICĂ", "color": AppColors.forest, "desc": "ALGORITMI & C++", "route": "Informatică"},
-      {"icon": Icons.language, "title": "LIMBI STRĂINE", "color": AppColors.sky, "desc": "ENGLEZĂ & ROMÂNĂ", "route": "Engleză"},
+  // ---------------------------------------------------------------------------
+  // PATHS
+  // ---------------------------------------------------------------------------
+  Widget _buildPathsSection(AppStyle s, bool isMobile) {
+    final paths = <Map<String, dynamic>>[
+      {
+        "icon": Icons.functions,
+        "title": s.pick("MATEMATICĂ", "Matematică"),
+        "desc": s.pick("ALGEBRĂ & GEOMETRIE", "Algebră, geometrie, analiză"),
+        "color": AppColors.sunset,
+        "route": "Matematică",
+      },
+      {
+        "icon": Icons.data_object,
+        "title": s.pick("INFORMATICĂ", "Informatică"),
+        "desc": s.pick("ALGORITMI & C++", "Algoritmi în C++ și Python"),
+        "color": AppColors.forest,
+        "route": "Informatică",
+      },
+      {
+        "icon": Icons.language,
+        "title": s.pick("LIMBI STRĂINE", "Limbi străine"),
+        "desc": s.pick("ENGLEZĂ & ROMÂNĂ", "Engleză și română"),
+        "color": AppColors.sky,
+        "route": "Engleză",
+      },
     ];
 
-    final List<Widget> pathCards = paths.map((path) {
-      return Padding(
-        padding: EdgeInsets.only(
-          bottom: isMobile && path != paths.last ? 12 : 0,
-          right: !isMobile && path != paths.last ? 20 : 0,
-        ),
-        child: GestureDetector(
-          onTap: () {
-            final encoded = Uri.encodeComponent(path["route"] as String);
-            context.go('/lista-exercitii?materie=$encoded');
-          },
-          child: RetroBlock(
-            bgColor: AppColors.cardBg,
-            padding: isMobile ? 16 : 24,
-            shadowOffset: isMobile ? 3.5 : 6.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(isMobile ? 12 : 18),
-                  decoration: BoxDecoration(
-                    color: path["color"],
-                    border: Border.all(color: AppColors.border, width: 2.5),
-                    boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
-                  ),
-                  child: Icon(path["icon"], size: isMobile ? 26 : 36, color: Colors.white),
+    final pathCards = <Widget>[];
+    for (var i = 0; i < paths.length; i++) {
+      final path = paths[i];
+      final isLast = i == paths.length - 1;
+      pathCards.add(
+        Padding(
+          padding: EdgeInsets.only(
+            bottom: isMobile && !isLast ? 12 : 0,
+            right: !isMobile && !isLast ? s.pick(20.0, 16.0) : 0,
+          ),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                final encoded = Uri.encodeComponent(path["route"] as String);
+                context.go('/lista-exercitii?materie=$encoded');
+              },
+              child: RetroBlock(
+                bgColor: AppColors.cardBg,
+                padding: isMobile ? 16 : 24,
+                shadowOffset: isMobile ? 3.5 : 6.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    AppIconTile(
+                      icon: path["icon"] as IconData,
+                      color: path["color"] as Color,
+                      iconSize: isMobile ? 26 : s.pick(36.0, 30.0),
+                      padding: isMobile ? 12 : s.pick(18.0, 16.0),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      path["title"] as String,
+                      textAlign: TextAlign.center,
+                      style: s.heading(isMobile ? 16 : s.pick(20.0, 18.0)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      path["desc"] as String,
+                      textAlign: TextAlign.center,
+                      style: s.isClean
+                          ? s.muted(isMobile ? 13 : 14)
+                          : TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  path["title"],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: isMobile ? 16 : 20,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.ink,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  path["desc"],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-                ),
-              ],
+              ),
             ),
           ),
         ),
       );
-    }).toList();
+    }
 
     return _buildConstrainedSection(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 28, horizontal: isMobile ? 14 : 24),
@@ -805,20 +418,17 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            "CHOOSE YOUR PATH",
+            s.pick("CHOOSE YOUR PATH", "Alege materia"),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: isMobile ? 22 : 34,
-              fontWeight: FontWeight.w900,
-              color: AppColors.ink,
-              letterSpacing: 1.5,
-            ),
+            style: s.display(isMobile ? 22 : s.pick(34.0, 30.0)),
           ),
           const SizedBox(height: 6),
           Text(
-            "SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.",
+            s.pick("SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.", "Vezi problemele disponibile pentru fiecare disciplină."),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+            style: s.isClean
+                ? s.muted(isMobile ? 14 : 16)
+                : TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
           SizedBox(height: isMobile ? 18 : 24),
           isMobile
@@ -829,47 +439,43 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMastersSection(bool isMobile) {
+  // ---------------------------------------------------------------------------
+  // MASTERS
+  // ---------------------------------------------------------------------------
+  Widget _buildMastersSection(AppStyle s, bool isMobile) {
     final leftContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
-          child: const Text(
-            "GUILD ROSTER",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 10),
-          ),
+        AppBadge(
+          text: s.pick("GUILD ROSTER", "Profesori"),
+          color: s.pick(AppColors.isDark ? AppColors.sunset : AppColors.ink, AppColors.sky),
+          fontSize: 10,
         ),
         const SizedBox(height: 12),
         Text(
-          isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
-          style: TextStyle(
-            fontSize: isMobile ? 24 : 40,
-            fontWeight: FontWeight.w900,
-            color: AppColors.ink,
-            height: 1.1,
-            letterSpacing: 1.0,
+          s.pick(
+            isMobile ? "MEET THE MASTERS." : "MEET THE\nMASTERS.",
+            isMobile ? "Lecții 1-la-1 cu profesori verificați." : "Lecții 1-la-1 cu\nprofesori verificați.",
           ),
+          style: s.display(isMobile ? 24 : s.pick(40.0, 34.0)),
         ),
         const SizedBox(height: 10),
         Text(
-          "Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
-          style: TextStyle(
-            fontSize: isMobile ? 13 : 16,
-            color: AppColors.ink,
-            fontWeight: FontWeight.bold,
-            height: 1.45,
+          s.pick(
+            "Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
+            "Fiecare profesor e verificat înainte de a preda. Lecțiile au loc online, cu tablă interactivă și apel video.",
           ),
+          style: s.body(isMobile ? 13 : 16, color: s.isClean ? AppColors.textMuted : AppColors.ink, height: 1.5, retroWeight: FontWeight.bold),
         ),
         SizedBox(height: isMobile ? 16 : 22),
         RetroButton(
-          text: "EXPLOREAZĂ PROFESORII",
-          icon: Icons.groups,
-          bgColor: AppColors.sunset,
+          text: s.pick("EXPLOREAZĂ PROFESORII", "Vezi profesorii"),
+          icon: s.pick(Icons.groups, Icons.groups_outlined),
+          bgColor: s.primaryFill(AppColors.sunset),
+          textColor: s.primaryText(Colors.white),
           isFullWidth: isMobile,
           fontSize: 14,
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           onPressed: () => context.go('/materii'),
         ),
       ],
@@ -883,10 +489,10 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSpacing: 10,
       childAspectRatio: isMobile ? 1.25 : 1.1,
       children: [
-        _buildMasterAvatar(Icons.calculate, "MATH", AppColors.sky),
-        _buildMasterAvatar(Icons.terminal, "CODE", AppColors.mustard),
-        _buildMasterAvatar(Icons.bolt, "PHYSICS", AppColors.forest),
-        _buildMasterAvatar(Icons.science, "CHEM", AppColors.sunset),
+        _buildMasterAvatar(s, Icons.calculate, s.pick("MATH", "Matematică"), AppColors.sky),
+        _buildMasterAvatar(s, Icons.terminal, s.pick("CODE", "Informatică"), AppColors.mustard),
+        _buildMasterAvatar(s, Icons.bolt, s.pick("PHYSICS", "Fizică"), AppColors.forest),
+        _buildMasterAvatar(s, Icons.science, s.pick("CHEM", "Chimie"), AppColors.sunset),
       ],
     );
 
@@ -917,12 +523,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMasterAvatar(IconData icon, String label, Color color) {
+  Widget _buildMasterAvatar(AppStyle s, IconData icon, String label, Color color) {
+    if (s.isClean) {
+      return Container(
+        decoration: BoxDecoration(
+          color: s.inset,
+          borderRadius: s.rTile,
+          border: Border.all(color: s.line),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppIconTile(icon: icon, color: color, iconSize: 22, padding: 12),
+            const SizedBox(height: 10),
+            Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
+          ],
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: color,
         border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
+        boxShadow: s.hardShadow(3),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -934,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColors.ink,
             child: Text(
               label,
-              style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+              style: TextStyle(color: s.onInk, fontSize: 8.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
             ),
           ),
         ],
@@ -942,7 +566,34 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRetroFooter(bool isMobile) {
+  // ---------------------------------------------------------------------------
+  // FOOTER
+  // ---------------------------------------------------------------------------
+  Widget _buildFooter(AppStyle s, bool isMobile) {
+    if (s.isClean) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 24 : 36),
+        decoration: BoxDecoration(
+          color: AppColors.cardBg,
+          border: Border(top: BorderSide(color: s.line)),
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              Text('iMeditații', style: s.heading(isMobile ? 18 : 20)),
+              const SizedBox(height: 6),
+              Text(
+                '© 2026 iMeditații. Pregătire pentru liceu și Bacalaureat.',
+                textAlign: TextAlign.center,
+                style: s.muted(isMobile ? 12.5 : 14),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 26 : 44),
@@ -955,12 +606,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               'IMEDITATII // GUILD',
-              style: TextStyle(
-                fontSize: isMobile ? 22 : 32,
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2.0,
-              ),
+              style: TextStyle(fontSize: isMobile ? 22 : 32, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2.0),
             ),
             const SizedBox(height: 6),
             Text(
@@ -971,6 +617,42 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 880;
+
+    return StyleBuilder(
+      builder: (context, s) {
+        return Scaffold(
+          backgroundColor: AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: Scrollbar(
+                  controller: _scrollController,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildHeroSection(s, isMobile),
+                        _buildPathsSection(s, isMobile),
+                        _buildMastersSection(s, isMobile),
+                        SizedBox(height: isMobile ? 14 : 28),
+                        _buildFooter(s, isMobile),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

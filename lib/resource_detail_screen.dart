@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
 import 'resources_data.dart';
+import 'ui_components.dart';
 
 class ResourceDetailScreen extends StatefulWidget {
   final String articleId;
@@ -19,14 +19,23 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   final Map<int, GlobalKey> _sectionKeys = {};
 
+  static const Map<String, String> _langLabels = {'cpp': 'C++', 'python': 'Python', 'code': 'Cod'};
+
   void _copyToClipboard(String code) {
+    final s = AppStyle.current;
     Clipboard.setData(ClipboardData(text: code));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text("COD COPIAT ÎN CLIPBOARD!", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: AppColors.forest,
+        content: Text(
+          s.pick("COD COPIAT ÎN CLIPBOARD!", "Codul a fost copiat."),
+          style: TextStyle(fontWeight: s.pick(FontWeight.bold, FontWeight.w500), color: Colors.white),
+        ),
+        backgroundColor: s.pick(AppColors.forest, AppStyle.codeBg),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 2)),
+        shape: RoundedRectangleBorder(
+          borderRadius: s.rButton,
+          side: s.isClean ? BorderSide.none : BorderSide(color: AppColors.border, width: 2),
+        ),
       ),
     );
   }
@@ -80,7 +89,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             "text": isMath
                 ? "În matematică, fiecare pas al deducției trebuie argumentat riguros:\n• Pasul 1: Identificarea ipotezei și stabilirea domeniului de definiție.\n• Pasul 2: Aplicarea formulelor fundamentale și a teoremelor specifice.\n• Pasul 3: Verificarea soluțiilor obținute și eliminarea soluțiilor străine."
                 : "În programare, implementarea corectă presupune respectarea normelor de eficiență algoritmică (atât ca timp de execuție, cât și ca memorie utilizată) și lizibilitatea codului.",
-            // NO CODE FOR MATH!
             "code": isMath
                 ? null
                 : meta['subject'] == 'PYTHON'
@@ -107,9 +115,8 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     final isMobile = MediaQuery.of(context).size.width < 900;
     final lecture = _getArticleData();
 
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
+    return StyleBuilder(
+      builder: (context, s) {
         if (lecture == null) {
           return FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance.collection('resources').doc(widget.articleId).get(),
@@ -117,31 +124,31 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
               if (snap.connectionState == ConnectionState.waiting) {
                 return Scaffold(
                   backgroundColor: AppColors.bg,
-                  body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+                  body: Center(child: CircularProgressIndicator(color: s.pick(AppColors.sunset, AppColors.sky))),
                 );
               }
               if (!snap.hasData || !snap.data!.exists) {
                 return Scaffold(
                   backgroundColor: AppColors.bg,
-                  appBar: AppBar(backgroundColor: AppColors.bg, iconTheme: IconThemeData(color: AppColors.ink)),
+                  appBar: AppBar(backgroundColor: AppColors.bg, elevation: 0, iconTheme: IconThemeData(color: AppColors.ink)),
                   body: Center(
-                    child: Text("LECȚIE NEIDENTIFICATĂ ÎN CODEX.", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.ink)),
+                    child: Text(s.pick("LECȚIE NEIDENTIFICATĂ ÎN CODEX.", "Lecția nu a fost găsită."), style: s.heading(18)),
                   ),
                 );
               }
 
               final data = snap.data!.data() as Map<String, dynamic>;
-              return _buildScreenBody(data, isMobile);
+              return _buildScreenBody(s, data, isMobile);
             },
           );
         }
 
-        return _buildScreenBody(lecture, isMobile);
+        return _buildScreenBody(s, lecture, isMobile);
       },
     );
   }
 
-  Widget _buildScreenBody(Map<String, dynamic> data, bool isMobile) {
+  Widget _buildScreenBody(AppStyle s, Map<String, dynamic> data, bool isMobile) {
     final List<dynamic> sections = data['sections'] ?? [];
 
     for (int i = 0; i < sections.length; i++) {
@@ -155,19 +162,21 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
       backgroundColor: AppColors.bg,
       appBar: AppBar(
         title: Text(
-          "CODEX // LECȚIE",
-          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: isMobile ? 15 : 18),
+          s.pick("CODEX // LECȚIE", "Lecții"),
+          style: s.isClean
+              ? TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600, fontSize: isMobile ? 15 : 16)
+              : TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: isMobile ? 15 : 18),
         ),
-        backgroundColor: AppColors.bg,
+        backgroundColor: s.pick(AppColors.bg, AppColors.cardBg),
         iconTheme: IconThemeData(color: AppColors.ink),
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(2.5),
-          child: Container(color: AppColors.border, height: 2.5),
+          preferredSize: Size.fromHeight(s.isClean ? 1 : 2.5),
+          child: Container(color: s.line, height: s.isClean ? 1 : 2.5),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 22 : 28),
+          icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 22 : s.pick(28.0, 24.0)),
           onPressed: () => context.go('/resurse'),
         ),
       ),
@@ -178,28 +187,35 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
               ? SingleChildScrollView(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                  child: _buildLectureContent(data, sections, isMobile, author, date),
+                  child: _buildLectureContent(s, data, sections, isMobile, author, date),
                 )
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Sticky Table of Contents
                     SizedBox(
                       width: 290,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 28),
-                        child: _buildTableOfContents(sections),
+                        child: _buildTableOfContents(s, sections),
                       ),
                     ),
                     const SizedBox(width: 28),
-                    // Main Article Reading View
                     Expanded(
                       child: Scrollbar(
                         controller: _scrollController,
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 8),
-                          child: _buildLectureContent(data, sections, isMobile, author, date),
+                          child: s.isClean
+                              // Clean keeps a readable line length.
+                              ? Align(
+                                  alignment: Alignment.topLeft,
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 760),
+                                    child: _buildLectureContent(s, data, sections, isMobile, author, date),
+                                  ),
+                                )
+                              : _buildLectureContent(s, data, sections, isMobile, author, date),
                         ),
                       ),
                     ),
@@ -210,13 +226,69 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     );
   }
 
-  Widget _buildTableOfContents(List<dynamic> sections) {
+  // ---------------------------------------------------------------------------
+  // TABLE OF CONTENTS
+  // ---------------------------------------------------------------------------
+  Widget _buildTableOfContents(AppStyle s, List<dynamic> sections) {
+    if (s.isClean) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
+        decoration: s.card(cleanLevel: 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text("Cuprins", style: s.heading(15)),
+            ),
+            const SizedBox(height: 10),
+            Material(
+              type: MaterialType.transparency,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: List.generate(sections.length, (i) {
+                  final raw = sections[i]['heading']?.toString() ?? "Secțiunea ${i + 1}";
+                  final label = raw.replaceFirst(RegExp(r'^\d+\.\s*'), '');
+                  return InkWell(
+                    borderRadius: s.rButton,
+                    hoverColor: AppColors.ink.withOpacity(AppColors.isDark ? 0.08 : 0.05),
+                    onTap: () => _scrollToSection(i),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 22,
+                            child: Text("${i + 1}", style: s.muted(13.5)),
+                          ),
+                          Expanded(
+                            child: Text(
+                              label,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: AppColors.ink, height: 1.4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cloud,
         border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
+        boxShadow: s.hardShadow(4),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,19 +298,13 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             children: [
               Icon(Icons.list_alt, size: 20, color: AppColors.ink),
               const SizedBox(width: 8),
-              Text(
-                "CUPRINS LECȚIE",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.ink, letterSpacing: 1.0),
-              ),
+              Text("CUPRINS LECȚIE", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.ink, letterSpacing: 1.0)),
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            "Apasă pentru salt la secțiune:",
-            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-          ),
+          Text("Apasă pentru salt la secțiune:", style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
           const SizedBox(height: 14),
-          Container(height: 2, color: AppColors.border),
+          const AppDivider(),
           const SizedBox(height: 14),
           ...List.generate(sections.length, (i) {
             final heading = sections[i]['heading'] ?? "Secțiunea ${i + 1}";
@@ -260,11 +326,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                       Expanded(
                         child: Text(
                           heading,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.ink,
-                          ),
+                          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: AppColors.ink),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -280,212 +342,272 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     );
   }
 
-  Widget _buildLectureContent(Map<String, dynamic> data, List<dynamic> sections, bool isMobile, String author, String date) {
+  // ---------------------------------------------------------------------------
+  // LECTURE
+  // ---------------------------------------------------------------------------
+  Widget _buildTags(AppStyle s, String? tag) {
+    if (s.isRetro) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        color: AppColors.forest,
+        child: Text(
+          tag ?? "RESURSĂ TEORETICĂ",
+          style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+        ),
+      );
+    }
+    final parts = (tag ?? "Resursă teoretică").split('//').map(AppStyle.sentence).where((p) => p.isNotEmpty).toList();
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (var i = 0; i < parts.length; i++)
+          AppBadge(text: parts[i], color: i == 0 ? AppColors.forest : AppColors.sky, fontSize: 11.5),
+      ],
+    );
+  }
+
+  Widget _buildLectureContent(
+    AppStyle s,
+    Map<String, dynamic> data,
+    List<dynamic> sections,
+    bool isMobile,
+    String author,
+    String date,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Topic Badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          color: AppColors.forest,
-          child: Text(
-            data['tag'] ?? "RESURSĂ TEORETICĂ",
-            style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
-          ),
-        ),
-        const SizedBox(height: 14),
-        // Title (Bigger Text)
+        _buildTags(s, data['tag']?.toString()),
+        SizedBox(height: s.pick(14.0, 16.0)),
         Text(
-          data['title'] ?? 'LECTURE',
-          style: TextStyle(
-            fontSize: isMobile ? 26 : 38,
-            fontWeight: FontWeight.w900,
-            color: AppColors.ink,
-            height: 1.15,
-            letterSpacing: 0.5,
-          ),
+          data['title'] ?? 'Lecție',
+          style: s.display(isMobile ? s.pick(26.0, 26.0) : s.pick(38.0, 34.0)),
         ),
         const SizedBox(height: 8),
-        // Subtitle (Bigger Text)
         Text(
           data['subtitle'] ?? '',
-          style: TextStyle(
-            fontSize: isMobile ? 14 : 17,
-            color: AppColors.textMuted,
-            fontWeight: FontWeight.bold,
-            height: 1.45,
-          ),
+          style: s.isClean
+              ? s.muted(isMobile ? 15 : 18, height: 1.5)
+              : TextStyle(fontSize: isMobile ? 14 : 17, color: AppColors.textMuted, fontWeight: FontWeight.bold, height: 1.45),
         ),
         const SizedBox(height: 16),
 
-        // Author & Date
+        // Author & date
         Row(
           children: [
             Container(
               width: 26,
               height: 26,
               decoration: BoxDecoration(
-                color: AppColors.mustard,
-                border: Border.all(color: AppColors.border, width: 1.5),
+                color: s.isClean ? s.tint(AppColors.sky) : AppColors.mustard,
+                border: s.isClean ? null : Border.all(color: AppColors.border, width: 1.5),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Text(
                 author.isNotEmpty ? author[0].toUpperCase() : 'A',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.black),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: s.pick(FontWeight.w900, FontWeight.w600),
+                  color: s.isClean ? s.accentText(AppColors.sky) : Colors.black,
+                ),
               ),
             ),
             const SizedBox(width: 8),
-            Text("AUTOR: ${author.toUpperCase()}", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.ink)),
+            Text(
+              s.pick("AUTOR: ${author.toUpperCase()}", author),
+              style: s.isClean
+                  ? TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, color: AppColors.ink)
+                  : TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.ink),
+            ),
             const SizedBox(width: 14),
-            Icon(Icons.event_note, size: 15, color: AppColors.textMuted),
-            const SizedBox(width: 4),
-            Text(date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textMuted)),
+            Icon(s.pick(Icons.event_note, Icons.calendar_today_outlined), size: s.pick(15.0, 13.0), color: AppColors.textMuted),
+            const SizedBox(width: 5),
+            Text(date, style: s.isClean ? s.muted(13) : TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textMuted)),
           ],
         ),
 
         const SizedBox(height: 20),
-        Container(height: 2.5, color: AppColors.border),
+        const AppDivider(retroThickness: 2.5),
         const SizedBox(height: 20),
 
-        // Dynamic Section Renderer
         ...List.generate(sections.length, (i) {
-          final s = sections[i];
-          final heading = s['heading'] ?? '';
-          final text = s['text'] ?? '';
-          final code = s['code'];
-          final lang = s['lang'] ?? 'code';
-          final callout = s['callout'];
+          final sec = sections[i];
+          final heading = sec['heading']?.toString() ?? '';
+          final text = sec['text']?.toString() ?? '';
+          final code = sec['code'];
+          final lang = sec['lang']?.toString() ?? 'code';
+          final callout = sec['callout'];
 
           return Container(
             key: _sectionKeys[i],
-            margin: const EdgeInsets.only(bottom: 28),
+            margin: EdgeInsets.only(bottom: s.pick(28.0, 32.0)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (heading.isNotEmpty) _buildSectionHeader(heading, isMobile),
-                if (text.isNotEmpty) _buildParagraph(text, isMobile),
-                // Render code ONLY IF PRESENT (Informatics has code, Math does not)
-                if (code != null && code.toString().isNotEmpty) _buildCodeBlock(code, lang, isMobile),
-                if (callout != null && callout.toString().isNotEmpty) _buildCallout(callout, AppColors.sunset, isMobile),
+                if (heading.isNotEmpty) _buildSectionHeader(s, heading, isMobile),
+                if (text.isNotEmpty) _buildParagraph(s, text, isMobile),
+                if (code != null && code.toString().isNotEmpty) _buildCodeBlock(s, code.toString(), lang, isMobile),
+                if (callout != null && callout.toString().isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: AppCallout(
+                      text: callout.toString(),
+                      color: AppColors.sunset,
+                      icon: s.isClean ? Icons.info_outline : null,
+                      fontSize: isMobile ? s.pick(14.5, 15.0) : s.pick(16.5, 16.0),
+                    ),
+                  ),
               ],
             ),
           );
         }),
 
         const SizedBox(height: 20),
-
-        // Bottom Action Banner
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.mustard,
-            border: Border.all(color: AppColors.border, width: 2.5),
-            boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(4, 4))],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "APLICĂ TEORIA ÎN PRACTICĂ",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                "Fixează-ți conceptele teoretice rezolvând exercițiile interactive din arena de antrenament.",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.ink,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                ),
-                icon: const Icon(Icons.play_arrow, size: 20),
-                label: const Text("DESCHIDE ARENA DE EXERCIȚII", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.8)),
-                onPressed: () => context.go('/exercitii'),
-              ),
-            ],
-          ),
-        ),
+        _buildBottomBanner(s),
       ],
     );
   }
 
-  Widget _buildSectionHeader(String title, bool isMobile) {
+  Widget _buildBottomBanner(AppStyle s) {
+    final title = s.pick("APLICĂ TEORIA ÎN PRACTICĂ", "Exersează ce ai citit");
+    final text = s.pick(
+      "Fixează-ți conceptele teoretice rezolvând exercițiile interactive din arena de antrenament.",
+      "Rezolvă probleme pe aceeași temă. Fiecare soluție e verificată automat.",
+    );
+
+    if (s.isClean) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: s.card(cleanLevel: 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: s.heading(18)),
+            const SizedBox(height: 6),
+            Text(text, style: s.muted(15)),
+            const SizedBox(height: 16),
+            RetroButton(
+              text: "Deschide exercițiile",
+              bgColor: s.primaryFill(AppColors.ink),
+              textColor: s.primaryText(Colors.white),
+              fontSize: 14,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              onPressed: () => context.go('/exercitii'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final bannerInk = AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.mustard,
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: s.hardShadow(4),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: bannerInk)),
+          const SizedBox(height: 6),
+          Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: bannerInk)),
+          const SizedBox(height: 16),
+          RetroButton(
+            text: "DESCHIDE ARENA DE EXERCIȚII",
+            icon: Icons.play_arrow,
+            bgColor: AppColors.ink,
+            textColor: s.onInk,
+            fontSize: 13,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            onPressed: () => context.go('/exercitii'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(AppStyle s, String title, bool isMobile) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 12),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: isMobile ? 21 : 26,
-          fontWeight: FontWeight.w900,
-          color: AppColors.ink,
-          letterSpacing: 0.4,
-        ),
+        style: s.isClean
+            ? s.heading(isMobile ? 20 : 24)
+            : TextStyle(fontSize: isMobile ? 21 : 26, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.4),
       ),
     );
   }
 
-  Widget _buildParagraph(String text, bool isMobile) {
+  Widget _buildParagraph(AppStyle s, String text, bool isMobile) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: isMobile ? 16 : 18.5,
-          color: AppColors.ink,
-          fontWeight: FontWeight.w600,
-          height: 1.75,
-          letterSpacing: 0.2,
-        ),
+        style: s.isClean
+            ? s.body(isMobile ? 16 : 17, height: 1.75)
+            : TextStyle(fontSize: isMobile ? 16 : 18.5, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.75, letterSpacing: 0.2),
       ),
     );
   }
 
-  Widget _buildCodeBlock(String code, String language, bool isMobile) {
+  Widget _buildCodeBlock(AppStyle s, String code, String language, bool isMobile) {
+    final label = s.pick(language.toUpperCase(), _langLabels[language] ?? language);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1B242B),
-        border: Border.all(color: AppColors.border, width: 2.5),
-        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3.5, 3.5))],
-      ),
+      clipBehavior: Clip.antiAlias,
+      decoration: s.codeSurface(withShadow: s.isRetro),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            color: const Color(0xFF141A1F),
+            color: AppStyle.codeGutter,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
-                    const SizedBox(width: 6),
-                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
-                    const SizedBox(width: 6),
-                    Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
-                    const SizedBox(width: 12),
+                    if (s.isRetro) ...[
+                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
+                      const SizedBox(width: 6),
+                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
+                      const SizedBox(width: 6),
+                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
+                      const SizedBox(width: 12),
+                    ],
                     Text(
-                      language.toUpperCase(),
-                      style: const TextStyle(color: Color(0xFF55EFC4), fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
+                      label,
+                      style: s.isClean
+                          ? const TextStyle(color: Colors.white70, fontSize: 12.5, fontWeight: FontWeight.w500)
+                          : const TextStyle(color: AppStyle.codeAccent, fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () => _copyToClipboard(code),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.copy, size: 15, color: Colors.white70),
-                      SizedBox(width: 4),
-                      Text("COPIAZĂ CODUL", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ],
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => _copyToClipboard(code),
+                    child: Row(
+                      children: [
+                        Icon(s.pick(Icons.copy, Icons.content_copy_outlined), size: s.pick(15.0, 14.0), color: Colors.white70),
+                        const SizedBox(width: 5),
+                        Text(
+                          s.pick("COPIAZĂ CODUL", "Copiază"),
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: s.pick(11.0, 12.5),
+                            fontWeight: s.pick(FontWeight.bold, FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -495,36 +617,14 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             padding: EdgeInsets.all(isMobile ? 14 : 18),
             child: SelectableText(
               code,
-              style: TextStyle(
-                fontFamily: 'monospace',
-                fontSize: isMobile ? 14 : 15.5,
-                color: const Color(0xFFECEFF4),
-                height: 1.55,
-                fontWeight: FontWeight.w600,
+              style: s.mono(
+                isMobile ? s.pick(14.0, 13.5) : s.pick(15.5, 14.5),
+                color: AppStyle.codeText,
+                height: 1.6,
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCallout(String text, Color accentColor, bool isMobile) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 14),
-      padding: EdgeInsets.all(isMobile ? 14 : 18),
-      decoration: BoxDecoration(
-        color: accentColor.withOpacity(0.12),
-        border: Border(left: BorderSide(color: accentColor, width: 4.5)),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: isMobile ? 14.5 : 16.5,
-          fontWeight: FontWeight.bold,
-          color: AppColors.ink,
-          height: 1.55,
-        ),
       ),
     );
   }

@@ -3,10 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
+import 'ui_components.dart';
 
-class NavRetroButton extends StatefulWidget {
+/// Kept for backwards compatibility — now a thin wrapper over RetroButton,
+/// so it follows the design system automatically.
+class NavRetroButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final Color? bgColor;
@@ -25,70 +27,16 @@ class NavRetroButton extends StatefulWidget {
   });
 
   @override
-  State<NavRetroButton> createState() => _NavRetroButtonState();
-}
-
-class _NavRetroButtonState extends State<NavRetroButton> {
-  bool isPressed = false;
-  bool isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final effectiveBg = widget.bgColor ?? AppColors.cardBg;
-    final effectiveTextColor = widget.textColor ?? AppColors.ink;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => isPressed = true),
-        onTapUp: (_) {
-          setState(() => isPressed = false);
-          widget.onPressed();
-        },
-        onTapCancel: () => setState(() => isPressed = false),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
-          width: widget.isFullWidth ? double.infinity : null,
-          transform: Matrix4.translationValues(
-            isPressed ? 2.0 : (isHovered ? -2.0 : 0.0),
-            isPressed ? 2.0 : (isHovered ? -2.0 : 0.0),
-            0,
-          ),
-          decoration: BoxDecoration(
-            color: effectiveBg,
-            border: Border.all(color: AppColors.border, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadow,
-                offset: isPressed ? const Offset(0, 0) : const Offset(4, 4),
-                blurRadius: 0,
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.icon != null) ...[
-                Icon(widget.icon, color: effectiveTextColor, size: 20),
-                const SizedBox(width: 8),
-              ],
-              Text(
-                widget.text.toUpperCase(),
-                style: TextStyle(
-                  color: effectiveTextColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return RetroButton(
+      text: text,
+      onPressed: onPressed,
+      bgColor: bgColor ?? AppColors.cardBg,
+      textColor: textColor ?? AppColors.ink,
+      icon: icon,
+      isFullWidth: isFullWidth,
+      fontSize: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
     );
   }
 }
@@ -97,15 +45,8 @@ class NavTextLink extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
   final bool isMobile;
-  final bool isClean;
 
-  const NavTextLink({
-    super.key,
-    required this.text,
-    required this.onTap,
-    this.isMobile = false,
-    this.isClean = false,
-  });
+  const NavTextLink({super.key, required this.text, required this.onTap, this.isMobile = false});
 
   @override
   State<NavTextLink> createState() => _NavTextLinkState();
@@ -116,29 +57,7 @@ class _NavTextLinkState extends State<NavTextLink> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isClean) {
-      return MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => isHovered = true),
-        onExit: (_) => setState(() => isHovered = false),
-        child: GestureDetector(
-          onTap: widget.onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: Text(
-              widget.text,
-              textAlign: widget.isMobile ? TextAlign.center : TextAlign.left,
-              style: TextStyle(
-                color: isHovered ? const Color(0xFF55EFC4) : Colors.white.withOpacity(0.9),
-                fontSize: 14.5,
-                fontWeight: isHovered ? FontWeight.w800 : FontWeight.w600,
-                letterSpacing: 0.3,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    final s = AppStyle.of(context);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -149,23 +68,33 @@ class _NavTextLinkState extends State<NavTextLink> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           width: widget.isMobile ? double.infinity : null,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: isHovered ? AppColors.mustard : Colors.transparent,
-            border: Border.all(
-              color: isHovered ? AppColors.border : Colors.transparent,
-              width: 2,
-            ),
-          ),
+          padding: s.isClean
+              ? EdgeInsets.symmetric(horizontal: 14, vertical: widget.isMobile ? 14 : 10)
+              : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: s.isClean
+              ? BoxDecoration(
+                  color: isHovered ? AppColors.ink.withOpacity(AppColors.isDark ? 0.08 : 0.06) : Colors.transparent,
+                  borderRadius: s.rButton,
+                )
+              : BoxDecoration(
+                  color: isHovered ? AppColors.mustard : Colors.transparent,
+                  border: Border.all(color: isHovered ? AppColors.border : Colors.transparent, width: 2),
+                ),
           child: Text(
-            widget.text.toUpperCase(),
+            s.caps(widget.text),
             textAlign: widget.isMobile ? TextAlign.center : TextAlign.left,
-            style: TextStyle(
-              color: AppColors.ink,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.0,
-            ),
+            style: s.isClean
+                ? TextStyle(
+                    color: isHovered ? AppColors.ink : AppColors.ink.withOpacity(0.78),
+                    fontSize: widget.isMobile ? 16 : 15,
+                    fontWeight: FontWeight.w500,
+                  )
+                : TextStyle(
+                    color: AppColors.ink,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
           ),
         ),
       ),
@@ -208,111 +137,118 @@ class CustomNavbar extends StatelessWidget {
     }
   }
 
-  void _showMobileMenu(BuildContext context, User? user, bool isClean) {
+  void _showMobileMenu(BuildContext context, User? user) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: isClean ? const Color(0xFF1E2327) : AppColors.bg,
-          borderRadius: isClean ? const BorderRadius.vertical(top: Radius.circular(16)) : BorderRadius.zero,
-          border: isClean ? null : Border(top: BorderSide(color: AppColors.border, width: 4)),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isClean ? "Meniu Navigare" : "SYSTEM MENU",
-                    style: TextStyle(
-                      color: isClean ? Colors.white : AppColors.ink,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: isClean ? 0.5 : 2.0,
+      builder: (context) {
+        final s = AppStyle.of(context);
+        return Container(
+          decoration: s.isClean
+              ? BoxDecoration(
+                  color: AppColors.cardBg,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  boxShadow: s.softShadow(2),
+                )
+              : BoxDecoration(
+                  color: AppColors.bg,
+                  border: Border(top: BorderSide(color: AppColors.border, width: 4)),
+                ),
+          padding: EdgeInsets.fromLTRB(24, s.isClean ? 12 : 24, 24, 24),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (s.isClean) ...[
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(color: s.lineStrong, borderRadius: BorderRadius.circular(2)),
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: isClean ? Colors.white70 : AppColors.ink, size: 28),
-                    onPressed: () => context.pop(),
-                  ),
+                  const SizedBox(height: 12),
                 ],
-              ),
-              const SizedBox(height: 18),
-              NavTextLink(text: isClean ? 'Probleme & Exerciții' : 'Daily Quest', isMobile: true, isClean: isClean, onTap: () { context.pop(); context.go('/exercitii'); }),
-              const SizedBox(height: 6),
-              NavTextLink(text: isClean ? 'Teorie & Articole (Codex)' : 'The Codex', isMobile: true, isClean: isClean, onTap: () { context.pop(); context.go('/resurse'); }),
-              const SizedBox(height: 6),
-              NavTextLink(text: isClean ? 'Profesori & Meditații' : 'Guild Masters', isMobile: true, isClean: isClean, onTap: () { context.pop(); context.go('/materii'); }),
-              const SizedBox(height: 18),
-              Container(height: 1, color: isClean ? Colors.white12 : AppColors.border),
-              const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      s.pick("SYSTEM MENU", "Meniu"),
+                      style: s.isClean
+                          ? s.heading(18)
+                          : TextStyle(color: AppColors.ink, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2.0),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: AppColors.ink, size: s.pick(32.0, 24.0)),
+                      onPressed: () => context.pop(),
+                    ),
+                  ],
+                ),
+                SizedBox(height: s.pick(24.0, 12.0)),
+                NavTextLink(text: s.pick('Teachers', 'Profesori'), isMobile: true, onTap: () { context.pop(); context.go('/materii'); }),
+                const SizedBox(height: 8),
+                NavTextLink(text: s.pick('Exercises', 'Exerciții'), isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); }),
+                const SizedBox(height: 8),
+                NavTextLink(text: s.pick('Resources', 'Lecții'), isMobile: true, onTap: () { context.pop(); context.go('/resurse'); }),
+                const SizedBox(height: 24),
+                AppDivider(retroThickness: 3),
+                const SizedBox(height: 24),
 
-              if (user == null) ...[
-                if (isClean) ...[
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2C3E50), padding: const EdgeInsets.symmetric(vertical: 14)),
+                if (user == null) ...[
+                  NavRetroButton(
+                    text: s.pick('Log In', 'Autentificare'),
+                    isFullWidth: true,
+                    bgColor: AppColors.cardBg,
+                    textColor: AppColors.ink,
                     onPressed: () { context.pop(); context.go('/login'); },
-                    child: const Text("Autentificare", style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF20BF6B), padding: const EdgeInsets.symmetric(vertical: 14)),
+                  const SizedBox(height: 16),
+                  NavRetroButton(
+                    text: s.pick('Start Playing', 'Creează cont'),
+                    isFullWidth: true,
+                    bgColor: s.primaryFill(AppColors.sky),
+                    textColor: s.primaryText(Colors.white),
                     onPressed: () { context.pop(); context.go('/inregistrare'); },
-                    child: const Text("Înregistrare Cont", style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ] else ...[
-                  NavRetroButton(text: 'Log In', isFullWidth: true, bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () { context.pop(); context.go('/login'); }),
+                  NavRetroButton(
+                    text: s.pick('Terminal', 'Panoul meu'),
+                    icon: s.pick(Icons.dashboard, Icons.dashboard_outlined),
+                    isFullWidth: true,
+                    bgColor: AppColors.mustard,
+                    textColor: AppColors.ink,
+                    onPressed: () { context.pop(); _handleDashboardRouting(context, user); },
+                  ),
                   const SizedBox(height: 16),
-                  NavRetroButton(text: 'Start Playing', isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: () { context.pop(); context.go('/inregistrare'); }),
-                ]
-              ] else ...[
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isClean ? const Color(0xFF2C3E50) : AppColors.mustard,
-                    foregroundColor: isClean ? Colors.white : AppColors.ink,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  NavRetroButton(
+                    text: s.pick('Profile', 'Profil'),
+                    icon: s.pick(Icons.person, Icons.person_outline),
+                    isFullWidth: true,
+                    bgColor: AppColors.cardBg,
+                    textColor: AppColors.ink,
+                    onPressed: () { context.pop(); _handleProfileRouting(context, user); },
                   ),
-                  icon: const Icon(Icons.dashboard, size: 20),
-                  label: Text(isClean ? "Panou Control" : "Terminal"),
-                  onPressed: () { context.pop(); _handleDashboardRouting(context, user); },
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isClean ? const Color(0xFF2C3E50) : AppColors.cardBg,
-                    foregroundColor: isClean ? Colors.white : AppColors.ink,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 16),
+                  NavRetroButton(
+                    text: s.pick('Log Out', 'Deconectare'),
+                    icon: Icons.logout,
+                    isFullWidth: true,
+                    bgColor: AppColors.sunset,
+                    textColor: Colors.white,
+                    onPressed: () async {
+                      context.pop();
+                      await FirebaseAuth.instance.signOut();
+                      if (context.mounted) context.go('/');
+                    },
                   ),
-                  icon: const Icon(Icons.person, size: 20),
-                  label: Text(isClean ? "Profilul Meu" : "Profile"),
-                  onPressed: () { context.pop(); _handleProfileRouting(context, user); },
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.sunset,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  icon: const Icon(Icons.logout, size: 20),
-                  label: const Text("Deconectare"),
-                  onPressed: () async {
-                    context.pop();
-                    await FirebaseAuth.instance.signOut();
-                    if (context.mounted) context.go('/');
-                  },
-                ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -320,258 +256,155 @@ class CustomNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 900;
-    final isClean = ThemeManager.isClean;
+    final isCompactPhone = screenWidth < 380;
 
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        final user = snapshot.data;
+    return StyleBuilder(
+      builder: (context, s) {
+        return StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            final user = snapshot.data;
 
-        // ----------------------------------------------------
-        // PBINFO-INSPIRED ACADEMIC CLEAN NAVBAR
-        // ----------------------------------------------------
-        if (isClean) {
-          return Container(
-            height: isDesktop ? 64 : 60,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E2327), // Authentic pbinfo dark graphite header
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.18),
-                  offset: const Offset(0, 2),
-                  blurRadius: 6,
+            return Container(
+              height: isDesktop ? 90 : 78,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: s.pick(AppColors.bg, AppColors.cardBg),
+                border: Border(
+                  bottom: s.isClean
+                      ? BorderSide(color: s.line, width: 1)
+                      : BorderSide(color: AppColors.border, width: 3),
                 ),
-              ],
-            ),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1200),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
-                  child: Row(
-                    children: [
-                      // Clean Academic Logo
-                      GestureDetector(
-                        onTap: () => context.go('/'),
-                        child: MouseRegion(
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // LOGO SECTION
+                        MouseRegion(
                           cursor: SystemMouseCursors.click,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF20BF6B),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: const Icon(Icons.school, color: Colors.white, size: 20),
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                "iMeditatii",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      if (isDesktop) ...[
-                        const SizedBox(width: 28),
-                        // Desktop Direct Academic Links
-                        NavTextLink(text: "Probleme", isClean: true, onTap: () => context.go('/exercitii')),
-                        NavTextLink(text: "Resurse & Teorie", isClean: true, onTap: () => context.go('/resurse')),
-                        NavTextLink(text: "Profesori", isClean: true, onTap: () => context.go('/materii')),
-
-                        const Spacer(),
-
-                        // Clean inline search input
-                        Container(
-                          width: 240,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.25),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.white.withOpacity(0.12)),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, size: 16, color: Colors.white.withOpacity(0.6)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: TextField(
-                                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                                  cursorColor: const Color(0xFF55EFC4),
-                                  decoration: InputDecoration(
-                                    hintText: "Caută probleme, teorie...",
-                                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
-                                    border: InputBorder.none,
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.zero,
+                          child: GestureDetector(
+                            onTap: () => context.go('/'),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(isDesktop ? 8 : 6),
+                                  decoration: s.isClean
+                                      ? BoxDecoration(color: AppColors.sunset, borderRadius: BorderRadius.circular(10))
+                                      : BoxDecoration(
+                                          color: AppColors.sunset,
+                                          border: Border.all(color: AppColors.border, width: 2),
+                                        ),
+                                  child: Icon(
+                                    s.pick(Icons.videogame_asset, Icons.school_rounded),
+                                    color: Colors.white,
+                                    size: isDesktop ? s.pick(28.0, 24.0) : s.pick(22.0, 20.0),
                                   ),
-                                  onSubmitted: (query) {
-                                    if (query.trim().isNotEmpty) {
-                                      context.go('/lista-exercitii?materie=${Uri.encodeComponent(query.trim())}');
-                                    }
-                                  },
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: isDesktop ? s.pick(16.0, 12.0) : 10),
+                                Text(
+                                  s.pick('IMEDITATII', 'iMeditații'),
+                                  style: s.isClean
+                                      ? TextStyle(
+                                          fontSize: isDesktop ? 24 : (isCompactPhone ? 18 : 20),
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.ink,
+                                          letterSpacing: -0.5,
+                                        )
+                                      : TextStyle(
+                                          fontSize: isDesktop ? 32 : (isCompactPhone ? 20 : 24),
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColors.ink,
+                                          letterSpacing: isDesktop ? 2.0 : 1.2,
+                                        ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 18),
 
-                        // Auth Actions
-                        if (user == null) ...[
-                          TextButton(
-                            onPressed: () => context.go('/login'),
-                            child: const Text("Autentificare", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13.5)),
+                        // DESKTOP NAVIGATION
+                        if (isDesktop) ...[
+                          Row(
+                            children: [
+                              NavTextLink(text: s.pick('Teachers', 'Profesori'), onTap: () => context.go('/materii')),
+                              SizedBox(width: s.pick(16.0, 4.0)),
+                              NavTextLink(text: s.pick('Exercises', 'Exerciții'), onTap: () => context.go('/exercitii')),
+                              SizedBox(width: s.pick(14.0, 4.0)),
+                              NavTextLink(text: s.pick('Resources', 'Lecții'), onTap: () => context.go('/resurse')),
+                            ],
                           ),
-                          const SizedBox(width: 6),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF20BF6B),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                              elevation: 0,
-                            ),
-                            onPressed: () => context.go('/inregistrare'),
-                            child: const Text("Cont Nou", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          Row(
+                            children: [
+                              if (user == null) ...[
+                                NavRetroButton(
+                                  text: s.pick('Log In', 'Autentificare'),
+                                  bgColor: AppColors.cardBg,
+                                  textColor: AppColors.ink,
+                                  onPressed: () => context.go('/login'),
+                                ),
+                                SizedBox(width: s.pick(16.0, 10.0)),
+                                NavRetroButton(
+                                  text: s.pick('Start Playing', 'Creează cont'),
+                                  bgColor: s.primaryFill(AppColors.sky),
+                                  textColor: s.primaryText(Colors.white),
+                                  onPressed: () => context.go('/inregistrare'),
+                                ),
+                              ] else ...[
+                                IconButton(
+                                  tooltip: s.pick('Terminal', 'Panoul meu'),
+                                  icon: Icon(s.pick(Icons.dashboard, Icons.dashboard_outlined), color: AppColors.ink, size: s.pick(28.0, 24.0)),
+                                  onPressed: () => _handleDashboardRouting(context, user),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  tooltip: s.pick('Profile', 'Profil'),
+                                  icon: Icon(s.pick(Icons.person, Icons.person_outline), color: AppColors.ink, size: s.pick(28.0, 24.0)),
+                                  onPressed: () => _handleProfileRouting(context, user),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  decoration: s.isClean
+                                      ? BoxDecoration(color: s.tint(AppColors.sunset), borderRadius: s.rButton)
+                                      : BoxDecoration(
+                                          color: AppColors.sunset,
+                                          border: Border.all(color: AppColors.border, width: 2),
+                                        ),
+                                  child: IconButton(
+                                    tooltip: s.pick('Log Out', 'Deconectare'),
+                                    icon: Icon(
+                                      Icons.logout,
+                                      color: s.isClean ? s.accentText(AppColors.sunset) : Colors.white,
+                                      size: 20,
+                                    ),
+                                    onPressed: () async {
+                                      await FirebaseAuth.instance.signOut();
+                                      if (context.mounted) context.go('/');
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
-                        ] else ...[
+                        ]
+                        // MOBILE NAVIGATION
+                        else ...[
                           IconButton(
-                            icon: const Icon(Icons.dashboard_outlined, color: Colors.white70, size: 22),
-                            tooltip: "Panou",
-                            onPressed: () => _handleDashboardRouting(context, user),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.person_outline, color: Colors.white70, size: 22),
-                            tooltip: "Profil",
-                            onPressed: () => _handleProfileRouting(context, user),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.logout, color: Colors.white70, size: 20),
-                            tooltip: "Deconectare",
-                            onPressed: () async {
-                              await FirebaseAuth.instance.signOut();
-                              if (context.mounted) context.go('/');
-                            },
+                            icon: Icon(s.pick(Icons.menu, Icons.menu_rounded), color: AppColors.ink, size: s.pick(32.0, 28.0)),
+                            onPressed: () => _showMobileMenu(context, user),
                           ),
                         ],
-                      ] else ...[
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.menu, color: Colors.white, size: 28),
-                          onPressed: () => _showMobileMenu(context, user, true),
-                        ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }
-
-        // ----------------------------------------------------
-        // ORIGINAL 8-BIT RETRO NAVBAR
-        // ----------------------------------------------------
-        return Container(
-          height: isDesktop ? 90 : 78,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: AppColors.bg,
-            border: Border(bottom: BorderSide(color: AppColors.border, width: 3)),
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1100),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () => context.go('/'),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(isDesktop ? 8 : 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.sunset,
-                                border: Border.all(color: AppColors.border, width: 2),
-                              ),
-                              child: Icon(Icons.videogame_asset, color: Colors.white, size: isDesktop ? 28 : 22),
-                            ),
-                            SizedBox(width: isDesktop ? 16 : 10),
-                            Text(
-                              'IMEDITATII',
-                              style: TextStyle(
-                                fontSize: isDesktop ? 32 : 24,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.ink,
-                                letterSpacing: isDesktop ? 2.0 : 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    if (isDesktop) ...[
-                      Row(
-                        children: [
-                          NavTextLink(text: 'Guild Masters', onTap: () => context.go('/materii')),
-                          const SizedBox(width: 14),
-                          NavTextLink(text: 'Daily Quest', onTap: () => context.go('/exercitii')),
-                          const SizedBox(width: 14),
-                          NavTextLink(text: 'The Codex', onTap: () => context.go('/resurse')),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          if (user == null) ...[
-                            NavRetroButton(text: 'Log In', bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () => context.go('/login')),
-                            const SizedBox(width: 14),
-                            NavRetroButton(text: 'Start Playing', bgColor: AppColors.sky, textColor: Colors.white, onPressed: () => context.go('/inregistrare')),
-                          ] else ...[
-                            IconButton(icon: Icon(Icons.dashboard, color: AppColors.ink, size: 28), onPressed: () => _handleDashboardRouting(context, user)),
-                            const SizedBox(width: 8),
-                            IconButton(icon: Icon(Icons.person, color: AppColors.ink, size: 28), onPressed: () => _handleProfileRouting(context, user)),
-                            const SizedBox(width: 8),
-                            Container(
-                              decoration: BoxDecoration(color: AppColors.sunset, border: Border.all(color: AppColors.border, width: 2)),
-                              child: IconButton(
-                                icon: const Icon(Icons.logout, color: Colors.white, size: 20),
-                                onPressed: () async {
-                                  await FirebaseAuth.instance.signOut();
-                                  if (context.mounted) context.go('/');
-                                },
-                              ),
-                            ),
-                          ]
-                        ],
-                      )
-                    ] else ...[
-                      IconButton(
-                        icon: Icon(Icons.menu, color: AppColors.ink, size: 32),
-                        onPressed: () => _showMobileMenu(context, user, false),
-                      )
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
