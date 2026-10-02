@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   int _completedQuests = 0;
   bool _isLoadingStats = true;
+  String _academicGrade = "9"; // 9, 10, 11, 12
 
   @override
   void initState() {
@@ -62,6 +63,427 @@ class _HomeScreenState extends State<HomeScreen> {
     context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 880;
+
+    return ValueListenableBuilder<AppStyleMode>(
+      valueListenable: ThemeManager.styleNotifier,
+      builder: (context, currentStyle, _) {
+        final isClean = currentStyle == AppStyleMode.clean;
+
+        return Scaffold(
+          backgroundColor: isClean
+              ? (AppColors.isDark ? const Color(0xFF141A1F) : const Color(0xFFF8F9FA))
+              : AppColors.bg,
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: Scrollbar(
+                  controller: _scrollController,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: isClean
+                        ? _buildAcademicDirectoryView(isMobile)
+                        : _buildRetroArcadeView(isMobile),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // =========================================================================
+  // VIEW 1: AUTHENTIC PBINFO-STYLE ACADEMIC DIRECTORY (CLEAN MODE)
+  // =========================================================================
+  Widget _buildAcademicDirectoryView(bool isMobile) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1140),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 36),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Clean Breadcrumb & Notice
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.isDark ? const Color(0xFF1E252B) : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.school, size: 20, color: Color(0xFF20BF6B)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Portal educațional de informatică și matematică conform programei școlare naționale 2026.",
+                        style: TextStyle(
+                          fontSize: isMobile ? 12 : 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Grade Tabs (Clasa a IX-a – Clasa a XII-a)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _academicGradeTab("9", "Clasa a IX-a (Python & C++)"),
+                    const SizedBox(width: 8),
+                    _academicGradeTab("10", "Clasa a X-a (Recursivitate & Matrice)"),
+                    const SizedBox(width: 8),
+                    _academicGradeTab("11", "Clasa a XI-a (Grafuri & Dinamică)"),
+                    const SizedBox(width: 8),
+                    _academicGradeTab("12", "Clasa a XII-a (OOP, SQL & Bacalaureat)"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Academic Curriculum Grid
+              if (!isMobile)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildCurriculumColumnA()),
+                    const SizedBox(width: 24),
+                    Expanded(child: _buildCurriculumColumnB()),
+                  ],
+                )
+              else
+                Column(
+                  children: [
+                    _buildCurriculumColumnA(),
+                    const SizedBox(height: 18),
+                    _buildCurriculumColumnB(),
+                  ],
+                ),
+
+              const SizedBox(height: 36),
+
+              // Clean Quick Practice Section
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.isDark ? const Color(0xFF1E252B) : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Vrei să exersezi direct în arenă?",
+                            style: TextStyle(fontSize: isMobile ? 16 : 18, fontWeight: FontWeight.w800, color: AppColors.ink),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Rezolvă probleme cu evaluator automat C++ și teste live.",
+                            style: TextStyle(fontSize: isMobile ? 12.5 : 14, color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF20BF6B),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        elevation: 0,
+                      ),
+                      onPressed: () => context.go('/exercitii'),
+                      child: const Text("Deschide Probleme", style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 40),
+              _buildAcademicFooter(isMobile),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _academicGradeTab(String grade, String title) {
+    final isSelected = _academicGrade == grade;
+    return InkWell(
+      onTap: () => setState(() => _academicGrade = grade),
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF20BF6B)
+              : (AppColors.isDark ? const Color(0xFF1E252B) : Colors.white),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: isSelected ? Colors.transparent : (AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
+          ),
+        ),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.ink,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurriculumColumnA() {
+    if (_academicGrade == "9") {
+      return Column(
+        children: [
+          _academicDirectoryCard(
+            title: "Elemente de bază ale limbajului Python",
+            badge: "NOU ÎN PROGRAMĂ",
+            badgeColor: const Color(0xFF20BF6B),
+            topics: [
+              {"title": "Introducere în Python & Scurt Istoric", "route": "/resurse/py-9-intro"},
+              {"title": "Variabile, Tipuri Primitive & input()", "route": "/resurse/py-9-vars"},
+              {"title": "Operatori Aritmetici & Logici", "route": "/resurse/py-9-operators"},
+            ],
+          ),
+          const SizedBox(height: 18),
+          _academicDirectoryCard(
+            title: "Structuri de control Python",
+            badge: "PYTHON 3",
+            badgeColor: const Color(0xFF45AAF2),
+            topics: [
+              {"title": "Instrucțiunea Decizională: if, elif, else", "route": "/resurse/py-9-if"},
+              {"title": "Structuri Repetitive: while & for range()", "route": "/resurse/py-9-loops"},
+            ],
+          ),
+        ],
+      );
+    } else if (_academicGrade == "10") {
+      return _academicDirectoryCard(
+        title: "Tablouri Bidimensionale (Matrice)",
+        badge: "C++",
+        badgeColor: const Color(0xFF45AAF2),
+        topics: [
+          {"title": "Matrice în C++: Declarare & Parcurgere", "route": "/resurse/cpp-10-matrix-basics"},
+          {"title": "Diagonala Principală & Secundară", "route": "/resurse/cpp-10-matrix-diagonals"},
+        ],
+      );
+    } else if (_academicGrade == "11") {
+      return _academicDirectoryCard(
+        title: "Tehnica Backtracking",
+        badge: "ALGORITMICĂ",
+        badgeColor: const Color(0xFF8854D0),
+        topics: [
+          {"title": "Backtracking: Căutare cu Revenire", "route": "/resurse/cpp-11-backtracking-intro"},
+          {"title": "Generarea Permutărilor", "route": "/resurse/cpp-11-backtracking-perm"},
+          {"title": "Generarea Combinărilor & Aranjamentelor", "route": "/resurse/cpp-11-backtracking-comb"},
+        ],
+      );
+    } else {
+      return _academicDirectoryCard(
+        title: "Programare Orientată pe Obiecte (OOP)",
+        badge: "C++",
+        badgeColor: const Color(0xFF45AAF2),
+        topics: [
+          {"title": "Clase, Obiecte & Modificatori de Acces", "route": "/resurse/cpp-12-oop-classes"},
+          {"title": "Constructori & Destructori", "route": "/resurse/cpp-12-oop-constructors"},
+          {"title": "Moștenire & Polimorfism", "route": "/resurse/cpp-12-oop-inheritance"},
+        ],
+      );
+    }
+  }
+
+  Widget _buildCurriculumColumnB() {
+    if (_academicGrade == "9") {
+      return Column(
+        children: [
+          _academicDirectoryCard(
+            title: "Elemente de bază ale limbajului C++",
+            badge: "CURRICULUM",
+            badgeColor: const Color(0xFFFA8231),
+            topics: [
+              {"title": "Directiva #include, iostream & cin/cout", "route": "/resurse/cpp-9-intro"},
+              {"title": "Tipuri de Date, Operatori & Codul ASCII", "route": "/resurse/cpp-9-types"},
+              {"title": "Buclele while, do-while și for", "route": "/resurse/cpp-9-loops"},
+            ],
+          ),
+          const SizedBox(height: 18),
+          _academicDirectoryCard(
+            title: "Algoritmi Elementari & Vectori",
+            badge: "OLIMPIADĂ & BAC",
+            badgeColor: const Color(0xFF20BF6B),
+            topics: [
+              {"title": "Prelucrarea Cifrelor unui Număr", "route": "/resurse/alg-9-digits"},
+              {"title": "Divizibilitate, Numere Prime & Descompunere", "route": "/resurse/alg-9-divisors"},
+              {"title": "Vectori în C++: Declarare & Parcurgere", "route": "/resurse/cpp-9-vectors-basic"},
+            ],
+          ),
+        ],
+      );
+    } else if (_academicGrade == "10") {
+      return _academicDirectoryCard(
+        title: "Recursivitate & Divide et Impera",
+        badge: "ALGORITMICĂ",
+        badgeColor: const Color(0xFF20BF6B),
+        topics: [
+          {"title": "Recursivitate: Stiva de apeluri", "route": "/resurse/cpp-10-recursion-intro"},
+          {"title": "Divide et Impera & Căutarea Binară", "route": "/resurse/cpp-10-d&i-intro"},
+          {"title": "MergeSort & QuickSort", "route": "/resurse/cpp-10-d&i-mergesort"},
+        ],
+      );
+    } else if (_academicGrade == "11") {
+      return _academicDirectoryCard(
+        title: "Grafuri Neorientate & Dinamică",
+        badge: "CLASA A XI-A",
+        badgeColor: const Color(0xFF20BF6B),
+        topics: [
+          {"title": "Matricea de Adiacență & Conexitate", "route": "/resurse/cpp-11-graphs-matrix"},
+          {"title": "Parcurgerile BFS și DFS", "route": "/resurse/cpp-11-graphs-bfs"},
+          {"title": "Programare Dinamică: Recurență & LIS", "route": "/resurse/cpp-11-dp-subseq"},
+        ],
+      );
+    } else {
+      return _academicDirectoryCard(
+        title: "Pregătire Bacalaureat Informatică",
+        badge: "EXAMEN BAC",
+        badgeColor: const Color(0xFFE75A41),
+        topics: [
+          {"title": "Strategii pentru Subiectul I (Grile)", "route": "/resurse/bac-12-info-sub1"},
+          {"title": "Rezolvarea Subiectului II (Șiruri & Struct)", "route": "/resurse/bac-12-info-sub2"},
+          {"title": "Subiectul III.3: Algoritmi Eficienți O(N) și O(1)", "route": "/resurse/bac-12-info-sub3"},
+        ],
+      );
+    }
+  }
+
+  Widget _academicDirectoryCard({
+    required String title,
+    required String badge,
+    required Color badgeColor,
+    required List<Map<String, String>> topics,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.isDark ? const Color(0xFF1E252B) : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08)),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: badgeColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  badge,
+                  style: TextStyle(color: badgeColor, fontSize: 10.5, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Divider(height: 1, color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.06)),
+          const SizedBox(height: 12),
+          ...topics.map((t) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: InkWell(
+                onTap: () => context.go(t['route']!),
+                child: Row(
+                  children: [
+                    const Icon(Icons.arrow_right, size: 18, color: Color(0xFF20BF6B)),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        t['title']!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAcademicFooter(bool isMobile) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.isDark ? Colors.white10 : Colors.black.withOpacity(0.08))),
+      ),
+      child: Center(
+        child: Text(
+          "iMeditatii • Platformă educațională deschisă • Conform programei Ministerului Educației",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12.5, color: AppColors.textMuted, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  // =========================================================================
+  // VIEW 2: ORIGINAL 8-BIT RETRO GAMING VIEW
+  // =========================================================================
+  Widget _buildRetroArcadeView(bool isMobile) {
+    return Column(
+      children: [
+        _buildHeroSection(isMobile),
+        _buildPathsSection(isMobile),
+        _buildMastersSection(isMobile),
+        SizedBox(height: isMobile ? 14 : 28),
+        _buildRetroFooter(isMobile),
+      ],
+    );
+  }
+
   Widget _buildConstrainedSection({required Widget child, EdgeInsetsGeometry? padding}) {
     return Container(
       width: double.infinity,
@@ -76,8 +498,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeroSection(bool isMobile) {
-    final isClean = ThemeManager.isClean;
-
     final leftContent = RetroBlock(
       bgColor: AppColors.mustard,
       padding: isMobile ? 18 : 36,
@@ -98,15 +518,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.cardBg,
-                      borderRadius: isClean ? BorderRadius.circular(6) : BorderRadius.zero,
-                      border: Border.all(
-                        color: isClean ? Colors.transparent : AppColors.border,
-                        width: isClean ? 1 : 2,
-                      ),
-                      boxShadow: [
-                        if (isClean)
-                          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 1)),
-                      ],
+                      border: Border.all(color: AppColors.border, width: 2),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -119,7 +531,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: AppColors.ink,
                             fontWeight: FontWeight.w900,
                             fontSize: isMobile ? 11 : 12,
-                            letterSpacing: isClean ? 0.5 : 1.2,
+                            letterSpacing: 1.2,
                           ),
                         ),
                       ],
@@ -127,18 +539,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.sunset,
-                      borderRadius: isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-                    ),
-                    child: Text(
+                    color: AppColors.sunset,
+                    child: const Text(
                       "SEASON 1",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 10,
-                        letterSpacing: isClean ? 0.5 : 1.0,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0),
                     ),
                   ),
                 ],
@@ -151,7 +555,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w900,
                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
                   height: 1.1,
-                  letterSpacing: isClean ? 0.2 : 1.0,
+                  letterSpacing: 1.0,
                 ),
               ),
               SizedBox(height: isMobile ? 10 : 16),
@@ -160,7 +564,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: isMobile ? 14 : 17,
                   color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink,
-                  fontWeight: isClean ? FontWeight.w500 : FontWeight.bold,
+                  fontWeight: FontWeight.bold,
                   height: 1.45,
                 ),
               ),
@@ -236,16 +640,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.ink,
                       fontWeight: FontWeight.w900,
                       fontSize: isMobile ? 14 : 16,
-                      letterSpacing: isClean ? 0.5 : 1.2,
+                      letterSpacing: 1.2,
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.sky,
-                      borderRadius: isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-                      border: Border.all(color: isClean ? Colors.transparent : AppColors.border, width: 2),
-                    ),
+                    decoration: BoxDecoration(color: AppColors.sky, border: Border.all(color: AppColors.border, width: 2)),
                     child: Text(
                       _completedQuests > 10 ? "GOLD GUILD" : (_completedQuests > 3 ? "SILVER RANK" : "NOVICE"),
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10),
@@ -258,11 +658,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.cloud,
-                  borderRadius: isClean ? BorderRadius.circular(8) : BorderRadius.zero,
-                  border: Border.all(
-                    color: isClean ? Colors.black.withOpacity(0.05) : AppColors.border,
-                    width: isClean ? 1 : 2,
-                  ),
+                  border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: Column(
                   children: [
@@ -277,7 +673,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 8),
                     ClipRRect(
-                      borderRadius: isClean ? BorderRadius.circular(4) : BorderRadius.zero,
                       child: LinearProgressIndicator(
                         value: (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0,
                         backgroundColor: AppColors.border.withOpacity(0.2),
@@ -347,7 +742,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPathsSection(bool isMobile) {
-    final isClean = ThemeManager.isClean;
     final List<Map<String, dynamic>> paths = [
       {"icon": Icons.functions, "title": "MATEMATICĂ", "color": AppColors.sunset, "desc": "ALGEBRĂ & GEOMETRIE", "route": "Matematică"},
       {"icon": Icons.data_object, "title": "INFORMATICĂ", "color": AppColors.forest, "desc": "ALGORITMI & C++", "route": "Informatică"},
@@ -376,17 +770,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: EdgeInsets.all(isMobile ? 12 : 18),
                   decoration: BoxDecoration(
                     color: path["color"],
-                    borderRadius: isClean ? BorderRadius.circular(12) : BorderRadius.zero,
-                    border: Border.all(
-                      color: isClean ? Colors.white.withOpacity(0.2) : AppColors.border,
-                      width: isClean ? 1 : 2.5,
-                    ),
-                    boxShadow: [
-                      if (!isClean)
-                        BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))
-                      else
-                        BoxShadow(color: (path["color"] as Color).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
-                    ],
+                    border: Border.all(color: AppColors.border, width: 2.5),
+                    boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
                   ),
                   child: Icon(path["icon"], size: isMobile ? 26 : 36, color: Colors.white),
                 ),
@@ -398,14 +783,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontSize: isMobile ? 16 : 20,
                     fontWeight: FontWeight.w900,
                     color: AppColors.ink,
-                    letterSpacing: isClean ? 0.3 : 1.0,
+                    letterSpacing: 1.0,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   path["desc"],
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: isClean ? FontWeight.w600 : FontWeight.bold, color: AppColors.textMuted),
+                  style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.bold, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -426,14 +811,14 @@ class _HomeScreenState extends State<HomeScreen> {
               fontSize: isMobile ? 22 : 34,
               fontWeight: FontWeight.w900,
               color: AppColors.ink,
-              letterSpacing: isClean ? 0.5 : 1.5,
+              letterSpacing: 1.5,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             "SELECTEAZĂ O DISCIPLINĂ PENTRU ANTRENAMENT.",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: isClean ? FontWeight.w500 : FontWeight.bold, color: AppColors.textMuted),
+            style: TextStyle(fontSize: isMobile ? 11 : 15, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
           SizedBox(height: isMobile ? 18 : 24),
           isMobile
@@ -445,25 +830,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMastersSection(bool isMobile) {
-    final isClean = ThemeManager.isClean;
-
     final leftContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
-            borderRadius: isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-          ),
-          child: Text(
+          color: AppColors.isDark ? AppColors.sunset : AppColors.ink,
+          child: const Text(
             "GUILD ROSTER",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-              letterSpacing: isClean ? 0.8 : 1.5,
-              fontSize: 10,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 10),
           ),
         ),
         const SizedBox(height: 12),
@@ -474,7 +849,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontWeight: FontWeight.w900,
             color: AppColors.ink,
             height: 1.1,
-            letterSpacing: isClean ? 0.2 : 1.0,
+            letterSpacing: 1.0,
           ),
         ),
         const SizedBox(height: 10),
@@ -483,7 +858,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(
             fontSize: isMobile ? 13 : 16,
             color: AppColors.ink,
-            fontWeight: isClean ? FontWeight.w500 : FontWeight.bold,
+            fontWeight: FontWeight.bold,
             height: 1.45,
           ),
         ),
@@ -508,10 +883,10 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSpacing: 10,
       childAspectRatio: isMobile ? 1.25 : 1.1,
       children: [
-        _buildMasterAvatar(Icons.calculate, "MATH", AppColors.sky, isClean),
-        _buildMasterAvatar(Icons.terminal, "CODE", AppColors.mustard, isClean),
-        _buildMasterAvatar(Icons.bolt, "PHYSICS", AppColors.forest, isClean),
-        _buildMasterAvatar(Icons.science, "CHEM", AppColors.sunset, isClean),
+        _buildMasterAvatar(Icons.calculate, "MATH", AppColors.sky),
+        _buildMasterAvatar(Icons.terminal, "CODE", AppColors.mustard),
+        _buildMasterAvatar(Icons.bolt, "PHYSICS", AppColors.forest),
+        _buildMasterAvatar(Icons.science, "CHEM", AppColors.sunset),
       ],
     );
 
@@ -542,21 +917,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMasterAvatar(IconData icon, String label, Color color, bool isClean) {
+  Widget _buildMasterAvatar(IconData icon, String label, Color color) {
     return Container(
       decoration: BoxDecoration(
         color: color,
-        borderRadius: isClean ? BorderRadius.circular(10) : BorderRadius.zero,
-        border: Border.all(
-          color: isClean ? Colors.white.withOpacity(0.2) : AppColors.border,
-          width: isClean ? 1 : 2.5,
-        ),
-        boxShadow: [
-          if (!isClean)
-            BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))
-          else
-            BoxShadow(color: color.withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 2)),
-        ],
+        border: Border.all(color: AppColors.border, width: 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(3, 3))],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -565,10 +931,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 5),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppColors.ink,
-              borderRadius: isClean ? BorderRadius.circular(4) : BorderRadius.zero,
-            ),
+            color: AppColors.ink,
             child: Text(
               label,
               style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w900, letterSpacing: 1.0),
@@ -579,14 +942,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFooter(bool isMobile) {
-    final isClean = ThemeManager.isClean;
+  Widget _buildRetroFooter(bool isMobile) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 24, vertical: isMobile ? 26 : 44),
       decoration: BoxDecoration(
         color: AppColors.isDark ? const Color(0xFF161E24) : AppColors.ink,
-        border: Border(top: BorderSide(color: isClean ? Colors.white.withOpacity(0.08) : AppColors.border, width: isClean ? 1 : 3)),
+        border: Border(top: BorderSide(color: AppColors.border, width: 3)),
       ),
       child: Center(
         child: Column(
@@ -597,55 +959,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: isMobile ? 22 : 32,
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
-                letterSpacing: isClean ? 1.0 : 2.0,
+                letterSpacing: 2.0,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               'SYSTEM LOG: LEVEL UP YOUR LEARNING IN 2026.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 11 : 14, fontWeight: isClean ? FontWeight.w500 : FontWeight.bold),
+              style: TextStyle(color: Colors.white70, fontSize: isMobile ? 11 : 14, fontWeight: FontWeight.bold),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 880;
-
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: Scrollbar(
-                  controller: _scrollController,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    physics: const ClampingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        _buildHeroSection(isMobile),
-                        _buildPathsSection(isMobile),
-                        _buildMastersSection(isMobile),
-                        SizedBox(height: isMobile ? 14 : 28),
-                        _buildFooter(isMobile),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
