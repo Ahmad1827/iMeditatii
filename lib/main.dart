@@ -14,8 +14,7 @@ import 'login_screen.dart';
 import 'signup_screen.dart';
 import 'complete_profile_screen.dart';
 import 'choose_role_screen.dart';
-import 'legal_screens.dart';
-
+import 'legal_screens.dart' hide AppColors;
 import 'specialization_screen.dart';
 import 'teacher_list_screen.dart';
 import 'teacher_profile_screen.dart';
