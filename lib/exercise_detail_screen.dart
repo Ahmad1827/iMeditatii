@@ -279,10 +279,32 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   String get _progressKey => "${widget.subject}_${widget.grade}_${widget.id}";
 
-  Future<void> _markExerciseAsDone() async {
+    Future<void> _markExerciseAsDone() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_progressKey, true);
     if (mounted) setState(() => _alreadyDone = true);
+
+    // Clasament: fiecare problemă se numără o singură dată pe cont.
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    try {
+      await FirebaseFirestore.instance.runTransaction((tx) async {
+        final snap = await tx.get(ref);
+        final solved = List<String>.from((snap.data()?['solvedIds'] as List?) ?? const []);
+        if (solved.contains(_progressKey)) return;
+        tx.set(
+          ref,
+          {
+            'solvedIds': FieldValue.arrayUnion([_progressKey]),
+            'solvedCount': FieldValue.increment(1),
+          },
+          SetOptions(merge: true),
+        );
+      });
+    } catch (e) {
+      debugPrint('Leaderboard sync: $e');
+    }
   }
 
   Future<bool> _isExerciseDone() async {

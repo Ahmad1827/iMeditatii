@@ -164,16 +164,24 @@ class _PbNavLinkState extends State<_PbNavLink> {
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+        child: Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: widget.active ? Pb.primary : Colors.transparent, width: 2)),
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, size: 17, color: color),
-                const SizedBox(width: 5),
+                Icon(widget.icon, size: 17, color: widget.active ? Pb.primary : color),
+                const SizedBox(width: 6),
               ],
-              Text(widget.label, style: TextStyle(color: color, fontSize: 16)),
+              Text(
+                widget.label,
+                style: TextStyle(fontSize: 14.5, fontWeight: widget.active ? FontWeight.w600 : FontWeight.w500, color: color),
+              ),
             ],
           ),
         ),
@@ -247,13 +255,45 @@ class CustomNavbar extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------- CLEAN
-  Widget _buildClean(BuildContext context, User? user, bool isDesktop) {
+    Widget _buildClean(BuildContext context, User? user, bool isDesktop) {
     final path = _currentPath(context);
 
+    final brand = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => context.go('/'),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(8)),
+              child: const Text('iM', style: TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
+            ),
+            const SizedBox(width: 9),
+            Text('iMeditații', style: TextStyle(color: Pb.text, fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
+          ],
+        ),
+      ),
+    );
+
+    final right = user == null
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PbButton(text: 'Autentificare', variant: PbVariant.link, size: PbSize.sm, onPressed: () => context.go('/login')),
+              const SizedBox(width: 6),
+              PbButton(text: 'Creează cont', size: PbSize.sm, onPressed: () => context.go('/inregistrare')),
+            ],
+          )
+        : _cleanUserMenu(context, user);
+
     return Container(
-      height: 56,
+      height: 60,
       width: double.infinity,
-      decoration: BoxDecoration(color: Pb.navbar, border: Border(bottom: BorderSide(color: Pb.border))),
+      decoration: BoxDecoration(color: Pb.surface, border: Border(bottom: BorderSide(color: Pb.border))),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: Pb.containerMax),
@@ -261,87 +301,104 @@ class CustomNavbar extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 12),
             child: Row(
               children: [
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => context.go('/'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 26,
-                          height: 26,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(7)),
-                          child: const Text('iM', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-                        ),
-                        const SizedBox(width: 8),
-                        Text('iMeditații', style: TextStyle(color: Pb.text, fontSize: 18, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
-                ),
+                brand,
                 if (isDesktop) ...[
                   const SizedBox(width: 28),
                   _PbNavLink(
                     label: 'Probleme',
+                    icon: Icons.code,
                     active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii'),
                     onTap: () => context.go('/exercitii'),
                   ),
                   _PbNavLink(
-                    label: 'Profesori',
-                    active: path.startsWith('/materii') || path.startsWith('/profesor'),
-                    onTap: () => context.go('/materii'),
-                  ),
-                  _PbNavLink(
                     label: 'Lecții',
+                    icon: Icons.menu_book_outlined,
                     active: path.startsWith('/resurse'),
                     onTap: () => context.go('/resurse'),
                   ),
+                  _PbNavLink(
+                    label: 'Profesori',
+                    icon: Icons.school_outlined,
+                    active: path.startsWith('/materii') || path.startsWith('/profesor'),
+                    onTap: () => context.go('/materii'),
+                  ),
                   const Spacer(),
-                  if (user == null) ...[
-                    _PbNavLink(
-                      icon: Icons.login,
-                      label: 'Autentificare',
-                      active: path == '/login',
-                      onTap: () => context.go('/login'),
-                    ),
-                    _PbNavLink(
-                      icon: Icons.person,
-                      label: 'Înregistrare',
-                      active: path == '/inregistrare',
-                      onTap: () => context.go('/inregistrare'),
-                    ),
-                  ] else ...[
-                    _PbNavLink(
-                      icon: Icons.dashboard_outlined,
-                      label: 'Panoul meu',
-                      active: path.startsWith('/panou'),
-                      onTap: () => _handleDashboardRouting(context, user),
-                    ),
-                    _PbNavLink(icon: Icons.person, label: 'Profil', onTap: () => _handleProfileRouting(context, user)),
-                    _PbNavLink(icon: Icons.logout, label: 'Ieșire', onTap: () => _signOut(context)),
-                  ],
+                  right,
                 ] else ...[
                   const Spacer(),
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () => _showCleanMenu(context, user),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          borderRadius: Pb.radius,
-                          border: Border.all(color: Pb.border),
-                        ),
-                        child: Icon(Icons.menu, color: Pb.text, size: 26),
-                      ),
-                    ),
+                  if (user != null) _cleanUserMenu(context, user),
+                  IconButton(
+                    icon: Icon(Icons.menu, color: Pb.text),
+                    onPressed: () => _showCleanMenu(context, user),
                   ),
                 ],
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cleanUserMenu(BuildContext context, User user) {
+    final label = ((user.displayName ?? '').trim().isNotEmpty ? user.displayName! : (user.email ?? '?')).trim();
+    final initial = label.isEmpty ? '?' : label[0].toUpperCase();
+    final photo = user.photoURL;
+
+    Widget row(IconData i, String t) => Row(
+          children: [
+            Icon(i, size: 18, color: Pb.muted),
+            const SizedBox(width: 10),
+            Text(t, style: TextStyle(fontSize: 14, color: Pb.text)),
+          ],
+        );
+
+    return PopupMenuButton<String>(
+      tooltip: 'Contul meu',
+      offset: const Offset(0, 48),
+      color: Pb.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: Pb.border)),
+      onSelected: (v) {
+        if (v == 'dash') _handleDashboardRouting(context, user);
+        if (v == 'profile') _handleProfileRouting(context, user);
+        if (v == 'logout') _signOut(context);
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
+              if (user.email != null && user.email != label)
+                Text(user.email!, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(value: 'dash', child: row(Icons.dashboard_outlined, 'Panoul meu')),
+        PopupMenuItem<String>(value: 'profile', child: row(Icons.person_outline, 'Profil')),
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(value: 'logout', child: row(Icons.logout, 'Ieșire')),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: Pb.primary.withOpacity(0.15),
+              backgroundImage: photo != null ? NetworkImage(photo) : null,
+              onBackgroundImageError: photo != null ? (_, __) {} : null,
+              child: photo == null
+                  ? Text(initial, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.primary))
+                  : null,
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.expand_more, size: 18, color: Pb.muted),
+          ],
         ),
       ),
     );

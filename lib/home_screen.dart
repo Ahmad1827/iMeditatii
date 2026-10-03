@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'app_colors.dart';
 import 'custom_navbar.dart';
@@ -78,13 +82,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
     // ===========================================================================
-  // CLEAN — dashboard (hero + daily, tracks, lesson table, sidebar)
+  // CLEAN — home: welcome, catalog (exerciții/lecții), noutăți + clasament
   // ===========================================================================
+  bool _hStarted = false;
+  bool _hShowLessons = false;
   String _hGrade = 'toate';
+  String _hSubject = 'toate';
   String _hQuery = '';
+  int _hLimit = 15;
+  int _hOpenPost = -1;
+  List<Map<String, dynamic>>? _hExercises;
+  Set<String> _hSolved = {};
+  List<Map<String, dynamic>>? _hPosts;
+  List<Map<String, dynamic>>? _hLeaders;
+  bool _hLeadersError = false;
+
+  static const Map<String, String> _hRoman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
 
   Widget _buildClean(bool isMobile) {
-    final sidebar = <Widget>[_hProgressCard(), const SizedBox(height: 16), _hGradesCard()];
+    if (!_hStarted) {
+      _hStarted = true;
+      Future.microtask(_hLoadAll);
+    }
 
     return Scaffold(
       backgroundColor: Pb.page,
@@ -96,29 +115,26 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(top: 24),
+                padding: const EdgeInsets.only(top: 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    PbContainer(child: _hHero(isMobile)),
-                    const SizedBox(height: 28),
-                    PbContainer(child: _hTracks(isMobile)),
-                    const SizedBox(height: 28),
+                    PbContainer(child: _hWelcome(isMobile)),
+                    const SizedBox(height: 24),
+                    PbContainer(child: _hCatalog(isMobile)),
+                    const SizedBox(height: 24),
                     PbContainer(
                       child: isMobile
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [...sidebar, const SizedBox(height: 16), _hLessonTable(true)],
+                              children: [_hLeaderboard(), const SizedBox(height: 16), _hPostsCard()],
                             )
                           : Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(child: _hLessonTable(false)),
+                                Expanded(child: _hPostsCard()),
                                 const SizedBox(width: 24),
-                                SizedBox(
-                                  width: 300,
-                                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: sidebar),
-                                ),
+                                SizedBox(width: 340, child: _hLeaderboard()),
                               ],
                             ),
                     ),
@@ -134,211 +150,354 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ---------------------------------------------------------------- data
+  Future<void> _hLoadAll() async {
+    await Future.wait([_hLoadExercises(), _hLoadPosts(), _hLoadLeaders()]);
+  }
+
+  Future<void> _hLoadExercises() async {
+    final out = <Map<String, dynamic>>[];
+    final seen = <String>{};
+
+    void add(String subject, String grade, String id, Map ex) {
+      final key = '${subject}_${grade}_$id';
+      if (!seen.add(key)) return;
+      out.add({
+        'subject': subject,
+        'grade': grade,
+        'id': id,
+        'title': '${ex['title'] ?? 'Problema $id'}',
+        'kind': ex['tip_exercitiu']?.toString() ?? (ex['raspuns_corect'] != null ? 'text' : 'cod'),
+        'difficulty': (ex['dificultate'] ?? ex['difficulty'])?.toString(),
+      });
+    }
+
+    try {
+      final raw = json.decode(await rootBundle.loadString('assets/data/exercise_details.json'));
+      if (raw is Map) {
+        raw.forEach((subject, grades) {
+          if (grades is! Map) return;
+          grades.forEach((grade, items) {
+            if (items is! Map) return;
+            items.forEach((id, ex) {
+              if (ex is Map) add('$subject', '$grade', '$id', ex);
+            });
+          });
+        });
+      }
+    } catch (e) {
+      debugPrint('Exercises (json): $e');
+    }
+
+    try {
+      final snap = await FirebaseFirestore.instance.collection('exercises').limit(200).get();
+      for (final d in snap.docs) {
+        final m = d.data();
+        if (m['title'] == null) continue;
+        add('${m['materie'] ?? m['subject'] ?? 'Informatică'}', '${m['clasa'] ?? m['grade'] ?? '9'}', d.id, m);
+      }
+    } catch (e) {
+      debugPrint('Exercises (firestore): $e');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final solved = prefs.getKeys().where((k) => prefs.get(k) == true).toSet();
+    if (mounted) {
+      setState(() {
+        _hExercises = out;
+        _hSolved = solved;
+      });
+    }
+  }
+
+  Future<void> _hLoadPosts() async {
+    var posts = <Map<String, dynamic>>[];
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy('createdAt', descending: true)
+          .limit(5)
+          .get();
+      posts = snap.docs
+          .map((d) {
+            final m = d.data();
+            final ts = m['createdAt'];
+            final dt = ts is Timestamp ? ts.toDate() : null;
+            return <String, dynamic>{
+              'title': '${m['title'] ?? ''}',
+              'body': '${m['body'] ?? ''}',
+              'author': '${m['author'] ?? 'Echipa iMeditații'}',
+              'date': dt == null
+                  ? ''
+                  : '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}',
+              'link': m['link']?.toString(),
+            };
+          })
+          .where((p) => (p['title'] as String).isNotEmpty)
+          .toList();
+    } catch (e) {
+      debugPrint('Posts: $e');
+    }
+
+    if (posts.isEmpty) {
+      posts = [
+        {
+          'title': 'Lecții noi pentru clasele IX–XII',
+          'body': 'Am adăugat lecții de Python, C++ și matematică, organizate pe clase și module după programa de liceu. '
+              'Fiecare lecție are exemple de cod și greșelile care apar cel mai des la Bacalaureat.',
+          'author': ResourcesData.defaultAuthor,
+          'date': ResourcesData.defaultDate,
+          'link': '/resurse',
+        },
+        {
+          'title': 'Probleme cu evaluare automată',
+          'body': 'Scrii soluția direct în browser, iar codul e rulat pe teste. '
+              'Vezi imediat ce teste au trecut și ce rezultat era așteptat.',
+          'author': ResourcesData.defaultAuthor,
+          'date': ResourcesData.defaultDate,
+          'link': '/exercitii',
+        },
+        {
+          'title': 'Clasamentul elevilor',
+          'body': 'Fiecare problemă rezolvată cât ești autentificat intră în clasament. Profilul tău apare acolo cu numărul de probleme rezolvate.',
+          'author': ResourcesData.defaultAuthor,
+          'date': ResourcesData.defaultDate,
+          'link': null,
+        },
+      ];
+    }
+    if (mounted) setState(() => _hPosts = posts);
+  }
+
+  Future<void> _hLoadLeaders() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('users')
+          .orderBy('solvedCount', descending: true)
+          .limit(25)
+          .get();
+      final list = <Map<String, dynamic>>[];
+      for (final d in snap.docs) {
+        final m = d.data();
+        if (m['role'] == 'teacher') continue;
+        final count = (m['solvedCount'] as num?)?.toInt() ?? 0;
+        if (count <= 0) continue;
+        list.add({
+          'uid': d.id,
+          'name': (m['name'] ?? m['fullName'] ?? m['displayName'] ?? m['nume'] ?? 'Elev').toString(),
+          'photo': (m['photoUrl'] ?? m['avatarUrl'] ?? m['photo'] ?? '').toString(),
+          'count': count,
+        });
+        if (list.length == 10) break;
+      }
+      if (mounted) setState(() => _hLeaders = list);
+    } catch (e) {
+      debugPrint('Leaderboard: $e');
+      if (mounted) {
+        setState(() {
+          _hLeaders = [];
+          _hLeadersError = true;
+        });
+      }
+    }
+  }
+
   // ---------------------------------------------------------------- helpers
-  Widget _hCard({required Widget child, EdgeInsetsGeometry padding = const EdgeInsets.all(18)}) => Container(
-        clipBehavior: Clip.antiAlias,
-        padding: padding,
-        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
-        child: child,
-      );
+  BoxDecoration get _hCardDeco =>
+      BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border));
 
-  Widget _hPill(String text, {Color? color}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-        decoration: BoxDecoration(
-          color: (color ?? Pb.muted).withOpacity(0.12),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Text(text, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: color ?? Pb.text)),
-      );
-
-  Widget _hSectionTitle(String title, String subtitle) => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _hLoading(String text) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
           children: [
-            Text(title, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Pb.text)),
-            const SizedBox(height: 2),
-            Text(subtitle, style: TextStyle(fontSize: 14, color: Pb.muted)),
+            const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
+            const SizedBox(width: 10),
+            Text(text, style: TextStyle(fontSize: 14, color: Pb.muted)),
           ],
         ),
       );
 
-  // ---------------------------------------------------------------- hero + daily
-  Widget _hHero(bool isMobile) {
-    final heroBg = AppColors.isDark ? const Color(0xFF141619) : const Color(0xFF1F2430);
+  Widget _hChip(String label, bool sel, VoidCallback onTap) => _HHover(
+        onTap: onTap,
+        builder: (h) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+          decoration: BoxDecoration(
+            color: sel ? Pb.text : (h ? Pb.hoverBg : Colors.transparent),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: sel ? Pb.text : Pb.border),
+          ),
+          child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: sel ? Pb.surface : Pb.text)),
+        ),
+      );
+
+  // ---------------------------------------------------------------- welcome
+  Widget _hWelcome(bool isMobile) {
+    final user = FirebaseAuth.instance.currentUser;
+    final first = (user?.displayName ?? '').trim().split(' ').first;
+    final title = user == null
+        ? 'Exersează pentru Bacalaureat'
+        : (first.isEmpty ? 'Bine ai revenit' : 'Bine ai revenit, $first');
+    final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
+    final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
+
+    Widget tile({required String label, IconData? icon, required Widget value, Widget? footer, VoidCallback? onTap}) => _HHover(
+          onTap: onTap,
+          builder: (h) => Container(
+            width: isMobile ? double.infinity : 190,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Pb.surface,
+              borderRadius: Pb.radius,
+              border: Border.all(color: h && onTap != null ? Pb.primary : Pb.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    if (icon != null) ...[Icon(icon, size: 15, color: Pb.muted), const SizedBox(width: 6)],
+                    Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Pb.muted)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                value,
+                if (footer != null) ...[const SizedBox(height: 6), footer],
+              ],
+            ),
+          ),
+        );
+
+    final tiles = [
+      tile(
+        label: 'Probleme rezolvate',
+        icon: Icons.check_circle_outline,
+        value: Text(_isLoadingStats ? '–' : '$_completedQuests',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
+        footer: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(value: _progressValue, minHeight: 4, backgroundColor: Pb.gray, color: Pb.primary),
+        ),
+      ),
+      tile(
+        label: 'Nivel',
+        icon: Icons.trending_up,
+        value: Text(rank, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
+        footer: Text('$inLevel din 5 spre următorul', style: TextStyle(fontSize: 12, color: Pb.muted)),
+      ),
+      tile(
+        label: 'Problema zilei',
+        icon: Icons.today_outlined,
+        value: Text('Informatică, a IX-a', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
+        footer: Text('Rezolvă acum', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Pb.link)),
+        onTap: _startDailyQuest,
+      ),
+    ];
 
     final intro = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(999)),
-          child: Text('Programa de liceu, clasele IX–XII',
-              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12.5)),
-        ),
-        const SizedBox(height: 16),
+        Text(title, style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5)),
+        const SizedBox(height: 6),
         Text(
-          'Exersează zilnic.\nIntră pregătit la Bac.',
-          style: TextStyle(color: Colors.white, fontSize: isMobile ? 28 : 42, fontWeight: FontWeight.w700, height: 1.12, letterSpacing: -0.8),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Probleme evaluate automat, lecții cu exemple de cod și profesori pentru lecții 1-la-1.',
-          style: TextStyle(color: Colors.white.withOpacity(0.72), fontSize: isMobile ? 15.5 : 17, height: 1.5),
-        ),
-        const SizedBox(height: 22),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            PbButton(text: 'Vezi problemele', onPressed: () => context.go('/exercitii')),
-            PbButton(text: 'Găsește un profesor', variant: PbVariant.outlineLight, onPressed: () => context.go('/materii')),
-          ],
+          'Probleme cu evaluare automată și lecții pe programa de liceu, clasele IX–XII.',
+          style: TextStyle(fontSize: 15, color: Pb.muted, height: 1.5),
         ),
       ],
     );
 
-    return Container(
-      padding: EdgeInsets.all(isMobile ? 22 : 32),
-      decoration: BoxDecoration(color: heroBg, borderRadius: BorderRadius.circular(16)),
-      child: isMobile
-          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [intro, const SizedBox(height: 22), _hDailyCard()])
-          : Row(
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          intro,
+          const SizedBox(height: 16),
+          for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(height: 10), tiles[i]],
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(child: intro),
+        const SizedBox(width: 20),
+        for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 12), tiles[i]],
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------- catalog
+  Widget _hCatalog(bool isMobile) {
+    final exercises = _hExercises ?? const <Map<String, dynamic>>[];
+    final lessonsAll = ResourcesData.allArticles;
+    final q = _hQuery.trim().toLowerCase();
+
+    final Iterable<String> subjSrc = _hShowLessons
+        ? lessonsAll.map((a) => AppStyle.sentence('${a['subject']}'))
+        : exercises.map((e) => '${e['subject']}');
+    final subjects = subjSrc.toSet().toList()..sort();
+
+    bool matches(String subject, String grade, String text) =>
+        (_hGrade == 'toate' || grade == _hGrade) &&
+        (_hSubject == 'toate' || subject == _hSubject) &&
+        (q.isEmpty || text.toLowerCase().contains(q));
+
+    final lessonRows = lessonsAll
+        .where((a) => matches(AppStyle.sentence('${a['subject']}'), '${a['grade']}', '${a['title']} ${a['desc']}'))
+        .toList();
+    final exRows = exercises.where((e) => matches('${e['subject']}', '${e['grade']}', '${e['title']}')).toList();
+    final total = _hShowLessons ? lessonRows.length : exRows.length;
+    final shown = total < _hLimit ? total : _hLimit;
+
+    void switchTo(bool lessons) => setState(() {
+          _hShowLessons = lessons;
+          _hSubject = 'toate';
+          _hLimit = 15;
+        });
+
+    Widget seg(String label, int count, bool sel, VoidCallback onTap) => _HHover(
+          onTap: onTap,
+          builder: (h) => AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: sel ? Pb.surface : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 4, offset: const Offset(0, 1))] : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(child: intro),
-                const SizedBox(width: 32),
-                SizedBox(width: 320, child: _hDailyCard()),
+                Text(label,
+                    style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
+                const SizedBox(width: 6),
+                Text('$count', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
               ],
             ),
-    );
-  }
-
-  Widget _hDailyCard() {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: Pb.surface, borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.today_outlined, size: 18, color: Pb.primary),
-              const SizedBox(width: 8),
-              Text('Problema zilei', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text('Informatică, clasa a IX-a', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Pb.text)),
-          const SizedBox(height: 6),
-          Text('Program C++ evaluat pe teste. Rezolvarea intră în progresul tău.',
-              style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
-          const SizedBox(height: 12),
-          Wrap(spacing: 6, runSpacing: 6, children: [_hPill('C++', color: Pb.primary), _hPill('Clasa a 9-a')]),
-          const SizedBox(height: 16),
-          PbButton(text: 'Rezolvă acum', fullWidth: true, onPressed: _startDailyQuest),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------- tracks
-  Widget _hTracks(bool isMobile) {
-    final all = ResourcesData.allArticles;
-    int lessons(String s) => all.where((a) => a['subject'] == s).length;
-    int modules(String s) => all.where((a) => a['subject'] == s).map((a) => a['module']).toSet().length;
-
-    Widget track(IconData icon, Color color, String title, String subject, String desc, String route) => _hCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-                child: Icon(icon, color: color, size: 22),
-              ),
-              const SizedBox(height: 14),
-              Text(title, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text)),
-              const SizedBox(height: 4),
-              Text(desc, style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
-              const SizedBox(height: 12),
-              Text('${modules(subject)} module, ${lessons(subject)} lecții', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  PbLink(text: 'Probleme', fontSize: 14, onTap: () => _openSubject(route)),
-                  const SizedBox(width: 16),
-                  PbLink(text: 'Lecții', fontSize: 14, onTap: () => context.go('/resurse')),
-                ],
-              ),
-            ],
           ),
         );
 
-    final items = [
-      track(Icons.terminal, Pb.primary, 'C++', 'C++',
-          'De la cin/cout la grafuri, backtracking și programare dinamică.', 'Informatică'),
-      track(Icons.data_object, const Color(0xFF3B82F6), 'Python', 'PYTHON',
-          'Sintaxă, structuri de control și primii algoritmi, pe noua programă.', 'Informatică'),
-      track(Icons.functions, const Color(0xFFE5484D), 'Matematică', 'MATEMATICĂ',
-          'Funcții, logaritmi, matrice și integrale pentru Bacalaureat.', 'Matematică'),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _hSectionTitle('Trasee', 'Alege ce vrei să exersezi.'),
-        isMobile
-            ? Column(children: [for (var i = 0; i < items.length; i++) ...[if (i > 0) const SizedBox(height: 12), items[i]]])
-            : IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [for (var i = 0; i < items.length; i++) ...[if (i > 0) const SizedBox(width: 16), Expanded(child: items[i])]],
-                ),
-              ),
-      ],
+    final toggle = Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          seg('Exerciții', exercises.length, !_hShowLessons, () => switchTo(false)),
+          seg('Lecții', lessonsAll.length, _hShowLessons, () => switchTo(true)),
+        ],
+      ),
     );
-  }
-
-  // ---------------------------------------------------------------- lesson table
-  Widget _hLessonTable(bool isMobile) {
-    final q = _hQuery.trim().toLowerCase();
-    final lessons = ResourcesData.allArticles.where((a) {
-      final gradeOk = _hGrade == 'toate' || a['grade'] == _hGrade;
-      final textOk = q.isEmpty ||
-          a['title'].toString().toLowerCase().contains(q) ||
-          a['desc'].toString().toLowerCase().contains(q);
-      return gradeOk && textOk;
-    }).toList();
-
-    Widget gradeTab(String value, String label) {
-      final sel = _hGrade == value;
-      return MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () => setState(() => _hGrade = value),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: sel ? Pb.primary : Colors.transparent, width: 2)),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Pb.text : Pb.muted),
-            ),
-          ),
-        ),
-      );
-    }
 
     final search = SizedBox(
-      width: isMobile ? double.infinity : 230,
+      width: isMobile ? double.infinity : 250,
       child: TextField(
-        onChanged: (v) => setState(() => _hQuery = v),
+        onChanged: (v) => setState(() {
+          _hQuery = v;
+          _hLimit = 15;
+        }),
         style: TextStyle(fontSize: 14, color: Pb.text),
         cursorColor: Pb.text,
-        decoration: Pb.input(hint: 'Caută o lecție').copyWith(
+        decoration: Pb.input(hint: _hShowLessons ? 'Caută o lecție' : 'Caută o problemă').copyWith(
           prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
           prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
           contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
@@ -346,181 +505,360 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
 
+    final filters = Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        _hChip('Toate clasele', _hGrade == 'toate', () => setState(() => _hGrade = 'toate')),
+        for (final g in const ['9', '10', '11', '12'])
+          _hChip('a ${_hRoman[g]}-a', _hGrade == g, () => setState(() => _hGrade = g)),
+        Container(width: 1, height: 20, margin: const EdgeInsets.symmetric(horizontal: 6), color: Pb.border),
+        _hChip('Toate materiile', _hSubject == 'toate', () => setState(() => _hSubject = 'toate')),
+        for (final s in subjects) _hChip(s, _hSubject == s, () => setState(() => _hSubject = s)),
+      ],
+    );
+
     final headStyle = TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted);
+    final tableHead = isMobile
+        ? null
+        : Container(
+            color: Pb.hoverBg,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: _hShowLessons
+                ? Row(children: [
+                    SizedBox(width: 30, child: Text('#', style: headStyle)),
+                    Expanded(child: Text('Titlu', style: headStyle)),
+                    SizedBox(width: 110, child: Text('Materie', style: headStyle)),
+                    SizedBox(width: 64, child: Text('Durată', textAlign: TextAlign.right, style: headStyle)),
+                  ])
+                : Row(children: [
+                    SizedBox(width: 36, child: Text('', style: headStyle)),
+                    SizedBox(width: 44, child: Text('#', style: headStyle)),
+                    Expanded(child: Text('Titlu', style: headStyle)),
+                    SizedBox(width: 130, child: Text('Materie', style: headStyle)),
+                    SizedBox(width: 90, child: Text('Dificultate', style: headStyle)),
+                    SizedBox(width: 70, child: Text('Tip', style: headStyle)),
+                  ]),
+          );
+
+    final List<Widget> rows;
+    if (!_hShowLessons && _hExercises == null) {
+      rows = [_hLoading('Se încarcă problemele...')];
+    } else if (total == 0) {
+      rows = [
+        Container(
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+          padding: const EdgeInsets.all(24),
+          child: Text('Nimic nu se potrivește filtrelor.', style: TextStyle(fontSize: 14, color: Pb.muted)),
+        ),
+      ];
+    } else if (_hShowLessons) {
+      rows = [
+        for (var i = 0; i < shown; i++)
+          _HLessonRow(
+            index: i + 1,
+            data: lessonRows[i],
+            isMobile: isMobile,
+            onTap: () => context.go('/resurse/${lessonRows[i]['id']}'),
+          ),
+      ];
+    } else {
+      rows = [for (var i = 0; i < shown; i++) _hExerciseRow(exRows[i], isMobile)];
+    }
 
     return Container(
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+      decoration: _hCardDeco,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    Text('Lecții', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
-                    const Spacer(),
-                    if (!isMobile) search,
-                  ],
-                ),
-                if (isMobile) ...[const SizedBox(height: 10), search],
-                const SizedBox(height: 4),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      gradeTab('toate', 'Toate'),
-                      gradeTab('9', 'a IX-a'),
-                      gradeTab('10', 'a X-a'),
-                      gradeTab('11', 'a XI-a'),
-                      gradeTab('12', 'a XII-a'),
-                    ],
-                  ),
-                ),
+                if (isMobile) ...[
+                  Align(alignment: Alignment.centerLeft, child: toggle),
+                  const SizedBox(height: 10),
+                  search,
+                ] else
+                  Row(children: [toggle, const Spacer(), search]),
+                const SizedBox(height: 12),
+                filters,
               ],
             ),
           ),
-          if (!isMobile)
+          if (tableHead != null) tableHead,
+          ...rows,
+          if (total > 0)
             Container(
-              color: Pb.hoverBg,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
-                  SizedBox(width: 30, child: Text('#', style: headStyle)),
-                  Expanded(child: Text('Titlu', style: headStyle)),
-                  SizedBox(width: 110, child: Text('Materie', style: headStyle)),
-                  SizedBox(width: 64, child: Text('Durată', textAlign: TextAlign.right, style: headStyle)),
+                  Expanded(child: Text('Afișate $shown din $total', style: TextStyle(fontSize: 13, color: Pb.muted))),
+                  if (total > shown)
+                    PbButton(
+                      text: 'Arată mai multe',
+                      variant: PbVariant.outlineSecondary,
+                      size: PbSize.sm,
+                      onPressed: () => setState(() => _hLimit += 15),
+                    ),
                 ],
               ),
             ),
-          if (lessons.isEmpty)
-            Container(
-              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
-              padding: const EdgeInsets.all(24),
-              child: Text('Nicio lecție nu se potrivește căutării.', style: TextStyle(fontSize: 14, color: Pb.muted)),
-            ),
-          for (var i = 0; i < lessons.length; i++)
-            _HLessonRow(
-              index: i + 1,
-              data: lessons[i],
-              isMobile: isMobile,
-              onTap: () => context.go('/resurse/${lessons[i]['id']}'),
-            ),
         ],
       ),
     );
   }
 
-  // ---------------------------------------------------------------- sidebar
-  Widget _hProgressCard() {
-    final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
-    final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
+  Widget _hExerciseRow(Map<String, dynamic> e, bool isMobile) {
+    final key = '${e['subject']}_${e['grade']}_${e['id']}';
+    final solved = _hSolved.contains(key);
+    final diff = (e['difficulty'] ?? '').toString();
+    final dl = diff.toLowerCase();
+    final Color diffColor = dl.startsWith('u') || dl.startsWith('e')
+        ? const Color(0xFF00A67E)
+        : dl.startsWith('m')
+            ? const Color(0xFFD99A00)
+            : (dl.startsWith('g') || dl.startsWith('h') || dl.startsWith('d'))
+                ? const Color(0xFFE5484D)
+                : Pb.muted;
+    final kind = e['kind'] == 'grila' ? 'Grilă' : (e['kind'] == 'text' ? 'Răspuns' : 'Cod');
+    final grade = '${e['grade']}';
 
-    return _hCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Progresul tău', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
-          const SizedBox(height: 14),
-          Row(
-            children: [
+    void open() => context.go(
+        '/exercitiu/${e['id']}?materie=${Uri.encodeComponent('${e['subject']}')}&clasa=${Uri.encodeComponent(grade)}');
+
+    return _HHover(
+      onTap: open,
+      builder: (h) => Container(
+        decoration: BoxDecoration(
+          color: h ? Pb.hoverBg : Colors.transparent,
+          border: Border(top: BorderSide(color: Pb.border)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 36,
+              child: Icon(solved ? Icons.check_circle : Icons.radio_button_unchecked,
+                  size: 18, color: solved ? Pb.success : Pb.border),
+            ),
+            if (!isMobile) SizedBox(width: 44, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${e['title']}',
+                    maxLines: isMobile ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? Pb.link : Pb.text),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isMobile
+                        ? '${e['subject']}, clasa a $grade-a${diff.isEmpty ? '' : ', ${AppStyle.sentence(diff)}'}'
+                        : 'Clasa a ${_hRoman[grade] ?? grade}-a',
+                    style: TextStyle(fontSize: 12.5, color: Pb.muted),
+                  ),
+                ],
+              ),
+            ),
+            if (!isMobile) ...[
               SizedBox(
-                width: 84,
-                height: 84,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CircularProgressIndicator(value: _progressValue, strokeWidth: 7, backgroundColor: Pb.gray, color: Pb.primary),
-                    Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_isLoadingStats ? '–' : '$_completedQuests',
-                              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
-                          Text('rezolvate', style: TextStyle(fontSize: 11, color: Pb.muted)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                width: 130,
+                child: Text('${e['subject']}', overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.text)),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _hPill(rank, color: Pb.primary),
-                    const SizedBox(height: 8),
-                    Text('$inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 13.5, color: Pb.text, height: 1.4)),
-                  ],
-                ),
+              SizedBox(
+                width: 90,
+                child: Text(diff.isEmpty ? '–' : AppStyle.sentence(diff),
+                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: diffColor)),
               ),
+              SizedBox(width: 70, child: Text(kind, style: TextStyle(fontSize: 13, color: Pb.muted))),
             ],
-          ),
-          const SizedBox(height: 14),
-          Container(height: 1, color: Pb.border),
-          const SizedBox(height: 10),
-          Text('Progresul se salvează pe acest dispozitiv.', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _hGradesCard() {
-    final all = ResourcesData.allArticles;
-    const grades = [
-      ['9', 'Clasa a IX-a'],
-      ['10', 'Clasa a X-a'],
-      ['11', 'Clasa a XI-a'],
-      ['12', 'Clasa a XII-a'],
-    ];
-
-    return _hCard(
-      padding: EdgeInsets.zero,
+  // ---------------------------------------------------------------- posts
+  Widget _hPostsCard() {
+    final posts = _hPosts;
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: _hCardDeco,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-            child: Text('Pe clase', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            child: Row(
+              children: [
+                Icon(Icons.campaign_outlined, size: 18, color: Pb.primary),
+                const SizedBox(width: 8),
+                Text('Noutăți', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
+              ],
+            ),
           ),
-          for (final g in grades)
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => setState(() => _hGrade = _hGrade == g[0] ? 'toate' : g[0]),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _hGrade == g[0] ? Pb.hoverBg : Colors.transparent,
-                    border: Border(top: BorderSide(color: Pb.border)),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          g[1],
-                          style: TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: _hGrade == g[0] ? FontWeight.w600 : FontWeight.w400,
-                            color: Pb.text,
-                          ),
-                        ),
-                      ),
-                      Text('${all.where((a) => a['grade'] == g[0]).length} lecții',
-                          style: TextStyle(fontSize: 13, color: Pb.muted)),
-                      const SizedBox(width: 6),
-                      Icon(Icons.chevron_right, size: 18, color: Pb.muted),
-                    ],
-                  ),
-                ),
+          if (posts == null)
+            _hLoading('Se încarcă noutățile...')
+          else
+            for (var i = 0; i < posts.length; i++) _hPostRow(i, posts[i]),
+        ],
+      ),
+    );
+  }
+
+  Widget _hPostRow(int i, Map<String, dynamic> p) {
+    final open = _hOpenPost == i;
+    final link = p['link'] as String?;
+    final date = '${p['date'] ?? ''}';
+    final author = '${p['author'] ?? ''}';
+
+    return _HHover(
+      onTap: () => setState(() => _hOpenPost = open ? -1 : i),
+      builder: (h) => Container(
+        decoration: BoxDecoration(
+          color: h ? Pb.hoverBg : Colors.transparent,
+          border: Border(top: BorderSide(color: Pb.border)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text('${p['title']}', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Pb.text))),
+                Icon(open ? Icons.expand_less : Icons.expand_more, size: 20, color: Pb.muted),
+              ],
+            ),
+            const SizedBox(height: 3),
+            Text(date.isEmpty ? author : '$author, $date', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+            const SizedBox(height: 8),
+            Text(
+              '${p['body']}',
+              maxLines: open ? null : 2,
+              overflow: open ? null : TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14, color: Pb.text, height: 1.55),
+            ),
+            if (open && link != null && link.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              PbLink(text: 'Deschide', fontSize: 14, onTap: () => context.go(link)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- leaderboard
+  Widget _hLeaderboard() {
+    final leaders = _hLeaders;
+    final me = FirebaseAuth.instance.currentUser?.uid;
+
+    Widget body;
+    if (leaders == null) {
+      body = _hLoading('Se încarcă clasamentul...');
+    } else if (leaders.isEmpty) {
+      body = Container(
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          _hLeadersError
+              ? 'Clasamentul nu poate fi încărcat acum.'
+              : 'Încă nu e nimeni în clasament. Rezolvă o problemă și fii primul.',
+          style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.5),
+        ),
+      );
+    } else {
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [for (var i = 0; i < leaders.length; i++) _hLeaderRow(i, leaders[i], leaders[i]['uid'] == me)],
+      );
+    }
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: _hCardDeco,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            child: Row(
+              children: [
+                const Icon(Icons.emoji_events_outlined, size: 18, color: Color(0xFFD99A00)),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Clasament elevi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text))),
+                Text('rezolvate', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+              ],
+            ),
+          ),
+          body,
+        ],
+      ),
+    );
+  }
+
+  Widget _hLeaderRow(int i, Map<String, dynamic> u, bool isMe) {
+    const medals = [Color(0xFFE6B422), Color(0xFFA8B0B8), Color(0xFFCD7F32)];
+    final name = '${u['name']}'.trim();
+    final photo = '${u['photo']}';
+    final initials = name.isEmpty
+        ? '?'
+        : name.split(RegExp(r'\s+')).take(2).map((w) => w[0].toUpperCase()).join();
+
+    return _HHover(
+      onTap: () => context.go('/elev/${u['uid']}'),
+      builder: (h) => Container(
+        decoration: BoxDecoration(
+          color: isMe ? Pb.primary.withOpacity(0.08) : (h ? Pb.hoverBg : Colors.transparent),
+          border: Border(top: BorderSide(color: Pb.border)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 28,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: i < 3
+                    ? Container(
+                        width: 22,
+                        height: 22,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: medals[i], shape: BoxShape.circle),
+                        child: Text('${i + 1}', style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.white)),
+                      )
+                    : Text('${i + 1}', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.muted)),
               ),
             ),
-        ],
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: Pb.primary.withOpacity(0.15),
+              backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
+              onBackgroundImageError: photo.isNotEmpty ? (_, __) {} : null,
+              child: photo.isEmpty
+                  ? Text(initials, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Pb.primary))
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                isMe ? '$name (tu)' : name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? Pb.link : Pb.text),
+              ),
+            ),
+            Text('${u['count']}', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Pb.text)),
+          ],
+        ),
       ),
     );
   }
@@ -1028,6 +1366,34 @@ class _HLessonRowState extends State<_HLessonRow> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HHover extends StatefulWidget {
+  final Widget Function(bool hover) builder;
+  final VoidCallback? onTap;
+
+  const _HHover({required this.builder, this.onTap});
+
+  @override
+  State<_HHover> createState() => _HHoverState();
+}
+
+class _HHoverState extends State<_HHover> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: widget.builder(_hover),
       ),
     );
   }
