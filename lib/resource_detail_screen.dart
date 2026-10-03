@@ -241,13 +241,21 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: article),
-                            const SizedBox(width: 28),
                             SizedBox(
-                              width: 320,
+                              width: 260,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [toc, const SizedBox(height: 20), practice],
+                                children: [toc, const SizedBox(height: 16), practice],
+                              ),
+                            ),
+                            const SizedBox(width: 40),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 760),
+                                  child: article,
+                                ),
                               ),
                             ),
                           ],

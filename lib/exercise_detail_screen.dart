@@ -38,6 +38,7 @@ class ExerciseDetailScreen extends StatefulWidget {
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Map<String, dynamic>? exerciseData;
   String selectedTab = "enunt";
+  int _consoleTab = 0;
   final CppSyntaxController _codeController = CppSyntaxController();
   final TextEditingController _answerController = TextEditingController();
   final FocusNode _editorFocusNode = FocusNode();
@@ -371,6 +372,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionOk = false;
       testResults.clear();
       isRunningCode = true;
+      _consoleTab = 1;
     });
 
     try {
@@ -569,67 +571,289 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   // ===========================================================================
   // CLEAN — pbinfo problem page
   // ===========================================================================
-  Widget _buildClean(bool isMobile) {
-    Widget page(Widget child) => Scaffold(
+    Widget _buildClean(bool isMobile) {
+    Widget shell(Widget body) => Scaffold(
           backgroundColor: Pb.page,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: PbContainer(child: child),
-                ),
-              ),
-            ],
-          ),
+          body: Column(children: [const CustomNavbar(), Expanded(child: body)]),
         );
 
     if (exerciseData == null) {
-      return page(const Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator(color: Pb.primary))));
+      return shell(const Center(child: CircularProgressIndicator(color: Pb.primary)));
     }
 
     if (exerciseData!.isEmpty) {
-      return page(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      return shell(SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: PbContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const PbAlert(type: PbAlertType.danger, text: 'Problema nu a fost găsită.'),
+              const SizedBox(height: 12),
+              PbLink(text: 'Înapoi la probleme', onTap: () => context.go('/exercitii'), underline: true),
+            ],
+          ),
+        ),
+      ));
+    }
+
+    final header = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _cleanBreadcrumbBox(),
+        const SizedBox(height: 14),
+        _cleanTitle(isMobile, _alreadyDone || solutionOk),
+        const SizedBox(height: 12),
+        _cleanMetaTable(isMobile),
+      ],
+    );
+
+    if (isMobile) {
+      return shell(SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: PbContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              const SizedBox(height: 20),
+              _cleanStatementPane(true),
+              const SizedBox(height: 20),
+              _cleanWorkPane(true),
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ));
+    }
+
+    return shell(Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 5,
+            child: _cleanPane(
+              header: PbNavTabs(
+                labels: const ['Enunț', 'Soluție'],
+                selected: selectedTab == 'enunt' ? 0 : 1,
+                onSelect: (i) => setState(() => selectedTab = i == 0 ? 'enunt' : 'solutie'),
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (selectedTab == 'enunt') ...[header, _cleanStatement(false)] else _cleanSolution(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 6,
+            child: _kind == 'cod'
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(flex: 3, child: _cleanEditorPane()),
+                      const SizedBox(height: 12),
+                      Expanded(flex: 2, child: _cleanConsolePane()),
+                    ],
+                  )
+                : SingleChildScrollView(child: _cleanWorkPane(false)),
+          ),
+        ],
+      ),
+    ));
+  }
+
+  Widget _cleanPane({required Widget header, required Widget child}) => Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const PbAlert(type: PbAlertType.danger, text: 'Problema nu a fost găsită.'),
-            const SizedBox(height: 12),
-            PbLink(text: 'Înapoi la probleme', onTap: () => context.go('/exercitii'), underline: true),
+            Padding(padding: const EdgeInsets.fromLTRB(8, 4, 8, 0), child: header),
+            Expanded(child: child),
           ],
         ),
       );
-    }
 
-    final done = _alreadyDone || solutionOk;
+  Widget _cleanEditorPane() {
+    Widget icon(IconData i, String tip, VoidCallback onTap) => IconButton(
+          icon: Icon(i, size: 18),
+          color: Pb.muted,
+          tooltip: tip,
+          splashRadius: 18,
+          visualDensity: VisualDensity.compact,
+          onPressed: onTap,
+        );
 
-    return page(
-      Column(
+    return _cleanPane(
+      header: SizedBox(
+        height: 42,
+        child: Row(
+          children: [
+            const SizedBox(width: 6),
+            Icon(Icons.code, size: 18, color: Pb.primary),
+            const SizedBox(width: 8),
+            Text('Cod', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
+            const SizedBox(width: 10),
+            const PbBadge(text: 'C++', fontSize: 11.5),
+            const Spacer(),
+            icon(Icons.undo, 'Anulează (Ctrl+Z)', _performUndo),
+            icon(Icons.redo, 'Refă (Ctrl+Y)', _performRedo),
+            icon(Icons.restart_alt, 'Resetează codul', _resetCode),
+          ],
+        ),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _cleanBreadcrumbBox(),
-          const SizedBox(height: 18),
-          _cleanTitle(isMobile, done),
-          const SizedBox(height: 12),
-          _cleanMetaTable(isMobile),
-          const SizedBox(height: 22),
-          if (isMobile) ...[
-            _cleanStatementPane(isMobile),
-            const SizedBox(height: 24),
-            _cleanWorkPane(isMobile),
-          ] else
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Container(height: 1, color: Pb.border),
+          Expanded(child: _buildEditor(clean: true, isMobile: false)),
+          Container(height: 1, color: Pb.border),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
               children: [
-                Expanded(flex: 5, child: _cleanStatementPane(isMobile)),
-                const SizedBox(width: 20),
-                Expanded(flex: 6, child: _cleanWorkPane(isMobile)),
+                Expanded(
+                  child: Text(
+                    'Linia ${_getCurrentLine()}, coloana ${_getCurrentCol()}',
+                    style: TextStyle(color: Pb.muted, fontSize: 13),
+                  ),
+                ),
+                PbButton(
+                  text: isRunningCode ? 'Se evaluează...' : 'Trimite soluția',
+                  size: PbSize.sm,
+                  icon: Icons.play_arrow,
+                  loading: isRunningCode,
+                  onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
+                ),
               ],
             ),
-          const SizedBox(height: 40),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _cleanConsolePane() {
+    final total = testResults.length;
+    final passed = testResults.where((t) => t["passed"] == true).length;
+    final examples = _examples;
+
+    Map<String, dynamic>? firstFail;
+    for (final t in testResults) {
+      if (t["passed"] != true) {
+        firstFail = t;
+        break;
+      }
+    }
+
+    Widget label(String t) => Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(t, style: TextStyle(fontSize: 13, color: Pb.muted)),
+        );
+
+    Widget body;
+    if (_consoleTab == 0) {
+      body = examples.isEmpty
+          ? Text('Problema nu are exemple publice.', style: TextStyle(color: Pb.muted, fontSize: 14))
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < examples.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 18),
+                  label('Intrare'),
+                  PbCodeBox(examples[i]['input']!, fontSize: 13.5),
+                  const SizedBox(height: 10),
+                  label('Ieșire așteptată'),
+                  PbCodeBox(examples[i]['output']!, fontSize: 13.5),
+                ],
+              ],
+            );
+    } else if (total == 0 && !isRunningCode) {
+      body = Text('Trimite soluția ca să vezi rezultatul pe teste.', style: TextStyle(color: Pb.muted, fontSize: 14));
+    } else {
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (isRunningCode)
+            Row(
+              children: [
+                const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
+                const SizedBox(width: 10),
+                Text('Se rulează testele ($total gata)...', style: TextStyle(color: Pb.muted, fontSize: 14)),
+              ],
+            )
+          else ...[
+            Text(
+              solutionOk ? 'Acceptat' : 'Respins',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: solutionOk ? Pb.success : Pb.danger),
+            ),
+            const SizedBox(height: 2),
+            Text('$passed din $total teste trecute', style: TextStyle(color: Pb.muted, fontSize: 13.5)),
+          ],
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final t in testResults)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: t["passed"] == true ? Pb.successBg : Pb.dangerBg,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        t["passed"] == true ? Icons.check : Icons.close,
+                        size: 14,
+                        color: t["passed"] == true ? Pb.successText : Pb.dangerText,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Test ${t['index']}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: t["passed"] == true ? Pb.successText : Pb.dangerText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          if (firstFail != null && !isRunningCode) ...[
+            const SizedBox(height: 18),
+            Text('Testul ${firstFail['index']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
+            const SizedBox(height: 8),
+            label('Așteptat'),
+            PbCodeBox('${firstFail['expected']}', fontSize: 13.5),
+            const SizedBox(height: 10),
+            label('Obținut'),
+            PbCodeBox('${firstFail['got']}'.isEmpty ? '(nimic)' : '${firstFail['got']}', fontSize: 13.5),
+          ],
+        ],
+      );
+    }
+
+    return _cleanPane(
+      header: PbNavTabs(
+        labels: const ['Exemple', 'Rezultat'],
+        badges: [null, total == 0 ? null : '$passed/$total'],
+        selected: _consoleTab,
+        onSelect: (i) => setState(() => _consoleTab = i),
+      ),
+      child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: body),
     );
   }
 
