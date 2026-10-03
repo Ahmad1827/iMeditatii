@@ -105,16 +105,19 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
-    final dark = AppColors.isDark;
     final catalog = _HReveal(delayMs: 120, child: _hCatalog(isMobile));
-    final side = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _HReveal(delayMs: 220, child: _hPostsCard()),
-        const SizedBox(height: 20),
-        _HReveal(delayMs: 320, child: _hLeaderboard()),
-      ],
-    );
+    final posts = _HReveal(delayMs: 200, child: _hPostsCard());
+    final leaders = _HReveal(delayMs: 280, child: _hLeaderboard());
+
+    Widget wideBox(Widget child) => Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1520),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
+              child: child,
+            ),
+          ),
+        );
 
     return Scaffold(
       backgroundColor: Pb.page,
@@ -126,40 +129,48 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: SingleChildScrollView(
                 controller: _scrollController,
+                padding: EdgeInsets.only(top: isMobile ? 22 : 36),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: isMobile ? 26 : 44),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Pb.primary.withOpacity(dark ? 0.20 : 0.12),
-                            _cViolet.withOpacity(dark ? 0.16 : 0.09),
-                            Pb.page,
-                          ],
-                          stops: const [0, 0.55, 1],
-                        ),
-                      ),
-                      child: PbContainer(child: _HReveal(child: _hWelcome(isMobile))),
-                    ),
-                    const SizedBox(height: 8),
-                    PbContainer(
-                      child: isMobile
-                          ? Column(
+                    wideBox(_HReveal(child: _hWelcome(isMobile))),
+                    SizedBox(height: isMobile ? 22 : 32),
+                    wideBox(
+                      LayoutBuilder(
+                        builder: (context, box) {
+                          if (isMobile) {
+                            return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [catalog, const SizedBox(height: 20), side],
-                            )
-                          : Row(
+                              children: [catalog, const SizedBox(height: 20), posts, const SizedBox(height: 20), leaders],
+                            );
+                          }
+                          if (box.maxWidth >= 1180) {
+                            return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(child: catalog),
-                                const SizedBox(width: 24),
-                                SizedBox(width: 360, child: side),
+                                SizedBox(width: 290, child: leaders),
+                                const SizedBox(width: 20),
+                                Expanded(flex: 5, child: catalog),
+                                const SizedBox(width: 20),
+                                Expanded(flex: 4, child: posts),
                               ],
-                            ),
+                            );
+                          }
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(width: 270, child: leaders),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [catalog, const SizedBox(height: 20), posts],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                     const SizedBox(height: 48),
                     _hFooter(isMobile),
@@ -326,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
     // ---------------------------------------------------------------- helpers
-  static const Color _cViolet = Color(0xFF7C5CFF);
+  static const Color _cGreen = Color(0xFF10B981);
   static const Color _cAmber = Color(0xFFF59E0B);
   static const Color _cRose = Color(0xFFE5484D);
   static const Color _cBlue = Color(0xFF3B82F6);
@@ -336,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final l = s.toLowerCase();
     if (l.startsWith('mat')) return _cRose;
     if (l.contains('python')) return _cBlue;
-    if (l.contains('engl') || l.contains('limb') || l.contains('rom')) return _cViolet;
+    if (l.contains('engl') || l.contains('limb') || l.contains('rom')) return _cGreen;
     if (l.contains('c++') || l.contains('info')) return Pb.primary;
     return _cAmber;
   }
@@ -356,14 +367,14 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Pb.border),
           boxShadow: [
-            BoxShadow(color: accent.first.withOpacity(AppColors.isDark ? 0.12 : 0.08), blurRadius: 24, offset: const Offset(0, 8)),
+            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.25 : 0.04), blurRadius: 12, offset: const Offset(0, 3)),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(height: 3, decoration: BoxDecoration(gradient: LinearGradient(colors: accent))),
+            Container(height: 3, color: accent.first),
             child,
           ],
         ),
@@ -459,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 border: Border.all(color: h ? accent.withOpacity(0.55) : Pb.border),
                 boxShadow: [
                   BoxShadow(
-                    color: accent.withOpacity(h ? 0.25 : 0.10),
+                    color: Colors.black.withOpacity(h ? 0.10 : 0.04),
                     blurRadius: h ? 22 : 14,
                     offset: Offset(0, h ? 10 : 5),
                   ),
@@ -475,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 34,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [accent, accent.withOpacity(0.72)]),
+                          color: accent,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(icon, size: 18, color: Colors.white),
@@ -515,7 +526,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         tile(
-          accent: _cViolet,
+          accent: _cGreen,
           icon: Icons.trending_up,
           label: 'Nivel',
           value: Text(rank, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Pb.text, height: 1.1)),
@@ -528,7 +539,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 6,
                     margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
                     decoration: BoxDecoration(
-                      color: i < inLevel ? _cViolet : Pb.gray,
+                      color: i < inLevel ? _cGreen : Pb.gray,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -561,7 +572,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [Pb.primary.withOpacity(0.16), _cViolet.withOpacity(0.16)]),
+              color: Pb.primary.withOpacity(0.12),
               borderRadius: BorderRadius.circular(999),
             ),
             child: const Text('Programa de liceu, clasele IX–XII',
@@ -651,8 +662,7 @@ class _HomeScreenState extends State<HomeScreen> {
             curve: Curves.easeOut,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              gradient: sel ? const LinearGradient(colors: [Pb.primary, _cViolet]) : null,
-              color: sel ? null : (h ? Pb.surface : Colors.transparent),
+              color: sel ? Pb.primary : (h ? Pb.surface : Colors.transparent),
               borderRadius: BorderRadius.circular(9),
               boxShadow: sel ? [BoxShadow(color: Pb.primary.withOpacity(0.30), blurRadius: 10, offset: const Offset(0, 3))] : null,
             ),
@@ -772,7 +782,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final switchKey = '${_hShowLessons}_${_hGrade}_${_hSubject}_${_hExercises == null}';
 
     return _hCard(
-      accent: const [Pb.primary, _cViolet],
+      accent: const [Pb.primary, _cGreen],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -934,7 +944,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _hPostRow(int i, Map<String, dynamic> p) {
-    const colors = [Pb.primary, _cAmber, _cViolet, _cRose, _cBlue];
+    const colors = [Pb.primary, _cAmber, _cGreen, _cRose, _cBlue];
     final c = colors[i % colors.length];
     final open = _hOpenPost == i;
     final link = p['link'] as String?;
@@ -1081,7 +1091,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 22,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [mc, mc.withOpacity(0.7)]),
+                          color: mc,
                           shape: BoxShape.circle,
                         ),
                         child: Text('${i + 1}',
