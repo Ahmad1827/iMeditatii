@@ -77,20 +77,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+    // ===========================================================================
+  // CLEAN — dashboard (hero + daily, tracks, lesson table, sidebar)
   // ===========================================================================
-  // CLEAN — pbinfo-style homepage
-  // ===========================================================================
-    Widget _buildClean(bool isMobile) {
-    final sidebar = <Widget>[
-      _cleanProgressCard(),
-      const SizedBox(height: 16),
-      _cleanDailyCard(),
-    ];
-    final main = <Widget>[
-      _cleanSubjectTiles(isMobile),
-      const SizedBox(height: 24),
-      _cleanLessonList(isMobile),
-    ];
+  String _hGrade = 'toate';
+  String _hQuery = '';
+
+  Widget _buildClean(bool isMobile) {
+    final sidebar = <Widget>[_hProgressCard(), const SizedBox(height: 16), _hGradesCard()];
 
     return Scaffold(
       backgroundColor: Pb.page,
@@ -106,25 +100,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    PbContainer(child: _cleanHero(isMobile)),
-                    const SizedBox(height: 24),
+                    PbContainer(child: _hHero(isMobile)),
+                    const SizedBox(height: 28),
+                    PbContainer(child: _hTracks(isMobile)),
+                    const SizedBox(height: 28),
                     PbContainer(
                       child: isMobile
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [...sidebar, const SizedBox(height: 24), ...main],
+                              children: [...sidebar, const SizedBox(height: 16), _hLessonTable(true)],
                             )
                           : Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: main)),
+                                Expanded(child: _hLessonTable(false)),
                                 const SizedBox(width: 24),
-                                SizedBox(width: 320, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: sidebar)),
+                                SizedBox(
+                                  width: 300,
+                                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: sidebar),
+                                ),
                               ],
                             ),
                     ),
                     const SizedBox(height: 48),
-                    _cleanFooter(isMobile),
+                    _hFooter(isMobile),
                   ],
                 ),
               ),
@@ -135,153 +134,56 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _cleanSubjectTiles(bool isMobile) {
-    int count(bool Function(String) test) =>
-        ResourcesData.allArticles.where((a) => test(a['subject'] as String)).length;
+  // ---------------------------------------------------------------- helpers
+  Widget _hCard({required Widget child, EdgeInsetsGeometry padding = const EdgeInsets.all(18)}) => Container(
+        clipBehavior: Clip.antiAlias,
+        padding: padding,
+        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+        child: child,
+      );
 
-    Widget tile(IconData icon, Color color, String title, String sub, String route) => MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => _openSubject(route),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-                    child: Icon(icon, color: color, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Pb.text)),
-                        const SizedBox(height: 2),
-                        Text(sub, style: TextStyle(fontSize: 13, color: Pb.muted)),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.chevron_right, color: Pb.muted, size: 20),
-                ],
-              ),
-            ),
-          ),
-        );
+  Widget _hPill(String text, {Color? color}) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+        decoration: BoxDecoration(
+          color: (color ?? Pb.muted).withOpacity(0.12),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(text, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: color ?? Pb.text)),
+      );
 
-    final items = [
-      tile(Icons.functions, const Color(0xFFE5484D), 'Matematică', '${count((s) => s == 'MATEMATICĂ')} lecții', 'Matematică'),
-      tile(Icons.data_object, Pb.primary, 'Informatică', 'C++ și Python, ${count((s) => s != 'MATEMATICĂ')} lecții', 'Informatică'),
-      tile(Icons.translate, const Color(0xFF6E56CF), 'Limbi străine', 'Exerciții de engleză', 'Engleză'),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text('Materii', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
-        const SizedBox(height: 12),
-        isMobile
-            ? Column(children: [for (var i = 0; i < items.length; i++) ...[if (i > 0) const SizedBox(height: 10), items[i]]])
-            : Row(children: [for (var i = 0; i < items.length; i++) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: items[i])]]),
-      ],
-    );
-  }
-
-  Widget _cleanLessonList(bool isMobile) {
-    final lessons = ResourcesData.allArticles.where((a) => a['grade'] == _grade).toList();
-
-    Widget gradeChip(String g) {
-      final sel = g == _grade;
-      return MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () => setState(() => _grade = g),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: sel ? Pb.text : Colors.transparent,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: sel ? Pb.text : Pb.border),
-            ),
-            child: Text('a $g-a', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: sel ? Pb.surface : Pb.text)),
-          ),
+  Widget _hSectionTitle(String title, String subtitle) => Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Pb.text)),
+            const SizedBox(height: 2),
+            Text(subtitle, style: TextStyle(fontSize: 14, color: Pb.muted)),
+          ],
         ),
       );
-    }
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                Text('Lecții', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
-                const SizedBox(width: 8),
-                for (final g in const ['9', '10', '11', '12']) gradeChip(g),
-              ],
-            ),
-          ),
-          Container(height: 1, color: Pb.border),
-          for (var i = 0; i < lessons.length; i++)
-            _CleanLessonRow(
-              index: i + 1,
-              data: lessons[i],
-              striped: i.isOdd,
-              isMobile: isMobile,
-              onTap: () => context.go('/resurse/${lessons[i]['id']}'),
-            ),
-        ],
-      ),
-    );
-  }
-
-    Widget _cleanHero(bool isMobile) {
-    Widget stat(String value, String label) => Container(
-          width: isMobile ? null : 160,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
-            borderRadius: Pb.radius,
-            border: Border.all(color: Colors.white.withOpacity(0.10)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 2),
-              Text(label, style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 13)),
-            ],
-          ),
-        );
-
-    final stats = [
-      stat(_isLoadingStats ? '–' : '$_completedQuests', 'probleme rezolvate'),
-      stat('${ResourcesData.allArticles.length}', 'lecții disponibile'),
-      stat('IX–XII', 'clase acoperite'),
-    ];
+  // ---------------------------------------------------------------- hero + daily
+  Widget _hHero(bool isMobile) {
+    final heroBg = AppColors.isDark ? const Color(0xFF141619) : const Color(0xFF1F2430);
 
     final intro = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Rezolvă probleme.\nÎnțelege teoria.',
-          style: TextStyle(color: Colors.white, fontSize: isMobile ? 30 : 44, fontWeight: FontWeight.w700, height: 1.1, letterSpacing: -1),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(999)),
+          child: Text('Programa de liceu, clasele IX–XII',
+              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12.5)),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         Text(
-          'Informatică și matematică pentru liceu, cu evaluare automată și lecții pe programa de Bacalaureat.',
+          'Exersează zilnic.\nIntră pregătit la Bac.',
+          style: TextStyle(color: Colors.white, fontSize: isMobile ? 28 : 42, fontWeight: FontWeight.w700, height: 1.12, letterSpacing: -0.8),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Probleme evaluate automat, lecții cu exemple de cod și profesori pentru lecții 1-la-1.',
           style: TextStyle(color: Colors.white.withOpacity(0.72), fontSize: isMobile ? 15.5 : 17, height: 1.5),
         ),
         const SizedBox(height: 22),
@@ -297,113 +199,350 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return Container(
-      padding: EdgeInsets.all(isMobile ? 22 : 36),
-      decoration: BoxDecoration(color: Pb.hero, borderRadius: const BorderRadius.all(Radius.circular(16))),
+      padding: EdgeInsets.all(isMobile ? 22 : 32),
+      decoration: BoxDecoration(color: heroBg, borderRadius: BorderRadius.circular(16)),
       child: isMobile
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [intro, const SizedBox(height: 22), Wrap(spacing: 10, runSpacing: 10, children: stats)],
-            )
+          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [intro, const SizedBox(height: 22), _hDailyCard()])
           : Row(
               children: [
                 Expanded(child: intro),
                 const SizedBox(width: 32),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [for (final w in stats) Padding(padding: const EdgeInsets.only(bottom: 10), child: w)],
-                ),
+                SizedBox(width: 320, child: _hDailyCard()),
               ],
             ),
     );
   }
 
-  
-
-  Widget _cleanProgressCard() {
-    final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
-    final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
-
-    return PbCard(
-      title: 'Progresul tău',
-      child: Row(
+  Widget _hDailyCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(color: Pb.surface, borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 88,
-            height: 88,
-            child: Stack(
-              fit: StackFit.expand,
+          Row(
+            children: [
+              Icon(Icons.today_outlined, size: 18, color: Pb.primary),
+              const SizedBox(width: 8),
+              Text('Problema zilei', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text('Informatică, clasa a IX-a', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Pb.text)),
+          const SizedBox(height: 6),
+          Text('Program C++ evaluat pe teste. Rezolvarea intră în progresul tău.',
+              style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
+          const SizedBox(height: 12),
+          Wrap(spacing: 6, runSpacing: 6, children: [_hPill('C++', color: Pb.primary), _hPill('Clasa a 9-a')]),
+          const SizedBox(height: 16),
+          PbButton(text: 'Rezolvă acum', fullWidth: true, onPressed: _startDailyQuest),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- tracks
+  Widget _hTracks(bool isMobile) {
+    final all = ResourcesData.allArticles;
+    int lessons(String s) => all.where((a) => a['subject'] == s).length;
+    int modules(String s) => all.where((a) => a['subject'] == s).map((a) => a['module']).toSet().length;
+
+    Widget track(IconData icon, Color color, String title, String subject, String desc, String route) => _hCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(height: 14),
+              Text(title, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text)),
+              const SizedBox(height: 4),
+              Text(desc, style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
+              const SizedBox(height: 12),
+              Text('${modules(subject)} module, ${lessons(subject)} lecții', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  PbLink(text: 'Probleme', fontSize: 14, onTap: () => _openSubject(route)),
+                  const SizedBox(width: 16),
+                  PbLink(text: 'Lecții', fontSize: 14, onTap: () => context.go('/resurse')),
+                ],
+              ),
+            ],
+          ),
+        );
+
+    final items = [
+      track(Icons.terminal, Pb.primary, 'C++', 'C++',
+          'De la cin/cout la grafuri, backtracking și programare dinamică.', 'Informatică'),
+      track(Icons.data_object, const Color(0xFF3B82F6), 'Python', 'PYTHON',
+          'Sintaxă, structuri de control și primii algoritmi, pe noua programă.', 'Informatică'),
+      track(Icons.functions, const Color(0xFFE5484D), 'Matematică', 'MATEMATICĂ',
+          'Funcții, logaritmi, matrice și integrale pentru Bacalaureat.', 'Matematică'),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _hSectionTitle('Trasee', 'Alege ce vrei să exersezi.'),
+        isMobile
+            ? Column(children: [for (var i = 0; i < items.length; i++) ...[if (i > 0) const SizedBox(height: 12), items[i]]])
+            : IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [for (var i = 0; i < items.length; i++) ...[if (i > 0) const SizedBox(width: 16), Expanded(child: items[i])]],
+                ),
+              ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------- lesson table
+  Widget _hLessonTable(bool isMobile) {
+    final q = _hQuery.trim().toLowerCase();
+    final lessons = ResourcesData.allArticles.where((a) {
+      final gradeOk = _hGrade == 'toate' || a['grade'] == _hGrade;
+      final textOk = q.isEmpty ||
+          a['title'].toString().toLowerCase().contains(q) ||
+          a['desc'].toString().toLowerCase().contains(q);
+      return gradeOk && textOk;
+    }).toList();
+
+    Widget gradeTab(String value, String label) {
+      final sel = _hGrade == value;
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => setState(() => _hGrade = value),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: sel ? Pb.primary : Colors.transparent, width: 2)),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Pb.text : Pb.muted),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final search = SizedBox(
+      width: isMobile ? double.infinity : 230,
+      child: TextField(
+        onChanged: (v) => setState(() => _hQuery = v),
+        style: TextStyle(fontSize: 14, color: Pb.text),
+        cursorColor: Pb.text,
+        decoration: Pb.input(hint: 'Caută o lecție').copyWith(
+          prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
+          prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        ),
+      ),
+    );
+
+    final headStyle = TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted);
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                CircularProgressIndicator(value: _progressValue, strokeWidth: 8, backgroundColor: Pb.gray, color: Pb.primary),
-                Center(
-                  child: Column(
+                Row(
+                  children: [
+                    Text('Lecții', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
+                    const Spacer(),
+                    if (!isMobile) search,
+                  ],
+                ),
+                if (isMobile) ...[const SizedBox(height: 10), search],
+                const SizedBox(height: 4),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(_isLoadingStats ? '–' : '$_completedQuests',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
-                      Text('rezolvate', style: TextStyle(fontSize: 11, color: Pb.muted)),
+                      gradeTab('toate', 'Toate'),
+                      gradeTab('9', 'a IX-a'),
+                      gradeTab('10', 'a X-a'),
+                      gradeTab('11', 'a XI-a'),
+                      gradeTab('12', 'a XII-a'),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 18),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PbBadge(text: rank, color: Pb.primary),
-                const SizedBox(height: 10),
-                Text('$inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 14, color: Pb.text, height: 1.4)),
-                const SizedBox(height: 4),
-                Text('Salvat pe acest dispozitiv', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-              ],
+          if (!isMobile)
+            Container(
+              color: Pb.hoverBg,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  SizedBox(width: 30, child: Text('#', style: headStyle)),
+                  Expanded(child: Text('Titlu', style: headStyle)),
+                  SizedBox(width: 110, child: Text('Materie', style: headStyle)),
+                  SizedBox(width: 64, child: Text('Durată', textAlign: TextAlign.right, style: headStyle)),
+                ],
+              ),
             ),
-          ),
+          if (lessons.isEmpty)
+            Container(
+              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+              padding: const EdgeInsets.all(24),
+              child: Text('Nicio lecție nu se potrivește căutării.', style: TextStyle(fontSize: 14, color: Pb.muted)),
+            ),
+          for (var i = 0; i < lessons.length; i++)
+            _HLessonRow(
+              index: i + 1,
+              data: lessons[i],
+              isMobile: isMobile,
+              onTap: () => context.go('/resurse/${lessons[i]['id']}'),
+            ),
         ],
       ),
     );
   }
 
-  Widget _cleanDailyCard() {
-    return PbCard(
-      title: 'Problema zilei',
+  // ---------------------------------------------------------------- sidebar
+  Widget _hProgressCard() {
+    final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
+    final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
+
+    return _hCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text('Progresul tău', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
+          const SizedBox(height: 14),
           Row(
             children: [
-              PbBadge(text: '#1', color: Pb.primary, fontSize: 13),
-              const SizedBox(width: 10),
-              Flexible(child: PbLink(text: 'Informatică, clasa a IX-a', onTap: _startDailyQuest, fontSize: 17)),
+              SizedBox(
+                width: 84,
+                height: 84,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CircularProgressIndicator(value: _progressValue, strokeWidth: 7, backgroundColor: Pb.gray, color: Pb.primary),
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(_isLoadingStats ? '–' : '$_completedQuests',
+                              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
+                          Text('rezolvate', style: TextStyle(fontSize: 11, color: Pb.muted)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _hPill(rank, color: Pb.primary),
+                    const SizedBox(height: 8),
+                    Text('$inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 13.5, color: Pb.text, height: 1.4)),
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Problemă de programare în C++, evaluată automat pe teste.',
-            style: TextStyle(color: Pb.muted, fontSize: 15, height: 1.5),
-          ),
           const SizedBox(height: 14),
-          PbButton(text: 'Rezolvă problema', onPressed: _startDailyQuest),
+          Container(height: 1, color: Pb.border),
+          const SizedBox(height: 10),
+          Text('Progresul se salvează pe acest dispozitiv.', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
         ],
       ),
     );
   }
 
-
-  Widget _cleanFooter(bool isMobile) {
-    final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 15, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 15, onTap: () => context.go('/politica-confidentialitate')),
+  Widget _hGradesCard() {
+    final all = ResourcesData.allArticles;
+    const grades = [
+      ['9', 'Clasa a IX-a'],
+      ['10', 'Clasa a X-a'],
+      ['11', 'Clasa a XI-a'],
+      ['12', 'Clasa a XII-a'],
     ];
-    final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 15));
+
+    return _hCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Text('Pe clase', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
+          ),
+          for (final g in grades)
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => setState(() => _hGrade = _hGrade == g[0] ? 'toate' : g[0]),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _hGrade == g[0] ? Pb.hoverBg : Colors.transparent,
+                    border: Border(top: BorderSide(color: Pb.border)),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          g[1],
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: _hGrade == g[0] ? FontWeight.w600 : FontWeight.w400,
+                            color: Pb.text,
+                          ),
+                        ),
+                      ),
+                      Text('${all.where((a) => a['grade'] == g[0]).length} lecții',
+                          style: TextStyle(fontSize: 13, color: Pb.muted)),
+                      const SizedBox(width: 6),
+                      Icon(Icons.chevron_right, size: 18, color: Pb.muted),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- footer
+  Widget _hFooter(bool isMobile) {
+    final links = [
+      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
+      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+    ];
+    final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
 
     return Container(
-      decoration: BoxDecoration(color: Pb.cardHeader, border: Border(top: BorderSide(color: Pb.border))),
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      decoration: BoxDecoration(color: Pb.surface, border: Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.symmetric(vertical: 22),
       child: PbContainer(
         child: isMobile
-            ? Column(children: [copy, const SizedBox(height: 10), Wrap(spacing: 18, runSpacing: 8, alignment: WrapAlignment.center, children: links)])
+            ? Column(children: [
+                copy,
+                const SizedBox(height: 10),
+                Wrap(spacing: 18, runSpacing: 8, alignment: WrapAlignment.center, children: links),
+              ])
             : Row(children: [copy, const Spacer(), ...links.expand((l) => [const SizedBox(width: 22), l])]),
       ),
     );

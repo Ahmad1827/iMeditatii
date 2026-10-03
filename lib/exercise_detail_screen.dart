@@ -568,10 +568,18 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
+    // ===========================================================================
+  // CLEAN — problem workspace (header bar + split panes + console)
   // ===========================================================================
-  // CLEAN — pbinfo problem page
-  // ===========================================================================
-    Widget _buildClean(bool isMobile) {
+  int _cTab = 0; // 0 enunț, 1 soluție, 2 trimiteri
+  int _cBottom = 0; // 0 exemplu, 1 rezultat
+  int _cSelTest = 0;
+  bool _cLastWasRun = false;
+  bool _cHintOpen = false;
+  bool _cShowSol = false;
+  final List<Map<String, dynamic>> _cSubmissions = [];
+
+  Widget _buildClean(bool isMobile) {
     Widget shell(Widget body) => Scaffold(
           backgroundColor: Pb.page,
           body: Column(children: [const CustomNavbar(), Expanded(child: body)]),
@@ -580,311 +588,246 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     if (exerciseData == null) {
       return shell(const Center(child: CircularProgressIndicator(color: Pb.primary)));
     }
-
     if (exerciseData!.isEmpty) {
-      return shell(SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: PbContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const PbAlert(type: PbAlertType.danger, text: 'Problema nu a fost găsită.'),
-              const SizedBox(height: 12),
-              PbLink(text: 'Înapoi la probleme', onTap: () => context.go('/exercitii'), underline: true),
-            ],
-          ),
+      return shell(Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Problema nu a fost găsită.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Pb.text)),
+            const SizedBox(height: 12),
+            PbButton(text: 'Înapoi la probleme', onPressed: () => context.go('/exercitii')),
+          ],
         ),
       ));
     }
 
-    final header = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _cleanBreadcrumbBox(),
-        const SizedBox(height: 14),
-        _cleanTitle(isMobile, _alreadyDone || solutionOk),
-        const SizedBox(height: 12),
-        _cleanMetaTable(isMobile),
-      ],
-    );
+    final tabContent = _cTab == 0 ? _cStatement() : (_cTab == 1 ? _cSolution() : _cSubmissionsList());
+    final isCode = _kind == 'cod';
 
     if (isMobile) {
       return shell(SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: PbContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              header,
-              const SizedBox(height: 20),
-              _cleanStatementPane(true),
-              const SizedBox(height: 20),
-              _cleanWorkPane(true),
-              const SizedBox(height: 32),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _cHeader(true),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _cCard(child: Padding(padding: const EdgeInsets.all(16), child: tabContent)),
+                  const SizedBox(height: 14),
+                  if (isCode) ...[
+                    _cEditor(height: 340),
+                    const SizedBox(height: 14),
+                    _cConsole(fill: false),
+                  ] else
+                    _cAnswerPanel(),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ],
         ),
       ));
     }
 
-    return shell(Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            flex: 5,
-            child: _cleanPane(
-              header: PbNavTabs(
-                labels: const ['Enunț', 'Soluție'],
-                selected: selectedTab == 'enunt' ? 0 : 1,
-                onSelect: (i) => setState(() => selectedTab = i == 0 ? 'enunt' : 'solutie'),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+    return shell(Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _cHeader(false),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: _cCard(
+                    fill: true,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
+                      child: tabContent,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 6,
+                  child: isCode
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(flex: 3, child: _cEditor()),
+                            const SizedBox(height: 12),
+                            Expanded(flex: 2, child: _cConsole(fill: true)),
+                          ],
+                        )
+                      : SingleChildScrollView(child: _cAnswerPanel()),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ));
+  }
+
+  // ---------------------------------------------------------------- building blocks
+  Widget _cCard({Widget? header, required Widget child, bool fill = false}) => Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+        child: Column(
+          mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (header != null) ...[header, Container(height: 1, color: Pb.border)],
+            fill ? Expanded(child: child) : child,
+          ],
+        ),
+      );
+
+  Widget _cTabs(List<String> labels, int sel, ValueChanged<int> onSel, {List<String?>? counts}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < labels.length; i++)
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => onSel(i),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: i == sel ? Pb.primary : Colors.transparent, width: 2)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (selectedTab == 'enunt') ...[header, _cleanStatement(false)] else _cleanSolution(),
+                    Text(
+                      labels[i],
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: i == sel ? FontWeight.w600 : FontWeight.w400,
+                        color: i == sel ? Pb.text : Pb.muted,
+                      ),
+                    ),
+                    if (counts != null && i < counts.length && counts[i] != null) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(999)),
+                        child: Text(counts[i]!, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Pb.muted)),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 6,
-            child: _kind == 'cod'
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 3, child: _cleanEditorPane()),
-                      const SizedBox(height: 12),
-                      Expanded(flex: 2, child: _cleanConsolePane()),
-                    ],
-                  )
-                : SingleChildScrollView(child: _cleanWorkPane(false)),
-          ),
-        ],
-      ),
-    ));
-  }
-
-  Widget _cleanPane({required Widget header, required Widget child}) => Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(padding: const EdgeInsets.fromLTRB(8, 4, 8, 0), child: header),
-            Expanded(child: child),
-          ],
-        ),
-      );
-
-  Widget _cleanEditorPane() {
-    Widget icon(IconData i, String tip, VoidCallback onTap) => IconButton(
-          icon: Icon(i, size: 18),
-          color: Pb.muted,
-          tooltip: tip,
-          splashRadius: 18,
-          visualDensity: VisualDensity.compact,
-          onPressed: onTap,
-        );
-
-    return _cleanPane(
-      header: SizedBox(
-        height: 42,
-        child: Row(
-          children: [
-            const SizedBox(width: 6),
-            Icon(Icons.code, size: 18, color: Pb.primary),
-            const SizedBox(width: 8),
-            Text('Cod', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
-            const SizedBox(width: 10),
-            const PbBadge(text: 'C++', fontSize: 11.5),
-            const Spacer(),
-            icon(Icons.undo, 'Anulează (Ctrl+Z)', _performUndo),
-            icon(Icons.redo, 'Refă (Ctrl+Y)', _performRedo),
-            icon(Icons.restart_alt, 'Resetează codul', _resetCode),
-          ],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(height: 1, color: Pb.border),
-          Expanded(child: _buildEditor(clean: true, isMobile: false)),
-          Container(height: 1, color: Pb.border),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Linia ${_getCurrentLine()}, coloana ${_getCurrentCol()}',
-                    style: TextStyle(color: Pb.muted, fontSize: 13),
-                  ),
-                ),
-                PbButton(
-                  text: isRunningCode ? 'Se evaluează...' : 'Trimite soluția',
-                  size: PbSize.sm,
-                  icon: Icons.play_arrow,
-                  loading: isRunningCode,
-                  onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _cleanConsolePane() {
-    final total = testResults.length;
-    final passed = testResults.where((t) => t["passed"] == true).length;
-    final examples = _examples;
-
-    Map<String, dynamic>? firstFail;
-    for (final t in testResults) {
-      if (t["passed"] != true) {
-        firstFail = t;
-        break;
-      }
-    }
-
-    Widget label(String t) => Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: Text(t, style: TextStyle(fontSize: 13, color: Pb.muted)),
-        );
-
-    Widget body;
-    if (_consoleTab == 0) {
-      body = examples.isEmpty
-          ? Text('Problema nu are exemple publice.', style: TextStyle(color: Pb.muted, fontSize: 14))
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var i = 0; i < examples.length; i++) ...[
-                  if (i > 0) const SizedBox(height: 18),
-                  label('Intrare'),
-                  PbCodeBox(examples[i]['input']!, fontSize: 13.5),
-                  const SizedBox(height: 10),
-                  label('Ieșire așteptată'),
-                  PbCodeBox(examples[i]['output']!, fontSize: 13.5),
-                ],
-              ],
-            );
-    } else if (total == 0 && !isRunningCode) {
-      body = Text('Trimite soluția ca să vezi rezultatul pe teste.', style: TextStyle(color: Pb.muted, fontSize: 14));
-    } else {
-      body = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (isRunningCode)
-            Row(
-              children: [
-                const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
-                const SizedBox(width: 10),
-                Text('Se rulează testele ($total gata)...', style: TextStyle(color: Pb.muted, fontSize: 14)),
-              ],
-            )
-          else ...[
-            Text(
-              solutionOk ? 'Acceptat' : 'Respins',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: solutionOk ? Pb.success : Pb.danger),
-            ),
-            const SizedBox(height: 2),
-            Text('$passed din $total teste trecute', style: TextStyle(color: Pb.muted, fontSize: 13.5)),
-          ],
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final t in testResults)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: t["passed"] == true ? Pb.successBg : Pb.dangerBg,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        t["passed"] == true ? Icons.check : Icons.close,
-                        size: 14,
-                        color: t["passed"] == true ? Pb.successText : Pb.dangerText,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Test ${t['index']}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: t["passed"] == true ? Pb.successText : Pb.dangerText,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          if (firstFail != null && !isRunningCode) ...[
-            const SizedBox(height: 18),
-            Text('Testul ${firstFail['index']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
-            const SizedBox(height: 8),
-            label('Așteptat'),
-            PbCodeBox('${firstFail['expected']}', fontSize: 13.5),
-            const SizedBox(height: 10),
-            label('Obținut'),
-            PbCodeBox('${firstFail['got']}'.isEmpty ? '(nimic)' : '${firstFail['got']}', fontSize: 13.5),
-          ],
-        ],
-      );
-    }
-
-    return _cleanPane(
-      header: PbNavTabs(
-        labels: const ['Exemple', 'Rezultat'],
-        badges: [null, total == 0 ? null : '$passed/$total'],
-        selected: _consoleTab,
-        onSelect: (i) => setState(() => _consoleTab = i),
-      ),
-      child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: body),
-    );
-  }
-
-    Widget _cleanStatementPane(bool isMobile) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          PbNavTabs(
-            labels: const ['Enunț', 'Soluție'],
-            selected: selectedTab == 'enunt' ? 0 : 1,
-            onSelect: (i) => setState(() => selectedTab = i == 0 ? 'enunt' : 'solutie'),
-          ),
-          PbTabPanel(child: selectedTab == 'enunt' ? _cleanStatement(isMobile) : _cleanSolution()),
-        ],
-      );
-
-  Widget _cleanWorkPane(bool isMobile) {
-    if (_kind == 'grila') return _cleanGrilaCard();
-    if (_kind == 'text') return _cleanTextCard();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _cleanCodeCard(isMobile),
-        if (testResults.isNotEmpty || isRunningCode) ...[
-          const SizedBox(height: 20),
-          _cleanEvaluation(isMobile),
-        ],
       ],
     );
   }
 
-  Widget _cleanMetaTable(bool isMobile) {
+  // ---------------------------------------------------------------- header
+  Widget _cHeader(bool isMobile) {
+    final listRoute = '/lista-exercitii?materie=${Uri.encodeComponent(widget.subject)}';
+    final sep = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted)),
+    );
+    final title = Text(
+      '${widget.id}. $_title',
+      style: TextStyle(fontSize: isMobile ? 22 : 26, fontWeight: FontWeight.w700, color: Pb.text, height: 1.2),
+    );
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(isMobile ? 14 : 20, 14, isMobile ? 14 : 20, 0),
+      decoration: BoxDecoration(color: Pb.surface, border: Border(bottom: BorderSide(color: Pb.border))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              PbLink(text: 'Probleme', fontSize: 13, onTap: () => context.go('/exercitii')),
+              sep,
+              PbLink(text: widget.subject, fontSize: 13, onTap: () => context.go(listRoute)),
+              sep,
+              Text('Clasa a ${widget.grade}-a', style: TextStyle(fontSize: 13, color: Pb.muted)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (isMobile) ...[
+            title,
+            const SizedBox(height: 10),
+            _cChips(),
+            const SizedBox(height: 12),
+            _cStatus(),
+          ] else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [title, const SizedBox(height: 10), _cChips()],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                _cStatus(),
+              ],
+            ),
+          const SizedBox(height: 6),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: _cTabs(
+              const ['Enunț', 'Soluție', 'Trimiterile mele'],
+              _cTab,
+              (i) => setState(() => _cTab = i),
+              counts: [null, null, _cSubmissions.isEmpty ? null : '${_cSubmissions.length}'],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cStatus() {
+    final done = _alreadyDone;
+    final best = _cSubmissions
+        .where((s) => s['submit'] == true)
+        .fold<int>(0, (m, s) => (s['score'] as int) > m ? s['score'] as int : m);
+    final sub = best > 0 ? 'Cel mai bun punctaj: $best/100' : (done ? 'Rezolvată anterior' : 'Încă nicio trimitere');
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: done ? Pb.successBg : Pb.hoverBg,
+        borderRadius: Pb.radius,
+        border: Border.all(color: done ? Pb.successBorder : Pb.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(done ? Icons.check_circle : Icons.radio_button_unchecked, size: 20, color: done ? Pb.successText : Pb.muted),
+          const SizedBox(width: 10),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(done ? 'Rezolvată' : 'Nerezolvată',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: done ? Pb.successText : Pb.text)),
+              Text(sub, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cChips() {
     final diffRaw = _str(['dificultate', 'difficulty']);
     final diff = (diffRaw ?? '').toLowerCase();
     Color? diffColor;
@@ -895,343 +838,695 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     } else if (diff.startsWith('g') || diff.startsWith('h') || diff.startsWith('d')) {
       diffColor = const Color(0xFFE5484D);
     }
+    final time = _str(['limita_timp', 'time_limit']);
+    final mem = _str(['limita_memorie', 'memory_limit']);
+    final tags = _list(['tags', 'etichete']) ?? const <String>[];
+    final kind = _kind == 'cod' ? 'C++' : (_kind == 'grila' ? 'Grilă' : 'Răspuns scurt');
 
     Widget chip(String label, {Color? fg, IconData? icon}) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: (fg ?? Pb.muted).withOpacity(0.12),
-            borderRadius: BorderRadius.circular(999),
-          ),
+          decoration: BoxDecoration(color: (fg ?? Pb.muted).withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 14, color: fg ?? Pb.muted),
-                const SizedBox(width: 4),
-              ],
-              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: fg ?? Pb.text)),
+              if (icon != null) ...[Icon(icon, size: 14, color: fg ?? Pb.muted), const SizedBox(width: 4)],
+              Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: fg ?? Pb.text)),
             ],
           ),
         );
-
-    final tags = _list(['tags', 'etichete']) ?? const <String>[];
-    final author = _str(['autor', 'author']);
 
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
-        chip(
-          _kind == 'cod' ? 'C++' : (_kind == 'grila' ? 'Grilă' : 'Răspuns scurt'),
-          icon: _kind == 'cod' ? Icons.code : Icons.quiz_outlined,
-        ),
+        chip(kind, icon: _kind == 'cod' ? Icons.code : Icons.quiz_outlined),
         chip('Clasa a ${widget.grade}-a', icon: Icons.school_outlined),
-        if (_kind == 'cod') chip('stdin / stdout', icon: Icons.swap_horiz),
+        if (time != null) chip(time, icon: Icons.timer_outlined),
+        if (mem != null) chip(mem, icon: Icons.memory),
         for (final t in tags) chip(t, icon: Icons.sell_outlined),
-        if (author != null) chip(author, icon: Icons.person_outline),
       ],
     );
   }
 
-  Widget _cleanTitle(bool isMobile, bool done) {
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 14,
-      runSpacing: 10,
-      children: [
-        Text('${widget.id}. $_title', style: TextStyle(fontSize: isMobile ? 24 : 30, color: Pb.text, fontWeight: FontWeight.w700, height: 1.2)),
-        if (done) PbBadge(text: 'rezolvată', color: Pb.success, fontSize: 13),
-      ],
-    );
-  }
+  // ---------------------------------------------------------------- left pane
+  Widget _cSection(String title, Widget child) => Padding(
+        padding: const EdgeInsets.only(top: 22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+            const SizedBox(height: 8),
+            child,
+          ],
+        ),
+      );
 
-
-  Widget _cleanBreadcrumbBox() {
-    final listRoute = '/lista-exercitii?materie=${Uri.encodeComponent(widget.subject)}';
-    return PbBreadcrumb(items: [
-      PbCrumb('Probleme', () => context.go('/exercitii')),
-      PbCrumb(widget.subject, () => context.go(listRoute)),
-      PbCrumb('Clasa a ${widget.grade}-a'),
-    ]);
-  }
-
-  Widget _cleanStatement(bool isMobile) {
-    final description = exerciseData!["description"]?.toString() ?? "Fără enunț.";
+  Widget _cStatement() {
     final input = _str(['input', 'date_intrare']);
     final output = _str(['output', 'date_iesire']);
-    final constraintsList = _list(['restrictii', 'constraints', 'restrictions']);
-    final constraintsText = _str(['restrictii', 'constraints', 'restrictions']);
+    final cList = _list(['restrictii', 'constraints', 'restrictions']);
+    final cText = _str(['restrictii', 'constraints', 'restrictions']);
     final hint = _str(['hint', 'indicatie']);
+    final expl = _str(['explicatie', 'explanation']);
     final examples = _examples;
 
     Widget bullets(List<String> items) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (final it in items)
               Padding(
-                padding: const EdgeInsets.only(left: 8, bottom: 4),
+                padding: const EdgeInsets.only(bottom: 6),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(padding: const EdgeInsets.only(top: 10, right: 10), child: CircleAvatar(radius: 2.5, backgroundColor: Pb.text)),
-                    Expanded(child: PbRichText(it)),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Text('•', style: TextStyle(fontSize: 15.5, color: Pb.muted)),
+                    ),
+                    Expanded(child: PbRichText(it, fontSize: 15, height: 1.6)),
                   ],
                 ),
               ),
           ],
         );
 
-    Widget exampleBox(String label, String content) => Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PbRichText(exerciseData!['description']?.toString() ?? 'Fără enunț.', fontSize: 15.5, height: 1.7),
+        if (input != null) _cSection('Date de intrare', PbRichText(input, fontSize: 15.5, height: 1.7)),
+        if (output != null) _cSection('Date de ieșire', PbRichText(output, fontSize: 15.5, height: 1.7)),
+        if (cList != null || cText != null)
+          _cSection('Restricții', cList != null ? bullets(cList) : PbRichText(cText!, fontSize: 15.5, height: 1.7)),
+        for (var i = 0; i < examples.length; i++)
+          _cSection('Exemplul ${i + 1}', _cExample(examples[i], i == 0 ? expl : null)),
+        if (hint != null) _cHint(hint),
+      ],
+    );
+  }
+
+  Widget _cExample(Map<String, String> ex, String? explanation) {
+    Widget row(String label, Widget value) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.muted)),
+              const SizedBox(height: 4),
+              value,
+            ],
+          ),
+        );
+    Widget mono(String v) => SelectableText(v.isEmpty ? ' ' : v, style: Pb.mono(14, color: Pb.text));
+
+    return ClipRRect(
+      borderRadius: Pb.radius,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 2),
+        decoration: BoxDecoration(color: Pb.codeBg, border: Border(left: BorderSide(color: Pb.primary, width: 3))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            row('Intrare', mono(ex['input']!)),
+            row('Ieșire', mono(ex['output']!)),
+            if (explanation != null) row('Explicație', PbRichText(explanation, fontSize: 14.5, height: 1.6)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cHint(String hint) => Padding(
+        padding: const EdgeInsets.only(top: 22),
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _cHintOpen = !_cHintOpen),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    child: Row(
+                      children: [
+                        Icon(Icons.lightbulb_outline, size: 18, color: Pb.muted),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text('Indiciu', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Pb.text))),
+                        Icon(_cHintOpen ? Icons.expand_less : Icons.expand_more, color: Pb.muted),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (_cHintOpen) ...[
+                Container(height: 1, color: Pb.border),
+                Padding(padding: const EdgeInsets.all(14), child: PbRichText(hint, fontSize: 15, height: 1.6)),
+              ],
+            ],
+          ),
+        ),
+      );
+
+  Widget _cSolution() {
+    final off = exerciseData!['official_solution'];
+    final code = off is Map ? off['code']?.toString() : null;
+
+    if (code == null) {
+      return Text('Problema nu are încă o soluție oficială.', style: TextStyle(fontSize: 15, color: Pb.muted));
+    }
+    if (!_alreadyDone && !_cShowSol) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.lock_outline, size: 28, color: Pb.muted),
+          const SizedBox(height: 10),
+          Text('Soluția oficială e ascunsă până rezolvi problema.',
+              style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Pb.text)),
+          const SizedBox(height: 6),
+          Text('Încearcă mai întâi singur. O poți deschide oricând.', style: TextStyle(fontSize: 14, color: Pb.muted)),
+          const SizedBox(height: 14),
+          PbButton(
+            text: 'Arată soluția',
+            variant: PbVariant.outlineSecondary,
+            size: PbSize.sm,
+            onPressed: () => setState(() => _cShowSol = true),
+          ),
+        ],
+      );
+    }
+    return PbCodeBox(code, lang: 'cpp', fontSize: 14);
+  }
+
+  Widget _cSubmissionsList() {
+    if (_cSubmissions.isEmpty) {
+      return Text('Nu ai trimis încă nicio soluție în această sesiune.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
+    }
+    return PbTable(
+      headers: const ['Ora', 'Tip', 'Verdict', 'Teste', 'Punctaj'],
+      rows: [
+        for (final s in _cSubmissions)
+          [
+            Text('${s['time']}'),
+            Text(s['submit'] == true ? 'Trimitere' : 'Rulare'),
+            Text(
+              s['ok'] == true
+                  ? (s['submit'] == true ? 'Acceptat' : 'Exemple corecte')
+                  : (s['submit'] == true ? 'Respins' : 'Exemple greșite'),
+              style: TextStyle(fontWeight: FontWeight.w600, color: s['ok'] == true ? Pb.success : Pb.danger),
+            ),
+            Text('${s['passed']}/${s['total']}'),
+            Text(s['submit'] == true ? '${s['score']}' : '–'),
+          ],
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------- editor
+  Widget _cEditor({double? height}) {
+    final fill = height == null;
+
+    Widget iconBtn(IconData i, String tip, VoidCallback f) => IconButton(
+          icon: Icon(i, size: 18),
+          color: Pb.muted,
+          tooltip: tip,
+          splashRadius: 18,
+          visualDensity: VisualDensity.compact,
+          onPressed: f,
+        );
+
+    final header = SizedBox(
+      height: 44,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Pb.hoverBg,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Pb.border),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.code, size: 15, color: Pb.primary),
+                  const SizedBox(width: 6),
+                  Text('C++ 20', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+                ],
+              ),
+            ),
+            const Spacer(),
+            PopupMenuButton<String>(
+              tooltip: 'Inserează',
+              color: Pb.surface,
+              icon: Icon(Icons.add_box_outlined, size: 18, color: Pb.muted),
+              onSelected: (v) {
+                switch (v) {
+                  case 'cin':
+                    _insertSnippet("cin >> ", ";");
+                    break;
+                  case 'cout':
+                    _insertSnippet("cout << ", " << \"\\n\";");
+                    break;
+                  case 'for':
+                    _insertSnippet("for (int i = 0; i < n; i++) {\n    ", "\n}");
+                    break;
+                  case 'tab':
+                    _insertSnippet("    ", "");
+                    break;
+                }
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'cin', child: Text('cin >> x;', style: Pb.mono(13))),
+                PopupMenuItem(value: 'cout', child: Text('cout << x;', style: Pb.mono(13))),
+                PopupMenuItem(value: 'for', child: Text('for (...) { }', style: Pb.mono(13))),
+                PopupMenuItem(value: 'tab', child: Text('Tab (4 spații)', style: TextStyle(fontSize: 13, color: Pb.text))),
+              ],
+            ),
+            iconBtn(Icons.undo, 'Anulează (Ctrl+Z)', _performUndo),
+            iconBtn(Icons.redo, 'Refă (Ctrl+Y)', _performRedo),
+            iconBtn(Icons.restart_alt, 'Resetează codul', _resetCode),
+          ],
+        ),
+      ),
+    );
+
+    final footer = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text('Ln ${_getCurrentLine()}, Col ${_getCurrentCol()}', style: TextStyle(color: Pb.muted, fontSize: 12.5)),
+          ),
+          PbButton(
+            text: 'Rulează',
+            icon: Icons.play_arrow,
+            variant: PbVariant.outlineSecondary,
+            size: PbSize.sm,
+            onPressed: isRunningCode ? null : () => _checkAuthAndExecute(() => _cRun(submit: false)),
+          ),
+          const SizedBox(width: 8),
+          PbButton(
+            text: isRunningCode ? 'Se evaluează...' : 'Trimite',
+            icon: Icons.cloud_upload_outlined,
+            variant: PbVariant.success,
+            size: PbSize.sm,
+            loading: isRunningCode,
+            onPressed: isRunningCode ? null : () => _checkAuthAndExecute(() => _cRun(submit: true)),
+          ),
+        ],
+      ),
+    );
+
+    final editor = _buildEditor(clean: true, isMobile: !fill);
+
+    return _cCard(
+      header: header,
+      fill: fill,
+      child: Column(
+        mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          fill ? Expanded(child: editor) : SizedBox(height: height, child: editor),
+          Container(height: 1, color: Pb.border),
+          footer,
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- console
+  Widget _cConsole({required bool fill}) {
+    final passed = testResults.where((t) => t['passed'] == true).length;
+    final header = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: _cTabs(
+        const ['Exemplu', 'Rezultat'],
+        _cBottom,
+        (i) => setState(() => _cBottom = i),
+        counts: [null, testResults.isEmpty ? null : '$passed/${testResults.length}'],
+      ),
+    );
+    final body = Padding(
+      padding: const EdgeInsets.all(14),
+      child: _cBottom == 0 ? _cSampleView() : _cResultView(),
+    );
+    return _cCard(header: header, fill: fill, child: fill ? SingleChildScrollView(child: body) : body);
+  }
+
+  Widget _cSampleView() {
+    final ex = _examples;
+    if (ex.isEmpty) {
+      return Text('Problema nu are un exemplu public.', style: TextStyle(fontSize: 14, color: Pb.muted));
+    }
+    Widget box(String label, String v) => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
-            const SizedBox(height: 6),
-            PbCodeBox(content),
+            Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Pb.muted)),
+            const SizedBox(height: 4),
+            PbCodeBox(v, fontSize: 13.5),
           ],
         );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: box('Intrare', ex.first['input']!)),
+            const SizedBox(width: 12),
+            Expanded(child: box('Ieșire așteptată', ex.first['output']!)),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          '„Rulează” verifică doar exemplele. „Trimite” rulează toate testele și îți salvează progresul.',
+          style: TextStyle(fontSize: 12.5, color: Pb.muted, height: 1.4),
+        ),
+      ],
+    );
+  }
+
+  Widget _cResultView() {
+    final total = testResults.length;
+    if (total == 0 && !isRunningCode) {
+      return Text('Rulează sau trimite soluția ca să vezi rezultatele aici.', style: TextStyle(fontSize: 14, color: Pb.muted));
+    }
+    final passed = testResults.where((t) => t['passed'] == true).length;
+
+    final Widget banner = isRunningCode
+        ? Row(
+            children: [
+              const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
+              const SizedBox(width: 10),
+              Text('Se rulează testele... ($total gata)', style: TextStyle(fontSize: 14, color: Pb.muted)),
+            ],
+          )
+        : Row(
+            children: [
+              Icon(solutionOk ? Icons.check_circle : Icons.cancel, size: 26, color: solutionOk ? Pb.success : Pb.danger),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _cLastWasRun
+                          ? (solutionOk ? 'Exemplele trec' : 'Exemplele nu trec')
+                          : (solutionOk ? 'Acceptat. Felicitări!' : 'Respins'),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: solutionOk ? Pb.success : Pb.danger),
+                    ),
+                    Text(
+                      '$passed din $total teste corecte${_cLastWasRun || total == 0 ? '' : ', punctaj ${(passed * 100 / total).round()}'}',
+                      style: TextStyle(fontSize: 13, color: Pb.muted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+
+    if (total == 0) return banner;
+
+    final sel = _cSelTest >= total ? 0 : _cSelTest;
+    final t = testResults[sel];
+    final visible = t['sample'] == true;
+
+    Widget detailBox(String label, String v) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Pb.muted)),
+              const SizedBox(height: 4),
+              PbCodeBox(v.isEmpty ? '(nimic)' : v, fontSize: 13.5),
+            ],
+          ),
+        );
+
+    final detail = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (visible) ...[
+          detailBox('Intrare', '${t['input'] ?? ''}'),
+          detailBox('Ieșire așteptată', '${t['expected']}'),
+          detailBox('Ieșirea ta', '${t['got']}'),
+        ] else
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Icon(Icons.lock_outline, size: 16, color: Pb.muted),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text('Test ascuns: datele nu sunt afișate.', style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+                ),
+              ],
+            ),
+          ),
+        if ('${t['error'] ?? ''}'.isNotEmpty) detailBox('Erori de compilare / execuție', '${t['error']}'),
+      ],
+    );
+
+    final list = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [for (var i = 0; i < total; i++) _cTestTile(i, testResults[i], i == sel)],
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const PbHeading('Cerința'),
-        PbRichText(description),
-        if (input != null) ...[const PbHeading('Date de intrare'), PbRichText(input)],
-        if (output != null) ...[const PbHeading('Date de ieșire'), PbRichText(output)],
-        if (constraintsList != null || constraintsText != null) ...[
-          const PbHeading('Restricții și precizări'),
-          constraintsList != null ? bullets(constraintsList) : PbRichText(constraintsText!),
-        ],
-        for (var i = 0; i < examples.length; i++) ...[
-          PbHeading(examples.length > 1 ? 'Exemplul ${i + 1}' : 'Exemplu'),
-          isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    exampleBox('Intrare', examples[i]['input']!),
-                    const SizedBox(height: 12),
-                    exampleBox('Ieșire', examples[i]['output']!),
-                  ],
-                )
+        banner,
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, box) => box.maxWidth < 420
+              ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [list, const SizedBox(height: 10), detail])
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: exampleBox('Intrare', examples[i]['input']!)),
-                    const SizedBox(width: 16),
-                    Expanded(child: exampleBox('Ieșire', examples[i]['output']!)),
+                    SizedBox(width: 150, child: list),
+                    const SizedBox(width: 14),
+                    Expanded(child: detail),
                   ],
                 ),
-        ],
-        if (hint != null) ...[
-          const PbHeading('Indicație'),
-          PbAlert(type: PbAlertType.info, child: PbRichText(hint, color: Pb.infoText)),
-        ],
+        ),
       ],
     );
   }
 
-  Widget _cleanSolution() {
-    final off = exerciseData!["official_solution"];
-    final code = off is Map ? off["code"]?.toString() : null;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const PbHeading('Soluția oficială'),
-        if (code != null)
-          PbCodeBox(code, lang: 'cpp')
-        else
-          const PbAlert(type: PbAlertType.secondary, text: 'Problema nu are încă o soluție oficială.'),
-      ],
-    );
-  }
-
-  Widget _cleanCodeCard(bool isMobile) {
-    PbButton tool(String text, VoidCallback onTap, {IconData? icon, PbVariant v = PbVariant.outlineSecondary}) =>
-        PbButton(text: text, icon: icon, variant: v, size: PbSize.sm, onPressed: onTap);
-
-    return PbCard(
-      header: Row(
-        children: [
-          Expanded(child: Text('Trimite o soluție', style: TextStyle(fontSize: 19, color: Pb.text))),
-          const PbBadge(text: 'C++'),
-        ],
-      ),
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                tool('Anulează', _performUndo, icon: Icons.undo),
-                tool('Refă', _performRedo, icon: Icons.redo),
-                tool('Tab', () => _insertSnippet("    ", "", 4)),
-                tool('{ }', () => _insertSnippet("{\n    ", "\n}", 4)),
-                tool('cin >>', () => _insertSnippet("cin >> ", ";", 7)),
-                tool('cout <<', () => _insertSnippet("cout << ", " << \"\\n\";", 8)),
-                tool('Resetează codul', _resetCode, v: PbVariant.outlineDanger),
-              ],
-            ),
+  Widget _cTestTile(int i, Map<String, dynamic> t, bool sel) {
+    final ok = t['passed'] == true;
+    final sample = t['sample'] == true;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => setState(() => _cSelTest = i),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: sel ? Pb.hoverBg : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: sel ? Pb.border : Colors.transparent),
           ),
-          Container(height: 1, color: Pb.border),
-          SizedBox(height: isMobile ? 300 : 420, child: _buildEditor(clean: true, isMobile: isMobile)),
-          Container(height: 1, color: Pb.border),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Linia ${_getCurrentLine()}, coloana ${_getCurrentCol()}',
-                    style: TextStyle(color: Pb.muted, fontSize: 14),
-                  ),
-                ),
-                PbButton(
-                  text: isRunningCode ? 'Se evaluează...' : 'Trimite soluția',
-                  loading: isRunningCode,
-                  onPressed: () => _checkAuthAndExecute(_runJudge0Checker),
-                ),
-              ],
-            ),
+          child: Row(
+            children: [
+              Icon(ok ? Icons.check_circle : Icons.cancel, size: 16, color: ok ? Pb.success : Pb.danger),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(sample ? 'Exemplu ${i + 1}' : 'Test ${i + 1}', style: TextStyle(fontSize: 13.5, color: Pb.text)),
+              ),
+              if (!sample) Icon(Icons.lock_outline, size: 13, color: Pb.muted),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _cleanEvaluation(bool isMobile) {
-    final total = testResults.length;
-    final passed = testResults.where((t) => t["passed"] == true).length;
-    final score = total == 0 ? 0 : (passed * 100 / total).round();
+  // ---------------------------------------------------------------- run / submit
+  Future<void> _cRun({required bool submit}) async {
+    final code = _codeController.text.trim();
+    if (code.isEmpty) return;
 
-    Widget summary;
-    if (isRunningCode) {
-      summary = PbAlert(type: PbAlertType.info, text: 'Evaluare în curs: $total ${total == 1 ? 'test rulat' : 'teste rulate'}.');
-    } else {
-      summary = PbAlert(
-        type: solutionOk ? PbAlertType.success : PbAlertType.danger,
-        child: Text.rich(TextSpan(children: [
-          TextSpan(text: 'Punctaj: $score', style: const TextStyle(fontWeight: FontWeight.w700)),
-          TextSpan(
-            text: solutionOk
-                ? '. Toate testele au trecut, problema este rezolvată.'
-                : '. $passed din $total teste au trecut.',
-          ),
-        ])),
-      );
+    final sampleCount = _examples.length;
+    final tests = <Map<String, String>>[
+      for (final ex in _examples) {'input': ex['input']!, 'output': ex['output']!},
+      if (submit && exerciseData?['tests'] is List)
+        for (final t in exerciseData!['tests'] as List)
+          if (t is Map) {'input': '${t['input'] ?? ''}', 'output': '${t['output'] ?? ''}'},
+    ];
+
+    setState(() {
+      isRunningCode = true;
+      solutionChecked = false;
+      solutionOk = false;
+      testResults.clear();
+      _cBottom = 1;
+      _cSelTest = 0;
+      _cLastWasRun = !submit;
+    });
+
+    if (tests.isEmpty) {
+      setState(() {
+        isRunningCode = false;
+        solutionChecked = true;
+        testResults.add({'index': 1, 'passed': false, 'sample': true, 'input': '', 'expected': 'teste definite', 'got': 'problema nu are teste', 'error': ''});
+      });
+      return;
     }
 
-    return PbCard(
-      title: 'Rezultatul evaluării',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          summary,
-          if (testResults.isNotEmpty) ...[
+    var all = true;
+    String norm(String s) => s.replaceAll('\r', '').trim();
+
+    try {
+      for (var i = 0; i < tests.length; i++) {
+        final res = await http.post(
+          Uri.parse('https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true'),
+          headers: const {
+            'Content-Type': 'application/json',
+            'X-RapidAPI-Key': 'YOUR_API_KEY',
+            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
+          },
+          body: jsonEncode({'language_id': 52, 'source_code': code, 'stdin': tests[i]['input']}),
+        );
+        final r = jsonDecode(res.body);
+        final got = norm('${r['stdout'] ?? ''}');
+        final err = norm('${r['compile_output'] ?? r['stderr'] ?? ''}');
+        final exp = norm(tests[i]['output']!);
+        final ok = got == exp;
+        if (!ok) all = false;
+
+        testResults.add({
+          'index': i + 1,
+          'passed': ok,
+          'sample': i < sampleCount,
+          'input': tests[i]['input'],
+          'expected': exp,
+          'got': got,
+          'error': err,
+        });
+        if (mounted) setState(() {});
+      }
+    } catch (e) {
+      all = false;
+      testResults.add({'index': testResults.length + 1, 'passed': false, 'sample': true, 'input': '', 'expected': 'fără erori', 'got': '', 'error': '$e'});
+    }
+
+    if (!mounted) return;
+    final passed = testResults.where((t) => t['passed'] == true).length;
+    final score = (passed * 100 / testResults.length).round();
+
+    setState(() {
+      isRunningCode = false;
+      solutionChecked = true;
+      solutionOk = all;
+      _cSubmissions.insert(0, {
+        'time': TimeOfDay.now().format(context),
+        'submit': submit,
+        'ok': all,
+        'score': score,
+        'passed': passed,
+        'total': testResults.length,
+      });
+    });
+
+    if (submit && all) await _markExerciseAsDone();
+  }
+
+  // ---------------------------------------------------------------- grilă / răspuns scurt
+  Widget _cAnswerPanel() {
+    final isGrila = _kind == 'grila';
+    final List<dynamic> variante = exerciseData!['variante'] ?? [];
+
+    return _cCard(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(isGrila ? 'Alege un răspuns' : 'Răspunsul tău',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
+            const SizedBox(height: 4),
+            Text(isGrila ? 'Un singur răspuns este corect.' : 'Scrie doar valoarea cerută.',
+                style: TextStyle(fontSize: 13.5, color: Pb.muted)),
             const SizedBox(height: 14),
-            PbTable(
-              headers: const ['Test', 'Rezultat', 'Răspuns așteptat', 'Răspunsul tău'],
-              columnWidths: {
-                0: FixedColumnWidth(isMobile ? 54 : 70),
-                1: FixedColumnWidth(isMobile ? 80 : 110),
-              },
-              rowColors: [for (final t in testResults) t["passed"] == true ? Pb.successBg : Pb.dangerBg],
-              rows: [
-                for (final t in testResults)
-                  [
-                    Text('#${t['index']}'),
-                    Text(
-                      t["passed"] == true ? 'corect' : 'greșit',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: t["passed"] == true ? Pb.successText : Pb.dangerText,
-                      ),
-                    ),
-                    Text('${t['expected']}', style: Pb.mono(13.5)),
-                    Text('${t['got']}'.isEmpty ? '(nimic)' : '${t['got']}', style: Pb.mono(13.5)),
-                  ],
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _cleanAnswerAlert() {
-    return PbAlert(
-      type: solutionOk ? PbAlertType.success : PbAlertType.danger,
-      text: solutionOk ? 'Răspuns corect. Problema este marcată ca rezolvată.' : 'Răspuns greșit. Mai încearcă.',
-    );
-  }
-
-  Widget _cleanGrilaCard() {
-    final List<dynamic> variante = exerciseData!["variante"] ?? [];
-    return PbCard(
-      title: 'Alege răspunsul corect',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final v in variante)
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => _checkAuthAndExecute(() => setState(() => _selectedGrilaOption = v.toString())),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        _selectedGrilaOption == v.toString() ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                        size: 20,
-                        color: _selectedGrilaOption == v.toString() ? Pb.primary : Pb.muted,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(v.toString(), style: TextStyle(fontSize: 16, color: Pb.text, height: 1.4))),
-                    ],
-                  ),
-                ),
+            if (isGrila)
+              ...[for (var i = 0; i < variante.length; i++) _cOption(i, variante[i].toString())]
+            else
+              TextField(
+                controller: _answerController,
+                style: TextStyle(fontSize: 16, color: Pb.text),
+                cursorColor: Pb.text,
+                decoration: Pb.input(hint: 'Scrie răspunsul aici'),
+                onSubmitted: (_) => _checkAuthAndExecute(_checkSimpleAnswer),
+              ),
+            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerRight,
+              child: PbButton(
+                text: 'Verifică',
+                variant: PbVariant.success,
+                onPressed: isGrila && _selectedGrilaOption == null ? null : () => _checkAuthAndExecute(_checkSimpleAnswer),
               ),
             ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: PbButton(
-              text: 'Verifică răspunsul',
-              onPressed: _selectedGrilaOption == null ? null : () => _checkAuthAndExecute(_checkSimpleAnswer),
-            ),
-          ),
-          if (solutionChecked) ...[const SizedBox(height: 14), _cleanAnswerAlert()],
-        ],
+            if (solutionChecked) ...[
+              const SizedBox(height: 14),
+              PbAlert(
+                type: solutionOk ? PbAlertType.success : PbAlertType.danger,
+                text: solutionOk ? 'Răspuns corect. Problema e marcată ca rezolvată.' : 'Răspuns greșit. Mai încearcă.',
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _cleanTextCard() {
-    return PbCard(
-      title: 'Răspunsul tău',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            controller: _answerController,
-            style: TextStyle(fontSize: 16, color: Pb.text),
-            cursorColor: Pb.text,
-            decoration: Pb.input(hint: 'Scrie răspunsul aici'),
-            onSubmitted: (_) => _checkAuthAndExecute(_checkSimpleAnswer),
+  Widget _cOption(int i, String text) {
+    final sel = _selectedGrilaOption == text;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => _checkAuthAndExecute(() => setState(() => _selectedGrilaOption = text)),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: sel ? Pb.primary.withOpacity(0.08) : Pb.surface,
+              borderRadius: Pb.radius,
+              border: Border.all(color: sel ? Pb.primary : Pb.border, width: sel ? 1.5 : 1),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: sel ? Pb.primary : Pb.hoverBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    String.fromCharCode(65 + i),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: sel ? Colors.white : Pb.text),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(text, style: TextStyle(fontSize: 15, color: Pb.text, height: 1.4))),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: PbButton(text: 'Verifică răspunsul', onPressed: () => _checkAuthAndExecute(_checkSimpleAnswer)),
-          ),
-          if (solutionChecked) ...[const SizedBox(height: 14), _cleanAnswerAlert()],
-        ],
+        ),
       ),
     );
   }
