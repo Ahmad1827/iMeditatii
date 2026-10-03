@@ -949,3 +949,86 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+class _HLessonRow extends StatefulWidget {
+  final int index;
+  final Map<String, dynamic> data;
+  final bool isMobile;
+  final VoidCallback onTap;
+
+  const _HLessonRow({required this.index, required this.data, required this.isMobile, required this.onTap});
+
+  @override
+  State<_HLessonRow> createState() => _HLessonRowState();
+}
+
+class _HLessonRowState extends State<_HLessonRow> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final d = widget.data;
+    final subject = AppStyle.sentence(d['subject'].toString());
+    final color = subject == 'Matematică'
+        ? const Color(0xFFE5484D)
+        : (subject == 'Python' ? const Color(0xFF3B82F6) : Pb.primary);
+    final readTime = (d['readTime'] ?? '').toString().toLowerCase();
+    final grade = d['grade'].toString();
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _hover ? Pb.hoverBg : Colors.transparent,
+            border: Border(top: BorderSide(color: Pb.border)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              SizedBox(width: 30, child: Text('${widget.index}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      d['title'].toString(),
+                      maxLines: widget.isMobile ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: _hover ? Pb.link : Pb.text),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.isMobile ? '$subject, clasa a $grade-a, $readTime' : 'Clasa a $grade-a',
+                      style: TextStyle(fontSize: 12.5, color: Pb.muted),
+                    ),
+                  ],
+                ),
+              ),
+              if (!widget.isMobile) ...[
+                SizedBox(
+                  width: 110,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                      child: Text(subject, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: color)),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 64,
+                  child: Text(readTime, textAlign: TextAlign.right, style: TextStyle(fontSize: 13, color: Pb.muted)),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
