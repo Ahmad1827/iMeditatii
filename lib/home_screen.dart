@@ -953,7 +953,7 @@ class _HomeScreenState extends State<HomeScreen> {
 // =============================================================================
 // pbinfo-style news post (collapsible)
 // =============================================================================
-class _PbPostState extends State<_PbPost> {
+class _PbPostState {
   bool _open = true;
 
   @override
