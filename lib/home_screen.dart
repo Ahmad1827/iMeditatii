@@ -105,13 +105,12 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
-    final catalog = _HReveal(delayMs: 100, child: _hCatalog(isMobile));
-    final posts = _HReveal(delayMs: 160, child: _hPostsCard());
-    final leaders = _HReveal(delayMs: 220, child: _hLeaderboard());
+    final catalog = _HReveal(delayMs: 140, child: _hCatalog(isMobile));
+    final posts = _HReveal(delayMs: 200, child: _hPostsCard());
 
-    Widget wideBox(Widget child) => Center(
+    Widget box(double max, Widget child) => Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1520),
+            constraints: BoxConstraints(maxWidth: max),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
               child: child,
@@ -129,66 +128,39 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Pb.surface,
-                        border: Border(bottom: BorderSide(color: Pb.border)),
-                      ),
-                      child: CustomPaint(
-                        painter: _HGridPaper(
-                          minor: Pb.text.withOpacity(0.03),
-                          major: Pb.text.withOpacity(0.055),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: isMobile ? 26 : 48),
-                          child: wideBox(_HReveal(child: _hWelcome(isMobile))),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: isMobile ? 20 : 28),
-                    wideBox(
-                      LayoutBuilder(
-                        builder: (context, box) {
-                          if (isMobile) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [catalog, const SizedBox(height: 20), posts, const SizedBox(height: 20), leaders],
-                            );
-                          }
-                          if (box.maxWidth >= 1180) {
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 270, child: leaders),
-                                const SizedBox(width: 20),
-                                Expanded(flex: 11, child: catalog),
-                                const SizedBox(width: 20),
-                                Expanded(flex: 10, child: posts),
-                              ],
-                            );
-                          }
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(width: 260, child: leaders),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Column(
+                child: CustomPaint(
+                  painter: _HGridPaper(
+                    minor: Pb.text.withOpacity(0.03),
+                    major: Pb.text.withOpacity(0.05),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: isMobile ? 24 : 44),
+                      box(760, _HReveal(child: _hWelcome(isMobile))),
+                      SizedBox(height: isMobile ? 24 : 36),
+                      box(
+                        1240,
+                        LayoutBuilder(
+                          builder: (context, b) => (isMobile || b.maxWidth < 860)
+                              ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [catalog, const SizedBox(height: 20), posts],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(flex: 3, child: catalog),
+                                    const SizedBox(width: 24),
+                                    Expanded(flex: 2, child: posts),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          );
-                        },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 48),
-                    _hFooter(isMobile),
-                  ],
+                      const SizedBox(height: 56),
+                      _hFooter(isMobile),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -377,29 +349,22 @@ class _HomeScreenState extends State<HomeScreen> {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Pb.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Pb.border),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Pb.border.withOpacity(0.7)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.25 : 0.04), blurRadius: 12, offset: const Offset(0, 3)),
+            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.06), blurRadius: 24, offset: const Offset(0, 8)),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-
-            child,
-          ],
-        ),
+        child: child,
       );
 
-    Widget _hCardHeader(IconData icon, Color color, String title, {Widget? trailing}) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+  Widget _hCardHeader(IconData icon, Color color, String title, {Widget? trailing}) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: Pb.muted),
-            const SizedBox(width: 8),
-            Expanded(child: Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text))),
+            Icon(icon, size: 19, color: Pb.muted),
+            const SizedBox(width: 9),
+            Expanded(child: Text(title, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Pb.text))),
             if (trailing != null) trailing,
           ],
         ),
@@ -436,69 +401,79 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ---------------------------------------------------------------- welcome
-    Widget _hWelcome(bool isMobile) {
+  Widget _hWelcome(bool isMobile) {
     final user = FirebaseAuth.instance.currentUser;
     final first = (user?.displayName ?? '').trim().split(' ').first;
-    final title = user == null
-        ? 'Exersează pentru Bacalaureat'
+    final greeting = user == null
+        ? 'Bun venit pe iMeditații'
         : (first.isEmpty ? 'Bine ai revenit' : 'Bine ai revenit, $first');
     final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
     final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
 
     final now = DateTime.now();
     final day = now.difference(DateTime(now.year)).inDays;
-    final f = _hFormulas[day % _hFormulas.length];
+    final fact = _hFacts[day % _hFacts.length];
 
-    Widget stat(Widget value, String label) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            value,
-            const SizedBox(height: 2),
-            Text(label, style: TextStyle(fontSize: 13, color: Pb.muted)),
+    BoxDecoration cardDeco() => BoxDecoration(
+          color: Pb.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Pb.border.withOpacity(0.7)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07), blurRadius: 28, offset: const Offset(0, 10)),
           ],
         );
 
-    final intro = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.6, height: 1.15),
-        ),
-        const SizedBox(height: 10),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Text(
-            'Probleme cu evaluare automată și lecții pe programa de liceu, clasele IX–XII.',
-            style: TextStyle(fontSize: isMobile ? 15 : 16, color: Pb.muted, height: 1.5),
+    final ringSize = isMobile ? 96.0 : 112.0;
+    final ring = SizedBox(
+      width: ringSize,
+      height: ringSize,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: _progressValue),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, __) => CircularProgressIndicator(
+              value: v,
+              strokeWidth: 9,
+              strokeCap: StrokeCap.round,
+              backgroundColor: Pb.gray,
+              color: Pb.primary,
+            ),
           ),
-        ),
-        const SizedBox(height: 22),
-        Wrap(
-          spacing: 36,
-          runSpacing: 12,
-          children: [
-            stat(
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: _isLoadingStats ? 0 : _completedQuests.toDouble()),
-                duration: const Duration(milliseconds: 800),
-                curve: Curves.easeOutCubic,
-                builder: (_, v, __) => Text('${v.round()}',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
+          Center(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: _isLoadingStats ? 0 : _completedQuests.toDouble()),
+              duration: const Duration(milliseconds: 900),
+              curve: Curves.easeOutCubic,
+              builder: (_, v, __) => Text(
+                '${v.round()}',
+                style: TextStyle(fontSize: isMobile ? 32 : 40, fontWeight: FontWeight.w700, color: Pb.text, height: 1),
               ),
-              'probleme rezolvate',
             ),
-            stat(
-              Text(rank, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
-              '$inLevel din 5 spre nivelul următor',
-            ),
-          ],
+          ),
+        ],
+      ),
+    );
+
+    final info = Column(
+      crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(greeting, style: TextStyle(fontSize: 14.5, color: Pb.muted)),
+        const SizedBox(height: 4),
+        Text(
+          _completedQuests == 1 ? 'problemă rezolvată' : 'probleme rezolvate',
+          style: TextStyle(fontSize: isMobile ? 26 : 30, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5, height: 1.15),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 6),
+        Text('$rank, $inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 14, color: Pb.muted)),
+        const SizedBox(height: 16),
         Wrap(
-          spacing: 10,
-          runSpacing: 10,
+          spacing: 8,
+          runSpacing: 8,
+          alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
           children: [
             PbButton(text: 'Problema zilei', icon: Icons.play_arrow, onPressed: _startDailyQuest),
             PbButton(text: 'Toate lecțiile', variant: PbVariant.outlineSecondary, onPressed: () => context.go('/resurse')),
@@ -507,47 +482,59 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
 
-    final formula = Container(
-      width: isMobile ? double.infinity : 400,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: Pb.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Pb.border),
-      ),
-      child: Column(
+    final statCard = Container(
+      padding: EdgeInsets.all(isMobile ? 22 : 26),
+      decoration: cardDeco(),
+      child: isMobile
+          ? Column(children: [ring, const SizedBox(height: 18), info])
+          : Row(children: [ring, const SizedBox(width: 28), Expanded(child: info)]),
+    );
+
+    final factCard = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: cardDeco(),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Formula zilei', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.muted)),
-          const SizedBox(height: 14),
-          Text(
-            f[0],
-            style: TextStyle(fontSize: isMobile ? 21 : 25, fontWeight: FontWeight.w600, color: Pb.link, letterSpacing: 0.2),
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: _cAmber.withOpacity(0.14), borderRadius: BorderRadius.circular(11)),
+            child: const Icon(Icons.lightbulb_outline, size: 20, color: _cAmber),
           ),
-          const SizedBox(height: 8),
-          Text(f[1], style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.4)),
-          const SizedBox(height: 16),
-          PbLink(text: 'Vezi lecția', fontSize: 14, onTap: () => context.go('/resurse/${f[2]}')),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Știai că?', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                const SizedBox(height: 4),
+                Text(fact, style: TextStyle(fontSize: 15, color: Pb.text, height: 1.5)),
+              ],
+            ),
+          ),
         ],
       ),
     );
 
-    if (isMobile) {
-      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [intro, const SizedBox(height: 24), formula]);
-    }
-    return Row(children: [Expanded(child: intro), const SizedBox(width: 32), formula]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [statCard, const SizedBox(height: 16), factCard],
+    );
   }
 
-  // formula, explicație, id lecție
-  static const List<List<String>> _hFormulas = [
-    ['Δ = b² − 4ac', 'Discriminantul ecuației de gradul al II-lea', 'mat-9-quad'],
-    ['x₁ + x₂ = −b/a,   x₁ · x₂ = c/a', 'Relațiile lui Viète', 'mat-9-quad'],
-    ['log_a(x · y) = log_a x + log_a y', 'Logaritmul unui produs', 'mat-10-powers'],
-    ['cmmdc(a, b) = cmmdc(b, a mod b)', 'Algoritmul lui Euclid', 'alg-9-gcd'],
-    ['det(A · B) = det(A) · det(B)', 'Determinantul unui produs de matrice', 'mat-11-determinants'],
-    ['∫[a,b] f(x) dx = F(b) − F(a)', 'Formula Leibniz–Newton', 'mat-12-definite'],
-    ['C(n, k) = n! / (k! · (n − k)!)', 'Combinări de n luate câte k', 'mat-10-combinatorics'],
-    ['d · d ≤ n', 'Divizori până la √n: test de primalitate rapid', 'alg-9-divisors'],
+  static const List<String> _hFacts = [
+    'Cuvântul „algoritm” vine de la numele matematicianului persan al-Khwarizmi, care a trăit în secolul al IX-lea.',
+    'Primul „bug” documentat a fost o molie reală, găsită în 1947 într-un releu al calculatorului Harvard Mark II.',
+    'Algoritmul lui Euclid pentru cmmdc are peste 2.000 de ani și e folosit și azi, de exemplu în criptografie.',
+    'Există exact 5 poliedre regulate: tetraedrul, cubul, octaedrul, dodecaedrul și icosaedrul.',
+    'Numărul 1 nu este prim: un număr prim are exact doi divizori, pe 1 și pe el însuși.',
+    'C++ a fost creat de Bjarne Stroustrup și s-a numit la început „C with Classes”.',
+    'Python își ia numele de la grupul de comedie Monty Python, nu de la șarpe.',
+    'Suma primelor n numere impare este n²: 1 + 3 + 5 + 7 = 16.',
+    'Într-un grup de doar 23 de persoane, șansa ca două să aibă aceeași zi de naștere depășește 50%.',
+    'Căutarea binară găsește un element într-un vector sortat de un milion de elemente în cel mult 20 de pași.',
   ];
   Widget _hDailyStrip(bool isMobile) {
     final now = DateTime.now();
@@ -1013,10 +1000,11 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 9,
-              height: 9,
-              margin: const EdgeInsets.only(top: 6),
-              decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+              child: Icon(Icons.article_outlined, size: 19, color: c),
             ),
             const SizedBox(width: 12),
             Expanded(
