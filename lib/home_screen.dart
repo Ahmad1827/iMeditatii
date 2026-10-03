@@ -105,6 +105,17 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
+    final dark = AppColors.isDark;
+    final catalog = _HReveal(delayMs: 120, child: _hCatalog(isMobile));
+    final side = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _HReveal(delayMs: 220, child: _hPostsCard()),
+        const SizedBox(height: 20),
+        _HReveal(delayMs: 320, child: _hLeaderboard()),
+      ],
+    );
+
     return Scaffold(
       backgroundColor: Pb.page,
       body: Column(
@@ -115,26 +126,38 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(top: 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    PbContainer(child: _hWelcome(isMobile)),
-                    const SizedBox(height: 24),
-                    PbContainer(child: _hCatalog(isMobile)),
-                    const SizedBox(height: 24),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: isMobile ? 26 : 44),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Pb.primary.withOpacity(dark ? 0.20 : 0.12),
+                            _cViolet.withOpacity(dark ? 0.16 : 0.09),
+                            Pb.page,
+                          ],
+                          stops: const [0, 0.55, 1],
+                        ),
+                      ),
+                      child: PbContainer(child: _HReveal(child: _hWelcome(isMobile))),
+                    ),
+                    const SizedBox(height: 8),
                     PbContainer(
                       child: isMobile
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [_hLeaderboard(), const SizedBox(height: 16), _hPostsCard()],
+                              children: [catalog, const SizedBox(height: 20), side],
                             )
                           : Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(child: _hPostsCard()),
+                                Expanded(child: catalog),
                                 const SizedBox(width: 24),
-                                SizedBox(width: 340, child: _hLeaderboard()),
+                                SizedBox(width: 360, child: side),
                               ],
                             ),
                     ),
@@ -302,9 +325,67 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ---------------------------------------------------------------- helpers
-  BoxDecoration get _hCardDeco =>
-      BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border));
+    // ---------------------------------------------------------------- helpers
+  static const Color _cViolet = Color(0xFF7C5CFF);
+  static const Color _cAmber = Color(0xFFF59E0B);
+  static const Color _cRose = Color(0xFFE5484D);
+  static const Color _cBlue = Color(0xFF3B82F6);
+  static const Color _cGold = Color(0xFFE6B422);
+
+  Color _hSubjectColor(String s) {
+    final l = s.toLowerCase();
+    if (l.startsWith('mat')) return _cRose;
+    if (l.contains('python')) return _cBlue;
+    if (l.contains('engl') || l.contains('limb') || l.contains('rom')) return _cViolet;
+    if (l.contains('c++') || l.contains('info')) return Pb.primary;
+    return _cAmber;
+  }
+
+  Color _hDiffColor(String d) {
+    final l = d.toLowerCase();
+    if (l.startsWith('u') || l.startsWith('e')) return const Color(0xFF10B981);
+    if (l.startsWith('m')) return _cAmber;
+    if (l.startsWith('g') || l.startsWith('h') || l.startsWith('d')) return _cRose;
+    return Pb.muted;
+  }
+
+  Widget _hCard({required List<Color> accent, required Widget child}) => Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Pb.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Pb.border),
+          boxShadow: [
+            BoxShadow(color: accent.first.withOpacity(AppColors.isDark ? 0.12 : 0.08), blurRadius: 24, offset: const Offset(0, 8)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(height: 3, decoration: BoxDecoration(gradient: LinearGradient(colors: accent))),
+            child,
+          ],
+        ),
+      );
+
+  Widget _hCardHeader(IconData icon, Color color, String title, {Widget? trailing}) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: color.withOpacity(0.14), borderRadius: BorderRadius.circular(9)),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            const SizedBox(width: 10),
+            Expanded(child: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text))),
+            if (trailing != null) trailing,
+          ],
+        ),
+      );
 
   Widget _hLoading(String text) => Padding(
         padding: const EdgeInsets.all(20),
@@ -317,18 +398,31 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 
-  Widget _hChip(String label, bool sel, VoidCallback onTap) => _HHover(
-        onTap: onTap,
-        builder: (h) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-          decoration: BoxDecoration(
-            color: sel ? Pb.text : (h ? Pb.hoverBg : Colors.transparent),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: sel ? Pb.text : Pb.border),
-          ),
-          child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: sel ? Pb.surface : Pb.text)),
+  Widget _hChip(String label, bool sel, VoidCallback onTap, {Color? color}) {
+    final c = color ?? Pb.primary;
+    return _HHover(
+      onTap: onTap,
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+        decoration: BoxDecoration(
+          color: sel ? c : (h ? c.withOpacity(0.08) : Colors.transparent),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: sel ? c : (h ? c.withOpacity(0.5) : Pb.border)),
         ),
-      );
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (color != null && !sel) ...[
+              Container(width: 7, height: 7, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+              const SizedBox(width: 6),
+            ],
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: sel ? Colors.white : Pb.text)),
+          ],
+        ),
+      ),
+    );
+  }
 
   // ---------------------------------------------------------------- welcome
   Widget _hWelcome(bool isMobile) {
@@ -340,93 +434,189 @@ class _HomeScreenState extends State<HomeScreen> {
     final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
     final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
 
-    Widget tile({required String label, IconData? icon, required Widget value, Widget? footer, VoidCallback? onTap}) => _HHover(
-          onTap: onTap,
-          builder: (h) => Container(
-            width: isMobile ? double.infinity : 190,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Pb.surface,
-              borderRadius: Pb.radius,
-              border: Border.all(color: h && onTap != null ? Pb.primary : Pb.border),
+    return LayoutBuilder(builder: (context, box) {
+      final wide = !isMobile && box.maxWidth > 1100;
+
+      Widget tile({
+        required Color accent,
+        required IconData icon,
+        required String label,
+        required Widget value,
+        Widget Function(bool hover)? footer,
+        VoidCallback? onTap,
+      }) =>
+          _HHover(
+            onTap: onTap,
+            builder: (h) => AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              width: wide ? 214 : double.infinity,
+              transform: Matrix4.translationValues(0, h && onTap != null ? -4 : 0, 0),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Pb.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: h ? accent.withOpacity(0.55) : Pb.border),
+                boxShadow: [
+                  BoxShadow(
+                    color: accent.withOpacity(h ? 0.25 : 0.10),
+                    blurRadius: h ? 22 : 14,
+                    offset: Offset(0, h ? 10 : 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 34,
+                        height: 34,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [accent, accent.withOpacity(0.72)]),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(icon, size: 18, color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Pb.muted))),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  value,
+                  if (footer != null) ...[const SizedBox(height: 10), footer(h)],
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    if (icon != null) ...[Icon(icon, size: 15, color: Pb.muted), const SizedBox(width: 6)],
-                    Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Pb.muted)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                value,
-                if (footer != null) ...[const SizedBox(height: 6), footer],
-              ],
+          );
+
+      final tiles = [
+        tile(
+          accent: Pb.primary,
+          icon: Icons.check_circle_outline,
+          label: 'Probleme rezolvate',
+          value: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: _isLoadingStats ? 0 : _completedQuests.toDouble()),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, __) => Text('${v.round()}',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Pb.text, height: 1)),
+          ),
+          footer: (_) => TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: _progressValue),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, __) => ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(value: v, minHeight: 6, backgroundColor: Pb.gray, color: Pb.primary),
             ),
           ),
-        );
-
-    final tiles = [
-      tile(
-        label: 'Probleme rezolvate',
-        icon: Icons.check_circle_outline,
-        value: Text(_isLoadingStats ? '–' : '$_completedQuests',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text)),
-        footer: ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(value: _progressValue, minHeight: 4, backgroundColor: Pb.gray, color: Pb.primary),
         ),
-      ),
-      tile(
-        label: 'Nivel',
-        icon: Icons.trending_up,
-        value: Text(rank, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
-        footer: Text('$inLevel din 5 spre următorul', style: TextStyle(fontSize: 12, color: Pb.muted)),
-      ),
-      tile(
-        label: 'Problema zilei',
-        icon: Icons.today_outlined,
-        value: Text('Informatică, a IX-a', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
-        footer: Text('Rezolvă acum', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Pb.link)),
-        onTap: _startDailyQuest,
-      ),
-    ];
-
-    final intro = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5)),
-        const SizedBox(height: 6),
-        Text(
-          'Probleme cu evaluare automată și lecții pe programa de liceu, clasele IX–XII.',
-          style: TextStyle(fontSize: 15, color: Pb.muted, height: 1.5),
+        tile(
+          accent: _cViolet,
+          icon: Icons.trending_up,
+          label: 'Nivel',
+          value: Text(rank, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Pb.text, height: 1.1)),
+          footer: (_) => Row(
+            children: [
+              for (var i = 0; i < 5; i++)
+                Expanded(
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300 + i * 120),
+                    height: 6,
+                    margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
+                    decoration: BoxDecoration(
+                      color: i < inLevel ? _cViolet : Pb.gray,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
-      ],
-    );
+        tile(
+          accent: _cAmber,
+          icon: Icons.local_fire_department_outlined,
+          label: 'Problema zilei',
+          onTap: _startDailyQuest,
+          value: Text('Informatică, a IX-a', style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text)),
+          footer: (h) => Row(
+            children: [
+              const Text('Rezolvă acum', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _cAmber)),
+              AnimatedPadding(
+                duration: const Duration(milliseconds: 180),
+                padding: EdgeInsets.only(left: h ? 8 : 4),
+                child: const Icon(Icons.arrow_forward, size: 15, color: _cAmber),
+              ),
+            ],
+          ),
+        ),
+      ];
 
-    if (isMobile) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      final intro = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          intro,
-          const SizedBox(height: 16),
-          for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(height: 10), tiles[i]],
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Pb.primary.withOpacity(0.16), _cViolet.withOpacity(0.16)]),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text('Programa de liceu, clasele IX–XII',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.primary)),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            style: TextStyle(fontSize: isMobile ? 27 : 36, fontWeight: FontWeight.w800, color: Pb.text, letterSpacing: -0.8, height: 1.15),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Probleme cu evaluare automată, lecții și un clasament al elevilor, pe programa de liceu.',
+            style: TextStyle(fontSize: isMobile ? 15 : 16.5, color: Pb.muted, height: 1.5),
+          ),
         ],
       );
-    }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(child: intro),
-        const SizedBox(width: 20),
-        for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 12), tiles[i]],
-      ],
-    );
+
+      if (isMobile) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            intro,
+            const SizedBox(height: 18),
+            for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(height: 12), tiles[i]],
+          ],
+        );
+      }
+      if (!wide) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            intro,
+            const SizedBox(height: 20),
+            Row(
+              children: [for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: tiles[i])]],
+            ),
+          ],
+        );
+      }
+      return Row(
+        children: [
+          Expanded(child: intro),
+          const SizedBox(width: 24),
+          for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 14), tiles[i]],
+        ],
+      );
+    });
   }
 
   // ---------------------------------------------------------------- catalog
-  Widget _hCatalog(bool isMobile) {
+  Widget _hCatalog(bool isMobile) =>
+      LayoutBuilder(builder: (context, box) => _hCatalogBody(isMobile, isMobile || box.maxWidth < 680));
+
+  Widget _hCatalogBody(bool isMobile, bool compact) {
     final exercises = _hExercises ?? const <Map<String, dynamic>>[];
     final lessonsAll = ResourcesData.allArticles;
     final q = _hQuery.trim().toLowerCase();
@@ -454,49 +644,60 @@ class _HomeScreenState extends State<HomeScreen> {
           _hLimit = 15;
         });
 
-    Widget seg(String label, int count, bool sel, VoidCallback onTap) => _HHover(
+    Widget seg(String label, IconData icon, int count, bool sel, VoidCallback onTap) => _HHover(
           onTap: onTap,
           builder: (h) => AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: sel ? Pb.surface : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 4, offset: const Offset(0, 1))] : null,
+              gradient: sel ? const LinearGradient(colors: [Pb.primary, _cViolet]) : null,
+              color: sel ? null : (h ? Pb.surface : Colors.transparent),
+              borderRadius: BorderRadius.circular(9),
+              boxShadow: sel ? [BoxShadow(color: Pb.primary.withOpacity(0.30), blurRadius: 10, offset: const Offset(0, 3))] : null,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(label,
-                    style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
+                Icon(icon, size: 16, color: sel ? Colors.white : Pb.muted),
                 const SizedBox(width: 6),
-                Text('$count', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: sel ? Colors.white : Pb.text)),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: sel ? Colors.white.withOpacity(0.22) : Pb.gray,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text('$count',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: sel ? Colors.white : Pb.muted)),
+                ),
               ],
             ),
           ),
         );
 
     final toggle = Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(10)),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(12)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          seg('Exerciții', exercises.length, !_hShowLessons, () => switchTo(false)),
-          seg('Lecții', lessonsAll.length, _hShowLessons, () => switchTo(true)),
+          seg('Exerciții', Icons.code, exercises.length, !_hShowLessons, () => switchTo(false)),
+          seg('Lecții', Icons.menu_book_outlined, lessonsAll.length, _hShowLessons, () => switchTo(true)),
         ],
       ),
     );
 
     final search = SizedBox(
-      width: isMobile ? double.infinity : 250,
+      width: isMobile ? double.infinity : (compact ? 200 : 250),
       child: TextField(
         onChanged: (v) => setState(() {
           _hQuery = v;
           _hLimit = 15;
         }),
         style: TextStyle(fontSize: 14, color: Pb.text),
-        cursorColor: Pb.text,
+        cursorColor: Pb.primary,
         decoration: Pb.input(hint: _hShowLessons ? 'Caută o lecție' : 'Caută o problemă').copyWith(
           prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
           prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -515,7 +716,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _hChip('a ${_hRoman[g]}-a', _hGrade == g, () => setState(() => _hGrade = g)),
         Container(width: 1, height: 20, margin: const EdgeInsets.symmetric(horizontal: 6), color: Pb.border),
         _hChip('Toate materiile', _hSubject == 'toate', () => setState(() => _hSubject = 'toate')),
-        for (final s in subjects) _hChip(s, _hSubject == s, () => setState(() => _hSubject = s)),
+        for (final s in subjects)
+          _hChip(s, _hSubject == s, () => setState(() => _hSubject = s), color: _hSubjectColor(s)),
       ],
     );
 
@@ -533,12 +735,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(width: 64, child: Text('Durată', textAlign: TextAlign.right, style: headStyle)),
                   ])
                 : Row(children: [
-                    SizedBox(width: 36, child: Text('', style: headStyle)),
-                    SizedBox(width: 44, child: Text('#', style: headStyle)),
+                    const SizedBox(width: 36),
+                    if (!compact) SizedBox(width: 44, child: Text('#', style: headStyle)),
                     Expanded(child: Text('Titlu', style: headStyle)),
                     SizedBox(width: 130, child: Text('Materie', style: headStyle)),
                     SizedBox(width: 90, child: Text('Dificultate', style: headStyle)),
-                    SizedBox(width: 70, child: Text('Tip', style: headStyle)),
+                    if (!compact) SizedBox(width: 70, child: Text('Tip', style: headStyle)),
                   ]),
           );
 
@@ -564,12 +766,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
       ];
     } else {
-      rows = [for (var i = 0; i < shown; i++) _hExerciseRow(exRows[i], isMobile)];
+      rows = [for (var i = 0; i < shown; i++) _hExerciseRow(exRows[i], isMobile, compact)];
     }
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: _hCardDeco,
+    final switchKey = '${_hShowLessons}_${_hGrade}_${_hSubject}_${_hExercises == null}';
+
+    return _hCard(
+      accent: const [Pb.primary, _cViolet],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -589,8 +792,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          if (tableHead != null) tableHead,
-          ...rows,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 240),
+            switchInCurve: Curves.easeOut,
+            layoutBuilder: (cur, prev) => Stack(alignment: Alignment.topCenter, children: [...prev, if (cur != null) cur]),
+            child: Column(
+              key: ValueKey(switchKey),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [if (tableHead != null) tableHead, ...rows],
+            ),
+          ),
           if (total > 0)
             Container(
               decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
@@ -601,7 +812,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (total > shown)
                     PbButton(
                       text: 'Arată mai multe',
-                      variant: PbVariant.outlineSecondary,
+                      variant: PbVariant.outlinePrimary,
                       size: PbSize.sm,
                       onPressed: () => setState(() => _hLimit += 15),
                     ),
@@ -613,18 +824,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _hExerciseRow(Map<String, dynamic> e, bool isMobile) {
+  Widget _hExerciseRow(Map<String, dynamic> e, bool isMobile, bool compact) {
     final key = '${e['subject']}_${e['grade']}_${e['id']}';
     final solved = _hSolved.contains(key);
     final diff = (e['difficulty'] ?? '').toString();
-    final dl = diff.toLowerCase();
-    final Color diffColor = dl.startsWith('u') || dl.startsWith('e')
-        ? const Color(0xFF00A67E)
-        : dl.startsWith('m')
-            ? const Color(0xFFD99A00)
-            : (dl.startsWith('g') || dl.startsWith('h') || dl.startsWith('d'))
-                ? const Color(0xFFE5484D)
-                : Pb.muted;
+    final dc = _hDiffColor(diff);
+    final sc = _hSubjectColor('${e['subject']}');
     final kind = e['kind'] == 'grila' ? 'Grilă' : (e['kind'] == 'text' ? 'Răspuns' : 'Cod');
     final grade = '${e['grade']}';
 
@@ -633,20 +838,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return _HHover(
       onTap: open,
-      builder: (h) => Container(
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
         decoration: BoxDecoration(
-          color: h ? Pb.hoverBg : Colors.transparent,
-          border: Border(top: BorderSide(color: Pb.border)),
+          color: h ? sc.withOpacity(0.06) : Colors.transparent,
+          border: Border(
+            top: BorderSide(color: Pb.border),
+            left: BorderSide(color: h ? sc : Colors.transparent, width: 3),
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.fromLTRB(13, 12, 16, 12),
         child: Row(
           children: [
             SizedBox(
               width: 36,
-              child: Icon(solved ? Icons.check_circle : Icons.radio_button_unchecked,
-                  size: 18, color: solved ? Pb.success : Pb.border),
+              child: Icon(
+                solved ? Icons.check_circle : Icons.radio_button_unchecked,
+                size: 18,
+                color: solved ? const Color(0xFF10B981) : Pb.border,
+              ),
             ),
-            if (!isMobile) SizedBox(width: 44, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
+            if (!compact) SizedBox(width: 44, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -655,7 +867,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     '${e['title']}',
                     maxLines: isMobile ? 2 : 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? Pb.link : Pb.text),
+                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? sc : Pb.text),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -670,14 +882,32 @@ class _HomeScreenState extends State<HomeScreen> {
             if (!isMobile) ...[
               SizedBox(
                 width: 130,
-                child: Text('${e['subject']}', overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.text)),
+                child: Row(
+                  children: [
+                    Container(width: 7, height: 7, decoration: BoxDecoration(color: sc, shape: BoxShape.circle)),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text('${e['subject']}',
+                          overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.text)),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 width: 90,
-                child: Text(diff.isEmpty ? '–' : AppStyle.sentence(diff),
-                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: diffColor)),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: diff.isEmpty
+                      ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
+                      : Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                          decoration: BoxDecoration(color: dc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
+                          child: Text(AppStyle.sentence(diff),
+                              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: dc)),
+                        ),
+                ),
               ),
-              SizedBox(width: 70, child: Text(kind, style: TextStyle(fontSize: 13, color: Pb.muted))),
+              if (!compact) SizedBox(width: 70, child: Text(kind, style: TextStyle(fontSize: 13, color: Pb.muted))),
             ],
           ],
         ),
@@ -688,22 +918,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // ---------------------------------------------------------------- posts
   Widget _hPostsCard() {
     final posts = _hPosts;
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: _hCardDeco,
+    return _hCard(
+      accent: const [_cAmber, _cRose],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-            child: Row(
-              children: [
-                Icon(Icons.campaign_outlined, size: 18, color: Pb.primary),
-                const SizedBox(width: 8),
-                Text('Noutăți', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
-              ],
-            ),
-          ),
+          _hCardHeader(Icons.campaign_outlined, _cAmber, 'Noutăți'),
           if (posts == null)
             _hLoading('Se încarcă noutățile...')
           else
@@ -714,6 +934,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _hPostRow(int i, Map<String, dynamic> p) {
+    const colors = [Pb.primary, _cAmber, _cViolet, _cRose, _cBlue];
+    final c = colors[i % colors.length];
     final open = _hOpenPost == i;
     final link = p['link'] as String?;
     final date = '${p['date'] ?? ''}';
@@ -721,34 +943,54 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return _HHover(
       onTap: () => setState(() => _hOpenPost = open ? -1 : i),
-      builder: (h) => Container(
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
-          color: h ? Pb.hoverBg : Colors.transparent,
+          color: h || open ? c.withOpacity(0.05) : Colors.transparent,
           border: Border(top: BorderSide(color: Pb.border)),
         ),
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: Column(
+        padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(child: Text('${p['title']}', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Pb.text))),
-                Icon(open ? Icons.expand_less : Icons.expand_more, size: 20, color: Pb.muted),
-              ],
+            Container(
+              width: 9,
+              height: 9,
+              margin: const EdgeInsets.only(top: 6),
+              decoration: BoxDecoration(color: c, shape: BoxShape.circle),
             ),
-            const SizedBox(height: 3),
-            Text(date.isEmpty ? author : '$author, $date', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-            const SizedBox(height: 8),
-            Text(
-              '${p['body']}',
-              maxLines: open ? null : 2,
-              overflow: open ? null : TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14, color: Pb.text, height: 1.55),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${p['title']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: h ? c : Pb.text)),
+                  const SizedBox(height: 3),
+                  Text(date.isEmpty ? author : '$author, $date', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                  const SizedBox(height: 7),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      '${p['body']}',
+                      maxLines: open ? null : 2,
+                      overflow: open ? null : TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 14, color: Pb.text, height: 1.55),
+                    ),
+                  ),
+                  if (open && link != null && link.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    PbLink(text: 'Deschide', fontSize: 14, onTap: () => context.go(link)),
+                  ],
+                ],
+              ),
             ),
-            if (open && link != null && link.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              PbLink(text: 'Deschide', fontSize: 14, onTap: () => context.go(link)),
-            ],
+            AnimatedRotation(
+              turns: open ? 0.5 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(Icons.expand_more, size: 20, color: Pb.muted),
+            ),
           ],
         ),
       ),
@@ -781,31 +1023,33 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: _hCardDeco,
+    return _hCard(
+      accent: const [_cGold, _cAmber],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-            child: Row(
-              children: [
-                const Icon(Icons.emoji_events_outlined, size: 18, color: Color(0xFFD99A00)),
-                const SizedBox(width: 8),
-                Expanded(child: Text('Clasament elevi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text))),
-                Text('rezolvate', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-              ],
-            ),
+          _hCardHeader(
+            Icons.emoji_events_outlined,
+            const Color(0xFFD99A00),
+            'Clasament elevi',
+            trailing: Text('rezolvate', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
           ),
           body,
+          Container(
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+            child: Text('Fiecare problemă rezolvată cât ești autentificat te urcă în clasament.',
+                style: TextStyle(fontSize: 12.5, color: Pb.muted, height: 1.4)),
+          ),
         ],
       ),
     );
   }
 
   Widget _hLeaderRow(int i, Map<String, dynamic> u, bool isMe) {
-    const medals = [Color(0xFFE6B422), Color(0xFFA8B0B8), Color(0xFFCD7F32)];
+    const medals = [_cGold, Color(0xFFA8B0B8), Color(0xFFCD7F32)];
+    final top = i < 3;
+    final mc = top ? medals[i] : Pb.primary;
     final name = '${u['name']}'.trim();
     final photo = '${u['photo']}';
     final initials = name.isEmpty
@@ -814,9 +1058,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return _HHover(
       onTap: () => context.go('/elev/${u['uid']}'),
-      builder: (h) => Container(
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
-          color: isMe ? Pb.primary.withOpacity(0.08) : (h ? Pb.hoverBg : Colors.transparent),
+          color: isMe
+              ? Pb.primary.withOpacity(h ? 0.14 : 0.08)
+              : top
+                  ? mc.withOpacity(h ? 0.16 : 0.08)
+                  : (h ? Pb.hoverBg : Colors.transparent),
           border: Border(top: BorderSide(color: Pb.border)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -826,26 +1075,38 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 28,
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: i < 3
+                child: top
                     ? Container(
                         width: 22,
                         height: 22,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(color: medals[i], shape: BoxShape.circle),
-                        child: Text('${i + 1}', style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.white)),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [mc, mc.withOpacity(0.7)]),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text('${i + 1}',
+                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.white)),
                       )
                     : Text('${i + 1}', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.muted)),
               ),
             ),
             const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Pb.primary.withOpacity(0.15),
-              backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
-              onBackgroundImageError: photo.isNotEmpty ? (_, __) {} : null,
-              child: photo.isEmpty
-                  ? Text(initials, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Pb.primary))
-                  : null,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: top || h ? mc : Colors.transparent, width: 2),
+              ),
+              child: CircleAvatar(
+                radius: 15,
+                backgroundColor: Pb.primary.withOpacity(0.15),
+                backgroundImage: photo.isNotEmpty ? NetworkImage(photo) : null,
+                onBackgroundImageError: photo.isNotEmpty ? (_, __) {} : null,
+                child: photo.isEmpty
+                    ? Text(initials, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Pb.primary))
+                    : null,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -853,17 +1114,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 isMe ? '$name (tu)' : name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? Pb.link : Pb.text),
+                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? mc : Pb.text),
               ),
             ),
-            Text('${u['count']}', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Pb.text)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+              decoration: BoxDecoration(color: mc.withOpacity(0.16), borderRadius: BorderRadius.circular(999)),
+              child: Text('${u['count']}', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Pb.text)),
+            ),
           ],
         ),
       ),
     );
   }
-
-  // ---------------------------------------------------------------- footer
   Widget _hFooter(bool isMobile) {
     final links = [
       PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
@@ -1394,6 +1657,90 @@ class _HHoverState extends State<_HHover> {
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         child: widget.builder(_hover),
+      ),
+    );
+  }
+}
+
+class _HReveal extends StatefulWidget {
+  final Widget child;
+  final int delayMs;
+
+  const _HReveal({required this.child, this.delayMs = 0});
+
+  @override
+  State<_HReveal> createState() => _HRevealState();
+}
+
+class _HRevealState extends State<_HReveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 520));
+  late final Animation<double> _a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: widget.delayMs), () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).disableAnimations) return widget.child;
+    return FadeTransition(
+      opacity: _a,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(_a),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class _HReveal extends StatefulWidget {
+  final Widget child;
+  final int delayMs;
+
+  const _HReveal({required this.child, this.delayMs = 0});
+
+  @override
+  State<_HReveal> createState() => _HRevealState();
+}
+
+class _HRevealState extends State<_HReveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 520));
+  late final Animation<double> _a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: widget.delayMs), () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).disableAnimations) return widget.child;
+    return FadeTransition(
+      opacity: _a,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(_a),
+        child: widget.child,
       ),
     );
   }
