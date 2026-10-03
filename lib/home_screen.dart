@@ -105,9 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
-    final catalog = _HReveal(delayMs: 120, child: _hCatalog(isMobile));
-    final posts = _HReveal(delayMs: 200, child: _hPostsCard());
-    final leaders = _HReveal(delayMs: 280, child: _hLeaderboard());
+    final dark = AppColors.isDark;
+    final catalog = _HReveal(delayMs: 160, child: _hCatalog(isMobile));
+    final posts = _HReveal(delayMs: 240, child: _hPostsCard());
+    final leaders = _HReveal(delayMs: 320, child: _hLeaderboard());
 
     Widget wideBox(Widget child) => Center(
           child: ConstrainedBox(
@@ -129,52 +130,60 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                padding: EdgeInsets.only(top: isMobile ? 22 : 36),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    wideBox(_HReveal(child: _hWelcome(isMobile))),
-                    SizedBox(height: isMobile ? 22 : 32),
-                    wideBox(
-                      LayoutBuilder(
-                        builder: (context, box) {
-                          if (isMobile) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [catalog, const SizedBox(height: 20), posts, const SizedBox(height: 20), leaders],
-                            );
-                          }
-                          if (box.maxWidth >= 1180) {
+                child: CustomPaint(
+                  painter: _HGridPaper(
+                    minor: Pb.text.withOpacity(dark ? 0.04 : 0.035),
+                    major: Pb.text.withOpacity(dark ? 0.07 : 0.065),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: isMobile ? 22 : 40),
+                      wideBox(_HReveal(child: _hWelcome(isMobile))),
+                      SizedBox(height: isMobile ? 20 : 28),
+                      wideBox(_HReveal(delayMs: 80, child: _hDailyStrip(isMobile))),
+                      SizedBox(height: isMobile ? 20 : 28),
+                      wideBox(
+                        LayoutBuilder(
+                          builder: (context, box) {
+                            if (isMobile) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [catalog, const SizedBox(height: 20), posts, const SizedBox(height: 20), leaders],
+                              );
+                            }
+                            if (box.maxWidth >= 1180) {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 270, child: leaders),
+                                  const SizedBox(width: 20),
+                                  Expanded(flex: 11, child: catalog),
+                                  const SizedBox(width: 20),
+                                  Expanded(flex: 10, child: posts),
+                                ],
+                              );
+                            }
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(width: 290, child: leaders),
+                                SizedBox(width: 260, child: leaders),
                                 const SizedBox(width: 20),
-                                Expanded(flex: 5, child: catalog),
-                                const SizedBox(width: 20),
-                                Expanded(flex: 4, child: posts),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [catalog, const SizedBox(height: 20), posts],
+                                  ),
+                                ),
                               ],
                             );
-                          }
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(width: 270, child: leaders),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [catalog, const SizedBox(height: 20), posts],
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 48),
-                    _hFooter(isMobile),
-                  ],
+                      const SizedBox(height: 48),
+                      _hFooter(isMobile),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -183,7 +192,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
   // ---------------------------------------------------------------- data
   Future<void> _hLoadAll() async {
     await Future.wait([_hLoadExercises(), _hLoadPosts(), _hLoadLeaders()]);
@@ -448,140 +456,136 @@ class _HomeScreenState extends State<HomeScreen> {
     return LayoutBuilder(builder: (context, box) {
       final wide = !isMobile && box.maxWidth > 1100;
 
-      Widget tile({
-        required Color accent,
-        required IconData icon,
-        required String label,
-        required Widget value,
-        Widget Function(bool hover)? footer,
-        VoidCallback? onTap,
-      }) =>
-          _HHover(
-            onTap: onTap,
-            builder: (h) => AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOut,
-              width: wide ? 214 : double.infinity,
-              transform: Matrix4.translationValues(0, h && onTap != null ? -4 : 0, 0),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Pb.surface,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: h ? accent.withOpacity(0.55) : Pb.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(h ? 0.10 : 0.04),
-                    blurRadius: h ? 22 : 14,
-                    offset: Offset(0, h ? 10 : 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 34,
-                        height: 34,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: accent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(icon, size: 18, color: Colors.white),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Pb.muted))),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  value,
-                  if (footer != null) ...[const SizedBox(height: 10), footer(h)],
-                ],
-              ),
-            ),
+      Widget label(String t, IconData icon, Color c) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: c),
+              const SizedBox(width: 6),
+              Text(t, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted)),
+            ],
           );
 
-      final tiles = [
-        tile(
-          accent: Pb.primary,
-          icon: Icons.check_circle_outline,
-          label: 'Probleme rezolvate',
-          value: TweenAnimationBuilder<double>(
+      final solved = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          label('Probleme rezolvate', Icons.check_circle_outline, Pb.primary),
+          const SizedBox(height: 8),
+          TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: _isLoadingStats ? 0 : _completedQuests.toDouble()),
             duration: const Duration(milliseconds: 900),
             curve: Curves.easeOutCubic,
             builder: (_, v, __) => Text('${v.round()}',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Pb.text, height: 1)),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Pb.text, height: 1)),
           ),
-          footer: (_) => TweenAnimationBuilder<double>(
+          const SizedBox(height: 10),
+          TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: _progressValue),
             duration: const Duration(milliseconds: 900),
             curve: Curves.easeOutCubic,
             builder: (_, v, __) => ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(value: v, minHeight: 6, backgroundColor: Pb.gray, color: Pb.primary),
+              child: LinearProgressIndicator(value: v, minHeight: 5, backgroundColor: Pb.gray, color: Pb.primary),
             ),
           ),
-        ),
-        tile(
-          accent: _cGreen,
-          icon: Icons.trending_up,
-          label: 'Nivel',
-          value: Text(rank, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Pb.text, height: 1.1)),
-          footer: (_) => Row(
+        ],
+      );
+
+      final level = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          label('Nivel', Icons.trending_up, _cAmber),
+          const SizedBox(height: 8),
+          Text(rank, style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Pb.text, height: 1.1)),
+          const SizedBox(height: 12),
+          Row(
             children: [
               for (var i = 0; i < 5; i++)
                 Expanded(
                   child: AnimatedContainer(
                     duration: Duration(milliseconds: 300 + i * 120),
-                    height: 6,
+                    height: 5,
                     margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
                     decoration: BoxDecoration(
-                      color: i < inLevel ? _cGreen : Pb.gray,
+                      color: i < inLevel ? _cAmber : Pb.gray,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),
             ],
           ),
+        ],
+      );
+
+      final daily = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          label('Problema zilei', Icons.local_fire_department_outlined, _cRose),
+          const SizedBox(height: 8),
+          Text('Informatică, a IX-a', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+          const SizedBox(height: 10),
+          PbButton(text: 'Rezolvă acum', icon: Icons.play_arrow, size: PbSize.sm, onPressed: _startDailyQuest),
+        ],
+      );
+
+      Widget cell(Widget c) => Padding(padding: const EdgeInsets.all(18), child: c);
+      final panel = Container(
+        width: wide ? 660 : double.infinity,
+        decoration: BoxDecoration(
+          color: Pb.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Pb.border),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.25 : 0.04), blurRadius: 12, offset: const Offset(0, 3)),
+          ],
         ),
-        tile(
-          accent: _cAmber,
-          icon: Icons.local_fire_department_outlined,
-          label: 'Problema zilei',
-          onTap: _startDailyQuest,
-          value: Text('Informatică, a IX-a', style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text)),
-          footer: (h) => Row(
-            children: [
-              const Text('Rezolvă acum', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _cAmber)),
-              AnimatedPadding(
-                duration: const Duration(milliseconds: 180),
-                padding: EdgeInsets.only(left: h ? 8 : 4),
-                child: const Icon(Icons.arrow_forward, size: 15, color: _cAmber),
+        child: isMobile
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  cell(solved),
+                  Container(height: 1, color: Pb.border),
+                  cell(level),
+                  Container(height: 1, color: Pb.border),
+                  cell(daily),
+                ],
+              )
+            : IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: cell(solved)),
+                    Container(width: 1, color: Pb.border),
+                    Expanded(child: cell(level)),
+                    Container(width: 1, color: Pb.border),
+                    Expanded(child: cell(daily)),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ];
+      );
 
       final intro = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: Pb.primary.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(999),
+            decoration: BoxDecoration(color: Pb.primary.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.functions, size: 14, color: Pb.primary),
+                SizedBox(width: 6),
+                Text('Programa de liceu, clasele IX–XII',
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.primary)),
+              ],
             ),
-            child: const Text('Programa de liceu, clasele IX–XII',
-                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.primary)),
           ),
           const SizedBox(height: 14),
           Text(
             title,
-            style: TextStyle(fontSize: isMobile ? 27 : 36, fontWeight: FontWeight.w800, color: Pb.text, letterSpacing: -0.8, height: 1.15),
+            style: TextStyle(fontSize: isMobile ? 27 : 38, fontWeight: FontWeight.w800, color: Pb.text, letterSpacing: -0.8, height: 1.15),
           ),
           const SizedBox(height: 8),
           Text(
@@ -592,35 +596,148 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       if (isMobile) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            intro,
-            const SizedBox(height: 18),
-            for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(height: 12), tiles[i]],
-          ],
-        );
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [intro, const SizedBox(height: 18), panel]);
       }
       if (!wide) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [intro, const SizedBox(height: 20), panel]);
+      }
+      return Row(children: [Expanded(child: intro), const SizedBox(width: 28), panel]);
+    });
+  }
+
+  // formula, explicație, id lecție
+  static const List<List<String>> _hFormulas = [
+    ['Δ = b² − 4ac', 'Discriminantul ecuației de gradul al II-lea', 'mat-9-quad'],
+    ['x₁ + x₂ = −b/a,   x₁ · x₂ = c/a', 'Relațiile lui Viète', 'mat-9-quad'],
+    ['log_a(x · y) = log_a x + log_a y', 'Logaritmul unui produs', 'mat-10-powers'],
+    ['cmmdc(a, b) = cmmdc(b, a mod b)', 'Algoritmul lui Euclid', 'alg-9-gcd'],
+    ['det(A · B) = det(A) · det(B)', 'Determinantul unui produs de matrice', 'mat-11-determinants'],
+    ['∫[a,b] f(x) dx = F(b) − F(a)', 'Formula Leibniz–Newton', 'mat-12-definite'],
+    ['C(n, k) = n! / (k! · (n − k)!)', 'Combinări de n luate câte k', 'mat-10-combinatorics'],
+    ['d · d ≤ n', 'Divizori până la √n: test de primalitate rapid', 'alg-9-divisors'],
+  ];
+
+  Widget _hDailyStrip(bool isMobile) {
+    final now = DateTime.now();
+    final day = now.difference(DateTime(now.year)).inDays;
+    final f = _hFormulas[day % _hFormulas.length];
+    final lessons = ResourcesData.allArticles;
+    final lesson = lessons[day % lessons.length];
+    final subj = AppStyle.sentence('${lesson['subject']}');
+    final sc = _hSubjectColor(subj);
+    final readTime = '${lesson['readTime'] ?? ''}'.toLowerCase();
+
+    Widget head(String t, IconData icon) => Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            intro,
-            const SizedBox(height: 20),
-            Row(
-              children: [for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: tiles[i])]],
-            ),
+            Icon(icon, size: 15, color: Pb.primary),
+            const SizedBox(width: 6),
+            Text(t, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted)),
           ],
         );
-      }
-      return Row(
-        children: [
-          Expanded(child: intro),
-          const SizedBox(width: 24),
-          for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 14), tiles[i]],
+
+    final formula = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        head('Formula zilei', Icons.functions),
+        const SizedBox(height: 10),
+        Text(f[0],
+            style: TextStyle(fontSize: isMobile ? 20 : 24, fontWeight: FontWeight.w700, color: Pb.primary, letterSpacing: 0.3)),
+        const SizedBox(height: 6),
+        Text(f[1], style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+        const SizedBox(height: 10),
+        PbLink(text: 'Vezi lecția', fontSize: 13.5, onTap: () => context.go('/resurse/${f[2]}')),
+      ],
+    );
+
+    final lessonCell = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        head('Lecția zilei', Icons.menu_book_outlined),
+        const SizedBox(height: 10),
+        Text('${lesson['title']}',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text, height: 1.3)),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+              decoration: BoxDecoration(color: sc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
+              child: Text(subj, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: sc)),
+            ),
+            const SizedBox(width: 8),
+            Text(readTime, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+          ],
+        ),
+        const SizedBox(height: 10),
+        PbLink(text: 'Citește', fontSize: 13.5, onTap: () => context.go('/resurse/${lesson['id']}')),
+      ],
+    );
+
+    final bac = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        head('Pregătire Bac informatică', Icons.flag_outlined),
+        const SizedBox(height: 10),
+        Text('Strategii pentru fiecare subiect, cu exemple.', style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.4)),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final n in const [1, 2, 3])
+              _hChip('Subiectul ${['I', 'II', 'III'][n - 1]}', false, () => context.go('/resurse/bac-12-info-sub$n')),
+          ],
+        ),
+      ],
+    );
+
+    Widget cell(Widget c) => Padding(padding: const EdgeInsets.all(18), child: c);
+    final formulaCell = CustomPaint(
+      painter: _HGridPaper(
+        minor: Pb.primary.withOpacity(0.06),
+        major: Pb.primary.withOpacity(0.11),
+        step: 14,
+      ),
+      child: cell(formula),
+    );
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Pb.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Pb.border),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.25 : 0.04), blurRadius: 12, offset: const Offset(0, 3)),
         ],
-      );
-    });
+      ),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                formulaCell,
+                Container(height: 1, color: Pb.border),
+                cell(lessonCell),
+                Container(height: 1, color: Pb.border),
+                cell(bac),
+              ],
+            )
+          : IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(flex: 5, child: formulaCell),
+                  Container(width: 1, color: Pb.border),
+                  Expanded(flex: 4, child: cell(lessonCell)),
+                  Container(width: 1, color: Pb.border),
+                  Expanded(flex: 4, child: cell(bac)),
+                ],
+              ),
+            ),
+    );
   }
 
   // ---------------------------------------------------------------- catalog
@@ -933,7 +1050,16 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _hCardHeader(Icons.campaign_outlined, _cAmber, 'Noutăți'),
+          _hCardHeader(
+            Icons.forum_outlined,
+            _cAmber,
+            'Postări',
+            trailing: Text(posts == null ? '' : '${posts.length} postări', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Text('Anunțuri și articole de la echipa iMeditații.', style: TextStyle(fontSize: 13, color: Pb.muted)),
+          ),
           if (posts == null)
             _hLoading('Se încarcă noutățile...')
           else
@@ -1712,4 +1838,35 @@ class _HRevealState extends State<_HReveal> with SingleTickerProviderStateMixin 
       ),
     );
   }
+}
+
+class _HGridPaper extends CustomPainter {
+  final Color minor;
+  final Color major;
+  final double step;
+  final int majorEvery;
+
+  const _HGridPaper({required this.minor, required this.major, this.step = 24, this.majorEvery = 5});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final pMinor = Paint()
+      ..color = minor
+      ..strokeWidth = 1;
+    final pMajor = Paint()
+      ..color = major
+      ..strokeWidth = 1;
+
+    var i = 0;
+    for (double x = 0; x <= size.width; x += step, i++) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), i % majorEvery == 0 ? pMajor : pMinor);
+    }
+    i = 0;
+    for (double y = 0; y <= size.height; y += step, i++) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), i % majorEvery == 0 ? pMajor : pMinor);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_HGridPaper old) => old.minor != minor || old.major != major || old.step != step;
 }

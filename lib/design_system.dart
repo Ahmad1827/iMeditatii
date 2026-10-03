@@ -69,7 +69,7 @@ class Pb {
   // Text
   static Color get text => _d ? const Color(0xFFE6E6E6) : const Color(0xFF262626);
   static Color get muted => _d ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-  static Color get link => _d ? const Color(0xFF5EC4CC) : const Color(0xFF0E7C86);
+  static Color get link => _d ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
 
   static Color get heading => text;
   static Color get inlineCode => text;
@@ -89,7 +89,7 @@ class Pb {
   static Color get editorActiveLine => _d ? const Color(0xFF343A40) : const Color(0xFFDCDCDC);
 
   // Semantic (Bootstrap)
-  static const Color primary = Color(0xFF0E7C86);
+  static const Color primary = Color(0xFF15803D);
   static const Color secondary = Color(0xFF6C757D);
   static const Color success = Color(0xFF198754);
   static const Color danger = Color(0xFFDC3545);

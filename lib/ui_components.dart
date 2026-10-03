@@ -261,7 +261,7 @@ _BtnColors _btnColors(PbVariant v, bool hover, bool down) {
 
   switch (v) {
     case PbVariant.primary:
-      final c = shade(Pb.primary, const Color(0xFF0B6870), const Color(0xFF095A61));
+      final c = shade(Pb.primary, const Color(0xFF166534), const Color(0xFF14532D));
       return _BtnColors(c, Colors.white, c);
     case PbVariant.secondary:
       final c = shade(Pb.secondary, const Color(0xFF5C636A), const Color(0xFF565E64));
