@@ -608,59 +608,104 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _cleanMetaTable(isMobile),
-          const SizedBox(height: 20),
-          _cleanTitle(isMobile, done),
-          const SizedBox(height: 16),
-          _cleanLanguageAlert(),
-          const SizedBox(height: 16),
           _cleanBreadcrumbBox(),
-          const SizedBox(height: 20),
-          PbNavTabs(
-            labels: const ['Enunț', 'Soluție'],
-            selected: selectedTab == 'enunt' ? 0 : 1,
-            onSelect: (i) => setState(() => selectedTab = i == 0 ? 'enunt' : 'solutie'),
-          ),
-          PbTabPanel(child: selectedTab == 'enunt' ? _cleanStatement(isMobile) : _cleanSolution()),
-          const SizedBox(height: 24),
-          if (_kind == 'cod') ...[
-            _cleanCodeCard(isMobile),
-            if (testResults.isNotEmpty || isRunningCode) ...[
-              const SizedBox(height: 20),
-              _cleanEvaluation(isMobile),
-            ],
-          ] else if (_kind == 'grila')
-            _cleanGrilaCard()
-          else
-            _cleanTextCard(),
+          const SizedBox(height: 18),
+          _cleanTitle(isMobile, done),
+          const SizedBox(height: 12),
+          _cleanMetaTable(isMobile),
+          const SizedBox(height: 22),
+          if (isMobile) ...[
+            _cleanStatementPane(isMobile),
+            const SizedBox(height: 24),
+            _cleanWorkPane(isMobile),
+          ] else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 5, child: _cleanStatementPane(isMobile)),
+                const SizedBox(width: 20),
+                Expanded(flex: 6, child: _cleanWorkPane(isMobile)),
+              ],
+            ),
           const SizedBox(height: 40),
         ],
       ),
     );
   }
 
-  Widget _cleanMetaTable(bool isMobile) {
-    final kindLabel = _kind == 'cod' ? 'Program C++' : (_kind == 'grila' ? 'Grilă' : 'Răspuns scurt');
-    final meta = <MapEntry<String, String>>[
-      MapEntry('Materie', widget.subject),
-      MapEntry('Clasa', 'a ${widget.grade}-a'),
-      MapEntry('Tip', kindLabel),
-      MapEntry('Intrare / ieșire', _kind == 'cod' ? 'tastatură / ecran' : '-'),
-      MapEntry('Dificultate', _str(['dificultate', 'difficulty']) ?? '-'),
-      MapEntry('Autor', _str(['autor', 'author']) ?? '-'),
-    ];
-
-    if (isMobile) {
-      return PbTable(
-        firstColumnBold: true,
-        columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
-        rows: [for (final m in meta) [Text(m.key), Text(m.value)]],
+    Widget _cleanStatementPane(bool isMobile) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PbNavTabs(
+            labels: const ['Enunț', 'Soluție'],
+            selected: selectedTab == 'enunt' ? 0 : 1,
+            onSelect: (i) => setState(() => selectedTab = i == 0 ? 'enunt' : 'solutie'),
+          ),
+          PbTabPanel(child: selectedTab == 'enunt' ? _cleanStatement(isMobile) : _cleanSolution()),
+        ],
       );
+
+  Widget _cleanWorkPane(bool isMobile) {
+    if (_kind == 'grila') return _cleanGrilaCard();
+    if (_kind == 'text') return _cleanTextCard();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _cleanCodeCard(isMobile),
+        if (testResults.isNotEmpty || isRunningCode) ...[
+          const SizedBox(height: 20),
+          _cleanEvaluation(isMobile),
+        ],
+      ],
+    );
+  }
+
+  Widget _cleanMetaTable(bool isMobile) {
+    final diffRaw = _str(['dificultate', 'difficulty']);
+    final diff = (diffRaw ?? '').toLowerCase();
+    Color? diffColor;
+    if (diff.startsWith('u') || diff.startsWith('e')) {
+      diffColor = const Color(0xFF00A67E);
+    } else if (diff.startsWith('m')) {
+      diffColor = const Color(0xFFD99A00);
+    } else if (diff.startsWith('g') || diff.startsWith('h') || diff.startsWith('d')) {
+      diffColor = const Color(0xFFE5484D);
     }
-    return PbTable(
-      headers: [for (final m in meta) m.key],
-      rows: [
-        [for (final m in meta) Text(m.value)],
+
+    Widget chip(String label, {Color? fg, IconData? icon}) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: (fg ?? Pb.muted).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 14, color: fg ?? Pb.muted),
+                const SizedBox(width: 4),
+              ],
+              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: fg ?? Pb.text)),
+            ],
+          ),
+        );
+
+    final tags = _list(['tags', 'etichete']) ?? const <String>[];
+    final author = _str(['autor', 'author']);
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
+        chip(
+          _kind == 'cod' ? 'C++' : (_kind == 'grila' ? 'Grilă' : 'Răspuns scurt'),
+          icon: _kind == 'cod' ? Icons.code : Icons.quiz_outlined,
+        ),
+        chip('Clasa a ${widget.grade}-a', icon: Icons.school_outlined),
+        if (_kind == 'cod') chip('stdin / stdout', icon: Icons.swap_horiz),
+        for (final t in tags) chip(t, icon: Icons.sell_outlined),
+        if (author != null) chip(author, icon: Icons.person_outline),
       ],
     );
   }
@@ -671,59 +716,20 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       spacing: 14,
       runSpacing: 10,
       children: [
-        PbBadge(text: '#${widget.id}', color: Pb.primary, fontSize: isMobile ? 22 : 30),
-        Text(_title, style: TextStyle(fontSize: isMobile ? 28 : 40, color: Pb.link, height: 1.15)),
+        Text('${widget.id}. $_title', style: TextStyle(fontSize: isMobile ? 24 : 30, color: Pb.text, fontWeight: FontWeight.w700, height: 1.2)),
         if (done) PbBadge(text: 'rezolvată', color: Pb.success, fontSize: 13),
       ],
     );
   }
 
-  Widget _cleanLanguageAlert() {
-    final base = TextStyle(color: Pb.secondaryText, fontSize: 16);
-    Widget body;
-    if (_kind == 'cod') {
-      body = Text.rich(TextSpan(style: base, children: const [
-        TextSpan(text: 'Această problemă acceptă numai soluții în '),
-        TextSpan(text: 'C++', style: TextStyle(fontWeight: FontWeight.w700)),
-        TextSpan(text: '.'),
-      ]));
-    } else if (_kind == 'grila') {
-      body = Text('Problemă grilă: un singur răspuns este corect.', style: base);
-    } else {
-      body = Text('Scrie doar valoarea cerută, fără explicații.', style: base);
-    }
-    return PbAlert(type: PbAlertType.secondary, child: body);
-  }
 
   Widget _cleanBreadcrumbBox() {
-    final tags = _list(['tags', 'etichete']) ?? const <String>[];
     final listRoute = '/lista-exercitii?materie=${Uri.encodeComponent(widget.subject)}';
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          PbBreadcrumb(items: [
-            PbCrumb('Probleme', () => context.go('/exercitii')),
-            PbCrumb(widget.subject, () => context.go(listRoute)),
-            PbCrumb('Clasa a ${widget.grade}-a', () => context.go(listRoute)),
-            PbCrumb(_title),
-          ]),
-          const SizedBox(height: 14),
-          Text.rich(
-            TextSpan(
-              style: TextStyle(fontSize: 15.5, color: Pb.text),
-              children: [
-                const TextSpan(text: 'Etichete: '),
-                TextSpan(text: tags.isEmpty ? 'nicio etichetă' : tags.join(', '), style: TextStyle(color: Pb.muted)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    return PbBreadcrumb(items: [
+      PbCrumb('Probleme', () => context.go('/exercitii')),
+      PbCrumb(widget.subject, () => context.go(listRoute)),
+      PbCrumb('Clasa a ${widget.grade}-a'),
+    ]);
   }
 
   Widget _cleanStatement(bool isMobile) {

@@ -30,7 +30,7 @@ class AppStyle {
   T pick<T>(T retro, T clean) => isClean ? clean : retro;
 
   /// Clean font. Used by main.dart (getTextTheme).
-  static TextTheme cleanTextTheme(TextTheme base) => GoogleFonts.ubuntuTextTheme(base);
+  static TextTheme cleanTextTheme(TextTheme base) => GoogleFonts.interTextTheme(base);
 
   /// "CALCUL INTEGRAL" -> "Calcul integral". Leaves mixed-case text alone.
   static String sentence(String t) {
@@ -54,33 +54,33 @@ class Pb {
 
   // Layout
   static const double containerMax = 1296;
-  static const BorderRadius radius = BorderRadius.all(Radius.circular(6));
+  static const BorderRadius radius = BorderRadius.all(Radius.circular(10));
 
-  // Surfaces
-  static Color get page => _d ? const Color(0xFF212529) : Colors.white;
-  static Color get surface => _d ? const Color(0xFF2B3035) : Colors.white;
-  static Color get cardHeader => _d ? const Color(0xFF343A40) : const Color(0xFFF7F7F7);
-  static Color get gray => _d ? const Color(0xFF343A40) : const Color(0xFFE9ECEF);
-  static Color get hoverBg => _d ? const Color(0xFF343A40) : const Color(0xFFF8F9FA);
-  static Color get tableStripe => _d ? const Color(0xFF30353B) : const Color(0xFFF2F2F2);
-  static Color get border => _d ? const Color(0xFF495057) : const Color(0xFFDEE2E6);
-  static Color get inputBorder => _d ? const Color(0xFF495057) : const Color(0xFFCED4DA);
+    // Surfaces
+  static Color get page => _d ? const Color(0xFF18191B) : const Color(0xFFF7F8FA);
+  static Color get surface => _d ? const Color(0xFF242629) : Colors.white;
+  static Color get cardHeader => surface;
+  static Color get gray => _d ? const Color(0xFF33363A) : const Color(0xFFEFF1F3);
+  static Color get hoverBg => _d ? const Color(0xFF2E3034) : const Color(0xFFF5F6F8);
+  static Color get tableStripe => _d ? const Color(0xFF2A2C30) : const Color(0xFFF9FAFB);
+  static Color get border => _d ? const Color(0xFF35383D) : const Color(0xFFE5E7EB);
+  static Color get inputBorder => _d ? const Color(0xFF45484D) : const Color(0xFFD1D5DB);
 
   // Text
-  static Color get text => _d ? const Color(0xFFDEE2E6) : const Color(0xFF212529);
-  static Color get muted => _d ? const Color(0xFFADB5BD) : const Color(0xFF6C757D);
-  static Color get link => _d ? const Color(0xFF6EA8FE) : const Color(0xFF0D6EFD);
+  static Color get text => _d ? const Color(0xFFE6E6E6) : const Color(0xFF262626);
+  static Color get muted => _d ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+  static Color get link => _d ? const Color(0xFF5EC4CC) : const Color(0xFF0E7C86);
 
-  /// Orange statement headings ("Cerința", "Exemplu").
-  static Color get heading => _d ? const Color(0xFFF5A04A) : const Color(0xFFF0861E);
-  static Color get inlineCode => _d ? const Color(0xFFE685B5) : const Color(0xFFD63384);
+  static Color get heading => text;
+  static Color get inlineCode => text;
+  static Color get codeChip => _d ? const Color(0xFF33363A) : const Color(0xFFEFF1F3);
 
   // Chrome
-  static Color get navbar => _d ? const Color(0xFF1A1D20) : const Color(0xFF343A40);
-  static Color get hero => _d ? const Color(0xFF1F4F7D) : const Color(0xFF3C87C8);
-  static Color get infoStrip => _d ? const Color(0xFF087990) : const Color(0xFF0DCAF0);
-  static Color get infoStripText => _d ? Colors.white : const Color(0xFF062C33);
-  static Color get postMeta => _d ? const Color(0xFF032830) : const Color(0xFFCFF4FC);
+  static Color get navbar => surface;
+  static Color get hero => _d ? const Color(0xFF141619) : const Color(0xFF1F2430);
+  static Color get infoStrip => _d ? const Color(0xFF3A2C1C) : const Color(0xFFFFF4E5);
+  static Color get infoStripText => _d ? const Color(0xFFFFD6A5) : const Color(0xFF8A4B00);
+  static Color get postMeta => _d ? const Color(0xFF2E3034) : const Color(0xFFF3F4F6);
 
   // Code
   static Color get codeBg => _d ? const Color(0xFF1E2226) : const Color(0xFFF8F9FA);
@@ -89,7 +89,7 @@ class Pb {
   static Color get editorActiveLine => _d ? const Color(0xFF343A40) : const Color(0xFFDCDCDC);
 
   // Semantic (Bootstrap)
-  static const Color primary = Color(0xFF0D6EFD);
+  static const Color primary = Color(0xFF0E7C86);
   static const Color secondary = Color(0xFF6C757D);
   static const Color success = Color(0xFF198754);
   static const Color danger = Color(0xFFDC3545);

@@ -177,19 +177,16 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'iMeditații',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: isMobile ? 42 : 62,
-                fontWeight: FontWeight.w700,
-                height: 1.05,
-                shadows: [Shadow(color: Colors.black.withOpacity(0.35), offset: const Offset(2, 2))],
-              ),
+              'Rezolvă probleme.\nÎnțelege teoria.',
+              style: TextStyle(color: Colors.white, fontSize: isMobile ? 34 : 52, fontWeight: FontWeight.w700, height: 1.1, letterSpacing: -1),
             ),
-            SizedBox(height: isMobile ? 14 : 22),
-            Text(
-              'Aici înveți! Probleme, lecții și profesori pentru liceu.',
-              style: TextStyle(color: Colors.white, fontSize: isMobile ? 20 : 30, fontWeight: FontWeight.w300, height: 1.3),
+            SizedBox(height: isMobile ? 14 : 20),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 620),
+              child: Text(
+                'Probleme de informatică și matematică pentru liceu, evaluate automat, plus lecții pe programa de Bacalaureat.',
+                style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: isMobile ? 17 : 20, height: 1.5),
+              ),
             ),
             SizedBox(height: isMobile ? 22 : 30),
             Wrap(
@@ -198,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 PbButton(
                   text: 'Vezi problemele',
-                  variant: PbVariant.light,
+                  variant: PbVariant.primary,
                   size: PbSize.lg,
                   onPressed: () => context.go('/exercitii'),
                 ),
@@ -788,12 +785,12 @@ class _PbPostState extends State<_PbPost> {
                     child: AnimatedRotation(
                       turns: _open ? 0 : -0.25,
                       duration: const Duration(milliseconds: 150),
-                      child: Icon(Icons.expand_circle_down, size: 26, color: Pb.text),
+                      child: Icon(Icons.keyboard_arrow_down, size: 24, color: Pb.muted),
                     ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                Expanded(child: PbLink(text: widget.title, onTap: widget.onLink, fontSize: 24)),
+                Expanded(child: PbLink(text: widget.title, onTap: widget.onLink, fontSize: 19, weight: FontWeight.w600)),
               ],
             ),
           ),

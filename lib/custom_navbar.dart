@@ -157,7 +157,7 @@ class _PbNavLinkState extends State<_PbNavLink> {
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.active ? Colors.white : Colors.white.withOpacity(_hover ? 0.85 : 0.6);
+    final color = (widget.active || _hover) ? Pb.text : Pb.muted;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hover = true),
@@ -253,7 +253,7 @@ class CustomNavbar extends StatelessWidget {
     return Container(
       height: 56,
       width: double.infinity,
-      color: Pb.navbar,
+      decoration: BoxDecoration(color: Pb.navbar, border: Border(bottom: BorderSide(color: Pb.border))),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: Pb.containerMax),
@@ -265,7 +265,20 @@ class CustomNavbar extends StatelessWidget {
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () => context.go('/'),
-                    child: const Text('iMeditații', style: TextStyle(color: Colors.white, fontSize: 21)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 26,
+                          height: 26,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(7)),
+                          child: const Text('iM', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                        ),
+                        const SizedBox(width: 8),
+                        Text('iMeditații', style: TextStyle(color: Pb.text, fontSize: 18, fontWeight: FontWeight.w700)),
+                      ],
+                    ),
                   ),
                 ),
                 if (isDesktop) ...[
@@ -319,9 +332,9 @@ class CustomNavbar extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           borderRadius: Pb.radius,
-                          border: Border.all(color: Colors.white.withOpacity(0.15)),
+                          border: Border.all(color: Pb.border),
                         ),
-                        child: Icon(Icons.menu, color: Colors.white.withOpacity(0.6), size: 26),
+                        child: Icon(Icons.menu, color: Pb.text, size: 26),
                       ),
                     ),
                   ),
@@ -360,7 +373,7 @@ class CustomNavbar extends StatelessWidget {
         final divider = Container(height: 1, color: Colors.white.withOpacity(0.12));
 
         return Container(
-          color: Pb.navbar,
+          color: const Color(0xFF1F2430),
           padding: const EdgeInsets.fromLTRB(20, 8, 12, 16),
           child: SafeArea(
             top: false,

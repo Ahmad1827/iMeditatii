@@ -261,7 +261,7 @@ _BtnColors _btnColors(PbVariant v, bool hover, bool down) {
 
   switch (v) {
     case PbVariant.primary:
-      final c = shade(Pb.primary, const Color(0xFF0B5ED7), const Color(0xFF0A58CA));
+      final c = shade(Pb.primary, const Color(0xFF0B6870), const Color(0xFF095A61));
       return _BtnColors(c, Colors.white, c);
     case PbVariant.secondary:
       final c = shade(Pb.secondary, const Color(0xFF5C636A), const Color(0xFF565E64));
@@ -469,7 +469,7 @@ class PbCard extends StatelessWidget {
   Widget build(BuildContext context) {
     AppStyle.of(context);
     final head = header ??
-        (title != null ? Text(title!, style: TextStyle(fontSize: 19, color: Pb.text, height: 1.3)) : null);
+        (title != null ? Text(title!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Pb.text, height: 1.3)) : null);
 
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -524,7 +524,7 @@ class PbBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: fontSize * 0.6, vertical: fontSize * 0.32),
-      decoration: BoxDecoration(color: color ?? Pb.secondary, borderRadius: Pb.radius),
+      decoration: BoxDecoration(color: color ?? Pb.secondary, borderRadius: BorderRadius.circular(999)),
       child: Text(
         text,
         style: TextStyle(color: textColor, fontSize: fontSize, fontWeight: FontWeight.w700, height: 1.15),
@@ -642,7 +642,8 @@ class _PbTabState extends State<_PbTab> {
           widget.label,
           style: TextStyle(
             fontSize: 16,
-            color: widget.active ? Pb.text : Pb.link,
+            color: widget.active ? Pb.text : Pb.muted,
+            fontWeight: widget.active ? FontWeight.w600 : FontWeight.w400,
             decoration: !widget.active && _hover ? TextDecoration.underline : null,
             decorationColor: Pb.link,
           ),
@@ -662,13 +663,9 @@ class _PbTabState extends State<_PbTab> {
         onTap: widget.onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-          decoration: widget.active
-              ? BoxDecoration(
-                  color: Pb.surface,
-                  border: Border(top: side, left: side, right: side),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                )
-              : BoxDecoration(border: Border(bottom: side)),
+          decoration: BoxDecoration(
+            border: Border(bottom: widget.active ? const BorderSide(color: Pb.primary, width: 2) : side),
+          ),
           child: row,
         ),
       ),
@@ -723,7 +720,7 @@ class PbBreadcrumb extends StatelessWidget {
               child: Text('/', style: TextStyle(color: Pb.muted, fontSize: 16)),
             ),
           if (items[i].onTap != null && i < items.length - 1)
-            PbLink(text: items[i].label, onTap: items[i].onTap!, underline: true)
+            PbLink(text: items[i].label, onTap: items[i].onTap!, fontSize: 14)
           else
             Text(items[i].label, style: TextStyle(color: Pb.muted, fontSize: 16)),
         ],
@@ -799,13 +796,13 @@ class PbHeading extends StatelessWidget {
   final double size;
   final EdgeInsets padding;
 
-  const PbHeading(this.text, {super.key, this.size = 28, this.padding = const EdgeInsets.only(top: 18, bottom: 8)});
+  const PbHeading(this.text, {super.key, this.size = 17, this.padding = const EdgeInsets.only(top: 20, bottom: 6)});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
-      child: Text(text, style: TextStyle(fontSize: size, color: Pb.heading, height: 1.2)),
+      child: Text(text, style: TextStyle(fontSize: size, color: Pb.heading, fontWeight: FontWeight.w700, height: 1.2)),
     );
   }
 }
@@ -831,7 +828,7 @@ class PbRichText extends StatelessWidget {
             if (parts[i].isNotEmpty)
               TextSpan(
                 text: parts[i],
-                style: i.isOdd ? Pb.mono(fontSize * 0.9, color: Pb.inlineCode, height: height) : null,
+                style: i.isOdd ? Pb.mono(fontSize * 0.88, color: Pb.inlineCode, height: height).copyWith(backgroundColor: Pb.codeChip) : null,
               ),
         ],
       ),
