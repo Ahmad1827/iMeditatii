@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-    // ===========================================================================
+  // ===========================================================================
   // CLEAN — home: welcome, catalog (exerciții/lecții), noutăți + clasament
   // ===========================================================================
   bool _hStarted = false;
@@ -360,49 +360,69 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-    // ---------------------------------------------------------------- helpers
+  // ---------------------------------------------------------------- helpers
   static const Color _cGreen = Color(0xFF10B981);
   static const Color _cAmber = Color(0xFFF59E0B);
   static const Color _cRose = Color(0xFFE5484D);
   static const Color _cBlue = Color(0xFF3B82F6);
   static const Color _cGold = Color(0xFFE6B422);
+  static const Color _cViolet = Color(0xFF8B5CF6);
+  static const Color _cTeal = Color(0xFF14B8A6);
 
-  Color _hSubjectColor(String s) {
-    final l = s.toLowerCase();
-    if (l.startsWith('mat')) return _cRose;
-    if (l.contains('python')) return _cBlue;
-    if (l.contains('engl') || l.contains('limb') || l.contains('rom')) return _cGreen;
-    if (l.contains('c++') || l.contains('info')) return Pb.primary;
-    return _cAmber;
-  }
+  Color _hSubjectColor(String s) => _hSubjColor(s);
 
   Color _hDiffColor(String d) {
     final l = d.toLowerCase();
-    if (l.startsWith('u') || l.startsWith('e')) return const Color(0xFF10B981);
+    if (l.startsWith('u') || l.startsWith('e')) return _cGreen;
     if (l.startsWith('m')) return _cAmber;
     if (l.startsWith('g') || l.startsWith('h') || l.startsWith('d')) return _cRose;
     return Pb.muted;
   }
 
-  Widget _hCard({required List<Color> accent, required Widget child}) => Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: Pb.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Pb.border.withOpacity(0.7)),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.06), blurRadius: 24, offset: const Offset(0, 8)),
-          ],
+  // Card with a thin gradient strip on top. On hover the border and the
+  // shadow pick up the card's accent colour.
+  Widget _hCard({required List<Color> accent, required Widget child}) => _HHover(
+        builder: (h) => AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Pb.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: h ? accent.first.withOpacity(0.45) : Pb.border.withOpacity(0.7)),
+            boxShadow: [
+              BoxShadow(
+                color: h
+                    ? accent.first.withOpacity(AppColors.isDark ? 0.20 : 0.16)
+                    : Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.06),
+                blurRadius: h ? 34 : 24,
+                offset: Offset(0, h ? 12 : 8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(height: 3, decoration: BoxDecoration(gradient: LinearGradient(colors: accent))),
+              child,
+            ],
+          ),
         ),
-        child: child,
       );
 
   Widget _hCardHeader(IconData icon, Color color, String title, {Widget? trailing}) => Padding(
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+        padding: const EdgeInsets.fromLTRB(16, 15, 18, 12),
         child: Row(
           children: [
-            Icon(icon, size: 19, color: Pb.muted),
-            const SizedBox(width: 9),
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: color.withOpacity(0.14), borderRadius: BorderRadius.circular(9)),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            const SizedBox(width: 10),
             Expanded(child: Text(title, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Pb.text))),
             if (trailing != null) trailing,
           ],
@@ -413,27 +433,43 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
+            const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: _cGreen)),
             const SizedBox(width: 10),
             Text(text, style: TextStyle(fontSize: 14, color: Pb.muted)),
           ],
         ),
       );
 
+  // Filter chip. Subject chips carry their own colour (dot + tint).
   Widget _hChip(String label, bool sel, VoidCallback onTap, {Color? color}) {
+    final c = color ?? Pb.link;
     return _HHover(
       onTap: onTap,
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
         decoration: BoxDecoration(
-          color: sel ? Pb.link.withOpacity(0.10) : (h ? Pb.hoverBg : Colors.transparent),
+          color: sel ? c.withOpacity(0.14) : (h ? c.withOpacity(0.07) : Colors.transparent),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: sel ? Pb.link.withOpacity(0.6) : Pb.border),
+          border: Border.all(color: sel ? c.withOpacity(0.65) : (h ? c.withOpacity(0.45) : Pb.border)),
         ),
-        child: Text(
-          label,
-          style: TextStyle(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.link : Pb.text),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (color != null) ...[
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                width: sel || h ? 8 : 6,
+                height: sel || h ? 8 : 6,
+                decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel || h ? c : Pb.text),
+            ),
+          ],
         ),
       ),
     );
@@ -447,16 +483,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ? 'Bun venit pe iMeditații'
         : (first.isEmpty ? 'Bine ai revenit' : 'Bine ai revenit, $first');
     final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
+    final rankColor = _completedQuests > 10 ? _cViolet : (_completedQuests > 3 ? _cBlue : _cGreen);
     final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
 
     final fact = _hFacts[_hFactIdx % _hFacts.length];
 
-    BoxDecoration cardDeco() => BoxDecoration(
-          color: Pb.surface,
+    // Soft wash of the card's colour in one corner; stronger on hover.
+    BoxDecoration cardDeco(Color tint, bool h) => BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color.alphaBlend(tint.withOpacity(h ? 0.14 : 0.07), Pb.surface), Pb.surface],
+            stops: const [0, 0.6],
+          ),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Pb.border.withOpacity(0.7)),
+          border: Border.all(color: h ? tint.withOpacity(0.5) : Pb.border.withOpacity(0.7)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07), blurRadius: 28, offset: const Offset(0, 10)),
+            BoxShadow(
+              color: h
+                  ? tint.withOpacity(AppColors.isDark ? 0.22 : 0.18)
+                  : Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07),
+              blurRadius: h ? 36 : 28,
+              offset: Offset(0, h ? 14 : 10),
+            ),
           ],
         );
 
@@ -475,8 +524,8 @@ class _HomeScreenState extends State<HomeScreen> {
               value: v,
               strokeWidth: 9,
               strokeCap: StrokeCap.round,
-              backgroundColor: Pb.gray,
-              color: Pb.primary,
+              backgroundColor: rankColor.withOpacity(0.15),
+              color: rankColor,
             ),
           ),
           Center(
@@ -505,7 +554,20 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontSize: isMobile ? 26 : 30, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5, height: 1.15),
         ),
         const SizedBox(height: 6),
-        Text('$rank, $inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 14, color: Pb.muted)),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(color: rankColor.withOpacity(0.15), borderRadius: BorderRadius.circular(999)),
+              child: Text(rank, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: rankColor)),
+            ),
+            Text('$inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 14, color: Pb.muted)),
+          ],
+        ),
         const SizedBox(height: 16),
         Wrap(
           spacing: 8,
@@ -519,26 +581,37 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
 
-    final statCard = Container(
+    Widget statCard(bool h) => AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      transform: Matrix4.translationValues(0, h ? -2 : 0, 0),
       padding: EdgeInsets.all(isMobile ? 22 : 26),
-      decoration: cardDeco(),
+      decoration: cardDeco(rankColor, h),
       child: isMobile
           ? Column(children: [ring, const SizedBox(height: 18), info])
           : Row(children: [ring, const SizedBox(width: 28), Expanded(child: info)]),
     );
 
-    final factCard = Container(
+    Widget factCard(bool h) => AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      transform: Matrix4.translationValues(0, h ? -2 : 0, 0),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: cardDeco(),
+      decoration: cardDeco(_cAmber, h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
             width: 38,
             height: 38,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: _cAmber.withOpacity(0.14), borderRadius: BorderRadius.circular(11)),
-            child: const Icon(Icons.lightbulb_outline, size: 20, color: _cAmber),
+            decoration: BoxDecoration(
+              color: h ? _cAmber : _cAmber.withOpacity(0.16),
+              borderRadius: BorderRadius.circular(11),
+              boxShadow: h ? [BoxShadow(color: _cAmber.withOpacity(0.45), blurRadius: 14)] : null,
+            ),
+            child: Icon(h ? Icons.lightbulb : Icons.lightbulb_outline, size: 20, color: h ? Colors.white : _cAmber),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -596,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [statCard, const SizedBox(height: 16), factCard],
+      children: [_HHover(builder: statCard), const SizedBox(height: 16), _HHover(builder: factCard)],
     );
   }
 
@@ -646,25 +719,35 @@ class _HomeScreenState extends State<HomeScreen> {
           _hLimit = 6;
         });
 
-        Widget seg(String label, IconData icon, int count, bool sel, VoidCallback onTap) => _HHover(
+    Widget seg(String label, IconData icon, int count, bool sel, Color c, VoidCallback onTap) => _HHover(
           onTap: onTap,
           builder: (h) => AnimatedContainer(
             duration: const Duration(milliseconds: 160),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
             decoration: BoxDecoration(
-              color: sel ? Pb.surface : Colors.transparent,
+              color: sel ? Pb.surface : (h ? Pb.surface.withOpacity(0.6) : Colors.transparent),
               borderRadius: BorderRadius.circular(8),
-              boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, 1))] : null,
+              border: Border.all(color: sel ? c.withOpacity(0.4) : Colors.transparent),
+              boxShadow: sel ? [BoxShadow(color: c.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 2))] : null,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 16, color: sel ? Pb.link : Pb.muted),
+                Icon(icon, size: 16, color: sel || h ? c : Pb.muted),
                 const SizedBox(width: 6),
                 Text(label,
-                    style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
+                    style: TextStyle(
+                        fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel || h ? Pb.text : Pb.muted)),
                 const SizedBox(width: 6),
-                Text('$count', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: sel ? c.withOpacity(0.15) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: Text('$count', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: sel ? c : Pb.muted)),
+                ),
               ],
             ),
           ),
@@ -676,9 +759,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          seg('Exerciții', Icons.code, exercises.length, !_hShowLessons && !_hShowLeaders, () => switchTo(0)),
-          seg('Lecții', Icons.menu_book_outlined, lessonsAll.length, _hShowLessons, () => switchTo(1)),
-          seg('Clasament', Icons.emoji_events_outlined, _hLeaders?.length ?? 0, _hShowLeaders, () => switchTo(2)),
+          seg('Exerciții', Icons.code, exercises.length, !_hShowLessons && !_hShowLeaders, _cGreen, () => switchTo(0)),
+          seg('Lecții', Icons.menu_book_outlined, lessonsAll.length, _hShowLessons, _cBlue, () => switchTo(1)),
+          seg('Clasament', Icons.emoji_events_outlined, _hLeaders?.length ?? 0, _hShowLeaders, _cGold, () => switchTo(2)),
         ],
       ),
     );
@@ -767,7 +850,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final extras = !_hShowLeaders;
 
     return _hCard(
-      accent: const [Pb.primary, _cGreen],
+      accent: const [_cGreen, _cTeal, _cBlue],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -885,7 +968,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 140),
         decoration: BoxDecoration(
-          color: h ? sc.withOpacity(0.06) : Colors.transparent,
+          gradient: LinearGradient(colors: [sc.withOpacity(h ? 0.13 : 0), sc.withOpacity(h ? 0.02 : 0)]),
           border: Border(
             top: BorderSide(color: Pb.border),
             left: BorderSide(color: h ? sc : Colors.transparent, width: 3),
@@ -897,12 +980,13 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               width: 36,
               child: Icon(
-                solved ? Icons.check_circle : Icons.radio_button_unchecked,
+                solved ? Icons.check_circle : (h ? Icons.play_circle_outline : Icons.radio_button_unchecked),
                 size: 18,
-                color: solved ? const Color(0xFF10B981) : Pb.border,
+                color: solved ? _cGreen : (h ? sc : Pb.border),
               ),
             ),
-            if (!compact) SizedBox(width: 44, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
+            if (!compact)
+              SizedBox(width: 44, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: h ? sc : Pb.muted))),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -928,8 +1012,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 130,
                 child: Row(
                   children: [
-                    Container(width: 7, height: 7, decoration: BoxDecoration(color: sc, shape: BoxShape.circle)),
-                    const SizedBox(width: 7),
+                    SizedBox(
+                      width: 10,
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 140),
+                          width: h ? 10 : 7,
+                          height: h ? 10 : 7,
+                          decoration: BoxDecoration(color: sc, shape: BoxShape.circle),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: Text('${e['subject']}',
                           overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.text)),
@@ -945,7 +1039,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
                       : Container(
                           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                          decoration: BoxDecoration(color: dc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
+                          decoration: BoxDecoration(color: dc.withOpacity(h ? 0.24 : 0.14), borderRadius: BorderRadius.circular(999)),
                           child: Text(AppStyle.sentence(diff),
                               style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: dc)),
                         ),
@@ -963,7 +1057,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _hPostsCard() {
     final posts = _hPosts;
     return _hCard(
-      accent: const [_cAmber, _cRose],
+      accent: const [_cAmber, _cRose, _cViolet],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -987,7 +1081,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _hPostRow(int i, Map<String, dynamic> p) {
-    final c = Pb.primary;
+    final c = const [_cAmber, _cBlue, _cViolet, _cTeal, _cRose][i % 5];
     final open = _hOpenPost == i;
     final link = p['link'] as String?;
     final date = '${p['date'] ?? ''}';
@@ -998,26 +1092,34 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
-          color: h || open ? c.withOpacity(0.05) : Colors.transparent,
-          border: Border(top: BorderSide(color: Pb.border)),
+          gradient: LinearGradient(colors: [c.withOpacity(h || open ? 0.12 : 0), c.withOpacity(h || open ? 0.02 : 0)]),
+          border: Border(
+            top: BorderSide(color: Pb.border),
+            left: BorderSide(color: h || open ? c : Colors.transparent, width: 3),
+          ),
         ),
-        padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+        padding: const EdgeInsets.fromLTRB(13, 14, 12, 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
               width: 36,
               height: 36,
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-              child: Icon(Icons.article_outlined, size: 19, color: c),
+              decoration: BoxDecoration(
+                color: h || open ? c : c.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: h || open ? [BoxShadow(color: c.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 3))] : null,
+              ),
+              child: Icon(Icons.article_outlined, size: 19, color: h || open ? Colors.white : c),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${p['title']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: h ? c : Pb.text)),
+                  Text('${p['title']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: h || open ? c : Pb.text)),
                   const SizedBox(height: 3),
                   Text(date.isEmpty ? author : '$author, $date', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
                   const SizedBox(height: 7),
@@ -1042,7 +1144,7 @@ class _HomeScreenState extends State<HomeScreen> {
             AnimatedRotation(
               turns: open ? 0.5 : 0,
               duration: const Duration(milliseconds: 200),
-              child: Icon(Icons.expand_more, size: 20, color: Pb.muted),
+              child: Icon(Icons.expand_more, size: 20, color: h || open ? c : Pb.muted),
             ),
           ],
         ),
@@ -1102,7 +1204,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _hLeaderRow(int i, Map<String, dynamic> u, bool isMe) {
     const medals = [_cGold, Color(0xFFA8B0B8), Color(0xFFCD7F32)];
     final top = i < 3;
-    final mc = top ? medals[i] : Pb.primary;
+    final mc = top ? medals[i] : Pb.link;
     final name = '${u['name']}'.trim();
     final photo = '${u['photo']}';
     final initials = name.isEmpty
@@ -1115,13 +1217,16 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: isMe
-              ? Pb.primary.withOpacity(h ? 0.14 : 0.08)
+              ? Pb.link.withOpacity(h ? 0.16 : 0.09)
               : top
-                  ? mc.withOpacity(h ? 0.16 : 0.08)
-                  : (h ? Pb.hoverBg : Colors.transparent),
-          border: Border(top: BorderSide(color: Pb.border)),
+                  ? mc.withOpacity(h ? 0.18 : 0.08)
+                  : (h ? mc.withOpacity(0.08) : Colors.transparent),
+          border: Border(
+            top: BorderSide(color: Pb.border),
+            left: BorderSide(color: h ? mc : Colors.transparent, width: 3),
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.fromLTRB(13, 10, 16, 10),
         child: Row(
           children: [
             SizedBox(
@@ -1172,7 +1277,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-              decoration: BoxDecoration(color: mc.withOpacity(0.16), borderRadius: BorderRadius.circular(999)),
+              decoration: BoxDecoration(color: mc.withOpacity(h ? 0.3 : 0.16), borderRadius: BorderRadius.circular(999)),
               child: Text('${u['count']}', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Pb.text)),
             ),
           ],
@@ -1604,6 +1709,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+/// One colour per subject, shared by the exercise rows, lesson rows and chips.
+Color _hSubjColor(String s) {
+  final l = s.toLowerCase();
+  if (l.startsWith('mat')) return const Color(0xFFE5484D); // rose
+  if (l.contains('python')) return const Color(0xFF3B82F6); // blue
+  if (l.contains('c++') || l.contains('info')) return const Color(0xFF8B5CF6); // violet
+  if (l.contains('engl') || l.contains('limb') || l.contains('rom')) return const Color(0xFF14B8A6); // teal
+  return const Color(0xFFF59E0B); // amber
+}
+
 class _HLessonRow extends StatefulWidget {
   final int index;
   final Map<String, dynamic> data;
@@ -1623,9 +1738,7 @@ class _HLessonRowState extends State<_HLessonRow> {
   Widget build(BuildContext context) {
     final d = widget.data;
     final subject = AppStyle.sentence(d['subject'].toString());
-    final color = subject == 'Matematică'
-        ? const Color(0xFFE5484D)
-        : (subject == 'Python' ? const Color(0xFF3B82F6) : Pb.primary);
+    final color = _hSubjColor(subject);
     final readTime = (d['readTime'] ?? '').toString().toLowerCase();
     final grade = d['grade'].toString();
 
@@ -1635,15 +1748,19 @@ class _HLessonRowState extends State<_HLessonRow> {
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
           decoration: BoxDecoration(
-            color: _hover ? Pb.hoverBg : Colors.transparent,
-            border: Border(top: BorderSide(color: Pb.border)),
+            gradient: LinearGradient(colors: [color.withOpacity(_hover ? 0.13 : 0), color.withOpacity(_hover ? 0.02 : 0)]),
+            border: Border(
+              top: BorderSide(color: Pb.border),
+              left: BorderSide(color: _hover ? color : Colors.transparent, width: 3),
+            ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.fromLTRB(13, 12, 16, 12),
           child: Row(
             children: [
-              SizedBox(width: 30, child: Text('${widget.index}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
+              SizedBox(width: 30, child: Text('${widget.index}', style: TextStyle(fontSize: 13.5, color: _hover ? color : Pb.muted))),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1652,7 +1769,7 @@ class _HLessonRowState extends State<_HLessonRow> {
                       d['title'].toString(),
                       maxLines: widget.isMobile ? 2 : 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: _hover ? Pb.link : Pb.text),
+                      style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: _hover ? color : Pb.text),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -1669,7 +1786,7 @@ class _HLessonRowState extends State<_HLessonRow> {
                     alignment: Alignment.centerLeft,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                      decoration: BoxDecoration(color: color.withOpacity(_hover ? 0.22 : 0.12), borderRadius: BorderRadius.circular(999)),
                       child: Text(subject, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: color)),
                     ),
                   ),

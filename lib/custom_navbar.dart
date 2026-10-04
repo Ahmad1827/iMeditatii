@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'app_colors.dart';
+import 'brand_mark.dart';
 import 'ui_components.dart';
 
 // =============================================================================
@@ -138,9 +139,40 @@ class _NavTextLinkState extends State<NavTextLink> {
 }
 
 // =============================================================================
-// CLEAN PIECES (Bootstrap navbar-dark)
+// CLEAN PIECES
 // =============================================================================
-class _PbNavLink extends StatefulWidget {
+const List<Color> _navGrad = [Color(0xFF22C55E), Color(0xFF0F766E)];
+
+/// Hover helper: rebuilds its child with the current hover state.
+class _NavHover extends StatefulWidget {
+  final Widget Function(bool hover) builder;
+  final VoidCallback? onTap;
+
+  const _NavHover({required this.builder, this.onTap});
+
+  @override
+  State<_NavHover> createState() => _NavHoverState();
+}
+
+class _NavHoverState extends State<_NavHover> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = widget.builder(_hover);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: widget.onTap == null
+          ? child
+          : GestureDetector(behavior: HitTestBehavior.opaque, onTap: widget.onTap, child: child),
+    );
+  }
+}
+
+/// Pill-shaped nav link. Active = tinted pill, hover = soft grey pill.
+class _PbNavLink extends StatelessWidget {
   final String label;
   final IconData? icon;
   final bool active;
@@ -149,41 +181,106 @@ class _PbNavLink extends StatefulWidget {
   const _PbNavLink({required this.label, required this.onTap, this.icon, this.active = false});
 
   @override
-  State<_PbNavLink> createState() => _PbNavLinkState();
-}
-
-class _PbNavLinkState extends State<_PbNavLink> {
-  bool _hover = false;
-
-  @override
   Widget build(BuildContext context) {
-    final color = (widget.active || _hover) ? Pb.text : Pb.muted;
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: Container(
-          height: 60,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          alignment: Alignment.center,
+    return _NavHover(
+      onTap: onTap,
+      builder: (h) {
+        final color = active ? Pb.link : (h ? Pb.text : Pb.muted);
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 170),
+          curve: Curves.easeOut,
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: widget.active ? Pb.primary : Colors.transparent, width: 2)),
+            color: active ? Pb.link.withOpacity(0.12) : (h ? Pb.hoverBg : Colors.transparent),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: active ? Pb.link.withOpacity(0.28) : Colors.transparent),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (widget.icon != null) ...[
-                Icon(widget.icon, size: 17, color: widget.active ? Pb.primary : color),
-                const SizedBox(width: 6),
+              if (icon != null) ...[
+                AnimatedScale(
+                  scale: h && !active ? 1.15 : 1,
+                  duration: const Duration(milliseconds: 170),
+                  child: Icon(icon, size: 17, color: color),
+                ),
+                const SizedBox(width: 7),
               ],
-              Text(
-                widget.label,
-                style: TextStyle(fontSize: 14.5, fontWeight: widget.active ? FontWeight.w600 : FontWeight.w500, color: color),
-              ),
+              Text(label, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: color)),
             ],
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Quiet text button ("Autentificare").
+class _NavGhost extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _NavGhost({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return _NavHover(
+      onTap: onTap,
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 170),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+        decoration: BoxDecoration(
+          color: h ? Pb.hoverBg : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(label, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: h ? Pb.link : Pb.text)),
+      ),
+    );
+  }
+}
+
+/// Gradient call-to-action ("Creează cont"). The arrow slides on hover.
+class _NavCta extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  final bool fullWidth;
+
+  const _NavCta({required this.label, required this.onTap, this.fullWidth = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return _NavHover(
+      onTap: onTap,
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 170),
+        curve: Curves.easeOut,
+        width: fullWidth ? double.infinity : null,
+        transform: Matrix4.translationValues(0, h ? -1 : 0, 0),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: fullWidth ? 13 : 8),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: _navGrad),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF10B981).withOpacity(h ? 0.45 : 0.22),
+              blurRadius: h ? 16 : 8,
+              offset: Offset(0, h ? 6 : 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Colors.white)),
+            const SizedBox(width: 6),
+            AnimatedSlide(
+              offset: Offset(h ? 0.25 : 0, 0),
+              duration: const Duration(milliseconds: 170),
+              child: const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
+            ),
+          ],
         ),
       ),
     );
@@ -255,27 +352,28 @@ class CustomNavbar extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------- CLEAN
-    Widget _buildClean(BuildContext context, User? user, bool isDesktop) {
+  Widget _buildClean(BuildContext context, User? user, bool isDesktop) {
     final path = _currentPath(context);
 
-    final brand = MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => context.go('/'),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(8)),
-              child: const Text('iM', style: TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
+    final brand = _NavHover(
+      onTap: () => context.go('/'),
+      builder: (h) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedRotation(
+            turns: h ? -0.03 : 0,
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutBack,
+            child: AnimatedScale(
+              scale: h ? 1.08 : 1,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutBack,
+              child: BrandMark(size: 32, glow: h),
             ),
-            const SizedBox(width: 9),
-            Text('iMeditații', style: TextStyle(color: Pb.text, fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
-          ],
-        ),
+          ),
+          const SizedBox(width: 10),
+          BrandWordmark(color: Pb.text, accent: Pb.link, fontSize: 18),
+        ],
       ),
     );
 
@@ -283,81 +381,164 @@ class CustomNavbar extends StatelessWidget {
         ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PbButton(text: 'Autentificare', variant: PbVariant.link, size: PbSize.sm, onPressed: () => context.go('/login')),
-              const SizedBox(width: 6),
-              PbButton(text: 'Creează cont', size: PbSize.sm, onPressed: () => context.go('/inregistrare')),
+              _NavGhost(label: 'Autentificare', onTap: () => context.go('/login')),
+              const SizedBox(width: 8),
+              _NavCta(label: 'Creează cont', onTap: () => context.go('/inregistrare')),
             ],
           )
-        : _cleanUserMenu(context, user);
+        : _cleanUserMenu(context, user, showName: true);
 
     return Container(
       height: 60,
       width: double.infinity,
-      decoration: BoxDecoration(color: Pb.surface, border: Border(bottom: BorderSide(color: Pb.border))),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: Pb.containerMax),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 12),
-            child: Row(
-              children: [
-                brand,
-                if (isDesktop) ...[
-                  const SizedBox(width: 28),
-                  _PbNavLink(
-                    label: 'Probleme',
-                    icon: Icons.code,
-                    active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii'),
-                    onTap: () => context.go('/exercitii'),
+      decoration: BoxDecoration(
+        // A hint of green on the logo side, fading into the plain surface.
+        gradient: LinearGradient(
+          colors: [Color.alphaBlend(Pb.link.withOpacity(0.06), Pb.surface), Pb.surface, Pb.surface],
+          stops: const [0, 0.45, 1],
+        ),
+        border: Border(bottom: BorderSide(color: Pb.border)),
+      ),
+      child: Stack(
+        children: [
+          // Thin accent line that glows in the middle of the bottom edge.
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 2,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      _navGrad[0].withOpacity(0),
+                      _navGrad[0].withOpacity(0.75),
+                      const Color(0xFF14B8A6).withOpacity(0.75),
+                      _navGrad[1].withOpacity(0),
+                    ],
+                    stops: const [0, 0.3, 0.7, 1],
                   ),
-                  _PbNavLink(
-                    label: 'Lecții',
-                    icon: Icons.menu_book_outlined,
-                    active: path.startsWith('/resurse'),
-                    onTap: () => context.go('/resurse'),
-                  ),
-                  _PbNavLink(
-                    label: 'Profesori',
-                    icon: Icons.school_outlined,
-                    active: path.startsWith('/materii') || path.startsWith('/profesor'),
-                    onTap: () => context.go('/materii'),
-                  ),
-                  const Spacer(),
-                  right,
-                ] else ...[
-                  const Spacer(),
-                  if (user != null) _cleanUserMenu(context, user),
-                  IconButton(
-                    icon: Icon(Icons.menu, color: Pb.text),
-                    onPressed: () => _showCleanMenu(context, user),
-                  ),
-                ],
-              ],
+                ),
+              ),
             ),
           ),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: Pb.containerMax),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 14),
+                child: Row(
+                  children: [
+                    brand,
+                    if (isDesktop) ...[
+                      const SizedBox(width: 18),
+                      Container(width: 1, height: 22, color: Pb.border),
+                      const SizedBox(width: 14),
+                      _PbNavLink(
+                        label: 'Probleme',
+                        icon: Icons.code,
+                        active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii'),
+                        onTap: () => context.go('/exercitii'),
+                      ),
+                      _PbNavLink(
+                        label: 'Lecții',
+                        icon: Icons.menu_book_outlined,
+                        active: path.startsWith('/resurse'),
+                        onTap: () => context.go('/resurse'),
+                      ),
+                      _PbNavLink(
+                        label: 'Profesori',
+                        icon: Icons.school_outlined,
+                        active: path.startsWith('/materii') || path.startsWith('/profesor'),
+                        onTap: () => context.go('/materii'),
+                      ),
+                      const Spacer(),
+                      right,
+                    ] else ...[
+                      const Spacer(),
+                      if (user != null) ...[
+                        _cleanUserMenu(context, user, showName: false),
+                        const SizedBox(width: 8),
+                      ],
+                      _NavHover(
+                        onTap: () => _showCleanMenu(context, user, path),
+                        builder: (h) => AnimatedContainer(
+                          duration: const Duration(milliseconds: 170),
+                          width: 38,
+                          height: 38,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: h ? Pb.hoverBg : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Pb.border),
+                          ),
+                          child: Icon(Icons.menu, size: 20, color: Pb.text),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cleanAvatar(User user, String label, double radius) {
+    final initial = label.isEmpty ? '?' : label[0].toUpperCase();
+    final photo = user.photoURL;
+    return Container(
+      padding: const EdgeInsets.all(1.5),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: _navGrad),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(1.5),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Pb.surface),
+        child: CircleAvatar(
+          radius: radius,
+          backgroundColor: Pb.link.withOpacity(0.16),
+          backgroundImage: photo != null ? NetworkImage(photo) : null,
+          onBackgroundImageError: photo != null ? (_, __) {} : null,
+          child: photo == null
+              ? Text(initial, style: TextStyle(fontSize: radius * 0.85, fontWeight: FontWeight.w700, color: Pb.link))
+              : null,
         ),
       ),
     );
   }
 
-  Widget _cleanUserMenu(BuildContext context, User user) {
+  Widget _cleanUserMenu(BuildContext context, User user, {bool showName = true}) {
     final label = ((user.displayName ?? '').trim().isNotEmpty ? user.displayName! : (user.email ?? '?')).trim();
-    final initial = label.isEmpty ? '?' : label[0].toUpperCase();
-    final photo = user.photoURL;
+    final short = label.contains('@') ? label.split('@').first : label.split(RegExp(r'\s+')).first;
 
-    Widget row(IconData i, String t) => Row(
-          children: [
-            Icon(i, size: 18, color: Pb.muted),
-            const SizedBox(width: 10),
-            Text(t, style: TextStyle(fontSize: 14, color: Pb.text)),
-          ],
+    Widget row(IconData i, String t, Color c) => _NavHover(
+          builder: (h) => Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: c.withOpacity(h ? 0.22 : 0.12), borderRadius: BorderRadius.circular(8)),
+                child: Icon(i, size: 17, color: c),
+              ),
+              const SizedBox(width: 11),
+              Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: h ? c : Pb.text)),
+            ],
+          ),
         );
 
     return PopupMenuButton<String>(
       tooltip: 'Contul meu',
-      offset: const Offset(0, 48),
+      offset: const Offset(0, 50),
+      elevation: 10,
       color: Pb.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: Pb.border)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: BorderSide(color: Pb.border)),
       onSelected: (v) {
         if (v == 'dash') _handleDashboardRouting(context, user);
         if (v == 'profile') _handleProfileRouting(context, user);
@@ -366,96 +547,171 @@ class CustomNavbar extends StatelessWidget {
       itemBuilder: (_) => [
         PopupMenuItem<String>(
           enabled: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(label, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
-              if (user.email != null && user.email != label)
-                Text(user.email!, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+              _cleanAvatar(user, label, 17),
+              const SizedBox(width: 11),
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
+                    if (user.email != null && user.email != label)
+                      Text(user.email!,
+                          maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         const PopupMenuDivider(),
-        PopupMenuItem<String>(value: 'dash', child: row(Icons.dashboard_outlined, 'Panoul meu')),
-        PopupMenuItem<String>(value: 'profile', child: row(Icons.person_outline, 'Profil')),
+        PopupMenuItem<String>(value: 'dash', child: row(Icons.dashboard_outlined, 'Panoul meu', Pb.link)),
+        PopupMenuItem<String>(value: 'profile', child: row(Icons.person_outline, 'Profil', const Color(0xFF3B82F6))),
         const PopupMenuDivider(),
-        PopupMenuItem<String>(value: 'logout', child: row(Icons.logout, 'Ieșire')),
+        PopupMenuItem<String>(value: 'logout', child: row(Icons.logout, 'Ieșire', const Color(0xFFE5484D))),
       ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Pb.primary.withOpacity(0.15),
-              backgroundImage: photo != null ? NetworkImage(photo) : null,
-              onBackgroundImageError: photo != null ? (_, __) {} : null,
-              child: photo == null
-                  ? Text(initial, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.primary))
-                  : null,
-            ),
-            const SizedBox(width: 4),
-            Icon(Icons.expand_more, size: 18, color: Pb.muted),
-          ],
+      child: _NavHover(
+        builder: (h) => AnimatedContainer(
+          duration: const Duration(milliseconds: 170),
+          padding: EdgeInsets.fromLTRB(4, 4, showName ? 8 : 4, 4),
+          decoration: BoxDecoration(
+            color: h ? Pb.hoverBg : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: h ? Pb.link.withOpacity(0.5) : Pb.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _cleanAvatar(user, label, 13),
+              if (showName) ...[
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 120),
+                  child: Text(short,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
+                ),
+                const SizedBox(width: 2),
+                AnimatedRotation(
+                  turns: h ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(Icons.expand_more, size: 18, color: Pb.muted),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showCleanMenu(BuildContext context, User? user) {
+  void _showCleanMenu(BuildContext context, User? user, String path) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) {
-        Widget item(IconData icon, String label, VoidCallback onTap) => GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                Navigator.of(ctx).pop();
-                onTap();
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+        void go(VoidCallback onTap) {
+          Navigator.of(ctx).pop();
+          onTap();
+        }
+
+        Widget item(IconData icon, String label, Color c, VoidCallback onTap, {bool active = false}) => _NavHover(
+              onTap: () => go(onTap),
+              builder: (h) => AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                margin: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 10),
+                decoration: BoxDecoration(
+                  color: active ? c.withOpacity(0.10) : (h ? Pb.hoverBg : Colors.transparent),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Row(
                   children: [
-                    Icon(icon, color: Colors.white70, size: 20),
-                    const SizedBox(width: 12),
-                    Text(label, style: const TextStyle(color: Colors.white, fontSize: 17)),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(color: c.withOpacity(0.14), borderRadius: BorderRadius.circular(10)),
+                      child: Icon(icon, color: c, size: 19),
+                    ),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Text(label,
+                          style: TextStyle(
+                              color: active ? c : Pb.text, fontSize: 16, fontWeight: active ? FontWeight.w600 : FontWeight.w500)),
+                    ),
+                    Icon(Icons.chevron_right, size: 20, color: Pb.muted),
                   ],
                 ),
               ),
             );
-        final divider = Container(height: 1, color: Colors.white.withOpacity(0.12));
+
+        Widget section(String t) => Padding(
+              padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+              child: Text(t, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Pb.muted, letterSpacing: 0.4)),
+            );
+
+        const blue = Color(0xFF3B82F6);
+        const violet = Color(0xFF8B5CF6);
+        const rose = Color(0xFFE5484D);
 
         return Container(
-          color: const Color(0xFF1F2430),
-          padding: const EdgeInsets.fromLTRB(20, 8, 12, 16),
+          decoration: BoxDecoration(
+            color: Pb.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+            border: Border(top: BorderSide(color: Pb.border)),
+          ),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
           child: SafeArea(
             top: false,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    const Expanded(child: Text('iMeditații', style: TextStyle(color: Colors.white, fontSize: 20))),
-                    IconButton(icon: const Icon(Icons.close, color: Colors.white70), onPressed: () => Navigator.of(ctx).pop()),
-                  ],
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(color: Pb.border, borderRadius: BorderRadius.circular(99)),
+                  ),
                 ),
-                divider,
-                item(Icons.code, 'Probleme', () => context.go('/exercitii')),
-                item(Icons.groups_outlined, 'Profesori', () => context.go('/materii')),
-                item(Icons.menu_book_outlined, 'Lecții', () => context.go('/resurse')),
-                divider,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 12, 0, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: BrandLogo(color: Pb.text, accent: Pb.link, markSize: 32, fontSize: 19),
+                        ),
+                      ),
+                      IconButton(icon: Icon(Icons.close, color: Pb.muted), onPressed: () => Navigator.of(ctx).pop()),
+                    ],
+                  ),
+                ),
+                section('NAVIGARE'),
+                item(Icons.code, 'Probleme', Pb.link, () => context.go('/exercitii'),
+                    active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii')),
+                item(Icons.menu_book_outlined, 'Lecții', blue, () => context.go('/resurse'),
+                    active: path.startsWith('/resurse')),
+                item(Icons.school_outlined, 'Profesori', violet, () => context.go('/materii'),
+                    active: path.startsWith('/materii') || path.startsWith('/profesor')),
+                section('CONT'),
                 if (user == null) ...[
-                  item(Icons.login, 'Autentificare', () => context.go('/login')),
-                  item(Icons.person_add_alt, 'Înregistrare', () => context.go('/inregistrare')),
+                  item(Icons.login, 'Autentificare', Pb.link, () => context.go('/login')),
+                  const SizedBox(height: 8),
+                  _NavCta(label: 'Creează cont', fullWidth: true, onTap: () => go(() => context.go('/inregistrare'))),
                 ] else ...[
-                  item(Icons.dashboard_outlined, 'Panoul meu', () => _handleDashboardRouting(context, user)),
-                  item(Icons.person_outline, 'Profil', () => _handleProfileRouting(context, user)),
-                  item(Icons.logout, 'Ieșire', () => _signOut(context)),
+                  item(Icons.dashboard_outlined, 'Panoul meu', Pb.link, () => _handleDashboardRouting(context, user)),
+                  item(Icons.person_outline, 'Profil', blue, () => _handleProfileRouting(context, user)),
+                  item(Icons.logout, 'Ieșire', rose, () => _signOut(context)),
                 ],
               ],
             ),

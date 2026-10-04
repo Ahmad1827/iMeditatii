@@ -15,8 +15,10 @@
   <meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#18191B" media="(prefers-color-scheme: dark)">
 
-  <!-- Favicon: green rounded square with "iM" (same as the navbar logo) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2315803D'/><text x='16' y='21.5' font-family='Arial,Helvetica,sans-serif' font-size='15' font-weight='700' fill='white' text-anchor='middle'>iM</text></svg>">
+  <!-- Favicon: open book with a spark (same drawing as BrandMark in the app) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2322C55E'/><stop offset='1' stop-color='%230F766E'/></linearGradient></defs><rect width='64' height='64' rx='18' fill='url(%23g)'/><path d='M32 31C27 27 20 26 13 28L13 49C20 47 27 48 32 52Z' fill='white'/><path d='M32 31C37 27 44 26 51 28L51 49C44 47 37 48 32 52Z' fill='white' fill-opacity='.78'/><path d='M32 9Q33.3 16.7 41 18Q33.3 19.3 32 27Q30.7 19.3 23 18Q30.7 16.7 32 9Z' fill='%23FDE68A'/></svg>">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <title>iMeditații</title>
   <link rel="manifest" href="manifest.json">
@@ -178,21 +180,20 @@
     }
 
     .mark {
-      width: 46px;
-      height: 46px;
-      border-radius: 13px;
-      background: var(--primary);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 19px;
-      letter-spacing: -.5px;
+      width: 48px;
+      height: 48px;
+      display: block;
       animation: bob 2.4s ease-in-out infinite;
-      box-shadow: 0 8px 20px rgba(21, 128, 61, .28);
+      filter: drop-shadow(0 8px 14px rgba(16, 185, 129, .35));
     }
-    @media (prefers-color-scheme: dark) { .mark { color: #052e16; } }
+    .mark .spark {
+      transform-origin: 32px 18px;
+      animation: twinkle 1.8s ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50%      { transform: scale(.72) rotate(45deg); opacity: .75; }
+    }
 
     @keyframes bob {
       0%, 100% { transform: translateY(0); }
@@ -205,6 +206,7 @@
       letter-spacing: -.5px;
       color: var(--text);
     }
+    .word span { color: var(--primary); }
 
     .msg {
       min-height: 22px;
@@ -238,7 +240,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .cloud, .bird, .mark, .card { animation: none !important; }
+      .cloud, .bird, .mark, .mark .spark, .card { animation: none !important; }
       .bird { display: none; }
     }
   </style>
@@ -263,8 +265,14 @@
 
     <div class="card">
       <div class="logo">
-        <div class="mark">iM</div>
-        <div class="word">iMeditații</div>
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <defs><linearGradient id="markg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22C55E"/><stop offset="1" stop-color="#0F766E"/></linearGradient></defs>
+          <rect width="64" height="64" rx="18" fill="url(#markg)"/>
+          <path d="M32 31C27 27 20 26 13 28L13 49C20 47 27 48 32 52Z" fill="#fff"/>
+          <path d="M32 31C37 27 44 26 51 28L51 49C44 47 37 48 32 52Z" fill="#fff" fill-opacity=".78"/>
+          <path class="spark" d="M32 9Q33.3 16.7 41 18Q33.3 19.3 32 27Q30.7 19.3 23 18Q30.7 16.7 32 9Z" fill="#FDE68A"/>
+        </svg>
+        <div class="word"><span>i</span>Meditații</div>
       </div>
       <div class="msg" id="msg">Pregătim lecțiile…</div>
       <div class="track"><div class="bar" id="bar"></div></div>

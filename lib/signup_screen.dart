@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'brand_mark.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbAlert, PbAlertType;
@@ -416,15 +417,9 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   Widget _brand() => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(9)),
-            child: const Text('iM', style: TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w700)),
-          ),
+          const BrandMark(size: 34, glow: true),
           const SizedBox(width: 10),
-          Text('iMeditații', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.3)),
+          BrandWordmark(color: Pb.text, accent: Pb.link, fontSize: 18),
         ],
       );
 
