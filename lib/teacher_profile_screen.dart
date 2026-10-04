@@ -4,14 +4,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
+import 'home_ambient.dart' show HomeSky;
+import 'sticky_footer.dart';
+import 'ui_components.dart'
+    show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer, PbAlert, PbAlertType;
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
@@ -173,6 +177,15 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   bool _isLoadingStripe = false;
   bool _isCheckingStatus = false;
 
+  // Cached, refreshed explicitly after edits (instead of refetching on every rebuild).
+  late Future<DocumentSnapshot> _teacherFuture = _fire.collection('teachers').doc(widget.teacherId).get();
+
+  // ---- clean state
+  bool _cHidden = false;
+  bool _cOpening = false;
+  final GlobalKey _cMainKey = GlobalKey();
+  final GlobalKey _cFootKey = GlobalKey();
+
   bool get isOwner => _auth.currentUser?.email == 'ahmadarnaoute1896@gmail.com';
 
   @override
@@ -185,6 +198,11 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _reloadTeacher() {
+    if (!mounted) return;
+    setState(() => _teacherFuture = _fire.collection('teachers').doc(widget.teacherId).get());
   }
 
   Future<void> _checkRealStripeStatus() async {
@@ -257,6 +275,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       final url = await ref.getDownloadURL();
       await _fire.collection('teachers').doc(uid).update({'image': url});
       await _fire.collection('users').doc(uid).set({'image': url}, SetOptions(merge: true));
+      _reloadTeacher();
+      if (mounted) _showToast('Poza a fost actualizată.');
     } catch (e) {
       if (mounted) _showToast('Eroare încărcare: $e', isError: true);
     } finally {
@@ -267,7 +287,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   Future<void> _approveTeacher(String uid) async {
     try {
       await _fire.collection('teachers').doc(uid).update({'active': true});
-      if (mounted) _showToast("PROFESOR APROBAT.");
+      if (uid == widget.teacherId) _reloadTeacher();
+      if (mounted) _showToast("PROFESOR APROBAT.", friendly: 'Profesorul a fost aprobat.');
     } catch (e) {
       if (mounted) _showToast("Eroare: $e", isError: true);
     }
@@ -277,13 +298,30 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     try {
       await _fire.collection('teachers').doc(uid).delete();
       await _fire.collection('users').doc(uid).update({'role': 'student'});
-      if (mounted) _showToast("PROFESOR RESPINS.", isError: true);
+      if (mounted) _showToast("PROFESOR RESPINS.", isError: true, friendly: 'Profesorul a fost respins.');
     } catch (e) {
       if (mounted) _showToast("Eroare: $e", isError: true);
     }
   }
 
-  void _showToast(String msg, {bool isError = false}) {
+  void _showToast(String msg, {bool isError = false, String? friendly}) {
+    if (AppStyle.current.isClean) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(isError ? Icons.error_outline : Icons.check_circle_outline, color: Colors.white, size: 18),
+              const SizedBox(width: 10),
+              Expanded(child: Text(friendly ?? AppStyle.sentence(msg), style: const TextStyle(color: Colors.white))),
+            ],
+          ),
+          backgroundColor: isError ? const Color(0xFFB4232A) : const Color(0xFF212529),
+          behavior: SnackBarBehavior.floating,
+          shape: const RoundedRectangleBorder(borderRadius: Pb.radius),
+        ),
+      );
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
@@ -342,120 +380,1009 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     return newChat.id;
   }
 
+  Future<void> _saveProfile(String uid, Map<String, TextEditingController> c) async {
+    await _fire.collection('teachers').doc(uid).set({
+      'name': c['name']!.text.trim(),
+      'subject': c['subject']!.text.trim(),
+      'experience': int.tryParse(c['exp']!.text.trim()) ?? 0,
+      'contact': c['contact']!.text.trim(),
+      'price': int.tryParse(c['price']!.text.trim()) ?? 50,
+      'bio': c['bio']!.text.trim(),
+    }, SetOptions(merge: true));
+    await _fire.collection('users').doc(uid).set({'name': c['name']!.text.trim()}, SetOptions(merge: true));
+    _reloadTeacher();
+  }
+
   @override
   Widget build(BuildContext context) {
+    return StyleBuilder(
+      builder: (context, s) => s.isClean
+          ? _buildClean(MediaQuery.of(context).size.width < 960)
+          : _buildRetro(MediaQuery.of(context).size.width < 960),
+    );
+  }
+
+  // ===========================================================================
+  // CLEAN — cover banner profile, stat tiles, rating distribution, Stripe card
+  // ===========================================================================
+  static const Color _cGreen = Color(0xFF10B981);
+  static const Color _cAmber = Color(0xFFF59E0B);
+  static const Color _cRose = Color(0xFFE5484D);
+  static const Color _cBlue = Color(0xFF3B82F6);
+
+  Color _subjectColor(String s) {
+    final l = s.toLowerCase();
+    if (l.contains('matemat')) return _cRose;
+    if (l.contains('info')) return Pb.primary;
+    if (l.contains('fizic')) return const Color(0xFF8B5CF6);
+    if (l.contains('chim')) return const Color(0xFF14B8A6);
+    if (l.contains('bio')) return const Color(0xFF22A06B);
+    if (l.contains('român')) return _cBlue;
+    if (l.contains('englez')) return _cAmber;
+    if (l.contains('francez')) return const Color(0xFF6366F1);
+    if (l.contains('istorie')) return const Color(0xFFD97706);
+    if (l.contains('geograf')) return const Color(0xFF0EA5E9);
+    return Pb.primary;
+  }
+
+  BoxDecoration _deco({double r = 16}) => BoxDecoration(
+        color: Pb.surface,
+        borderRadius: BorderRadius.circular(r),
+        border: Border.all(color: Pb.border.withOpacity(0.7)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.06), blurRadius: 24, offset: const Offset(0, 8)),
+        ],
+      );
+
+  Widget _cardTitle(IconData i, String t, {Widget? trailing}) => Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Row(
+          children: [
+            Icon(i, size: 19, color: Pb.muted),
+            const SizedBox(width: 9),
+            Expanded(child: Text(t, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text))),
+            if (trailing != null) trailing,
+          ],
+        ),
+      );
+
+  Widget _buildClean(bool isMobile) {
     final currentUserId = _auth.currentUser?.uid;
     final bool isMyProfile = currentUserId == widget.teacherId;
-    final isMobile = MediaQuery.of(context).size.width < 960;
 
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: StreamBuilder<DocumentSnapshot>(
-                  stream: _fire.collection('users').doc(widget.teacherId).snapshots(),
-                  builder: (context, userSnap) {
-                    if (!userSnap.hasData) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
-                    if (!userSnap.data!.exists) return Center(child: Text('LOG ERROR: PROFILE NOT FOUND.', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)));
-
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: HomeSky(
+              blockers: [_cMainKey, _cFootKey],
+              cardsHidden: _cHidden,
+              onToggleCards: () => setState(() => _cHidden = !_cHidden),
+              hideLabel: 'Ascunde profilul',
+              showLabel: 'Arată profilul',
+              child: StreamBuilder<DocumentSnapshot>(
+                stream: _fire.collection('users').doc(widget.teacherId).snapshots(),
+                builder: (context, userSnap) {
+                  Widget body;
+                  if (!userSnap.hasData) {
+                    body = const Padding(padding: EdgeInsets.all(60), child: Center(child: CircularProgressIndicator(color: Pb.primary)));
+                  } else if (!userSnap.data!.exists) {
+                    body = Container(
+                      padding: const EdgeInsets.all(30),
+                      decoration: _deco(r: 14),
+                      child: Column(
+                        children: [
+                          Icon(Icons.person_off_outlined, size: 36, color: Pb.muted),
+                          const SizedBox(height: 10),
+                          Text('Profilul nu a fost găsit.', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Pb.text)),
+                          const SizedBox(height: 16),
+                          PbButton(
+                            text: 'Înapoi la profesori',
+                            variant: PbVariant.outlineSecondary,
+                            size: PbSize.sm,
+                            onPressed: () => context.go('/materii'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
                     final userData = userSnap.data!.data() as Map<String, dynamic>;
-                    final bool hasStripeId = userData.containsKey('stripeAccountId') && userData['stripeAccountId'] != null && userData['stripeAccountId'].toString().isNotEmpty;
-                    final bool isStripeReady = userData['isStripeActive'] == true;
-
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: _fire.collection('teachers').doc(widget.teacherId).get(),
+                    body = FutureBuilder<DocumentSnapshot>(
+                      future: _teacherFuture,
                       builder: (context, teacherSnap) {
-                        final teacherData = (teacherSnap.data?.data() as Map<String, dynamic>?) ?? {};
-                        final image = teacherData['image'] ?? userData['image'] ?? '';
-                        final name = teacherData['name'] ?? userData['name'] ?? 'MASTER UNKNOWN';
-                        final email = teacherData['email'] ?? userData['email'] ?? 'N/A';
-                        final subject = teacherData['subject'] ?? 'GENERAL';
-                        final experience = teacherData['experience']?.toString() ?? '0';
-                        final contact = teacherData['contact'] ?? 'N/A';
-                        final price = teacherData['price']?.toString() ?? '50';
-                        final bio = teacherData['bio'] ?? 'Mentor dedicat pregătirii interactive și aprofundate. Sesiuni 1-la-1 personalizate cu tablă interactivă live.';
-                        final bool isApproved = teacherData['active'] == true;
+                        final t = (teacherSnap.data?.data() as Map<String, dynamic>?) ?? {};
+                        return _cContent(userData, t, isMyProfile, currentUserId ?? '', isMobile);
+                      },
+                    );
+                  }
+                  return StickyFooterScroll(
+                    controller: _scrollController,
+                    body: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1140),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(isMobile ? 12 : 24, isMobile ? 20 : 36, isMobile ? 12 : 24, 0),
+                          child: KeyedSubtree(key: _cMainKey, child: _PrReveal(child: body)),
+                        ),
+                      ),
+                    ),
+                    footer: KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                        return Scrollbar(
-                          controller: _scrollController,
-                          child: SingleChildScrollView(
-                            controller: _scrollController,
-                            physics: const ClampingScrollPhysics(),
-                            padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 36),
-                            child: Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 1140),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    if (isOwner) _buildAdminPanel(),
-                                    if (isMyProfile && !isApproved) _buildPendingBanner(),
+  Widget _cContent(Map<String, dynamic> userData, Map<String, dynamic> t, bool isMyProfile, String uid, bool isMobile) {
+    final bool hasStripeId = userData['stripeAccountId'] != null && userData['stripeAccountId'].toString().isNotEmpty;
+    final bool isStripeReady = userData['isStripeActive'] == true;
+    final image = '${t['image'] ?? userData['image'] ?? ''}';
+    final name = '${t['name'] ?? userData['name'] ?? 'Profesor'}';
+    final email = '${t['email'] ?? userData['email'] ?? ''}';
+    final subject = '${t['subject'] ?? 'General'}';
+    final experience = '${t['experience'] ?? 0}';
+    final contact = '${t['contact'] ?? ''}';
+    final price = '${t['price'] ?? 50}';
+    final bio = '${t['bio'] ?? ''}'.trim().isEmpty
+        ? 'Mentor dedicat pregătirii interactive și aprofundate. Sesiuni 1 la 1 personalizate, cu tablă interactivă live.'
+        : '${t['bio']}'.trim();
+    final bool isApproved = t['active'] == true;
+    final c = _subjectColor(subject);
 
-                                    if (!isMobile)
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            width: 360,
-                                            child: _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
-                                          ),
-                                          const SizedBox(width: 28),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                                              children: [
-                                                _buildStatsGrid(subject, experience, price, isMobile),
-                                                const SizedBox(height: 24),
-                                                _buildLoreAndFeaturesBlock(bio, subject),
-                                                const SizedBox(height: 24),
-                                                if (isMyProfile) ...[
-                                                  _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
-                                                  const SizedBox(height: 24),
-                                                ],
-                                                _ratingSection(widget.teacherId),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                                        children: [
-                                          _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
-                                          const SizedBox(height: 20),
-                                          _buildStatsGrid(subject, experience, price, isMobile),
-                                          const SizedBox(height: 20),
-                                          _buildLoreAndFeaturesBlock(bio, subject),
-                                          const SizedBox(height: 20),
-                                          if (isMyProfile) ...[
-                                            _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
-                                            const SizedBox(height: 20),
-                                          ],
-                                          _ratingSection(widget.teacherId),
-                                        ],
-                                      ),
-                                    SizedBox(height: isMobile ? 32 : 60),
-                                  ],
-                                ),
+    final right = <Widget>[
+      _cStats(price, experience, c, isMobile),
+      const SizedBox(height: 16),
+      _cAbout(bio, c),
+      const SizedBox(height: 16),
+      if (isMyProfile) ...[
+        _cStripe(hasStripeId, isStripeReady, email, isMobile),
+        const SizedBox(height: 16),
+      ],
+      _cReviews(c),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (isOwner) _cAdmin(),
+        if (isMyProfile && !isApproved)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: PbAlert(
+              type: PbAlertType.warning,
+              icon: Icons.hourglass_top_rounded,
+              child: Text(
+                'Profilul tău așteaptă aprobarea unui administrator. Până atunci nu apare în lista publică de profesori.',
+                style: TextStyle(fontSize: 14.5),
+              ),
+            ),
+          ),
+        if (!isMobile)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 340, child: _cIdentity(name, email, image, subject, contact, isApproved, isMyProfile, uid, c, isMobile)),
+              const SizedBox(width: 20),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: right)),
+            ],
+          )
+        else ...[
+          _cIdentity(name, email, image, subject, contact, isApproved, isMyProfile, uid, c, isMobile),
+          const SizedBox(height: 16),
+          ...right,
+        ],
+      ],
+    );
+  }
+
+  Widget _cIdentity(String name, String email, String image, String subject, String contact, bool isApproved, bool isMyProfile,
+      String uid, Color c, bool isMobile) {
+    final parts = name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).take(2);
+    final initials = parts.isEmpty ? '?' : parts.map((w) => w[0].toUpperCase()).join();
+    const avatar = 108.0;
+
+    Widget chip(String label, Color col, {IconData? icon}) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(color: col.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[Icon(icon, size: 13, color: col), const SizedBox(width: 4)],
+              Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: col)),
+            ],
+          ),
+        );
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: _deco(r: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topCenter,
+            children: [
+              Container(
+                height: 104,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [c.withOpacity(0.85), Color.lerp(c, _cBlue, 0.45)!.withOpacity(0.7)],
+                  ),
+                ),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(_getSubjectIcon(subject), size: 26, color: Colors.white.withOpacity(0.7)),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -avatar / 2,
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      width: avatar,
+                      height: avatar,
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(color: Pb.surface, shape: BoxShape.circle),
+                      child: CircleAvatar(
+                        backgroundColor: c.withOpacity(0.15),
+                        backgroundImage: image.isNotEmpty ? CachedNetworkImageProvider(image) : null,
+                        child: image.isEmpty
+                            ? Text(initials, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: c))
+                            : null,
+                      ),
+                    ),
+                    if (isMyProfile)
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: _uploading ? null : () => _changePhoto(uid),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Pb.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Pb.surface, width: 3),
+                            ),
+                            child: _uploading
+                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                : const Icon(Icons.photo_camera_outlined, color: Colors.white, size: 16),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: avatar / 2 + 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Column(
+              children: [
+                Text(name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.3)),
+                if (email.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(email, textAlign: TextAlign.center, style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+                ],
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    chip(subject, c),
+                    isApproved
+                        ? chip('Verificat', _cGreen, icon: Icons.verified)
+                        : chip('În așteptare', _cAmber, icon: Icons.hourglass_top_rounded),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
+                  decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone_outlined, size: 18, color: Pb.muted),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          contact.isEmpty || contact == 'N/A' ? 'Telefon nespecificat' : contact,
+                          style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Pb.text),
+                        ),
+                      ),
+                      if (contact.isNotEmpty && contact != 'N/A')
+                        IconButton(
+                          tooltip: 'Copiază',
+                          splashRadius: 18,
+                          icon: Icon(Icons.copy_rounded, size: 17, color: Pb.muted),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: contact));
+                            _showToast('Copiat.', friendly: 'Numărul a fost copiat.');
+                          },
+                        )
+                      else
+                        const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (isMyProfile)
+                  PbButton(
+                    text: 'Editează profilul',
+                    icon: Icons.edit_outlined,
+                    variant: PbVariant.outlineSecondary,
+                    fullWidth: true,
+                    onPressed: () => _openEditDialog(uid, isMobile),
+                  )
+                else
+                  PbButton(
+                    text: 'Scrie un mesaj',
+                    icon: Icons.chat_bubble_outline,
+                    fullWidth: true,
+                    loading: _cOpening,
+                    onPressed: _cOpening
+                        ? null
+                        : () async {
+                            setState(() => _cOpening = true);
+                            try {
+                              final chatId = await _openOrCreateChat(context, widget.teacherId, name);
+                              if (mounted && chatId.isNotEmpty) context.push('/chat/$chatId', extra: name);
+                            } finally {
+                              if (mounted) setState(() => _cOpening = false);
+                            }
+                          },
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cStats(String price, String exp, Color c, bool isMobile) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _fire.collection('teachers').doc(widget.teacherId).collection('reviews').snapshots(),
+      builder: (context, snap) {
+        final docs = snap.data?.docs ?? [];
+        final ratings = docs.map((d) => ((d.data() as Map)['rating'] as num?)?.toDouble() ?? 0).toList();
+        final avg = ratings.isEmpty ? 0.0 : ratings.reduce((a, b) => a + b) / ratings.length;
+        final expN = int.tryParse(exp) ?? 0;
+
+        Widget tile(IconData i, String label, String value, String sub, Color col) => Container(
+              padding: EdgeInsets.all(isMobile ? 12 : 16),
+              decoration: _deco(r: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: col.withOpacity(0.12), borderRadius: BorderRadius.circular(9)),
+                        child: Icon(i, size: 16, color: col),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: isMobile ? 17 : 21, fontWeight: FontWeight.w700, color: Pb.text)),
+                  Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Pb.muted)),
+                ],
+              ),
+            );
+
+        return Row(
+          children: [
+            Expanded(child: tile(Icons.payments_outlined, 'Tarif', '$price RON', 'pe oră', Pb.primary)),
+            SizedBox(width: isMobile ? 8 : 12),
+            Expanded(child: tile(Icons.military_tech_outlined, 'Experiență', expN == 0 ? 'Nou' : '$expN ${expN == 1 ? 'an' : 'ani'}', 'de predare', _cAmber)),
+            SizedBox(width: isMobile ? 8 : 12),
+            Expanded(
+              child: tile(
+                Icons.star_rounded,
+                'Rating',
+                ratings.isEmpty ? '–' : avg.toStringAsFixed(1),
+                ratings.isEmpty ? 'fără recenzii' : '${ratings.length} ${ratings.length == 1 ? 'recenzie' : 'recenzii'}',
+                _cRose,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _cAbout(String bio, Color c) {
+    final features = [
+      (Icons.draw_outlined, 'Tablă interactivă live', _cBlue),
+      (Icons.school_outlined, 'Pregătire pentru Bac', Pb.primary),
+      (Icons.quiz_outlined, 'Teme și probleme', _cAmber),
+      (Icons.forum_outlined, 'Feedback 1 la 1', _cRose),
+    ];
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _deco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _cardTitle(Icons.person_outline, 'Despre'),
+          Text(bio, style: TextStyle(fontSize: 15, color: Pb.text, height: 1.65)),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final f in features)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                  decoration: BoxDecoration(color: f.$3.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(f.$1, size: 16, color: f.$3),
+                      const SizedBox(width: 7),
+                      Text(f.$2, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Pb.text)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cStripe(bool hasStripeId, bool isStripeReady, String email, bool isMobile) {
+    final action = !hasStripeId
+        ? PbButton(text: 'Configurează plățile', icon: Icons.account_balance_wallet_outlined, loading: _isLoadingStripe, onPressed: _isLoadingStripe ? null : _setupStripeAccount)
+        : (!isStripeReady
+            ? PbButton(text: 'Finalizează configurarea', icon: Icons.arrow_forward, loading: _isLoadingStripe, onPressed: _isLoadingStripe ? null : _setupStripeAccount)
+            : PbButton(
+                text: 'Deschide panoul Stripe',
+                icon: Icons.open_in_new,
+                variant: PbVariant.success,
+                loading: _isLoadingStripe,
+                onPressed: _isLoadingStripe ? null : _openStripeDashboard,
+              ));
+
+    final reset = PbLink(
+      text: 'Resetează parola',
+      fontSize: 13.5,
+      onTap: () async {
+        await _auth.sendPasswordResetEmail(email: email);
+        _showToast('RESET LOG TRANSMITTED.', friendly: 'Ți-am trimis un email pentru resetarea parolei.');
+      },
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _deco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _cardTitle(
+            Icons.account_balance_wallet_outlined,
+            'Plăți',
+            trailing: _isCheckingStatus
+                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary))
+                : Text('prin Stripe', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+          ),
+          PbAlert(
+            type: isStripeReady ? PbAlertType.success : PbAlertType.warning,
+            icon: isStripeReady ? Icons.verified_outlined : Icons.info_outline,
+            child: Text(
+              isStripeReady
+                  ? 'Contul de plăți e activ. Poți primi bani pentru lecții.'
+                  : (hasStripeId
+                      ? 'Configurarea nu e completă. Termină pașii din Stripe ca să poți primi plăți.'
+                      : 'Nu ai încă un cont de plăți. Configurează-l ca elevii să-ți poată plăti lecțiile.'),
+              style: const TextStyle(fontSize: 14.5),
+            ),
+          ),
+          const SizedBox(height: 14),
+          if (isMobile) ...[
+            action,
+            const SizedBox(height: 10),
+            Center(child: reset),
+          ] else
+            Row(children: [action, const Spacer(), reset]),
+        ],
+      ),
+    );
+  }
+
+  Widget _cReviews(Color c) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _fire.collection('teachers').doc(widget.teacherId).collection('reviews').orderBy('createdAt', descending: true).snapshots(),
+      builder: (context, snap) {
+        final docs = snap.data?.docs ?? [];
+        final ratings = docs.map((d) => (((d.data() as Map)['rating'] as num?) ?? 0).round().clamp(0, 5).toInt()).toList();
+        final avg = ratings.isEmpty ? 0.0 : ratings.reduce((a, b) => a + b) / ratings.length;
+        final counts = List<int>.generate(6, (i) => ratings.where((r) => r == i).length);
+
+        Widget stars(num v, {double size = 16}) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(
+                5,
+                (i) => Icon(
+                  v >= i + 1 ? Icons.star_rounded : (v >= i + 0.5 ? Icons.star_half_rounded : Icons.star_outline_rounded),
+                  size: size,
+                  color: _cAmber,
+                ),
+              ),
+            );
+
+        final summary = Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Column(
+              children: [
+                Text(ratings.isEmpty ? '–' : avg.toStringAsFixed(1),
+                    style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, color: Pb.text, height: 1)),
+                const SizedBox(height: 6),
+                stars(avg),
+                const SizedBox(height: 4),
+                Text('${ratings.length} ${ratings.length == 1 ? 'recenzie' : 'recenzii'}', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+              ],
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: Column(
+                children: [
+                  for (var s = 5; s >= 1; s--)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2.5),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 14, child: Text('$s', style: TextStyle(fontSize: 12.5, color: Pb.muted))),
+                          const Icon(Icons.star_rounded, size: 13, color: _cAmber),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(99),
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0, end: ratings.isEmpty ? 0 : counts[s] / ratings.length),
+                                duration: const Duration(milliseconds: 700),
+                                curve: Curves.easeOutCubic,
+                                builder: (_, v, __) => LinearProgressIndicator(value: v, minHeight: 7, color: _cAmber, backgroundColor: Pb.gray),
                               ),
                             ),
                           ),
-                        );
-                      },
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 22,
+                            child: Text('${counts[s]}', textAlign: TextAlign.right, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        );
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: _deco(r: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _cardTitle(
+                Icons.reviews_outlined,
+                'Recenzii',
+                trailing: docs.length > 3
+                    ? PbLink(text: 'Toate (${docs.length})', fontSize: 13.5, onTap: () => context.push('/toate-recenziile/${widget.teacherId}'))
+                    : null,
+              ),
+              if (!snap.hasData)
+                const Padding(padding: EdgeInsets.all(12), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)))
+              else if (docs.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.star_outline_rounded, size: 22, color: Pb.muted),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text('Încă nu există recenzii. După prima lecție, elevii pot lăsa o părere aici.',
+                            style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.4)),
+                      ),
+                    ],
+                  ),
+                )
+              else ...[
+                summary,
+                const SizedBox(height: 16),
+                Container(height: 1, color: Pb.border),
+                for (final d in docs.take(3))
+                  Builder(builder: (context) {
+                    final r = d.data() as Map<String, dynamic>;
+                    final ts = r['createdAt'];
+                    final dt = ts is Timestamp ? ts.toDate() : null;
+                    final author = '${r['studentName'] ?? r['author'] ?? r['name'] ?? 'Elev'}';
+                    return Container(
+                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Pb.border))),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 16,
+                            backgroundColor: c.withOpacity(0.14),
+                            child: Text(author.isEmpty ? '?' : author[0].toUpperCase(),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: c)),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(author, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
+                                    ),
+                                    if (dt != null)
+                                      Text(
+                                        '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}',
+                                        style: TextStyle(fontSize: 12, color: Pb.muted),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                stars((r['rating'] as num?) ?? 0, size: 14),
+                                if ('${r['comment'] ?? ''}'.trim().isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  Text('${r['comment']}', style: TextStyle(fontSize: 14, color: Pb.text, height: 1.5)),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     );
-                  },
+                  }),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _cAdmin() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _fire.collection('teachers').where('active', isEqualTo: false).snapshots(),
+      builder: (context, snapshot) {
+        final pending = snapshot.data?.docs ?? [];
+        if (pending.isEmpty) return const SizedBox.shrink();
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(18),
+          decoration: _deco(r: 16).copyWith(border: Border.all(color: _cBlue.withOpacity(0.45))),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _cardTitle(
+                Icons.admin_panel_settings_outlined,
+                'Profesori în așteptare',
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+                  decoration: BoxDecoration(color: _cBlue.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                  child: Text('${pending.length}', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: _cBlue)),
+                ),
+              ),
+              for (final doc in pending)
+                Builder(builder: (context) {
+                  final d = doc.data() as Map<String, dynamic>;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+                    decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${d['name'] ?? 'Fără nume'}', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Pb.text)),
+                              Text('${d['subject'] ?? ''}  ${d['email'] ?? ''}', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                            ],
+                          ),
+                        ),
+                        PbButton(text: 'Aprobă', icon: Icons.check, variant: PbVariant.success, size: PbSize.sm, onPressed: () => _approveTeacher(doc.id)),
+                        const SizedBox(width: 6),
+                        PbButton(text: 'Respinge', variant: PbVariant.outlineDanger, size: PbSize.sm, onPressed: () => _rejectTeacher(doc.id)),
+                      ],
+                    ),
+                  );
+                }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _cEditDialog(String uid, Map<String, dynamic> data) async {
+    final c = {
+      'name': TextEditingController(text: data['name'] ?? ''),
+      'subject': TextEditingController(text: data['subject'] ?? ''),
+      'exp': TextEditingController(text: '${data['experience'] ?? ''}'),
+      'contact': TextEditingController(text: data['contact'] ?? ''),
+      'price': TextEditingController(text: '${data['price'] ?? 50}'),
+      'bio': TextEditingController(text: data['bio'] ?? ''),
+    };
+    var saving = false;
+
+    Widget field(String key, String label, IconData icon, {TextInputType? type, int lines = 1, String? suffix}) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+              const SizedBox(height: 5),
+              TextField(
+                controller: c[key],
+                keyboardType: type,
+                maxLines: lines,
+                style: TextStyle(fontSize: 15, color: Pb.text),
+                cursorColor: Pb.primary,
+                decoration: Pb.input().copyWith(
+                  prefixIcon: lines == 1 ? Icon(icon, size: 18, color: Pb.muted) : null,
+                  suffixText: suffix,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                 ),
               ),
             ],
           ),
         );
-      },
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => Dialog(
+          backgroundColor: Pb.surface,
+          insetPadding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Pb.border)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 540),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 8, 10),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text('Editează profilul', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Pb.text))),
+                      IconButton(icon: Icon(Icons.close, color: Pb.muted), onPressed: () => Navigator.of(ctx).pop()),
+                    ],
+                  ),
+                ),
+                Container(height: 1, color: Pb.border),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+                    child: Column(
+                      children: [
+                        field('name', 'Nume complet', Icons.person_outline),
+                        field('subject', 'Materia', Icons.auto_stories_outlined),
+                        Row(
+                          children: [
+                            Expanded(child: field('exp', 'Experiență', Icons.military_tech_outlined, type: TextInputType.number, suffix: 'ani')),
+                            const SizedBox(width: 12),
+                            Expanded(child: field('price', 'Tarif', Icons.payments_outlined, type: TextInputType.number, suffix: 'RON/oră')),
+                          ],
+                        ),
+                        field('contact', 'Telefon', Icons.phone_outlined, type: TextInputType.phone),
+                        field('bio', 'Despre tine', Icons.notes, lines: 4),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(height: 1, color: Pb.border),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      PbButton(text: 'Renunță', variant: PbVariant.secondary, onPressed: () => Navigator.of(ctx).pop()),
+                      const SizedBox(width: 8),
+                      PbButton(
+                        text: 'Salvează',
+                        icon: Icons.check,
+                        loading: saving,
+                        onPressed: saving
+                            ? null
+                            : () async {
+                                setLocal(() => saving = true);
+                                try {
+                                  await _saveProfile(uid, c);
+                                  if (ctx.mounted) Navigator.of(ctx).pop();
+                                  _showToast('Saved.', friendly: 'Profilul a fost actualizat.');
+                                } catch (e) {
+                                  setLocal(() => saving = false);
+                                  _showToast('Eroare: $e', isError: true);
+                                }
+                              },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cFooter(bool isMobile) {
+    final links = [
+      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
+      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+    ];
+    final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
+    return Container(
+      decoration: BoxDecoration(color: Pb.surface, border: Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.symmetric(vertical: 22),
+      child: PbContainer(
+        child: isMobile
+            ? Column(children: [
+                copy,
+                const SizedBox(height: 10),
+                Wrap(spacing: 18, runSpacing: 8, alignment: WrapAlignment.center, children: links),
+              ])
+            : Row(children: [copy, const Spacer(), ...links.expand((l) => [const SizedBox(width: 22), l])]),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
+  Widget _buildRetro(bool isMobile) {
+    final currentUserId = _auth.currentUser?.uid;
+    final bool isMyProfile = currentUserId == widget.teacherId;
+
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: StreamBuilder<DocumentSnapshot>(
+              stream: _fire.collection('users').doc(widget.teacherId).snapshots(),
+              builder: (context, userSnap) {
+                if (!userSnap.hasData) return Center(child: CircularProgressIndicator(color: AppColors.sunset));
+                if (!userSnap.data!.exists) {
+                  return Center(
+                      child: Text('LOG ERROR: PROFILE NOT FOUND.', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)));
+                }
+
+                final userData = userSnap.data!.data() as Map<String, dynamic>;
+                final bool hasStripeId = userData.containsKey('stripeAccountId') &&
+                    userData['stripeAccountId'] != null &&
+                    userData['stripeAccountId'].toString().isNotEmpty;
+                final bool isStripeReady = userData['isStripeActive'] == true;
+
+                return FutureBuilder<DocumentSnapshot>(
+                  future: _teacherFuture,
+                  builder: (context, teacherSnap) {
+                    final teacherData = (teacherSnap.data?.data() as Map<String, dynamic>?) ?? {};
+                    final image = teacherData['image'] ?? userData['image'] ?? '';
+                    final name = teacherData['name'] ?? userData['name'] ?? 'MASTER UNKNOWN';
+                    final email = teacherData['email'] ?? userData['email'] ?? 'N/A';
+                    final subject = teacherData['subject'] ?? 'GENERAL';
+                    final experience = teacherData['experience']?.toString() ?? '0';
+                    final contact = teacherData['contact'] ?? 'N/A';
+                    final price = teacherData['price']?.toString() ?? '50';
+                    final bio = teacherData['bio'] ??
+                        'Mentor dedicat pregătirii interactive și aprofundate. Sesiuni 1-la-1 personalizate cu tablă interactivă live.';
+                    final bool isApproved = teacherData['active'] == true;
+
+                    return Scrollbar(
+                      controller: _scrollController,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        physics: const ClampingScrollPhysics(),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 36),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1140),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (isOwner) _buildAdminPanel(),
+                                if (isMyProfile && !isApproved) _buildPendingBanner(),
+                                if (!isMobile)
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 360,
+                                        child: _buildIdentityCard(
+                                            name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
+                                      ),
+                                      const SizedBox(width: 28),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: [
+                                            _buildStatsGrid(subject, experience, price, isMobile),
+                                            const SizedBox(height: 24),
+                                            _buildLoreAndFeaturesBlock(bio, subject),
+                                            const SizedBox(height: 24),
+                                            if (isMyProfile) ...[
+                                              _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
+                                              const SizedBox(height: 24),
+                                            ],
+                                            _ratingSection(widget.teacherId),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
+                                      const SizedBox(height: 20),
+                                      _buildStatsGrid(subject, experience, price, isMobile),
+                                      const SizedBox(height: 20),
+                                      _buildLoreAndFeaturesBlock(bio, subject),
+                                      const SizedBox(height: 20),
+                                      if (isMyProfile) ...[
+                                        _buildFinancialDashboard(hasStripeId, isStripeReady, email, isMobile),
+                                        const SizedBox(height: 20),
+                                      ],
+                                      _ratingSection(widget.teacherId),
+                                    ],
+                                  ),
+                                SizedBox(height: isMobile ? 32 : 60),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -472,7 +1399,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             Expanded(
               child: Text(
                 "SYSTEM AUTHORIZATION PENDING. PROFILE HIDDEN FROM PUBLIC GUILD ROSTER.",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, letterSpacing: 0.5),
+                style: TextStyle(
+                    fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.isDark ? const Color(0xFF10161A) : AppColors.ink, letterSpacing: 0.5),
               ),
             ),
           ],
@@ -848,7 +1776,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             ),
             child: Row(
               children: [
-                Icon(isStripeReady ? Icons.check_circle : Icons.warning, color: isStripeReady ? const Color(0xFF55EFC4) : AppColors.mustard, size: 22),
+                Icon(isStripeReady ? Icons.check_circle : Icons.warning,
+                    color: isStripeReady ? const Color(0xFF55EFC4) : AppColors.mustard, size: 22),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -865,11 +1794,29 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (!hasStripeId)
-                  RetroButton(text: "INITIALIZE WALLET", isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                  RetroButton(
+                      text: "INITIALIZE WALLET",
+                      isFullWidth: true,
+                      bgColor: AppColors.sky,
+                      textColor: Colors.white,
+                      onPressed: _setupStripeAccount,
+                      isLoading: _isLoadingStripe)
                 else if (hasStripeId && !isStripeReady)
-                  RetroButton(text: "COMPLETE SETUP", isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                  RetroButton(
+                      text: "COMPLETE SETUP",
+                      isFullWidth: true,
+                      bgColor: AppColors.sky,
+                      textColor: Colors.white,
+                      onPressed: _setupStripeAccount,
+                      isLoading: _isLoadingStripe)
                 else
-                  RetroButton(text: "OPEN DASHBOARD", isFullWidth: true, bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
+                  RetroButton(
+                      text: "OPEN DASHBOARD",
+                      isFullWidth: true,
+                      bgColor: AppColors.forest,
+                      textColor: Colors.white,
+                      onPressed: _openStripeDashboard,
+                      isLoading: _isLoadingStripe),
                 const SizedBox(height: 12),
                 Center(
                   child: TextButton(
@@ -877,7 +1824,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       await _auth.sendPasswordResetEmail(email: email);
                       _showToast("RESET LOG TRANSMITTED.");
                     },
-                    child: const Text("RESET ACCESS KEY", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
+                    child: const Text("RESET ACCESS KEY",
+                        style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
                   ),
                 ),
               ],
@@ -886,18 +1834,22 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             Row(
               children: [
                 if (!hasStripeId)
-                  RetroButton(text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                  RetroButton(
+                      text: "INITIALIZE WALLET", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
                 else if (hasStripeId && !isStripeReady)
-                  RetroButton(text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
+                  RetroButton(
+                      text: "COMPLETE SETUP", bgColor: AppColors.sky, textColor: Colors.white, onPressed: _setupStripeAccount, isLoading: _isLoadingStripe)
                 else
-                  RetroButton(text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
+                  RetroButton(
+                      text: "OPEN DASHBOARD", bgColor: AppColors.forest, textColor: Colors.white, onPressed: _openStripeDashboard, isLoading: _isLoadingStripe),
                 const Spacer(),
                 TextButton(
                   onPressed: () async {
                     await _auth.sendPasswordResetEmail(email: email);
                     _showToast("RESET LOG TRANSMITTED.");
                   },
-                  child: const Text("RESET KEY", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
+                  child: const Text("RESET KEY",
+                      style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13, decoration: TextDecoration.underline)),
                 ),
               ],
             ),
@@ -943,7 +1895,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 2)),
                   child: Center(
-                    child: Text("NO REVIEWS LOGGED IN SYSTEM YET.", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMuted)),
+                    child: Text("NO REVIEWS LOGGED IN SYSTEM YET.",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMuted)),
                   ),
                 ),
               ...docs.take(3).map((d) {
@@ -955,7 +1908,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(children: List.generate(5, (i) => Icon(i < (rData['rating'] ?? 0) ? Icons.star : Icons.star_border, color: AppColors.sunset, size: 16))),
+                      Row(
+                          children: List.generate(
+                              5, (i) => Icon(i < (rData['rating'] ?? 0) ? Icons.star : Icons.star_border, color: AppColors.sunset, size: 16))),
                       const SizedBox(height: 8),
                       Text(rData['comment'] ?? '', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.ink)),
                     ],
@@ -967,7 +1922,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   padding: const EdgeInsets.only(top: 8),
                   child: TextButton(
                     onPressed: () => context.push('/toate-recenziile/$teacherId'),
-                    child: Text("ACCESS ALL REVIEWS (${docs.length}) →", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sky)),
+                    child: Text("ACCESS ALL REVIEWS (${docs.length}) →",
+                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sky)),
                   ),
                 ),
             ],
@@ -980,18 +1936,25 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   Future<void> _openEditDialog(String uid, bool isMobile) async {
     final doc = await _fire.collection('teachers').doc(uid).get();
     final data = (doc.data() as Map<String, dynamic>?) ?? {};
-    final nameCtrl = TextEditingController(text: data['name'] ?? '');
-    final subjectCtrl = TextEditingController(text: data['subject'] ?? '');
-    final expCtrl = TextEditingController(text: '${data['experience'] ?? ''}');
-    final contactCtrl = TextEditingController(text: data['contact'] ?? '');
-    final priceCtrl = TextEditingController(text: '${data['price'] ?? 50}');
-    final bioCtrl = TextEditingController(text: data['bio'] ?? '');
-
     if (!mounted) return;
+
+    if (AppStyle.current.isClean) {
+      await _cEditDialog(uid, data);
+      return;
+    }
+
+    final c = {
+      'name': TextEditingController(text: data['name'] ?? ''),
+      'subject': TextEditingController(text: data['subject'] ?? ''),
+      'exp': TextEditingController(text: '${data['experience'] ?? ''}'),
+      'contact': TextEditingController(text: data['contact'] ?? ''),
+      'price': TextEditingController(text: '${data['price'] ?? 50}'),
+      'bio': TextEditingController(text: data['bio'] ?? ''),
+    };
 
     await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor: AppColors.bg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: AppColors.border, width: 4)),
         title: Text('UPDATE MASTER DATA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: AppColors.ink)),
@@ -1001,33 +1964,27 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _styledInput(nameCtrl, 'FULL NAME'),
-                _styledInput(subjectCtrl, 'DISCIPLINE'),
-                _styledInput(expCtrl, 'EXP YEARS', type: TextInputType.number),
-                _styledInput(contactCtrl, 'CONTACT LINK / PHONE'),
-                _styledInput(priceCtrl, 'HOURLY RATE (RON)', type: TextInputType.number),
-                _styledInput(bioCtrl, 'DESPRE MENTOR / BIO', maxLines: 3),
+                _styledInput(c['name']!, 'FULL NAME'),
+                _styledInput(c['subject']!, 'DISCIPLINE'),
+                _styledInput(c['exp']!, 'EXP YEARS', type: TextInputType.number),
+                _styledInput(c['contact']!, 'CONTACT LINK / PHONE'),
+                _styledInput(c['price']!, 'HOURLY RATE (RON)', type: TextInputType.number),
+                _styledInput(c['bio']!, 'DESPRE MENTOR / BIO', maxLines: 3),
               ],
             ),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => context.pop(), child: Text('CANCEL', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold))),
+          TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: Text('CANCEL', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold))),
           RetroButton(
             text: 'SAVE DATA',
             bgColor: AppColors.sunset,
             textColor: Colors.white,
             onPressed: () async {
-              await _fire.collection('teachers').doc(uid).set({
-                'name': nameCtrl.text.trim(),
-                'subject': subjectCtrl.text.trim(),
-                'experience': int.tryParse(expCtrl.text.trim()) ?? 0,
-                'contact': contactCtrl.text.trim(),
-                'price': int.tryParse(priceCtrl.text.trim()) ?? 50,
-                'bio': bioCtrl.text.trim(),
-              }, SetOptions(merge: true));
-              await _fire.collection('users').doc(uid).set({'name': nameCtrl.text.trim()}, SetOptions(merge: true));
-              if (mounted) context.pop();
+              await _saveProfile(uid, c);
+              if (dialogCtx.mounted) Navigator.of(dialogCtx).pop();
             },
           ),
         ],
@@ -1053,6 +2010,34 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.sky, width: 2.5)),
         ),
       ),
+    );
+  }
+}
+
+class _PrReveal extends StatefulWidget {
+  final Widget child;
+  const _PrReveal({required this.child});
+
+  @override
+  State<_PrReveal> createState() => _PrRevealState();
+}
+
+class _PrRevealState extends State<_PrReveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 520))..forward();
+  late final Animation<double> _a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).disableAnimations) return widget.child;
+    return FadeTransition(
+      opacity: _a,
+      child: SlideTransition(position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(_a), child: widget.child),
     );
   }
 }
