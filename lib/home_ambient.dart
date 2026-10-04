@@ -10,18 +10,28 @@ import 'app_colors.dart';
 import 'ui_components.dart';
 
 // ============================================================================
-// HomeSky — fundal + nori interactivi + păsări + armate care marșează
+// HomeSky — fundal + nori interactivi + armate care marșează
 // + tab secret cu arc/praștie + buton care ascunde panourile.
+//
+// scene: HomeScene.meadow  -> păsări (pagina principală, lecții)
+//        HomeScene.fantasy -> dragoni, castel, turnul vrăjitorului,
+//                             cristale, foc de tabără, licurici (probleme)
+//
 // `blockers` = zonele cu conținut (carduri); acolo click-urile merg normal.
+// `cheerSignal` = schimbă valoarea ca armata să strige și dragonii să scuipe foc
+//                 (ex. când elevul rezolvă o problemă).
 //
 // Armata:
-//  • click pe un soldat  -> salută / sare (pedestru) sau calul se ridică (călăreț)
-//  • click pe stegar     -> toată armata strigă și ridică armele
-//  • click pe un căzut   -> îl ajuți să se ridice mai repede
-//  • săgeată / piatră    -> soldatul cade (sau calul se ridică), rămâne în urmă,
-//                           apoi aleargă să prindă coloana; vecinii ridică scuturile
-//                           și pot bloca următoarele lovituri
+//  • click pe un soldat  -> salută / sare sau calul se ridică
+//  • click pe stegar     -> toată armata strigă
+//  • click pe un căzut   -> îl ajuți să se ridice
+//  • săgeată / piatră    -> cade, rămâne în urmă, apoi aleargă; vecinii ridică scutul
+// Fantasy:
+//  • click pe dragon     -> scuipă foc;   lovit -> fuge rănit
+//  • cristal / glob / foc -> scântei și lumină (și cu mouse-ul, și cu armele)
 // ============================================================================
+enum HomeScene { meadow, fantasy }
+
 class HomeSky extends StatefulWidget {
   final Widget child;
   final List<GlobalKey> blockers;
@@ -30,6 +40,8 @@ class HomeSky extends StatefulWidget {
   final bool armies;
   final String hideLabel;
   final String showLabel;
+  final HomeScene scene;
+  final int cheerSignal;
 
   const HomeSky({
     super.key,
@@ -40,6 +52,8 @@ class HomeSky extends StatefulWidget {
     this.armies = true,
     this.hideLabel = 'Ascunde panourile',
     this.showLabel = 'Arată panourile',
+    this.scene = HomeScene.meadow,
+    this.cheerSignal = 0,
   });
 
   @override
@@ -69,6 +83,43 @@ class _Bird {
   double vy = 0;
   final double phase;
   bool startled = false;
+}
+
+class _Dragon {
+  _Dragon({
+    required this.x,
+    required this.y,
+    required this.vx,
+    required this.scale,
+    required this.phase,
+    required this.color,
+    required this.nextBreath,
+  });
+  double x;
+  double y;
+  double vx;
+  double vy = 0;
+  final double scale;
+  final double phase;
+  final int color;
+  double fire = 0; // 1 -> 0
+  double nextBreath;
+  bool fleeing = false;
+}
+
+class _Mote {
+  _Mote(this.x, this.y, this.phase, this.warm);
+  double x;
+  double y;
+  final double phase;
+  final bool warm;
+}
+
+class _Burst {
+  _Burst(this.x, this.y, this.vx, this.vy, this.color, this.born);
+  double x, y, vx, vy;
+  final Color color;
+  final double born;
 }
 
 class _Drop {
@@ -118,19 +169,18 @@ class _Soldier {
   _Soldier(this.kind, this.wpn, this.dx, this.lane, this.seed, this.coat, {this.banner = false});
   final _Kind kind;
   final _Wpn wpn;
-  final double dx; // distance behind the leader (to the right)
-  final double lane; // vertical offset, gives ranks / depth
+  final double dx;
+  final double lane;
   final double seed;
-  final int coat; // horse coat colour (riders) or hair colour (foot)
+  final int coat;
   final bool banner;
 
-  // live state
-  double walk = 0; // own walk clock (stops when down, runs faster when catching up)
-  double lag = 0; // how far behind his place in the column he is (px)
-  double downFor = 0; // length of the current knock-down
-  double downLeft = 0; // time left lying down / rearing
-  double react = 0; // 1 -> 0, salute / hop / rear after a click
-  double guard = 0; // seconds left with the shield raised
+  double walk = 0;
+  double lag = 0;
+  double downFor = 0;
+  double downLeft = 0;
+  double react = 0;
+  double guard = 0;
 }
 
 class _Army {
@@ -142,9 +192,9 @@ class _Army {
     required this.members,
     required this.length,
   });
-  double x; // x of the leader (leftmost)
+  double x;
   double t = 0;
-  double cheer = 0; // seconds left of the war cry
+  double cheer = 0;
   final _Faction faction;
   final int cloth;
   final int trim;
@@ -156,12 +206,16 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   static const double g = 900;
 
   // ---- army tuning
-  static const double _armySpeed = 50; // px / second
-  static const double _armyGroundFrac = 0.82; // where the feet walk (fraction of height)
-  static const double _armyGap = 4; // seconds between armies
-  static const double _cheerLen = 1.8; // seconds of the war cry
+  static const double _armySpeed = 50;
+  static const double _armyGroundFrac = 0.82;
+  static const double _armyGap = 4;
+  static const double _cheerLen = 1.8;
   static const List<int> _coats = [0xFF8C7360, 0xFFB7A894, 0xFF5E5148, 0xFFCBBFA8, 0xFF7A6A58];
   static const List<int> _hairs = [0xFFC9A96A, 0xFF6B4F3A, 0xFFA0522D, 0xFF3E3028];
+
+  // ---- fantasy props (fractions of the sky size)
+  static const List<double> _crystalX = [0.27, 0.58, 0.76];
+  static const List<int> _crystalCol = [0xFF6FD3E6, 0xFFB48CF0, 0xFF7FE0B0];
 
   final _rnd = math.Random();
   final ValueNotifier<int> _frame = ValueNotifier(0);
@@ -182,9 +236,18 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   final List<_Spark> _sparks = [];
   double _nextFlock = 4;
 
+  // fantasy
+  final List<_Dragon> _dragons = [];
+  final List<_Mote> _motes = [];
+  final List<_Burst> _bursts = [];
+  final List<double> _crystalGlow = [0, 0, 0];
+  double _nextDragon = 3;
+  double _orbGlow = 0;
+  double _campFlare = 0;
+
   _Army? _army;
   double _nextArmy = 2;
-  double _armyRaise = 0; // 0..1, how far the weapons are lifted to point
+  double _armyRaise = 0;
   bool _armyHint = false;
   _Faction? _lastFaction;
 
@@ -203,13 +266,21 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   double _lastMoveTime = 0;
   double _throwVx = 0;
   bool _hoverThing = false;
-  bool _hoverSoldier = false;
+  bool _hoverClick = false;
+
+  bool get _fantasy => widget.scene == HomeScene.fantasy;
 
   @override
   void initState() {
     super.initState();
     _ticker = createTicker(_tick)..start();
     HardwareKeyboard.instance.addHandler(_onKey);
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeSky old) {
+    super.didUpdateWidget(old);
+    if (widget.cheerSignal != old.cheerSignal) _celebrate();
   }
 
   @override
@@ -228,6 +299,21 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     return false;
   }
 
+  void _celebrate() {
+    final a = _army;
+    if (a != null) a.cheer = _cheerLen;
+    for (final d in _dragons) {
+      d.fire = 1;
+    }
+    if (_fantasy && _size != Size.zero) {
+      for (var i = 0; i < _crystalX.length; i++) {
+        _crystalBurst(i);
+      }
+      _orbGlow = 1;
+      _campFlare = 1;
+    }
+  }
+
   Offset get _origin => Offset(_size.width - 70, _size.height - 64);
 
   double _flightFor(double dist) => _weapon == _Weapon.sling ? 0.22 + dist / 2600 : 0.35 + dist / 1800;
@@ -238,13 +324,109 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   }
 
   void _ensureClouds() {
-    if (_clouds.isNotEmpty) return;
-    for (var i = 0; i < 6; i++) {
-      _clouds.add(_Cloud(
-        x: _rnd.nextDouble() * _size.width,
-        y: _size.height * (0.06 + _rnd.nextDouble() * 0.30),
-        scale: 0.7 + _rnd.nextDouble() * 0.7,
-        speed: 6 + _rnd.nextDouble() * 8,
+    if (_clouds.isEmpty) {
+      for (var i = 0; i < 6; i++) {
+        _clouds.add(_Cloud(
+          x: _rnd.nextDouble() * _size.width,
+          y: _size.height * (0.06 + _rnd.nextDouble() * 0.30),
+          scale: 0.7 + _rnd.nextDouble() * 0.7,
+          speed: 6 + _rnd.nextDouble() * 8,
+        ));
+      }
+    }
+    if (_fantasy && _motes.isEmpty) {
+      for (var i = 0; i < 26; i++) {
+        _motes.add(_Mote(
+          _rnd.nextDouble() * _size.width,
+          _size.height * (0.5 + _rnd.nextDouble() * 0.45),
+          _rnd.nextDouble() * math.pi * 2,
+          i.isEven,
+        ));
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------ fantasy helpers
+  double get _propScale => (_size.height / 850).clamp(0.75, 1.25).toDouble();
+  Offset _crystalAt(int i) => Offset(_size.width * _crystalX[i], _size.height * 0.885);
+  Offset get _towerBase => Offset(math.max(90.0, _size.width * 0.085), _size.height * 0.76);
+  Offset get _orbAt => _towerBase + Offset(0, -146 * _propScale);
+  Offset get _castleBase => Offset(_size.width * 0.86, _size.height * 0.70);
+  Offset get _fireAt => Offset(_size.width * 0.44, _size.height * 0.9);
+
+  void _burstAt(Offset at, Color c, int n) {
+    for (var i = 0; i < n && _bursts.length < 320; i++) {
+      final a = _rnd.nextDouble() * math.pi * 2;
+      final sp = 30 + _rnd.nextDouble() * 90;
+      _bursts.add(_Burst(at.dx, at.dy, math.cos(a) * sp, math.sin(a) * sp - 40, c, _now));
+    }
+  }
+
+  void _crystalBurst(int i) {
+    _crystalGlow[i] = 1;
+    _burstAt(_crystalAt(i) + Offset(0, -14 * _propScale), Color(_crystalCol[i]), 18);
+  }
+
+  void _orbBurst() {
+    _orbGlow = 1;
+    _burstAt(_orbAt, const Color(0xFFC9A6FF), 24);
+  }
+
+  void _fireFlare() {
+    _campFlare = 1;
+    _burstAt(_fireAt + Offset(0, -12 * _propScale), const Color(0xFFF7B955), 14);
+  }
+
+  _Dragon? _dragonAt(Offset p, {double slack = 0}) {
+    for (final d in _dragons) {
+      final head = Offset(d.x + (d.vx < 0 ? -1 : 1) * 34 * d.scale, d.y - 10 * d.scale);
+      if ((Offset(d.x, d.y) - p).distance < 34 * d.scale + slack || (head - p).distance < 14 * d.scale + slack) return d;
+    }
+    return null;
+  }
+
+  int _crystalIndexAt(Offset p, {double slack = 0}) {
+    for (var i = 0; i < _crystalX.length; i++) {
+      if ((_crystalAt(i) + Offset(0, -12 * _propScale) - p).distance < 20 * _propScale + slack) return i;
+    }
+    return -1;
+  }
+
+  bool _orbHit(Offset p, {double slack = 0}) => (_orbAt - p).distance < 16 * _propScale + slack;
+  bool _fireHit(Offset p, {double slack = 0}) => (_fireAt + Offset(0, -10 * _propScale) - p).distance < 20 * _propScale + slack;
+
+  void _spawnDragon() {
+    final dir = _rnd.nextBool() ? 1.0 : -1.0;
+    final y0 = _size.height * (0.08 + _rnd.nextDouble() * 0.22);
+    final sp = 55 + _rnd.nextDouble() * 30;
+    final col = _pick(const [0xFF4F7F6A, 0xFF9A4A44, 0xFF5B6B80, 0xFF8A7148, 0xFF6B5A86]);
+    final sc = 0.85 + _rnd.nextDouble() * 0.45;
+    void add(double back, double dy, double s) => _dragons.add(_Dragon(
+          x: (dir > 0 ? -150.0 : _size.width + 150) - dir * back,
+          y: y0 + dy,
+          vx: dir * sp,
+          scale: s,
+          phase: _rnd.nextDouble() * math.pi * 2,
+          color: col,
+          nextBreath: _now + 3 + _rnd.nextDouble() * 6,
+        ));
+    add(0, 0, sc);
+    if (_rnd.nextDouble() < 0.35) add(120, 28, sc * 0.6); // a young one follows
+    _nextDragon = _now + 18 + _rnd.nextDouble() * 12;
+  }
+
+  void _hurtDragon(_Dragon d) {
+    d.fire = 1;
+    d.fleeing = true;
+    d.vy = -110;
+    d.vx *= 1.9;
+    for (var i = 0; i < 8; i++) {
+      _feathers.add(_Feather(
+        x: d.x,
+        y: d.y,
+        vx: (_rnd.nextDouble() - 0.5) * 80,
+        vy: -10 + _rnd.nextDouble() * 40,
+        born: _now,
       ));
     }
   }
@@ -276,13 +458,11 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       if (rider) return r < 0.4 ? _Wpn.lance : _Wpn.saber;
       return r < 0.4 ? _Wpn.spear : _Wpn.saber;
     }
-    // mongol
     if (rider) return r < 0.5 ? _Wpn.saber : _Wpn.spear;
     return _Wpn.spear;
   }
 
   _Army _makeArmy() {
-    // never the same faction twice in a row
     var f = _pick(_Faction.values);
     if (f == _lastFaction) f = _Faction.values[(f.index + 1 + _rnd.nextInt(3)) % _Faction.values.length];
     _lastFaction = f;
@@ -291,8 +471,8 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     late double rStep, fStep;
     switch (f) {
       case _Faction.crusader:
-        riders = 3 + _rnd.nextInt(3); // 3..5
-        foot = 7 + _rnd.nextInt(4); // 7..10
+        riders = 3 + _rnd.nextInt(3);
+        foot = 7 + _rnd.nextInt(4);
         rStep = 56;
         fStep = 24;
         cloth = 0xFFE4D9BE;
@@ -300,23 +480,23 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         break;
       case _Faction.viking:
         riders = 0;
-        foot = 12 + _rnd.nextInt(5); // 12..16
+        foot = 12 + _rnd.nextInt(5);
         rStep = 0;
         fStep = 24;
         cloth = _pick(const [0xFFC2A25A, 0xFF5F7E99, 0xFF76926E, 0xFFA65A52]);
         trim = 0xFFE8DCC0;
         break;
       case _Faction.saracen:
-        riders = 4 + _rnd.nextInt(3); // 4..6
-        foot = 5 + _rnd.nextInt(4); // 5..8
+        riders = 4 + _rnd.nextInt(3);
+        foot = 5 + _rnd.nextInt(4);
         rStep = 52;
         fStep = 24;
         cloth = _pick(const [0xFF4F8A86, 0xFFE8E0C8, 0xFF4F7F57, 0xFF4F5F8A]);
         trim = 0xFFC9A24A;
         break;
       case _Faction.mongol:
-        riders = 9 + _rnd.nextInt(4); // 9..12
-        foot = _rnd.nextInt(3); // 0..2
+        riders = 9 + _rnd.nextInt(4);
+        foot = _rnd.nextInt(3);
         rStep = 44;
         fStep = 24;
         cloth = _pick(const [0xFF7A5A40, 0xFF8A4A40, 0xFF56707F]);
@@ -357,14 +537,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       ));
       dx += fStep;
     }
-    return _Army(
-      x: _size.width + 60,
-      faction: f,
-      cloth: cloth,
-      trim: trim,
-      members: members,
-      length: dx,
-    );
+    return _Army(x: _size.width + 60, faction: f, cloth: cloth, trim: trim, members: members, length: dx);
   }
 
   // ------------------------------------------------------------------ loop
@@ -399,7 +572,39 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     }
     _drops.removeWhere((d) => _now - d.born > 1.3 || d.y > _size.height);
 
-    if (!_reduce && _now >= _nextFlock) {
+    if (_fantasy) {
+      // ---- dragons
+      if (!_reduce && _now >= _nextDragon) _spawnDragon();
+      for (final d in _dragons) {
+        d.x += d.vx * dt;
+        d.y += d.vy * dt + math.sin(_now * 1.2 + d.phase) * 14 * dt;
+        d.fire = math.max(0.0, d.fire - dt * 0.9);
+        if (!d.fleeing && _now >= d.nextBreath) {
+          d.fire = 1;
+          d.nextBreath = _now + 8 + _rnd.nextDouble() * 10;
+        }
+      }
+      _dragons.removeWhere((d) => d.x < -280 || d.x > _size.width + 280 || d.y < -220);
+
+      // ---- fireflies / magic motes
+      for (final m in _motes) {
+        m.x += (math.sin(_now * 0.6 + m.phase) * 9 + 4) * dt * drift;
+        m.y += math.sin(_now * 0.9 + m.phase * 1.7) * 6 * dt * drift;
+        if (m.x > _size.width + 10) m.x = -10;
+      }
+      for (final b in _bursts) {
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.vx *= math.pow(0.4, dt).toDouble();
+        b.vy += 30 * dt;
+      }
+      _bursts.removeWhere((b) => _now - b.born > 1.4);
+      for (var i = 0; i < _crystalGlow.length; i++) {
+        _crystalGlow[i] = math.max(0.0, _crystalGlow[i] - dt * 0.8);
+      }
+      _orbGlow = math.max(0.0, _orbGlow - dt * 0.7);
+      _campFlare = math.max(0.0, _campFlare - dt * 0.8);
+    } else if (!_reduce && _now >= _nextFlock) {
       final y0 = _size.height * (0.10 + _rnd.nextDouble() * 0.18);
       final speed = 70 + _rnd.nextDouble() * 20;
       for (var i = 0; i < 3; i++) {
@@ -436,7 +641,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     _shots.removeWhere((s) => s.landed && _now - s.landedAt > (s.kind == _Weapon.bow ? 2.5 : 0.0));
     _sparks.removeWhere((sp) => _now - sp.born > 0.5);
 
-    // ---- army: one at a time, next one comes _armyGap seconds after the last left
+    // ---- army
     if (!_reduce && widget.armies) {
       final a = _army;
       if (a == null) {
@@ -452,9 +657,9 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
           m.guard = math.max(0.0, m.guard - dt);
           if (m.downLeft > 0) {
             m.downLeft = math.max(0.0, m.downLeft - dt);
-            m.lag += _armySpeed * dt; // stays where he fell while the column moves on
+            m.lag += _armySpeed * dt;
           } else if (m.lag > 0) {
-            m.lag = math.max(0.0, m.lag - _armySpeed * 0.9 * dt); // hurries to catch up
+            m.lag = math.max(0.0, m.lag - _armySpeed * 0.9 * dt);
             m.walk += dt * 1.9;
           } else {
             m.walk += dt;
@@ -493,7 +698,6 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     }
   }
 
-  /// true = knocked down, false = blocked by a raised shield
   bool _hitSoldier(_Army a, _Soldier m) {
     final hasShield = a.faction != _Faction.mongol;
     if (hasShield && m.guard > 0 && _rnd.nextDouble() < 0.55) {
@@ -504,7 +708,6 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     m.downFor = m.kind == _Kind.foot ? 2.4 : 1.6;
     m.downLeft = m.downFor;
     m.react = 0;
-    // neighbours raise their shields
     final mx = _xOf(a, m);
     for (final o in a.members) {
       if (identical(o, m)) continue;
@@ -527,6 +730,26 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     for (final b in _birds) {
       if (!b.startled && (Offset(b.x, b.y) - p).distance < 26) {
         _startle(b);
+        hit = true;
+      }
+    }
+    if (_fantasy) {
+      final d = _dragonAt(p, slack: 6);
+      if (d != null && !d.fleeing) {
+        _hurtDragon(d);
+        hit = true;
+      }
+      final ci = _crystalIndexAt(p, slack: 6);
+      if (ci >= 0) {
+        _crystalBurst(ci);
+        hit = true;
+      }
+      if (_orbHit(p, slack: 6)) {
+        _orbBurst();
+        hit = true;
+      }
+      if (_fireHit(p, slack: 6)) {
+        _fireFlare();
         hit = true;
       }
     }
@@ -567,7 +790,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   _Soldier? _soldierAt(Offset p, {double slack = 0}) {
     final a = _army;
     if (a == null) return null;
-    final order = [...a.members]..sort((x, y) => y.lane.compareTo(x.lane)); // front rank first
+    final order = [...a.members]..sort((x, y) => y.lane.compareTo(x.lane));
     for (final m in order) {
       final isFoot = m.kind == _Kind.foot;
       final k = _kFor(a, m);
@@ -575,7 +798,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       final wy = _groundAt(wx) + m.lane * _armyScale;
       Rect r;
       if (isFoot && m.downLeft > 0) {
-        r = Rect.fromLTRB(wx - 4 * k, wy - 16 * k, wx + 50 * k, wy + 2 * k); // lying on his back
+        r = Rect.fromLTRB(wx - 4 * k, wy - 16 * k, wx + 50 * k, wy + 2 * k);
       } else if (isFoot) {
         r = Rect.fromLTRB(wx - 11 * k, wy - 52 * k, wx + 11 * k, wy);
       } else {
@@ -584,6 +807,12 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       if (r.inflate(slack).contains(p)) return m;
     }
     return null;
+  }
+
+  bool _clickableAt(Offset p) {
+    if (_soldierAt(p) != null) return true;
+    if (!_fantasy) return false;
+    return _dragonAt(p) != null || _crystalIndexAt(p) >= 0 || _orbHit(p) || _fireHit(p);
   }
 
   bool _blocked(Offset global) {
@@ -614,13 +843,33 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     final s = _soldierAt(p);
     if (a != null && s != null) {
       if (s.downLeft > 0) {
-        s.downLeft = math.min(s.downLeft, 0.35); // help him up
+        s.downLeft = math.min(s.downLeft, 0.35);
       } else if (s.banner) {
-        a.cheer = _cheerLen; // war cry
+        a.cheer = _cheerLen;
       } else {
         s.react = 1;
       }
       return;
+    }
+    if (_fantasy) {
+      final d = _dragonAt(p);
+      if (d != null) {
+        d.fire = 1; // roar
+        return;
+      }
+      final ci = _crystalIndexAt(p);
+      if (ci >= 0) {
+        _crystalBurst(ci);
+        return;
+      }
+      if (_orbHit(p)) {
+        _orbBurst();
+        return;
+      }
+      if (_fireHit(p)) {
+        _fireFlare();
+        return;
+      }
     }
     final b = _birdAt(p);
     if (b != null && !b.startled) {
@@ -674,12 +923,12 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     _aim = e.localPosition;
     final blocked = _blocked(e.position);
     _aimValid = !blocked;
-    final soldier = !blocked && _soldierAt(_aim) != null;
-    final over = !blocked && !soldier && (_cloudAt(_aim) != null || _birdAt(_aim) != null);
-    if (over != _hoverThing || soldier != _hoverSoldier) {
+    final click = !blocked && _clickableAt(_aim);
+    final over = !blocked && !click && (_cloudAt(_aim) != null || _birdAt(_aim) != null);
+    if (over != _hoverThing || click != _hoverClick) {
       setState(() {
         _hoverThing = over;
-        _hoverSoldier = soldier;
+        _hoverClick = click;
       });
     }
   }
@@ -702,7 +951,6 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         ),
       );
 
-  // buton: împinge panourile în afara ecranului și înapoi
   Widget _cardsButton() {
     final hidden = widget.cardsHidden;
     return Positioned(
@@ -842,7 +1090,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         ? SystemMouseCursors.precise
         : (_held != null
             ? SystemMouseCursors.grabbing
-            : (_hoverSoldier ? SystemMouseCursors.click : (_hoverThing ? SystemMouseCursors.grab : MouseCursor.defer)));
+            : (_hoverClick ? SystemMouseCursors.click : (_hoverThing ? SystemMouseCursors.grab : MouseCursor.defer)));
 
     return LayoutBuilder(builder: (context, box) {
       _size = Size(box.maxWidth, box.maxHeight);
@@ -891,9 +1139,25 @@ class _SkyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final now = s._now;
+    final fantasy = s._fantasy;
+    final ps = s._propScale;
+
+    // ---- far props (behind the army)
+    if (fantasy) {
+      _paintCastle(canvas, s._castleBase, ps, now, dark);
+      _paintTower(canvas, s._towerBase, ps, now, s._orbGlow, dark);
+    }
 
     final army = s._army;
     if (army != null) _paintArmy(canvas, s, army, dark);
+
+    // ---- near props (in front of the army)
+    if (fantasy) {
+      for (var i = 0; i < _HomeSkyState._crystalX.length; i++) {
+        _paintCrystals(canvas, s._crystalAt(i), ps, Color(_HomeSkyState._crystalCol[i]), now + i * 1.7, s._crystalGlow[i], dark);
+      }
+      _paintCampfire(canvas, s._fireAt, ps, now, s._campFlare, dark);
+    }
 
     final cloudPaint = Paint()
       ..color = Colors.white.withOpacity(dark ? 0.12 : 0.62)
@@ -936,6 +1200,10 @@ class _SkyPainter extends CustomPainter {
       canvas.drawPath(path, bird);
     }
 
+    for (final d in s._dragons) {
+      _paintDragon(canvas, d, now, dark);
+    }
+
     for (final f in s._feathers) {
       final k = ((now - f.born) / 1.8).clamp(0.0, 1.0).toDouble();
       canvas.save();
@@ -943,9 +1211,33 @@ class _SkyPainter extends CustomPainter {
       canvas.rotate(f.rot);
       canvas.drawOval(
         Rect.fromCenter(center: Offset.zero, width: 7, height: 2.6),
-        Paint()..color = const Color(0xFF8A8F86).withOpacity(1 - k),
+        Paint()..color = (fantasy ? const Color(0xFF7A8C7E) : const Color(0xFF8A8F86)).withOpacity(1 - k),
       );
       canvas.restore();
+    }
+
+    if (fantasy) {
+      // fireflies / magic motes
+      for (final m in s._motes) {
+        final tw = 0.5 + 0.5 * math.sin(now * 2.1 + m.phase * 3);
+        final col = m.warm ? const Color(0xFFF4D06F) : const Color(0xFF9FE6D6);
+        canvas.drawCircle(
+          Offset(m.x, m.y),
+          4.5,
+          Paint()
+            ..color = col.withOpacity((dark ? 0.35 : 0.22) * tw)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+        );
+        canvas.drawCircle(Offset(m.x, m.y), 1.4, Paint()..color = col.withOpacity((dark ? 0.9 : 0.7) * tw));
+      }
+      for (final b in s._bursts) {
+        final k = ((now - b.born) / 1.4).clamp(0.0, 1.0).toDouble();
+        canvas.drawCircle(
+          Offset(b.x, b.y),
+          2.2 * (1 - k) + 0.8,
+          Paint()..color = b.color.withOpacity(0.9 * (1 - k)),
+        );
+      }
     }
   }
 
@@ -1038,10 +1330,370 @@ class _IconPainter extends CustomPainter {
 }
 
 // ============================================================================
+// FANTASY PROPS — all faded toward the mist so they sit inside the painting.
+// ============================================================================
+Color _mist(Color c, bool dark, [double k = 0.35]) =>
+    Color.lerp(c, dark ? const Color(0xFF9AA8AE) : const Color(0xFFE0E7E8), k)!;
+
+void _paintCastle(Canvas c, Offset base, double s, double t, bool dark) {
+  final stone = (dark ? const Color(0xFF51606C) : const Color(0xFF9AAABA)).withOpacity(dark ? 0.6 : 0.5);
+  final shade = (dark ? const Color(0xFF3F4B56) : const Color(0xFF8396A8)).withOpacity(dark ? 0.65 : 0.55);
+  final roof = (dark ? const Color(0xFF5A4C66) : const Color(0xFF7F86A8)).withOpacity(dark ? 0.65 : 0.55);
+  final glow = const Color(0xFFFFC870).withOpacity(dark ? 0.85 : 0.35);
+  final p = Paint()..color = stone;
+
+  c.save();
+  c.translate(base.dx, base.dy);
+  c.scale(s);
+
+  c.drawOval(
+    Rect.fromCenter(center: const Offset(0, 4), width: 250, height: 32),
+    Paint()
+      ..color = shade.withOpacity(0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+  );
+
+  void crenels(double l, double r, double top) {
+    for (var x = l; x < r - 2; x += 10) {
+      c.drawRect(Rect.fromLTWH(x, top - 6, 6, 6), p);
+    }
+  }
+
+  // curtain wall + keep
+  c.drawRect(const Rect.fromLTRB(-72, -36, 72, 0), p);
+  crenels(-72, 72, -36);
+  c.drawRect(const Rect.fromLTRB(-28, -80, 28, -36), Paint()..color = shade);
+  crenels(-28, 28, -80);
+
+  void tower(double cx, double h, double w) {
+    c.drawRect(Rect.fromLTRB(cx - w / 2, -h, cx + w / 2, 0), p);
+    final r = Path()
+      ..moveTo(cx - w / 2 - 4, -h)
+      ..lineTo(cx, -h - w * 1.5)
+      ..lineTo(cx + w / 2 + 4, -h)
+      ..close();
+    c.drawPath(r, Paint()..color = roof);
+    final top = Offset(cx, -h - w * 1.5);
+    c.drawLine(top, top + const Offset(0, -12), Paint()
+      ..color = shade
+      ..strokeWidth = 1.2);
+    final wave = math.sin(t * 3 + cx) * 2;
+    final flag = Path()
+      ..moveTo(top.dx, top.dy - 12)
+      ..quadraticBezierTo(top.dx + 6, top.dy - 13 + wave, top.dx + 13, top.dy - 10 + wave)
+      ..lineTo(top.dx, top.dy - 6)
+      ..close();
+    c.drawPath(flag, Paint()..color = const Color(0xFFB0574F).withOpacity(dark ? 0.65 : 0.5));
+    c.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(cx, -h * 0.62), width: 4, height: 8), const Radius.circular(2)),
+      Paint()..color = glow,
+    );
+  }
+
+  tower(-76, 92, 22);
+  tower(76, 92, 22);
+  tower(0, 112, 18);
+
+  final gate = Path()
+    ..moveTo(-10, 0)
+    ..lineTo(-10, -16)
+    ..arcToPoint(const Offset(10, -16), radius: const Radius.circular(10))
+    ..lineTo(10, 0)
+    ..close();
+  c.drawPath(gate, Paint()..color = shade);
+  for (final x in const [-14.0, 14.0]) {
+    c.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(x, -58), width: 4, height: 7), const Radius.circular(2)),
+      Paint()..color = glow,
+    );
+  }
+  if (dark) {
+    c.drawCircle(
+      const Offset(0, -50),
+      60,
+      Paint()
+        ..color = const Color(0xFFFFC870).withOpacity(0.05)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 30),
+    );
+  }
+  c.restore();
+}
+
+void _paintTower(Canvas c, Offset base, double s, double t, double glow, bool dark) {
+  final stone = (dark ? const Color(0xFF5A6470) : const Color(0xFFA7B0B8)).withOpacity(dark ? 0.65 : 0.6);
+  final line = (dark ? const Color(0xFF3E4650) : const Color(0xFF7F8A94)).withOpacity(0.55);
+  final roof = (dark ? const Color(0xFF5B4A7A) : const Color(0xFF7E6BA6)).withOpacity(dark ? 0.75 : 0.62);
+  const violet = Color(0xFFB98CFF);
+
+  c.save();
+  c.translate(base.dx, base.dy);
+  c.scale(s);
+
+  c.drawOval(
+    Rect.fromCenter(center: const Offset(0, 3), width: 70, height: 14),
+    Paint()
+      ..color = line.withOpacity(0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+  );
+
+  final body = Path()
+    ..moveTo(-15, 0)
+    ..lineTo(-11, -104)
+    ..lineTo(11, -104)
+    ..lineTo(15, 0)
+    ..close();
+  c.drawPath(body, Paint()..color = stone);
+  for (final y in const [-26.0, -52.0, -78.0]) {
+    final hw = 15 - 4 * (-y / 104);
+    c.drawLine(Offset(-hw, y), Offset(hw, y), Paint()
+      ..color = line
+      ..strokeWidth = 1);
+  }
+  // windows
+  for (final y in const [-36.0, -68.0]) {
+    c.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, y), width: 5, height: 9), const Radius.circular(2.5)),
+      Paint()..color = violet.withOpacity((dark ? 0.7 : 0.45) + 0.3 * glow),
+    );
+  }
+  // balcony + roof
+  c.drawRect(const Rect.fromLTRB(-16, -107, 16, -103), Paint()..color = line);
+  final r = Path()
+    ..moveTo(-18, -104)
+    ..quadraticBezierTo(-6, -116, 0, -142)
+    ..quadraticBezierTo(6, -116, 18, -104)
+    ..close();
+  c.drawPath(r, Paint()..color = roof);
+  // orb
+  final pulse = 0.5 + 0.5 * math.sin(t * 2.2);
+  c.drawCircle(
+    const Offset(0, -146),
+    10 + 8 * glow,
+    Paint()
+      ..color = violet.withOpacity(0.22 + 0.18 * pulse + 0.4 * glow)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
+  );
+  c.drawCircle(const Offset(0, -146), 3.2, Paint()..color = const Color(0xFFEDE3FF).withOpacity(0.9));
+  c.restore();
+}
+
+void _paintCrystals(Canvas c, Offset base, double s, Color col, double t, double glow, bool dark) {
+  final pulse = 0.5 + 0.5 * math.sin(t * 1.6);
+  c.save();
+  c.translate(base.dx, base.dy);
+  c.scale(s);
+  c.drawCircle(
+    const Offset(0, -10),
+    20 + 10 * glow,
+    Paint()
+      ..color = col.withOpacity((dark ? 0.22 : 0.14) + 0.10 * pulse + 0.35 * glow)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+  );
+  const shards = [
+    [0.0, 26.0, 8.0, 0.0],
+    [-8.0, 18.0, 6.0, -0.32],
+    [8.0, 16.0, 6.0, 0.36],
+    [-3.0, 11.0, 5.0, -0.7],
+  ];
+  final face = _mist(col, dark, 0.25).withOpacity(dark ? 0.7 : 0.62);
+  final light = Color.lerp(face, Colors.white, 0.45)!;
+  for (final sh in shards) {
+    c.save();
+    c.translate(sh[0], 0);
+    c.rotate(sh[3]);
+    final h = sh[1];
+    final w = sh[2];
+    final path = Path()
+      ..moveTo(-w / 2, 0)
+      ..lineTo(-w / 2, -h * 0.72)
+      ..lineTo(0, -h)
+      ..lineTo(w / 2, -h * 0.72)
+      ..lineTo(w / 2, 0)
+      ..close();
+    c.drawPath(path, Paint()..color = face);
+    final hl = Path()
+      ..moveTo(-w / 2, 0)
+      ..lineTo(-w / 2, -h * 0.72)
+      ..lineTo(0, -h)
+      ..lineTo(0, 0)
+      ..close();
+    c.drawPath(hl, Paint()..color = light.withOpacity(0.35));
+    c.restore();
+  }
+  c.restore();
+}
+
+void _paintCampfire(Canvas c, Offset base, double s, double t, double flare, bool dark) {
+  c.save();
+  c.translate(base.dx, base.dy);
+  c.scale(s);
+
+  c.drawCircle(
+    const Offset(0, -8),
+    26 + 12 * flare,
+    Paint()
+      ..color = const Color(0xFFF7A54A).withOpacity((dark ? 0.25 : 0.14) + 0.2 * flare)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
+  );
+  // smoke
+  for (var j = 0; j < 3; j++) {
+    final k = (t * 0.35 + j / 3) % 1.0;
+    c.drawCircle(
+      Offset(math.sin(k * 6 + j) * 6, -(22 + 64 * k)),
+      4 + 9 * k,
+      Paint()
+        ..color = (dark ? const Color(0xFFB8C0C6) : const Color(0xFF9AA3AA)).withOpacity(0.16 * (1 - k))
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
+  }
+  // logs + stones
+  final log = Paint()
+    ..color = _mist(const Color(0xFF6E543E), dark, 0.25)
+    ..strokeWidth = 3.4
+    ..strokeCap = StrokeCap.round;
+  c.drawLine(const Offset(-12, 0), const Offset(10, -5), log);
+  c.drawLine(const Offset(12, 0), const Offset(-10, -5), log);
+  for (final x in const [-15.0, -8.0, 0.0, 8.0, 15.0]) {
+    c.drawOval(Rect.fromCenter(center: Offset(x, 1), width: 7, height: 4), Paint()..color = _mist(const Color(0xFF7D838A), dark, 0.3));
+  }
+  // flames
+  const cols = [Color(0xFFE8663D), Color(0xFFF4A340), Color(0xFFF7D46B)];
+  for (var i = 0; i < 3; i++) {
+    final h = 13 + 4 * math.sin(t * 9 + i * 2.1) + 14 * flare - i * 2.5;
+    final w = 9.0 - i * 2;
+    final sway = math.sin(t * 5 + i) * 1.6;
+    final f = Path()
+      ..moveTo(-w, -3)
+      ..quadraticBezierTo(-w * 0.6, -h * 0.6, sway, -h)
+      ..quadraticBezierTo(w * 0.6, -h * 0.6, w, -3)
+      ..close();
+    c.drawPath(f, Paint()..color = cols[i].withOpacity(dark ? 0.85 : 0.75));
+  }
+  c.restore();
+}
+
+// ---------------------------------------------------------------- dragon
+void _dragonWing(Canvas c, double tipY, Color membrane, Color bone) {
+  final p = Path()
+    ..moveTo(6, -3)
+    ..lineTo(-4, tipY * 0.55)
+    ..lineTo(-24, tipY)
+    ..quadraticBezierTo(-22, tipY * 0.45 + 2, -17, -1)
+    ..quadraticBezierTo(-12, tipY * 0.22, -7, -1)
+    ..quadraticBezierTo(-2, tipY * 0.12, 4, -1)
+    ..close();
+  c.drawPath(p, Paint()..color = membrane);
+  final b = _ps(bone, 1.6);
+  final elbow = Offset(-4, tipY * 0.55);
+  c.drawLine(const Offset(6, -3), elbow, b);
+  c.drawLine(elbow, Offset(-24, tipY), b);
+  c.drawLine(elbow, const Offset(-17, -1), _ps(bone, 1.0));
+  c.drawLine(elbow, const Offset(-7, -1), _ps(bone, 1.0));
+}
+
+void _paintDragon(Canvas canvas, _Dragon d, double now, bool dark) {
+  final base = Color(d.color);
+  final body = _mist(base, dark, 0.3);
+  final dk = _mist(Color.lerp(base, Colors.black, 0.35)!, dark, 0.3);
+  final belly = _mist(const Color(0xFFD9C79A), dark, 0.35);
+  final wingFar = _mist(Color.lerp(base, Colors.black, 0.2)!, dark, 0.4);
+  final wingNear = _mist(Color.lerp(base, Colors.white, 0.1)!, dark, 0.38);
+
+  canvas.saveLayer(
+    Rect.fromCenter(center: Offset(d.x, d.y), width: 320 * d.scale, height: 220 * d.scale),
+    Paint()..color = Colors.white.withOpacity(dark ? 0.72 : 0.84),
+  );
+  canvas.translate(d.x, d.y);
+  canvas.scale(d.vx < 0 ? -d.scale : d.scale, d.scale);
+
+  final s = math.sin(now * (d.fleeing ? 11 : 6) + d.phase);
+  final wingY = -46 + 64 * ((1 - s) / 2); // up -46 ... down +18
+
+  // far wing
+  canvas.save();
+  canvas.translate(-3, -2);
+  _dragonWing(canvas, wingY * 0.85, wingFar, dk);
+  canvas.restore();
+
+  // tail with spade
+  final tw = math.sin(now * 3 + d.phase) * 5;
+  final tail = Path()
+    ..moveTo(-18, 0)
+    ..cubicTo(-34, 5, -46, -6 + tw, -62, 2 + tw);
+  canvas.drawPath(tail, _ps(body, 4.2));
+  final tip = Offset(-62, 2 + tw);
+  final spade = Path()
+    ..moveTo(tip.dx + 2, tip.dy)
+    ..lineTo(tip.dx - 6, tip.dy - 5)
+    ..lineTo(tip.dx - 10, tip.dy)
+    ..lineTo(tip.dx - 6, tip.dy + 5)
+    ..close();
+  canvas.drawPath(spade, _pf(dk));
+
+  // body, belly, spines, legs
+  canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: 48, height: 16), _pf(body));
+  canvas.drawOval(Rect.fromCenter(center: const Offset(2, 3.5), width: 34, height: 6.5), _pf(belly));
+  for (var i = 0; i < 5; i++) {
+    final x = -14.0 + i * 7;
+    final sp = Path()
+      ..moveTo(x - 2.5, -7)
+      ..lineTo(x, -11.5)
+      ..lineTo(x + 2.5, -7)
+      ..close();
+    canvas.drawPath(sp, _pf(dk));
+  }
+  canvas.drawLine(const Offset(-9, 6), const Offset(-14, 13), _ps(dk, 2.4));
+  canvas.drawLine(const Offset(8, 6), const Offset(5, 13), _ps(dk, 2.4));
+
+  // neck + head
+  final neck = Path()
+    ..moveTo(18, -2)
+    ..quadraticBezierTo(28, -3, 32, -12);
+  canvas.drawPath(neck, _ps(body, 7));
+  final jaw = d.fire > 0 ? 3.0 * math.min(1.0, d.fire * 2) : 0.0;
+  final head = Path()
+    ..moveTo(28, -16)
+    ..lineTo(44, -13)
+    ..lineTo(46, -10)
+    ..lineTo(31, -8)
+    ..close();
+  canvas.drawPath(head, _pf(body));
+  final lower = Path()
+    ..moveTo(31, -8)
+    ..lineTo(45, -9 + jaw)
+    ..lineTo(44, -7 + jaw)
+    ..lineTo(31, -6)
+    ..close();
+  canvas.drawPath(lower, _pf(dk));
+  canvas.drawLine(const Offset(30, -15), const Offset(24, -22), _ps(dk, 1.6));
+  canvas.drawLine(const Offset(33, -15), const Offset(29, -23), _ps(dk, 1.6));
+  canvas.drawCircle(const Offset(37, -12.5), 1.3, _pf(const Color(0xFFF4D06F)));
+
+  // near wing
+  _dragonWing(canvas, wingY, wingNear, dk);
+
+  // fire breath
+  if (d.fire > 0) {
+    final reach = math.min(1.0, (1 - d.fire) * 3 + 0.2);
+    for (var i = 0; i < 9; i++) {
+      final k = i / 8;
+      final col = k < 0.35
+          ? Color.lerp(const Color(0xFFFFF0A8), const Color(0xFFF7B955), k / 0.35)!
+          : Color.lerp(const Color(0xFFF7B955), const Color(0xFFD9573A), (k - 0.35) / 0.65)!;
+      canvas.drawCircle(
+        Offset(46 + 74 * k * reach, -9 + 8 * k * k + math.sin(now * 20 + i) * 1.2),
+        2.5 + 9 * k,
+        Paint()
+          ..color = col.withOpacity(d.fire * (1 - k * 0.6) * 0.85)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 1 + 3 * k),
+      );
+    }
+  }
+  canvas.restore();
+}
+
+// ============================================================================
 // ARMIES — Crusaders, Vikings, Saracens, Mongols.
-// Everything is drawn facing +x in local coordinates; the painter mirrors it
-// so the column marches to the left. Colours are blended toward a mist tone
-// and the whole group is drawn translucent so it looks faded / painted-in.
 // ============================================================================
 class _Pal {
   _Pal(this.dark, this.faction, this.clothV, this.trimV);
@@ -1112,7 +1764,6 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   final raise = s._armyRaise;
   final order = [...a.members]..sort((p, q) => p.lane.compareTo(q.lane));
 
-  // war cry envelope (fast in, fast out)
   final cheerK = a.cheer <= 0
       ? 0.0
       : math.min(1.0, a.cheer / 0.3) * math.min(1.0, (_HomeSkyState._cheerLen - a.cheer) / 0.2);
@@ -1130,7 +1781,6 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
     final k = s._kFor(a, m);
     final isDown = m.downLeft > 0;
 
-    // ground shadow
     canvas.drawOval(
       Rect.fromCenter(
         center: Offset(wx + (isDown && isFoot ? 22 * k : 0), wy + 1),
@@ -1142,13 +1792,11 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
     );
 
-    // angle from the shoulder to the secret tab (diagonal, up and to the left)
     final shoulder = isFoot ? 35.0 : 69.0;
     final dxw = tab.dx - wx;
     final dyw = tab.dy - (wy - shoulder * k);
     var ang = math.atan2(dyw / k, -dxw / k).clamp(-0.95, -0.22).toDouble();
 
-    // effective weapon pose: point at the tab, cheer, or salute after a click
     var rr = (isDown || m.lag > 0) ? 0.0 : raise;
     if (cheerK > 0 && !isDown) {
       rr = math.max(rr, cheerK);
@@ -1166,20 +1814,17 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
 
     canvas.save();
     canvas.translate(wx, wy);
-    canvas.scale(-k, k); // mirror: marching left
+    canvas.scale(-k, k);
     if (isFoot) {
       final hop = salute * 6 + (cheerK > 0 ? math.sin(a.t * 14 + m.seed).abs() * 4 * cheerK : 0.0);
-      if (fall > 0) canvas.rotate(-1.45 * fall); // falls on his back
+      if (fall > 0) canvas.rotate(-1.45 * fall);
       canvas.translate(0, -hop);
       _drawFoot(canvas, pal, m, m.walk * 8 + m.seed, rr, ang, a.t, gk);
     } else {
-      final rear = math.max(
-        fall,
-        math.max(salute, cheerK * 0.5 * math.sin(a.t * 6 + m.seed).abs()),
-      );
+      final rear = math.max(fall, math.max(salute, cheerK * 0.5 * math.sin(a.t * 6 + m.seed).abs()));
       if (rear > 0) {
         canvas.translate(-17, 0);
-        canvas.rotate(-0.42 * rear); // rears up on the hind legs
+        canvas.rotate(-0.42 * rear);
         canvas.translate(17, 0);
       }
       _drawRider(canvas, pal, m, m.walk * 5.2 + m.seed, rr, ang, a.t, gk);
@@ -1188,7 +1833,6 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   }
   canvas.restore();
 
-  // low mist around the feet
   canvas.drawOval(
     Rect.fromLTRB(left, g - 6 * sc, right, g + 24 * sc),
     Paint()
@@ -1197,7 +1841,6 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   );
 }
 
-// ---------------------------------------------------------------- shields
 void _kite(Canvas c, _Pal p, double cx, double top, double w, double h) {
   final path = Path()
     ..moveTo(cx - w / 2, top)
@@ -1236,11 +1879,10 @@ void _shield(Canvas c, _Pal p, double cx, double top) {
       _round(c, p, Offset(cx + 0.5, top + 9), 7);
       break;
     case _Faction.mongol:
-      break; // light cavalry, no shield
+      break;
   }
 }
 
-// ---------------------------------------------------------------- torso / head
 void _torso(Canvas c, _Pal p, double top, double bottom, double belt) {
   final h = bottom - top;
   switch (p.faction) {
@@ -1320,7 +1962,7 @@ void _head(Canvas c, _Pal p, double cy, {required bool great, required int hairV
       c.drawRect(Rect.fromLTWH(4.2, cy - 1.2, 1.5, 6), _pf(p.steelDark));
       break;
     case _Faction.saracen:
-      c.drawCircle(Offset(-1, cy + 1), 5.6, _pf(p.steel)); // mail aventail
+      c.drawCircle(Offset(-1, cy + 1), 5.6, _pf(p.steel));
       c.drawCircle(Offset(2.3, cy + 1), 3.0, skin);
       final cone = Path()
         ..moveTo(-5.4, cy - 0.5)
@@ -1348,10 +1990,8 @@ void _head(Canvas c, _Pal p, double cy, {required bool great, required int hairV
   }
 }
 
-// ---------------------------------------------------------------- banners
 void _flag(Canvas c, _Pal p, double px, double top, double wave) {
   if (p.faction == _Faction.mongol) {
-    // horse-tail standard
     c.drawCircle(Offset(px, top - 2), 2.2, _pf(p.trim));
     final tuft = _ps(p.fur, 2.4);
     c.drawLine(Offset(px, top), Offset(px - 6 + wave * 0.5, top + 12), tuft);
@@ -1384,7 +2024,6 @@ void _flag(Canvas c, _Pal p, double px, double top, double wave) {
   c.drawCircle(Offset(px, top - 2), 1.7, _pf(p.steel));
 }
 
-// ---------------------------------------------------------------- weapons
 void _weapon(Canvas c, _Pal p, _Wpn w, Offset hand, double a) {
   final d = Offset(math.cos(a), math.sin(a));
   final n = Offset(-d.dy, d.dx);
@@ -1447,7 +2086,6 @@ void _weapon(Canvas c, _Pal p, _Wpn w, Offset hand, double a) {
         ..lineTo(l2.dx, l2.dy)
         ..close();
       c.drawPath(leaf, _pf(p.steel));
-      // pennon streams backwards
       final a0 = hand + d * 58;
       final a1 = hand + d * 70;
       final a2 = hand + d * 64 + const Offset(-11, 5);
@@ -1461,33 +2099,26 @@ void _weapon(Canvas c, _Pal p, _Wpn w, Offset hand, double a) {
   }
 }
 
-// ---------------------------------------------------------------- foot soldier
 void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t, double guard) {
   final sw = math.sin(ph);
   final bob = -math.cos(ph * 2).abs() * 1.1;
-  final fy = -bob; // keep the feet planted
+  final fy = -bob;
   c.save();
   c.translate(0, bob);
 
-  // far leg
   c.drawLine(const Offset(0, -16), Offset(-sw * 7, fy), _ps(Color.lerp(p.hose, Colors.black, 0.18)!, 4.0));
 
-  // banner pole (far hand)
   if (m.banner) {
     c.drawLine(const Offset(7, -6), const Offset(7, -86), _ps(p.wood, 2.0));
     _flag(c, p, 7, -84, math.sin(t * 3 + m.seed) * 2.2);
   }
 
-  // shield carried on the far arm (raised in front of the face when on guard)
   if (guard <= 0) _shield(c, p, 6, -37);
 
-  // near leg
   c.drawLine(const Offset(0, -16), Offset(sw * 7, fy), _ps(p.hose, 4.2));
 
-  // body
   _torso(c, p, -37, -14, -24);
 
-  // near arm + weapon: carried at rest, lifted to point at the tab
   const sh = Offset(1.5, -35);
   final rest = Offset(4.5 - sw * 2.5, -24);
   final dir = Offset(math.cos(ang), math.sin(ang));
@@ -1497,14 +2128,12 @@ void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang
   _weapon(c, p, m.wpn, hand, wa);
   c.drawCircle(hand, 2.1, _pf(p.skin));
 
-  // head
   _head(c, p, -41.5, great: false, hairV: m.coat, sw: sw);
 
   if (guard > 0) _shield(c, p, _lerpD(6, 10, guard), _lerpD(-37, -52, guard));
   c.restore();
 }
 
-// ---------------------------------------------------------------- rider
 void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t, double guard) {
   final coat = p.f(m.coat);
   final coatDark = Color.lerp(coat, Colors.black, 0.28)!;
@@ -1528,7 +2157,6 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
   c.save();
   c.translate(0, bob);
 
-  // far legs + tail
   leg(const Offset(14, -27), ph + math.pi, coatFar);
   leg(const Offset(-15, -27), ph, coatFar);
   final tail = Path()
@@ -1536,14 +2164,11 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
     ..quadraticBezierTo(-37, -38 + sw * 2, -34 + sw * 2, -17);
   c.drawPath(tail, _ps(coatDark, 3.4));
 
-  // body
   c.drawOval(Rect.fromCenter(center: const Offset(0, -36), width: 56, height: 25), _pf(coat));
 
-  // near legs
   leg(const Offset(14, -27), ph, coat);
   leg(const Offset(-15, -27), ph + math.pi, coat);
 
-  // horse cloth: full caparison (crusader / saracen) or a plain saddle blanket (mongol)
   if (p.faction == _Faction.mongol) {
     c.drawRRect(RRect.fromLTRBR(-11, -49, 11, -40, const Radius.circular(3)), _pf(p.cloth));
     c.drawRect(Rect.fromLTWH(-11, -42, 22, 2), _pf(p.trim));
@@ -1571,10 +2196,8 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
     }
   }
 
-  // saddle
   c.drawRRect(RRect.fromLTRBR(-6, -50, 6, -45, const Radius.circular(2)), _pf(p.wood));
 
-  // neck, mane, head, ear, eye
   c.drawLine(const Offset(15, -43), const Offset(30, -62), _ps(coat, 11.5));
   c.drawLine(const Offset(12, -48), const Offset(26, -67), _ps(coatDark, 3.2));
   c.save();
@@ -1591,17 +2214,14 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
     ..close();
   c.drawPath(ear, _pf(coatDark));
 
-  // ---- rider (seat at the saddle)
   c.save();
   c.translate(-1, -49);
 
-  // banner pole (far hand)
   if (m.banner) {
     c.drawLine(const Offset(9, 10), const Offset(9, -82), _ps(p.wood, 2.0));
     _flag(c, p, 9, -80, math.sin(t * 3 + m.seed) * 2.2);
   }
 
-  // leg, stirrup
   final legP = Path()
     ..moveTo(0, -1)
     ..lineTo(7, 9)
@@ -1609,16 +2229,13 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
   c.drawPath(legP, _ps(p.hose, 4.4));
   c.drawRect(Rect.fromCenter(center: const Offset(4, 21), width: 6, height: 2.6), _pf(p.steelDark));
 
-  // sidearm on riders who carry a spear / lance
   if (m.wpn == _Wpn.lance || m.wpn == _Wpn.spear) {
     c.drawLine(const Offset(-4, -5), const Offset(-15, 6), _ps(p.wood, 2.6));
   }
 
-  // shield + body
   if (guard <= 0) _shield(c, p, 8.5, -26);
   _torso(c, p, -24, 2, -7);
 
-  // near arm + weapon: held low at rest, lifted to point at the tab
   const sh = Offset(1.2, -21);
   const rein = Offset(8.5, -8);
   final dir = Offset(math.cos(ang), math.sin(ang));
@@ -1631,16 +2248,14 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
   _weapon(c, p, m.wpn, hand, wa);
   c.drawCircle(hand, 2.2, _pf(p.skin));
 
-  // head
   _head(c, p, -29.5, great: p.faction == _Faction.crusader, hairV: 0xFF3E3028, sw: sw);
 
   if (guard > 0) _shield(c, p, _lerpD(8.5, 11, guard), _lerpD(-26, -40, guard));
 
-  c.restore(); // rider
-  c.restore(); // bob
+  c.restore();
+  c.restore();
 }
 
-// săgeată orientată spre +x, cu vârful în origine
 void _drawArrow(Canvas c, double len, double opacity) {
   final shaft = Paint()
     ..color = const Color(0xFF6E5A45).withOpacity(opacity)

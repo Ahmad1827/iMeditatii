@@ -5,8 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
+import 'custom_navbar.dart' show CustomNavbar;
+import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
 
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
@@ -34,6 +36,18 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   bool isLoading = true;
   int completedCount = 0;
 
+  // ---- clean state
+  final ScrollController _cScroll = ScrollController();
+  final TextEditingController _cSearch = TextEditingController();
+  Set<String> _solved = {};
+  String _cDiff = 'toate';
+  bool _cUnsolved = false;
+  bool _cHidden = false;
+  int _cLimit = 25;
+  final GlobalKey _cTopKey = GlobalKey();
+  final GlobalKey _cMainKey = GlobalKey();
+  final GlobalKey _cFootKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +58,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _cScroll.dispose();
+    _cSearch.dispose();
     super.dispose();
   }
 
@@ -107,7 +123,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     if (mounted) {
       setState(() {
         allExercises = fetched;
-        availableGrades = tempGrades.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+        availableGrades = tempGrades.toList()
+          ..sort((a, b) => (int.tryParse(a) ?? 99).compareTo(int.tryParse(b) ?? 99));
 
         if (!availableGrades.contains(selectedGrade) && availableGrades.isNotEmpty) {
           selectedGrade = availableGrades.first;
@@ -132,12 +149,15 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
     int done = 0;
     final prefs = await SharedPreferences.getInstance();
+    final solved = prefs.getKeys().where((k) => prefs.get(k) == true).toSet();
     for (var ex in gradeFiltered) {
       final key = "${widget.subject}_${selectedGrade}_${ex['id']}";
-      if (prefs.getBool(key) ?? false) done++;
+      if (solved.contains(key)) done++;
     }
 
+    if (!mounted) return;
     setState(() {
+      _solved = solved;
       completedCount = done;
       availableCategories = tempCategories.toList()..sort();
 
@@ -165,9 +185,680 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   Future<bool> _isExerciseDone(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final key = "${widget.subject}_${selectedGrade}_$id";
-    return prefs.getBool(key) ?? false;
+    return prefs.get(key) == true;
   }
 
+  Future<void> _openExercise(Map<String, dynamic> ex) async {
+    final encodedMaterie = Uri.encodeComponent(widget.subject);
+    final encodedClasa = Uri.encodeComponent(selectedGrade);
+    await context.push('/exercitiu/${ex["id"]}?materie=$encodedMaterie&clasa=$encodedClasa');
+    if (mounted) _updateCategoriesAndFilter();
+  }
+
+  void _selectGrade(String g) {
+    setState(() {
+      selectedGrade = g;
+      _cLimit = 25;
+    });
+    _updateCategoriesAndFilter();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StyleBuilder(
+      builder: (context, s) => s.isClean
+          ? _buildClean(MediaQuery.of(context).size.width < 900)
+          : _buildRetro(MediaQuery.of(context).size.width < 800),
+    );
+  }
+
+  // ===========================================================================
+  // CLEAN — subject header with progress ring, categories, problem table
+  // ===========================================================================
+  static const Color _cGreen = Color(0xFF10B981);
+  static const Color _cAmber = Color(0xFFF59E0B);
+  static const Color _cRose = Color(0xFFE5484D);
+  static const Color _cBlue = Color(0xFF3B82F6);
+  static const List<Color> _catColors = [Pb.primary, _cBlue, _cAmber, _cRose, Color(0xFF8B5CF6), Color(0xFF14B8A6)];
+  static const Map<String, String> _roman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
+
+  Color get _subjectColor {
+    final l = widget.subject.toLowerCase();
+    if (l.startsWith('mat')) return _cRose;
+    if (l.contains('info')) return Pb.primary;
+    if (l.contains('engl')) return _cAmber;
+    if (l.contains('rom')) return _cBlue;
+    if (l.contains('fiz')) return const Color(0xFF8B5CF6);
+    if (l.contains('chim')) return const Color(0xFF14B8A6);
+    return Pb.primary;
+  }
+
+  String _gradeLabel(String g) => 'a ${_roman[g] ?? g}-a';
+
+  Color _catColor(String cat) {
+    final i = availableCategories.indexOf(cat);
+    return _catColors[(i < 0 ? 0 : i) % _catColors.length];
+  }
+
+  Color _diffColor(String d) {
+    final l = d.toLowerCase();
+    if (l.startsWith('u') || l.startsWith('e')) return _cGreen;
+    if (l.startsWith('m')) return _cAmber;
+    if (l.startsWith('g') || l.startsWith('h') || l.startsWith('d')) return _cRose;
+    return Pb.muted;
+  }
+
+  String _diffKey(String d) {
+    final l = d.toLowerCase();
+    if (l.startsWith('u') || l.startsWith('e')) return 'usoara';
+    if (l.startsWith('m')) return 'medie';
+    if (l.startsWith('g') || l.startsWith('h') || l.startsWith('d')) return 'grea';
+    return 'alta';
+  }
+
+  bool _isSolved(Map<String, dynamic> ex) => _solved.contains("${widget.subject}_${selectedGrade}_${ex['id']}");
+
+  BoxDecoration _cDeco({double r = 16}) => BoxDecoration(
+        color: Pb.surface,
+        borderRadius: BorderRadius.circular(r),
+        border: Border.all(color: Pb.border.withOpacity(0.7)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.06), blurRadius: 24, offset: const Offset(0, 8)),
+        ],
+      );
+
+  Widget _buildClean(bool isMobile) {
+    final inGrade = allExercises.where((e) => e['grade'] == selectedGrade).toList();
+    final rows = displayedExercises.where((e) {
+      if (_cDiff != 'toate' && _diffKey('${e['difficulty']}') != _cDiff) return false;
+      if (_cUnsolved && _isSolved(e)) return false;
+      return true;
+    }).toList();
+
+    Widget box(double max, Widget child) => Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: max),
+            child: Padding(padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24), child: child),
+          ),
+        );
+
+    Widget slide(double dx, Widget child) => AnimatedSlide(
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+          offset: _cHidden ? Offset(dx, 0) : Offset.zero,
+          child: IgnorePointer(ignoring: _cHidden, child: child),
+        );
+
+    final Widget body;
+    if (isLoading) {
+      body = Container(
+        padding: const EdgeInsets.all(28),
+        decoration: _cDeco(r: 14),
+        child: Row(
+          children: [
+            const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
+            const SizedBox(width: 12),
+            Text('Se încarcă problemele...', style: TextStyle(fontSize: 14, color: Pb.muted)),
+          ],
+        ),
+      );
+    } else if (isMobile) {
+      body = slide(
+        -1.4,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [_cCategoryChips(inGrade), const SizedBox(height: 12), _cTable(rows, isMobile)],
+        ),
+      );
+    } else {
+      body = Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 260, child: slide(-3.2, _cCategories(inGrade))),
+          const SizedBox(width: 20),
+          Expanded(child: slide(1.6, _cTable(rows, isMobile))),
+        ],
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: HomeSky(
+              scene: HomeScene.fantasy,
+              blockers: [_cTopKey, if (!_cHidden) _cMainKey, _cFootKey],
+              cardsHidden: _cHidden,
+              onToggleCards: () => setState(() => _cHidden = !_cHidden),
+              hideLabel: 'Ascunde problemele',
+              showLabel: 'Arată problemele',
+              child: Scrollbar(
+                controller: _cScroll,
+                child: SingleChildScrollView(
+                  controller: _cScroll,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: isMobile ? 20 : 36),
+                      box(1180, KeyedSubtree(key: _cTopKey, child: _LReveal(child: _cHeader(inGrade, isMobile)))),
+                      SizedBox(height: isMobile ? 14 : 20),
+                      box(1180, KeyedSubtree(key: _cMainKey, child: _LReveal(delayMs: 140, child: body))),
+                      const SizedBox(height: 56),
+                      KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- header
+  Widget _cHeader(List<Map<String, dynamic>> inGrade, bool isMobile) {
+    final c = _subjectColor;
+    final total = inGrade.length;
+    final ratio = total == 0 ? 0.0 : completedCount / total;
+
+    final ring = SizedBox(
+      width: isMobile ? 84 : 96,
+      height: isMobile ? 84 : 96,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: ratio),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, __) => CircularProgressIndicator(
+              value: v,
+              strokeWidth: 8,
+              strokeCap: StrokeCap.round,
+              backgroundColor: Pb.gray,
+              color: c,
+            ),
+          ),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('$completedCount', style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w700, color: Pb.text, height: 1)),
+                Text('din $total', style: TextStyle(fontSize: 12, color: Pb.muted)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    Widget seg(String g) {
+      final sel = selectedGrade == g;
+      final count = allExercises.where((e) => e['grade'] == g).length;
+      return _LHover(
+        onTap: () => _selectGrade(g),
+        builder: (h) => AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
+          decoration: BoxDecoration(
+            color: sel ? Pb.surface : (h ? Pb.surface.withOpacity(0.5) : Colors.transparent),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, 1))] : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_gradeLabel(g),
+                  style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
+              const SizedBox(width: 6),
+              Text('$count', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final toggle = Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(12)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [for (final g in availableGrades) seg(g)]),
+    );
+
+    final search = TextField(
+      controller: _cSearch,
+      onChanged: (v) {
+        searchQuery = v;
+        _cLimit = 25;
+        _updateCategoriesAndFilter();
+      },
+      style: TextStyle(fontSize: 14.5, color: Pb.text),
+      cursorColor: Pb.primary,
+      decoration: Pb.input(hint: 'Caută după titlu sau capitol').copyWith(
+        prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
+        prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+        suffixIcon: searchQuery.isEmpty
+            ? null
+            : IconButton(
+                icon: Icon(Icons.close, size: 17, color: Pb.muted),
+                splashRadius: 16,
+                onPressed: () {
+                  _cSearch.clear();
+                  searchQuery = '';
+                  _updateCategoriesAndFilter();
+                },
+              ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+      ),
+    );
+
+    final info = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            PbLink(text: 'Probleme', fontSize: 13, onTap: () => context.go('/exercitii')),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted)),
+            ),
+            Text(widget.subject, style: TextStyle(fontSize: 13, color: Pb.muted)),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Container(width: 10, height: 10, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                widget.subject,
+                style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5, height: 1.15),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          total == 0
+              ? 'Nu sunt încă probleme pentru clasa ${_gradeLabel(selectedGrade)}.'
+              : 'Clasa ${_gradeLabel(selectedGrade)}: $total probleme în ${availableCategories.length} capitole. '
+                  '${completedCount == total && total > 0 ? 'Le-ai rezolvat pe toate!' : 'Mai ai ${total - completedCount} de rezolvat.'}',
+          style: TextStyle(fontSize: 14.5, color: Pb.muted, height: 1.5),
+        ),
+      ],
+    );
+
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 18 : 24),
+      decoration: _cDeco(r: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          isMobile
+              ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [info, const SizedBox(height: 14), ring])
+              : Row(children: [Expanded(child: info), const SizedBox(width: 24), ring]),
+          const SizedBox(height: 18),
+          if (isMobile) ...[
+            if (availableGrades.isNotEmpty)
+              Align(alignment: Alignment.centerLeft, child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: toggle)),
+            const SizedBox(height: 10),
+            search,
+          ] else
+            Row(
+              children: [
+                if (availableGrades.isNotEmpty) toggle,
+                const SizedBox(width: 16),
+                Expanded(child: search),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- categories
+  Widget _cCategories(List<Map<String, dynamic>> inGrade) {
+    Widget row(String cat, int count, int done, Color? c) {
+      final sel = selectedCategory == cat;
+      final accent = c ?? Pb.primary;
+      return _LHover(
+        onTap: () {
+          setState(() {
+            selectedCategory = cat;
+            _cLimit = 25;
+          });
+          _updateCategoriesAndFilter();
+        },
+        builder: (h) => AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          decoration: BoxDecoration(
+            color: sel ? accent.withOpacity(0.08) : (h ? Pb.hoverBg : Colors.transparent),
+            border: Border(
+              top: BorderSide(color: Pb.border),
+              left: BorderSide(color: sel ? accent : Colors.transparent, width: 3),
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(13, 10, 14, 10),
+          child: Row(
+            children: [
+              if (c != null)
+                Container(width: 8, height: 8, decoration: BoxDecoration(color: c, shape: BoxShape.circle))
+              else
+                Icon(Icons.apps, size: 14, color: sel ? accent : Pb.muted),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  AppStyle.sentence(cat),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13.5, fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel || h ? Pb.text : Pb.muted),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(done > 0 ? '$done/$count' : '$count', style: TextStyle(fontSize: 12.5, color: done == count && count > 0 ? _cGreen : Pb.muted)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    int doneIn(Iterable<Map<String, dynamic>> l) => l.where(_isSolved).length;
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: _cDeco(r: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Row(
+              children: [
+                Icon(Icons.folder_open_outlined, size: 18, color: Pb.muted),
+                const SizedBox(width: 8),
+                Text('Capitole', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+              ],
+            ),
+          ),
+          row('Toate', inGrade.length, doneIn(inGrade), null),
+          for (final cat in availableCategories)
+            row(cat, inGrade.where((e) => e['category'] == cat).length, doneIn(inGrade.where((e) => e['category'] == cat)), _catColor(cat)),
+        ],
+      ),
+    );
+  }
+
+  Widget _cChip(String label, bool sel, VoidCallback onTap, {Color? color, IconData? icon}) {
+    final accent = color ?? Pb.link;
+    return _LHover(
+      onTap: onTap,
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+        decoration: BoxDecoration(
+          color: sel ? accent.withOpacity(0.10) : (h ? Pb.hoverBg : Colors.transparent),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: sel ? accent.withOpacity(0.6) : Pb.border),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (color != null) ...[
+              Container(width: 7, height: 7, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+              const SizedBox(width: 6),
+            ],
+            if (icon != null) ...[Icon(icon, size: 14, color: sel ? accent : Pb.muted), const SizedBox(width: 5)],
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? accent : Pb.text)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cCategoryChips(List<Map<String, dynamic>> inGrade) {
+    void pick(String c) {
+      setState(() => selectedCategory = c);
+      _updateCategoriesAndFilter();
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          Padding(padding: const EdgeInsets.only(right: 6), child: _cChip('Toate capitolele', selectedCategory == 'Toate', () => pick('Toate'))),
+          for (final cat in availableCategories)
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: _cChip(AppStyle.sentence(cat), selectedCategory == cat, () => pick(cat), color: _catColor(cat)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- table
+  Widget _cTable(List<Map<String, dynamic>> rows, bool isMobile) {
+    final shown = rows.length < _cLimit ? rows.length : _cLimit;
+    final headStyle = TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted);
+
+    final filters = Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        _cChip('Orice dificultate', _cDiff == 'toate', () => setState(() => _cDiff = 'toate')),
+        _cChip('Ușoară', _cDiff == 'usoara', () => setState(() => _cDiff = 'usoara'), color: _cGreen),
+        _cChip('Medie', _cDiff == 'medie', () => setState(() => _cDiff = 'medie'), color: _cAmber),
+        _cChip('Grea', _cDiff == 'grea', () => setState(() => _cDiff = 'grea'), color: _cRose),
+        Container(width: 1, height: 20, margin: const EdgeInsets.symmetric(horizontal: 4), color: Pb.border),
+        _cChip('Doar nerezolvate', _cUnsolved, () => setState(() => _cUnsolved = !_cUnsolved), icon: Icons.radio_button_unchecked),
+      ],
+    );
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: _cDeco(r: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        selectedCategory == 'Toate' ? 'Toate problemele' : AppStyle.sentence(selectedCategory),
+                        style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text),
+                      ),
+                    ),
+                    Text('${rows.length} probleme', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                filters,
+              ],
+            ),
+          ),
+          if (!isMobile && rows.isNotEmpty)
+            Container(
+              color: Pb.hoverBg,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(children: [
+                const SizedBox(width: 36),
+                SizedBox(width: 52, child: Text('#', style: headStyle)),
+                Expanded(child: Text('Titlu', style: headStyle)),
+                SizedBox(width: 170, child: Text('Capitol', style: headStyle)),
+                SizedBox(width: 96, child: Text('Dificultate', style: headStyle)),
+              ]),
+            ),
+          if (rows.isEmpty)
+            Container(
+              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Icon(Icons.search_off, size: 30, color: Pb.muted),
+                  const SizedBox(height: 8),
+                  Text('Nicio problemă nu se potrivește filtrelor.', style: TextStyle(fontSize: 14, color: Pb.muted)),
+                  const SizedBox(height: 12),
+                  PbButton(
+                    text: 'Resetează filtrele',
+                    variant: PbVariant.outlineSecondary,
+                    size: PbSize.sm,
+                    onPressed: () {
+                      _cSearch.clear();
+                      searchQuery = '';
+                      setState(() {
+                        _cDiff = 'toate';
+                        _cUnsolved = false;
+                        selectedCategory = 'Toate';
+                      });
+                      _updateCategoriesAndFilter();
+                    },
+                  ),
+                ],
+              ),
+            )
+          else
+            for (var i = 0; i < shown; i++) _cRow(rows[i], isMobile),
+          if (rows.isNotEmpty)
+            Container(
+              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(child: Text('Afișate $shown din ${rows.length}', style: TextStyle(fontSize: 13, color: Pb.muted))),
+                  if (rows.length > shown)
+                    PbButton(
+                      text: 'Arată mai multe',
+                      variant: PbVariant.outlinePrimary,
+                      size: PbSize.sm,
+                      onPressed: () => setState(() => _cLimit += 25),
+                    ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cRow(Map<String, dynamic> e, bool isMobile) {
+    final solved = _isSolved(e);
+    final diff = '${e['difficulty'] ?? ''}';
+    final dc = _diffColor(diff);
+    final cat = '${e['category'] ?? ''}';
+    final cc = _catColor(cat);
+
+    return _LHover(
+      onTap: () => _openExercise(e),
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        decoration: BoxDecoration(
+          color: h ? cc.withOpacity(0.06) : Colors.transparent,
+          border: Border(
+            top: BorderSide(color: Pb.border),
+            left: BorderSide(color: h ? cc : Colors.transparent, width: 3),
+          ),
+        ),
+        padding: const EdgeInsets.fromLTRB(13, 12, 16, 12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 36,
+              child: Icon(
+                solved ? Icons.check_circle : Icons.radio_button_unchecked,
+                size: 18,
+                color: solved ? _cGreen : Pb.border,
+              ),
+            ),
+            if (!isMobile) SizedBox(width: 52, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${e['title']}',
+                    maxLines: isMobile ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? cc : Pb.text),
+                  ),
+                  if (isMobile) ...[
+                    const SizedBox(height: 2),
+                    Text('#${e['id']}, ${AppStyle.sentence(cat)}, ${AppStyle.sentence(diff)}',
+                        style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                  ],
+                ],
+              ),
+            ),
+            if (!isMobile) ...[
+              SizedBox(
+                width: 170,
+                child: Row(
+                  children: [
+                    Container(width: 7, height: 7, decoration: BoxDecoration(color: cc, shape: BoxShape.circle)),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(AppStyle.sentence(cat),
+                          overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.text)),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 96,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: diff.isEmpty
+                      ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
+                      : Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                          decoration: BoxDecoration(color: dc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
+                          child: Text(AppStyle.sentence(diff),
+                              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: dc)),
+                        ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cFooter(bool isMobile) {
+    final links = [
+      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
+      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+    ];
+    final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
+
+    return Container(
+      decoration: BoxDecoration(color: Pb.surface, border: Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.symmetric(vertical: 22),
+      child: PbContainer(
+        child: isMobile
+            ? Column(children: [
+                copy,
+                const SizedBox(height: 10),
+                Wrap(spacing: 18, runSpacing: 8, alignment: WrapAlignment.center, children: links),
+              ])
+            : Row(children: [copy, const Spacer(), ...links.expand((l) => [const SizedBox(width: 22), l])]),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
   Widget _buildHeader(bool isMobile) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 32, vertical: isMobile ? 12 : 16),
@@ -227,10 +918,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                           children: availableGrades.map((g) {
                             final isSel = g == selectedGrade;
                             return GestureDetector(
-                              onTap: () {
-                                setState(() => selectedGrade = g);
-                                _updateCategoriesAndFilter();
-                              },
+                              onTap: () => _selectGrade(g),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 color: isSel
@@ -306,10 +994,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                         children: availableGrades.map((g) {
                           final isSel = g == selectedGrade;
                           return GestureDetector(
-                            onTap: () {
-                              setState(() => selectedGrade = g);
-                              _updateCategoriesAndFilter();
-                            },
+                            onTap: () => _selectGrade(g),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                               decoration: BoxDecoration(
@@ -510,66 +1195,58 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 800;
-
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, currentMode, _) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          appBar: AppBar(
-            title: Text(
-              'QUEST LOG',
-              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: isMobile ? 15 : 16),
-            ),
-            backgroundColor: AppColors.bg,
-            iconTheme: IconThemeData(color: AppColors.ink),
-            elevation: 0,
-            centerTitle: true,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(2),
-              child: Container(color: AppColors.border, height: 2),
-            ),
-          ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                _buildHeader(isMobile),
-                Expanded(
-                  child: isLoading
-                      ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
-                      : Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 1100),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 24, vertical: isMobile ? 16 : 22),
-                              child: isMobile
-                                  ? ListView(
-                                      children: [
-                                        _buildSidebar(isMobile),
-                                        const SizedBox(height: 18),
-                                        _buildSingleColumnList(isMobile),
-                                      ],
-                                    )
-                                  : Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 330, child: _buildSidebar(isMobile)),
-                                        const SizedBox(width: 28),
-                                        Expanded(child: _buildSingleColumnList(isMobile)),
-                                      ],
-                                    ),
-                            ),
-                          ),
+  Widget _buildRetro(bool isMobile) {
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      appBar: AppBar(
+        title: Text(
+          'QUEST LOG',
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 2.0, fontSize: isMobile ? 15 : 16),
+        ),
+        backgroundColor: AppColors.bg,
+        iconTheme: IconThemeData(color: AppColors.ink),
+        elevation: 0,
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: Container(color: AppColors.border, height: 2),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(isMobile),
+            Expanded(
+              child: isLoading
+                  ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
+                  : Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1100),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 24, vertical: isMobile ? 16 : 22),
+                          child: isMobile
+                              ? ListView(
+                                  children: [
+                                    _buildSidebar(isMobile),
+                                    const SizedBox(height: 18),
+                                    _buildSingleColumnList(isMobile),
+                                  ],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(width: 330, child: _buildSidebar(isMobile)),
+                                    const SizedBox(width: 28),
+                                    Expanded(child: _buildSingleColumnList(isMobile)),
+                                  ],
+                                ),
                         ),
-                ),
-              ],
+                      ),
+                    ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -608,14 +1285,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                     exercise: ex,
                     isDone: isDone,
                     isMobile: isMobile,
-                    onTap: () async {
-                      final encodedMaterie = Uri.encodeComponent(widget.subject);
-                      final encodedClasa = Uri.encodeComponent(selectedGrade);
-                      final exId = ex["id"];
-
-                      await context.push('/exercitiu/$exId?materie=$encodedMaterie&clasa=$encodedClasa');
-                      if (mounted) _updateCategoriesAndFilter();
-                    },
+                    onTap: () => _openExercise(ex),
                   );
                 },
               );
@@ -686,13 +1356,13 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
   bool _isPressed = false;
 
   List<Color> get _badgeColors => [
-    AppColors.sky,
-    AppColors.orange,
-    AppColors.purple,
-    AppColors.mustard,
-    AppColors.sunset,
-    AppColors.forest,
-  ];
+        AppColors.sky,
+        AppColors.orange,
+        AppColors.purple,
+        AppColors.mustard,
+        AppColors.sunset,
+        AppColors.forest,
+      ];
 
   Color _getBadgeColor() {
     if (widget.isDone) return AppColors.forest;
@@ -840,6 +1510,78 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// small helpers (Clean)
+// =============================================================================
+class _LHover extends StatefulWidget {
+  final Widget Function(bool hover) builder;
+  final VoidCallback? onTap;
+
+  const _LHover({required this.builder, this.onTap});
+
+  @override
+  State<_LHover> createState() => _LHoverState();
+}
+
+class _LHoverState extends State<_LHover> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: widget.builder(_hover),
+      ),
+    );
+  }
+}
+
+class _LReveal extends StatefulWidget {
+  final Widget child;
+  final int delayMs;
+
+  const _LReveal({required this.child, this.delayMs = 0});
+
+  @override
+  State<_LReveal> createState() => _LRevealState();
+}
+
+class _LRevealState extends State<_LReveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 520));
+  late final Animation<double> _a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: widget.delayMs), () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).disableAnimations) return widget.child;
+    return FadeTransition(
+      opacity: _a,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(_a),
+        child: widget.child,
       ),
     );
   }

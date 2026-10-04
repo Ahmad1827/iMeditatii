@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
 import 'custom_navbar.dart';
+import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
 
 // ----------------------------------------------------
@@ -382,7 +383,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionChecked = true;
       solutionOk = (raspunsElev == raspunsCorect);
     });
-    if (solutionOk) await _markExerciseAsDone();
+    if (solutionOk) {
+      setState(() => _cCheer++);
+      await _markExerciseAsDone();
+    }
   }
 
   Future<void> _runJudge0Checker() async {
@@ -600,25 +604,66 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   bool _cHintOpen = false;
   bool _cShowSol = false;
   final List<Map<String, dynamic>> _cSubmissions = [];
+  int _cCheer = 0; // bump -> the army cheers, dragons breathe fire
+  bool _cHidden = false; // panes slid out to show the scene
+  final GlobalKey _cHeadKey = GlobalKey();
+  final GlobalKey _cLeftKey = GlobalKey();
+  final GlobalKey _cRightKey = GlobalKey();
+
+  Widget _cSceneToggle() => Padding(
+        padding: const EdgeInsets.only(left: 8, bottom: 6),
+        child: Tooltip(
+          message: _cHidden ? 'Arată problema' : 'Ascunde panourile și privește scena',
+          child: PbButton(
+            text: _cHidden ? 'Arată problema' : 'Scena',
+            icon: _cHidden ? Icons.visibility_outlined : Icons.landscape_outlined,
+            variant: PbVariant.outlineSecondary,
+            size: PbSize.sm,
+            onPressed: () => setState(() => _cHidden = !_cHidden),
+          ),
+        ),
+      );
 
   Widget _buildClean(bool isMobile) {
-    Widget shell(Widget body) => Scaffold(
+    Widget shell(Widget body, {bool sky = true}) => Scaffold(
           backgroundColor: Pb.page,
-          body: Column(children: [const CustomNavbar(), Expanded(child: body)]),
+          body: Column(
+            children: [
+              const CustomNavbar(),
+              Expanded(
+                child: sky
+                    ? HomeSky(
+                        scene: HomeScene.fantasy,
+                        cheerSignal: _cCheer,
+                        blockers: [_cHeadKey, if (!_cHidden) _cLeftKey, if (!_cHidden) _cRightKey],
+                        child: body,
+                      )
+                    : body,
+              ),
+            ],
+          ),
         );
 
     if (exerciseData == null) {
-      return shell(const Center(child: CircularProgressIndicator(color: Pb.primary)));
+      return shell(const Center(child: CircularProgressIndicator(color: Pb.primary)), sky: false);
     }
     if (exerciseData!.isEmpty) {
       return shell(Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Problema nu a fost găsită.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Pb.text)),
-            const SizedBox(height: 12),
-            PbButton(text: 'Înapoi la probleme', onPressed: () => context.go('/exercitii')),
-          ],
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: Pb.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Pb.border.withOpacity(0.7)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Problema nu a fost găsită.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Pb.text)),
+              const SizedBox(height: 12),
+              PbButton(text: 'Înapoi la probleme', onPressed: () => context.go('/exercitii')),
+            ],
+          ),
         ),
       ));
     }
@@ -626,80 +671,117 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final tabContent = _cTab == 0 ? _cStatement() : (_cTab == 1 ? _cSolution() : _cSubmissionsList());
     final isCode = _kind == 'cod';
 
+    Widget slide(double dx, Widget child) => AnimatedSlide(
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+          offset: _cHidden ? Offset(dx, 0) : Offset.zero,
+          child: IgnorePointer(ignoring: _cHidden, child: child),
+        );
+
+    final header = KeyedSubtree(key: _cHeadKey, child: _cHeader(isMobile));
+
     if (isMobile) {
       return shell(SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _cHeader(true),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _cCard(child: Padding(padding: const EdgeInsets.all(16), child: tabContent)),
-                  const SizedBox(height: 14),
-                  if (isCode) ...[
-                    _cEditor(height: 340),
-                    const SizedBox(height: 14),
-                    _cConsole(fill: false),
-                  ] else
-                    _cAnswerPanel(),
-                  const SizedBox(height: 24),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              const SizedBox(height: 14),
+              slide(
+                -1.4,
+                KeyedSubtree(
+                  key: _cLeftKey,
+                  child: _cCard(child: Padding(padding: const EdgeInsets.all(16), child: tabContent)),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 14),
+              slide(
+                1.4,
+                KeyedSubtree(
+                  key: _cRightKey,
+                  child: isCode
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [_cEditor(height: 340), const SizedBox(height: 14), _cConsole(fill: false)],
+                        )
+                      : _cAnswerPanel(),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ));
     }
 
-    return shell(Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _cHeader(false),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
+    return shell(Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          header,
+          const SizedBox(height: 14),
+          Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
                   flex: 5,
-                  child: _cCard(
-                    fill: true,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
-                      child: tabContent,
+                  child: slide(
+                    -1.4,
+                    KeyedSubtree(
+                      key: _cLeftKey,
+                      child: _cCard(
+                        fill: true,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
+                          child: tabContent,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   flex: 6,
-                  child: isCode
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(flex: 3, child: _cEditor()),
-                            const SizedBox(height: 12),
-                            Expanded(flex: 2, child: _cConsole(fill: true)),
-                          ],
-                        )
-                      : SingleChildScrollView(child: _cAnswerPanel()),
+                  child: slide(
+                    1.4,
+                    KeyedSubtree(
+                      key: _cRightKey,
+                      child: isCode
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(flex: 3, child: _cEditor()),
+                                const SizedBox(height: 14),
+                                Expanded(flex: 2, child: _cConsole(fill: true)),
+                              ],
+                            )
+                          : SingleChildScrollView(child: _cAnswerPanel()),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ));
   }
 
   // ---------------------------------------------------------------- building blocks
   Widget _cCard({Widget? header, required Widget child, bool fill = false}) => Container(
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Pb.surface, borderRadius: Pb.radius, border: Border.all(color: Pb.border)),
+        decoration: BoxDecoration(
+          color: Pb.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Pb.border.withOpacity(0.7)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07), blurRadius: 24, offset: const Offset(0, 8)),
+          ],
+        ),
         child: Column(
           mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -765,8 +847,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
 
     return Container(
+      clipBehavior: Clip.antiAlias,
       padding: EdgeInsets.fromLTRB(isMobile ? 14 : 20, 14, isMobile ? 14 : 20, 0),
-      decoration: BoxDecoration(color: Pb.surface, border: Border(bottom: BorderSide(color: Pb.border))),
+      decoration: BoxDecoration(
+        color: Pb.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Pb.border.withOpacity(0.7)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07), blurRadius: 24, offset: const Offset(0, 8)),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -802,14 +892,22 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               ],
             ),
           const SizedBox(height: 6),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: _cTabs(
-              const ['Enunț', 'Soluție', 'Trimiterile mele'],
-              _cTab,
-              (i) => setState(() => _cTab = i),
-              counts: [null, null, _cSubmissions.isEmpty ? null : '${_cSubmissions.length}'],
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _cTabs(
+                    const ['Enunț', 'Soluție', 'Trimiterile mele'],
+                    _cTab,
+                    (i) => setState(() => _cTab = i),
+                    counts: [null, null, _cSubmissions.isEmpty ? null : '${_cSubmissions.length}'],
+                  ),
+                ),
+              ),
+              _cSceneToggle(),
+            ],
           ),
         ],
       ),
@@ -1460,7 +1558,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       });
     });
 
-    if (submit && all) await _markExerciseAsDone();
+    if (submit && all) {
+      setState(() => _cCheer++);
+      await _markExerciseAsDone();
+    }
   }
 
   // ---------------------------------------------------------------- grilă / răspuns scurt
