@@ -101,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>>? _hPosts;
   List<Map<String, dynamic>>? _hLeaders;
   bool _hLeadersError = false;
+  bool _hCardsHidden = false;
 
   static const Map<String, String> _hRoman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
 
@@ -110,8 +111,24 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
-    final catalog = _HReveal(delayMs: 140, child: _hCatalog(isMobile));
-    final posts = _HReveal(delayMs: 200, child: _hPostsCard());
+    final catalog = _HReveal(
+      delayMs: 140,
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeInOutCubic,
+        offset: _hCardsHidden ? const Offset(-3.2, 0) : Offset.zero,
+        child: IgnorePointer(ignoring: _hCardsHidden, child: _hCatalog(isMobile)),
+      ),
+    );
+    final posts = _HReveal(
+      delayMs: 200,
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeInOutCubic,
+        offset: _hCardsHidden ? const Offset(3.2, 0) : Offset.zero,
+        child: IgnorePointer(ignoring: _hCardsHidden, child: _hPostsCard()),
+      ),
+    );
 
     Widget box(double max, Widget child) => Center(
           child: ConstrainedBox(
@@ -130,7 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
           const CustomNavbar(),
           Expanded(
             child: HomeSky(
-              blockers: [_hTopKey, _hMainKey, _hFootKey],
+              blockers: [_hTopKey, if (!_hCardsHidden) _hMainKey, _hFootKey],
+              cardsHidden: _hCardsHidden,
+              onToggleCards: () => setState(() => _hCardsHidden = !_hCardsHidden),
               child: Scrollbar(
                 controller: _scrollController,
                 child: SingleChildScrollView(
