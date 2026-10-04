@@ -84,6 +84,18 @@ class _Spark {
   final double born;
 }
 
+class _Knight {
+  double x = 0;
+  double y = 0;
+  int phase = 3; // 0 walk in, 1 point, 2 walk out, 3 idle
+  double phaseT = 0;
+  double walk = 0;
+  double tip = 0;
+  bool get active => phase != 3;
+  bool get pointing => phase == 1;
+  bool get facingLeft => phase == 0 || phase == 1;
+}
+
 class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   static const double g = 900;
 
@@ -104,6 +116,22 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   final List<_Shot> _shots = [];
   final List<_Spark> _sparks = [];
   double _nextFlock = 4;
+
+  final _Knight _knight = _Knight();
+  double _nextKnight = 9; // first visit after 9 s (set to 1 to test)
+  static const double _kTargetX = 64;
+  static const double _kClimbStart = 460;
+  bool _knightHint = false;
+
+  double get _kBaseY => _size.height * 0.80;
+  double get _kTabY => _size.height * 0.5 + 58;
+
+  double _kYFor(double x) {
+    if (x >= _kClimbStart) return _kBaseY;
+    final k = ((_kClimbStart - x) / (_kClimbStart - _kTargetX)).clamp(0.0, 1.0).toDouble();
+    final e = k * k * (3 - 2 * k);
+    return _kBaseY + (_kTabY - _kBaseY) * e;
+  }
 
   _Weapon? _weapon;
   bool _drawerOpen = false;
@@ -234,6 +262,49 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     _shots.removeWhere((s) => s.landed && _now - s.landedAt > (s.kind == _Weapon.bow ? 2.5 : 0.0));
     _sparks.removeWhere((sp) => _now - sp.born > 0.5);
 
+    final kn = _knight;
+    if (!_reduce) {
+      if (!kn.active) {
+        if (_now >= _nextKnight && !_drawerOpen && _weapon == null) {
+          kn.phase = 0;
+          kn.phaseT = 0;
+          kn.x = _size.width + 40;
+          kn.y = _kYFor(kn.x);
+        }
+      } else {
+        kn.phaseT += dt;
+        kn.walk += dt * 6.5;
+        kn.tip = math.max(0.0, kn.tip - dt * 1.6);
+        if (kn.phase == 0) {
+          kn.x -= 58 * dt;
+          kn.y = _kYFor(kn.x);
+          if (kn.x <= _kTargetX) {
+            kn.x = _kTargetX;
+            kn.y = _kYFor(kn.x);
+            kn.phase = 1;
+            kn.phaseT = 0;
+          }
+        } else if (kn.phase == 1) {
+          if (kn.phaseT > 4.8 || _drawerOpen) {
+            kn.phase = 2;
+            kn.phaseT = 0;
+          }
+        } else if (kn.phase == 2) {
+          kn.x += 58 * dt;
+          kn.y = _kYFor(kn.x);
+          if (kn.x > _size.width + 60) {
+            kn.phase = 3;
+            _nextKnight = _now + 60 + _rnd.nextDouble() * 30;
+          }
+        }
+      }
+    }
+    final hint = kn.pointing && !_drawerOpen;
+    if (hint != _knightHint) {
+      _knightHint = hint;
+      if (mounted) setState(() {});
+    }
+
     _frame.value++;
   }
 
@@ -311,6 +382,11 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       _shoot(p);
       return;
     }
+    if (_knight.active &&
+        Rect.fromCenter(center: Offset(_knight.x, _knight.y - 24), width: 40, height: 60).contains(p)) {
+      _knight.tip = 1;
+      return;
+    }
     final b = _birdAt(p);
     if (b != null && !b.startled) {
       _startle(b);
@@ -386,7 +462,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       );
 
   Widget _secretTab() {
-    final showHandle = _tabHover || _drawerOpen;
+    final showHandle = _tabHover || _drawerOpen || _knightHint;
 
     final handle = MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -534,6 +610,8 @@ class _SkyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final now = s._now;
 
+    if (s._knight.active) _paintKnight(canvas, s._knight, dark);
+
     final cloudPaint = Paint()
       ..color = Colors.white.withOpacity(dark ? 0.12 : 0.62)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14);
@@ -674,6 +752,83 @@ class _IconPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _IconPainter old) => old.kind != kind || old.color != color;
+}
+
+void _paintKnight(Canvas canvas, _Knight k, bool dark) {
+  final a = dark ? 0.78 : 0.9;
+  final armor = (dark ? const Color(0xFF8FA0A8) : const Color(0xFF6F8088)).withOpacity(a);
+  final tunic = (dark ? const Color(0xFF7FA088) : const Color(0xFF6E9577)).withOpacity(a);
+  final plume = const Color(0xFFB5645A).withOpacity(a);
+  final wood = const Color(0xFF8B6B4A).withOpacity(a);
+  final skin = const Color(0xFFD9B79A).withOpacity(a);
+
+  canvas.drawOval(
+    Rect.fromCenter(center: Offset(k.x, k.y + 1), width: 30, height: 7),
+    Paint()
+      ..color = Colors.black.withOpacity(dark ? 0.25 : 0.12)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+  );
+
+  canvas.save();
+  canvas.translate(k.x, k.y);
+  if (k.facingLeft) canvas.scale(-1, 1);
+  final walking = !k.pointing;
+  final sw = walking ? math.sin(k.walk) : 0.0;
+  canvas.translate(0, walking ? math.cos(k.walk * 2).abs() * -1.2 : 0.0);
+
+  final limb = Paint()
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = 4.2
+    ..style = PaintingStyle.stroke;
+
+  limb.color = armor.withOpacity(a * 0.75);
+  canvas.drawLine(const Offset(0, -15), Offset(-sw * 6, 0), limb);
+  limb.color = armor;
+  canvas.drawLine(const Offset(0, -15), Offset(sw * 6, 0), limb);
+
+  final shield = Path()
+    ..moveTo(-9, -33)
+    ..lineTo(-2, -33)
+    ..lineTo(-2, -22)
+    ..quadraticBezierTo(-5.5, -18, -9, -22)
+    ..close();
+  canvas.drawPath(shield, Paint()..color = plume.withOpacity(a * 0.9));
+
+  canvas.drawRRect(
+    RRect.fromRectAndRadius(const Rect.fromLTWH(-5, -35, 10, 21), const Radius.circular(4)),
+    Paint()..color = tunic,
+  );
+  canvas.drawRect(const Rect.fromLTWH(-5, -22, 10, 2), Paint()..color = wood);
+
+  final arm = Paint()
+    ..color = armor
+    ..strokeWidth = 3.6
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+  if (k.pointing) {
+    final ang = -0.32 + math.sin(k.phaseT * 3.2) * 0.06;
+    final tip = Offset(4 + math.cos(ang) * 17, -31 + math.sin(ang) * 17);
+    canvas.drawLine(const Offset(3, -31), tip, arm);
+    canvas.drawCircle(tip, 2.2, Paint()..color = skin);
+  } else {
+    canvas.drawLine(const Offset(3, -31), Offset(3 - sw * 5, -22), arm);
+  }
+
+  // head: lifts a bit when tipped
+  final lift = k.tip > 0 ? -3.5 * math.sin(k.tip * math.pi) : 0.0;
+  canvas.save();
+  canvas.translate(0, lift);
+  canvas.drawCircle(const Offset(0, -41), 6.2, Paint()..color = armor);
+  canvas.drawRect(const Rect.fromLTWH(0.5, -42.2, 5.5, 1.6), Paint()..color = const Color(0xFF2E3A40).withOpacity(a));
+  final plumePath = Path()
+    ..moveTo(-1, -47)
+    ..quadraticBezierTo(-8, -53 + (walking ? sw * 1.5 : 0), -10, -45)
+    ..quadraticBezierTo(-6, -47, -1, -45)
+    ..close();
+  canvas.drawPath(plumePath, Paint()..color = plume);
+  canvas.restore();
+
+  canvas.restore();
 }
 
 // săgeată orientată spre +x, cu vârful în origine
