@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 
 import 'theme_manager.dart';
+import 'design_system.dart' show AppStyleScope;
 import 'app_colors.dart';
 
 import 'home_screen.dart';
@@ -292,7 +293,7 @@ class IMeditatiiApp extends StatelessWidget {
 
             return Stack(
               children: [
-                child ?? const SizedBox(),
+                AppStyleScope(child: child ?? const SizedBox()),
                 Positioned(
                   bottom: isMobile ? 14 : 20,
                   left: isMobile ? 14 : 20,

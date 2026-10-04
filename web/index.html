@@ -6,332 +6,307 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="iMeditatii - Învață și predă cu zâmbetul pe buze.">
+  <meta name="description" content="iMeditații - Învață și predă cu zâmbetul pe buze.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="iMeditatii">
-  <meta name="theme-color" content="#5BA8B5">
+  <meta name="apple-mobile-web-app-title" content="iMeditații">
+  <meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18191B" media="(prefers-color-scheme: dark)">
 
-  <!-- Favicon SVG Pixel Art (Carte & Scânteie) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%235BA8B5'/><rect x='4' y='6' width='24' height='20' fill='%23F9F7F1'/><rect x='6' y='8' width='20' height='16' fill='%23FFFFFF'/><path d='M15 8 h2 v16 h-2 z M8 12 h5 v2 h-5 z M19 12 h5 v2 h-5 z M8 16 h4 v2 h-4 z M19 16 h4 v2 h-4 z' fill='%232C363F'/><rect x='14' y='3' width='4' height='4' fill='%23EAB334'/></svg>">
+  <!-- Favicon: green rounded square with "iM" (same as the navbar logo) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2315803D'/><text x='16' y='21.5' font-family='Arial,Helvetica,sans-serif' font-size='15' font-weight='700' fill='white' text-anchor='middle'>iM</text></svg>">
 
-  <title>iMeditatii</title>
+  <title>iMeditații</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- Google Fonts VT323 -->
+  <!-- Same font as the app (Inter) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    :root {
+      --page-top: #EAF3EC;
+      --page-bottom: #F7F8FA;
+      --surface: #FFFFFF;
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #262626;
+      --muted: #6B7280;
+      --primary: #15803D;
+      --track: #E5E7EB;
+      --hill-1: #CFE5D4;
+      --hill-2: #B5D6BD;
+      --hill-3: #9CC7A7;
+      --cloud: rgba(255, 255, 255, 0.85);
+      --bird: #5B6B60;
+      --shadow: 0 24px 60px rgba(21, 128, 61, 0.14), 0 6px 18px rgba(0, 0, 0, 0.06);
     }
 
-    body {
-      background-color: #5BA8B5;
-      font-family: 'VT323', monospace;
-      height: 100vh;
-      width: 100vw;
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page-top: #1B2420;
+        --page-bottom: #18191B;
+        --surface: #242629;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #E6E6E6;
+        --muted: #9CA3AF;
+        --primary: #4ADE80;
+        --track: #33363A;
+        --hill-1: #1F2E26;
+        --hill-2: #1A2820;
+        --hill-3: #15211A;
+        --cloud: rgba(255, 255, 255, 0.10);
+        --bird: #B8C4BA;
+        --shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 6px 18px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      width: 100%;
       overflow: hidden;
+      background: var(--page-bottom);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     }
 
-    #retro-sky-loader {
+    #loader {
       position: fixed;
       inset: 0;
       z-index: 99999;
-      background: linear-gradient(180deg, #74C7D5 0%, #8ED6DC 40%, #BFE7EA 70%, #5BA8B5 100%);
+      background: linear-gradient(180deg, var(--page-top) 0%, var(--page-bottom) 70%);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      overflow: hidden;
+      transition: opacity .55s ease, transform .55s ease;
     }
 
-    /* Pixel Texture Grid */
-    .pixel-grid {
-      position: absolute;
-      inset: 0;
-      background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px);
-      background-size: 16px 16px;
+    #loader.fade-out {
+      opacity: 0;
+      transform: scale(1.015);
       pointer-events: none;
     }
 
-    /* Animated Floating Clouds */
+    /* ---------- soft clouds ---------- */
     .cloud {
       position: absolute;
-      background: #FFFFFF;
-      border: 3px solid #2C363F;
-      box-shadow: 4px 4px 0px rgba(44, 54, 63, 0.2);
+      height: 38px;
+      border-radius: 999px;
+      background: var(--cloud);
+      filter: blur(6px);
+      animation: drift linear infinite;
+    }
+    .cloud.c1 { width: 190px; top: 14%; left: -220px; animation-duration: 60s; }
+    .cloud.c2 { width: 260px; top: 26%; left: -300px; animation-duration: 84s; animation-delay: -30s; height: 46px; }
+    .cloud.c3 { width: 150px; top: 8%;  left: -200px; animation-duration: 70s; animation-delay: -52s; }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to   { transform: translateX(calc(100vw + 340px)); }
     }
 
-    .cloud::before, .cloud::after {
-      content: '';
+    /* ---------- birds ---------- */
+    .bird {
       position: absolute;
-      background: #FFFFFF;
-      border: 3px solid #2C363F;
+      left: -40px;
+      width: 22px;
+      height: 10px;
+      animation: fly linear infinite;
+    }
+    .bird svg { width: 100%; height: 100%; overflow: visible; }
+    .bird path {
+      fill: none;
+      stroke: var(--bird);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      opacity: .6;
+      animation: flap .5s ease-in-out infinite alternate;
+      transform-origin: center;
+    }
+    .bird.b1 { top: 20%; animation-duration: 26s; }
+    .bird.b2 { top: 24%; animation-duration: 26s; animation-delay: .9s; transform: scale(.8); }
+    .bird.b3 { top: 17%; animation-duration: 26s; animation-delay: 1.6s; transform: scale(.7); }
+
+    @keyframes fly {
+      from { transform: translateX(0); }
+      to   { transform: translateX(calc(100vw + 80px)); }
+    }
+    @keyframes flap {
+      from { transform: scaleY(1); }
+      to   { transform: scaleY(.35); }
     }
 
-    .cloud-1 {
-      width: 90px;
-      height: 28px;
-      top: 15%;
-      left: -120px;
-      animation: floatLeftToRight 22s linear infinite;
-    }
-    .cloud-1::before {
-      width: 38px;
-      height: 28px;
-      top: -16px;
-      left: 16px;
-      border-bottom: none;
-    }
-    .cloud-1::after {
-      width: 28px;
-      height: 20px;
-      top: -10px;
-      left: 46px;
-      border-bottom: none;
-    }
-
-    .cloud-2 {
-      width: 120px;
-      height: 32px;
-      top: 28%;
-      left: -150px;
-      animation: floatLeftToRight 28s linear infinite 8s;
-      opacity: 0.9;
-    }
-    .cloud-2::before {
-      width: 50px;
-      height: 36px;
-      top: -20px;
-      left: 20px;
-      border-bottom: none;
-    }
-    .cloud-2::after {
-      width: 34px;
-      height: 24px;
-      top: -14px;
-      left: 64px;
-      border-bottom: none;
-    }
-
-    .cloud-3 {
-      width: 80px;
-      height: 24px;
-      top: 10%;
-      left: -100px;
-      animation: floatLeftToRight 19s linear infinite 14s;
-    }
-    .cloud-3::before {
-      width: 32px;
-      height: 24px;
-      top: -14px;
-      left: 12px;
-      border-bottom: none;
-    }
-
-    @keyframes floatLeftToRight {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(calc(100vw + 250px)); }
-    }
-
-    /* Central Retro Card */
-    .retro-card {
-      position: relative;
-      z-index: 10;
-      background-color: #F9F7F1;
-      border: 3.5px solid #2C363F;
-      box-shadow: 6px 6px 0px #2C363F;
-      padding: 36px 40px;
-      width: 90%;
-      max-width: 440px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .logo-container {
-      background-color: #EAB334;
-      border: 3px solid #2C363F;
-      padding: 8px 24px;
-      box-shadow: 3px 3px 0px #2C363F;
-      margin-bottom: 18px;
-      transform: rotate(-1deg);
-    }
-
-    .logo-text {
-      color: #2C363F;
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      line-height: 1;
-    }
-
-    .subtitle {
-      color: #2C363F;
-      font-size: 20px;
-      font-weight: bold;
-      letter-spacing: 1.5px;
-      margin-bottom: 20px;
-    }
-
-    /* Calming Retro Progress Bar */
-    .progress-bar-border {
-      width: 100%;
-      height: 24px;
-      background: #E2DFD2;
-      border: 2.5px solid #2C363F;
-      padding: 2px;
-      position: relative;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #5BA8B5, #3C7A61);
-      animation: loadSmooth 2.2s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
-    }
-
-    @keyframes loadSmooth {
-      0% { width: 4%; }
-      35% { width: 45%; }
-      70% { width: 82%; }
-      100% { width: 100%; }
-    }
-
-    .loading-hint {
-      margin-top: 14px;
-      font-size: 16px;
-      color: #718093;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .dot-flashing {
-      display: inline-block;
-      animation: dots 1.4s infinite;
-    }
-
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
-    }
-
-    /* Animated Gentle Waves at Bottom */
-    .ocean {
+    /* ---------- hills ---------- */
+    .hills {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 160px;
-      overflow: hidden;
+      left: 0; right: 0; bottom: 0;
+      height: 36vh;
+      min-height: 190px;
       pointer-events: none;
-      z-index: 2;
+    }
+    .hills svg { position: absolute; bottom: 0; width: 100%; height: 100%; }
+
+    /* ---------- card ---------- */
+    .card {
+      position: relative;
+      z-index: 3;
+      width: min(92vw, 380px);
+      padding: 34px 32px 28px;
+      border-radius: 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      text-align: center;
+      animation: rise .7s cubic-bezier(.2, .8, .2, 1) both;
     }
 
-    .wave {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 200%;
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 19px;
+      letter-spacing: -.5px;
+      animation: bob 2.4s ease-in-out infinite;
+      box-shadow: 0 8px 20px rgba(21, 128, 61, .28);
+    }
+    @media (prefers-color-scheme: dark) { .mark { color: #052e16; } }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-4px); }
+    }
+
+    .word {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -.5px;
+      color: var(--text);
+    }
+
+    .msg {
+      min-height: 22px;
+      font-size: 14.5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      transition: opacity .25s ease;
+    }
+    .msg.swap { opacity: 0; }
+
+    .track {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--track);
+      overflow: hidden;
+    }
+    .bar {
       height: 100%;
-      background-repeat: repeat-x;
+      width: 6%;
+      border-radius: 999px;
+      background: var(--primary);
+      animation: fill 2.6s cubic-bezier(.25, .7, .3, 1) forwards;
+    }
+    .bar.done { animation: none; width: 100%; transition: width .35s ease; }
+
+    @keyframes fill {
+      0%   { width: 6%; }
+      40%  { width: 55%; }
+      75%  { width: 82%; }
+      100% { width: 92%; }
     }
 
-    .wave-back {
-      background-image: radial-gradient(circle at 25px 0, transparent 24px, #4B98A6 25px);
-      background-size: 50px 100px;
-      opacity: 0.6;
-      animation: waveMove 8s linear infinite;
-    }
-
-    .wave-mid {
-      background-image: radial-gradient(circle at 35px 0, transparent 34px, #3B8493 35px);
-      background-size: 70px 120px;
-      opacity: 0.8;
-      bottom: -15px;
-      animation: waveMoveReverse 12s linear infinite;
-    }
-
-    .wave-front {
-      background-image: radial-gradient(circle at 45px 0, transparent 44px, #2C6B78 45px);
-      background-size: 90px 140px;
-      bottom: -30px;
-      animation: waveMove 16s linear infinite;
-    }
-
-    @keyframes waveMove {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    @keyframes waveMoveReverse {
-      0% { transform: translateX(-50%); }
-      100% { transform: translateX(0); }
-    }
-
-    .fade-out {
-      opacity: 0 !important;
-      transform: translateY(-8px) scale(0.98);
-      pointer-events: none !important;
+    @media (prefers-reduced-motion: reduce) {
+      .cloud, .bird, .mark, .card { animation: none !important; }
+      .bird { display: none; }
     }
   </style>
 </head>
 <body>
-  <div id="retro-sky-loader">
-    <div class="pixel-grid"></div>
+  <div id="loader" role="status" aria-live="polite" aria-label="Se încarcă iMeditații">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
 
-    <!-- Floating Clouds -->
-    <div class="cloud cloud-1"></div>
-    <div class="cloud cloud-2"></div>
-    <div class="cloud cloud-3"></div>
+    <div class="bird b1"><svg viewBox="0 0 22 10"><path d="M1 6 Q6 0 11 5 Q16 0 21 6"/></svg></div>
+    <div class="bird b2"><svg viewBox="0 0 22 10"><path d="M1 6 Q6 0 11 5 Q16 0 21 6"/></svg></div>
+    <div class="bird b3"><svg viewBox="0 0 22 10"><path d="M1 6 Q6 0 11 5 Q16 0 21 6"/></svg></div>
 
-    <!-- Center Card -->
-    <div class="retro-card">
-      <div class="logo-container">
-        <div class="logo-text">iMEDITATII</div>
-      </div>
-      <div class="subtitle">PREGĂTIM AVENTURA TA...</div>
-      
-      <div class="progress-bar-border">
-        <div class="progress-bar-fill"></div>
-      </div>
-
-      <div class="loading-hint">SE ÎNCARCĂ LUMEA VIRTUALĂ</div>
+    <div class="hills">
+      <svg viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
+        <path fill="var(--hill-1)" d="M0 150 C200 90 380 190 620 140 C860 90 1040 40 1240 100 C1340 130 1400 120 1440 110 L1440 320 L0 320 Z"/>
+        <path fill="var(--hill-2)" d="M0 210 C220 150 420 250 700 200 C940 160 1120 120 1440 190 L1440 320 L0 320 Z"/>
+        <path fill="var(--hill-3)" d="M0 270 C260 220 520 300 800 255 C1040 220 1240 240 1440 265 L1440 320 L0 320 Z"/>
+      </svg>
     </div>
 
-    <!-- Bottom Layered Waves -->
-    <div class="ocean">
-      <div class="wave wave-back"></div>
-      <div class="wave wave-mid"></div>
-      <div class="wave wave-front"></div>
+    <div class="card">
+      <div class="logo">
+        <div class="mark">iM</div>
+        <div class="word">iMeditații</div>
+      </div>
+      <div class="msg" id="msg">Pregătim lecțiile…</div>
+      <div class="track"><div class="bar" id="bar"></div></div>
     </div>
   </div>
 
   <script>
-    // Asigură că ecranul plăcut durează minim 2.2 secunde înainte de tranziție
-    const minDelayPromise = new Promise(resolve => setTimeout(resolve, 2200));
-    
-    const flutterReadyPromise = new Promise(resolve => {
-      window.addEventListener('flutter-first-frame', resolve, { once: true });
-    });
+    (function () {
+      // friendly rotating messages
+      var msgs = [
+        'Pregătim lecțiile…',
+        'Aprindem testele automate…',
+        'Trezim dragonii…',
+        'Adunăm profesorii…',
+        'Aproape gata…'
+      ];
+      var i = 0;
+      var el = document.getElementById('msg');
+      var timer = setInterval(function () {
+        i = (i + 1) % msgs.length;
+        el.classList.add('swap');
+        setTimeout(function () { el.textContent = msgs[i]; el.classList.remove('swap'); }, 220);
+      }, 1500);
 
-    Promise.all([minDelayPromise, flutterReadyPromise]).then(() => {
-      const loader = document.getElementById('retro-sky-loader');
-      if (loader) {
-        loader.classList.add('fade-out');
-        setTimeout(() => loader.remove(), 550);
-      }
-    });
+      // keep the splash for at least 1.4 s so it never just flashes
+      var minDelay = new Promise(function (r) { setTimeout(r, 1400); });
+      var ready = new Promise(function (r) {
+        window.addEventListener('flutter-first-frame', r, { once: true });
+      });
+
+      Promise.all([minDelay, ready]).then(function () {
+        clearInterval(timer);
+        var bar = document.getElementById('bar');
+        if (bar) bar.classList.add('done');
+        setTimeout(function () {
+          var loader = document.getElementById('loader');
+          if (!loader) return;
+          loader.classList.add('fade-out');
+          setTimeout(function () { loader.remove(); }, 600);
+        }, 250);
+      });
+    })();
   </script>
 
   <script src="flutter_bootstrap.js" async></script>
