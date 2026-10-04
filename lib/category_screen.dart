@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import 'theme_manager.dart';
 import 'app_colors.dart';
+import 'clean_kit.dart';
+import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'ui_components.dart' show StyleBuilder, Pb, PbButton, PbVariant, PbSize;
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
@@ -104,25 +107,13 @@ class _CategoryTileState extends State<CategoryTile> {
               Expanded(
                 child: Text(
                   widget.title.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1.2),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  border: Border.all(color: AppColors.border, width: 2),
-                ),
-                child: Icon(
-                  Icons.arrow_forward_ios,
-                  size: 20,
-                  color: AppColors.ink,
-                ),
+                decoration: BoxDecoration(color: AppColors.cardBg, border: Border.all(color: AppColors.border, width: 2)),
+                child: Icon(Icons.arrow_forward_ios, size: 20, color: AppColors.ink),
               ),
             ],
           ),
@@ -146,12 +137,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
   List<String> categories = [];
   bool isLoading = true;
 
-  List<Color> get _tileColors => [
-    AppColors.sky,
-    AppColors.mustard,
-    AppColors.sunset,
-    AppColors.forest,
-  ];
+  // ---- clean extras
+  final Map<String, int> _counts = {};
+  final TextEditingController _search = TextEditingController();
+  String _q = '';
+  final GlobalKey _cardKey = GlobalKey();
+
+  List<Color> get _tileColors => [AppColors.sky, AppColors.mustard, AppColors.sunset, AppColors.forest];
 
   @override
   void initState() {
@@ -159,8 +151,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
     _loadCategories();
   }
 
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadCategories() async {
-    Set<String> uniqueCategories = {};
+    final Set<String> uniqueCategories = {};
 
     try {
       final String response = await rootBundle.loadString('assets/data/exercises.json');
@@ -169,8 +167,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
       if (subjectData != null) {
         final gradeData = subjectData[widget.grade.toString()];
-        if (gradeData != null) {
-          uniqueCategories.addAll((gradeData as Map<String, dynamic>).keys);
+        if (gradeData is Map<String, dynamic>) {
+          uniqueCategories.addAll(gradeData.keys);
+          gradeData.forEach((k, v) {
+            final n = v is List ? v.length : (v is Map ? v.length : 0);
+            _counts[k] = (_counts[k] ?? 0) + n;
+          });
         }
       }
     } catch (e) {
@@ -187,8 +189,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        if (data['category'] != null) {
-          uniqueCategories.add(data['category'] as String);
+        final c = data['category'];
+        if (c is String && c.isNotEmpty) {
+          uniqueCategories.add(c);
+          _counts[c] = (_counts[c] ?? 0) + 1;
         }
       }
     } catch (e) {
@@ -197,15 +201,184 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
     if (mounted) {
       setState(() {
-        categories = uniqueCategories.toList();
-        categories.sort();
+        categories = uniqueCategories.toList()..sort();
         isLoading = false;
       });
     }
   }
 
+  void _back() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/exercitii');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    return StyleBuilder(builder: (context, s) => s.isClean ? _buildClean(context) : _buildRetro(context));
+  }
+
+  // ===========================================================================
+  // CLEAN — searchable chapter list grouped A–Z with problem counts and a
+  // size bar for each chapter. Dragon scene.
+  // ===========================================================================
+  Widget _buildClean(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+    final c = ckSubjectColor(widget.subject);
+    final q = _q.trim().toLowerCase();
+    final list = categories.where((x) => q.isEmpty || x.toLowerCase().contains(q)).toList();
+    final total = _counts.values.fold(0, (a, b) => a + b);
+    final biggest = _counts.values.isEmpty ? 1 : _counts.values.reduce((a, b) => a > b ? a : b);
+
+    Widget body;
+    if (isLoading) {
+      body = const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)));
+    } else if (categories.isEmpty) {
+      body = Container(
+        padding: const EdgeInsets.all(26),
+        decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(14)),
+        child: Column(
+          children: [
+            Icon(Icons.inventory_2_outlined, size: 32, color: Pb.muted),
+            const SizedBox(height: 8),
+            Text('Încă nu există capitole pentru clasa asta.', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
+            const SizedBox(height: 4),
+            Text('Revino curând sau alege altă clasă.', style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+          ],
+        ),
+      );
+    } else if (list.isEmpty) {
+      body = Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text('Niciun capitol nu se potrivește cu „$_q”.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Pb.muted)),
+      );
+    } else {
+      final rows = <Widget>[];
+      String? letter;
+      for (final cat in list) {
+        final l = cat.isEmpty ? '#' : cat[0].toUpperCase();
+        if (l != letter) {
+          letter = l;
+          rows.add(Padding(
+            padding: const EdgeInsets.fromLTRB(4, 14, 4, 6),
+            child: Text(l, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: c, letterSpacing: 1)),
+          ));
+        }
+        final n = _counts[cat] ?? 0;
+        rows.add(CkHover(
+          onTap: () => context.go('/lista-exercitii?materie=${Uri.encodeComponent(widget.subject)}&clasa=${widget.grade}'),
+          builder: (h) => AnimatedContainer(
+            duration: const Duration(milliseconds: 140),
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: h ? c.withOpacity(0.06) : Pb.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: h ? c.withOpacity(0.5) : Pb.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(cat, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: h ? c : Pb.text)),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: LinearProgressIndicator(value: n / biggest, minHeight: 4, color: c.withOpacity(0.7), backgroundColor: Pb.gray),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Text(n == 1 ? '1 problemă' : '$n probleme', style: TextStyle(fontSize: 13, color: Pb.muted)),
+                const SizedBox(width: 8),
+                Icon(Icons.chevron_right, size: 20, color: h ? c : Pb.border),
+              ],
+            ),
+          ),
+        ));
+      }
+      body = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows);
+    }
+
+    final card = Container(
+      key: _cardKey,
+      padding: EdgeInsets.all(isMobile ? 18 : 28),
+      decoration: ckDeco(r: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(children: [PbButton(text: 'Înapoi', icon: Icons.arrow_back, variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: _back)]),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(14)),
+                child: Icon(ckSubjectIcon(widget.subject), size: 26, color: c),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${widget.subject}, clasa a ${widget.grade}-a', style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+                    Text('Capitole', style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.4)),
+                  ],
+                ),
+              ),
+              if (!isLoading && categories.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${categories.length}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Pb.text)),
+                    Text('$total probleme', style: TextStyle(fontSize: 12, color: Pb.muted)),
+                  ],
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (categories.length > 4)
+            TextField(
+              controller: _search,
+              onChanged: (v) => setState(() => _q = v),
+              style: TextStyle(fontSize: 15, color: Pb.text),
+              cursorColor: Pb.primary,
+              decoration: Pb.input(hint: 'Caută un capitol').copyWith(
+                prefixIcon: Icon(Icons.search, size: 19, color: Pb.muted),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              ),
+            ),
+          body,
+        ],
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: HomeSky(
+        scene: HomeScene.fantasy,
+        blockers: [_cardKey],
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24, vertical: isMobile ? 24 : 48),
+            child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 760), child: CkReveal(child: card)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
+  Widget _buildRetro(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeManager.themeNotifier,
       builder: (context, _, __) {
@@ -214,11 +387,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           appBar: AppBar(
             title: Text(
               "${widget.subject} // LEVEL ${widget.grade}".toUpperCase(),
-              style: TextStyle(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
-              ),
+              style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, letterSpacing: 2.0),
             ),
             backgroundColor: AppColors.bg,
             iconTheme: IconThemeData(color: AppColors.ink),
@@ -250,12 +419,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             bgColor: AppColors.cloud,
                             child: Text(
                               "NO QUEST CATEGORIES FOUND.",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.ink,
-                                letterSpacing: 1.5,
-                              ),
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.ink, letterSpacing: 1.5),
                             ),
                           ),
                         )
@@ -271,12 +435,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               child: CategoryTile(
                                 title: category,
                                 bgColor: color,
-                                onTap: () {
-                                  context.go(
-                                    '/exercitii/${widget.subject}/${widget.grade}',
-                                    extra: category,
-                                  );
-                                },
+                                onTap: () => context.go('/exercitii/${widget.subject}/${widget.grade}', extra: category),
                               ),
                             );
                           },
