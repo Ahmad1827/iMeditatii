@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'app_colors.dart';
 import 'custom_navbar.dart';
+import 'home_ambient.dart';
 import 'resources_data.dart';
 import 'ui_components.dart';
 
@@ -130,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Positioned.fill(
                   child: Image.asset(
-                    'assets/images/background.jpg',
+                    'assets/images/background.png',
                     fit: BoxFit.cover,
                     alignment: Alignment.bottomCenter,
                     filterQuality: FilterQuality.medium,
@@ -138,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 if (dark) Positioned.fill(child: ColoredBox(color: Pb.page.withOpacity(0.86))),
+                const Positioned.fill(child: IgnorePointer(child: HomeAmbient())),
                 Scrollbar(
                   controller: _scrollController,
                   child: SingleChildScrollView(
@@ -172,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+                if (!isMobile) const Positioned.fill(child: BalloonGame(contentWidth: 1272)),
               ],
             ),
           ),
