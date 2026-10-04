@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 import 'theme_manager.dart';
+import 'retro_lock.dart';
 
 // =============================================================================
 // STYLE SWITCH
@@ -176,7 +177,7 @@ class _AppStyleScopeState extends State<AppStyleScope> {
     return _AppStyleInherited(
       isClean: ThemeManager.isClean,
       isDark: AppColors.isDark,
-      child: widget.child,
+      child: RetroLock(locked: !ThemeManager.isClean, child: widget.child),
     );
   }
 }
