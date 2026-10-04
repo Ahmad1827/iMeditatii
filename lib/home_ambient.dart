@@ -98,14 +98,6 @@ class _Dragon {
   bool fleeing = false;
 }
 
-class _Mote {
-  _Mote(this.x, this.y, this.phase, this.warm);
-  double x;
-  double y;
-  final double phase;
-  final bool warm;
-}
-
 class _Drop {
   _Drop(this.x, this.y, this.born);
   double x;
@@ -216,7 +208,6 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   double _nextFlock = 4;
 
   final List<_Dragon> _dragons = [];
-  final List<_Mote> _motes = [];
   double _nextDragon = 3;
 
   _Army? _army;
@@ -298,16 +289,6 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
           y: _size.height * (0.06 + _rnd.nextDouble() * 0.30),
           scale: 0.7 + _rnd.nextDouble() * 0.7,
           speed: 6 + _rnd.nextDouble() * 8,
-        ));
-      }
-    }
-    if (_fantasy && _motes.isEmpty) {
-      for (var i = 0; i < 26; i++) {
-        _motes.add(_Mote(
-          _rnd.nextDouble() * _size.width,
-          _size.height * (0.5 + _rnd.nextDouble() * 0.45),
-          _rnd.nextDouble() * math.pi * 2,
-          i.isEven,
         ));
       }
     }
@@ -511,12 +492,6 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         }
       }
       _dragons.removeWhere((d) => d.x < -280 || d.x > _size.width + 280 || d.y < -220);
-
-      for (final m in _motes) {
-        m.x += (math.sin(_now * 0.6 + m.phase) * 9 + 4) * dt * drift;
-        m.y += math.sin(_now * 0.9 + m.phase * 1.7) * 6 * dt * drift;
-        if (m.x > _size.width + 10) m.x = -10;
-      }
     } else if (!_reduce && _now >= _nextFlock) {
       final y0 = _size.height * (0.10 + _rnd.nextDouble() * 0.18);
       final speed = 70 + _rnd.nextDouble() * 20;
@@ -1101,20 +1076,6 @@ class _SkyPainter extends CustomPainter {
       canvas.restore();
     }
 
-    if (fantasy) {
-      for (final m in s._motes) {
-        final tw = 0.5 + 0.5 * math.sin(now * 2.1 + m.phase * 3);
-        final col = m.warm ? const Color(0xFFF4D06F) : const Color(0xFF9FE6D6);
-        canvas.drawCircle(
-          Offset(m.x, m.y),
-          4.5,
-          Paint()
-            ..color = col.withOpacity((dark ? 0.35 : 0.22) * tw)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
-        );
-        canvas.drawCircle(Offset(m.x, m.y), 1.4, Paint()..color = col.withOpacity((dark ? 0.9 : 0.7) * tw));
-      }
-    }
   }
 
   @override

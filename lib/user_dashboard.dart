@@ -3,10 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
+import 'clean_kit.dart';
 import 'custom_navbar.dart';
+import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'sticky_footer.dart';
+import 'ui_components.dart' show StyleBuilder, Pb, PbButton, PbVariant, PbSize;
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
@@ -143,6 +147,57 @@ class UserDashboard extends StatefulWidget {
 }
 
 class _UserDashboardState extends State<UserDashboard> {
+  late final String _uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+  late final Future<DocumentSnapshot> _userFuture =
+      FirebaseFirestore.instance.collection('users').doc(_uid.isEmpty ? 'none' : _uid).get();
+  late final Stream<QuerySnapshot> _chatsStream = _uid.isEmpty
+      ? const Stream<QuerySnapshot>.empty()
+      : FirebaseFirestore.instance
+          .collection('chats')
+          .where('studentId', isEqualTo: _uid)
+          .orderBy('updatedAt', descending: true)
+          .snapshots();
+
+  // ---- clean state
+  final ScrollController _scroll = ScrollController();
+  final TextEditingController _search = TextEditingController();
+  String _q = '';
+  bool _hidden = false;
+  Map<String, int> _solved = {};
+  final GlobalKey _mainKey = GlobalKey();
+  final GlobalKey _footKey = GlobalKey();
+
+  // keys look like "<materie>_<clasa>_<id>"
+  static final RegExp _progressKey = RegExp(r'^(.+?)_(\d+)_(.+)$');
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSolved();
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _search.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSolved() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final map = <String, int>{};
+      for (final k in prefs.getKeys()) {
+        final m = _progressKey.firstMatch(k);
+        if (m == null || prefs.get(k) != true) continue;
+        map[m.group(1)!] = (map[m.group(1)!] ?? 0) + 1;
+      }
+      if (mounted) setState(() => _solved = map);
+    } catch (e) {
+      debugPrint('Progres: $e');
+    }
+  }
+
   String _getInitials(String name) {
     if (name.isEmpty) return '?';
     List<String> names = name.split(" ");
@@ -158,80 +213,408 @@ class _UserDashboardState extends State<UserDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isMobile = MediaQuery.of(context).size.width < 750;
-
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
-        if (user == null) {
+    return StyleBuilder(
+      builder: (context, s) {
+        if (_uid.isEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go('/materii');
+            if (mounted) context.go('/materii');
           });
           return Scaffold(
-            backgroundColor: AppColors.bg,
-            body: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+            backgroundColor: s.isClean ? Pb.page : AppColors.bg,
+            body: Center(child: CircularProgressIndicator(color: s.isClean ? Pb.primary : AppColors.sunset)),
           );
         }
+        final w = MediaQuery.of(context).size.width;
+        return s.isClean ? _buildClean(w < 880) : _buildRetro(w < 750);
+      },
+    );
+  }
 
-        final String userId = user.uid;
+  // ===========================================================================
+  // CLEAN — "Panoul meu": greeting, searchable conversations and a progress
+  // card with a level ring and per-subject bars. Dragon scene.
+  // ===========================================================================
+  static const Color _cBlue = Color(0xFF3B82F6);
+  static const Color _cAmber = Color(0xFFF59E0B);
 
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
+  String _when(Timestamp? t) {
+    if (t == null) return '';
+    final d = t.toDate();
+    final n = DateTime.now();
+    if (d.year == n.year && d.month == n.month && d.day == n.day) return DateFormat('HH:mm').format(d);
+    return DateFormat('dd.MM').format(d);
+  }
+
+  int get _total => _solved.values.fold(0, (a, b) => a + b);
+
+  Widget _buildClean(bool isMobile) {
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: HomeSky(
+              scene: HomeScene.fantasy,
+              blockers: [_mainKey, _footKey],
+              cardsHidden: _hidden,
+              onToggleCards: () => setState(() => _hidden = !_hidden),
+              hideLabel: 'Ascunde panoul',
+              showLabel: 'Arată panoul',
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _chatsStream,
+                builder: (context, snap) {
+                  final docs = snap.data?.docs ?? const <QueryDocumentSnapshot>[];
+                  final loading = snap.connectionState == ConnectionState.waiting && !snap.hasData;
+                  return StickyFooterScroll(
+                    controller: _scroll,
+                    body: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1040),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(isMobile ? 12 : 24, isMobile ? 20 : 36, isMobile ? 12 : 24, 0),
+                          child: KeyedSubtree(key: _mainKey, child: CkReveal(child: _cBody(docs, loading, isMobile))),
+                        ),
+                      ),
+                    ),
+                    footer: KeyedSubtree(key: _footKey, child: CkFooter(isMobile: isMobile)),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cBody(List<QueryDocumentSnapshot> docs, bool loading, bool isMobile) {
+    final left = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [_cChats(docs, loading)],
+    );
+    final right = _cProgress();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _cHeader(docs.length, isMobile),
+        const SizedBox(height: 14),
+        if (isMobile) ...[right, const SizedBox(height: 14), left] else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Expanded(child: left), const SizedBox(width: 14), SizedBox(width: 310, child: right)],
+          ),
+      ],
+    );
+  }
+
+  Widget _cHeader(int chats, bool isMobile) {
+    Widget stat(IconData i, String v, String l, Color c) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(color: c.withOpacity(0.09), borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const CustomNavbar(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 850),
+              Icon(i, size: 17, color: c),
+              const SizedBox(width: 8),
+              Text(v, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
+              const SizedBox(width: 5),
+              Text(l, style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+            ],
+          ),
+        );
+
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 18 : 26),
+      decoration: ckDeco(r: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Panoul meu', style: TextStyle(fontSize: 14, color: Pb.muted)),
+          const SizedBox(height: 2),
+          FutureBuilder<DocumentSnapshot>(
+            future: _userFuture,
+            builder: (context, snap) {
+              final data = (snap.data?.data() as Map<String, dynamic>?) ?? {};
+              final first = '${data['name'] ?? ''}'.trim().split(' ').first;
+              return Text(
+                first.isEmpty ? 'Bine ai revenit' : 'Bine ai revenit, $first',
+                style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5, height: 1.15),
+              );
+            },
+          ),
+          const SizedBox(height: 6),
+          Text('Continuă de unde ai rămas: exersează, citește o lecție sau scrie unui profesor.',
+              style: TextStyle(fontSize: 14.5, color: Pb.muted, height: 1.5)),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              stat(Icons.emoji_events_outlined, '$_total', _total == 1 ? 'problemă rezolvată' : 'probleme rezolvate', Pb.primary),
+              stat(Icons.forum_outlined, '$chats', chats == 1 ? 'conversație' : 'conversații', _cBlue),
+              stat(Icons.bolt, '${_total * 50}', 'XP', _cAmber),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              PbButton(text: 'Exersează', icon: Icons.play_arrow, onPressed: () => context.go('/exercitii')),
+              PbButton(text: 'Găsește profesori', icon: Icons.school_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/materii')),
+              PbButton(text: 'Profilul meu', icon: Icons.person_outline, variant: PbVariant.outlineSecondary, onPressed: () => context.go('/elev/$_uid')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Unique: level ring (every 5 problems = a level) + progress per subject.
+  Widget _cProgress() {
+    final level = _total ~/ 5 + 1;
+    final inLevel = _total % 5;
+    final entries = _solved.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final best = entries.isEmpty ? 1 : entries.first.value;
+    final rank = _total > 10 ? 'Avansat' : (_total > 3 ? 'Intermediar' : 'Începător');
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: ckDeco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ckCardTitle(Icons.trending_up, 'Progresul tău'),
+          Row(
+            children: [
+              SizedBox(
+                width: 84,
+                height: 84,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: inLevel / 5),
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.easeOutCubic,
+                      builder: (_, v, __) => CircularProgressIndicator(
+                        value: v,
+                        strokeWidth: 8,
+                        strokeCap: StrokeCap.round,
+                        backgroundColor: Pb.gray,
+                        color: Pb.primary,
+                      ),
+                    ),
+                    Center(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return SizedBox(
-                                  height: 120,
-                                  child: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
-                                );
-                              }
-                              final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
-                              final userName = data['name'] ?? 'PLAYER';
-                              return _buildHeaderSection(userName, userId, isMobile);
-                            },
-                          ),
-                          SizedBox(height: isMobile ? 32 : 48),
-                          Row(
-                            children: [
-                              Icon(Icons.forum, color: AppColors.ink, size: isMobile ? 24 : 28),
-                              const SizedBox(width: 12),
-                              Text(
-                                "MASTER LOGS (MESSAGES)",
-                                style: TextStyle(
-                                  fontSize: isMobile ? 18 : 22,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.ink,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: isMobile ? 16 : 24),
-                          _buildChatList(userId, isMobile),
+                          Text('$level', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700, color: Pb.text, height: 1)),
+                          Text('nivel', style: TextStyle(fontSize: 11.5, color: Pb.muted)),
                         ],
                       ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(rank, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
+                    const SizedBox(height: 3),
+                    Text('$inLevel din 5 spre nivelul ${level + 1}', style: TextStyle(fontSize: 13, color: Pb.muted, height: 1.4)),
+                  ],
                 ),
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 18),
+          if (entries.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+              child: Text('Nu ai rezolvat nicio problemă încă. Prima te urcă deja în clasament.',
+                  style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
+            )
+          else
+            for (final e in entries.take(5))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(ckSubjectIcon(e.key), size: 15, color: ckSubjectColor(e.key)),
+                        const SizedBox(width: 7),
+                        Expanded(child: Text(e.key, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: Pb.text))),
+                        Text('${e.value}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.text)),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: e.value / best),
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.easeOutCubic,
+                        builder: (_, v, __) => LinearProgressIndicator(value: v, minHeight: 6, color: ckSubjectColor(e.key), backgroundColor: Pb.gray),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          const SizedBox(height: 4),
+          PbButton(text: 'Continuă să exersezi', icon: Icons.arrow_forward, size: PbSize.sm, fullWidth: true, onPressed: () => context.go('/exercitii')),
+        ],
+      ),
+    );
+  }
+
+  Widget _cChats(List<QueryDocumentSnapshot> docs, bool loading) {
+    final q = _q.trim().toLowerCase();
+    final list = docs.where((d) {
+      final m = d.data() as Map<String, dynamic>;
+      if (q.isEmpty) return true;
+      return '${m['teacherName'] ?? ''} ${m['lastMessage'] ?? ''}'.toLowerCase().contains(q);
+    }).toList();
+
+    final search = TextField(
+      controller: _search,
+      onChanged: (v) => setState(() => _q = v),
+      style: TextStyle(fontSize: 14.5, color: Pb.text),
+      cursorColor: Pb.primary,
+      decoration: Pb.input(hint: 'Caută un profesor sau un mesaj').copyWith(
+        prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
+        prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+        suffixIcon: _q.isEmpty
+            ? null
+            : IconButton(
+                icon: Icon(Icons.close, size: 17, color: Pb.muted),
+                splashRadius: 16,
+                onPressed: () {
+                  _search.clear();
+                  setState(() => _q = '');
+                },
+              ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+      ),
+    );
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: ckDeco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ckCardTitle(Icons.forum_outlined, 'Mesaje cu profesorii', trailing: Text('${list.length}', style: TextStyle(fontSize: 13, color: Pb.muted))),
+                search,
+              ],
+            ),
+          ),
+          if (loading)
+            const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)))
+          else if (list.isEmpty)
+            Container(
+              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                children: [
+                  Icon(docs.isEmpty ? Icons.forum_outlined : Icons.search_off, size: 32, color: Pb.muted),
+                  const SizedBox(height: 8),
+                  Text(docs.isEmpty ? 'Nu ai scris încă niciunui profesor.' : 'Nicio conversație nu se potrivește.',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text)),
+                  const SizedBox(height: 3),
+                  Text(docs.isEmpty ? 'Alege o materie și găsește un profesor potrivit.' : 'Încearcă alt nume sau șterge căutarea.',
+                      textAlign: TextAlign.center, style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+                  if (docs.isEmpty) ...[
+                    const SizedBox(height: 14),
+                    PbButton(text: 'Găsește un profesor', icon: Icons.school_outlined, size: PbSize.sm, onPressed: () => context.go('/materii')),
+                  ],
+                ],
+              ),
+            )
+          else
+            for (final d in list)
+              _UdChatRow(
+                data: d.data() as Map<String, dynamic>,
+                when: _when((d.data() as Map<String, dynamic>)['updatedAt'] as Timestamp?),
+                onOpen: (name) => context.go('/chat/${d.id}', extra: name),
+              ),
+        ],
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
+  Widget _buildRetro(bool isMobile) {
+    final String userId = _uid;
+
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 24 : 40),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 850),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FutureBuilder<DocumentSnapshot>(
+                        future: _userFuture,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return SizedBox(
+                              height: 120,
+                              child: Center(child: CircularProgressIndicator(color: AppColors.sunset)),
+                            );
+                          }
+                          final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+                          final userName = data['name'] ?? 'PLAYER';
+                          return _buildHeaderSection(userName, userId, isMobile);
+                        },
+                      ),
+                      SizedBox(height: isMobile ? 32 : 48),
+                      Row(
+                        children: [
+                          Icon(Icons.forum, color: AppColors.ink, size: isMobile ? 24 : 28),
+                          const SizedBox(width: 12),
+                          Text(
+                            "MASTER LOGS (MESSAGES)",
+                            style: TextStyle(
+                              fontSize: isMobile ? 18 : 22,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.ink,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: isMobile ? 16 : 24),
+                      _buildChatList(userId, isMobile),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -332,11 +715,7 @@ class _UserDashboardState extends State<UserDashboard> {
 
   Widget _buildChatList(String userId, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('chats')
-          .where('studentId', isEqualTo: userId)
-          .orderBy('updatedAt', descending: true)
-          .snapshots(),
+      stream: _chatsStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Column(children: List.generate(3, (index) => _chatCardSkeleton(isMobile)));
@@ -454,6 +833,95 @@ class _UserDashboardState extends State<UserDashboard> {
   }
 }
 
+// =============================================================================
+// Clean conversation row (fetches the teacher's photo once)
+// =============================================================================
+class _UdChatRow extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final String when;
+  final void Function(String name) onOpen;
+
+  const _UdChatRow({required this.data, required this.when, required this.onOpen});
+
+  @override
+  State<_UdChatRow> createState() => _UdChatRowState();
+}
+
+class _UdChatRowState extends State<_UdChatRow> {
+  late final Future<DocumentSnapshot> _teacher = FirebaseFirestore.instance
+      .collection('teachers')
+      .doc('${widget.data['teacherId'] ?? ''}'.isEmpty ? 'none' : '${widget.data['teacherId']}')
+      .get();
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = '${widget.data['teacherName'] ?? 'Profesor'}';
+    final last = '${widget.data['lastMessage'] ?? ''}';
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: _teacher,
+      builder: (context, snap) {
+        final t = (snap.data?.data() as Map<String, dynamic>?) ?? {};
+        final name = '${t['name'] ?? fallback}';
+        final image = '${t['image'] ?? ''}';
+        final subject = '${t['subject'] ?? ''}';
+        final c = subject.isEmpty ? ckColorFor(name) : ckSubjectColor(subject);
+        return CkHover(
+          onTap: () => widget.onOpen(name),
+          builder: (h) => AnimatedContainer(
+            duration: const Duration(milliseconds: 140),
+            decoration: BoxDecoration(
+              color: h ? c.withOpacity(0.05) : Colors.transparent,
+              border: Border(top: BorderSide(color: Pb.border), left: BorderSide(color: h ? c : Colors.transparent, width: 3)),
+            ),
+            padding: const EdgeInsets.fromLTRB(15, 12, 18, 12),
+            child: Row(
+              children: [
+                CkAvatar(name: name, image: image, size: 42, color: c),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: h ? c : Pb.text))),
+                          if (subject.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                              decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                              child: Text(subject, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: c)),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(last.isEmpty ? 'Nicio replică încă' : last, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(widget.when, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                    const SizedBox(height: 4),
+                    Icon(Icons.chevron_right, size: 18, color: h ? c : Pb.border),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// =============================================================================
+// Retro chat card (original)
+// =============================================================================
 class _RetroChatCard extends StatefulWidget {
   final String name;
   final String avatarUrl;
@@ -523,9 +991,7 @@ class _RetroChatCardState extends State<_RetroChatCard> {
                   decoration: BoxDecoration(
                     color: AppColors.cloud,
                     border: Border.all(color: AppColors.border, width: 2),
-                    image: widget.avatarUrl.isNotEmpty
-                        ? DecorationImage(image: NetworkImage(widget.avatarUrl), fit: BoxFit.cover)
-                        : null,
+                    image: widget.avatarUrl.isNotEmpty ? DecorationImage(image: NetworkImage(widget.avatarUrl), fit: BoxFit.cover) : null,
                   ),
                   child: widget.avatarUrl.isEmpty
                       ? Center(

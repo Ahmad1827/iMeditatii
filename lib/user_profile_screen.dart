@@ -7,9 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
-import 'theme_manager.dart';
 import 'app_colors.dart';
+import 'clean_kit.dart';
 import 'custom_navbar.dart';
+import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'sticky_footer.dart';
+import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbAlert, PbAlertType;
 
 class RetroBlock extends StatelessWidget {
   final Widget child;
@@ -175,6 +178,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String? _contact = '';
   String? _imageUrl;
 
+  // ---- progress data (clean)
+  List<String> _solvedIds = [];
+  Set<String> _localSolved = {};
+  String _role = 'student';
+  bool _hidden = false;
+  final GlobalKey _mainKey = GlobalKey();
+  final GlobalKey _footKey = GlobalKey();
+
+  static final RegExp _progressKey = RegExp(r'^(.+?)_(\d+)_(.+)$');
+
   @override
   void initState() {
     super.initState();
@@ -187,7 +200,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     super.dispose();
   }
 
-  void _showSnackbar(String message, {bool isError = false}) {
+  void _showSnackbar(String message, {bool isError = false, String? friendly}) {
+    if (AppStyle.current.isClean) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(isError ? Icons.error_outline : Icons.check_circle_outline, color: Colors.white, size: 18),
+              const SizedBox(width: 10),
+              Expanded(child: Text(friendly ?? AppStyle.sentence(message), style: const TextStyle(color: Colors.white))),
+            ],
+          ),
+          backgroundColor: isError ? const Color(0xFFB4232A) : const Color(0xFF212529),
+          behavior: SnackBarBehavior.floating,
+          shape: const RoundedRectangleBorder(borderRadius: Pb.radius),
+        ),
+      );
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -233,15 +263,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       _bio = data['bio'] ?? 'Gata să cucerească quest-urile zilnice și să acumuleze EXP.';
       _contact = data['contact'] ?? 'N/A';
       _imageUrl = data['image'];
+      _solvedIds = ((data['solvedIds'] as List?) ?? const []).map((e) => '$e').toList();
+      _role = '${data['role'] ?? 'student'}';
     }
 
     if (widget.userId == _auth.currentUser?.uid) {
       _email = _auth.currentUser?.email ?? 'N/A';
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        _localSolved = prefs.getKeys().where((k) => _progressKey.hasMatch(k) && prefs.get(k) == true).toSet();
+      } catch (_) {}
     } else {
       _email ??= doc.data()?['email'] ?? 'N/A';
     }
 
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   Future<void> _pickImage() async {
@@ -265,9 +301,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _imageUrl = url;
         _uploading = false;
       });
-      _showSnackbar('AVATAR UPDATED.');
+      _showSnackbar('AVATAR UPDATED.', friendly: 'Poza a fost actualizată.');
     } catch (e) {
-      _showSnackbar('ERROR UPLOADING: $e', isError: true);
+      _showSnackbar('ERROR UPLOADING: $e', isError: true, friendly: 'Nu am putut încărca poza. Încearcă din nou.');
       setState(() => _uploading = false);
     }
   }
@@ -283,12 +319,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       'contact': newContact ?? _contact,
     }, SetOptions(merge: true));
 
-    _showSnackbar('PROFILE LOG UPDATED.');
+    _showSnackbar('PROFILE LOG UPDATED.', friendly: 'Profilul a fost actualizat.');
     _loadUserProfile();
+  }
+
+  Future<void> _applyPassword(String current, String next) async {
+    final user = _auth.currentUser!;
+    final cred = EmailAuthProvider.credential(email: user.email!, password: current);
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(next);
   }
 
   Future<void> _changePassword() async {
     if (widget.userId != _auth.currentUser?.uid) return;
+    if (AppStyle.current.isClean) return _cChangePassword();
+
     final currentCtrl = TextEditingController();
     final newCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
@@ -325,10 +370,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     if (ok != true) return;
     try {
-      final user = _auth.currentUser!;
-      final cred = EmailAuthProvider.credential(email: user.email!, password: currentCtrl.text.trim());
-      await user.reauthenticateWithCredential(cred);
-      await user.updatePassword(newCtrl.text.trim());
+      await _applyPassword(currentCtrl.text.trim(), newCtrl.text.trim());
       _showSnackbar('ACCESS KEY UPDATED SUCCESSFULLY.');
     } catch (e) {
       _showSnackbar('ERROR UPDATING KEY: $e', isError: true);
@@ -348,86 +390,577 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isCurrentUser = widget.userId == _auth.currentUser?.uid;
-    final isMobile = MediaQuery.of(context).size.width < 900;
+    return StyleBuilder(
+      builder: (context, s) {
+        final w = MediaQuery.of(context).size.width;
+        return s.isClean ? _buildClean(w < 900) : _buildRetro(w < 900);
+      },
+    );
+  }
 
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeNotifier,
-      builder: (context, _, __) {
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: _loading
-                    ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
-                    : Scrollbar(
-                        controller: _scrollController,
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          physics: const ClampingScrollPhysics(),
-                          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 32),
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 1080),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  if (!isMobile)
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        // Left Column: Player Identity Card
-                                        SizedBox(
-                                          width: 330,
-                                          child: _buildIdentityCard(isCurrentUser, isMobile),
-                                        ),
-                                        const SizedBox(width: 24),
-                                        // Right Column: Progression & Security
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                            children: [
-                                              _buildStatsHUD(isMobile),
-                                              const SizedBox(height: 20),
-                                              _buildProgressSection(),
-                                              if (isCurrentUser) ...[
-                                                const SizedBox(height: 20),
-                                                _buildSettingsSection(isMobile),
-                                              ],
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  else
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: [
-                                        _buildIdentityCard(isCurrentUser, isMobile),
-                                        const SizedBox(height: 20),
-                                        _buildStatsHUD(isMobile),
-                                        const SizedBox(height: 20),
-                                        _buildProgressSection(),
-                                        if (isCurrentUser) ...[
-                                          const SizedBox(height: 20),
-                                          _buildSettingsSection(isMobile),
-                                        ],
-                                      ],
-                                    ),
-                                  SizedBox(height: isMobile ? 28 : 48),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+  // ===========================================================================
+  // CLEAN — cover banner, stat tiles, ACHIEVEMENTS, progress per subject.
+  // Works for your own profile and for other players. Dragon scene.
+  // ===========================================================================
+  static const Color _cAmber = Color(0xFFF59E0B);
+  static const Color _cBlue = Color(0xFF3B82F6);
+
+  Set<String> get _allSolved => {..._solvedIds, ..._localSolved};
+
+  Map<String, int> get _bySubject {
+    final map = <String, int>{};
+    for (final id in _allSolved) {
+      final m = _progressKey.firstMatch(id);
+      if (m == null) continue;
+      map[m.group(1)!] = (map[m.group(1)!] ?? 0) + 1;
+    }
+    return map;
+  }
+
+  Widget _buildClean(bool isMobile) {
+    final isMe = widget.userId == _auth.currentUser?.uid;
+    return Scaffold(
+      backgroundColor: Pb.page,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: HomeSky(
+              scene: HomeScene.fantasy,
+              blockers: [_mainKey, _footKey],
+              cardsHidden: _hidden,
+              onToggleCards: () => setState(() => _hidden = !_hidden),
+              hideLabel: 'Ascunde profilul',
+              showLabel: 'Arată profilul',
+              child: StickyFooterScroll(
+                controller: _scrollController,
+                body: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1040),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(isMobile ? 12 : 24, isMobile ? 20 : 36, isMobile ? 12 : 24, 0),
+                      child: KeyedSubtree(
+                        key: _mainKey,
+                        child: _loading
+                            ? const Padding(padding: EdgeInsets.all(60), child: Center(child: CircularProgressIndicator(color: Pb.primary)))
+                            : CkReveal(child: _cContent(isMe, isMobile)),
                       ),
+                    ),
+                  ),
+                ),
+                footer: KeyedSubtree(key: _footKey, child: CkFooter(isMobile: isMobile)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cContent(bool isMe, bool isMobile) {
+    final by = _bySubject;
+    final total = _allSolved.length;
+    final level = total ~/ 5 + 1;
+    final rank = total > 10 ? 'Avansat' : (total > 3 ? 'Intermediar' : 'Începător');
+    final color = _role == 'teacher' ? _cBlue : Pb.primary;
+    final badges = ckAchievements(total, by);
+    final earned = badges.where((b) => b.earned).length;
+
+    Widget tile(IconData i, String label, String value, String sub, Color col) => Container(
+          padding: EdgeInsets.all(isMobile ? 12 : 16),
+          decoration: ckDeco(r: 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: col.withOpacity(0.12), borderRadius: BorderRadius.circular(9)),
+                    child: Icon(i, size: 16, color: col),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted))),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: isMobile ? 17 : 21, fontWeight: FontWeight.w700, color: Pb.text)),
+              Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Pb.muted)),
+            ],
+          ),
+        );
+
+    final stats = Row(
+      children: [
+        Expanded(child: tile(Icons.check_circle_outline, 'Rezolvate', '$total', total == 1 ? 'problemă' : 'probleme', Pb.primary)),
+        SizedBox(width: isMobile ? 8 : 12),
+        Expanded(child: tile(Icons.bolt, 'Experiență', '${total * 50} XP', 'nivelul $level', _cAmber)),
+        SizedBox(width: isMobile ? 8 : 12),
+        Expanded(child: tile(Icons.military_tech_outlined, 'Rang', rank, '$earned/${badges.length} realizări', _cBlue)),
+      ],
+    );
+
+    final achievements = Container(
+      padding: const EdgeInsets.all(20),
+      decoration: ckDeco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ckCardTitle(Icons.emoji_events_outlined, 'Realizări', trailing: Text('$earned din ${badges.length}', style: TextStyle(fontSize: 13, color: Pb.muted))),
+          CkBadgeGrid(items: badges),
+        ],
+      ),
+    );
+
+    final entries = by.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final best = entries.isEmpty ? 1 : entries.first.value;
+    final progress = Container(
+      padding: const EdgeInsets.all(20),
+      decoration: ckDeco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ckCardTitle(
+            Icons.trending_up,
+            'Progres pe materii',
+            trailing: isMe ? GestureDetector(onTap: () => context.go('/exercitii'), child: Text('Exersează', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.link))) : null,
+          ),
+          if (entries.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+              child: Text(isMe ? 'Nu ai rezolvat nicio problemă încă. Prima apare aici.' : 'Încă nicio problemă rezolvată.',
+                  style: TextStyle(fontSize: 14, color: Pb.muted)),
+            )
+          else
+            for (final e in entries)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(ckSubjectIcon(e.key), size: 16, color: ckSubjectColor(e.key)),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(e.key, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Pb.text))),
+                        Text('${e.value}', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: e.value / best),
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.easeOutCubic,
+                        builder: (_, v, __) => LinearProgressIndicator(value: v, minHeight: 7, color: ckSubjectColor(e.key), backgroundColor: Pb.gray),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+        ],
+      ),
+    );
+
+    final about = Container(
+      padding: const EdgeInsets.all(20),
+      decoration: ckDeco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ckCardTitle(Icons.person_outline, 'Despre'),
+          Text(_bio == null || _bio!.trim().isEmpty ? 'Nicio descriere încă.' : _bio!, style: TextStyle(fontSize: 14.5, color: Pb.text, height: 1.6)),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                Icon(Icons.phone_outlined, size: 18, color: Pb.muted),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    (_contact == null || _contact!.isEmpty || _contact == 'N/A') ? 'Telefon nespecificat' : _contact!,
+                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Pb.text),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final security = Container(
+      padding: const EdgeInsets.all(20),
+      decoration: ckDeco(r: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ckCardTitle(Icons.lock_outline, 'Securitate'),
+          Text('Schimbă parola contului. Îți cerem parola curentă ca să confirmi că ești tu.', style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
+          const SizedBox(height: 14),
+          PbButton(text: 'Schimbă parola', icon: Icons.lock_reset, variant: PbVariant.outlineSecondary, fullWidth: true, onPressed: _cChangePassword),
+        ],
+      ),
+    );
+
+    final cover = CkCover(
+      color: color,
+      name: _name ?? '',
+      image: _imageUrl ?? '',
+      isMobile: isMobile,
+      topRight: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(color: Colors.white.withOpacity(0.92), borderRadius: BorderRadius.circular(999)),
+        child: Text('Nivelul $level', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
+      ),
+      avatarOverlay: isMe
+          ? MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: _uploading ? null : _pickImage,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: Pb.primary, shape: BoxShape.circle, border: Border.all(color: Pb.surface, width: 3)),
+                  child: _uploading
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.photo_camera_outlined, color: Colors.white, size: 16),
+                ),
+              ),
+            )
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(_name ?? 'Elev', style: TextStyle(fontSize: isMobile ? 24 : 30, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.4)),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                child: Text(_role == 'teacher' ? 'Profesor' : 'Elev', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: color)),
+              ),
+              if ((_email ?? '').isNotEmpty && _email != 'N/A') Text(_email!, style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+            ],
+          ),
+          if (isMe) ...[
+            const SizedBox(height: 16),
+            PbButton(text: 'Editează profilul', icon: Icons.edit_outlined, variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: _cEditDialog),
+          ],
+        ],
+      ),
+    );
+
+    final left = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [stats, const SizedBox(height: 14), achievements, const SizedBox(height: 14), progress]);
+    final right = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [about, if (isMe) ...[const SizedBox(height: 14), security]]);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        cover,
+        const SizedBox(height: 14),
+        if (isMobile) ...[left, const SizedBox(height: 14), right] else
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: left), const SizedBox(width: 14), SizedBox(width: 320, child: right)]),
+      ],
+    );
+  }
+
+  Future<void> _cEditDialog() async {
+    final nameCtrl = TextEditingController(text: _name);
+    final bioCtrl = TextEditingController(text: _bio);
+    final contactCtrl = TextEditingController(text: _contact == 'N/A' ? '' : _contact);
+
+    Widget field(TextEditingController c, String label, IconData icon, {int lines = 1, TextInputType? type}) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+              const SizedBox(height: 5),
+              TextField(
+                controller: c,
+                maxLines: lines,
+                keyboardType: type,
+                style: TextStyle(fontSize: 15, color: Pb.text),
+                cursorColor: Pb.primary,
+                decoration: Pb.input().copyWith(
+                  prefixIcon: lines == 1 ? Icon(icon, size: 18, color: Pb.muted) : null,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                ),
               ),
             ],
           ),
         );
-      },
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Pb.surface,
+        insetPadding: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Pb.border)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 8, 10),
+                child: Row(
+                  children: [
+                    Expanded(child: Text('Editează profilul', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Pb.text))),
+                    IconButton(icon: Icon(Icons.close, color: Pb.muted), onPressed: () => Navigator.of(ctx).pop(false)),
+                  ],
+                ),
+              ),
+              Container(height: 1, color: Pb.border),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+                  child: Column(
+                    children: [
+                      field(nameCtrl, 'Nume complet', Icons.person_outline),
+                      field(contactCtrl, 'Telefon', Icons.phone_outlined, type: TextInputType.phone),
+                      field(bioCtrl, 'Despre tine', Icons.notes, lines: 4),
+                    ],
+                  ),
+                ),
+              ),
+              Container(height: 1, color: Pb.border),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PbButton(text: 'Renunță', variant: PbVariant.secondary, onPressed: () => Navigator.of(ctx).pop(false)),
+                    const SizedBox(width: 8),
+                    PbButton(text: 'Salvează', icon: Icons.check, onPressed: () => Navigator.of(ctx).pop(true)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (ok == true) {
+      await _saveProfile(newName: nameCtrl.text.trim(), newBio: bioCtrl.text.trim(), newContact: contactCtrl.text.trim());
+    }
+  }
+
+  Future<void> _cChangePassword() async {
+    final currentCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    String? error;
+    var saving = false;
+    var show = false;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => Dialog(
+          backgroundColor: Pb.surface,
+          insetPadding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Pb.border)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 8, 10),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text('Schimbă parola', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Pb.text))),
+                      IconButton(icon: Icon(Icons.close, color: Pb.muted), onPressed: () => Navigator.of(ctx).pop()),
+                    ],
+                  ),
+                ),
+                Container(height: 1, color: Pb.border),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Parola curentă', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+                      const SizedBox(height: 5),
+                      TextField(
+                        controller: currentCtrl,
+                        obscureText: !show,
+                        style: TextStyle(fontSize: 15, color: Pb.text),
+                        cursorColor: Pb.primary,
+                        decoration: Pb.input().copyWith(contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12)),
+                      ),
+                      const SizedBox(height: 12),
+                      Text('Parola nouă', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+                      const SizedBox(height: 5),
+                      TextField(
+                        controller: newCtrl,
+                        obscureText: !show,
+                        style: TextStyle(fontSize: 15, color: Pb.text),
+                        cursorColor: Pb.primary,
+                        decoration: Pb.input(hint: 'Cel puțin 6 caractere').copyWith(
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                          suffixIcon: IconButton(
+                            splashRadius: 18,
+                            icon: Icon(show ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 19, color: Pb.muted),
+                            onPressed: () => setLocal(() => show = !show),
+                          ),
+                        ),
+                      ),
+                      if (error != null) ...[
+                        const SizedBox(height: 12),
+                        PbAlert(type: PbAlertType.danger, icon: Icons.error_outline, child: Text(error!, style: const TextStyle(fontSize: 14))),
+                      ],
+                    ],
+                  ),
+                ),
+                Container(height: 1, color: Pb.border),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      PbButton(text: 'Renunță', variant: PbVariant.secondary, onPressed: () => Navigator.of(ctx).pop()),
+                      const SizedBox(width: 8),
+                      PbButton(
+                        text: 'Schimbă parola',
+                        icon: Icons.check,
+                        loading: saving,
+                        onPressed: saving
+                            ? null
+                            : () async {
+                                if (currentCtrl.text.isEmpty) {
+                                  setLocal(() => error = 'Scrie parola curentă.');
+                                  return;
+                                }
+                                if (newCtrl.text.trim().length < 6) {
+                                  setLocal(() => error = 'Parola nouă trebuie să aibă cel puțin 6 caractere.');
+                                  return;
+                                }
+                                setLocal(() {
+                                  saving = true;
+                                  error = null;
+                                });
+                                try {
+                                  await _applyPassword(currentCtrl.text.trim(), newCtrl.text.trim());
+                                  if (ctx.mounted) Navigator.of(ctx).pop();
+                                  _showSnackbar('ACCESS KEY UPDATED.', friendly: 'Parola a fost schimbată.');
+                                } on FirebaseAuthException catch (e) {
+                                  setLocal(() {
+                                    saving = false;
+                                    error = (e.code == 'wrong-password' || e.code == 'invalid-credential')
+                                        ? 'Parola curentă nu e corectă.'
+                                        : (e.code == 'weak-password' ? 'Parola nouă e prea slabă.' : (e.message ?? 'Nu am putut schimba parola.'));
+                                  });
+                                } catch (e) {
+                                  setLocal(() {
+                                    saving = false;
+                                    error = 'Nu am putut schimba parola. Încearcă din nou.';
+                                  });
+                                }
+                              },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RETRO — original layout
+  // ===========================================================================
+  Widget _buildRetro(bool isMobile) {
+    final isCurrentUser = widget.userId == _auth.currentUser?.uid;
+
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: Column(
+        children: [
+          const CustomNavbar(),
+          Expanded(
+            child: _loading
+                ? Center(child: CircularProgressIndicator(color: AppColors.sunset))
+                : Scrollbar(
+                    controller: _scrollController,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: const ClampingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 20 : 32),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1080),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (!isMobile)
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 330,
+                                      child: _buildIdentityCard(isCurrentUser, isMobile),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          _buildStatsHUD(isMobile),
+                                          const SizedBox(height: 20),
+                                          _buildProgressSection(),
+                                          if (isCurrentUser) ...[
+                                            const SizedBox(height: 20),
+                                            _buildSettingsSection(isMobile),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    _buildIdentityCard(isCurrentUser, isMobile),
+                                    const SizedBox(height: 20),
+                                    _buildStatsHUD(isMobile),
+                                    const SizedBox(height: 20),
+                                    _buildProgressSection(),
+                                    if (isCurrentUser) ...[
+                                      const SizedBox(height: 20),
+                                      _buildSettingsSection(isMobile),
+                                    ],
+                                  ],
+                                ),
+                              SizedBox(height: isMobile ? 28 : 48),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -439,7 +972,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Avatar
           Stack(
             alignment: Alignment.bottomRight,
             children: [
@@ -473,7 +1005,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Badges
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -504,7 +1035,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMuted),
           ),
           const SizedBox(height: 16),
-          // Bio Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -525,7 +1055,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          // Comms Contact
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
