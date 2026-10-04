@@ -13,12 +13,23 @@ import 'ui_components.dart';
 // HomeSky — fundal + nori interactivi + păsări + armate care marșează
 // + tab secret cu arc/praștie + buton care ascunde panourile.
 // `blockers` = zonele cu conținut (carduri); acolo click-urile merg normal.
+//
+// Armata:
+//  • click pe un soldat  -> salută / sare (pedestru) sau calul se ridică (călăreț)
+//  • click pe stegar     -> toată armata strigă și ridică armele
+//  • click pe un căzut   -> îl ajuți să se ridice mai repede
+//  • săgeată / piatră    -> soldatul cade (sau calul se ridică), rămâne în urmă,
+//                           apoi aleargă să prindă coloana; vecinii ridică scuturile
+//                           și pot bloca următoarele lovituri
 // ============================================================================
 class HomeSky extends StatefulWidget {
   final Widget child;
   final List<GlobalKey> blockers;
   final bool cardsHidden;
   final VoidCallback? onToggleCards;
+  final bool armies;
+  final String hideLabel;
+  final String showLabel;
 
   const HomeSky({
     super.key,
@@ -26,6 +37,9 @@ class HomeSky extends StatefulWidget {
     this.blockers = const [],
     this.cardsHidden = false,
     this.onToggleCards,
+    this.armies = true,
+    this.hideLabel = 'Ascunde panourile',
+    this.showLabel = 'Arată panourile',
   });
 
   @override
@@ -109,6 +123,14 @@ class _Soldier {
   final double seed;
   final int coat; // horse coat colour (riders) or hair colour (foot)
   final bool banner;
+
+  // live state
+  double walk = 0; // own walk clock (stops when down, runs faster when catching up)
+  double lag = 0; // how far behind his place in the column he is (px)
+  double downFor = 0; // length of the current knock-down
+  double downLeft = 0; // time left lying down / rearing
+  double react = 0; // 1 -> 0, salute / hop / rear after a click
+  double guard = 0; // seconds left with the shield raised
 }
 
 class _Army {
@@ -122,6 +144,7 @@ class _Army {
   });
   double x; // x of the leader (leftmost)
   double t = 0;
+  double cheer = 0; // seconds left of the war cry
   final _Faction faction;
   final int cloth;
   final int trim;
@@ -136,6 +159,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   static const double _armySpeed = 50; // px / second
   static const double _armyGroundFrac = 0.82; // where the feet walk (fraction of height)
   static const double _armyGap = 4; // seconds between armies
+  static const double _cheerLen = 1.8; // seconds of the war cry
   static const List<int> _coats = [0xFF8C7360, 0xFFB7A894, 0xFF5E5148, 0xFFCBBFA8, 0xFF7A6A58];
   static const List<int> _hairs = [0xFFC9A96A, 0xFF6B4F3A, 0xFFA0522D, 0xFF3E3028];
 
@@ -179,6 +203,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   double _lastMoveTime = 0;
   double _throwVx = 0;
   bool _hoverThing = false;
+  bool _hoverSoldier = false;
 
   @override
   void initState() {
@@ -231,6 +256,11 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   double get _pointStartX => math.min(_size.width * 0.55, 600.0);
 
   T _pick<T>(List<T> l) => l[_rnd.nextInt(l.length)];
+
+  double _kFor(_Army a, _Soldier m) =>
+      _armyScale * ((m.kind == _Kind.rider && a.faction == _Faction.mongol) ? 0.9 : 1.0);
+
+  double _xOf(_Army a, _Soldier m) => a.x + m.dx * _armyScale + m.lag;
 
   _Wpn _weaponFor(_Faction f, bool rider) {
     final r = _rnd.nextDouble();
@@ -407,14 +437,31 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     _sparks.removeWhere((sp) => _now - sp.born > 0.5);
 
     // ---- army: one at a time, next one comes _armyGap seconds after the last left
-    if (!_reduce) {
+    if (!_reduce && widget.armies) {
       final a = _army;
       if (a == null) {
         if (_now >= _nextArmy) _army = _makeArmy();
       } else {
         a.x -= _armySpeed * dt;
         a.t += dt;
-        if (a.x + a.length * _armyScale < -140) {
+        a.cheer = math.max(0.0, a.cheer - dt);
+        final sc = _armyScale;
+        var tail = 0.0;
+        for (final m in a.members) {
+          m.react = math.max(0.0, m.react - dt * 1.7);
+          m.guard = math.max(0.0, m.guard - dt);
+          if (m.downLeft > 0) {
+            m.downLeft = math.max(0.0, m.downLeft - dt);
+            m.lag += _armySpeed * dt; // stays where he fell while the column moves on
+          } else if (m.lag > 0) {
+            m.lag = math.max(0.0, m.lag - _armySpeed * 0.9 * dt); // hurries to catch up
+            m.walk += dt * 1.9;
+          } else {
+            m.walk += dt;
+          }
+          tail = math.max(tail, m.dx * sc + m.lag);
+        }
+        if (a.x + tail < -160) {
           _army = null;
           _nextArmy = _now + _armyGap;
         }
@@ -446,8 +493,29 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     }
   }
 
+  /// true = knocked down, false = blocked by a raised shield
+  bool _hitSoldier(_Army a, _Soldier m) {
+    final hasShield = a.faction != _Faction.mongol;
+    if (hasShield && m.guard > 0 && _rnd.nextDouble() < 0.55) {
+      m.react = 0.5;
+      m.guard = math.max(m.guard, 2.0);
+      return false;
+    }
+    m.downFor = m.kind == _Kind.foot ? 2.4 : 1.6;
+    m.downLeft = m.downFor;
+    m.react = 0;
+    // neighbours raise their shields
+    final mx = _xOf(a, m);
+    for (final o in a.members) {
+      if (identical(o, m)) continue;
+      if ((_xOf(a, o) - mx).abs() < 170 * _armyScale) o.guard = 3.0;
+    }
+    return true;
+  }
+
   void _impact(Offset p) {
     var hit = false;
+    var blocked = false;
     for (final c in _clouds) {
       if (c.rect.inflate(6).contains(p)) {
         c.puff = 1;
@@ -462,7 +530,22 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         hit = true;
       }
     }
-    _sparks.add(_Spark(p, hit ? const Color(0xFFF4D06F) : const Color(0xFF9A8F7A), _now));
+    final a = _army;
+    if (a != null) {
+      final m = _soldierAt(p, slack: 5);
+      if (m != null && m.downLeft == 0) {
+        if (_hitSoldier(a, m)) {
+          hit = true;
+        } else {
+          blocked = true;
+        }
+      }
+    }
+    _sparks.add(_Spark(
+      p,
+      blocked ? const Color(0xFFDDE3E6) : (hit ? const Color(0xFFF4D06F) : const Color(0xFF9A8F7A)),
+      _now,
+    ));
     if (hit && mounted) setState(() => _hits++);
   }
 
@@ -477,6 +560,28 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   _Bird? _birdAt(Offset p) {
     for (final b in _birds) {
       if ((Offset(b.x, b.y) - p).distance < 24) return b;
+    }
+    return null;
+  }
+
+  _Soldier? _soldierAt(Offset p, {double slack = 0}) {
+    final a = _army;
+    if (a == null) return null;
+    final order = [...a.members]..sort((x, y) => y.lane.compareTo(x.lane)); // front rank first
+    for (final m in order) {
+      final isFoot = m.kind == _Kind.foot;
+      final k = _kFor(a, m);
+      final wx = _xOf(a, m);
+      final wy = _groundAt(wx) + m.lane * _armyScale;
+      Rect r;
+      if (isFoot && m.downLeft > 0) {
+        r = Rect.fromLTRB(wx - 4 * k, wy - 16 * k, wx + 50 * k, wy + 2 * k); // lying on his back
+      } else if (isFoot) {
+        r = Rect.fromLTRB(wx - 11 * k, wy - 52 * k, wx + 11 * k, wy);
+      } else {
+        r = Rect.fromLTRB(wx - 42 * k, wy - 102 * k, wx + 38 * k, wy);
+      }
+      if (r.inflate(slack).contains(p)) return m;
     }
     return null;
   }
@@ -503,6 +608,18 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     final p = e.localPosition;
     if (_weapon != null) {
       _shoot(p);
+      return;
+    }
+    final a = _army;
+    final s = _soldierAt(p);
+    if (a != null && s != null) {
+      if (s.downLeft > 0) {
+        s.downLeft = math.min(s.downLeft, 0.35); // help him up
+      } else if (s.banner) {
+        a.cheer = _cheerLen; // war cry
+      } else {
+        s.react = 1;
+      }
       return;
     }
     final b = _birdAt(p);
@@ -557,8 +674,14 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     _aim = e.localPosition;
     final blocked = _blocked(e.position);
     _aimValid = !blocked;
-    final over = !blocked && (_cloudAt(_aim) != null || _birdAt(_aim) != null);
-    if (over != _hoverThing) setState(() => _hoverThing = over);
+    final soldier = !blocked && _soldierAt(_aim) != null;
+    final over = !blocked && !soldier && (_cloudAt(_aim) != null || _birdAt(_aim) != null);
+    if (over != _hoverThing || soldier != _hoverSoldier) {
+      setState(() {
+        _hoverThing = over;
+        _hoverSoldier = soldier;
+      });
+    }
   }
 
   // ------------------------------------------------------------------ UI
@@ -579,7 +702,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         ),
       );
 
-  // buton: împinge panourile (exerciții + postări) în afara ecranului și înapoi
+  // buton: împinge panourile în afara ecranului și înapoi
   Widget _cardsButton() {
     final hidden = widget.cardsHidden;
     return Positioned(
@@ -606,7 +729,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
                 Icon(hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 16, color: Pb.muted),
                 const SizedBox(width: 6),
                 Text(
-                  hidden ? 'Arată panourile' : 'Ascunde panourile',
+                  hidden ? widget.showLabel : widget.hideLabel,
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text),
                 ),
               ],
@@ -717,7 +840,9 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
 
     final MouseCursor cursor = _weapon != null
         ? SystemMouseCursors.precise
-        : (_held != null ? SystemMouseCursors.grabbing : (_hoverThing ? SystemMouseCursors.grab : MouseCursor.defer));
+        : (_held != null
+            ? SystemMouseCursors.grabbing
+            : (_hoverSoldier ? SystemMouseCursors.click : (_hoverThing ? SystemMouseCursors.grab : MouseCursor.defer)));
 
     return LayoutBuilder(builder: (context, box) {
       _size = Size(box.maxWidth, box.maxHeight);
@@ -746,7 +871,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
                 ),
               ),
               _secretTab(),
-              _cardsButton(),
+              if (widget.onToggleCards != null) _cardsButton(),
             ],
           ),
         ),
@@ -917,8 +1042,6 @@ class _IconPainter extends CustomPainter {
 // Everything is drawn facing +x in local coordinates; the painter mirrors it
 // so the column marches to the left. Colours are blended toward a mist tone
 // and the whole group is drawn translucent so it looks faded / painted-in.
-// At the end of the approach every soldier lifts his weapon (sword, saber,
-// axe, spear or lance) and points it diagonally at the secret tab.
 // ============================================================================
 class _Pal {
   _Pal(this.dark, this.faction, this.clothV, this.trimV);
@@ -981,12 +1104,18 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   final sc = s._armyScale;
   final size = s._size;
   final g = size.height * _HomeSkyState._armyGroundFrac;
+  final tail = a.members.fold<double>(0, (t, m) => math.max(t, m.dx * sc + m.lag));
   final left = a.x - 140 * sc;
-  final right = a.x + a.length * sc + 100 * sc;
+  final right = a.x + tail + 120 * sc;
   final pal = _Pal(dark, a.faction, a.cloth, a.trim);
   final tab = s._tabPoint;
   final raise = s._armyRaise;
   final order = [...a.members]..sort((p, q) => p.lane.compareTo(q.lane));
+
+  // war cry envelope (fast in, fast out)
+  final cheerK = a.cheer <= 0
+      ? 0.0
+      : math.min(1.0, a.cheer / 0.3) * math.min(1.0, (_HomeSkyState._cheerLen - a.cheer) / 0.2);
 
   canvas.saveLayer(
     Rect.fromLTRB(left, g - 200 * sc, right, g + 40 * sc),
@@ -995,14 +1124,19 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
 
   for (final m in order) {
     final isFoot = m.kind == _Kind.foot;
-    final wx = a.x + m.dx * sc;
+    final wx = a.x + m.dx * sc + m.lag;
     if (wx < -160 || wx > size.width + 160) continue;
     final wy = s._groundAt(wx) + m.lane * sc;
-    final k = sc * ((!isFoot && a.faction == _Faction.mongol) ? 0.9 : 1.0); // steppe ponies are smaller
+    final k = s._kFor(a, m);
+    final isDown = m.downLeft > 0;
 
     // ground shadow
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(wx, wy + 1), width: (isFoot ? 22 : 62) * k, height: 6 * k),
+      Rect.fromCenter(
+        center: Offset(wx + (isDown && isFoot ? 22 * k : 0), wy + 1),
+        width: (isFoot ? (isDown ? 48 : 22) : 62) * k,
+        height: 6 * k,
+      ),
       Paint()
         ..color = Colors.black.withOpacity(dark ? 0.22 : 0.12)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
@@ -1012,15 +1146,43 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
     final shoulder = isFoot ? 35.0 : 69.0;
     final dxw = tab.dx - wx;
     final dyw = tab.dy - (wy - shoulder * k);
-    final ang = math.atan2(dyw / k, -dxw / k).clamp(-0.95, -0.22).toDouble();
+    var ang = math.atan2(dyw / k, -dxw / k).clamp(-0.95, -0.22).toDouble();
+
+    // effective weapon pose: point at the tab, cheer, or salute after a click
+    var rr = (isDown || m.lag > 0) ? 0.0 : raise;
+    if (cheerK > 0 && !isDown) {
+      rr = math.max(rr, cheerK);
+      ang = _lerpD(ang, -1.45, cheerK);
+    }
+    final salute = m.react > 0 ? math.sin(m.react * math.pi) : 0.0;
+    if (isFoot && salute > 0) {
+      rr = math.max(rr, salute);
+      ang = _lerpD(ang, -1.45, salute);
+    }
+    final gk = a.faction == _Faction.mongol ? 0.0 : math.min(1.0, m.guard / 0.3);
+    final fall = isDown
+        ? math.min(1.0, (m.downFor - m.downLeft) / 0.22) * math.min(1.0, m.downLeft / 0.35)
+        : 0.0;
 
     canvas.save();
     canvas.translate(wx, wy);
     canvas.scale(-k, k); // mirror: marching left
     if (isFoot) {
-      _drawFoot(canvas, pal, m, a.t * 8 + m.seed, raise, ang, a.t);
+      final hop = salute * 6 + (cheerK > 0 ? math.sin(a.t * 14 + m.seed).abs() * 4 * cheerK : 0.0);
+      if (fall > 0) canvas.rotate(-1.45 * fall); // falls on his back
+      canvas.translate(0, -hop);
+      _drawFoot(canvas, pal, m, m.walk * 8 + m.seed, rr, ang, a.t, gk);
     } else {
-      _drawRider(canvas, pal, m, a.t * 5.2 + m.seed, raise, ang, a.t);
+      final rear = math.max(
+        fall,
+        math.max(salute, cheerK * 0.5 * math.sin(a.t * 6 + m.seed).abs()),
+      );
+      if (rear > 0) {
+        canvas.translate(-17, 0);
+        canvas.rotate(-0.42 * rear); // rears up on the hind legs
+        canvas.translate(17, 0);
+      }
+      _drawRider(canvas, pal, m, m.walk * 5.2 + m.seed, rr, ang, a.t, gk);
     }
     canvas.restore();
   }
@@ -1300,7 +1462,7 @@ void _weapon(Canvas c, _Pal p, _Wpn w, Offset hand, double a) {
 }
 
 // ---------------------------------------------------------------- foot soldier
-void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t) {
+void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t, double guard) {
   final sw = math.sin(ph);
   final bob = -math.cos(ph * 2).abs() * 1.1;
   final fy = -bob; // keep the feet planted
@@ -1316,8 +1478,8 @@ void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang
     _flag(c, p, 7, -84, math.sin(t * 3 + m.seed) * 2.2);
   }
 
-  // shield (far arm)
-  _shield(c, p, 6, -37);
+  // shield carried on the far arm (raised in front of the face when on guard)
+  if (guard <= 0) _shield(c, p, 6, -37);
 
   // near leg
   c.drawLine(const Offset(0, -16), Offset(sw * 7, fy), _ps(p.hose, 4.2));
@@ -1337,11 +1499,13 @@ void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang
 
   // head
   _head(c, p, -41.5, great: false, hairV: m.coat, sw: sw);
+
+  if (guard > 0) _shield(c, p, _lerpD(6, 10, guard), _lerpD(-37, -52, guard));
   c.restore();
 }
 
 // ---------------------------------------------------------------- rider
-void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t) {
+void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t, double guard) {
   final coat = p.f(m.coat);
   final coatDark = Color.lerp(coat, Colors.black, 0.28)!;
   final coatFar = Color.lerp(coat, Colors.black, 0.18)!;
@@ -1451,7 +1615,7 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
   }
 
   // shield + body
-  _shield(c, p, 8.5, -26);
+  if (guard <= 0) _shield(c, p, 8.5, -26);
   _torso(c, p, -24, 2, -7);
 
   // near arm + weapon: held low at rest, lifted to point at the tab
@@ -1469,6 +1633,8 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
 
   // head
   _head(c, p, -29.5, great: p.faction == _Faction.crusader, hairV: 0xFF3E3028, sw: sw);
+
+  if (guard > 0) _shield(c, p, _lerpD(8.5, 11, guard), _lerpD(-26, -40, guard));
 
   c.restore(); // rider
   c.restore(); // bob
