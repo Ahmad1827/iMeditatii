@@ -10,7 +10,7 @@ import 'app_colors.dart';
 import 'ui_components.dart';
 
 // ============================================================================
-// HomeSky — fundal + nori interactivi + păsări + armată care marșează
+// HomeSky — fundal + nori interactivi + păsări + armate care marșează
 // + tab secret cu arc/praștie + buton care ascunde panourile.
 // `blockers` = zonele cu conținut (carduri); acolo click-urile merg normal.
 // ============================================================================
@@ -93,23 +93,38 @@ class _Spark {
   final double born;
 }
 
-// ----------------------------------------------------------------- army
-enum _Kind { banner, knight, foot }
+// ----------------------------------------------------------------- armies
+enum _Faction { crusader, viking, saracen, mongol }
+
+enum _Wpn { sword, saber, axe, spear, lance }
+
+enum _Kind { rider, foot }
 
 class _Soldier {
-  _Soldier(this.kind, this.dx, this.lane, this.seed, this.coat);
+  _Soldier(this.kind, this.wpn, this.dx, this.lane, this.seed, this.coat, {this.banner = false});
   final _Kind kind;
+  final _Wpn wpn;
   final double dx; // distance behind the leader (to the right)
-  final double lane; // small vertical offset, gives depth
+  final double lane; // vertical offset, gives ranks / depth
   final double seed;
-  final int coat; // horse coat colour
+  final int coat; // horse coat colour (riders) or hair colour (foot)
+  final bool banner;
 }
 
 class _Army {
-  _Army({required this.x, required this.cloth, required this.members, required this.length});
+  _Army({
+    required this.x,
+    required this.faction,
+    required this.cloth,
+    required this.trim,
+    required this.members,
+    required this.length,
+  });
   double x; // x of the leader (leftmost)
   double t = 0;
+  final _Faction faction;
   final int cloth;
+  final int trim;
   final List<_Soldier> members;
   final double length;
 }
@@ -118,11 +133,11 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   static const double g = 900;
 
   // ---- army tuning
-  static const double _armySpeed = 46; // px / second
+  static const double _armySpeed = 50; // px / second
   static const double _armyGroundFrac = 0.82; // where the feet walk (fraction of height)
   static const double _armyGap = 4; // seconds between armies
-  static const List<int> _cloths = [0xFFA65A52, 0xFF5F7E99, 0xFFC2A25A, 0xFF76926E, 0xFF8A6A84];
   static const List<int> _coats = [0xFF8C7360, 0xFFB7A894, 0xFF5E5148, 0xFFCBBFA8, 0xFF7A6A58];
+  static const List<int> _hairs = [0xFFC9A96A, 0xFF6B4F3A, 0xFFA0522D, 0xFF3E3028];
 
   final _rnd = math.Random();
   final ValueNotifier<int> _frame = ValueNotifier(0);
@@ -145,8 +160,9 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
 
   _Army? _army;
   double _nextArmy = 2;
-  double _armyRaise = 0; // 0..1, how far the arms are lifted to point
+  double _armyRaise = 0; // 0..1, how far the weapons are lifted to point
   bool _armyHint = false;
+  _Faction? _lastFaction;
 
   _Weapon? _weapon;
   bool _drawerOpen = false;
@@ -214,29 +230,108 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   Offset get _tabPoint => Offset(10, _size.height * 0.5 + 23);
   double get _pointStartX => math.min(_size.width * 0.55, 600.0);
 
+  T _pick<T>(List<T> l) => l[_rnd.nextInt(l.length)];
+
+  _Wpn _weaponFor(_Faction f, bool rider) {
+    final r = _rnd.nextDouble();
+    if (f == _Faction.crusader) {
+      if (rider) return r < 0.6 ? _Wpn.lance : _Wpn.sword;
+      return r < 0.55 ? _Wpn.spear : _Wpn.sword;
+    }
+    if (f == _Faction.viking) {
+      if (r < 0.6) return _Wpn.axe;
+      return r < 0.85 ? _Wpn.spear : _Wpn.sword;
+    }
+    if (f == _Faction.saracen) {
+      if (rider) return r < 0.4 ? _Wpn.lance : _Wpn.saber;
+      return r < 0.4 ? _Wpn.spear : _Wpn.saber;
+    }
+    // mongol
+    if (rider) return r < 0.5 ? _Wpn.saber : _Wpn.spear;
+    return _Wpn.spear;
+  }
+
   _Army _makeArmy() {
+    // never the same faction twice in a row
+    var f = _pick(_Faction.values);
+    if (f == _lastFaction) f = _Faction.values[(f.index + 1 + _rnd.nextInt(3)) % _Faction.values.length];
+    _lastFaction = f;
+
+    late int riders, foot, cloth, trim;
+    late double rStep, fStep;
+    switch (f) {
+      case _Faction.crusader:
+        riders = 3 + _rnd.nextInt(3); // 3..5
+        foot = 7 + _rnd.nextInt(4); // 7..10
+        rStep = 56;
+        fStep = 24;
+        cloth = 0xFFE4D9BE;
+        trim = _pick(const [0xFFA65A52, 0xFF4F6F99]);
+        break;
+      case _Faction.viking:
+        riders = 0;
+        foot = 12 + _rnd.nextInt(5); // 12..16
+        rStep = 0;
+        fStep = 24;
+        cloth = _pick(const [0xFFC2A25A, 0xFF5F7E99, 0xFF76926E, 0xFFA65A52]);
+        trim = 0xFFE8DCC0;
+        break;
+      case _Faction.saracen:
+        riders = 4 + _rnd.nextInt(3); // 4..6
+        foot = 5 + _rnd.nextInt(4); // 5..8
+        rStep = 52;
+        fStep = 24;
+        cloth = _pick(const [0xFF4F8A86, 0xFFE8E0C8, 0xFF4F7F57, 0xFF4F5F8A]);
+        trim = 0xFFC9A24A;
+        break;
+      case _Faction.mongol:
+        riders = 9 + _rnd.nextInt(4); // 9..12
+        foot = _rnd.nextInt(3); // 0..2
+        rStep = 44;
+        fStep = 24;
+        cloth = _pick(const [0xFF7A5A40, 0xFF8A4A40, 0xFF56707F]);
+        trim = 0xFFC9B58A;
+        break;
+    }
+
+    final bannerWpn = f == _Faction.viking
+        ? _Wpn.axe
+        : (f == _Faction.saracen || f == _Faction.mongol ? _Wpn.saber : _Wpn.sword);
+
     final members = <_Soldier>[];
     var dx = 0.0;
-    final riders = 2 + _rnd.nextInt(3); // 2..4
     for (var i = 0; i < riders; i++) {
+      final isBanner = i == 0;
       members.add(_Soldier(
-        i == 0 ? _Kind.banner : _Kind.knight,
+        _Kind.rider,
+        isBanner ? bannerWpn : _weaponFor(f, true),
         dx,
-        0,
+        i.isOdd ? 9.0 : 0.0,
         _rnd.nextDouble() * math.pi * 2,
-        _coats[_rnd.nextInt(_coats.length)],
+        _pick(_coats),
+        banner: isBanner,
       ));
-      dx += 74;
+      dx += rStep;
     }
-    dx += 10;
-    final foot = 4 + _rnd.nextInt(4); // 4..7
-    for (var i = 0; i < foot; i++) {
-      members.add(_Soldier(_Kind.foot, dx, i.isOdd ? 5 : 0, _rnd.nextDouble() * math.pi * 2, 0));
-      dx += 30;
+    if (riders > 0 && foot > 0) dx += 14;
+    for (var j = 0; j < foot; j++) {
+      final isBanner = riders == 0 && j == 0;
+      members.add(_Soldier(
+        _Kind.foot,
+        isBanner ? bannerWpn : _weaponFor(f, false),
+        dx,
+        (j % 3) * 5.0,
+        _rnd.nextDouble() * math.pi * 2,
+        _pick(_hairs),
+        banner: isBanner,
+      ));
+      dx += fStep;
     }
     return _Army(
       x: _size.width + 60,
-      cloth: _cloths[_rnd.nextInt(_cloths.length)],
+      faction: f,
+      cloth: cloth,
+      trim: trim,
       members: members,
       length: dx,
     );
@@ -319,7 +414,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       } else {
         a.x -= _armySpeed * dt;
         a.t += dt;
-        if (a.x + a.length * _armyScale < -70) {
+        if (a.x + a.length * _armyScale < -140) {
           _army = null;
           _nextArmy = _now + _armyGap;
         }
@@ -818,26 +913,44 @@ class _IconPainter extends CustomPainter {
 }
 
 // ============================================================================
-// ARMY — medieval column (banner knight, knights on horses, spearmen).
+// ARMIES — Crusaders, Vikings, Saracens, Mongols.
 // Everything is drawn facing +x in local coordinates; the painter mirrors it
 // so the column marches to the left. Colours are blended toward a mist tone
 // and the whole group is drawn translucent so it looks faded / painted-in.
+// At the end of the approach every soldier lifts his weapon (sword, saber,
+// axe, spear or lance) and points it diagonally at the secret tab.
 // ============================================================================
 class _Pal {
-  _Pal(this.dark, this.clothV);
+  _Pal(this.dark, this.faction, this.clothV, this.trimV);
   final bool dark;
+  final _Faction faction;
   final int clothV;
+  final int trimV;
 
   Color f(int v, [double k = 0.30]) =>
       Color.lerp(Color(v), dark ? const Color(0xFF9AA8AE) : const Color(0xFFE0E7E8), k)!;
 
   late final Color steel = f(0xFF7C8A91);
   late final Color steelDark = f(0xFF55626A);
-  late final Color cloth = f(clothV);
+  late final Color blade = f(0xFFC9D2D6, 0.18);
+  late final Color cloth = f(clothV, faction == _Faction.crusader ? 0.12 : 0.30);
+  late final Color trim = f(trimV);
   late final Color wood = f(0xFF8A6D52);
-  late final Color skin = f(0xFFD8B79B, 0.15);
   late final Color cream = f(0xFFE8DCC0, 0.10);
-  late final Color hose = f(0xFF6B5E55);
+  late final Color leather = f(0xFF7A5E44);
+  late final Color fur = f(0xFF5A4636);
+  late final Color skin = f(
+    faction == _Faction.saracen ? 0xFFC49A74 : (faction == _Faction.mongol ? 0xFFBE9470 : 0xFFD8B79B),
+    0.15,
+  );
+  late final Color hose = f(
+    faction == _Faction.crusader
+        ? 0xFF6B5E55
+        : (faction == _Faction.viking ? 0xFF6A5A48 : (faction == _Faction.saracen ? 0xFFCFC3A8 : 0xFF4A3F36)),
+  );
+  late final Color sleeve = faction == _Faction.crusader
+      ? steel
+      : (faction == _Faction.saracen ? cloth : leather);
 }
 
 Paint _pf(Color c) => Paint()..color = c;
@@ -847,53 +960,69 @@ Paint _ps(Color c, double w) => Paint()
   ..strokeCap = StrokeCap.round
   ..style = PaintingStyle.stroke;
 
+double _lerpD(double a, double b, double t) => a + (b - a) * t;
+
+double _restAngle(_Wpn w) {
+  switch (w) {
+    case _Wpn.sword:
+      return -1.35;
+    case _Wpn.saber:
+      return -1.25;
+    case _Wpn.axe:
+      return -1.0;
+    case _Wpn.spear:
+      return -1.5;
+    case _Wpn.lance:
+      return -1.45;
+  }
+}
+
 void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   final sc = s._armyScale;
   final size = s._size;
   final g = size.height * _HomeSkyState._armyGroundFrac;
-  final left = a.x - 90 * sc;
-  final right = a.x + a.length * sc + 90 * sc;
-  final pal = _Pal(dark, a.cloth);
+  final left = a.x - 140 * sc;
+  final right = a.x + a.length * sc + 100 * sc;
+  final pal = _Pal(dark, a.faction, a.cloth, a.trim);
   final tab = s._tabPoint;
   final raise = s._armyRaise;
+  final order = [...a.members]..sort((p, q) => p.lane.compareTo(q.lane));
 
   canvas.saveLayer(
-    Rect.fromLTRB(left, g - 150 * sc, right, g + 36 * sc),
+    Rect.fromLTRB(left, g - 200 * sc, right, g + 40 * sc),
     Paint()..color = Colors.white.withOpacity(dark ? 0.62 : 0.76),
   );
 
-  for (var pass = 0; pass < 2; pass++) {
-    for (final m in a.members.reversed) {
-      if ((m.lane > 0 ? 1 : 0) != pass) continue;
-      final wx = a.x + m.dx * sc;
-      if (wx < -140 || wx > size.width + 140) continue;
-      final wy = s._groundAt(wx) + m.lane * sc;
-      final isFoot = m.kind == _Kind.foot;
+  for (final m in order) {
+    final isFoot = m.kind == _Kind.foot;
+    final wx = a.x + m.dx * sc;
+    if (wx < -160 || wx > size.width + 160) continue;
+    final wy = s._groundAt(wx) + m.lane * sc;
+    final k = sc * ((!isFoot && a.faction == _Faction.mongol) ? 0.9 : 1.0); // steppe ponies are smaller
 
-      // ground shadow
-      canvas.drawOval(
-        Rect.fromCenter(center: Offset(wx, wy + 1), width: (isFoot ? 22 : 62) * sc, height: 6 * sc),
-        Paint()
-          ..color = Colors.black.withOpacity(dark ? 0.22 : 0.12)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
-      );
+    // ground shadow
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(wx, wy + 1), width: (isFoot ? 22 : 62) * k, height: 6 * k),
+      Paint()
+        ..color = Colors.black.withOpacity(dark ? 0.22 : 0.12)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
 
-      // angle from the shoulder to the secret tab (diagonal, up and to the left)
-      final shoulder = isFoot ? 35.0 : 69.0;
-      final dxw = tab.dx - wx;
-      final dyw = tab.dy - (wy - shoulder * sc);
-      final ang = math.atan2(dyw / sc, -dxw / sc).clamp(-0.95, -0.22).toDouble();
+    // angle from the shoulder to the secret tab (diagonal, up and to the left)
+    final shoulder = isFoot ? 35.0 : 69.0;
+    final dxw = tab.dx - wx;
+    final dyw = tab.dy - (wy - shoulder * k);
+    final ang = math.atan2(dyw / k, -dxw / k).clamp(-0.95, -0.22).toDouble();
 
-      canvas.save();
-      canvas.translate(wx, wy);
-      canvas.scale(-sc, sc); // mirror: marching left
-      if (isFoot) {
-        _drawFoot(canvas, pal, a.t * 8 + m.seed, raise, ang);
-      } else {
-        _drawRider(canvas, pal, m, a.t * 5.2 + m.seed, raise, ang, a.t);
-      }
-      canvas.restore();
+    canvas.save();
+    canvas.translate(wx, wy);
+    canvas.scale(-k, k); // mirror: marching left
+    if (isFoot) {
+      _drawFoot(canvas, pal, m, a.t * 8 + m.seed, raise, ang, a.t);
+    } else {
+      _drawRider(canvas, pal, m, a.t * 5.2 + m.seed, raise, ang, a.t);
     }
+    canvas.restore();
   }
   canvas.restore();
 
@@ -906,6 +1035,7 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   );
 }
 
+// ---------------------------------------------------------------- shields
 void _kite(Canvas c, _Pal p, double cx, double top, double w, double h) {
   final path = Path()
     ..moveTo(cx - w / 2, top)
@@ -917,12 +1047,260 @@ void _kite(Canvas c, _Pal p, double cx, double top, double w, double h) {
   c.drawPath(path, _pf(p.cream));
   c.save();
   c.clipPath(path);
-  c.drawRect(Rect.fromLTWH(cx - w * 0.14, top, w * 0.28, h), _pf(p.cloth));
+  c.drawRect(Rect.fromLTWH(cx - w * 0.14, top, w * 0.28, h), _pf(p.trim));
   c.restore();
   c.drawPath(path, _ps(p.steelDark, 1.1));
 }
 
-void _drawFoot(Canvas c, _Pal p, double ph, double raise, double ang) {
+void _round(Canvas c, _Pal p, Offset o, double r) {
+  c.drawCircle(o, r, _pf(p.cloth));
+  final wedge = _pf(p.trim);
+  for (var i = 0; i < 4; i++) {
+    c.drawArc(Rect.fromCircle(center: o, radius: r), i * math.pi / 2, math.pi / 4, true, wedge);
+  }
+  c.drawCircle(o, r, _ps(p.steelDark, 1.2));
+  c.drawCircle(o, r * 0.3, _pf(p.steel));
+}
+
+void _shield(Canvas c, _Pal p, double cx, double top) {
+  switch (p.faction) {
+    case _Faction.crusader:
+      _kite(c, p, cx, top, 9.5, 20.5);
+      break;
+    case _Faction.viking:
+      _round(c, p, Offset(cx + 0.5, top + 9.5), 8.5);
+      break;
+    case _Faction.saracen:
+      _round(c, p, Offset(cx + 0.5, top + 9), 7);
+      break;
+    case _Faction.mongol:
+      break; // light cavalry, no shield
+  }
+}
+
+// ---------------------------------------------------------------- torso / head
+void _torso(Canvas c, _Pal p, double top, double bottom, double belt) {
+  final h = bottom - top;
+  switch (p.faction) {
+    case _Faction.crusader:
+      c.drawRRect(RRect.fromLTRBR(-5.8, top, 5.8, bottom, const Radius.circular(3)), _pf(p.cloth));
+      final cr = _pf(p.trim.withOpacity(0.9));
+      c.drawRect(Rect.fromLTWH(-1, top + 3, 2, h - 8), cr);
+      c.drawRect(Rect.fromLTWH(-4, top + 6, 8, 2), cr);
+      break;
+    case _Faction.viking:
+      c.drawRRect(RRect.fromLTRBR(-5.8, top, 5.8, bottom, const Radius.circular(3)), _pf(p.cloth));
+      c.drawRect(Rect.fromLTWH(-5.8, bottom - 3, 11.6, 3), _pf(p.trim));
+      c.drawRect(Rect.fromLTWH(-5.8, top + 2, 11.6, 3.5), _pf(p.leather));
+      break;
+    case _Faction.saracen:
+      c.drawRRect(RRect.fromLTRBR(-6.4, top, 6.4, bottom + 2, const Radius.circular(3.5)), _pf(p.cloth));
+      c.drawRect(Rect.fromLTWH(-6.4, belt - 1, 12.8, 3.2), _pf(p.trim));
+      break;
+    case _Faction.mongol:
+      c.drawRRect(RRect.fromLTRBR(-5.8, top, 5.8, bottom, const Radius.circular(3)), _pf(p.leather));
+      for (var y = top + 3; y < bottom - 2; y += 3) {
+        c.drawLine(Offset(-5.4, y), Offset(5.4, y), _ps(p.steelDark.withOpacity(0.7), 0.7));
+      }
+      final skirt = Path()
+        ..moveTo(-5.8, bottom - 5)
+        ..lineTo(5.8, bottom - 5)
+        ..lineTo(7.6, bottom + 3)
+        ..lineTo(-7.6, bottom + 3)
+        ..close();
+      c.drawPath(skirt, _pf(p.cloth));
+      break;
+  }
+  if (p.faction != _Faction.saracen) {
+    c.drawRect(Rect.fromLTWH(-6, belt, 12, 2), _pf(p.wood));
+  }
+  final collar = p.faction == _Faction.mongol ? p.fur : (p.faction == _Faction.saracen ? p.cloth : p.steel);
+  c.drawOval(Rect.fromCenter(center: Offset(0, top), width: 12, height: 4.5), _pf(collar));
+}
+
+void _head(Canvas c, _Pal p, double cy, {required bool great, required int hairV, required double sw}) {
+  final skin = _pf(p.skin);
+  switch (p.faction) {
+    case _Faction.crusader:
+      if (great) {
+        c.drawRRect(RRect.fromLTRBR(-4.6, cy - 9.5, 4.8, cy + 5, const Radius.circular(2)), _pf(p.steel));
+        c.drawRect(Rect.fromLTWH(1.4, cy - 9.5, 1.2, 14.5), _pf(p.steelDark));
+        c.drawRect(Rect.fromLTWH(0.6, cy - 4.7, 4.2, 1.3), _pf(p.steelDark));
+        final plume = Path()
+          ..moveTo(-1, cy - 9.5)
+          ..quadraticBezierTo(-9, cy - 18.5 + sw * 1.2, -13, cy - 7.5 + sw * 2)
+          ..quadraticBezierTo(-7, cy - 11.5, -1, cy - 7.5)
+          ..close();
+        c.drawPath(plume, _pf(p.trim));
+      } else {
+        c.drawCircle(Offset(-0.5, cy), 5.4, _pf(p.steel));
+        c.drawCircle(Offset(2.3, cy + 1), 3.0, skin);
+        final helm = Path()
+          ..moveTo(-5.6, cy)
+          ..arcToPoint(Offset(5.8, cy), radius: const Radius.circular(5.7), clockwise: true)
+          ..close();
+        c.drawPath(helm, _pf(p.steel));
+        c.drawRect(Rect.fromLTWH(4.2, cy - 1.5, 1.5, 6.5), _pf(p.steelDark));
+      }
+      break;
+    case _Faction.viking:
+      final hair = _pf(p.f(hairV, 0.2));
+      c.drawCircle(Offset(-1.2, cy + 0.8), 5.8, hair);
+      c.drawCircle(Offset(2.3, cy + 1), 3.0, skin);
+      c.drawOval(Rect.fromCenter(center: Offset(2.8, cy + 4.6), width: 6.4, height: 5.6), hair);
+      final cone = Path()
+        ..moveTo(-5.6, cy)
+        ..quadraticBezierTo(-4.2, cy - 8, 0.8, cy - 10.5)
+        ..quadraticBezierTo(4.4, cy - 8, 5.8, cy)
+        ..close();
+      c.drawPath(cone, _pf(p.steel));
+      c.drawRect(Rect.fromLTWH(-5.6, cy - 1.2, 11.4, 1.8), _pf(p.steelDark));
+      c.drawRect(Rect.fromLTWH(4.2, cy - 1.2, 1.5, 6), _pf(p.steelDark));
+      break;
+    case _Faction.saracen:
+      c.drawCircle(Offset(-1, cy + 1), 5.6, _pf(p.steel)); // mail aventail
+      c.drawCircle(Offset(2.3, cy + 1), 3.0, skin);
+      final cone = Path()
+        ..moveTo(-5.4, cy - 0.5)
+        ..quadraticBezierTo(-3.8, cy - 8, 0.5, cy - 11)
+        ..quadraticBezierTo(4.2, cy - 8, 5.6, cy - 0.5)
+        ..close();
+      c.drawPath(cone, _pf(p.steel));
+      c.drawLine(Offset(0.5, cy - 11), Offset(0.5, cy - 14.5), _ps(p.steelDark, 1.2));
+      final wrap = Rect.fromCenter(center: Offset(0.2, cy - 1.4), width: 12.6, height: 4.4);
+      c.drawOval(wrap, _pf(p.cream));
+      c.drawOval(wrap, _ps(p.trim, 0.9));
+      break;
+    case _Faction.mongol:
+      c.drawOval(Rect.fromCenter(center: Offset(-3.5, cy + 2), width: 4.4, height: 7), _pf(p.fur));
+      c.drawCircle(Offset(2.0, cy + 1), 3.2, skin);
+      final cap = Path()
+        ..moveTo(-5.4, cy - 1)
+        ..quadraticBezierTo(-3.4, cy - 8, 1, cy - 9.5)
+        ..quadraticBezierTo(4.6, cy - 8, 5.6, cy - 1)
+        ..close();
+      c.drawPath(cap, _pf(p.cloth));
+      c.drawOval(Rect.fromCenter(center: Offset(0.2, cy - 1.2), width: 13.6, height: 4.6), _pf(p.fur));
+      c.drawCircle(Offset(1, cy - 10.2), 1.2, _pf(p.trim));
+      break;
+  }
+}
+
+// ---------------------------------------------------------------- banners
+void _flag(Canvas c, _Pal p, double px, double top, double wave) {
+  if (p.faction == _Faction.mongol) {
+    // horse-tail standard
+    c.drawCircle(Offset(px, top - 2), 2.2, _pf(p.trim));
+    final tuft = _ps(p.fur, 2.4);
+    c.drawLine(Offset(px, top), Offset(px - 6 + wave * 0.5, top + 12), tuft);
+    c.drawLine(Offset(px, top), Offset(px - 2 + wave * 0.5, top + 15), tuft);
+    c.drawLine(Offset(px, top), Offset(px - 9 + wave * 0.5, top + 9), tuft);
+    return;
+  }
+  final flag = Path()
+    ..moveTo(px, top)
+    ..quadraticBezierTo(px - 13, top - 3 + wave, px - 27, top + 1 + wave * 1.4)
+    ..lineTo(px - 22, top + 8 + wave * 1.4)
+    ..lineTo(px - 27, top + 15 + wave * 1.4)
+    ..quadraticBezierTo(px - 13, top + 11 + wave, px, top + 14)
+    ..close();
+  c.drawPath(flag, _pf(p.cloth));
+  switch (p.faction) {
+    case _Faction.crusader:
+      c.drawRect(Rect.fromLTWH(px - 14, top + 1, 2.4, 12), _pf(p.trim));
+      c.drawRect(Rect.fromLTWH(px - 19, top + 5.2, 11, 2.4), _pf(p.trim));
+      break;
+    case _Faction.viking:
+      c.drawRect(Rect.fromLTWH(px - 26, top + 5.5, 24, 3), _pf(p.trim));
+      break;
+    case _Faction.saracen:
+      c.drawArc(Rect.fromCircle(center: Offset(px - 12, top + 7), radius: 3.6), 0.6, 5.0, false, _ps(p.trim, 1.4));
+      break;
+    case _Faction.mongol:
+      break;
+  }
+  c.drawCircle(Offset(px, top - 2), 1.7, _pf(p.steel));
+}
+
+// ---------------------------------------------------------------- weapons
+void _weapon(Canvas c, _Pal p, _Wpn w, Offset hand, double a) {
+  final d = Offset(math.cos(a), math.sin(a));
+  final n = Offset(-d.dy, d.dx);
+  switch (w) {
+    case _Wpn.sword:
+      c.drawLine(hand - d * 3, hand + d * 2, _ps(p.wood, 2.2));
+      c.drawLine(hand + d * 2 - n * 3.6, hand + d * 2 + n * 3.6, _ps(p.steelDark, 1.8));
+      c.drawLine(hand + d * 2, hand + d * 25, _ps(p.blade, 2.2));
+      break;
+    case _Wpn.saber:
+      c.drawLine(hand - d * 3, hand + d * 2, _ps(p.wood, 2.2));
+      c.drawLine(hand + d * 2 - n * 2.6, hand + d * 2 + n * 2.6, _ps(p.steelDark, 1.5));
+      final o2 = hand + d * 2;
+      final ctrl = hand + d * 14 + n * 1.2;
+      final tip = hand + d * 25 + n * 4.5;
+      final blade = Path()
+        ..moveTo(o2.dx, o2.dy)
+        ..quadraticBezierTo(ctrl.dx, ctrl.dy, tip.dx, tip.dy);
+      c.drawPath(blade, _ps(p.blade, 2.2));
+      break;
+    case _Wpn.axe:
+      c.drawLine(hand - d * 4, hand + d * 21, _ps(p.wood, 2.3));
+      final b = hand + d * 17;
+      final pa = b - d * 2.5;
+      final pb = b + d * 4 + n * 8;
+      final pc = b + d * 9;
+      final pe = b + d * 4 - n * 2;
+      final cp = b + d * 10 + n * 4;
+      final head = Path()
+        ..moveTo(pa.dx, pa.dy)
+        ..lineTo(pb.dx, pb.dy)
+        ..quadraticBezierTo(cp.dx, cp.dy, pc.dx, pc.dy)
+        ..lineTo(pe.dx, pe.dy)
+        ..close();
+      c.drawPath(head, _pf(p.steel));
+      c.drawPath(head, _ps(p.steelDark, 0.8));
+      break;
+    case _Wpn.spear:
+      c.drawLine(hand - d * 14, hand + d * 52, _ps(p.wood, 1.9));
+      final tip = hand + d * 63;
+      final bse = hand + d * 51;
+      final l1 = bse + n * 2.4;
+      final l2 = bse - n * 2.4;
+      final leaf = Path()
+        ..moveTo(tip.dx, tip.dy)
+        ..lineTo(l1.dx, l1.dy)
+        ..lineTo(l2.dx, l2.dy)
+        ..close();
+      c.drawPath(leaf, _pf(p.steel));
+      break;
+    case _Wpn.lance:
+      c.drawLine(hand - d * 16, hand + d * 72, _ps(p.wood, 2.0));
+      final tip = hand + d * 86;
+      final bse = hand + d * 72;
+      final l1 = bse + n * 2.2;
+      final l2 = bse - n * 2.2;
+      final leaf = Path()
+        ..moveTo(tip.dx, tip.dy)
+        ..lineTo(l1.dx, l1.dy)
+        ..lineTo(l2.dx, l2.dy)
+        ..close();
+      c.drawPath(leaf, _pf(p.steel));
+      // pennon streams backwards
+      final a0 = hand + d * 58;
+      final a1 = hand + d * 70;
+      final a2 = hand + d * 64 + const Offset(-11, 5);
+      final pen = Path()
+        ..moveTo(a0.dx, a0.dy)
+        ..lineTo(a1.dx, a1.dy)
+        ..lineTo(a2.dx, a2.dy)
+        ..close();
+      c.drawPath(pen, _pf(p.cloth));
+      break;
+  }
+}
+
+// ---------------------------------------------------------------- foot soldier
+void _drawFoot(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t) {
   final sw = math.sin(ph);
   final bob = -math.cos(ph * 2).abs() * 1.1;
   final fy = -bob; // keep the feet planted
@@ -932,54 +1310,37 @@ void _drawFoot(Canvas c, _Pal p, double ph, double raise, double ang) {
   // far leg
   c.drawLine(const Offset(0, -16), Offset(-sw * 7, fy), _ps(Color.lerp(p.hose, Colors.black, 0.18)!, 4.0));
 
-  // spear (held by the far hand)
-  c.save();
-  c.translate(7, -8);
-  c.rotate(math.sin(ph * 0.5) * 0.02);
-  c.drawLine(Offset.zero, const Offset(0, -66), _ps(p.wood, 1.8));
-  final head = Path()
-    ..moveTo(-1.8, -66)
-    ..lineTo(0, -77)
-    ..lineTo(1.8, -66)
-    ..close();
-  c.drawPath(head, _pf(p.steel));
-  c.restore();
+  // banner pole (far hand)
+  if (m.banner) {
+    c.drawLine(const Offset(7, -6), const Offset(7, -86), _ps(p.wood, 2.0));
+    _flag(c, p, 7, -84, math.sin(t * 3 + m.seed) * 2.2);
+  }
 
-  // kite shield on the far arm
-  _kite(c, p, 6, -37, 9, 20);
+  // shield (far arm)
+  _shield(c, p, 6, -37);
 
   // near leg
   c.drawLine(const Offset(0, -16), Offset(sw * 7, fy), _ps(p.hose, 4.2));
 
-  // surcoat with a cross, belt and mail collar
-  c.drawRRect(RRect.fromLTRBR(-5.8, -37, 5.8, -14, const Radius.circular(3)), _pf(p.cloth));
-  final cross = _pf(p.cream.withOpacity(0.55));
-  c.drawRect(Rect.fromLTWH(-1, -34, 2, 15), cross);
-  c.drawRect(Rect.fromLTWH(-4, -31, 8, 2), cross);
-  c.drawRect(Rect.fromLTWH(-6, -24, 12, 2), _pf(p.wood));
-  c.drawOval(Rect.fromCenter(center: const Offset(0, -37), width: 12, height: 4.5), _pf(p.steel));
+  // body
+  _torso(c, p, -37, -14, -24);
 
-  // near arm: swings, then lifts to point at the tab
+  // near arm + weapon: carried at rest, lifted to point at the tab
   const sh = Offset(1.5, -35);
-  final swing = Offset(1.5 - sw * 4.5, -23);
+  final rest = Offset(4.5 - sw * 2.5, -24);
   final dir = Offset(math.cos(ang), math.sin(ang));
-  final hand = Offset.lerp(swing, sh + dir * 15, raise)!;
-  c.drawLine(sh, hand, _ps(p.steel, 3.6));
+  final hand = Offset.lerp(rest, sh + dir * 15, raise)!;
+  final wa = _lerpD(_restAngle(m.wpn) + sw * 0.08, ang, raise);
+  c.drawLine(sh, hand, _ps(p.sleeve, 3.6));
+  _weapon(c, p, m.wpn, hand, wa);
   c.drawCircle(hand, 2.1, _pf(p.skin));
-  if (raise > 0.6) c.drawLine(hand, hand + dir * 3.5, _ps(p.skin, 1.5));
 
-  // head: coif, face, nasal helm
-  c.drawCircle(const Offset(-0.5, -41.5), 5.4, _pf(p.steel));
-  c.drawCircle(const Offset(2.3, -40.5), 3.0, _pf(p.skin));
-  final helm = Path()
-    ..moveTo(-5.6, -41.5)
-    ..arcToPoint(const Offset(5.8, -41.5), radius: const Radius.circular(5.7), clockwise: true)
-    ..close();
-  c.drawPath(helm, _pf(p.steel));
-  c.drawRect(Rect.fromLTWH(4.2, -43, 1.5, 6.5), _pf(p.steelDark));
+  // head
+  _head(c, p, -41.5, great: false, hairV: m.coat, sw: sw);
   c.restore();
 }
 
+// ---------------------------------------------------------------- rider
 void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double ang, double t) {
   final coat = p.f(m.coat);
   final coatDark = Color.lerp(coat, Colors.black, 0.28)!;
@@ -1018,23 +1379,33 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
   leg(const Offset(14, -27), ph, coat);
   leg(const Offset(-15, -27), ph + math.pi, coat);
 
-  // caparison (cloth over the horse)
-  final cap = Path()
-    ..moveTo(-21, -47)
-    ..lineTo(15, -47)
-    ..quadraticBezierTo(21, -46, 21.5, -38)
-    ..lineTo(22, -15)
-    ..lineTo(15, -18)
-    ..lineTo(8, -14)
-    ..lineTo(1, -18)
-    ..lineTo(-6, -14)
-    ..lineTo(-13, -18)
-    ..lineTo(-20, -14)
-    ..lineTo(-25, -17)
-    ..lineTo(-26, -36)
-    ..close();
-  c.drawPath(cap, _pf(p.cloth));
-  c.drawRect(Rect.fromLTWH(-25.5, -25, 47, 2.2), _pf(p.cream.withOpacity(0.6)));
+  // horse cloth: full caparison (crusader / saracen) or a plain saddle blanket (mongol)
+  if (p.faction == _Faction.mongol) {
+    c.drawRRect(RRect.fromLTRBR(-11, -49, 11, -40, const Radius.circular(3)), _pf(p.cloth));
+    c.drawRect(Rect.fromLTWH(-11, -42, 22, 2), _pf(p.trim));
+  } else {
+    final cap = Path()
+      ..moveTo(-21, -47)
+      ..lineTo(15, -47)
+      ..quadraticBezierTo(21, -46, 21.5, -38)
+      ..lineTo(22, -15)
+      ..lineTo(15, -18)
+      ..lineTo(8, -14)
+      ..lineTo(1, -18)
+      ..lineTo(-6, -14)
+      ..lineTo(-13, -18)
+      ..lineTo(-20, -14)
+      ..lineTo(-25, -17)
+      ..lineTo(-26, -36)
+      ..close();
+    c.drawPath(cap, _pf(p.cloth));
+    c.drawRect(Rect.fromLTWH(-25.5, -25, 47, 2.2), _pf(p.trim.withOpacity(0.85)));
+    if (p.faction == _Faction.crusader) {
+      final cr = _pf(p.trim.withOpacity(0.9));
+      c.drawRect(Rect.fromLTWH(-2, -44, 3, 19), cr);
+      c.drawRect(Rect.fromLTWH(-9, -37, 17, 3), cr);
+    }
+  }
 
   // saddle
   c.drawRRect(RRect.fromLTRBR(-6, -50, 6, -45, const Radius.circular(2)), _pf(p.wood));
@@ -1060,78 +1431,44 @@ void _drawRider(Canvas c, _Pal p, _Soldier m, double ph, double raise, double an
   c.save();
   c.translate(-1, -49);
 
-  // banner or lance, held by the far hand
-  final wave = math.sin(t * 3 + m.seed) * 2.2;
-  if (m.kind == _Kind.banner) {
+  // banner pole (far hand)
+  if (m.banner) {
     c.drawLine(const Offset(9, 10), const Offset(9, -82), _ps(p.wood, 2.0));
-    final flag = Path()
-      ..moveTo(9, -80)
-      ..quadraticBezierTo(22, -83 + wave, 36, -79 + wave * 1.4)
-      ..lineTo(31, -72 + wave * 1.4)
-      ..lineTo(36, -65 + wave * 1.4)
-      ..quadraticBezierTo(22, -69 + wave, 9, -66)
-      ..close();
-    c.drawPath(flag, _pf(p.cloth));
-    c.drawCircle(const Offset(9, -83), 1.7, _pf(p.steel));
-  } else {
-    c.save();
-    c.rotate(0.06);
-    c.drawLine(const Offset(9, 10), const Offset(9, -76), _ps(p.wood, 1.9));
-    final lanceHead = Path()
-      ..moveTo(7.4, -76)
-      ..lineTo(9, -87)
-      ..lineTo(10.6, -76)
-      ..close();
-    c.drawPath(lanceHead, _pf(p.steel));
-    final pennon = Path()
-      ..moveTo(9, -72)
-      ..lineTo(21, -69 + wave)
-      ..lineTo(9, -65)
-      ..close();
-    c.drawPath(pennon, _pf(p.cloth));
-    c.restore();
+    _flag(c, p, 9, -80, math.sin(t * 3 + m.seed) * 2.2);
   }
 
-  // leg, stirrup, scabbard
+  // leg, stirrup
   final legP = Path()
     ..moveTo(0, -1)
     ..lineTo(7, 9)
     ..lineTo(3, 20);
   c.drawPath(legP, _ps(p.hose, 4.4));
   c.drawRect(Rect.fromCenter(center: const Offset(4, 21), width: 6, height: 2.6), _pf(p.steelDark));
-  c.drawLine(const Offset(-4, -5), const Offset(-15, 6), _ps(p.wood, 2.6));
 
-  // shield, torso, belt, collar
-  _kite(c, p, 8.5, -26, 10, 21);
-  c.drawRRect(RRect.fromLTRBR(-6, -24, 6, 2, const Radius.circular(3.2)), _pf(p.cloth));
-  final cross = _pf(p.cream.withOpacity(0.55));
-  c.drawRect(Rect.fromLTWH(-1, -21, 2, 18), cross);
-  c.drawRect(Rect.fromLTWH(-4.5, -16, 9, 2), cross);
-  c.drawRect(Rect.fromLTWH(-6.2, -7, 12.4, 2), _pf(p.wood));
-  c.drawOval(Rect.fromCenter(center: const Offset(0, -24), width: 12.5, height: 4.6), _pf(p.steel));
+  // sidearm on riders who carry a spear / lance
+  if (m.wpn == _Wpn.lance || m.wpn == _Wpn.spear) {
+    c.drawLine(const Offset(-4, -5), const Offset(-15, 6), _ps(p.wood, 2.6));
+  }
 
-  // near arm: holds the reins, then lifts to point at the tab
+  // shield + body
+  _shield(c, p, 8.5, -26);
+  _torso(c, p, -24, 2, -7);
+
+  // near arm + weapon: held low at rest, lifted to point at the tab
   const sh = Offset(1.2, -21);
   const rein = Offset(8.5, -8);
   final dir = Offset(math.cos(ang), math.sin(ang));
   final hand = Offset.lerp(rein, sh + dir * 16, raise)!;
+  final wa = _lerpD(_restAngle(m.wpn), ang, raise);
   if (raise < 0.95) {
     c.drawLine(rein, const Offset(37, -9), _ps(p.wood.withOpacity(1 - raise), 0.9));
   }
-  c.drawLine(sh, hand, _ps(p.steel, 3.8));
+  c.drawLine(sh, hand, _ps(p.sleeve, 3.8));
+  _weapon(c, p, m.wpn, hand, wa);
   c.drawCircle(hand, 2.2, _pf(p.skin));
-  if (raise > 0.6) c.drawLine(hand, hand + dir * 3.5, _ps(p.skin, 1.5));
 
-  // great helm with a plume
-  c.drawRRect(RRect.fromLTRBR(-4.6, -39, 4.8, -24.5, const Radius.circular(2)), _pf(p.steel));
-  c.drawRect(Rect.fromLTWH(1.4, -39, 1.2, 14.5), _pf(p.steelDark));
-  c.drawRect(Rect.fromLTWH(0.6, -34.2, 4.2, 1.3), _pf(p.steelDark));
-  final plume = Path()
-    ..moveTo(-1, -39)
-    ..quadraticBezierTo(-9, -48 + sw * 1.2, -13, -37 + sw * 2)
-    ..quadraticBezierTo(-7, -41, -1, -37)
-    ..close();
-  c.drawPath(plume, _pf(p.cloth));
+  // head
+  _head(c, p, -29.5, great: p.faction == _Faction.crusader, hairV: 0xFF3E3028, sw: sw);
 
   c.restore(); // rider
   c.restore(); // bob
