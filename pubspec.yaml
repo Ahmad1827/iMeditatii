@@ -114,3 +114,4 @@ flutter:
     - assets/data/exercise_details.json
     - assets/icons/
     - .env
+    - assets/images/

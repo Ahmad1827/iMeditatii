@@ -86,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ===========================================================================
   bool _hStarted = false;
   bool _hShowLessons = false;
+  bool _hShowLeaders = false;
   String _hGrade = 'toate';
   String _hSubject = 'toate';
   String _hQuery = '';
@@ -105,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
+    final dark = AppColors.isDark;
     final catalog = _HReveal(delayMs: 140, child: _hCatalog(isMobile));
     final posts = _HReveal(delayMs: 200, child: _hPostsCard());
 
@@ -124,45 +126,53 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const CustomNavbar(),
           Expanded(
-            child: Scrollbar(
-              controller: _scrollController,
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                child: CustomPaint(
-                  painter: _HGridPaper(
-                    minor: Pb.text.withOpacity(0.03),
-                    major: Pb.text.withOpacity(0.05),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(height: isMobile ? 24 : 44),
-                      box(760, _HReveal(child: _hWelcome(isMobile))),
-                      SizedBox(height: isMobile ? 24 : 36),
-                      box(
-                        1240,
-                        LayoutBuilder(
-                          builder: (context, b) => (isMobile || b.maxWidth < 860)
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [catalog, const SizedBox(height: 20), posts],
-                                )
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(flex: 3, child: catalog),
-                                    const SizedBox(width: 24),
-                                    Expanded(flex: 2, child: posts),
-                                  ],
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 56),
-                      _hFooter(isMobile),
-                    ],
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/background.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.bottomCenter,
+                    filterQuality: FilterQuality.medium,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                   ),
                 ),
-              ),
+                if (dark) Positioned.fill(child: ColoredBox(color: Pb.page.withOpacity(0.86))),
+                Scrollbar(
+                  controller: _scrollController,
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: isMobile ? 24 : 44),
+                        box(760, _HReveal(child: _hWelcome(isMobile))),
+                        SizedBox(height: isMobile ? 24 : 36),
+                        box(
+                          1320,
+                          LayoutBuilder(
+                            builder: (context, b) => (isMobile || b.maxWidth < 900)
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [catalog, const SizedBox(height: 20), posts],
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(flex: 6, child: catalog),
+                                      const SizedBox(width: 24),
+                                      Expanded(flex: 5, child: posts),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 56),
+                        _hFooter(isMobile),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -539,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ---------------------------------------------------------------- catalog
   Widget _hCatalog(bool isMobile) =>
-      LayoutBuilder(builder: (context, box) => _hCatalogBody(isMobile, isMobile || box.maxWidth < 680));
+      LayoutBuilder(builder: (context, box) => _hCatalogBody(isMobile, isMobile || box.maxWidth < 760));
 
   Widget _hCatalogBody(bool isMobile, bool compact) {
     final exercises = _hExercises ?? const <Map<String, dynamic>>[];
@@ -563,8 +573,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final total = _hShowLessons ? lessonRows.length : exRows.length;
     final shown = total < _hLimit ? total : _hLimit;
 
-    void switchTo(bool lessons) => setState(() {
-          _hShowLessons = lessons;
+    void switchTo(int tab) => setState(() {
+          _hShowLessons = tab == 1;
+          _hShowLeaders = tab == 2;
           _hSubject = 'toate';
           _hLimit = 15;
         });
@@ -599,14 +610,15 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          seg('Exerciții', Icons.code, exercises.length, !_hShowLessons, () => switchTo(false)),
-          seg('Lecții', Icons.menu_book_outlined, lessonsAll.length, _hShowLessons, () => switchTo(true)),
+          seg('Exerciții', Icons.code, exercises.length, !_hShowLessons && !_hShowLeaders, () => switchTo(0)),
+          seg('Lecții', Icons.menu_book_outlined, lessonsAll.length, _hShowLessons, () => switchTo(1)),
+          seg('Clasament', Icons.emoji_events_outlined, _hLeaders?.length ?? 0, _hShowLeaders, () => switchTo(2)),
         ],
       ),
     );
 
     final search = SizedBox(
-      width: isMobile ? double.infinity : (compact ? 200 : 250),
+      width: (isMobile || compact) ? double.infinity : 250,
       child: TextField(
         onChanged: (v) => setState(() {
           _hQuery = v;
@@ -686,6 +698,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final switchKey = '${_hShowLessons}_${_hGrade}_${_hSubject}_${_hExercises == null}';
+    final extras = !_hShowLeaders;
 
     return _hCard(
       accent: const [Pb.primary, _cGreen],
@@ -697,14 +710,15 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (isMobile) ...[
-                  Align(alignment: Alignment.centerLeft, child: toggle),
-                  const SizedBox(height: 10),
-                  search,
+                if (isMobile || compact) ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: toggle),
+                  ),
+                  if (extras) ...[const SizedBox(height: 10), search],
                 ] else
-                  Row(children: [toggle, const Spacer(), search]),
-                const SizedBox(height: 12),
-                filters,
+                  Row(children: [toggle, const Spacer(), if (extras) search]),
+                if (extras) ...[const SizedBox(height: 12), filters],
               ],
             ),
           ),
@@ -712,13 +726,15 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: const Duration(milliseconds: 240),
             switchInCurve: Curves.easeOut,
             layoutBuilder: (cur, prev) => Stack(alignment: Alignment.topCenter, children: [...prev, if (cur != null) cur]),
-            child: Column(
-              key: ValueKey(switchKey),
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [if (tableHead != null) tableHead, ...rows],
-            ),
+            child: _hShowLeaders
+                ? KeyedSubtree(key: const ValueKey('leaders'), child: _hLeaderboardBody())
+                : Column(
+                    key: ValueKey(switchKey),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [if (tableHead != null) tableHead, ...rows],
+                  ),
           ),
-          if (total > 0)
+          if (!_hShowLeaders && total > 0)
             Container(
               decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -737,6 +753,47 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         ],
       ),
+    );
+  }
+
+  Widget _hLeaderboardBody() {
+    final leaders = _hLeaders;
+    final me = FirebaseAuth.instance.currentUser?.uid;
+
+    Widget body;
+    if (leaders == null) {
+      body = _hLoading('Se încarcă clasamentul...');
+    } else if (leaders.isEmpty) {
+      body = Container(
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          _hLeadersError
+              ? 'Clasamentul nu poate fi încărcat acum.'
+              : 'Încă nu e nimeni în clasament. Rezolvă o problemă și fii primul.',
+          style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.5),
+        ),
+      );
+    } else {
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [for (var i = 0; i < leaders.length; i++) _hLeaderRow(i, leaders[i], leaders[i]['uid'] == me)],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        body,
+        Container(
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          child: Text(
+            'Fiecare problemă rezolvată cât ești autentificat te urcă în clasament.',
+            style: TextStyle(fontSize: 12.5, color: Pb.muted, height: 1.4),
+          ),
+        ),
+      ],
     );
   }
 
@@ -899,7 +956,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     alignment: Alignment.topLeft,
                     child: Text(
                       '${p['body']}',
-                      maxLines: open ? null : 2,
+                      maxLines: open ? null : 3,
                       overflow: open ? null : TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 14, color: Pb.text, height: 1.55),
                     ),
