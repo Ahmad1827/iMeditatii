@@ -88,6 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hStarted = false;
   bool _hShowLessons = false;
   bool _hShowLeaders = false;
+  final GlobalKey _hTopKey = GlobalKey();
+  final GlobalKey _hMainKey = GlobalKey();
+  final GlobalKey _hFootKey = GlobalKey();
   String _hGrade = 'toate';
   String _hSubject = 'toate';
   String _hQuery = '';
@@ -107,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.microtask(_hLoadAll);
     }
 
-    final dark = AppColors.isDark;
     final catalog = _HReveal(delayMs: 140, child: _hCatalog(isMobile));
     final posts = _HReveal(delayMs: 200, child: _hPostsCard());
 
@@ -127,32 +129,23 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const CustomNavbar(),
           Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/background.png',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.bottomCenter,
-                    filterQuality: FilterQuality.medium,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  ),
-                ),
-                if (dark) Positioned.fill(child: ColoredBox(color: Pb.page.withOpacity(0.86))),
-                const Positioned.fill(child: IgnorePointer(child: HomeAmbient())),
-                Scrollbar(
+            child: HomeSky(
+              blockers: [_hTopKey, _hMainKey, _hFootKey],
+              child: Scrollbar(
+                controller: _scrollController,
+                child: SingleChildScrollView(
                   controller: _scrollController,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(height: isMobile ? 24 : 44),
-                        box(760, _HReveal(child: _hWelcome(isMobile))),
-                        SizedBox(height: isMobile ? 24 : 36),
-                        box(
-                          1320,
-                          LayoutBuilder(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: isMobile ? 24 : 44),
+                      box(760, KeyedSubtree(key: _hTopKey, child: _HReveal(child: _hWelcome(isMobile)))),
+                      SizedBox(height: isMobile ? 24 : 36),
+                      box(
+                        1320,
+                        KeyedSubtree(
+                          key: _hMainKey,
+                          child: LayoutBuilder(
                             builder: (context, b) => (isMobile || b.maxWidth < 900)
                                 ? Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -168,14 +161,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 56),
-                        _hFooter(isMobile),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 56),
+                      KeyedSubtree(key: _hFootKey, child: _hFooter(isMobile)),
+                    ],
                   ),
                 ),
-                if (!isMobile) const Positioned.fill(child: BalloonGame(contentWidth: 1272)),
-              ],
+              ),
             ),
           ),
         ],
