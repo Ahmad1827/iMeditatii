@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,10 +34,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadPlayerStats();
+    _hFactTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      if (mounted) setState(() => _hFactIdx++);
+    });
   }
 
   @override
   void dispose() {
+    _hFactTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -94,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _hGrade = 'toate';
   String _hSubject = 'toate';
   String _hQuery = '';
-  int _hLimit = 15;
+  int _hLimit = 6;
   int _hOpenPost = -1;
   List<Map<String, dynamic>>? _hExercises;
   Set<String> _hSolved = {};
@@ -102,6 +107,16 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>>? _hLeaders;
   bool _hLeadersError = false;
   bool _hCardsHidden = false;
+  int _hFactIdx = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
+  Timer? _hFactTimer;
+
+  void _hNextFact() {
+    _hFactTimer?.cancel();
+    setState(() => _hFactIdx++);
+    _hFactTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      if (mounted) setState(() => _hFactIdx++);
+    });
+  }
 
   static const Map<String, String> _hRoman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
 
@@ -434,9 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
     final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
 
-    final now = DateTime.now();
-    final day = now.difference(DateTime(now.year)).inDays;
-    final fact = _hFacts[day % _hFacts.length];
+    final fact = _hFacts[_hFactIdx % _hFacts.length];
 
     BoxDecoration cardDeco() => BoxDecoration(
           color: Pb.surface,
@@ -532,9 +545,48 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Știai că?', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Pb.text)),
-                const SizedBox(height: 4),
-                Text(fact, style: TextStyle(fontSize: 15, color: Pb.text, height: 1.5)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('Știai că?', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                    ),
+                    for (var i = 0; i < _hFacts.length; i++)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: i == _hFactIdx % _hFacts.length ? 14 : 5,
+                        height: 5,
+                        margin: const EdgeInsets.only(left: 3),
+                        decoration: BoxDecoration(
+                          color: i == _hFactIdx % _hFacts.length ? _cAmber : Pb.border,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                    const SizedBox(width: 6),
+                    IconButton(
+                      tooltip: 'Alt fapt',
+                      icon: Icon(Icons.arrow_forward, size: 16, color: Pb.muted),
+                      splashRadius: 16,
+                      visualDensity: VisualDensity.compact,
+                      onPressed: _hNextFact,
+                    ),
+                  ],
+                ),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 450),
+                  transitionBuilder: (child, a) => FadeTransition(
+                    opacity: a,
+                    child: SlideTransition(
+                      position: Tween(begin: const Offset(0, 0.25), end: Offset.zero).animate(a),
+                      child: child,
+                    ),
+                  ),
+                  layoutBuilder: (cur, prev) => Stack(alignment: Alignment.topLeft, children: [...prev, if (cur != null) cur]),
+                  child: Text(
+                    fact,
+                    key: ValueKey(fact),
+                    style: TextStyle(fontSize: 15, color: Pb.text, height: 1.5),
+                  ),
+                ),
               ],
             ),
           ),
@@ -591,7 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _hShowLessons = tab == 1;
           _hShowLeaders = tab == 2;
           _hSubject = 'toate';
-          _hLimit = 15;
+          _hLimit = 6;
         });
 
         Widget seg(String label, IconData icon, int count, bool sel, VoidCallback onTap) => _HHover(
@@ -636,7 +688,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: TextField(
         onChanged: (v) => setState(() {
           _hQuery = v;
-          _hLimit = 15;
+          _hLimit = 6;
         }),
         style: TextStyle(fontSize: 14, color: Pb.text),
         cursorColor: Pb.primary,
@@ -754,14 +806,19 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
-                  Expanded(child: Text('Afișate $shown din $total', style: TextStyle(fontSize: 13, color: Pb.muted))),
-                  if (total > shown)
-                    PbButton(
-                      text: 'Arată mai multe',
-                      variant: PbVariant.outlinePrimary,
-                      size: PbSize.sm,
-                      onPressed: () => setState(() => _hLimit += 15),
+                  Expanded(
+                    child: Text(
+                      _hShowLessons ? '$shown din $total lecții' : '$shown din $total probleme',
+                      style: TextStyle(fontSize: 13, color: Pb.muted),
                     ),
+                  ),
+                  PbButton(
+                    text: _hShowLessons ? 'Toate lecțiile' : 'Toate problemele',
+                    icon: Icons.arrow_forward,
+                    variant: PbVariant.outlinePrimary,
+                    size: PbSize.sm,
+                    onPressed: () => context.go(_hShowLessons ? '/resurse' : '/exercitii'),
+                  ),
                 ],
               ),
             ),

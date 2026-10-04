@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'sticky_footer.dart';
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
 
 class ExerciseListScreen extends StatefulWidget {
@@ -334,22 +335,18 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               onToggleCards: () => setState(() => _cHidden = !_cHidden),
               hideLabel: 'Ascunde problemele',
               showLabel: 'Arată problemele',
-              child: Scrollbar(
+              child: StickyFooterScroll(
                 controller: _cScroll,
-                child: SingleChildScrollView(
-                  controller: _cScroll,
-                  child: Column(
+                body: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: isMobile ? 20 : 36),
                       box(1180, KeyedSubtree(key: _cTopKey, child: _LReveal(child: _cHeader(inGrade, isMobile)))),
                       SizedBox(height: isMobile ? 14 : 20),
                       box(1180, KeyedSubtree(key: _cMainKey, child: _LReveal(delayMs: 140, child: body))),
-                      const SizedBox(height: 56),
-                      KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
                     ],
                   ),
-                ),
+                footer: KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
               ),
             ),
           ),

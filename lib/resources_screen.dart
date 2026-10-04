@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart';
+import 'sticky_footer.dart';
 import 'resources_data.dart';
 import 'ui_components.dart';
 
@@ -310,11 +311,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               onToggleCards: () => setState(() => _cHidden = !_cHidden),
               hideLabel: 'Ascunde lecțiile',
               showLabel: 'Arată lecțiile',
-              child: Scrollbar(
+              child: StickyFooterScroll(
                 controller: _scrollController,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
+                body: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: isMobile ? 20 : 40),
@@ -336,11 +335,9 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                       ),
                       SizedBox(height: isMobile ? 16 : 22),
                       box(1180, KeyedSubtree(key: _cMainKey, child: _RReveal(delayMs: 140, child: body))),
-                      const SizedBox(height: 56),
-                      KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
                     ],
                   ),
-                ),
+                footer: KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
               ),
             ),
           ),

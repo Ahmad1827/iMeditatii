@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'sticky_footer.dart';
 import 'retro_widgets.dart';
 import 'ui_components.dart' show StyleBuilder, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
 
@@ -126,11 +127,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
               onToggleCards: () => setState(() => _hidden = !_hidden),
               hideLabel: 'Ascunde materiile',
               showLabel: 'Arată materiile',
-              child: Scrollbar(
+              child: StickyFooterScroll(
                 controller: _scroll,
-                child: SingleChildScrollView(
-                  controller: _scroll,
-                  child: Column(
+                body: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: isMobile ? 20 : 40),
@@ -155,11 +154,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 56),
-                      KeyedSubtree(key: _footKey, child: _cFooter(context, isMobile)),
                     ],
                   ),
-                ),
+                footer: KeyedSubtree(key: _footKey, child: _cFooter(context, isMobile)),
               ),
             ),
           ),

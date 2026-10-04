@@ -635,7 +635,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     ? HomeSky(
                         scene: HomeScene.fantasy,
                         cheerSignal: _cCheer,
-                        blockers: [_cHeadKey, if (!_cHidden) _cLeftKey, if (!_cHidden) _cRightKey],
+                        blockers: [_cHeadKey, _cLeftKey, _cRightKey],
+                        cardsHidden: _cHidden,
+                        onToggleCards: _cHidden ? () => setState(() => _cHidden = false) : null,
+                        showLabel: 'Arată problema',
                         child: body,
                       )
                     : body,
