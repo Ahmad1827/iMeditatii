@@ -1,81 +1,337 @@
 {
   "Informatică": {
     "9": {
-      "Structuri secvențiale": [
-        { "id": "1", "title": "Suma a două numere", "difficulty": "ușoară" },
-        { "id": "2", "title": "Schimbare valori (Swap)", "difficulty": "ușoară" },
-        { "id": "3", "title": "Media aritmetică", "difficulty": "ușoară" },
-        { "id": "4", "title": "Ultima cifră", "difficulty": "ușoară" },
-        { "id": "5", "title": "Aria dreptunghiului", "difficulty": "ușoară" }
+      "1. Structuri secvențiale": [
+        {
+          "id": "1",
+          "title": "Suma a două numere",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Aria și perimetrul dreptunghiului",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Media aritmetică",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "4",
+          "title": "Interschimbarea a două valori",
+          "difficulty": "ușoară"
+        }
       ],
-      "Structuri alternative": [
-        { "id": "6", "title": "Maximul a două numere", "difficulty": "ușoară" },
-        { "id": "7", "title": "Verificare an bisect", "difficulty": "ușoară" },
-        { "id": "8", "title": "Laturi triunghi", "difficulty": "medie" },
-        { "id": "9", "title": "Verificare paritate", "difficulty": "ușoară" },
-        { "id": "10", "title": "Semnul unui număr", "difficulty": "ușoară" }
+      "2. Structuri alternative": [
+        {
+          "id": "5",
+          "title": "Maximul a două numere",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "6",
+          "title": "Par sau impar",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "7",
+          "title": "Semnul unui număr",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "8",
+          "title": "An bisect",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "9",
+          "title": "Laturile unui triunghi",
+          "difficulty": "medie"
+        }
       ],
-      "Structuri repetitive": [
-        { "id": "11", "title": "Suma cifrelor", "difficulty": "medie" },
-        { "id": "12", "title": "Cel mai mare divizor comun", "difficulty": "medie" },
-        { "id": "13", "title": "Oglinditul unui număr", "difficulty": "ușoară" },
-        { "id": "14", "title": "Număr palindrom", "difficulty": "ușoară" },
-        { "id": "15", "title": "Factori primi", "difficulty": "medie" }
+      "3. Prelucrarea cifrelor": [
+        {
+          "id": "10",
+          "title": "Ultima cifră",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "11",
+          "title": "Suma cifrelor",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "12",
+          "title": "Oglinditul unui număr",
+          "difficulty": "medie"
+        },
+        {
+          "id": "13",
+          "title": "Număr palindrom",
+          "difficulty": "medie"
+        }
       ],
-      "Tablouri unidimensionale": [
-        { "id": "16", "title": "Suma elementelor din vector", "difficulty": "ușoară" },
-        { "id": "17", "title": "Validare număr prim", "difficulty": "medie" },
-        { "id": "18", "title": "Minim și Maxim în vector", "difficulty": "ușoară" },
-        { "id": "19", "title": "Căutare binară", "difficulty": "medie" },
-        { "id": "20", "title": "Vector de frecvență", "difficulty": "medie" }
+      "4. Divizibilitate și numere prime": [
+        {
+          "id": "14",
+          "title": "CMMDC (algoritmul lui Euclid)",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "15",
+          "title": "Număr prim",
+          "difficulty": "medie"
+        },
+        {
+          "id": "16",
+          "title": "Descompunerea în factori primi",
+          "difficulty": "medie"
+        },
+        {
+          "id": "17",
+          "title": "Ciurul lui Eratostene",
+          "difficulty": "grea"
+        }
+      ],
+      "5. Tablouri unidimensionale": [
+        {
+          "id": "18",
+          "title": "Suma elementelor unui vector",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "19",
+          "title": "Minimul și maximul dintr-un vector",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "20",
+          "title": "Căutare liniară",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "21",
+          "title": "Cea mai frecventă valoare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "22",
+          "title": "Sortare prin selecție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "23",
+          "title": "Căutare binară",
+          "difficulty": "medie"
+        },
+        {
+          "id": "24",
+          "title": "Interclasarea a doi vectori",
+          "difficulty": "medie"
+        },
+        {
+          "id": "25",
+          "title": "Secvența de sumă maximă",
+          "difficulty": "grea"
+        }
       ]
     },
     "10": {
-      "Tablouri bidimensionale (Matrice)": [
-        { "id": "21", "title": "Suma pe diagonala principală", "difficulty": "ușoară" },
-        { "id": "22", "title": "Diagonala secundară", "difficulty": "ușoară" },
-        { "id": "23", "title": "Matrice transpusă", "difficulty": "medie" },
-        { "id": "24", "title": "Parcurgere în spirală", "difficulty": "grea" },
-        { "id": "25", "title": "Matrice simetrică", "difficulty": "medie" }
+      "1. Tablouri bidimensionale (matrice)": [
+        {
+          "id": "26",
+          "title": "Suma pe diagonala principală",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "27",
+          "title": "Produsul de pe diagonala secundară",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "28",
+          "title": "Transpusa unei matrice",
+          "difficulty": "medie"
+        },
+        {
+          "id": "29",
+          "title": "Matrice simetrică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "30",
+          "title": "Parcurgere în spirală",
+          "difficulty": "grea"
+        }
       ],
-      "Șiruri de caractere": [
-        { "id": "26", "title": "Numărare vocale", "difficulty": "ușoară" },
-        { "id": "27", "title": "Verificare anagrame", "difficulty": "medie" },
-        { "id": "28", "title": "Palindrom șir de caractere", "difficulty": "ușoară" },
-        { "id": "29", "title": "Inversare cuvânt", "difficulty": "ușoară" }
+      "2. Șiruri de caractere": [
+        {
+          "id": "31",
+          "title": "Numărul de vocale",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "32",
+          "title": "Inversarea unui cuvânt",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "33",
+          "title": "Cuvânt palindrom",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "34",
+          "title": "Litere distincte",
+          "difficulty": "medie"
+        },
+        {
+          "id": "35",
+          "title": "Anagrame",
+          "difficulty": "medie"
+        }
       ],
-      "Subprograme și recursivitate": [
-        { "id": "30", "title": "Factorial recursiv", "difficulty": "ușoară" },
-        { "id": "31", "title": "Fibonacci recursiv", "difficulty": "medie" },
-        { "id": "32", "title": "Turnurile din Hanoi", "difficulty": "medie" },
-        { "id": "33", "title": "CMMDC recursiv", "difficulty": "medie" }
+      "3. Recursivitate": [
+        {
+          "id": "36",
+          "title": "Factorial recursiv",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "37",
+          "title": "CMMDC recursiv",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "38",
+          "title": "Fibonacci recursiv",
+          "difficulty": "medie"
+        },
+        {
+          "id": "39",
+          "title": "Turnurile din Hanoi",
+          "difficulty": "grea"
+        }
       ],
-      "Divide et Impera": [
-        { "id": "34", "title": "Ridicare la putere logaritmică", "difficulty": "medie" },
-        { "id": "35", "title": "Merge Sort", "difficulty": "medie" }
+      "4. Divide et Impera": [
+        {
+          "id": "40",
+          "title": "Ridicare la putere în timp logaritmic",
+          "difficulty": "medie"
+        },
+        {
+          "id": "41",
+          "title": "Sortare prin interclasare (MergeSort)",
+          "difficulty": "grea"
+        }
+      ],
+      "5. Stivă și mulțimi (STL)": [
+        {
+          "id": "42",
+          "title": "Cele mai mari trei valori distincte",
+          "difficulty": "medie"
+        },
+        {
+          "id": "43",
+          "title": "Paranteze corecte",
+          "difficulty": "medie"
+        }
       ]
     },
     "11": {
-      "Metoda Backtracking": [
-        { "id": "36", "title": "Generarea permutărilor", "difficulty": "medie" },
-        { "id": "37", "title": "Generarea combinărilor", "difficulty": "medie" },
-        { "id": "38", "title": "Generarea aranjamentelor", "difficulty": "medie" },
-        { "id": "39", "title": "Problema Damelor (N-Queens)", "difficulty": "grea" },
-        { "id": "40", "title": "Partițiile unui număr", "difficulty": "grea" }
+      "1. Backtracking": [
+        {
+          "id": "44",
+          "title": "Generarea permutărilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "45",
+          "title": "Generarea aranjamentelor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "46",
+          "title": "Generarea combinărilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "47",
+          "title": "Partițiile unui număr",
+          "difficulty": "grea"
+        },
+        {
+          "id": "48",
+          "title": "Problema damelor",
+          "difficulty": "grea"
+        }
       ],
-      "Teoria Grafurilor": [
-        { "id": "41", "title": "Matricea de adiacență", "difficulty": "ușoară" },
-        { "id": "42", "title": "Gradele nodurilor", "difficulty": "ușoară" },
-        { "id": "43", "title": "Parcurgere în lățime (BFS)", "difficulty": "medie" },
-        { "id": "44", "title": "Parcurgere în adâncime (DFS)", "difficulty": "medie" },
-        { "id": "45", "title": "Componente conexe", "difficulty": "medie" }
+      "2. Grafuri neorientate": [
+        {
+          "id": "49",
+          "title": "Matricea de adiacență",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "50",
+          "title": "Gradele nodurilor",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "51",
+          "title": "Parcurgerea în lățime (BFS)",
+          "difficulty": "medie"
+        },
+        {
+          "id": "52",
+          "title": "Parcurgerea în adâncime (DFS)",
+          "difficulty": "medie"
+        },
+        {
+          "id": "53",
+          "title": "Componente conexe",
+          "difficulty": "medie"
+        }
       ],
-      "Programare dinamică": [
-        { "id": "46", "title": "Problema Rucsacului (0-1)", "difficulty": "grea" },
-        { "id": "47", "title": "Cel mai lung subșir crescător (LIS)", "difficulty": "grea" },
-        { "id": "48", "title": "Traseu sumă maximă în matrice", "difficulty": "medie" },
-        { "id": "49", "title": "Subșirul comun maximal (LCS)", "difficulty": "grea" },
-        { "id": "50", "title": "Problema Monedelor (Restul minim)", "difficulty": "medie" }
+      "3. Grafuri ponderate": [
+        {
+          "id": "54",
+          "title": "Drumuri minime (Dijkstra)",
+          "difficulty": "grea"
+        },
+        {
+          "id": "55",
+          "title": "Arbore parțial de cost minim (Kruskal)",
+          "difficulty": "grea"
+        }
+      ],
+      "4. Programare dinamică": [
+        {
+          "id": "56",
+          "title": "Traseu de sumă maximă în matrice",
+          "difficulty": "medie"
+        },
+        {
+          "id": "57",
+          "title": "Problema monedelor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "58",
+          "title": "Cel mai lung subșir crescător (LIS)",
+          "difficulty": "medie"
+        },
+        {
+          "id": "59",
+          "title": "Problema rucsacului (0-1)",
+          "difficulty": "grea"
+        },
+        {
+          "id": "60",
+          "title": "Subșirul comun maximal (LCS)",
+          "difficulty": "grea"
+        }
       ]
     }
   }
