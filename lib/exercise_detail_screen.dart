@@ -30,6 +30,9 @@ class ExerciseDetailScreen extends StatefulWidget {
   final String grade;
   final String id;
 
+  /// Whether a typed short answer counts as the expected one.
+  static bool answersMatch(String given, String expected) => _ExerciseDetailScreenState.answersMatch(given, expected);
+
   const ExerciseDetailScreen({super.key, required this.subject, required this.grade, required this.id});
 
   @override
@@ -373,15 +376,39 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   // ===========================================================================
   // CHECKERS
   // ===========================================================================
+  /// "− 12", "-12" and "-12,0" are the same answer; so are "1/2" and "0.5".
+  static String _normAnswer(String s) =>
+      s.trim().toLowerCase().replaceAll(RegExp(r'[−–—]'), '-').replaceAll(',', '.').replaceAll(RegExp(r'\s+'), '');
+
+  static double? _answerValue(String s) {
+    final direct = double.tryParse(s);
+    if (direct != null) return direct;
+    final parts = s.split('/');
+    if (parts.length != 2) return null;
+    final a = double.tryParse(parts[0]), b = double.tryParse(parts[1]);
+    return a == null || b == null || b == 0 ? null : a / b;
+  }
+
+  static bool answersMatch(String given, String expected) {
+    final g = _normAnswer(given), e = _normAnswer(expected);
+    if (g.isEmpty) return false;
+    if (g == e) return true;
+    final gv = _answerValue(g), ev = _answerValue(e);
+    return gv != null && ev != null && (gv - ev).abs() < 1e-9;
+  }
+
   void _checkSimpleAnswer() async {
-    final raspunsCorect = exerciseData!["raspuns_corect"]?.toString().trim().toLowerCase();
-    final raspunsElev = exerciseData!["tip_exercitiu"] == "grila"
-        ? (_selectedGrilaOption?.trim().toLowerCase() ?? "")
-        : _answerController.text.trim().toLowerCase();
+    final isGrila = exerciseData!["tip_exercitiu"] == "grila";
+    final raspunsCorect = exerciseData!["raspuns_corect"]?.toString() ?? '';
+    final raspunsElev = isGrila ? (_selectedGrilaOption ?? '') : _answerController.text;
+    // A multiple-choice option must be the very one marked correct, not just equal in value.
+    final ok = isGrila
+        ? raspunsElev.trim().toLowerCase() == raspunsCorect.trim().toLowerCase()
+        : answersMatch(raspunsElev, raspunsCorect);
 
     setState(() {
       solutionChecked = true;
-      solutionOk = (raspunsElev == raspunsCorect);
+      solutionOk = ok;
     });
     if (solutionOk) {
       setState(() => _cCheer++);
@@ -1109,8 +1136,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _cSolution() {
     final off = exerciseData!['official_solution'];
     final code = off is Map ? off['code']?.toString() : null;
+    final worked = _str(['solutie', 'rezolvare']); // maths: a worked solution in words
 
-    if (code == null) {
+    if (code == null && worked == null) {
       return Text('Problema nu are încă o soluție oficială.', style: TextStyle(fontSize: 15, color: Pb.muted));
     }
     if (!_alreadyDone && !_cShowSol) {
@@ -1130,6 +1158,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             size: PbSize.sm,
             onPressed: () => setState(() => _cShowSol = true),
           ),
+        ],
+      );
+    }
+    if (code == null) {
+      final answer = exerciseData!['raspuns_corect']?.toString();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PbRichText(worked!, fontSize: 15.5, height: 1.7),
+          if (answer != null && answer.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            PbAlert(type: PbAlertType.success, text: 'Răspuns: $answer'),
+          ],
         ],
       );
     }

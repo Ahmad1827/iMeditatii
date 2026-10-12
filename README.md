@@ -2,7 +2,7 @@
 
 > **Live site:** [https://ahmad1827.github.io/](https://ahmad1827.github.io/)
 
-A learning platform for Romanian high-school students: auto-graded programming problems, lessons that follow the school curriculum, and 1-to-1 tutoring with verified teachers. Teachers get a workspace where they write by hand, run code, and send both to their students.
+A learning platform for Romanian high-school students: auto-graded problems in computer science and maths, lessons that follow the school curriculum, and 1-to-1 tutoring with verified teachers. Teachers get a workspace where they write by hand, run code, and send both to their students.
 
 <p align="center">
   <img src="assets/site-tour.gif" alt="A tour of iMeditații: home page, problems, the in-browser code editor, lessons, teachers and dark mode" width="100%"/>
@@ -14,7 +14,7 @@ A learning platform for Romanian high-school students: auto-graded programming p
 
 ### For students
 
-* **Problems with automatic grading.** 60 computer science problems for grades IX–XI, grouped by chapter and difficulty. C++ solutions are compiled and run against tests. The maths section is in place and waiting for its problem set.
+* **Problems with automatic grading.** 60 computer science problems (grades IX–XI) and 61 maths problems (grades IX–XII), grouped by chapter and difficulty. C++ solutions are compiled and run against tests; maths answers are checked on the spot, and each maths problem has a worked solution.
 * **An editor in the browser.** Syntax colours, auto-indent, sample tests, and a result panel showing which tests passed.
 * **Lessons.** Python, C++ and maths for grades IX–XII, organised by chapter, with reading progress.
 * **Tutors.** Browse verified teachers by subject, read reviews, and message them directly.

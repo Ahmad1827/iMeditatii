@@ -334,5 +334,352 @@
         }
       ]
     }
+  },
+  "Matematică": {
+    "9": {
+      "1. Mulțimi și elemente de logică": [
+        {
+          "id": "1",
+          "title": "Reuniunea a două mulțimi",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Numărul de submulțimi",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Inecuație cu modul",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Progresii": [
+        {
+          "id": "4",
+          "title": "Termenul al zecelea",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "5",
+          "title": "Suma primilor 20 de termeni",
+          "difficulty": "medie"
+        },
+        {
+          "id": "6",
+          "title": "Progresie geometrică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "7",
+          "title": "Doi termeni cunoscuți",
+          "difficulty": "grea"
+        }
+      ],
+      "3. Funcția de gradul I": [
+        {
+          "id": "8",
+          "title": "Valoarea unei funcții",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "9",
+          "title": "Ecuație de gradul I",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "10",
+          "title": "Intersecția cu axa Ox",
+          "difficulty": "medie"
+        },
+        {
+          "id": "11",
+          "title": "Punct pe grafic",
+          "difficulty": "medie"
+        }
+      ],
+      "4. Funcția de gradul II": [
+        {
+          "id": "12",
+          "title": "Discriminantul",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "13",
+          "title": "Suma rădăcinilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "14",
+          "title": "Valoarea minimă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "15",
+          "title": "Rădăcini reale distincte",
+          "difficulty": "grea"
+        }
+      ]
+    },
+    "10": {
+      "1. Puteri, radicali și logaritmi": [
+        {
+          "id": "16",
+          "title": "Logaritm în baza 2",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "17",
+          "title": "Putere cu exponent rațional",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "18",
+          "title": "Diferență de logaritmi",
+          "difficulty": "medie"
+        },
+        {
+          "id": "19",
+          "title": "Radicali asemenea",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Ecuații exponențiale și logaritmice": [
+        {
+          "id": "20",
+          "title": "Ecuație exponențială",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "21",
+          "title": "Ecuație logaritmică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "22",
+          "title": "Substituție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "23",
+          "title": "Inecuație logaritmică",
+          "difficulty": "grea"
+        }
+      ],
+      "3. Combinatorică": [
+        {
+          "id": "24",
+          "title": "Factorial",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "25",
+          "title": "Alegerea unei echipe",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "26",
+          "title": "Numere cu cifre distincte",
+          "difficulty": "medie"
+        },
+        {
+          "id": "27",
+          "title": "Binomul lui Newton",
+          "difficulty": "grea"
+        }
+      ],
+      "4. Geometrie analitică": [
+        {
+          "id": "28",
+          "title": "Distanța dintre două puncte",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "29",
+          "title": "Panta unei drepte",
+          "difficulty": "medie"
+        },
+        {
+          "id": "30",
+          "title": "Ecuația unei drepte",
+          "difficulty": "medie"
+        },
+        {
+          "id": "31",
+          "title": "Aria unui triunghi",
+          "difficulty": "grea"
+        }
+      ]
+    },
+    "11": {
+      "1. Matrice și determinanți": [
+        {
+          "id": "32",
+          "title": "Determinant de ordin 2",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "33",
+          "title": "Determinant de ordin 3",
+          "difficulty": "medie"
+        },
+        {
+          "id": "34",
+          "title": "Pătratul unei matrice",
+          "difficulty": "medie"
+        },
+        {
+          "id": "35",
+          "title": "Matrice neinversabilă",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Sisteme de ecuații liniare": [
+        {
+          "id": "36",
+          "title": "Sistem cu două necunoscute",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "37",
+          "title": "Sistem cu trei necunoscute",
+          "difficulty": "medie"
+        },
+        {
+          "id": "38",
+          "title": "O infinitate de soluții",
+          "difficulty": "grea"
+        }
+      ],
+      "3. Limite de funcții": [
+        {
+          "id": "39",
+          "title": "Limită prin înlocuire",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "40",
+          "title": "Cazul 0/0",
+          "difficulty": "medie"
+        },
+        {
+          "id": "41",
+          "title": "Limită la infinit",
+          "difficulty": "medie"
+        },
+        {
+          "id": "42",
+          "title": "Limită remarcabilă",
+          "difficulty": "grea"
+        }
+      ],
+      "4. Derivate": [
+        {
+          "id": "43",
+          "title": "Derivata într-un punct",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "44",
+          "title": "Derivata unui produs",
+          "difficulty": "medie"
+        },
+        {
+          "id": "45",
+          "title": "Punct de minim",
+          "difficulty": "medie"
+        },
+        {
+          "id": "46",
+          "title": "Maxim local",
+          "difficulty": "grea"
+        }
+      ]
+    },
+    "12": {
+      "1. Legi de compoziție": [
+        {
+          "id": "47",
+          "title": "Calcul cu o lege",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "48",
+          "title": "Element neutru",
+          "difficulty": "medie"
+        },
+        {
+          "id": "49",
+          "title": "Element neutru, lege cu produs",
+          "difficulty": "medie"
+        },
+        {
+          "id": "50",
+          "title": "Simetricul unui element",
+          "difficulty": "grea"
+        }
+      ],
+      "2. Primitive": [
+        {
+          "id": "51",
+          "title": "O primitivă a unui polinom",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "52",
+          "title": "Primitivă cu condiție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "53",
+          "title": "Primitiva cosinusului",
+          "difficulty": "medie"
+        }
+      ],
+      "3. Integrale definite": [
+        {
+          "id": "54",
+          "title": "Integrala unui monom",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "55",
+          "title": "Integrala unei funcții de gradul I",
+          "difficulty": "medie"
+        },
+        {
+          "id": "56",
+          "title": "Integrala exponențialei",
+          "difficulty": "medie"
+        },
+        {
+          "id": "57",
+          "title": "Aria de sub grafic",
+          "difficulty": "grea"
+        }
+      ],
+      "4. Polinoame": [
+        {
+          "id": "58",
+          "title": "Restul împărțirii la X − 1",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "59",
+          "title": "Suma rădăcinilor unui polinom",
+          "difficulty": "medie"
+        },
+        {
+          "id": "60",
+          "title": "Divizibilitate cu X − 2",
+          "difficulty": "medie"
+        },
+        {
+          "id": "61",
+          "title": "Produsul rădăcinilor",
+          "difficulty": "grea"
+        }
+      ]
+    }
   }
 }

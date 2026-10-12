@@ -2367,5 +2367,697 @@
         ]
       }
     }
+  },
+  "Matematică": {
+    "9": {
+      "1": {
+        "title": "Reuniunea a două mulțimi",
+        "category": "1. Mulțimi și elemente de logică",
+        "difficulty": "ușoară",
+        "description": "Fie mulțimile A = {1, 2, 3, 4, 5, 6} și B = {4, 5, 6, 7, 8}. Câte elemente are mulțimea A ∪ B?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "8",
+        "hint": "Elementele comune se numără o singură dată.",
+        "solutie": "A ∪ B = {1, 2, 3, 4, 5, 6, 7, 8}, deci are 8 elemente. Altfel: card(A ∪ B) = card A + card B − card(A ∩ B) = 6 + 5 − 3 = 8."
+      },
+      "2": {
+        "title": "Numărul de submulțimi",
+        "category": "1. Mulțimi și elemente de logică",
+        "difficulty": "ușoară",
+        "description": "Câte submulțimi are mulțimea A = {a, b, c, d}? Se numără și mulțimea vidă, și A însăși.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "16",
+        "hint": "O mulțime cu n elemente are 2ⁿ submulțimi.",
+        "solutie": "Fiecare element fie intră, fie nu intră într-o submulțime, deci sunt 2 · 2 · 2 · 2 = 2⁴ = 16 submulțimi."
+      },
+      "3": {
+        "title": "Inecuație cu modul",
+        "category": "1. Mulțimi și elemente de logică",
+        "difficulty": "medie",
+        "description": "Care este mulțimea soluțiilor reale ale inecuației |x − 2| ≤ 3?",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "(−1, 5)",
+          "[−5, 1]",
+          "(−∞, −1] ∪ [5, +∞)",
+          "[−1, 5]"
+        ],
+        "raspuns_corect": "[−1, 5]",
+        "hint": "|u| ≤ a înseamnă −a ≤ u ≤ a.",
+        "solutie": "|x − 2| ≤ 3 ⇔ −3 ≤ x − 2 ≤ 3 ⇔ −1 ≤ x ≤ 5. Soluția este intervalul închis [−1, 5]."
+      },
+      "4": {
+        "title": "Termenul al zecelea",
+        "category": "2. Progresii",
+        "difficulty": "ușoară",
+        "description": "Într-o progresie aritmetică, a₁ = 3 și rația r = 4. Calculează a₁₀.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "39",
+        "hint": "aₙ = a₁ + (n − 1) · r.",
+        "solutie": "a₁₀ = a₁ + 9r = 3 + 9 · 4 = 39."
+      },
+      "5": {
+        "title": "Suma primilor 20 de termeni",
+        "category": "2. Progresii",
+        "difficulty": "medie",
+        "description": "Calculează suma primilor 20 de termeni ai progresiei aritmetice cu a₁ = 2 și rația r = 3.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "610",
+        "hint": "Sₙ = n · (2a₁ + (n − 1) · r) / 2.",
+        "solutie": "S₂₀ = 20 · (2 · 2 + 19 · 3) / 2 = 10 · 61 = 610."
+      },
+      "6": {
+        "title": "Progresie geometrică",
+        "category": "2. Progresii",
+        "difficulty": "medie",
+        "description": "Într-o progresie geometrică, b₁ = 2 și rația q = 3. Calculează b₅.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "162",
+        "hint": "bₙ = b₁ · qⁿ⁻¹.",
+        "solutie": "b₅ = b₁ · q⁴ = 2 · 81 = 162."
+      },
+      "7": {
+        "title": "Doi termeni cunoscuți",
+        "category": "2. Progresii",
+        "difficulty": "grea",
+        "description": "Într-o progresie aritmetică, a₃ = 11 și a₇ = 27. Calculează a₁₅.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "59",
+        "hint": "Diferența a₇ − a₃ este de patru ori rația.",
+        "solutie": "a₇ − a₃ = 4r = 16, deci r = 4. Atunci a₁ = a₃ − 2r = 3 și a₁₅ = a₁ + 14r = 3 + 56 = 59."
+      },
+      "8": {
+        "title": "Valoarea unei funcții",
+        "category": "3. Funcția de gradul I",
+        "difficulty": "ușoară",
+        "description": "Fie funcția f : ℝ → ℝ, f(x) = 3x − 7. Calculează f(4).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "5",
+        "hint": "Înlocuiește x cu 4.",
+        "solutie": "f(4) = 3 · 4 − 7 = 12 − 7 = 5."
+      },
+      "9": {
+        "title": "Ecuație de gradul I",
+        "category": "3. Funcția de gradul I",
+        "difficulty": "ușoară",
+        "description": "Rezolvă în ℝ ecuația 5x − 8 = 2x + 13. Scrie valoarea lui x.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "7",
+        "hint": "Treci termenii cu x într-o parte și numerele în cealaltă.",
+        "solutie": "5x − 2x = 13 + 8, deci 3x = 21 și x = 7."
+      },
+      "10": {
+        "title": "Intersecția cu axa Ox",
+        "category": "3. Funcția de gradul I",
+        "difficulty": "medie",
+        "description": "Graficul funcției f : ℝ → ℝ, f(x) = 2x − 6 intersectează axa Ox în punctul:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "(0, −6)",
+          "(−3, 0)",
+          "(3, 0)",
+          "(6, 0)"
+        ],
+        "raspuns_corect": "(3, 0)",
+        "hint": "Pe axa Ox, ordonata este 0: rezolvă f(x) = 0.",
+        "solutie": "f(x) = 0 ⇔ 2x − 6 = 0 ⇔ x = 3. Punctul este (3, 0). Punctul (0, −6) este intersecția cu axa Oy."
+      },
+      "11": {
+        "title": "Punct pe grafic",
+        "category": "3. Funcția de gradul I",
+        "difficulty": "medie",
+        "description": "Determină numărul real m pentru care punctul A(2, 5) aparține graficului funcției f(x) = mx + 1.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "2",
+        "hint": "A(2, 5) este pe grafic dacă f(2) = 5.",
+        "solutie": "f(2) = 5 ⇔ 2m + 1 = 5 ⇔ m = 2."
+      },
+      "12": {
+        "title": "Discriminantul",
+        "category": "4. Funcția de gradul II",
+        "difficulty": "ușoară",
+        "description": "Calculează discriminantul ecuației x² − 5x + 6 = 0.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "1",
+        "hint": "Δ = b² − 4ac.",
+        "solutie": "Δ = (−5)² − 4 · 1 · 6 = 25 − 24 = 1."
+      },
+      "13": {
+        "title": "Suma rădăcinilor",
+        "category": "4. Funcția de gradul II",
+        "difficulty": "medie",
+        "description": "Fie x₁ și x₂ rădăcinile ecuației 2x² − 8x + 3 = 0. Calculează x₁ + x₂.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "4",
+        "hint": "Relațiile lui Viète: x₁ + x₂ = −b / a.",
+        "solutie": "x₁ + x₂ = −b / a = 8 / 2 = 4. Nu e nevoie să afli rădăcinile."
+      },
+      "14": {
+        "title": "Valoarea minimă",
+        "category": "4. Funcția de gradul II",
+        "difficulty": "medie",
+        "description": "Care este valoarea minimă a funcției f : ℝ → ℝ, f(x) = x² − 6x + 11?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "2",
+        "hint": "Minimul se atinge în vârful parabolei, x = −b / (2a).",
+        "solutie": "Vârful are abscisa x = 6 / 2 = 3, iar f(3) = 9 − 18 + 11 = 2. Altfel: f(x) = (x − 3)² + 2 ≥ 2."
+      },
+      "15": {
+        "title": "Rădăcini reale distincte",
+        "category": "4. Funcția de gradul II",
+        "difficulty": "grea",
+        "description": "Pentru ce valori reale ale lui m ecuația x² − 2mx + 9 = 0 are două rădăcini reale distincte?",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "m ∈ (−3, 3)",
+          "m ∈ [−3, 3]",
+          "m ∈ (3, +∞)",
+          "m ∈ (−∞, −3) ∪ (3, +∞)"
+        ],
+        "raspuns_corect": "m ∈ (−∞, −3) ∪ (3, +∞)",
+        "hint": "Două rădăcini reale distincte înseamnă Δ > 0.",
+        "solutie": "Δ = 4m² − 36. Condiția Δ > 0 dă m² > 9, adică m < −3 sau m > 3."
+      }
+    },
+    "10": {
+      "16": {
+        "title": "Logaritm în baza 2",
+        "category": "1. Puteri, radicali și logaritmi",
+        "difficulty": "ușoară",
+        "description": "Calculează log₂ 32.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "5",
+        "hint": "Caută puterea lui 2 care dă 32.",
+        "solutie": "32 = 2⁵, deci log₂ 32 = 5."
+      },
+      "17": {
+        "title": "Putere cu exponent rațional",
+        "category": "1. Puteri, radicali și logaritmi",
+        "difficulty": "ușoară",
+        "description": "Calculează 27 la puterea 2/3.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "9",
+        "hint": "a^(m/n) este radicalul de ordin n din a, ridicat la puterea m.",
+        "solutie": "27^(2/3) = (∛27)² = 3² = 9."
+      },
+      "18": {
+        "title": "Diferență de logaritmi",
+        "category": "1. Puteri, radicali și logaritmi",
+        "difficulty": "medie",
+        "description": "Calculează log₃ 54 − log₃ 2.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "log a − log b = log (a / b), în aceeași bază.",
+        "solutie": "log₃ 54 − log₃ 2 = log₃ (54 / 2) = log₃ 27 = 3."
+      },
+      "19": {
+        "title": "Radicali asemenea",
+        "category": "1. Puteri, radicali și logaritmi",
+        "difficulty": "medie",
+        "description": "Se știe că √50 + √18 − √32 = k√2. Determină numărul k.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "4",
+        "hint": "Scoate factorii de sub radical: √50 = 5√2.",
+        "solutie": "√50 = 5√2, √18 = 3√2, √32 = 4√2. Suma este (5 + 3 − 4)√2 = 4√2, deci k = 4."
+      },
+      "20": {
+        "title": "Ecuație exponențială",
+        "category": "2. Ecuații exponențiale și logaritmice",
+        "difficulty": "ușoară",
+        "description": "Rezolvă în ℝ ecuația 2^(x+1) = 64. Scrie valoarea lui x.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "5",
+        "hint": "Scrie 64 ca putere a lui 2.",
+        "solutie": "64 = 2⁶, deci x + 1 = 6 și x = 5."
+      },
+      "21": {
+        "title": "Ecuație logaritmică",
+        "category": "2. Ecuații exponențiale și logaritmice",
+        "difficulty": "medie",
+        "description": "Rezolvă în ℝ ecuația log₂(x − 3) = 4. Scrie valoarea lui x.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "19",
+        "hint": "log₂ u = 4 înseamnă u = 2⁴.",
+        "solutie": "Condiție: x − 3 > 0. Din definiție, x − 3 = 2⁴ = 16, deci x = 19, care respectă condiția."
+      },
+      "22": {
+        "title": "Substituție",
+        "category": "2. Ecuații exponențiale și logaritmice",
+        "difficulty": "medie",
+        "description": "Ecuația 9ˣ − 4 · 3ˣ + 3 = 0 are două soluții reale. Calculează suma lor.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "1",
+        "hint": "Notează t = 3ˣ, cu t > 0. Atunci 9ˣ = t².",
+        "solutie": "Cu t = 3ˣ, ecuația devine t² − 4t + 3 = 0, cu t = 1 sau t = 3. Atunci 3ˣ = 1 dă x = 0, iar 3ˣ = 3 dă x = 1. Suma este 0 + 1 = 1."
+      },
+      "23": {
+        "title": "Inecuație logaritmică",
+        "category": "2. Ecuații exponențiale și logaritmice",
+        "difficulty": "grea",
+        "description": "Care este mulțimea soluțiilor reale ale inecuației log₂(x − 1) < 3?",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "(−∞, 9)",
+          "(1, 8)",
+          "(9, +∞)",
+          "(1, 9)"
+        ],
+        "raspuns_corect": "(1, 9)",
+        "hint": "Nu uita condiția de existență: x − 1 > 0.",
+        "solutie": "Condiția de existență dă x > 1. Baza 2 este supraunitară, deci log₂(x − 1) < 3 ⇔ x − 1 < 8 ⇔ x < 9. Soluția este (1, 9)."
+      },
+      "24": {
+        "title": "Factorial",
+        "category": "3. Combinatorică",
+        "difficulty": "ușoară",
+        "description": "Calculează 5!.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "120",
+        "hint": "n! = 1 · 2 · … · n.",
+        "solutie": "5! = 1 · 2 · 3 · 4 · 5 = 120."
+      },
+      "25": {
+        "title": "Alegerea unei echipe",
+        "category": "3. Combinatorică",
+        "difficulty": "ușoară",
+        "description": "În câte moduri pot fi alese 2 persoane dintr-un grup de 7, dacă ordinea nu contează?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "21",
+        "hint": "Ordinea nu contează, deci numeri combinări.",
+        "solutie": "C₇² = 7 · 6 / 2 = 21."
+      },
+      "26": {
+        "title": "Numere cu cifre distincte",
+        "category": "3. Combinatorică",
+        "difficulty": "medie",
+        "description": "Câte numere de trei cifre distincte se pot forma cu cifrele 1, 2, 3, 4, 5 și 6?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "120",
+        "hint": "Ordinea contează, deci numeri aranjamente.",
+        "solutie": "Prima cifră se alege în 6 moduri, a doua în 5, a treia în 4: A₆³ = 6 · 5 · 4 = 120."
+      },
+      "27": {
+        "title": "Binomul lui Newton",
+        "category": "3. Combinatorică",
+        "difficulty": "grea",
+        "description": "Care este coeficientul lui x² în dezvoltarea (x + 2)⁵?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "80",
+        "hint": "Termenul general este C₅ᵏ · x^(5−k) · 2ᵏ.",
+        "solutie": "x² apare pentru k = 3: C₅³ · x² · 2³ = 10 · 8 · x² = 80x². Coeficientul este 80."
+      },
+      "28": {
+        "title": "Distanța dintre două puncte",
+        "category": "4. Geometrie analitică",
+        "difficulty": "ușoară",
+        "description": "Calculează distanța dintre punctele A(1, 2) și B(4, 6).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "5",
+        "hint": "AB = √((x₂ − x₁)² + (y₂ − y₁)²).",
+        "solutie": "AB = √((4 − 1)² + (6 − 2)²) = √(9 + 16) = √25 = 5."
+      },
+      "29": {
+        "title": "Panta unei drepte",
+        "category": "4. Geometrie analitică",
+        "difficulty": "medie",
+        "description": "Care este panta dreptei care trece prin punctele A(−1, 3) și B(3, 11)?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "2",
+        "hint": "m = (y₂ − y₁) / (x₂ − x₁).",
+        "solutie": "m = (11 − 3) / (3 − (−1)) = 8 / 4 = 2."
+      },
+      "30": {
+        "title": "Ecuația unei drepte",
+        "category": "4. Geometrie analitică",
+        "difficulty": "medie",
+        "description": "Care este ecuația dreptei care trece prin punctul A(0, 1) și are panta 3?",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "y = x + 3",
+          "y = 3x − 1",
+          "y = 3x + 1",
+          "y = −3x + 1"
+        ],
+        "raspuns_corect": "y = 3x + 1",
+        "hint": "y − y₀ = m(x − x₀).",
+        "solutie": "y − 1 = 3(x − 0), deci y = 3x + 1."
+      },
+      "31": {
+        "title": "Aria unui triunghi",
+        "category": "4. Geometrie analitică",
+        "difficulty": "grea",
+        "description": "Calculează aria triunghiului cu vârfurile A(0, 0), B(6, 0) și C(2, 5).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "15",
+        "hint": "Latura AB este pe axa Ox, iar înălțimea din C este ordonata lui C.",
+        "solutie": "AB = 6, iar înălțimea din C pe AB este 5. Aria = 6 · 5 / 2 = 15."
+      }
+    },
+    "11": {
+      "32": {
+        "title": "Determinant de ordin 2",
+        "category": "1. Matrice și determinanți",
+        "difficulty": "ușoară",
+        "description": "Calculează determinantul matricei A cu liniile (3, 2) și (1, 4).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "10",
+        "hint": "Pentru liniile (a, b) și (c, d), determinantul este ad − bc.",
+        "solutie": "det A = 3 · 4 − 2 · 1 = 12 − 2 = 10."
+      },
+      "33": {
+        "title": "Determinant de ordin 3",
+        "category": "1. Matrice și determinanți",
+        "difficulty": "medie",
+        "description": "Calculează determinantul matricei cu liniile (1, 2, 3), (0, 1, 4) și (5, 6, 0).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "1",
+        "hint": "Dezvoltă după prima coloană: are un zero.",
+        "solutie": "După prima coloană: 1 · (1 · 0 − 4 · 6) + 5 · (2 · 4 − 3 · 1) = −24 + 25 = 1."
+      },
+      "34": {
+        "title": "Pătratul unei matrice",
+        "category": "1. Matrice și determinanți",
+        "difficulty": "medie",
+        "description": "Fie matricea A cu liniile (1, 2) și (3, 4). Calculează suma elementelor matricei A².",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "54",
+        "hint": "A² = A · A: linie înmulțită cu coloană.",
+        "solutie": "A² are liniile (7, 10) și (15, 22). Suma elementelor este 7 + 10 + 15 + 22 = 54."
+      },
+      "35": {
+        "title": "Matrice neinversabilă",
+        "category": "1. Matrice și determinanți",
+        "difficulty": "medie",
+        "description": "Matricea A cu liniile (2, m) și (4, 6) nu este inversabilă pentru:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "m = −3",
+          "m = 2",
+          "m = 12",
+          "m = 3"
+        ],
+        "raspuns_corect": "m = 3",
+        "hint": "O matrice nu este inversabilă exact când determinantul ei este 0.",
+        "solutie": "det A = 2 · 6 − 4m = 12 − 4m. Din 12 − 4m = 0 rezultă m = 3."
+      },
+      "36": {
+        "title": "Sistem cu două necunoscute",
+        "category": "2. Sisteme de ecuații liniare",
+        "difficulty": "ușoară",
+        "description": "Rezolvă sistemul 2x + y = 7, x − y = 2. Scrie valoarea lui x.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "Adună cele două ecuații: y se reduce.",
+        "solutie": "Adunând ecuațiile: 3x = 9, deci x = 3. Apoi y = x − 2 = 1."
+      },
+      "37": {
+        "title": "Sistem cu trei necunoscute",
+        "category": "2. Sisteme de ecuații liniare",
+        "difficulty": "medie",
+        "description": "Rezolvă sistemul x + y + z = 6, x − y + z = 2, 2x + y − z = 1. Scrie valoarea lui z.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "Scade a doua ecuație din prima ca să afli y.",
+        "solutie": "Prima minus a doua: 2y = 4, deci y = 2. Rămâne x + z = 4 și 2x − z = −1; adunate dau 3x = 3, deci x = 1 și z = 3."
+      },
+      "38": {
+        "title": "O infinitate de soluții",
+        "category": "2. Sisteme de ecuații liniare",
+        "difficulty": "grea",
+        "description": "Sistemul x + 2y = 3, 2x + my = 6 are o infinitate de soluții pentru:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "m = 2",
+          "m = −4",
+          "m = 4",
+          "niciun m real"
+        ],
+        "raspuns_corect": "m = 4",
+        "hint": "A doua ecuație trebuie să fie prima înmulțită cu un număr.",
+        "solutie": "Prima ecuație înmulțită cu 2 este 2x + 4y = 6. Coincide cu a doua exact când m = 4; atunci sistemul are o infinitate de soluții."
+      },
+      "39": {
+        "title": "Limită prin înlocuire",
+        "category": "3. Limite de funcții",
+        "difficulty": "ușoară",
+        "description": "Calculează limita funcției f(x) = x² + 3x − 1 când x tinde la 2.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "9",
+        "hint": "Funcția este continuă: înlocuiește x cu 2.",
+        "solutie": "Limita este 2² + 3 · 2 − 1 = 4 + 6 − 1 = 9."
+      },
+      "40": {
+        "title": "Cazul 0/0",
+        "category": "3. Limite de funcții",
+        "difficulty": "medie",
+        "description": "Calculează limita funcției f(x) = (x² − 9) / (x − 3) când x tinde la 3.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "6",
+        "hint": "Descompune numărătorul: x² − 9 = (x − 3)(x + 3).",
+        "solutie": "(x² − 9) / (x − 3) = x + 3 pentru x ≠ 3, deci limita este 3 + 3 = 6."
+      },
+      "41": {
+        "title": "Limită la infinit",
+        "category": "3. Limite de funcții",
+        "difficulty": "medie",
+        "description": "Calculează limita funcției f(x) = (6x² + x) / (2x² − 5) când x tinde la +∞.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "Gradele sunt egale: contează raportul coeficienților dominanți.",
+        "solutie": "Împărțind sus și jos la x²: (6 + 1/x) / (2 − 5/x²) → 6 / 2 = 3."
+      },
+      "42": {
+        "title": "Limită remarcabilă",
+        "category": "3. Limite de funcții",
+        "difficulty": "grea",
+        "description": "Limita funcției f(x) = sin(5x) / x când x tinde la 0 este:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "1",
+          "0",
+          "5",
+          "1/5"
+        ],
+        "raspuns_corect": "5",
+        "hint": "sin u / u tinde la 1 când u tinde la 0.",
+        "solutie": "sin(5x) / x = 5 · sin(5x) / (5x) → 5 · 1 = 5."
+      },
+      "43": {
+        "title": "Derivata într-un punct",
+        "category": "4. Derivate",
+        "difficulty": "ușoară",
+        "description": "Fie f(x) = x³ − 4x. Calculează f′(2).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "8",
+        "hint": "(xⁿ)′ = n · xⁿ⁻¹.",
+        "solutie": "f′(x) = 3x² − 4, deci f′(2) = 12 − 4 = 8."
+      },
+      "44": {
+        "title": "Derivata unui produs",
+        "category": "4. Derivate",
+        "difficulty": "medie",
+        "description": "Fie f(x) = x · eˣ. Calculează f′(0).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "1",
+        "hint": "(u · v)′ = u′ · v + u · v′.",
+        "solutie": "f′(x) = eˣ + x · eˣ = (x + 1) · eˣ, deci f′(0) = 1."
+      },
+      "45": {
+        "title": "Punct de minim",
+        "category": "4. Derivate",
+        "difficulty": "medie",
+        "description": "Care este abscisa punctului de minim al funcției f(x) = x² − 8x + 3?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "4",
+        "hint": "Rezolvă f′(x) = 0.",
+        "solutie": "f′(x) = 2x − 8 = 0 dă x = 4. Derivata este negativă înainte de 4 și pozitivă după, deci x = 4 este punct de minim."
+      },
+      "46": {
+        "title": "Maxim local",
+        "category": "4. Derivate",
+        "difficulty": "grea",
+        "description": "Fie f(x) = x³ − 3x² − 9x + 5. Care este valoarea maximului local al funcției?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "10",
+        "hint": "Află unde se anulează f′ și studiază semnul ei.",
+        "solutie": "f′(x) = 3x² − 6x − 9 = 3(x + 1)(x − 3). Derivata trece din pozitiv în negativ în x = −1, deci acolo este maximul local: f(−1) = −1 − 3 + 9 + 5 = 10."
+      }
+    },
+    "12": {
+      "47": {
+        "title": "Calcul cu o lege",
+        "category": "1. Legi de compoziție",
+        "difficulty": "ușoară",
+        "description": "Pe ℝ se definește legea x ∗ y = x + y − 3. Calculează 5 ∗ 4.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "6",
+        "hint": "Înlocuiește x cu 5 și y cu 4.",
+        "solutie": "5 ∗ 4 = 5 + 4 − 3 = 6."
+      },
+      "48": {
+        "title": "Element neutru",
+        "category": "1. Legi de compoziție",
+        "difficulty": "medie",
+        "description": "Pe ℝ se definește legea x ∗ y = x + y − 3. Care este elementul ei neutru?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "Caută e cu x ∗ e = x pentru orice x.",
+        "solutie": "x ∗ e = x ⇔ x + e − 3 = x ⇔ e = 3. Legea este comutativă, deci și e ∗ x = x."
+      },
+      "49": {
+        "title": "Element neutru, lege cu produs",
+        "category": "1. Legi de compoziție",
+        "difficulty": "medie",
+        "description": "Pe ℝ se definește legea x ∗ y = xy − 2x − 2y + 6. Care este elementul ei neutru?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "Legea se poate scrie x ∗ y = (x − 2)(y − 2) + 2.",
+        "solutie": "x ∗ e = x ⇔ (x − 2)(e − 2) + 2 = x ⇔ (x − 2)(e − 2) = x − 2 pentru orice x, deci e − 2 = 1 și e = 3."
+      },
+      "50": {
+        "title": "Simetricul unui element",
+        "category": "1. Legi de compoziție",
+        "difficulty": "grea",
+        "description": "Pe ℝ se definește legea x ∗ y = xy − 2x − 2y + 6, cu elementul neutru e = 3. Simetricul lui 4 este:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "2/5",
+          "−4",
+          "5/2",
+          "1/4"
+        ],
+        "raspuns_corect": "5/2",
+        "hint": "Caută x′ cu 4 ∗ x′ = 3.",
+        "solutie": "4 ∗ x′ = (4 − 2)(x′ − 2) + 2 = 2x′ − 2. Din 2x′ − 2 = 3 rezultă x′ = 5/2."
+      },
+      "51": {
+        "title": "O primitivă a unui polinom",
+        "category": "2. Primitive",
+        "difficulty": "ușoară",
+        "description": "O primitivă a funcției f(x) = 3x² + 2x este:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "6x + 2",
+          "x³ + 2x",
+          "3x³ + x²",
+          "x³ + x²"
+        ],
+        "raspuns_corect": "x³ + x²",
+        "hint": "Derivează fiecare variantă și compară cu f.",
+        "solutie": "(x³ + x²)′ = 3x² + 2x = f(x). Varianta 6x + 2 este derivata lui f, nu o primitivă."
+      },
+      "52": {
+        "title": "Primitivă cu condiție",
+        "category": "2. Primitive",
+        "difficulty": "medie",
+        "description": "Fie F primitiva funcției f(x) = 4x³ pentru care F(0) = 2. Calculează F(1).",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "3",
+        "hint": "Primitivele lui 4x³ sunt x⁴ + C.",
+        "solutie": "F(x) = x⁴ + C. Din F(0) = 2 rezultă C = 2, deci F(1) = 1 + 2 = 3."
+      },
+      "53": {
+        "title": "Primitiva cosinusului",
+        "category": "2. Primitive",
+        "difficulty": "medie",
+        "description": "Mulțimea primitivelor funcției f(x) = cos x este:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "−sin x + C",
+          "sin x + C",
+          "cos x + C",
+          "tg x + C"
+        ],
+        "raspuns_corect": "sin x + C",
+        "hint": "Ce funcție are derivata cos x?",
+        "solutie": "(sin x)′ = cos x, deci primitivele sunt sin x + C. Atenție: (cos x)′ = −sin x."
+      },
+      "54": {
+        "title": "Integrala unui monom",
+        "category": "3. Integrale definite",
+        "difficulty": "ușoară",
+        "description": "Calculează integrala de la 0 la 2 din funcția f(x) = 3x².",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "8",
+        "hint": "O primitivă a lui 3x² este x³. Aplică formula Leibniz–Newton.",
+        "solutie": "Integrala este x³ luat între 0 și 2, adică 2³ − 0³ = 8."
+      },
+      "55": {
+        "title": "Integrala unei funcții de gradul I",
+        "category": "3. Integrale definite",
+        "difficulty": "medie",
+        "description": "Calculează integrala de la 1 la 3 din funcția f(x) = 2x + 1.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "10",
+        "hint": "O primitivă este x² + x.",
+        "solutie": "Integrala este (x² + x) luat între 1 și 3, adică (9 + 3) − (1 + 1) = 10."
+      },
+      "56": {
+        "title": "Integrala exponențialei",
+        "category": "3. Integrale definite",
+        "difficulty": "medie",
+        "description": "Integrala de la 0 la 1 din funcția f(x) = eˣ este:",
+        "tip_exercitiu": "grila",
+        "variante": [
+          "e − 1",
+          "e",
+          "1",
+          "e + 1"
+        ],
+        "raspuns_corect": "e − 1",
+        "hint": "eˣ este propria primitivă.",
+        "solutie": "Integrala este eˣ luat între 0 și 1, adică e¹ − e⁰ = e − 1."
+      },
+      "57": {
+        "title": "Aria de sub grafic",
+        "category": "3. Integrale definite",
+        "difficulty": "grea",
+        "description": "Calculează aria suprafeței cuprinse între graficul funcției f(x) = x², axa Ox și dreptele x = 0 și x = 3.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "9",
+        "hint": "Funcția este pozitivă, deci aria este integrala ei de la 0 la 3.",
+        "solutie": "Aria este integrala de la 0 la 3 din x², adică x³ / 3 luat între 0 și 3: 27 / 3 − 0 = 9."
+      },
+      "58": {
+        "title": "Restul împărțirii la X − 1",
+        "category": "4. Polinoame",
+        "difficulty": "ușoară",
+        "description": "Care este restul împărțirii polinomului f = X³ − 2X + 5 la X − 1?",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "4",
+        "hint": "Restul împărțirii lui f la X − a este f(a).",
+        "solutie": "Restul este f(1) = 1 − 2 + 5 = 4."
+      },
+      "59": {
+        "title": "Suma rădăcinilor unui polinom",
+        "category": "4. Polinoame",
+        "difficulty": "medie",
+        "description": "Fie f = X³ − 6X² + 11X − 6. Calculează suma rădăcinilor lui f.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "6",
+        "hint": "Relațiile lui Viète: x₁ + x₂ + x₃ = −b / a.",
+        "solutie": "x₁ + x₂ + x₃ = −(−6) / 1 = 6. Verificare: rădăcinile sunt 1, 2 și 3."
+      },
+      "60": {
+        "title": "Divizibilitate cu X − 2",
+        "category": "4. Polinoame",
+        "difficulty": "medie",
+        "description": "Determină numărul real a pentru care polinomul f = X³ + aX − 10 este divizibil cu X − 2.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "1",
+        "hint": "f este divizibil cu X − 2 exact când f(2) = 0.",
+        "solutie": "f(2) = 8 + 2a − 10 = 2a − 2. Din 2a − 2 = 0 rezultă a = 1."
+      },
+      "61": {
+        "title": "Produsul rădăcinilor",
+        "category": "4. Polinoame",
+        "difficulty": "grea",
+        "description": "Fie f = X³ − 3X² − 4X + 12. Calculează produsul rădăcinilor lui f.",
+        "tip_exercitiu": "text",
+        "raspuns_corect": "-12",
+        "hint": "Relațiile lui Viète: x₁ · x₂ · x₃ = −d / a.",
+        "solutie": "x₁ · x₂ · x₃ = −12 / 1 = −12. Verificare: f = (X − 3)(X − 2)(X + 2), cu rădăcinile 3, 2 și −2, al căror produs este −12."
+      }
+    }
   }
 }
