@@ -9,7 +9,7 @@ A gamified, retro-terminal styled tutoring platform designed to level up the lea
 ## Quick Preview
 
 <p align="center">
-  <img src="assets/gifiMeditatii.gif" alt="iMeditatii Gameplay & Walkthrough Demo" width="100%"/>
+  <img src="assets/atelier-demo.gif" alt="iMeditatii Atelier demo: a handwritten math page, the code editor, and sending work to students" width="100%"/>
 </p>
 
 ---
