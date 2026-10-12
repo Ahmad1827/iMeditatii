@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'judge0.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
@@ -425,19 +425,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final inputData = tests[i]["input"] ?? "";
         final expectedOutput = tests[i]["output"] ?? "";
 
-        final response = await http.post(
-          Uri.parse("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true"),
-          headers: {
-            "Content-Type": "application/json",
-            "X-RapidAPI-Key": "YOUR_API_KEY",
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-          },
-          body: jsonEncode({"language_id": 52, "source_code": code, "stdin": inputData}),
-        );
-
-        final result = jsonDecode(response.body);
+        final result = await Judge0.run(code: code, stdin: inputData.toString());
         String normalize(String s) => s.replaceAll('\r', '').trim();
-        final normOutput = normalize((result["stdout"] ?? "").toString());
+        final normOutput = normalize(result.stdout);
         final normExpected = normalize(expectedOutput.toString());
         final ok = normOutput == normExpected;
         if (!ok) allPassed = false;
@@ -1511,18 +1501,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     try {
       for (var i = 0; i < tests.length; i++) {
-        final res = await http.post(
-          Uri.parse('https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true'),
-          headers: const {
-            'Content-Type': 'application/json',
-            'X-RapidAPI-Key': 'YOUR_API_KEY',
-            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-          },
-          body: jsonEncode({'language_id': 52, 'source_code': code, 'stdin': tests[i]['input']}),
-        );
-        final r = jsonDecode(res.body);
-        final got = norm('${r['stdout'] ?? ''}');
-        final err = norm('${r['compile_output'] ?? r['stderr'] ?? ''}');
+        final r = await Judge0.run(code: code, stdin: tests[i]['input'] ?? '');
+        final got = norm(r.stdout);
+        final err = norm(r.error);
         final exp = norm(tests[i]['output']!);
         final ok = got == exp;
         if (!ok) all = false;

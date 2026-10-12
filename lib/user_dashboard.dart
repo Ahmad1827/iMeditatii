@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
+import 'workspace_cards.dart';
 import 'clean_kit.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
@@ -291,7 +292,10 @@ class _UserDashboardState extends State<UserDashboard> {
   Widget _cBody(List<QueryDocumentSnapshot> docs, bool loading, bool isMobile) {
     final left = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [_cChats(docs, loading)],
+      children: [
+        if (_uid.isNotEmpty) ...[ReceivedMaterialsCard(uid: _uid), const SizedBox(height: 14)],
+        _cChats(docs, loading),
+      ],
     );
     final right = _cProgress();
 

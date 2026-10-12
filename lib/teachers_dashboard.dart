@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'workspace_cards.dart';
 import 'clean_kit.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky;
@@ -284,6 +285,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
         const SizedBox(height: 14),
         if (_isAdmin) ...[_cTabs(), const SizedBox(height: 14)],
         if (showChats) ...[
+          if (_uid.isNotEmpty) ...[TeacherWorkspaceCard(uid: _uid), const SizedBox(height: 14)],
           if (names.isNotEmpty) ...[_cStudentStrip(names, chatIds), const SizedBox(height: 14)],
           _cChats(docs, loading),
         ] else
@@ -349,8 +351,8 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
           const SizedBox(height: 6),
           Text(
             _isAdmin
-                ? 'Răspunde elevilor, aprobă problemele și lecțiile trimise și ține evidența profesorilor.'
-                : 'Răspunde elevilor tăi și adaugă probleme sau lecții noi pentru comunitate.',
+                ? 'Răspunde elevilor, pregătește materiale în atelier și aprobă problemele și lecțiile trimise.'
+                : 'Răspunde elevilor tăi, pregătește notițe și cod în atelier și adaugă probleme sau lecții noi.',
             style: TextStyle(fontSize: 14.5, color: Pb.muted, height: 1.5),
           ),
           const SizedBox(height: 16),
@@ -367,7 +369,13 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              PbButton(text: 'Problemă nouă', icon: Icons.add_task, onPressed: () => context.go('/adauga-exercitiu')),
+              PbButton(text: 'Atelier', icon: Icons.auto_stories_outlined, onPressed: () => context.go('/atelier')),
+              PbButton(
+                text: 'Problemă nouă',
+                icon: Icons.add_task,
+                variant: PbVariant.outlinePrimary,
+                onPressed: () => context.go('/adauga-exercitiu'),
+              ),
               PbButton(
                 text: 'Lecție nouă',
                 icon: Icons.menu_book_outlined,

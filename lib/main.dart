@@ -39,6 +39,8 @@ import 'add_exercise_screen.dart';
 import 'resources_screen.dart';
 import 'resource_detail_screen.dart';
 import 'add_article_screen.dart';
+import 'workspace_screen.dart';
+import 'material_screen.dart';
 import 'seed_problems.dart';
 
 void main() async {
@@ -229,6 +231,20 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/adauga-articol',
       builder: (context, state) => const AddArticleScreen(),
+    ),
+    GoRoute(
+      path: '/atelier',
+      builder: (context, state) => WorkspaceScreen(
+        openDocId: state.uri.queryParameters['doc'],
+        create: state.uri.queryParameters['nou'],
+      ),
+    ),
+    GoRoute(
+      path: '/material/:id',
+      builder: (context, state) => MaterialScreen(
+        key: ValueKey(state.pathParameters['id']),
+        shareId: state.pathParameters['id']!,
+      ),
     ),
   ],
 );
