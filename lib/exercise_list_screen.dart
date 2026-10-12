@@ -17,6 +17,14 @@ class ExerciseListScreen extends StatefulWidget {
 
   const ExerciseListScreen({super.key, required this.subject, this.grade});
 
+  /// Last subject opened, so /exercitii lands back on it.
+  static const String lastSubjectKey = 'exercises_last_subject';
+
+  static const List<(IconData, String, String)> subjects = [
+    (Icons.data_object, 'Informatică', 'Algoritmi și C++'),
+    (Icons.functions, 'Matematică', 'Algebră, analiză, geometrie'),
+  ];
+
   @override
   State<ExerciseListScreen> createState() => _ExerciseListScreenState();
 }
@@ -54,6 +62,14 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     super.initState();
     selectedGrade = widget.grade ?? "9";
     _loadAllExercises();
+    if (ExerciseListScreen.subjects.any((m) => m.$2 == widget.subject)) {
+      SharedPreferences.getInstance().then((p) => p.setString(ExerciseListScreen.lastSubjectKey, widget.subject));
+    }
+  }
+
+  void _switchSubject(String materie) {
+    if (materie == widget.subject) return;
+    context.go('/lista-exercitii?materie=${Uri.encodeComponent(materie)}');
   }
 
   @override
@@ -223,8 +239,10 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   static const List<Color> _catColors = [Pb.primary, _cBlue, _cAmber, _cRose, Color(0xFF8B5CF6), Color(0xFF14B8A6)];
   static const Map<String, String> _roman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
 
-  Color get _subjectColor {
-    final l = widget.subject.toLowerCase();
+  Color get _subjectColor => _colorOf(widget.subject);
+
+  Color _colorOf(String subject) {
+    final l = subject.toLowerCase();
     if (l.startsWith('mat')) return _cRose;
     if (l.contains('info')) return Pb.primary;
     if (l.contains('engl')) return _cAmber;
@@ -424,6 +442,70 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       child: Row(mainAxisSize: MainAxisSize.min, children: [for (final g in availableGrades) seg(g)]),
     );
 
+    Widget subjectTile(IconData icon, String name, String tagline) {
+      final sel = widget.subject == name;
+      final sc = _colorOf(name);
+      return _LHover(
+        onTap: () => _switchSubject(name),
+        builder: (h) {
+          final badge = AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: isMobile ? 34 : 42,
+            height: isMobile ? 34 : 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: sel ? sc : sc.withOpacity(h ? 0.18 : 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: isMobile ? 18 : 21, color: sel ? Colors.white : sc),
+          );
+          final title = Text(
+            name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: isMobile ? 14.5 : 16.5, fontWeight: FontWeight.w700, color: sel || h ? Pb.text : Pb.muted, letterSpacing: -0.2),
+          );
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            transform: Matrix4.translationValues(0, h && !sel ? -2 : 0, 0),
+            padding: EdgeInsets.all(isMobile ? 10 : 12),
+            decoration: BoxDecoration(
+              color: sel ? sc.withOpacity(0.08) : (h ? Pb.hoverBg : Colors.transparent),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: sel ? sc.withOpacity(0.65) : Pb.border, width: 1.5),
+              boxShadow: sel ? [BoxShadow(color: sc.withOpacity(0.18), blurRadius: 18, offset: const Offset(0, 6))] : null,
+            ),
+            child: Row(
+              children: [
+                badge,
+                SizedBox(width: isMobile ? 9 : 12),
+                Expanded(
+                  child: isMobile
+                      ? title
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            title,
+                            const SizedBox(height: 1),
+                            Text(tagline, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                          ],
+                        ),
+                ),
+                if (!isMobile)
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 180),
+                    opacity: sel ? 1 : 0,
+                    child: Icon(Icons.check_circle, size: 18, color: sc),
+                  ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     final search = TextField(
       controller: _cSearch,
       onChanged: (v) {
@@ -455,31 +537,20 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            PbLink(text: 'Probleme', fontSize: 13, onTap: () => context.go('/exercitii')),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted)),
-            ),
-            Text(widget.subject, style: TextStyle(fontSize: 13, color: Pb.muted)),
-          ],
+        Text('Probleme cu evaluare automată', style: TextStyle(fontSize: 13, color: Pb.muted)),
+        const SizedBox(height: 10),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 540),
+          child: Row(
+            children: [
+              for (final (i, m) in ExerciseListScreen.subjects.indexed) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(child: subjectTile(m.$1, m.$2, m.$3)),
+              ],
+            ],
+          ),
         ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Container(width: 10, height: 10, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                widget.subject,
-                style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5, height: 1.15),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
         Text(
           total == 0
               ? 'Nu sunt încă probleme pentru clasa ${_gradeLabel(selectedGrade)}.'
@@ -856,6 +927,44 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   // ===========================================================================
   // RETRO — original layout
   // ===========================================================================
+  Widget _retroSubjectToggle(bool isMobile) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border.all(color: AppColors.border, width: isMobile ? 2 : 2.5),
+        boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(isMobile ? 2 : 3, isMobile ? 2 : 3))],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: ExerciseListScreen.subjects.map((m) {
+          final isSel = m.$2 == widget.subject;
+          final fg = isSel ? const Color(0xFF10161A) : AppColors.ink;
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => _switchSubject(m.$2),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 16, vertical: isMobile ? 8 : 10),
+                color: isSel ? const Color(0xFFEAB334) : Colors.transparent,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(m.$1, size: isMobile ? 16 : 18, color: fg),
+                    const SizedBox(width: 8),
+                    Text(
+                      m.$2.toUpperCase(),
+                      style: TextStyle(color: fg, fontWeight: FontWeight.w900, fontSize: isMobile ? 13 : 16, letterSpacing: 0.8),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildHeader(bool isMobile) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 32, vertical: isMobile ? 12 : 16),
@@ -875,7 +984,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                         MouseRegion(
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
-                            onTap: () => context.go('/exercitii'),
+                            onTap: () => context.go('/'),
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -889,16 +998,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            widget.subject.toUpperCase(),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.isDark ? const Color(0xFFEAB334) : AppColors.ink,
-                              fontSize: 18,
-                              letterSpacing: 1.0,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: FittedBox(fit: BoxFit.scaleDown, child: _retroSubjectToggle(isMobile)),
                           ),
                         ),
                       ],
@@ -944,7 +1046,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
-                        onTap: () => context.go('/exercitii'),
+                        onTap: () => context.go('/'),
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -960,15 +1062,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          widget.subject.toUpperCase(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.isDark ? const Color(0xFFEAB334) : AppColors.ink,
-                            fontSize: 24,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
+                        _retroSubjectToggle(isMobile),
+                        const SizedBox(height: 8),
                         Text(
                           "RESOLVE PROBLEMS • EARN XP",
                           style: TextStyle(

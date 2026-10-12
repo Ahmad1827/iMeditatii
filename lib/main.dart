@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 import 'theme_manager.dart';
@@ -32,7 +33,6 @@ import 'paid_message_screen.dart';
 import 'review_screen.dart';
 import 'all_reviews_screen.dart';
 
-import 'exercises_screen.dart';
 import 'exercise_list_screen.dart';
 import 'exercise_detail_screen.dart';
 import 'add_exercise_screen.dart';
@@ -185,15 +185,17 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/exercitii',
-      pageBuilder: (context, state) => const NoTransitionPage(
-        child: ExercisesScreen(),
-      ),
+      redirect: (context, state) async {
+        final prefs = await SharedPreferences.getInstance();
+        final materie = prefs.getString(ExerciseListScreen.lastSubjectKey) ?? 'Informatică';
+        return '/lista-exercitii?materie=${Uri.encodeComponent(materie)}';
+      },
     ),
     GoRoute(
       path: '/lista-exercitii',
       builder: (context, state) {
         final materie = state.uri.queryParameters['materie'] ?? 'Matematică';
-        return ExerciseListScreen(subject: materie);
+        return ExerciseListScreen(key: ValueKey(materie), subject: materie);
       },
     ),
     GoRoute(
