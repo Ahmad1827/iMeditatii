@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'clean_kit.dart';
 import 'code_workbench.dart';
 import 'custom_navbar.dart' show CustomNavbar;
+import 'ink_page.dart';
 import 'note_editor.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, showPbModal;
 import 'workspace_models.dart';
@@ -17,12 +18,15 @@ import 'workspace_models.dart';
 // place, opened as tabs, saved as you type, and sent to students in two clicks.
 // =============================================================================
 const Color _noteColor = Color(0xFF3B82F6);
+const Color _inkColor = Color(0xFFE5484D);
 const Color _pyColor = Color(0xFFF59E0B);
 const Color _green = Color(0xFF10B981);
 const Color _red = Color(0xFFE5484D);
 
-Color wsDocColor(String type, String lang) => type == WsDoc.note ? _noteColor : (lang == 'python' ? _pyColor : Pb.primary);
-IconData wsDocIcon(String type) => type == WsDoc.note ? Icons.sticky_note_2_outlined : Icons.code;
+Color wsDocColor(String type, String lang) =>
+    type == WsDoc.ink ? _inkColor : (type == WsDoc.note ? _noteColor : (lang == 'python' ? _pyColor : Pb.primary));
+IconData wsDocIcon(String type) =>
+    type == WsDoc.ink ? Icons.draw_outlined : (type == WsDoc.note ? Icons.sticky_note_2_outlined : Icons.code);
 
 String wsAgo(DateTime? d) {
   if (d == null) return 'acum';
@@ -44,6 +48,7 @@ class _Session {
   final String initialContent;
   final TextEditingController title;
   final NoteEditorHandle note = NoteEditorHandle();
+  final InkPageHandle ink = InkPageHandle();
   final ValueNotifier<_Save> status = ValueNotifier(_Save.saved);
   String code;
   String lang;
@@ -63,7 +68,9 @@ class _Session {
         stdin = d.stdin;
 
   bool get isCode => type == WsDoc.code;
-  String get content => isCode ? code : (note.read() ?? initialContent);
+  bool get isInk => type == WsDoc.ink;
+  String get content => isCode ? code : ((isInk ? ink.read() : note.read()) ?? initialContent);
+  int get maxLength => isInk ? InkDoc.maxLength : NoteContent.maxLength;
   String get displayTitle => title.text.trim().isEmpty ? (isCode ? 'Fișier fără nume' : 'Pagină fără titlu') : title.text.trim();
 
   void dispose() {
@@ -187,9 +194,11 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
     final c = widget.create;
     if (c != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final id = await _create(c == 'note'
-            ? WsTemplate.all.first
-            : WsTemplate.all.firstWhere((t) => t.type == WsDoc.code && t.lang == (c == 'python' ? 'python' : 'cpp')));
+        final id = await _create(c == 'ink'
+            ? WsTemplate.mathPage
+            : (c == 'note'
+                ? WsTemplate.all.first
+                : WsTemplate.all.firstWhere((t) => t.type == WsDoc.code && t.lang == (c == 'python' ? 'python' : 'cpp'))));
         // Swap "?nou=" for the new document, so a reload does not create another one.
         if (id != null && mounted) context.go('/atelier?doc=$id');
       });
@@ -233,9 +242,9 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
       fields['lang'] = s.lang;
       fields['stdin'] = s.stdin;
     } else {
-      final c = s.note.read();
+      final c = s.isInk ? s.ink.read() : s.note.read();
       if (c != null) {
-        if (c.length > NoteContent.maxLength) {
+        if (c.length > s.maxLength) {
           if (!s.closed) s.status.value = _Save.tooLarge;
           return;
         }
@@ -401,8 +410,8 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
 
     if (s != null && s.dirty) await _save(s);
     final content = s?.content ?? d!.content;
-    if (content.length > NoteContent.maxLength) {
-      _toast('Pagina e prea mare ca să fie trimisă. Șterge din desene și încearcă din nou.');
+    if (content.length > (s?.maxLength ?? (d!.isInk ? InkDoc.maxLength : NoteContent.maxLength))) {
+      _toast('Pagina e prea mare ca să fie trimisă. Șterge din ce ai scris și încearcă din nou.');
       return;
     }
     try {
@@ -524,12 +533,15 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
         );
     final t = WsTemplate.all;
     return [
-      item(t[0], Icons.sticky_note_2_outlined, _noteColor, 'Pagină de notițe'),
+      item(WsTemplate.mathPage, Icons.draw_outlined, _inkColor, 'Caiet de matematică', sub: 'Scrii de mână pe toată pagina'),
+      item(t[0], Icons.sticky_note_2_outlined, _noteColor, 'Pagină de text'),
       item(t[3], Icons.code, Pb.primary, 'Fișier C++'),
       item(t[4], Icons.code, _pyColor, 'Fișier Python'),
       const PopupMenuDivider(),
       item(t[1], Icons.event_note_outlined, _noteColor, t[1].name, sub: t[1].desc),
       item(t[2], Icons.assignment_outlined, _noteColor, t[2].name, sub: t[2].desc),
+      item(t[6], Icons.draw_outlined, _inkColor, t[6].name, sub: t[6].desc),
+      item(t[7], Icons.draw_outlined, _inkColor, t[7].name, sub: t[7].desc),
     ];
   }
 
@@ -539,7 +551,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
     if (_section != null && !sections.contains(_section)) _section = null;
 
     final list = _docs.where((d) {
-      if (_filter != 'all' && d.type != _filter) return false;
+      if (_filter != 'all' && d.isCode != (_filter == WsDoc.code)) return false;
       if (_section != null && d.section.trim() != _section) return false;
       if (q.isEmpty) return true;
       final title = (_sessions[d.id]?.displayTitle ?? d.displayTitle).toLowerCase();
@@ -670,7 +682,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
             child: Container(
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(10)),
-              child: Row(children: [seg('all', 'Toate'), seg(WsDoc.note, 'Notițe'), seg(WsDoc.code, 'Cod')]),
+              child: Row(children: [seg('all', 'Toate'), seg(WsDoc.note, 'Caiet'), seg(WsDoc.code, 'Cod')]),
             ),
           ),
           if (sections.isNotEmpty)
@@ -705,6 +717,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
     final meta = [
       if (d.section.trim().isNotEmpty) d.section.trim(),
       if (d.isCode) (s?.lang ?? d.lang) == 'python' ? 'Python' : 'C++',
+      if (d.isInk) 'Scris de mână',
       wsAgo(d.updatedAt),
     ].join(' · ');
 
@@ -946,7 +959,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
         icon = Icons.warning_amber_rounded;
         text = 'Pagină prea mare';
         color = _red;
-        tip = 'Pagina a depășit limita de mărime. Șterge din desene ca să poată fi salvată.';
+        tip = 'Pagina a depășit limita de mărime. Șterge din ce ai scris ca să poată fi salvată.';
         break;
     }
     final w = Row(
@@ -966,7 +979,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
     final doc = _docs.where((d) => d.id == s.id).firstOrNull;
     final section = doc?.section.trim() ?? '';
 
-    if (!s.isCode) {
+    if (!s.isCode && !s.isInk) {
       final header = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1004,7 +1017,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
 
     final color = wsDocColor(s.type, s.lang);
     return Column(
-      key: ValueKey('code-${s.id}'),
+      key: ValueKey('${s.type}-${s.id}'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
@@ -1012,7 +1025,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Pb.border))),
           child: Row(
             children: [
-              Icon(Icons.insert_drive_file_outlined, size: 17, color: color),
+              Icon(s.isInk ? Icons.draw_outlined : Icons.insert_drive_file_outlined, size: 17, color: color),
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
@@ -1023,9 +1036,10 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
                   },
                   cursorColor: Pb.primary,
                   autocorrect: false,
+                  textCapitalization: s.isInk ? TextCapitalization.sentences : TextCapitalization.none,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text),
                   decoration: InputDecoration.collapsed(
-                    hintText: 'Numele fișierului',
+                    hintText: s.isInk ? 'Pagină fără titlu' : 'Numele fișierului',
                     hintStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.muted.withOpacity(0.6)),
                   ),
                 ),
@@ -1041,7 +1055,11 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
             ],
           ),
         ),
-        Expanded(
+        if (s.isInk)
+          Expanded(
+            child: InkPage(initialContent: s.initialContent, handle: s.ink, compact: isMobile, onDirty: () => _touch(s)),
+          ),
+        if (!s.isInk) Expanded(
           child: CodeWorkbench(
             initialCode: s.initialContent,
             initialLang: s.lang,
@@ -1130,12 +1148,18 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
               Text('Atelierul tău', style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.5)),
               const SizedBox(height: 8),
               Text(
-                'Scrie notițe cu text, liste și desen de mână, sau deschide un fișier de cod și rulează-l pe loc. '
+                'Scrie de mână pe o pagină întreagă, ca într-un caiet, sau deschide un fișier de cod și rulează-l pe loc. '
                 'Totul se salvează singur. Când e gata, trimite-l elevilor și îl găsesc în panoul lor.',
                 style: TextStyle(fontSize: 15, color: Pb.muted, height: 1.55),
               ),
               const SizedBox(height: 28),
-              group('CAIET', [
+              group('SCRIS DE MÂNĂ', [
+                card(t[5], Icons.draw_outlined),
+                card(t[6], Icons.draw_outlined),
+                card(t[7], Icons.draw_outlined),
+              ]),
+              const SizedBox(height: 26),
+              group('PAGINI DE TEXT', [
                 card(t[0], Icons.sticky_note_2_outlined),
                 card(t[1], Icons.event_note_outlined),
                 card(t[2], Icons.assignment_outlined),

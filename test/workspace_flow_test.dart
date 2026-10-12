@@ -14,7 +14,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:flutter/gestures.dart';
+
 import 'package:iMeditatii/code_workbench.dart';
+import 'package:iMeditatii/ink_page.dart';
 import 'package:iMeditatii/material_screen.dart';
 import 'package:iMeditatii/note_editor.dart';
 import 'package:iMeditatii/theme_manager.dart';
@@ -358,6 +361,116 @@ void main() {
     await tester.pumpAndSettle();
     expect((await db.collection('workspace_shares').get()).docs.length, 1);
 
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a handwritten page: the student writes on top, the teacher sees it', (tester) async {
+    final sheet = find.byWidgetPredicate((w) => w is CustomPaint && w.painter.runtimeType.toString() == '_SheetPainter');
+    Future<void> write(List<List<Offset>> strokes, {Offset at = Offset.zero}) async {
+      final origin = tester.getTopLeft(sheet) + at;
+      for (final st in strokes) {
+        final g = await tester.startGesture(origin + st.first, kind: PointerDeviceKind.mouse, buttons: kPrimaryMouseButton);
+        for (var i = 1; i < st.length; i++) {
+          await g.moveTo(origin + st[i]);
+        }
+        await g.up();
+      }
+      await tester.pump();
+    }
+
+    // "x² + 1", roughly
+    final sample = [
+      [const Offset(80, 90), const Offset(110, 130)],
+      [const Offset(110, 90), const Offset(80, 130)],
+      [const Offset(122, 78), const Offset(132, 72), const Offset(138, 80), const Offset(124, 96), const Offset(142, 96)],
+      [const Offset(170, 110), const Offset(200, 110)],
+      [const Offset(185, 95), const Offset(185, 125)],
+      [const Offset(230, 100), const Offset(242, 88), const Offset(242, 132)],
+    ];
+
+    await open(tester, '/atelier?nou=ink');
+    final docs = (await db.collection('workspace_docs').get()).docs;
+    final docId = docs.single.id;
+    expect(docs.single['type'], 'ink');
+    expect(find.byType(InkPage), findsOneWidget);
+    expect(find.byType(NoteEditor), findsNothing);
+
+    await tester.enterText(_hint('Pagină fără titlu'), 'Funcția de gradul II');
+    await write(sample);
+    await tester.tap(find.byTooltip('Dreptunghi'));
+    await tester.pump();
+    await write([
+      [const Offset(60, 60), const Offset(270, 150)],
+    ]);
+    expect(find.text('Se salvează'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 1000));
+    await tester.pumpAndSettle();
+    final saved = (await db.collection('workspace_docs').doc(docId).get()).data()!;
+    expect(saved['title'], 'Funcția de gradul II');
+    expect(InkDoc.parse(saved['content'] as String).strokes.length, 7);
+    await _shot(tester, '40-ink-teacher');
+
+    await tester.tap(find.text('Trimite elevilor').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mihai Ionescu'));
+    await tester.pump();
+    await tester.tap(find.text('Trimite la un elev'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    final sent = (await db.collection('workspace_shares').doc('${docId}_s1').get()).data()!;
+    expect(sent['type'], 'ink');
+    expect(sent['content'], saved['content']);
+
+    // student: sees the page, writes underneath; only their layer is stored separately
+    viewer = 's1';
+    await open(tester, '/panou-elev');
+    expect(find.textContaining('Pagină scrisă de mână'), findsOneWidget);
+    await tester.tap(find.text('Funcția de gradul II'));
+    await tester.pumpAndSettle();
+    expect(find.byType(InkPage), findsOneWidget);
+    await tester.tap(find.byTooltip('Culoare').at(2));
+    await tester.pump();
+    await write(sample.sublist(3), at: const Offset(0, 140));
+    await tester.pump(const Duration(milliseconds: 1300));
+    await tester.pumpAndSettle();
+    var sh = (await db.collection('workspace_shares').doc('${docId}_s1').get()).data()!;
+    expect(sh['content'], saved['content']);
+    expect(InkDoc.parse(sh['studentContent'] as String).strokes.length, 3);
+    expect(sh['seenAt'], isNotNull);
+    await _shot(tester, '41-ink-student');
+
+    // reopening: the student's ink is still there and can be added to
+    await open(tester, '/material/${docId}_s1');
+    await write([
+      [const Offset(300, 300), const Offset(340, 300)],
+    ]);
+    await tester.pump(const Duration(milliseconds: 1300));
+    await tester.pumpAndSettle();
+    sh = (await db.collection('workspace_shares').doc('${docId}_s1').get()).data()!;
+    expect(InkDoc.parse(sh['studentContent'] as String).strokes.length, 4);
+
+    // teacher: read-only, with and without the student's layer
+    viewer = 't1';
+    await open(tester, '/material/${docId}_s1');
+    expect(find.text('Cu ce a scris elevul'), findsOneWidget);
+    expect(find.byTooltip('Stilou'), findsNothing);
+    await _shot(tester, '42-ink-teacher-sees');
+    await tester.tap(find.text('Doar ce ai trimis'));
+    await tester.pumpAndSettle();
+    expect(find.byType(InkPage), findsOneWidget);
+
+    // erasing everything clears the student's copy
+    viewer = 's1';
+    await open(tester, '/material/${docId}_s1');
+    await tester.tap(find.byTooltip('Șterge tot ce ai scris tu'));
+    await tester.pump(const Duration(milliseconds: 1300));
+    await tester.pumpAndSettle();
+    expect((await db.collection('workspace_shares').doc('${docId}_s1').get())['studentContent'], isNull);
+
+    // phone
+    await open(tester, '/material/${docId}_s1', size: const Size(390, 780));
+    await _shot(tester, '43-ink-phone');
     expect(tester.takeException(), isNull);
   });
 

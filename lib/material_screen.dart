@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'clean_kit.dart';
 import 'code_workbench.dart';
 import 'custom_navbar.dart' show CustomNavbar;
+import 'ink_page.dart';
 import 'note_editor.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, showPbModal;
 import 'workspace_models.dart';
@@ -14,8 +15,9 @@ import 'workspace_screen.dart' show wsAgo, wsDocColor, wsDocIcon;
 
 // =============================================================================
 // MATERIAL — what a student sees when they open something a teacher sent.
-// Notes are read-only (checklists can be ticked). Code opens in the same IDE
-// the teacher used; the student works on their own copy, which is saved.
+// Text notes are read-only (checklists can be ticked). Code opens in the same
+// IDE the teacher used, on the student's own saved copy. A handwritten page
+// can be written on: the student's ink is a separate layer over the teacher's.
 // The teacher can open the same link to see how the student got on.
 // =============================================================================
 class MaterialScreen extends StatelessWidget {
@@ -54,7 +56,8 @@ class _MaterialBodyState extends State<MaterialBody> {
   bool _missing = false;
 
   Map<String, bool> _checks = {};
-  String? _myCode; // student's working copy
+  String? _myCode; // student's working copy (code), or their ink layer (handwritten page)
+  final InkPageHandle _ink = InkPageHandle();
   Timer? _timer;
   bool _dirty = false;
   final ValueNotifier<int> _saveState = ValueNotifier(0); // 0 saved, 1 saving, 2 error
@@ -123,11 +126,19 @@ class _MaterialBodyState extends State<MaterialBody> {
     _timer = Timer(const Duration(milliseconds: 1000), _saveCopy);
   }
 
+  void _onInk() {
+    _dirty = true;
+    _saveState.value = 1;
+    _timer?.cancel();
+    _timer = Timer(const Duration(milliseconds: 1200), _saveCopy);
+  }
+
   Future<void> _saveCopy() async {
     _timer?.cancel();
     final s = _share;
     if (s == null || !_dirty) return;
     _dirty = false;
+    if (s.isInk) _myCode = _ink.isEmpty ? null : _ink.read();
     try {
       await Workspace.saveStudentCopy(s.id, _myCode);
       if (mounted && !_dirty) _saveState.value = 0;
@@ -185,7 +196,11 @@ class _MaterialBodyState extends State<MaterialBody> {
         children: [
           _header(_share!, isMobile),
           Container(height: 1, color: Pb.border),
-          Expanded(child: _share!.isCode ? _codeBody(_share!, isMobile) : _noteBody(_share!, isMobile)),
+          Expanded(
+            child: _share!.isCode
+                ? _codeBody(_share!, isMobile)
+                : (_share!.isInk ? _inkBody(_share!, isMobile) : _noteBody(_share!, isMobile)),
+          ),
         ],
       );
     }
@@ -245,7 +260,7 @@ class _MaterialBodyState extends State<MaterialBody> {
               ],
             ),
           ),
-          if (s.isCode && _isStudent)
+          if ((s.isCode || s.isInk) && _isStudent)
             ValueListenableBuilder<int>(
               valueListenable: _saveState,
               builder: (_, v, __) => Row(
@@ -255,7 +270,7 @@ class _MaterialBodyState extends State<MaterialBody> {
                       size: 16, color: v == 2 ? const Color(0xFFE5484D) : Pb.muted),
                   if (!isMobile) ...[
                     const SizedBox(width: 5),
-                    Text(v == 0 ? 'Copia ta e salvată' : (v == 1 ? 'Se salvează' : 'Nesalvat'),
+                    Text(v == 0 ? (s.isInk ? 'Ce ai scris e salvat' : 'Copia ta e salvată') : (v == 1 ? 'Se salvează' : 'Nesalvat'),
                         style: TextStyle(fontSize: 12.5, color: v == 2 ? const Color(0xFFE5484D) : Pb.muted)),
                   ],
                 ],
@@ -356,6 +371,78 @@ class _MaterialBodyState extends State<MaterialBody> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _inkBody(WsShare s, bool isMobile) {
+    final hasCopy = s.studentContent != null;
+    final showOriginal = _isTeacher && (_showOriginal || !hasCopy);
+
+    Widget seg(bool original, String label) {
+      final sel = showOriginal == original;
+      return CkHover(
+        onTap: () => setState(() => _showOriginal = original),
+        builder: (h) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: sel ? Pb.surface : (h ? Pb.surface.withOpacity(0.5) : Colors.transparent),
+            borderRadius: BorderRadius.circular(7),
+            boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, 1))] : null,
+          ),
+          child: Text(label, style: TextStyle(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (s.message.trim().isNotEmpty) Padding(padding: const EdgeInsets.fromLTRB(12, 12, 12, 0), child: _teacherNote(s)),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          child: Row(
+            children: [
+              if (_isTeacher && hasCopy) ...[
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(10)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [seg(false, 'Cu ce a scris elevul'), seg(true, 'Doar ce ai trimis')]),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Text(
+                  _isTeacher
+                      ? (hasCopy
+                          ? 'Elevul a scris pe pagină ${wsAgo(s.studentUpdatedAt)}.'
+                          : (s.seen ? 'Elevul a deschis pagina, dar nu a scris nimic pe ea.' : 'Elevul încă nu a deschis pagina.'))
+                      : 'Poți scrie direct pe pagină. Ce scrii tu se salvează și îl vede și profesorul; ce a scris profesorul rămâne neschimbat.',
+                  style: TextStyle(fontSize: 13, color: Pb.muted, height: 1.4),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(height: 1, color: Pb.border),
+        Expanded(
+          child: _isTeacher
+              ? InkPage(
+                  key: ValueKey('ink-$showOriginal'),
+                  base: s.content,
+                  initialContent: showOriginal ? '' : s.studentContent!,
+                  readOnly: true,
+                  compact: isMobile,
+                )
+              : InkPage(
+                  base: s.content,
+                  initialContent: _myCode ?? '',
+                  handle: _ink,
+                  onDirty: _onInk,
+                  compact: isMobile,
+                  maxLength: 400000,
+                ),
+        ),
+      ],
     );
   }
 

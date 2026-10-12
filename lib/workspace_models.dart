@@ -18,33 +18,95 @@ class NoteStroke {
   final int color; // ARGB
   final double width; // relative to canvas width
   final bool marker; // highlighter: wide + translucent
+  final bool straight; // shapes: joined with straight segments, no smoothing
   final List<Offset> points; // normalised by canvas width
 
-  NoteStroke({required this.color, required this.width, this.marker = false, List<Offset>? points})
+  NoteStroke({required this.color, required this.width, this.marker = false, this.straight = false, List<Offset>? points})
       : points = points ?? <Offset>[];
 
   Map<String, dynamic> toJson() => {
         'c': color,
         'w': _r(width),
         if (marker) 'm': 1,
+        if (straight) 's': 1,
         'p': [for (final p in points) ...[_r(p.dx), _r(p.dy)]],
       };
 
+  /// Same data with points as integers (1/10000 of the width): about a third
+  /// smaller, which matters for full handwritten pages.
+  Map<String, dynamic> toCompactJson() => {
+        'c': color,
+        'w': _r(width),
+        if (marker) 'm': 1,
+        if (straight) 's': 1,
+        'q': [for (final p in points) ...[(p.dx * 10000).round(), (p.dy * 10000).round()]],
+      };
+
   static NoteStroke fromJson(Map<String, dynamic> j) {
-    final raw = (j['p'] as List?) ?? const [];
     final pts = <Offset>[];
-    for (var i = 0; i + 1 < raw.length; i += 2) {
-      pts.add(Offset((raw[i] as num).toDouble(), (raw[i + 1] as num).toDouble()));
+    final q = j['q'] as List?;
+    if (q != null) {
+      for (var i = 0; i + 1 < q.length; i += 2) {
+        pts.add(Offset((q[i] as num) / 10000, (q[i + 1] as num) / 10000));
+      }
+    } else {
+      final raw = (j['p'] as List?) ?? const [];
+      for (var i = 0; i + 1 < raw.length; i += 2) {
+        pts.add(Offset((raw[i] as num).toDouble(), (raw[i + 1] as num).toDouble()));
+      }
     }
     return NoteStroke(
       color: (j['c'] as num?)?.toInt() ?? 0xFF262626,
       width: (j['w'] as num?)?.toDouble() ?? 0.004,
       marker: j['m'] == 1,
+      straight: j['s'] == 1,
       points: pts,
     );
   }
 
   static double _r(double v) => (v * 10000).roundToDouble() / 10000;
+}
+
+// ----------------------------------------------------------------- ink pages
+/// A whole handwritten page: one tall sheet of paper covered in strokes.
+class InkDoc {
+  /// A sent page lives in one Firestore document (1 MiB) together with the
+  /// student's own layer, so each side gets a bit under half.
+  static const int maxLength = 480000;
+  static const double startHeight = 1.4; // height / width, roughly A4
+
+  String paper; // blank | grid | lines
+  double height;
+  final List<NoteStroke> strokes;
+
+  InkDoc({this.paper = 'grid', this.height = startHeight, List<NoteStroke>? strokes}) : strokes = strokes ?? <NoteStroke>[];
+
+  static InkDoc parse(String raw) {
+    if (raw.trim().isEmpty) return InkDoc();
+    try {
+      final j = jsonDecode(raw) as Map<String, dynamic>;
+      return InkDoc(
+        paper: '${j['paper'] ?? 'grid'}',
+        height: ((j['h'] as num?)?.toDouble() ?? startHeight).clamp(0.5, 40.0).toDouble(),
+        strokes: [
+          for (final s in (j['strokes'] as List?) ?? const [])
+            if (s is Map) NoteStroke.fromJson(Map<String, dynamic>.from(s)),
+        ],
+      );
+    } catch (_) {
+      return InkDoc();
+    }
+  }
+
+  String encode() => jsonEncode({
+        'v': 1,
+        'kind': 'ink',
+        'paper': paper,
+        'h': (height * 1000).round() / 1000,
+        'strokes': [for (final s in strokes) s.toCompactJson()],
+      });
+
+  static String blank(String paper) => InkDoc(paper: paper).encode();
 }
 
 class NoteBlock {
@@ -176,6 +238,9 @@ class NoteContent {
 class WsDoc {
   static const String note = 'note';
   static const String code = 'code';
+  static const String ink = 'ink';
+
+  static String typeOf(dynamic v) => v == code ? code : (v == ink ? ink : note);
 
   final String id;
   final String ownerId;
@@ -204,6 +269,7 @@ class WsDoc {
   });
 
   bool get isCode => type == code;
+  bool get isInk => type == ink;
   String get displayTitle => title.trim().isEmpty ? (isCode ? 'Fișier fără nume' : 'Pagină fără titlu') : title.trim();
   String get langLabel => lang == 'python' ? 'Python' : 'C++';
 
@@ -212,7 +278,7 @@ class WsDoc {
     return WsDoc(
       id: d.id,
       ownerId: '${m['ownerId'] ?? ''}',
-      type: m['type'] == code ? code : note,
+      type: typeOf(m['type']),
       title: '${m['title'] ?? ''}',
       content: '${m['content'] ?? ''}',
       lang: m['lang'] == 'python' ? 'python' : 'cpp',
@@ -267,6 +333,7 @@ class WsShare {
   });
 
   bool get isCode => type == WsDoc.code;
+  bool get isInk => type == WsDoc.ink;
   bool get seen => seenAt != null;
   bool get studentEdited => studentContent != null && studentContent != content;
   String get displayTitle => title.trim().isEmpty ? (isCode ? 'Fișier fără nume' : 'Pagină fără titlu') : title.trim();
@@ -277,7 +344,7 @@ class WsShare {
     return WsShare(
       id: d.id,
       docId: '${m['docId'] ?? ''}',
-      type: m['type'] == WsDoc.code ? WsDoc.code : WsDoc.note,
+      type: WsDoc.typeOf(m['type']),
       title: '${m['title'] ?? ''}',
       content: '${m['content'] ?? ''}',
       lang: m['lang'] == 'python' ? 'python' : 'cpp',
@@ -432,7 +499,7 @@ class Workspace {
     }
     await batch.commit();
 
-    final label = title.trim().isEmpty ? (type == WsDoc.code ? 'un fișier de cod' : 'o pagină de notițe') : '„${title.trim()}”';
+    final label = title.trim().isEmpty ? (type == WsDoc.code ? 'un fișier de cod' : (type == WsDoc.ink ? 'o pagină scrisă de mână' : 'o pagină de notițe')) : '„${title.trim()}”';
     final text = message.trim().isEmpty
         ? 'Ți-am trimis $label. Îl găsești în panoul tău, la Materiale primite.'
         : 'Ți-am trimis $label: ${message.trim()}';
@@ -486,6 +553,8 @@ class WsTemplate {
   });
 
   static String _note(List<NoteBlock> b) => NoteContent.encode(b);
+
+  static WsTemplate get mathPage => all.firstWhere((t) => t.type == WsDoc.ink);
 
   static final List<WsTemplate> all = [
     WsTemplate(
@@ -565,6 +634,27 @@ class WsTemplate {
           'for x in v:\n'
           '    suma += x\n\n'
           'print(suma)\n',
+    ),
+    WsTemplate(
+      name: 'Caiet de matematică',
+      desc: 'Scrii de mână pe foaie cu pătrățele.',
+      type: WsDoc.ink,
+      title: '',
+      build: () => InkDoc.blank('grid'),
+    ),
+    WsTemplate(
+      name: 'Foaie albă',
+      desc: 'Desen liber, fără liniatură.',
+      type: WsDoc.ink,
+      title: '',
+      build: () => InkDoc.blank('blank'),
+    ),
+    WsTemplate(
+      name: 'Foaie liniată',
+      desc: 'Scris de mână pe rânduri.',
+      type: WsDoc.ink,
+      title: '',
+      build: () => InkDoc.blank('lines'),
     ),
   ];
 }

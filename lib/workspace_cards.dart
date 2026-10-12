@@ -91,7 +91,7 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                           trailing: PbLink(text: 'Deschide atelierul', fontSize: 13.5, onTap: () => context.go('/atelier')),
                         ),
                         Text(
-                          'Caietul tău de notițe și un editor de cod care rulează pe loc. Ce scrii aici poți trimite direct elevilor.',
+                          'Un caiet pe care scrii de mână și un editor de cod care rulează pe loc. Ce faci aici poți trimite direct elevilor.',
                           style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45),
                         ),
                         const SizedBox(height: 12),
@@ -100,7 +100,7 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                           runSpacing: 8,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            PbButton(text: 'Pagină nouă', icon: Icons.sticky_note_2_outlined, size: PbSize.sm, onPressed: () => context.go('/atelier?nou=note')),
+                            PbButton(text: 'Caiet de matematică', icon: Icons.draw_outlined, size: PbSize.sm, onPressed: () => context.go('/atelier?nou=ink')),
                             PbButton(
                               text: 'Fișier C++',
                               icon: Icons.code,
@@ -155,7 +155,7 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                                       Text(
                                         [
                                           if (d.section.trim().isNotEmpty) d.section.trim(),
-                                          d.isCode ? _codeSummary(d.content, d.langLabel) : 'Notițe',
+                                          d.isCode ? _codeSummary(d.content, d.langLabel) : (d.isInk ? 'Scris de mână' : 'Notițe'),
                                           'modificat ${wsAgo(d.updatedAt)}',
                                         ].join(' · '),
                                         maxLines: 1,
@@ -280,7 +280,7 @@ class _ReceivedMaterialsCardState extends State<ReceivedMaterialsCard> {
 
   Widget _row(BuildContext context, WsShare s) {
     final c = wsDocColor(s.type, s.lang);
-    final preview = s.isCode ? _codeSummary(s.content, s.langLabel) : NoteContent.preview(s.content, max: 90);
+    final preview = s.isCode ? _codeSummary(s.content, s.langLabel) : (s.isInk ? 'Pagină scrisă de mână' : NoteContent.preview(s.content, max: 90));
     return CkHover(
       onTap: () => context.push('/material/${s.id}'),
       builder: (h) => AnimatedContainer(
