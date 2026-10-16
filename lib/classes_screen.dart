@@ -13,7 +13,7 @@ import 'homework_composer.dart';
 import 'homework_dock.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer, showPbModal;
 import 'workspace_models.dart';
-import 'workspace_screen.dart' show wsAgo, wsDialogShell;
+import 'workspace_screen.dart' show wsAgo, wsDialogShell, wsDocColor;
 
 // =============================================================================
 // CLASSES
@@ -131,6 +131,126 @@ class ClassesBody extends StatelessWidget {
 }
 
 // ----------------------------------------------------------------- teacher
+/// A homework is still open while someone it went to hasn't finished it.
+bool _hwOpen(Homework h, Map<String, String> r) => r.isEmpty || r.keys.any((id) => !h.isDone(id));
+
+Widget _statTile(BuildContext context, String n, String label, Color c, IconData icon) {
+  final isMobile = MediaQuery.of(context).size.width < 700;
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 14, vertical: 10),
+    decoration: BoxDecoration(color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+    child: isMobile
+        ? Column(
+            children: [
+              Text(n, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: c)),
+              Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.text)),
+            ],
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: c),
+              const SizedBox(width: 8),
+              Text(n, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: c)),
+              const SizedBox(width: 5),
+              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+            ],
+          ),
+  );
+}
+
+/// Stat tiles: an even row on phones, a wrap of chips on wider screens.
+Widget _stats(BuildContext context, List<Widget> tiles) {
+  if (MediaQuery.of(context).size.width < 700) {
+    return Row(children: [
+      for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 8), Expanded(child: tiles[i])],
+    ]);
+  }
+  return Wrap(spacing: 10, runSpacing: 10, children: tiles);
+}
+
+/// The homework a teacher gave, with tabs for open / finished by everyone and
+/// grouped by deadline, like the student sees theirs.
+class _TeacherHomeworkList extends StatefulWidget {
+  final List<Homework> homework;
+  final List<SchoolClass> classes;
+  final bool loading;
+  final bool showClass;
+  final Widget empty;
+  const _TeacherHomeworkList({required this.homework, required this.classes, required this.empty, this.loading = false, this.showClass = true});
+
+  @override
+  State<_TeacherHomeworkList> createState() => _TeacherHomeworkListState();
+}
+
+class _TeacherHomeworkListState extends State<_TeacherHomeworkList> {
+  int _tab = 0;
+  String? _classFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.loading) return const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)));
+    if (widget.homework.isEmpty) return widget.empty;
+
+    final rec = {for (final h in widget.homework) h.id: hwRecipients(h, widget.classes)};
+    bool pass(Homework h) => _classFilter == null || h.classIds.contains(_classFilter);
+    final open = widget.homework.where((h) => _hwOpen(h, rec[h.id]!)).toList()..sort(_byDue);
+    final closed = widget.homework.where((h) => !_hwOpen(h, rec[h.id]!)).toList()
+      ..sort((a, b) => (b.dueAt ?? b.createdAt ?? DateTime(0)).compareTo(a.dueAt ?? a.createdAt ?? DateTime(0)));
+    final withHw = widget.showClass ? widget.classes.where((c) => widget.homework.any((h) => h.classIds.contains(c.id))).toList() : const <SchoolClass>[];
+
+    final children = <Widget>[];
+    if (_tab == 0) {
+      final shown = open.where(pass).toList();
+      if (shown.isEmpty) {
+        children.add(Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _emptyBox(Icons.celebration_outlined, 'Toți elevii au terminat', 'Temele terminate de toată lumea sunt la „Terminate de toți”.'),
+        ));
+      }
+      var first = true;
+      for (final g in _Due.values) {
+        final items = shown.where((h) => _dueOf(h) == g).toList();
+        if (items.isEmpty) continue;
+        children.add(_groupLabel(_dueTitle(g), _dueGroupColor(g), items.length));
+        for (final h in items) {
+          children.add(HomeworkProgressTile(key: ValueKey('open_${h.id}'), homework: h, recipients: rec[h.id]!, showClass: widget.showClass, initiallyOpen: first));
+          first = false;
+        }
+      }
+    } else {
+      final shown = closed.where(pass).toList();
+      children.add(const SizedBox(height: 16));
+      if (shown.isEmpty) {
+        children.add(_emptyBox(Icons.hourglass_empty, 'Nicio temă terminată de toți', 'Când toți elevii apasă „Am terminat”, tema trece aici.'));
+      }
+      for (final h in shown) {
+        children.add(HomeworkProgressTile(key: ValueKey('closed_${h.id}'), homework: h, recipients: rec[h.id]!, showClass: widget.showClass));
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _tabs([('Active', open.length), ('Terminate de toți', closed.length)], _tab, (i) => setState(() => _tab = i)),
+        if (withHw.length > 1) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _filterChip('Toate', _classFilter == null, () => setState(() => _classFilter = null)),
+              for (final c in withHw)
+                _filterChip(c.displayName, _classFilter == c.id, () => setState(() => _classFilter = _classFilter == c.id ? null : c.id), color: _classColor(c)),
+            ],
+          ),
+        ],
+        ...children,
+      ],
+    );
+  }
+}
+
 class TeacherClassesView extends StatefulWidget {
   final String uid;
   const TeacherClassesView({super.key, required this.uid});
@@ -142,12 +262,13 @@ class TeacherClassesView extends StatefulWidget {
 class _TeacherClassesViewState extends State<TeacherClassesView> {
   late final Stream<List<SchoolClass>> _classes = Classes.taughtBy(widget.uid);
   late final Stream<List<Homework>> _homework = Classes.assignedBy(widget.uid);
+  late final Future<String> _nameF = Workspace.teacherName(widget.uid).catchError((_) => 'Profesor');
   String _name = 'Profesor';
 
   @override
   void initState() {
     super.initState();
-    Workspace.teacherName(widget.uid).then((n) => _name = n).catchError((_) => _name);
+    _nameF.then((n) => _name = n);
   }
 
   Future<void> _newClass() async {
@@ -163,6 +284,7 @@ class _TeacherClassesViewState extends State<TeacherClassesView> {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
+    final wide = MediaQuery.of(context).size.width >= 980;
     return StreamBuilder<List<SchoolClass>>(
       stream: _classes,
       builder: (context, cs) {
@@ -171,31 +293,60 @@ class _TeacherClassesViewState extends State<TeacherClassesView> {
           stream: _homework,
           builder: (context, hs) {
             final hw = hs.data ?? const <Homework>[];
+            final students = {for (final c in classes) for (final m in c.members) m.id}.length;
+            final open = hw.where((h) => _hwOpen(h, hwRecipients(h, classes))).toList();
+            final late = open.where((h) => h.overdue).length;
+
+            final list = _TeacherHomeworkList(
+              homework: hw,
+              classes: classes,
+              loading: !hs.hasData && !hs.hasError,
+              empty: _emptyBox(
+                Icons.assignment_outlined,
+                'Nicio temă încă',
+                'O temă poate merge la o clasă întreagă sau la elevi anume, cu termen, probleme din bancă sau o pagină din Atelier.',
+                action: cs.hasData ? PbButton(text: 'Dă prima temă', icon: Icons.assignment_add, onPressed: () => _newHomework(classes)) : null,
+              ),
+            );
+            final side = _sidebar(cs, classes, hw);
+
             return ListView(
-              padding: const EdgeInsets.only(bottom: 90),
+              padding: const EdgeInsets.only(bottom: 100),
               children: [
                 PbContainer(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 26),
+                      FutureBuilder<String>(
+                        future: _nameF,
+                        builder: (context, s) {
+                          final first = (s.data ?? '').split(' ').first;
+                          return Text(first.isEmpty || first == 'Profesor' ? 'Bună!' : 'Bună, $first!',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.primary));
+                        },
+                      ),
+                      const SizedBox(height: 4),
                       Wrap(
                         spacing: 16,
                         runSpacing: 14,
-                        crossAxisAlignment: WrapCrossAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.end,
                         alignment: WrapAlignment.spaceBetween,
                         children: [
                           ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 560),
+                            constraints: const BoxConstraints(maxWidth: 620),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Clase și teme', style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w800, color: Pb.text)),
+                                Text('Clase și teme', style: TextStyle(fontSize: isMobile ? 28 : 34, fontWeight: FontWeight.w800, color: Pb.text, height: 1.15)),
                                 const SizedBox(height: 6),
                                 Text(
-                                  'Fă o clasă (chiar și pentru un singur elev), trimite-i linkul, iar elevul intră în ea după ce își face cont. '
-                                  'Temele date clasei ajung la toți, și la cei care intră mai târziu.',
-                                  style: TextStyle(fontSize: 15, color: Pb.muted, height: 1.5),
+                                  classes.isEmpty
+                                      ? 'Fă o clasă (chiar și pentru un singur elev), trimite-i linkul și dă-i teme. Le vede pe orice pagină a site-ului.'
+                                      : (open.isEmpty
+                                          ? 'Nicio temă în lucru. Toate temele date sunt terminate.'
+                                          : '${open.length == 1 ? 'O temă e' : '${open.length} teme sunt'} în lucru${late > 0 ? ', ${late == 1 ? 'una a' : '$late au'} trecut de termen' : ''}.'),
+                                  style: TextStyle(fontSize: 15.5, color: Pb.muted, height: 1.45),
                                 ),
                               ],
                             ),
@@ -210,49 +361,31 @@ class _TeacherClassesViewState extends State<TeacherClassesView> {
                           ),
                         ],
                       ),
-                      _sectionTitle('Clasele tale', trailing: classes.isEmpty ? null : Text('${classes.length}', style: TextStyle(color: Pb.muted))),
-                      if (!cs.hasData && !cs.hasError)
-                        const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)))
-                      else if (classes.isEmpty)
-                        _emptyBox(
-                          Icons.groups_outlined,
-                          'Încă nu ai nicio clasă',
-                          'Creezi clasa, primești un link și îl trimiți pe WhatsApp sau pe mail. Elevul îl deschide, își face cont și rămâne în clasă.',
-                          action: PbButton(text: 'Creează prima clasă', icon: Icons.group_add_outlined, onPressed: _newClass),
+                      if (classes.isNotEmpty || hw.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        _stats(context, [
+                          _statTile(context, '${classes.length}', classes.length == 1 ? 'clasă' : 'clase', hwBlue, Icons.groups_outlined),
+                          _statTile(context, '$students', students == 1 ? 'elev' : 'elevi', Pb.primary, Icons.person_outline),
+                          _statTile(context, '${open.length}', 'în lucru', hwAmber, Icons.assignment_outlined),
+                          if (late > 0) _statTile(context, '$late', 'după termen', hwRed, Icons.error_outline),
+                        ]),
+                      ],
+                      const SizedBox(height: 22),
+                      if (wide)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [_columnTitle('Teme date'), list])),
+                            const SizedBox(width: 28),
+                            SizedBox(width: 340, child: side),
+                          ],
                         )
-                      else
-                        LayoutBuilder(builder: (context, box) {
-                          final cols = box.maxWidth > 980 ? 3 : (box.maxWidth > 620 ? 2 : 1);
-                          final w = (box.maxWidth - (cols - 1) * 14) / cols;
-                          return Wrap(
-                            spacing: 14,
-                            runSpacing: 14,
-                            children: [
-                              for (final c in classes)
-                                SizedBox(
-                                  width: w,
-                                  child: _ClassCard(
-                                    c: c,
-                                    homeworkCount: hw.where((h) => h.classIds.contains(c.id)).length,
-                                    onHomework: () => _newHomework(classes, preselect: {c.id}),
-                                  ),
-                                ),
-                            ],
-                          );
-                        }),
-                      _sectionTitle('Teme date', trailing: hw.isEmpty ? null : Text('${hw.length}', style: TextStyle(color: Pb.muted))),
-                      if (hw.isEmpty)
-                        _emptyBox(
-                          Icons.assignment_outlined,
-                          'Nicio temă încă',
-                          'O temă poate merge la o clasă întreagă sau la elevi anume, cu termen, probleme din bancă sau o pagină din Atelier.',
-                        )
-                      else
-                        for (final h in hw)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: HomeworkProgressTile(homework: h, recipients: hwRecipients(h, classes)),
-                          ),
+                      else ...[
+                        side,
+                        const SizedBox(height: 28),
+                        _columnTitle('Teme date'),
+                        list,
+                      ],
                     ],
                   ),
                 ),
@@ -261,6 +394,42 @@ class _TeacherClassesViewState extends State<TeacherClassesView> {
           },
         );
       },
+    );
+  }
+
+  Widget _columnTitle(String t) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Text(t, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
+      );
+
+  Widget _sidebar(AsyncSnapshot<List<SchoolClass>> cs, List<SchoolClass> classes, List<Homework> hw) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text('Clasele tale', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text))),
+            if (classes.isNotEmpty) PbLink(text: '+ Clasă nouă', fontSize: 14, onTap: _newClass),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (!cs.hasData && !cs.hasError)
+          const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)))
+        else if (classes.isEmpty)
+          _emptyBox(
+            Icons.groups_outlined,
+            'Încă nu ai nicio clasă',
+            'Creezi clasa, primești un link și îl trimiți pe WhatsApp sau pe mail. Elevul îl deschide, își face cont și rămâne în clasă.',
+            action: PbButton(text: 'Creează prima clasă', icon: Icons.group_add_outlined, onPressed: _newClass),
+          )
+        else
+          for (final c in classes)
+            _ClassCard(
+              c: c,
+              openHomework: hw.where((h) => h.classIds.contains(c.id) && _hwOpen(h, hwRecipients(h, [c]))).length,
+              onHomework: () => _newHomework(classes, preselect: {c.id}),
+            ),
+      ],
     );
   }
 }
@@ -366,76 +535,87 @@ class _ClassNameDialogState extends State<_ClassNameDialog> {
 
 class _ClassCard extends StatelessWidget {
   final SchoolClass c;
-  final int homeworkCount;
+  final int openHomework;
   final VoidCallback onHomework;
-  const _ClassCard({required this.c, required this.homeworkCount, required this.onHomework});
+  const _ClassCard({required this.c, required this.openHomework, required this.onHomework});
 
   @override
   Widget build(BuildContext context) {
-    final color = c.subject.isEmpty ? ckColorFor(c.id) : ckSubjectColor(c.subject);
+    final color = _classColor(c);
     final n = c.members.length;
     return CkHover(
       onTap: () => context.go(c.path),
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
+        clipBehavior: Clip.antiAlias,
         decoration: ckDeco(r: 16).copyWith(border: Border.all(color: h ? color.withOpacity(0.6) : Pb.border.withOpacity(0.7))),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: color.withOpacity(0.13), borderRadius: BorderRadius.circular(11)),
-                  child: Icon(c.subject.isEmpty ? Icons.groups_outlined : ckSubjectIcon(c.subject), size: 21, color: color),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            Container(height: 4, color: color),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(c.displayName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: h ? color : Pb.text)),
-                      Text(
-                        [if (c.subject.isNotEmpty) c.subject, n == 0 ? 'niciun elev încă' : (n == 1 ? '1 elev' : '$n elevi'), if (homeworkCount > 0) '$homeworkCount teme'].join(' · '),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 13, color: Pb.muted),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(color: color.withOpacity(0.13), borderRadius: BorderRadius.circular(11)),
+                        child: Icon(_classIcon(c), size: 20, color: color),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            if (n > 0) ...[
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 28,
-                child: Stack(
-                  children: [
-                    for (var i = 0; i < n && i < 6; i++)
-                      Positioned(
-                        left: i * 20.0,
-                        child: Container(
-                          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Pb.surface, width: 2)),
-                          child: CkAvatar(name: c.members[i].name, image: '', size: 26),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(c.displayName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                            Text(
+                              [if (c.subject.isNotEmpty) c.subject, n == 0 ? 'niciun elev încă' : (n == 1 ? '1 elev' : '$n elevi')].join(' · '),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12.5, color: Pb.muted),
+                            ),
+                          ],
                         ),
                       ),
-                    if (n > 6) Positioned(left: 6 * 20.0 + 6, top: 5, child: Text('+${n - 6}', style: TextStyle(fontSize: 12.5, color: Pb.muted))),
-                  ],
-                ),
+                      if (openHomework > 0) hwPill(openHomework == 1 ? '1 temă activă' : '$openHomework teme active', color),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      if (n > 0)
+                        Expanded(
+                          child: SizedBox(
+                            height: 28,
+                            child: Stack(
+                              children: [
+                                for (var i = 0; i < n && i < 5; i++)
+                                  Positioned(
+                                    left: i * 19.0,
+                                    child: Container(
+                                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Pb.surface, width: 2)),
+                                      child: CkAvatar(name: c.members[i].name, image: '', size: 26),
+                                    ),
+                                  ),
+                                if (n > 5) Positioned(left: 5 * 19.0 + 6, top: 5, child: Text('+${n - 5}', style: TextStyle(fontSize: 12.5, color: Pb.muted))),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        Expanded(child: Text('Trimite linkul ca să intre elevii.', style: TextStyle(fontSize: 12.5, color: Pb.muted))),
+                      _IconPill(icon: Icons.link, tooltip: 'Copiază linkul', onTap: () => copyClassLink(context, c.id)),
+                      const SizedBox(width: 6),
+                      _IconPill(icon: Icons.assignment_add, tooltip: 'Temă pentru clasă', onTap: onHomework, color: Pb.primary),
+                    ],
+                  ),
+                ],
               ),
-            ],
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                PbButton(text: 'Temă', icon: Icons.assignment_add, size: PbSize.sm, onPressed: onHomework),
-                PbButton(text: 'Copiază linkul', icon: Icons.link, size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => copyClassLink(context, c.id)),
-              ],
             ),
           ],
         ),
@@ -444,47 +624,103 @@ class _ClassCard extends StatelessWidget {
   }
 }
 
-/// A homework as the teacher sees it: who finished it and who didn't.
+class _IconPill extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+  final Color? color;
+  const _IconPill({required this.icon, required this.tooltip, required this.onTap, this.color});
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: tooltip,
+        child: Semantics(
+          button: true,
+          label: tooltip,
+          child: CkHover(
+            onTap: onTap,
+            builder: (h) => AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: color != null ? color!.withOpacity(h ? 0.2 : 0.12) : (h ? Pb.gray : Pb.hoverBg),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: color ?? Pb.text),
+            ),
+          ),
+        ),
+      );
+}
+
+/// A homework as the teacher sees it: a calendar tile with the deadline, how
+/// many finished, and when opened, each student with how far they got.
 class HomeworkProgressTile extends StatefulWidget {
   final Homework homework;
   final Map<String, String> recipients;
-  const HomeworkProgressTile({super.key, required this.homework, required this.recipients});
+  final bool showClass;
+  final bool initiallyOpen;
+  const HomeworkProgressTile({super.key, required this.homework, required this.recipients, this.showClass = true, this.initiallyOpen = false});
 
   @override
   State<HomeworkProgressTile> createState() => _HomeworkProgressTileState();
 }
 
 class _HomeworkProgressTileState extends State<HomeworkProgressTile> {
-  bool _open = false;
+  late bool _open = widget.initiallyOpen;
+
+  Homework get h => widget.homework;
 
   Future<void> _delete() async {
     final ok = await showPbModal<bool>(
       context,
       title: 'Ștergi tema?',
-      body: Text('„${widget.homework.displayTitle}” dispare și de la elevi. Nu se poate anula.'),
+      body: Text('„${h.displayTitle}” dispare și de la elevi. Nu se poate anula.'),
       actions: (c) => [
         PbButton(text: 'Renunță', variant: PbVariant.secondary, onPressed: () => Navigator.of(c).pop(false)),
         PbButton(text: 'Șterge', variant: PbVariant.danger, onPressed: () => Navigator.of(c).pop(true)),
       ],
     );
     if (ok == true) {
-      Classes.deleteHomework(widget.homework.id).catchError((_) {
+      Classes.deleteHomework(h.id).catchError((_) {
         if (mounted) _toast(context, 'Nu am putut șterge tema.');
       });
     }
   }
 
+  Widget _dateTile(Color c, bool allDone) {
+    final d = h.dueAt;
+    return Container(
+      width: 52,
+      height: 56,
+      decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+      child: allDone
+          ? const Icon(Icons.done_all_rounded, color: hwGreen, size: 24)
+          : d == null
+              ? Icon(Icons.event_available_outlined, color: c, size: 22)
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(_weekdayShort[d.weekday - 1], style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: c, letterSpacing: 0.6)),
+                    Text('${d.day}', style: TextStyle(fontSize: 21, height: 1.1, fontWeight: FontWeight.w800, color: c)),
+                  ],
+                ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final h = widget.homework;
     final r = widget.recipients;
-    final doneIds = r.keys.where(h.isDone).toList();
+    final doneN = r.keys.where(h.isDone).length;
     final total = r.length;
-    final frac = total == 0 ? 0.0 : doneIds.length / total;
-    final dueC = h.dueAt == null ? Pb.muted : hwDueColor(h);
+    final allDone = total > 0 && doneN == total;
+    final c = allDone ? hwGreen : hwDueColor(h);
+    final to = widget.showClass ? h.audience : [for (final s in h.studentIds) h.studentNames[s] ?? 'Elev'].join(', ');
     return Container(
-      decoration: ckDeco(r: 14),
+      margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
+      decoration: ckDeco(r: 16).copyWith(border: Border.all(color: _open && !allDone ? c.withOpacity(0.45) : Pb.border.withOpacity(0.7))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -492,88 +728,208 @@ class _HomeworkProgressTileState extends State<HomeworkProgressTile> {
             onTap: () => setState(() => _open = !_open),
             builder: (hv) => Container(
               color: hv ? Pb.hoverBg : Colors.transparent,
-              padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
+              padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 38,
-                    height: 38,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CircularProgressIndicator(value: frac, strokeWidth: 3.5, color: hwGreen, backgroundColor: Pb.border),
-                        Text('${doneIds.length}', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Pb.text)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 13),
+                  _dateTile(c, allDone),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(h.displayTitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
-                        const SizedBox(height: 2),
-                        Text.rich(
-                          TextSpan(children: [
-                            TextSpan(text: total == 0 ? 'încă niciun elev' : '${doneIds.length} din $total au terminat'),
-                            if (h.audience.isNotEmpty) TextSpan(text: ' · ${h.audience}'),
-                            if (h.dueAt != null) TextSpan(text: ' · termen ${hwDueLabel(h.dueAt!)}', style: TextStyle(color: dueC, fontWeight: FontWeight.w600)),
-                          ]),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 13, color: Pb.muted),
+                        Text(h.displayTitle,
+                            maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text, height: 1.3)),
+                        if (to.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text('pentru $to', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: Pb.muted)),
+                        ],
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                total == 0 ? 'încă niciun elev' : '$doneN din $total au terminat',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: allDone ? hwGreen : Pb.text),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            if (total > 0)
+                              SizedBox(
+                                width: 90,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(99),
+                                  child: LinearProgressIndicator(
+                                    value: doneN / total,
+                                    minHeight: 5,
+                                    backgroundColor: Pb.gray,
+                                    valueColor: const AlwaysStoppedAnimation(hwGreen),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            if (h.dueAt != null)
+                              hwPill(h.overdue ? 'Termen trecut · ${hwDueLabel(h.dueAt!)}' : 'Termen: ${hwDueLabel(h.dueAt!)}', hwDueColor(h), icon: Icons.schedule)
+                            else
+                              hwPill('Fără termen', Pb.muted, icon: Icons.schedule),
+                            if (h.problems.isNotEmpty) hwPill(h.problems.length == 1 ? '1 problemă' : '${h.problems.length} probleme', Pb.muted, icon: Icons.code),
+                            if (h.material != null) hwPill('Fișă din Atelier', Pb.muted, icon: Icons.description_outlined),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  Icon(_open ? Icons.expand_less : Icons.expand_more, color: Pb.muted),
+                  const SizedBox(width: 6),
+                  AnimatedRotation(turns: _open ? 0.5 : 0, duration: const Duration(milliseconds: 180), child: Icon(Icons.expand_more, color: Pb.muted)),
                 ],
               ),
             ),
           ),
-          if (_open)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: !_open ? const SizedBox(width: double.infinity) : _details(r),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _label(String t, {String? trailing}) => Padding(
+        padding: const EdgeInsets.only(top: 14, bottom: 8),
+        child: Row(
+          children: [
+            Expanded(child: Text(t, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Pb.muted, letterSpacing: 0.5))),
+            if (trailing != null) Text(trailing, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Pb.muted)),
+          ],
+        ),
+      );
+
+  Widget _details(Map<String, String> r) {
+    // Not done first, so the teacher sees who still has to do it.
+    final ids = r.keys.toList()..sort((a, b) => (h.isDone(a) ? 1 : 0).compareTo(h.isDone(b) ? 1 : 0));
+    return Container(
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border.withOpacity(0.7)))),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (h.instructions.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
             Container(
-              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (h.instructions.trim().isNotEmpty) ...[
-                    Text(h.instructions.trim(), style: TextStyle(fontSize: 14, color: Pb.text, height: 1.5)),
-                    const SizedBox(height: 10),
-                  ],
-                  if (h.problems.isNotEmpty || h.material != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: [
-                          for (final p in h.problems) hwPill(p.title, ckSubjectColor(p.subject), icon: Icons.functions),
-                          if (h.material != null) hwPill(h.material!.displayTitle, hwBlue, icon: Icons.auto_stories_outlined),
-                        ],
-                      ),
-                    ),
-                  if (total > 0)
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final e in r.entries)
-                          hwPill(e.value, h.isDone(e.key) ? hwGreen : Pb.muted, icon: h.isDone(e.key) ? Icons.check : Icons.schedule),
-                      ],
-                    ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('Dată ${wsAgo(h.createdAt)}', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-                      const Spacer(),
-                      PbButton(text: 'Șterge', icon: Icons.delete_outline, size: PbSize.sm, variant: PbVariant.outlineDanger, onPressed: _delete),
-                    ],
-                  ),
+                  Padding(padding: const EdgeInsets.only(top: 2), child: Icon(Icons.format_quote_rounded, size: 18, color: Pb.muted)),
+                  const SizedBox(width: 10),
+                  Expanded(child: SelectableText(h.instructions.trim(), style: TextStyle(fontSize: 14, color: Pb.text, height: 1.5))),
                 ],
               ),
             ),
+          ],
+          if (h.problems.isNotEmpty || h.material != null) ...[
+            _label('PAȘII TEMEI'),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (var i = 0; i < h.problems.length; i++)
+                  CkHover(
+                    onTap: () => GoRouter.of(context).push(h.problems[i].path),
+                    builder: (hv) => hwPill('${i + 1}. ${h.problems[i].title.isEmpty ? h.problems[i].id : h.problems[i].title}', ckSubjectColor(h.problems[i].subject),
+                        icon: ckSubjectIcon(h.problems[i].subject)),
+                  ),
+                if (h.material != null)
+                  hwPill('${h.problems.length + 1}. ${h.material!.displayTitle}', wsDocColor(h.material!.type, h.material!.lang), icon: Icons.description_outlined),
+              ],
+            ),
+          ],
+          _label('ELEVI', trailing: r.isEmpty ? null : '${r.keys.where(h.isDone).length}/${r.length} au terminat'),
+          if (r.isEmpty)
+            Text('Clasa nu are încă elevi. Tema ajunge și la cei care intră mai târziu.', style: TextStyle(fontSize: 13.5, color: Pb.muted))
+          else
+            Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: Pb.border)),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  for (var i = 0; i < ids.length; i++) _StudentProgressRow(homework: h, id: ids[i], name: r[ids[i]]!, first: i == 0),
+                ],
+              ),
+            ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(child: Text('Dată ${wsAgo(h.createdAt)}', style: TextStyle(fontSize: 12.5, color: Pb.muted))),
+              PbButton(text: 'Șterge', icon: Icons.delete_outline, size: PbSize.sm, variant: PbVariant.outlineDanger, onPressed: _delete),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One student in a homework: done or not, and how many of its problems they
+/// solved so far.
+class _StudentProgressRow extends StatefulWidget {
+  final Homework homework;
+  final String id;
+  final String name;
+  final bool first;
+  const _StudentProgressRow({required this.homework, required this.id, required this.name, required this.first});
+
+  @override
+  State<_StudentProgressRow> createState() => _StudentProgressRowState();
+}
+
+class _StudentProgressRowState extends State<_StudentProgressRow> {
+  late final Stream<Set<String>> _solved = Classes.solvedBy(widget.id);
+
+  @override
+  Widget build(BuildContext context) {
+    final h = widget.homework;
+    final done = h.isDone(widget.id);
+    return Container(
+      decoration: BoxDecoration(border: widget.first ? null : Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      child: Row(
+        children: [
+          CkAvatar(name: widget.name, image: '', size: 30),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PbLink(text: widget.name, fontSize: 14, onTap: () => context.go('/elev/${widget.id}')),
+                if (h.problems.isNotEmpty)
+                  StreamBuilder<Set<String>>(
+                    stream: _solved,
+                    builder: (context, s) {
+                      final n = h.problems.where((p) => (s.data ?? const <String>{}).contains(p.progressKey)).length;
+                      return Text('$n/${h.problems.length} probleme rezolvate', style: TextStyle(fontSize: 12, color: Pb.muted));
+                    },
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (done)
+            hwPill(h.done[widget.id] == null ? 'Terminată' : 'Terminată ${wsAgo(h.done[widget.id])}', hwGreen, icon: Icons.check)
+          else if (h.overdue)
+            hwPill('Întârziată', hwRed, icon: Icons.error_outline)
+          else
+            hwPill('În lucru', hwAmber, icon: Icons.schedule),
         ],
       ),
     );
@@ -1398,154 +1754,254 @@ class _TeacherClassViewState extends State<_TeacherClassView> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _banner(List<Homework> list) {
+    final col = _classColor(c);
     final isMobile = MediaQuery.of(context).size.width < 700;
-    final color = c.subject.isEmpty ? Pb.primary : ckSubjectColor(c.subject);
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 90),
-      children: [
-        PbContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 18),
-              Align(alignment: Alignment.centerLeft, child: PbLink(text: '← Toate clasele', fontSize: 14, onTap: () => context.go('/clase'))),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 16,
-                runSpacing: 12,
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Column(
+    final open = list.where((h) => _hwOpen(h, hwRecipients(h, [c]))).length;
+    final n = c.members.length;
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: ckDeco(r: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(height: 6, color: col),
+          Padding(
+            padding: EdgeInsets.all(isMobile ? 16 : 22),
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(c.displayName, style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w800, color: Pb.text)),
-                      Text(
-                        [if (c.subject.isNotEmpty) c.subject, c.members.length == 1 ? '1 elev' : '${c.members.length} elevi'].join(' · '),
-                        style: TextStyle(fontSize: 15, color: Pb.muted),
+                      Container(
+                        width: isMobile ? 48 : 58,
+                        height: isMobile ? 48 : 58,
+                        decoration: BoxDecoration(color: col.withOpacity(0.13), borderRadius: BorderRadius.circular(14)),
+                        child: Icon(_classIcon(c), size: isMobile ? 24 : 28, color: col),
+                      ),
+                      SizedBox(width: isMobile ? 14 : 18),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(c.displayName, style: TextStyle(fontSize: isMobile ? 23 : 29, fontWeight: FontWeight.w800, color: Pb.text, height: 1.2)),
+                            const SizedBox(height: 4),
+                            Text(
+                              [if (c.subject.isNotEmpty) c.subject, n == 0 ? 'niciun elev încă' : (n == 1 ? '1 elev' : '$n elevi'), 'cod ${c.id}'].join(' · '),
+                              style: TextStyle(fontSize: 14.5, color: Pb.muted),
+                            ),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                hwPill(open == 0 ? 'Nicio temă activă' : (open == 1 ? '1 temă activă' : '$open teme active'), open == 0 ? Pb.muted : col,
+                                    icon: Icons.assignment_outlined),
+                                if (list.length > open) hwPill('${list.length - open} terminate de toți', hwGreen, icon: Icons.done_all),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      PbButton(text: 'Temă pentru clasă', icon: Icons.assignment_add, onPressed: _homework),
-                      PbButton(text: 'Redenumește', icon: Icons.edit_outlined, variant: PbVariant.outlineSecondary, onPressed: _rename),
-                      PbButton(text: 'Șterge', icon: Icons.delete_outline, variant: PbVariant.outlineDanger, onPressed: _deleteClass),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Invite box: the link is the main thing on this page.
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.07),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.35)),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.link, size: 19, color: color),
-                        const SizedBox(width: 8),
-                        Text('Linkul clasei', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Cine îl deschide își face cont (sau intră în cont) și ajunge direct în clasă. Rămâne acolo până îl scoți.',
-                      style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(color: Pb.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: Pb.border)),
-                      child: SelectableText(classLink(c.id), style: TextStyle(fontSize: 14.5, fontFamily: 'monospace', color: Pb.text)),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        PbButton(text: 'Copiază linkul', icon: Icons.copy, size: PbSize.sm, onPressed: () => copyClassLink(context, c.id)),
-                        PbButton(text: 'Trimite pe WhatsApp', icon: Icons.chat_outlined, size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => shareClassOnWhatsApp(c)),
-                        Text('sau codul ', style: TextStyle(fontSize: 13.5, color: Pb.muted)),
-                        SelectableText(c.id, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 2, color: Pb.text)),
-                      ],
-                    ),
+                    PbButton(text: isMobile ? 'Temă nouă' : 'Temă pentru clasă', icon: Icons.assignment_add, onPressed: _homework),
+                    PbButton(text: 'Redenumește', icon: Icons.edit_outlined, variant: PbVariant.outlineSecondary, onPressed: _rename),
+                    PbButton(text: 'Șterge', icon: Icons.delete_outline, variant: PbVariant.outlineDanger, onPressed: _deleteClass),
                   ],
                 ),
-              ),
-              _sectionTitle('Teme'),
-              StreamBuilder<List<Homework>>(
-                stream: _hw,
-                builder: (context, s) {
-                  final list = s.data ?? const <Homework>[];
-                  if (!s.hasData && !s.hasError) return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)));
-                  if (list.isEmpty) {
-                    return _emptyBox(Icons.assignment_outlined, 'Nicio temă pentru clasa asta', 'Elevii văd tema imediat, într-un buton din colțul ecranului.',
-                        action: PbButton(text: 'Dă prima temă', icon: Icons.assignment_add, onPressed: _homework));
-                  }
-                  return Column(
-                    children: [
-                      for (final h in list)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: HomeworkProgressTile(homework: h, recipients: hwRecipients(h, [c])),
-                        ),
-                    ],
-                  );
-                },
-              ),
-              _sectionTitle('Elevi', trailing: Text('${c.members.length}', style: TextStyle(color: Pb.muted))),
-              if (c.members.isEmpty)
-                _emptyBox(Icons.person_add_alt, 'Niciun elev încă', 'Trimite linkul de mai sus. Elevii apar aici imediat ce intră.')
-              else
-                Container(
-                  decoration: ckDeco(r: 14),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    children: [
-                      for (var i = 0; i < c.members.length; i++)
-                        Container(
-                          decoration: BoxDecoration(border: i == 0 ? null : Border(top: BorderSide(color: Pb.border))),
-                          padding: const EdgeInsets.fromLTRB(14, 9, 8, 9),
-                          child: Row(
-                            children: [
-                              CkAvatar(name: c.members[i].name, image: '', size: 34),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    PbLink(text: c.members[i].name, fontSize: 14.5, onTap: () => context.go('/elev/${c.members[i].id}')),
-                                    Text('a intrat ${wsAgo(c.members[i].joinedAt)}', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                tooltip: 'Scoate din clasă',
-                                icon: Icon(Icons.person_remove_outlined, size: 19, color: Pb.muted),
-                                onPressed: () => _remove(c.members[i]),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _linkCard() {
+    final color = _classColor(c);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.link, size: 19, color: color),
+              const SizedBox(width: 8),
+              Text('Linkul clasei', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Cine îl deschide își face cont (sau intră în cont) și ajunge direct în clasă. Rămâne acolo până îl scoți.',
+            style: TextStyle(fontSize: 13, color: Pb.muted, height: 1.45),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(color: Pb.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: Pb.border)),
+            child: SelectableText(classLink(c.id), style: TextStyle(fontSize: 13.5, fontFamily: 'monospace', color: Pb.text)),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              PbButton(text: 'Copiază linkul', icon: Icons.copy, size: PbSize.sm, onPressed: () => copyClassLink(context, c.id)),
+              PbButton(text: 'WhatsApp', icon: Icons.chat_outlined, size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => shareClassOnWhatsApp(c)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Text('sau codul ', style: TextStyle(fontSize: 13, color: Pb.muted)),
+              SelectableText(c.id, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 2, color: Pb.text)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _members(List<Homework> list) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 22, bottom: 12),
+          child: Row(
+            children: [
+              Expanded(child: Text('Elevi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text))),
+              Text('${c.members.length}', style: TextStyle(color: Pb.muted)),
             ],
           ),
         ),
+        if (c.members.isEmpty)
+          _emptyBox(Icons.person_add_alt, 'Niciun elev încă', 'Trimite linkul de mai sus. Elevii apar aici imediat ce intră.')
+        else
+          Container(
+            decoration: ckDeco(r: 14),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                for (var i = 0; i < c.members.length; i++) _memberRow(c.members[i], i == 0, list),
+              ],
+            ),
+          ),
       ],
+    );
+  }
+
+  Widget _memberRow(ClassMember m, bool first, List<Homework> list) {
+    final done = list.where((h) => h.isDone(m.id)).length;
+    final late = list.where((h) => !h.isDone(m.id) && h.overdue).length;
+    return Container(
+      decoration: BoxDecoration(border: first ? null : Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.fromLTRB(12, 9, 6, 9),
+      child: Row(
+        children: [
+          CkAvatar(name: m.name, image: '', size: 34),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PbLink(text: m.name, fontSize: 14.5, onTap: () => context.go('/elev/${m.id}')),
+                Text(
+                  list.isEmpty ? 'a intrat ${wsAgo(m.joinedAt)}' : '$done/${list.length} teme terminate${late > 0 ? ' · $late ${late == 1 ? 'întârziată' : 'întârziate'}' : ''}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12.5, color: late > 0 ? hwRed : Pb.muted),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'Scoate din clasă',
+            icon: Icon(Icons.person_remove_outlined, size: 19, color: Pb.muted),
+            onPressed: () => _remove(m),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.of(context).size.width >= 980;
+    return StreamBuilder<List<Homework>>(
+      stream: _hw,
+      builder: (context, s) {
+        final list = s.data ?? const <Homework>[];
+        final homework = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _sectionTitle('Teme'),
+            _TeacherHomeworkList(
+              homework: list,
+              classes: [c],
+              showClass: false,
+              loading: !s.hasData && !s.hasError,
+              empty: _emptyBox(Icons.assignment_outlined, 'Nicio temă pentru clasa asta', 'Elevii văd tema imediat, într-un buton din colțul ecranului.',
+                  action: PbButton(text: 'Dă prima temă', icon: Icons.assignment_add, onPressed: _homework)),
+            ),
+          ],
+        );
+        final side = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [_linkCard(), _members(list)],
+        );
+        return ListView(
+          padding: const EdgeInsets.only(bottom: 100),
+          children: [
+            PbContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 18),
+                  Align(alignment: Alignment.centerLeft, child: PbLink(text: '← Toate clasele', fontSize: 14, onTap: () => context.go('/clase'))),
+                  const SizedBox(height: 14),
+                  _banner(list),
+                  if (wide)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: homework),
+                        const SizedBox(width: 28),
+                        SizedBox(width: 340, child: Padding(padding: const EdgeInsets.only(top: 26), child: side)),
+                      ],
+                    )
+                  else ...[
+                    const SizedBox(height: 18),
+                    _linkCard(),
+                    homework,
+                    _members(list),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

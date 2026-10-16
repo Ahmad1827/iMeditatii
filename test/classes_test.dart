@@ -169,8 +169,10 @@ void main() {
       await open(tester, ClassBody(uid: 't1', code: code));
       expect(find.text('Linkul clasei'), findsOneWidget);
       expect(find.textContaining('/clasa/$code'), findsOneWidget);
-      expect(find.text('Mihai Ionescu'), findsOneWidget);
+      expect(find.text('Mihai Ionescu'), findsWidgets); // in the members list and in the open homework
       expect(find.textContaining('1 din 2 au terminat'), findsOneWidget);
+      expect(find.text('În lucru'), findsOneWidget); // Mihai
+      expect(find.textContaining('Terminată'), findsOneWidget); // Ioana
     });
 
     testWidgets('the dock: shows homework, hides it, brings it back, done makes it go away', (tester) async {
