@@ -652,8 +652,6 @@ int _byDue(Homework a, Homework b) {
   return a.dueAt!.compareTo(b.dueAt!);
 }
 
-int _byDoneAt(Homework a, Homework b, String uid) => (b.done[uid] ?? DateTime(0)).compareTo(a.done[uid] ?? DateTime(0));
-
 Widget _groupLabel(String text, Color c, int n) => paperLabel(text, dot: c, count: '$n');
 
 /// One homework, as the student sees it in a list: a calendar tile with the

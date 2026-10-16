@@ -499,33 +499,16 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     );
   }
 
+  /// The student's desk: one notebook with every exercise the teacher gave,
+  /// soonest deadline first. Solved ones are crossed off.
   List<Widget> _myPapers(List<Homework> mine, Set<String> solved) {
-    final todo = mine.where((h) => !h.isDone(widget.uid)).toList()..sort(_byDue);
-    final done = mine.where((h) => h.isDone(widget.uid)).toList()..sort((a, b) => _byDoneAt(a, b, widget.uid));
-    return [
-      if (todo.isEmpty)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: StickyNote(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
-              child: Column(
-                children: [
-                  Text(done.isEmpty ? 'Nicio temă pe bancă' : 'Ai terminat tot. Bravo!', textAlign: TextAlign.center, style: chalk(30, color: StickyNote.ink)),
-                  const SizedBox(height: 6),
-                  Text('Când profesorul îți dă o temă, apare aici și în colțul ecranului, pe orice pagină.',
-                      textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: StickyNote.inkMuted, height: 1.5)),
-                ],
-              ),
-            ),
-          ),
-        ),
-      for (final h in todo) StudentHomeworkCard(key: ValueKey('desk_${h.id}'), homework: h, uid: widget.uid, solved: solved, initiallyOpen: true),
-      if (done.isNotEmpty) ...[
-        paperLabel('Terminate', dot: hwGreen, count: '${done.length}'),
-        for (final h in done) StudentHomeworkCard(key: ValueKey('deskdone_${h.id}'), homework: h, uid: widget.uid, solved: solved),
-      ],
+    final seen = <String>{};
+    final problems = [
+      for (final h in [...mine]..sort(_byDue))
+        for (final p in h.problems)
+          if (seen.add(p.progressKey)) p,
     ];
+    return [const SizedBox(height: 8), _Notebook(problems: problems, solved: solved)];
   }
 
   List<Widget> _catedraPapers(List<SchoolClass> classes, SchoolClass c, List<Homework> hw) {
@@ -1168,4 +1151,207 @@ class _Person extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _Person old) => old.name != name || old.back != back || old.ring != ring;
+}
+
+/// A spiral notebook lying on the desk: the exercises on ruled lines, each
+/// one opens the problem, solved ones crossed off.
+class _Notebook extends StatelessWidget {
+  final List<HwProblem> problems;
+  final Set<String> solved;
+  const _Notebook({required this.problems, required this.solved});
+
+  static const double line = 46; // one ruled line per exercise
+  static const Color _ink = Color(0xFF2B3A55);
+  static const Color _paper = Color(0xFFFFFEF8);
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+    final left = isMobile ? 46.0 : 64.0; // the red margin
+    final done = problems.where((p) => solved.contains(p.progressKey)).length;
+    return Transform.rotate(
+      angle: isMobile ? 0 : -0.012,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 14),
+            decoration: BoxDecoration(
+              color: _paper,
+              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(6), bottomRight: Radius.circular(6)),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.28), blurRadius: 24, offset: const Offset(0, 12)),
+                // the pages underneath
+                const BoxShadow(color: Color(0xFFEDE8DA), offset: Offset(3, 4)),
+                const BoxShadow(color: Color(0xFFE2DCCB), offset: Offset(6, 8)),
+              ],
+            ),
+            child: CustomPaint(
+              painter: _NotebookLines(left: left, top: line * 1.6, line: line),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, line * 0.5, 0, line * 0.6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: line * 1.1,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: left + 14, right: 18),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Text('Exerciții', style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w800, color: _ink)),
+                            ),
+                            if (problems.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Text('$done din ${problems.length} rezolvate',
+                                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: done == problems.length ? hwGreen : _ink.withOpacity(0.6))),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (problems.isEmpty)
+                      SizedBox(
+                        height: line * 2,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: left + 14, right: 18),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Niciun exercițiu de la profesor deocamdată.', style: TextStyle(fontSize: 15.5, color: _ink.withOpacity(0.7))),
+                          ),
+                        ),
+                      ),
+                    for (var i = 0; i < problems.length; i++) _row(context, i + 1, problems[i], left, isMobile),
+                    // blank lines, so it reads as a page
+                    SizedBox(height: line * math.max(2, 7 - math.max(problems.length, 2))),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // the spiral
+          Positioned(
+            top: 0,
+            left: 18,
+            right: 18,
+            child: LayoutBuilder(
+              builder: (context, box) {
+                final n = (box.maxWidth / 34).floor();
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    for (var i = 0; i < n; i++)
+                      Container(
+                        width: 10,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [Color(0xFF8D96A0), Color(0xFFE3E7EB), Color(0xFF8D96A0)]),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _row(BuildContext context, int n, HwProblem p, double left, bool isMobile) {
+    final ok = solved.contains(p.progressKey);
+    final c = ckSubjectColor(p.subject);
+    return Semantics(
+      button: true,
+      label: p.title,
+      child: CkHover(
+        onTap: () => GoRouter.of(context).push(p.path),
+        builder: (h) => Container(
+          height: line,
+          color: h ? c.withOpacity(0.06) : Colors.transparent,
+          child: Row(
+            children: [
+              SizedBox(
+                width: left,
+                child: Text('$n.', textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _ink.withOpacity(0.55))),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text.rich(
+                  TextSpan(children: [
+                    TextSpan(
+                      text: p.title.isEmpty ? p.id : p.title,
+                      style: TextStyle(
+                        fontSize: isMobile ? 15.5 : 17,
+                        fontWeight: FontWeight.w600,
+                        color: ok ? _ink.withOpacity(0.45) : _ink,
+                        decoration: ok ? TextDecoration.lineThrough : null,
+                        decorationColor: hwRed,
+                        decorationThickness: 2.2,
+                      ),
+                    ),
+                    if (!isMobile)
+                      TextSpan(
+                        text: '   ${p.subject}${p.grade.isEmpty ? '' : ', a ${p.grade}-a'}',
+                        style: TextStyle(fontSize: 12.5, color: _ink.withOpacity(0.45)),
+                      ),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (ok)
+                const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle, size: 18, color: hwGreen),
+                    SizedBox(width: 4),
+                    Text('Rezolvată', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: hwGreen)),
+                  ],
+                )
+              else
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Rezolvă', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: h ? c : Pb.primary)),
+                    Icon(Icons.chevron_right, size: 19, color: h ? c : Pb.primary),
+                  ],
+                ),
+              const SizedBox(width: 14),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NotebookLines extends CustomPainter {
+  final double left;
+  final double top;
+  final double line;
+  _NotebookLines({required this.left, required this.top, required this.line});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final blue = Paint()
+      ..color = const Color(0xFF8BB4E8).withOpacity(0.55)
+      ..strokeWidth = 1;
+    for (var y = top; y < size.height - 4; y += line) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), blue);
+    }
+    final red = Paint()
+      ..color = const Color(0xFFE5484D).withOpacity(0.6)
+      ..strokeWidth = 1.4;
+    canvas.drawLine(Offset(left, 0), Offset(left, size.height), red);
+    canvas.drawLine(Offset(left + 3, 0), Offset(left + 3, size.height), red..strokeWidth = 0.8);
+  }
+
+  @override
+  bool shouldRepaint(covariant _NotebookLines old) => old.left != left || old.top != top || old.line != line;
 }

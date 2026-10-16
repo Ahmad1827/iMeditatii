@@ -122,6 +122,7 @@ void main() {
           GoRoute(path: '/clase', builder: (_, __) => const Scaffold(body: Text('PAGINA CLASE'))),
           GoRoute(path: '/clasa/:code', builder: (_, __) => const Scaffold(body: Text('PAGINA CLASA'))),
           GoRoute(path: '/login', builder: (_, __) => const Scaffold(body: Text('PAGINA LOGIN'))),
+          GoRoute(path: '/exercitiu/:id', builder: (_, s) => Scaffold(body: Text('PAGINA EXERCITIU ${s.pathParameters['id']}'))),
           GoRoute(path: '/inregistrare', builder: (_, __) => const Scaffold(body: Text('PAGINA SIGNUP'))),
         ],
       );
@@ -290,12 +291,12 @@ void main() {
       expect(find.textContaining('0 din 2 au terminat'), findsOneWidget);
     });
 
-    testWidgets('the student sees solved problems, continues the next one, and finds finished homework', (tester) async {
+    testWidgets('the desk of a student: a notebook of exercises, solved ones crossed off', (tester) async {
       final code = await Classes.create(teacherId: 't1', teacherName: 'Ana Pop', name: '9B Info', subject: 'Informatică');
       await Classes.join(code, 's1', 'Mihai Ionescu');
       await db.collection('users').doc('s1').update({'solvedIds': ['Informatică_9_1']});
       final cls = SchoolClass.fromSnap(await Classes.classes.doc(code).get());
-      final id = await Classes.assign(
+      await Classes.assign(
         teacherId: 't1',
         teacherName: 'Ana Pop',
         title: 'Sume și produse',
@@ -311,19 +312,16 @@ void main() {
       await tester.ensureVisible(find.bySemanticsLabel('Banca ta'));
       await tester.tap(find.bySemanticsLabel('Banca ta'));
       await tester.pumpAndSettle();
-      expect(find.text('1/2 rezolvate'), findsOneWidget);
-      expect(find.text('Rezolvată'), findsOneWidget);
-      expect(find.text('Continuă'), findsOneWidget);
 
-      await tester.tap(find.text('Am terminat'));
+      expect(find.text('Exerciții'), findsOneWidget);
+      expect(find.text('1 din 2 rezolvate'), findsOneWidget);
+      expect(find.text('Rezolvată'), findsOneWidget); // Suma, crossed off
+      expect(find.text('Rezolvă'), findsOneWidget); // Produsul
+      expect(find.text('Am terminat'), findsNothing); // just the exercises
+
+      await tester.tap(find.text('Rezolvă'));
       await tester.pumpAndSettle();
-      expect(Homework.fromSnap(await Classes.homework.doc(id).get()).isDone('s1'), isTrue);
-      expect(find.text('Ai terminat tot. Bravo!'), findsOneWidget);
-      expect(find.text('Terminate'), findsOneWidget);
-      expect(find.text('Sume și produse'), findsOneWidget); // under "Terminate"
-      await tester.tap(find.text('Înapoi în clasă'));
-      await tester.pumpAndSettle();
-      expect(find.text('Înapoi în clasă'), findsNothing);
+      expect(find.text('PAGINA EXERCITIU 2'), findsOneWidget);
     });
 
     testWidgets('student page and phone layouts build without overflow', (tester) async {
@@ -345,7 +343,7 @@ void main() {
         await tester.ensureVisible(find.bySemanticsLabel('Banca ta'));
         await tester.tap(find.bySemanticsLabel('Banca ta'));
         await tester.pumpAndSettle();
-        expect(find.text('Suma a două numere'), findsOneWidget);
+        expect(find.textContaining('Suma a două numere'), findsOneWidget);
         await open(tester, ClassroomView(uid: 't1', teacher: true), size: size);
         expect(find.text('Andrei, pregătire BAC'), findsWidgets);
         await open(tester, ClassBody(uid: 't1', code: code), size: size);
