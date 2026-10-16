@@ -370,6 +370,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             runSpacing: 8,
             children: [
               PbButton(text: 'Atelier', icon: Icons.auto_stories_outlined, onPressed: () => context.go('/atelier')),
+              PbButton(text: 'Clase și teme', icon: Icons.assignment_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/clase')),
               PbButton(
                 text: 'Problemă nouă',
                 icon: Icons.add_task,

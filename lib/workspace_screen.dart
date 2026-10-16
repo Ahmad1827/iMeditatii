@@ -1262,7 +1262,7 @@ class _TabState extends State<_Tab> {
 // =============================================================================
 // Dialogs
 // =============================================================================
-Widget _dialogShell({required String title, String? subtitle, required Widget body, required List<Widget> actions, double maxWidth = 520}) {
+Widget wsDialogShell({required String title, String? subtitle, required Widget body, required List<Widget> actions, double maxWidth = 520}) {
   return Dialog(
     backgroundColor: Pb.surface,
     insetPadding: const EdgeInsets.all(16),
@@ -1477,7 +1477,7 @@ class _SendDialogState extends State<_SendDialog> {
     }
 
     final n = _sel.length;
-    return _dialogShell(
+    return wsDialogShell(
       title: 'Trimite elevilor',
       subtitle: '„${widget.title}” ajunge în panoul lor, la Materiale primite.',
       body: body,
@@ -1520,7 +1520,7 @@ class _SentDialog extends StatelessWidget {
           ),
         );
 
-    return _dialogShell(
+    return wsDialogShell(
       title: 'Cui i-am trimis',
       subtitle: shares.isEmpty ? null : '$seen din ${shares.length} ${shares.length == 1 ? 'elev l-a' : 'elevi l-au'} deschis.',
       body: shares.isEmpty
@@ -1603,7 +1603,7 @@ class _SectionDialogState extends State<_SectionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return _dialogShell(
+    return wsDialogShell(
       title: 'Mută în secțiune',
       subtitle: 'Secțiunile grupează documentele, de exemplu pe clase sau pe capitole.',
       maxWidth: 460,

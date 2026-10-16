@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'classes_models.dart';
 
 import 'app_colors.dart';
 import 'brand_mark.dart';
@@ -323,13 +324,8 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
         }
       }
 
-      if (mounted) {
-        if (role == 'teacher') {
-          context.go('/profesor/$uid');
-        } else {
-          context.go('/materii');
-        }
-      }
+      final landing = role == 'teacher' ? '/profesor/$uid' : await Classes.studentLanding();
+      if (mounted) context.go(landing);
     } on FirebaseAuthException catch (e) {
       _showSnackbar(e.message ?? 'REGISTRATION FAILED.', isError: true, friendly: _friendly(e));
     } catch (e) {

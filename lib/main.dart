@@ -42,6 +42,8 @@ import 'add_article_screen.dart';
 import 'workspace_screen.dart';
 import 'material_screen.dart';
 import 'seed_problems.dart';
+import 'classes_screen.dart';
+import 'homework_dock.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -240,6 +242,17 @@ final GoRouter _router = GoRouter(
       ),
     ),
     GoRoute(
+      path: '/clase',
+      builder: (context, state) => const ClassesScreen(),
+    ),
+    GoRoute(
+      path: '/clasa/:code',
+      builder: (context, state) => ClassScreen(
+        key: ValueKey(state.pathParameters['code']),
+        code: state.pathParameters['code']!,
+      ),
+    ),
+    GoRoute(
       path: '/material/:id',
       builder: (context, state) => MaterialScreen(
         key: ValueKey(state.pathParameters['id']),
@@ -312,6 +325,7 @@ class IMeditatiiApp extends StatelessWidget {
             return Stack(
               children: [
                 AppStyleScope(child: child ?? const SizedBox()),
+                HomeworkDock(router: _router),
                 Positioned(
                   bottom: isMobile ? 14 : 20,
                   left: isMobile ? 14 : 20,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'classes_models.dart';
 
 import 'app_colors.dart';
 import 'brand_mark.dart';
@@ -291,13 +292,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       if (mounted) context.go('/completare-profil');
     } else {
       final role = doc.data()!['role'];
-      if (mounted) {
-        if (role == 'teacher') {
-          context.go('/panou-profesor');
-        } else {
-          context.go('/materii');
-        }
-      }
+      final landing = role == 'teacher' ? '/panou-profesor' : await Classes.studentLanding();
+      if (mounted) context.go(landing);
     }
   }
 
@@ -389,13 +385,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       }
 
       final data = userDoc.data();
-      if (mounted) {
-        if (data?['role'] == 'teacher') {
-          context.go('/panou-profesor');
-        } else {
-          context.go('/materii');
-        }
-      }
+      final landing = data?['role'] == 'teacher' ? '/panou-profesor' : await Classes.studentLanding();
+      if (mounted) context.go(landing);
     } catch (e) {
       if (mounted) {
         _showError('GOOGLE AUTHENTICATION FAILED: $e', friendly: _friendly(e));

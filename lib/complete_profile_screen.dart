@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'classes_models.dart';
 
 import 'theme_manager.dart';
 import 'app_colors.dart';
@@ -227,6 +228,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         }, SetOptions(merge: true));
       }
 
+      final landing = role == 'teacher' ? '/panou-profesor' : await Classes.studentLanding();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           clean
@@ -244,11 +246,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 ),
         );
 
-        if (role == 'teacher') {
-          context.go('/panou-profesor');
-        } else {
-          context.go('/materii');
-        }
+        context.go(landing);
       }
     } catch (e) {
       if (!mounted) return;

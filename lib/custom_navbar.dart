@@ -453,6 +453,13 @@ class CustomNavbar extends StatelessWidget {
                         active: path.startsWith('/materii') || path.startsWith('/profesor'),
                         onTap: () => context.go('/materii'),
                       ),
+                      if (user != null)
+                        _PbNavLink(
+                          label: 'Clase',
+                          icon: Icons.assignment_outlined,
+                          active: path.startsWith('/clase') || path.startsWith('/clasa'),
+                          onTap: () => context.go('/clase'),
+                        ),
                       const Spacer(),
                       right,
                     ] else ...[
@@ -703,6 +710,9 @@ class CustomNavbar extends StatelessWidget {
                     active: path.startsWith('/resurse')),
                 item(Icons.school_outlined, 'Profesori', violet, () => context.go('/materii'),
                     active: path.startsWith('/materii') || path.startsWith('/profesor')),
+                if (user != null)
+                  item(Icons.assignment_outlined, 'Clase și teme', const Color(0xFFF59E0B), () => context.go('/clase'),
+                      active: path.startsWith('/clase') || path.startsWith('/clasa')),
                 section('CONT'),
                 if (user == null) ...[
                   item(Icons.login, 'Autentificare', Pb.link, () => context.go('/login')),
@@ -751,6 +761,10 @@ class CustomNavbar extends StatelessWidget {
               NavTextLink(text: 'Exercises', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); }),
               const SizedBox(height: 8),
               NavTextLink(text: 'Resources', isMobile: true, onTap: () { context.pop(); context.go('/resurse'); }),
+              if (user != null) ...[
+                const SizedBox(height: 8),
+                NavTextLink(text: 'Classes', isMobile: true, onTap: () { context.pop(); context.go('/clase'); }),
+              ],
               const SizedBox(height: 24),
               Container(height: 3, color: AppColors.border),
               const SizedBox(height: 24),
@@ -835,6 +849,10 @@ class CustomNavbar extends StatelessWidget {
                       NavTextLink(text: 'Exercises', onTap: () => context.go('/exercitii')),
                       const SizedBox(width: 14),
                       NavTextLink(text: 'Resources', onTap: () => context.go('/resurse')),
+                      if (user != null) ...[
+                        const SizedBox(width: 14),
+                        NavTextLink(text: 'Classes', onTap: () => context.go('/clase')),
+                      ],
                     ],
                   ),
                   Row(

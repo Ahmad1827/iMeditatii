@@ -367,6 +367,7 @@ class _UserDashboardState extends State<UserDashboard> {
             runSpacing: 8,
             children: [
               PbButton(text: 'Exersează', icon: Icons.play_arrow, onPressed: () => context.go('/exercitii')),
+              PbButton(text: 'Temele mele', icon: Icons.assignment_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/clase')),
               PbButton(text: 'Găsește profesori', icon: Icons.school_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/materii')),
               PbButton(text: 'Profilul meu', icon: Icons.person_outline, variant: PbVariant.outlineSecondary, onPressed: () => context.go('/elev/$_uid')),
             ],

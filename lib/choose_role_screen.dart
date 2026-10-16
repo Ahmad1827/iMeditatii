@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'classes_models.dart';
 
 import 'theme_manager.dart';
 import 'app_colors.dart';
@@ -152,8 +153,9 @@ class _ChooseRoleScreenState extends State<ChooseRoleScreen> {
         'role': role,
       }, SetOptions(merge: true));
 
+      final landing = role == 'teacher' ? '/panou-profesor' : await Classes.studentLanding();
       if (!context.mounted) return;
-      context.go(role == 'teacher' ? '/panou-profesor' : '/materii');
+      context.go(landing);
     } catch (e) {
       if (!mounted) return;
       setState(() {
