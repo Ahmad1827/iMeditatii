@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:iMeditatii/classes_models.dart';
 import 'package:iMeditatii/classes_screen.dart';
+import 'package:iMeditatii/classroom_kit.dart';
 import 'package:iMeditatii/homework_dock.dart';
 import 'package:iMeditatii/theme_manager.dart';
 import 'package:iMeditatii/workspace_models.dart';
@@ -22,6 +23,7 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    classroomHandFont = false; // no font downloads in tests
     ThemeManager.themeNotifier.value = ThemeMode.light;
     ThemeManager.styleNotifier.value = AppStyleMode.clean;
     db = FakeFirebaseFirestore();
