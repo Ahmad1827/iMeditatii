@@ -12,7 +12,6 @@ import 'classes_models.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'homework_composer.dart';
 import 'homework_dock.dart';
-import 'home_ambient.dart' show HomeSky;
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer, showPbModal;
 import 'workspace_models.dart';
 import 'workspace_screen.dart' show wsAgo, wsDialogShell, wsDocColor;
@@ -48,31 +47,10 @@ Future<void> shareClassOnWhatsApp(SchoolClass c) => launchUrl(
       mode: LaunchMode.externalApplication,
     );
 
-/// The pages sit on the site's meadow, like the other pages. The content
-/// covers it, so the scene stays decoration (birds and clouds, no armies).
 Widget _shell(Widget child) => Scaffold(
       backgroundColor: Pb.page,
-      body: Column(children: [const CustomNavbar(), Expanded(child: _Meadow(child: child))]),
+      body: Column(children: [const CustomNavbar(), Expanded(child: child)]),
     );
-
-class _Meadow extends StatefulWidget {
-  final Widget child;
-  const _Meadow({required this.child});
-
-  @override
-  State<_Meadow> createState() => _MeadowState();
-}
-
-class _MeadowState extends State<_Meadow> {
-  final _content = GlobalKey();
-
-  @override
-  Widget build(BuildContext context) => HomeSky(
-        armies: false,
-        blockers: [_content],
-        child: KeyedSubtree(key: _content, child: widget.child),
-      );
-}
 
 Widget _spinner() => const Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)));
 

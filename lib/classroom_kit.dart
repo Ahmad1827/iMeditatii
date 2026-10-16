@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 import 'clean_kit.dart' show CkHover;
@@ -17,15 +16,15 @@ import 'ui_components.dart' show Pb;
 //   BinderSpine   the coloured spine of a ring binder
 // =============================================================================
 
-/// Off in widget tests, where Google Fonts can't be downloaded.
-bool classroomHandFont = true;
-
-/// Handwriting, for what is "written" on the board or on notes.
-TextStyle chalk(double size, {Color color = const Color(0xF2FFFFFF), FontWeight weight = FontWeight.w700, double? height}) {
-  final base = TextStyle(fontSize: size, color: color, fontWeight: weight, height: height);
-  if (!classroomHandFont) return base.copyWith(fontFamily: 'Caveat'); // used if a test loads it
-  return GoogleFonts.caveat(textStyle: base);
-}
+/// Text written on the board or on a note, in the site's font. Sizes are
+/// given on a handwriting scale and shrunk to match the site's type.
+TextStyle chalk(double size, {Color color = const Color(0xF2FFFFFF), FontWeight weight = FontWeight.w700, double? height}) => TextStyle(
+      fontSize: math.max(12, (size * 0.68).roundToDouble()),
+      color: color,
+      fontWeight: size >= 40 ? FontWeight.w800 : weight,
+      height: height,
+      letterSpacing: size >= 40 ? -0.5 : null,
+    );
 
 const Color chalkWhite = Color(0xF2FFFFFF);
 const Color chalkYellow = Color(0xFFFFE89A);
