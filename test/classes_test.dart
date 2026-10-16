@@ -174,29 +174,38 @@ void main() {
       await Classes.join(code, 's1', 'Mihai Ionescu');
       await Classes.join(code, 's2', 'Ioana Radu');
       final cls = SchoolClass.fromSnap(await Classes.classes.doc(code).get());
-      final id = await Classes.assign(teacherId: 't1', teacherName: 'Ana Pop', title: 'Ecuații', toClasses: [cls]);
+      final id = await Classes.assign(
+        teacherId: 't1',
+        teacherName: 'Ana Pop',
+        title: 'Ecuații',
+        toClasses: [cls],
+        problems: const [HwProblem(id: '1', title: 'Suma a două numere', subject: 'Informatică', grade: '9')],
+      );
       await Classes.setDone(id, 's2', true);
+      await db.collection('users').doc('s2').update({'solvedIds': ['Informatică_9_1']});
       await open(tester, ClassBody(uid: 't1', code: code));
       expect(find.text('Mihai'), findsOneWidget); // sitting in a bench
       expect(find.text('Ioana'), findsOneWidget);
+      expect(find.text('1/1'), findsOneWidget); // the paper on Ioana's desk
+      expect(find.text('0/1'), findsOneWidget); // and on Mihai's
 
-      // The catedra: the link and the homework with everyone's progress.
+      // The catedra: the notebook of exercises given, nothing else.
       await tester.tap(find.text('CATEDRA'));
       await tester.pumpAndSettle();
-      expect(find.text('Linkul clasei'), findsOneWidget);
-      expect(find.textContaining('/clasa/$code'), findsOneWidget);
-      expect(find.textContaining('1 din 2 au terminat'), findsOneWidget);
-      expect(find.text('În lucru'), findsOneWidget); // Mihai
-      expect(find.textContaining('Terminată'), findsOneWidget); // Ioana
+      expect(find.text('Exerciții'), findsOneWidget);
+      expect(find.text('1 exercițiu'), findsOneWidget);
+      expect(find.text('Deschide'), findsOneWidget);
+      expect(find.text('Linkul clasei'), findsNothing);
 
-      // Back in the room, Ioana's desk shows just her.
+      // Ioana's desk: her notebook, the exercise crossed off.
       await tester.tap(find.text('Înapoi în clasă'));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.bySemanticsLabel('Banca lui Ioana Radu'));
       await tester.tap(find.bySemanticsLabel('Banca lui Ioana Radu'));
       await tester.pumpAndSettle();
-      expect(find.text('1 din 1 teme terminate'), findsOneWidget);
-      expect(find.text('Exerciții'), findsOneWidget); // her notebook
+      expect(find.text('Exerciții'), findsOneWidget);
+      expect(find.text('1 din 1 rezolvate'), findsOneWidget);
+      expect(find.text('Rezolvată'), findsOneWidget);
     });
 
     testWidgets('the dock: shows homework, hides it, brings it back, done makes it go away', (tester) async {
@@ -289,7 +298,7 @@ void main() {
       expect(hw.problems.single.title, 'Suma a două numere');
       await tester.tap(find.text('CATEDRA'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('0 din 2 au terminat'), findsOneWidget);
+      expect(find.textContaining('Suma a două numere'), findsOneWidget); // in the catedra's notebook
     });
 
     testWidgets('the desk of a student: a notebook of exercises, solved ones crossed off', (tester) async {
@@ -351,7 +360,7 @@ void main() {
         await tester.ensureVisible(find.text('CATEDRA'));
         await tester.tap(find.text('CATEDRA'));
         await tester.pumpAndSettle();
-        expect(find.text('Linkul clasei'), findsOneWidget);
+        expect(find.text('Exerciții'), findsOneWidget);
       }
       expect(tester.takeException(), isNull);
     });

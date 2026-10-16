@@ -302,6 +302,12 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
                 children: [
                   ChalkButton(text: 'Temă nouă', icon: Icons.assignment_add, filled: true, onTap: () => _newHomework(classes, c)),
                   ChalkButton(text: 'Copiază linkul', icon: Icons.link, onTap: () => copyClassLink(context, c.id)),
+                  ChalkButton(
+                    text: 'Redenumește',
+                    icon: Icons.edit_outlined,
+                    onTap: () => showDialog<String>(context: context, builder: (_) => _ClassNameDialog(uid: widget.uid, teacherName: c.teacherName, existing: c)),
+                  ),
+                  ChalkButton(text: 'Șterge clasa', icon: Icons.delete_outline, color: chalkPink, onTap: () => _deleteClass(c)),
                 ],
               ),
             ],
@@ -426,7 +432,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
 
     final List<Widget> papers;
     if (sid == null) {
-      papers = _catedraPapers(classes, c, hw);
+      papers = _catedraPapers(c, hw);
     } else if (sid == widget.uid) {
       papers = _myPapers(_homeworkOf(c, hw, sid), solved);
     } else {
@@ -486,7 +492,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
                 children: [
                   Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 820),
+                      constraints: const BoxConstraints(maxWidth: 940),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: papers),
                     ),
                   ),
@@ -505,41 +511,13 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     return [const SizedBox(height: 8), _Notebook(problems: _problemsOf(mine), solved: solved)];
   }
 
-  List<Widget> _catedraPapers(List<SchoolClass> classes, SchoolClass c, List<Homework> hw) {
+  /// The catedra: the notebook with every exercise given to the class.
+  List<Widget> _catedraPapers(SchoolClass c, List<Homework> hw) {
     final mine = [
       for (final h in hw)
         if (h.classIds.contains(c.id) || h.studentIds.any(c.hasMember)) h,
     ];
-    return [
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          PbButton(text: 'Temă nouă', icon: Icons.assignment_add, onPressed: () => _newHomework(classes, c)),
-          PbButton(
-            text: 'Redenumește',
-            icon: Icons.edit_outlined,
-            variant: PbVariant.light,
-            onPressed: () => showDialog<String>(context: context, builder: (_) => _ClassNameDialog(uid: widget.uid, teacherName: c.teacherName, existing: c)),
-          ),
-          PbButton(text: 'Șterge clasa', icon: Icons.delete_outline, variant: PbVariant.danger, onPressed: () => _deleteClass(c)),
-        ],
-      ),
-      const SizedBox(height: 22),
-      _linkNote(context, c),
-      const SizedBox(height: 10),
-      paperLabel('Teme date', count: '${mine.length}'),
-      _TeacherHomeworkList(
-        homework: mine,
-        classes: [c],
-        showClass: false,
-        empty: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: _emptyBox(Icons.assignment_outlined, 'Nicio temă pentru clasa asta', 'Elevii văd tema imediat, pe bancă și în colțul ecranului.',
-              action: PbButton(text: 'Dă prima temă', icon: Icons.assignment_add, onPressed: () => _newHomework(classes, c))),
-        ),
-      ),
-    ];
+    return [const SizedBox(height: 8), _Notebook(problems: _problemsOf(mine), teacher: true)];
   }
 
   Future<void> _deleteClass(SchoolClass c) async {
@@ -562,48 +540,6 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     }
   }
 }
-
-/// The invite link, on a sticky note.
-Widget _linkNote(BuildContext context, SchoolClass c) => StickyNote(
-      angle: -0.8,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.link, size: 20, color: StickyNote.ink),
-                const SizedBox(width: 8),
-                Flexible(child: Text('Linkul clasei', maxLines: 1, overflow: TextOverflow.ellipsis, style: chalk(26, color: StickyNote.ink))),
-              ],
-            ),
-            Text(
-              'Cine îl deschide își face cont (sau intră în cont), ajunge în clasă și își alege o bancă.',
-              style: TextStyle(fontSize: 13, color: StickyNote.inkMuted, height: 1.45),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(color: Pb.surface.withOpacity(0.85), borderRadius: BorderRadius.circular(8)),
-              child: SelectableText(classLink(c.id), style: TextStyle(fontSize: 13.5, fontFamily: 'monospace', color: Pb.text)),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                PbButton(text: 'Copiază linkul', icon: Icons.copy, size: PbSize.sm, onPressed: () => copyClassLink(context, c.id)),
-                PbButton(text: 'WhatsApp', icon: Icons.chat_outlined, size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => shareClassOnWhatsApp(c)),
-                Text('sau codul ', style: TextStyle(fontSize: 13, color: StickyNote.inkMuted)),
-                SelectableText(c.id, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 2, color: StickyNote.ink)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
 
 // ---------------------------------------------------------------- furniture
 /// One half of a bench: a chair, maybe someone on it, maybe papers.
@@ -941,49 +877,14 @@ class _StudentDeskState extends State<_StudentDesk> {
   late final Stream<Set<String>> _solved = Classes.solvedBy(widget.sid);
 
   @override
-  Widget build(BuildContext context) {
-    final list = [...widget.homework]..sort(_byDue);
-    final done = list.where((h) => h.isDone(widget.sid)).length;
-    return StreamBuilder<Set<String>>(
-      stream: _solved,
-      builder: (context, s) {
-        final solved = s.data ?? const <String>{};
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            StickyNote(
-              angle: 0.8,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 22, 18, 16),
-                child: Row(
-                  children: [
-                    CkAvatar(name: widget.name, image: '', size: 44),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.name, style: chalk(28, color: StickyNote.ink)),
-                          Text(list.isEmpty ? 'Nicio temă încă' : '$done din ${list.length} teme terminate',
-                              style: TextStyle(fontSize: 13.5, color: StickyNote.inkMuted, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                    PbButton(text: 'Profil', size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => context.go('/elev/${widget.sid}')),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _Notebook(problems: _problemsOf(list), solved: solved),
-          ],
-        );
-      },
-    );
-  }
-
+  Widget build(BuildContext context) => StreamBuilder<Set<String>>(
+        stream: _solved,
+        builder: (context, s) => Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: _Notebook(problems: _problemsOf(widget.homework), solved: s.data ?? const <String>{}),
+        ),
+      );
 }
-
 
 /// A person drawn simply: a student from behind (hair, ears, shoulders) or
 /// the teacher facing the class. Hair, skin and shirt come from the name, so
@@ -1084,16 +985,16 @@ List<HwProblem> _problemsOf(List<Homework> homework) {
 class _Notebook extends StatelessWidget {
   final List<HwProblem> problems;
   final Set<String> solved;
-  const _Notebook({required this.problems, required this.solved});
-
-  static const double line = 46; // one ruled line per exercise
+  final bool teacher; // the teacher's own list: nothing to cross off
+  const _Notebook({required this.problems, this.solved = const {}, this.teacher = false});
   static const Color _ink = Color(0xFF2B3A55);
   static const Color _paper = Color(0xFFFFFEF8);
 
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
-    final left = isMobile ? 46.0 : 64.0; // the red margin
+    final left = isMobile ? 50.0 : 72.0; // the red margin
+    final line = isMobile ? 56.0 : 66.0; // one ruled line per exercise
     final done = problems.where((p) => solved.contains(p.progressKey)).length;
     return Transform.rotate(
       angle: isMobile ? 0 : -0.012,
@@ -1127,13 +1028,16 @@ class _Notebook extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
-                              child: Text('Exerciții', style: TextStyle(fontSize: isMobile ? 24 : 28, fontWeight: FontWeight.w800, color: _ink)),
+                              child: Text('Exerciții', style: TextStyle(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.w800, color: _ink)),
                             ),
                             if (problems.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 6),
-                                child: Text('$done din ${problems.length} rezolvate',
-                                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: done == problems.length ? hwGreen : _ink.withOpacity(0.6))),
+                                child: Text(teacher ? '${problems.length} ${problems.length == 1 ? 'exercițiu' : 'exerciții'}' : '$done din ${problems.length} rezolvate',
+                                    style: TextStyle(
+                                        fontSize: isMobile ? 14 : 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: !teacher && done == problems.length ? hwGreen : _ink.withOpacity(0.6))),
                               ),
                           ],
                         ),
@@ -1146,11 +1050,12 @@ class _Notebook extends StatelessWidget {
                           padding: EdgeInsets.only(left: left + 14, right: 18),
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: Text('Niciun exercițiu de la profesor deocamdată.', style: TextStyle(fontSize: 15.5, color: _ink.withOpacity(0.7))),
+                            child: Text(teacher ? 'Încă n-ai dat exerciții clasei. Apasă „Temă nouă” pe tablă.' : 'Niciun exercițiu de la profesor deocamdată.',
+                                style: TextStyle(fontSize: isMobile ? 16 : 18, color: _ink.withOpacity(0.7))),
                           ),
                         ),
                       ),
-                    for (var i = 0; i < problems.length; i++) _row(context, i + 1, problems[i], left, isMobile),
+                    for (var i = 0; i < problems.length; i++) _row(context, i + 1, problems[i], left, line, isMobile),
                     // blank lines, so it reads as a page
                     SizedBox(height: line * math.max(2, 7 - math.max(problems.length, 2))),
                   ],
@@ -1188,8 +1093,8 @@ class _Notebook extends StatelessWidget {
     );
   }
 
-  Widget _row(BuildContext context, int n, HwProblem p, double left, bool isMobile) {
-    final ok = solved.contains(p.progressKey);
+  Widget _row(BuildContext context, int n, HwProblem p, double left, double line, bool isMobile) {
+    final ok = !teacher && solved.contains(p.progressKey);
     final c = ckSubjectColor(p.subject);
     return Semantics(
       button: true,
@@ -1203,7 +1108,7 @@ class _Notebook extends StatelessWidget {
             children: [
               SizedBox(
                 width: left,
-                child: Text('$n.', textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _ink.withOpacity(0.55))),
+                child: Text('$n.', textAlign: TextAlign.center, style: TextStyle(fontSize: isMobile ? 17 : 20, fontWeight: FontWeight.w700, color: _ink.withOpacity(0.55))),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1212,7 +1117,7 @@ class _Notebook extends StatelessWidget {
                     TextSpan(
                       text: p.title.isEmpty ? p.id : p.title,
                       style: TextStyle(
-                        fontSize: isMobile ? 15.5 : 17,
+                        fontSize: isMobile ? 18 : 22,
                         fontWeight: FontWeight.w600,
                         color: ok ? _ink.withOpacity(0.45) : _ink,
                         decoration: ok ? TextDecoration.lineThrough : null,
@@ -1223,7 +1128,7 @@ class _Notebook extends StatelessWidget {
                     if (!isMobile)
                       TextSpan(
                         text: '   ${p.subject}${p.grade.isEmpty ? '' : ', a ${p.grade}-a'}',
-                        style: TextStyle(fontSize: 12.5, color: _ink.withOpacity(0.45)),
+                        style: TextStyle(fontSize: 15, color: _ink.withOpacity(0.45)),
                       ),
                   ]),
                   maxLines: 1,
@@ -1235,17 +1140,17 @@ class _Notebook extends StatelessWidget {
                 const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.check_circle, size: 18, color: hwGreen),
-                    SizedBox(width: 4),
-                    Text('Rezolvată', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: hwGreen)),
+                    Icon(Icons.check_circle, size: 22, color: hwGreen),
+                    SizedBox(width: 5),
+                    Text('Rezolvată', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: hwGreen)),
                   ],
                 )
               else
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Rezolvă', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: h ? c : Pb.primary)),
-                    Icon(Icons.chevron_right, size: 19, color: h ? c : Pb.primary),
+                    Text(teacher ? 'Deschide' : 'Rezolvă', style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w800, color: h ? c : Pb.primary)),
+                    Icon(Icons.chevron_right, size: 22, color: h ? c : Pb.primary),
                   ],
                 ),
               const SizedBox(width: 14),
