@@ -155,8 +155,17 @@ void main() {
       final cls = SchoolClass.fromSnap(await Classes.classes.doc(code).get());
       expect(cls.hasMember('s1'), isTrue);
       expect(cls.members.single.name, 'Mihai Ionescu');
-      expect(find.text('Temele clasei'), findsOneWidget);
+      expect(find.text('9B Mate'), findsWidgets); // on the board and on its sign
       expect(await Classes.studentLanding(), '/materii'); // invite used up
+
+      // The room is empty until they pick a chair.
+      expect(find.text('Alege-ți un loc: apasă pe un scaun liber.'), findsOneWidget);
+      await tester.ensureVisible(find.text('Stai aici').at(3));
+      await tester.tap(find.text('Stai aici').at(3));
+      await tester.pumpAndSettle();
+      expect(SchoolClass.fromSnap(await Classes.classes.doc(code).get()).seats['s1'], 3);
+      expect(find.text('Tu'), findsOneWidget);
+      expect(find.text('Stai aici'), findsNothing);
     });
 
     testWidgets('the owner sees the link, members and progress', (tester) async {
@@ -167,12 +176,25 @@ void main() {
       final id = await Classes.assign(teacherId: 't1', teacherName: 'Ana Pop', title: 'Ecuații', toClasses: [cls]);
       await Classes.setDone(id, 's2', true);
       await open(tester, ClassBody(uid: 't1', code: code));
+      expect(find.text('Mihai'), findsOneWidget); // sitting in a bench
+      expect(find.text('Ioana'), findsOneWidget);
+
+      // The catedra: the link and the homework with everyone's progress.
+      await tester.tap(find.text('CATEDRA'));
+      await tester.pumpAndSettle();
       expect(find.text('Linkul clasei'), findsOneWidget);
       expect(find.textContaining('/clasa/$code'), findsOneWidget);
-      expect(find.text('Mihai Ionescu'), findsWidgets); // in the members list and in the open homework
       expect(find.textContaining('1 din 2 au terminat'), findsOneWidget);
       expect(find.text('În lucru'), findsOneWidget); // Mihai
       expect(find.textContaining('Terminată'), findsOneWidget); // Ioana
+
+      // Back in the room, Ioana's desk shows just her.
+      await tester.tap(find.text('Înapoi în clasă'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.bySemanticsLabel('Banca lui Ioana Radu'));
+      await tester.tap(find.bySemanticsLabel('Banca lui Ioana Radu'));
+      await tester.pumpAndSettle();
+      expect(find.text('1 din 1 teme terminate'), findsOneWidget);
     });
 
     testWidgets('the dock: shows homework, hides it, brings it back, done makes it go away', (tester) async {
@@ -230,9 +252,13 @@ void main() {
       final code = await Classes.create(teacherId: 't1', teacherName: 'Ana Pop', name: '9B Mate');
       await Classes.join(code, 's1', 'Mihai Ionescu');
       await Classes.join(code, 's2', 'Ioana Radu');
-      await open(tester, TeacherClassesView(uid: 't1'));
+      await open(tester, ClassroomView(uid: 't1', teacher: true));
 
+      // From the board: the class is already picked.
       await tester.tap(find.text('Temă nouă'));
+      await tester.pumpAndSettle();
+      expect(find.text('Trimite la 2 elevi'), findsOneWidget);
+      await tester.tap(find.text('9B Mate').last);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Trimite tema'));
       await tester.pumpAndSettle();
@@ -259,6 +285,8 @@ void main() {
       expect(hw.classIds, [code]);
       expect(hw.dueAt, isNotNull);
       expect(hw.problems.single.title, 'Suma a două numere');
+      await tester.tap(find.text('CATEDRA'));
+      await tester.pumpAndSettle();
       expect(find.textContaining('0 din 2 au terminat'), findsOneWidget);
     });
 
@@ -278,7 +306,11 @@ void main() {
         ],
         dueAt: DateTime.now().add(const Duration(days: 3)),
       );
-      await open(tester, StudentClassesView(uid: 's1'));
+      await Classes.takeSeat(code, 's1', 0);
+      await open(tester, ClassroomView(uid: 's1', teacher: false));
+      await tester.ensureVisible(find.bySemanticsLabel('Banca ta'));
+      await tester.tap(find.bySemanticsLabel('Banca ta'));
+      await tester.pumpAndSettle();
       expect(find.text('1/2 rezolvate'), findsOneWidget);
       expect(find.text('Rezolvată'), findsOneWidget);
       expect(find.text('Continuă'), findsOneWidget);
@@ -286,10 +318,12 @@ void main() {
       await tester.tap(find.text('Am terminat'));
       await tester.pumpAndSettle();
       expect(Homework.fromSnap(await Classes.homework.doc(id).get()).isDone('s1'), isTrue);
-      expect(find.text('Sume și produse'), findsNothing); // left the to-do tab
-      await tester.tap(find.text('Terminate'));
+      expect(find.text('Ai terminat tot. Bravo!'), findsOneWidget);
+      expect(find.text('Terminate'), findsOneWidget);
+      expect(find.text('Sume și produse'), findsOneWidget); // under "Terminate"
+      await tester.tap(find.text('Înapoi în clasă'));
       await tester.pumpAndSettle();
-      expect(find.text('Sume și produse'), findsOneWidget);
+      expect(find.text('Înapoi în clasă'), findsNothing);
     });
 
     testWidgets('student page and phone layouts build without overflow', (tester) async {
@@ -305,13 +339,19 @@ void main() {
         problems: const [HwProblem(id: '1', title: 'Suma a două numere', subject: 'Informatică', grade: '9')],
         dueAt: DateTime.now().subtract(const Duration(hours: 3)),
       );
+      await Classes.takeSeat(code, 's1', 1);
       for (final size in const [Size(1280, 860), Size(380, 800)]) {
-        await open(tester, StudentClassesView(uid: 's1'), size: size);
-        expect(find.text('Temele mele'), findsOneWidget);
+        await open(tester, ClassroomView(uid: 's1', teacher: false), size: size);
+        await tester.ensureVisible(find.bySemanticsLabel('Banca ta'));
+        await tester.tap(find.bySemanticsLabel('Banca ta'));
+        await tester.pumpAndSettle();
         expect(find.text('Suma a două numere'), findsOneWidget);
-        await open(tester, TeacherClassesView(uid: 't1'), size: size);
-        expect(find.text('Andrei, pregătire BAC'), findsOneWidget);
+        await open(tester, ClassroomView(uid: 't1', teacher: true), size: size);
+        expect(find.text('Andrei, pregătire BAC'), findsWidgets);
         await open(tester, ClassBody(uid: 't1', code: code), size: size);
+        await tester.ensureVisible(find.text('CATEDRA'));
+        await tester.tap(find.text('CATEDRA'));
+        await tester.pumpAndSettle();
         expect(find.text('Linkul clasei'), findsOneWidget);
       }
       expect(tester.takeException(), isNull);

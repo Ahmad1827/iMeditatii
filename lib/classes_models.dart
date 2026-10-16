@@ -34,6 +34,7 @@ class SchoolClass {
   final String teacherId;
   final String teacherName;
   final List<ClassMember> members;
+  final Map<String, int> seats; // uid -> chair the student picked
   final DateTime? createdAt;
 
   const SchoolClass({
@@ -43,6 +44,7 @@ class SchoolClass {
     required this.teacherId,
     required this.teacherName,
     required this.members,
+    this.seats = const {},
     this.createdAt,
   });
 
@@ -69,6 +71,10 @@ class SchoolClass {
       teacherId: '${m['teacherId'] ?? ''}',
       teacherName: '${m['teacherName'] ?? 'Profesor'}',
       members: members,
+      seats: {
+        for (final e in ((m['seats'] as Map?) ?? const {}).entries)
+          if (e.value is num && raw.containsKey(e.key)) '${e.key}': (e.value as num).toInt(),
+      },
       createdAt: (m['createdAt'] as Timestamp?)?.toDate(),
     );
   }
@@ -276,6 +282,15 @@ class Classes {
   static Future<void> removeMember(String code, String uid) => classes.doc(code).update({
         'memberIds': FieldValue.arrayRemove([uid]),
         'members.$uid': FieldValue.delete(),
+        'seats.$uid': FieldValue.delete(),
+      });
+
+  /// Sits the student on chair [seat]. Fails if someone else picked it first.
+  static Future<void> takeSeat(String code, String uid, int seat) => _db.runTransaction((tx) async {
+        final ref = classes.doc(code);
+        final c = SchoolClass.fromSnap(await tx.get(ref));
+        if (c.seats.entries.any((e) => e.value == seat && e.key != uid)) throw StateError('Locul tocmai a fost ocupat.');
+        tx.update(ref, {'seats.$uid': seat});
       });
 
   // ---- homework
