@@ -502,13 +502,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
   /// The student's desk: one notebook with every exercise the teacher gave,
   /// soonest deadline first. Solved ones are crossed off.
   List<Widget> _myPapers(List<Homework> mine, Set<String> solved) {
-    final seen = <String>{};
-    final problems = [
-      for (final h in [...mine]..sort(_byDue))
-        for (final p in h.problems)
-          if (seen.add(p.progressKey)) p,
-    ];
-    return [const SizedBox(height: 8), _Notebook(problems: problems, solved: solved)];
+    return [const SizedBox(height: 8), _Notebook(problems: _problemsOf(mine), solved: solved)];
   }
 
   List<Widget> _catedraPapers(List<SchoolClass> classes, SchoolClass c, List<Homework> hw) {
@@ -981,93 +975,15 @@ class _StudentDeskState extends State<_StudentDesk> {
               ),
             ),
             const SizedBox(height: 16),
-            for (final h in list) _paper(h, solved),
+            _Notebook(problems: _problemsOf(list), solved: solved),
           ],
         );
       },
     );
   }
 
-  Widget _paper(Homework h, Set<String> solved) {
-    final done = h.isDone(widget.sid);
-    final c = hwDueColor(h, done: done);
-    final n = h.problems.where((p) => solved.contains(p.progressKey)).length;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: NotebookPaper(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 14, 14, 14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _calendarTile(h, c, done),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(h.displayTitle, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        if (done)
-                          hwPill(h.done[widget.sid] == null ? 'Terminată' : 'Terminată ${wsAgo(h.done[widget.sid])}', hwGreen, icon: Icons.check)
-                        else if (h.overdue)
-                          hwPill('Întârziată', hwRed, icon: Icons.error_outline)
-                        else
-                          hwPill('În lucru', hwAmber, icon: Icons.schedule),
-                        if (h.dueAt != null) hwPill('Termen: ${hwDueLabel(h.dueAt!)}', Pb.muted, icon: Icons.event_outlined),
-                      ],
-                    ),
-                    if (h.problems.isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      Text('$n/${h.problems.length} probleme rezolvate', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Pb.muted)),
-                      const SizedBox(height: 4),
-                      for (final p in h.problems)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Row(
-                            children: [
-                              Icon(solved.contains(p.progressKey) ? Icons.check_circle : Icons.radio_button_unchecked,
-                                  size: 17, color: solved.contains(p.progressKey) ? hwGreen : Pb.muted),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(p.title.isEmpty ? p.id : p.title, style: TextStyle(fontSize: 14, color: Pb.text))),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-Widget _calendarTile(Homework h, Color c, bool done) {
-  final d = h.dueAt;
-  return Container(
-    width: 52,
-    height: 56,
-    decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-    child: done
-        ? const Icon(Icons.check_rounded, color: hwGreen, size: 26)
-        : d == null
-            ? Icon(Icons.event_available_outlined, color: c, size: 22)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(_weekdayShort[d.weekday - 1], style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: c, letterSpacing: 0.6)),
-                  Text('${d.day}', style: TextStyle(fontSize: 21, height: 1.1, fontWeight: FontWeight.w800, color: c)),
-                ],
-              ),
-  );
-}
 
 /// A person drawn simply: a student from behind (hair, ears, shoulders) or
 /// the teacher facing the class. Hair, skin and shirt come from the name, so
@@ -1151,6 +1067,16 @@ class _Person extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _Person old) => old.name != name || old.back != back || old.ring != ring;
+}
+
+/// Every exercise in [homework], soonest deadline first, each once.
+List<HwProblem> _problemsOf(List<Homework> homework) {
+  final seen = <String>{};
+  return [
+    for (final h in [...homework]..sort(_byDue))
+      for (final p in h.problems)
+        if (seen.add(p.progressKey)) p,
+  ];
 }
 
 /// A spiral notebook lying on the desk: the exercises on ruled lines, each

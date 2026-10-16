@@ -196,6 +196,7 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Banca lui Ioana Radu'));
       await tester.pumpAndSettle();
       expect(find.text('1 din 1 teme terminate'), findsOneWidget);
+      expect(find.text('Exerciții'), findsOneWidget); // her notebook
     });
 
     testWidgets('the dock: shows homework, hides it, brings it back, done makes it go away', (tester) async {
