@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'clean_kit.dart';
 import 'classes_models.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize;
-import 'workspace_screen.dart' show wsDocColor, wsDocIcon, wsDialogShell;
+import 'workspace_screen.dart' show wsDocColor, wsDialogShell;
 
 // =============================================================================
 // HOMEWORK — what a student sees.
@@ -87,15 +87,18 @@ class HomeworkDetails extends StatefulWidget {
   final Homework homework;
   final String uid;
   final bool showHeader;
+  final bool showPills; // due date, done, hidden; off when the card shows them
+  final Set<String>? solved; // solved problem keys, when the parent already has them
   final VoidCallback? onNavigate; // e.g. close the dialog before leaving the page
 
-  const HomeworkDetails({super.key, required this.homework, required this.uid, this.showHeader = true, this.onNavigate});
+  const HomeworkDetails({super.key, required this.homework, required this.uid, this.showHeader = true, this.showPills = true, this.solved, this.onNavigate});
 
   @override
   State<HomeworkDetails> createState() => _HomeworkDetailsState();
 }
 
 class _HomeworkDetailsState extends State<HomeworkDetails> {
+  late final Stream<Set<String>> _solvedStream = Classes.solvedBy(widget.uid);
   bool _opening = false;
   bool? _done; // optimistic, until the stream catches up
   bool? _hidden;
@@ -154,8 +157,19 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => widget.solved != null
+      ? _body(widget.solved!)
+      : StreamBuilder<Set<String>>(
+        stream: _solvedStream,
+        builder: (context, s) => _body(s.data ?? const <String>{}),
+      );
+
+  Widget _body(Set<String> solved) {
     final dueC = hwDueColor(h, done: done);
+    final solvedCount = h.problems.where((p) => solved.contains(p.progressKey)).length;
+    final allSolved = h.problems.isNotEmpty && solvedCount == h.problems.length;
+    final next = h.problems.where((p) => !solved.contains(p.progressKey)).firstOrNull;
+    final started = solvedCount > 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -165,101 +179,105 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
           Text('De la ${h.teacherName}${h.audience.isEmpty ? '' : ' · ${h.audience}'}', style: TextStyle(fontSize: 13, color: Pb.muted)),
           const SizedBox(height: 8),
         ],
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            if (done) hwPill('Terminată', hwGreen, icon: Icons.check),
-            if (h.dueAt != null)
-              hwPill(
-                h.overdue && !done ? 'Termen depășit: ${hwDueLabel(h.dueAt!)}' : 'Termen: ${hwDueLabel(h.dueAt!)}',
-                dueC,
-                icon: Icons.event_outlined,
-              )
-            else
-              hwPill('Fără termen', Pb.muted, icon: Icons.event_outlined),
-            if (hidden && !done) hwPill('Ascunsă din bară', Pb.muted, icon: Icons.visibility_off_outlined),
-          ],
-        ),
+        if (widget.showPills)
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              if (done) hwPill('Terminată', hwGreen, icon: Icons.check),
+              if (h.dueAt != null)
+                hwPill(
+                  h.overdue && !done ? 'Termen depășit: ${hwDueLabel(h.dueAt!)}' : 'Termen: ${hwDueLabel(h.dueAt!)}',
+                  dueC,
+                  icon: Icons.event_outlined,
+                )
+              else
+                hwPill('Fără termen', Pb.muted, icon: Icons.event_outlined),
+              if (hidden && !done) hwPill('Ascunsă din bară', Pb.muted, icon: Icons.visibility_off_outlined),
+            ],
+          ),
         if (h.instructions.trim().isNotEmpty) ...[
           const SizedBox(height: 12),
-          SelectableText(h.instructions.trim(), style: TextStyle(fontSize: 14.5, color: Pb.text, height: 1.5)),
+          Container(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(padding: const EdgeInsets.only(top: 2), child: Icon(Icons.format_quote_rounded, size: 18, color: Pb.muted)),
+                const SizedBox(width: 10),
+                Expanded(child: SelectableText(h.instructions.trim(), style: TextStyle(fontSize: 14.5, color: Pb.text, height: 1.5))),
+              ],
+            ),
+          ),
         ],
-        if (h.problems.isNotEmpty) ...[
-          const SizedBox(height: 14),
-          Text('PROBLEME', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Pb.muted, letterSpacing: 0.5)),
-          const SizedBox(height: 6),
-          for (final p in h.problems)
-            CkHover(
-              onTap: () => _go(p.path),
-              builder: (hv) => AnimatedContainer(
-                duration: const Duration(milliseconds: 120),
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                decoration: BoxDecoration(
-                  color: hv ? Pb.primary.withOpacity(0.06) : Pb.hoverBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: hv ? Pb.primary.withOpacity(0.4) : Colors.transparent),
+        if (h.problems.isNotEmpty || h.material != null) ...[
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Text('PAȘII TEMEI',
+                    maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Pb.muted, letterSpacing: 0.5)),
+              ),
+              if (h.problems.isNotEmpty)
+                Text(
+                  '$solvedCount/${h.problems.length} rezolvate',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: allSolved ? hwGreen : Pb.muted),
                 ),
-                child: Row(
-                  children: [
-                    Icon(ckSubjectIcon(p.subject), size: 17, color: ckSubjectColor(p.subject)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(p.title.isEmpty ? p.id : p.title,
-                          maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
-                    ),
-                    Text('${p.subject}${p.grade.isEmpty ? '' : ', a ${p.grade}-a'}', style: TextStyle(fontSize: 12, color: Pb.muted)),
-                    const SizedBox(width: 6),
-                    Icon(Icons.chevron_right, size: 17, color: hv ? Pb.primary : Pb.muted),
-                  ],
-                ),
+            ],
+          ),
+          if (h.problems.isNotEmpty) ...[
+            const SizedBox(height: 7),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                value: solvedCount / h.problems.length,
+                minHeight: 5,
+                backgroundColor: Pb.gray,
+                valueColor: AlwaysStoppedAnimation(allSolved ? hwGreen : Pb.primary),
               ),
             ),
+          ],
+          const SizedBox(height: 10),
+          for (var i = 0; i < h.problems.length; i++) _problemStep(i + 1, h.problems[i], solved.contains(h.problems[i].progressKey)),
+          if (h.material != null) _materialStep(h.problems.length + 1),
         ],
-        if (h.material != null) ...[
-          const SizedBox(height: 14),
-          Text('DIN ATELIER', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Pb.muted, letterSpacing: 0.5)),
+        if (allSolved && !done) ...[
           const SizedBox(height: 6),
-          CkHover(
-            onTap: _opening ? null : _openMaterial,
-            builder: (hv) {
-              final m = h.material!;
-              final c = wsDocColor(m.type, m.lang);
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 120),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                decoration: BoxDecoration(
-                  color: hv ? c.withOpacity(0.07) : Pb.hoverBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: hv ? c.withOpacity(0.45) : Colors.transparent),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(color: hwGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: Row(
+              children: [
+                const Icon(Icons.emoji_events_outlined, size: 18, color: hwGreen),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text('Ai rezolvat toate problemele. Marchează tema ca terminată, ca să vadă și profesorul.',
+                      style: TextStyle(fontSize: 13.5, color: Pb.text, height: 1.4)),
                 ),
-                child: Row(
-                  children: [
-                    Icon(wsDocIcon(m.type), size: 18, color: c),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(m.displayTitle,
-                          maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
-                    ),
-                    if (_opening)
-                      SizedBox(width: 15, height: 15, child: CircularProgressIndicator(strokeWidth: 2, color: c))
-                    else
-                      Text('Deschide', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: c)),
-                  ],
-                ),
-              );
-            },
+              ],
+            ),
           ),
         ],
         const SizedBox(height: 16),
         Wrap(
           spacing: 8,
           runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            if (!done && next != null)
+              PbButton(text: started ? 'Continuă' : 'Începe tema', icon: Icons.play_arrow_rounded, size: PbSize.sm, onPressed: () => _go(next.path))
+            else if (!done && h.problems.isEmpty && h.material != null)
+              PbButton(text: 'Începe tema', icon: Icons.play_arrow_rounded, size: PbSize.sm, onPressed: _opening ? null : _openMaterial),
             done
                 ? PbButton(text: 'Nu am terminat', icon: Icons.undo, size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => _setDone(false))
-                : PbButton(text: 'Am terminat', icon: Icons.check, size: PbSize.sm, variant: PbVariant.success, onPressed: () => _setDone(true)),
+                : PbButton(
+                    text: 'Am terminat',
+                    icon: Icons.check,
+                    size: PbSize.sm,
+                    variant: (next == null) ? PbVariant.success : PbVariant.outlinePrimary,
+                    onPressed: () => _setDone(true),
+                  ),
             if (!done)
               hidden
                   ? PbButton(text: 'Arată în bară', icon: Icons.visibility_outlined, size: PbSize.sm, variant: PbVariant.outlinePrimary, onPressed: () => _setHidden(false))
@@ -267,6 +285,95 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _stepNumber(int n, bool ok, Color c) => Container(
+        width: 26,
+        height: 26,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: ok ? hwGreen : c.withOpacity(0.12),
+          shape: BoxShape.circle,
+        ),
+        child: ok
+            ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+            : Text('$n', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: c)),
+      );
+
+  Widget _step({required int n, required bool ok, required Color color, required String title, required String sub, required Widget trailing, VoidCallback? onTap}) =>
+      CkHover(
+        onTap: onTap,
+        builder: (hv) => AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+          decoration: BoxDecoration(
+            color: hv ? color.withOpacity(0.06) : Pb.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: hv ? color.withOpacity(0.45) : Pb.border),
+          ),
+          child: Row(
+            children: [
+              _stepNumber(n, ok, color),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: ok ? Pb.muted : Pb.text,
+                          decoration: ok ? TextDecoration.lineThrough : null,
+                          decorationColor: Pb.muted,
+                        )),
+                    if (sub.isNotEmpty) Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Pb.muted)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              trailing,
+            ],
+          ),
+        ),
+      );
+
+  Widget _go2(String label, Color c) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: c)),
+          Icon(Icons.chevron_right, size: 17, color: c),
+        ],
+      );
+
+  Widget _problemStep(int n, HwProblem p, bool ok) {
+    final c = ckSubjectColor(p.subject);
+    return _step(
+      n: n,
+      ok: ok,
+      color: c,
+      title: p.title.isEmpty ? p.id : p.title,
+      sub: [p.subject, if (p.grade.isNotEmpty) 'clasa a ${p.grade}-a'].join(' · '),
+      trailing: ok ? hwPill('Rezolvată', hwGreen, icon: Icons.check) : _go2('Rezolvă', c),
+      onTap: () => _go(p.path),
+    );
+  }
+
+  Widget _materialStep(int n) {
+    final m = h.material!;
+    final c = wsDocColor(m.type, m.lang);
+    return _step(
+      n: n,
+      ok: false,
+      color: c,
+      title: m.displayTitle,
+      sub: 'Din Atelier · lucrezi pe copia ta',
+      trailing: _opening ? SizedBox(width: 15, height: 15, child: CircularProgressIndicator(strokeWidth: 2, color: c)) : _go2('Deschide', c),
+      onTap: _opening ? null : _openMaterial,
     );
   }
 }

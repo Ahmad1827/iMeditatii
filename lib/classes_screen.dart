@@ -78,18 +78,6 @@ Widget _emptyBox(IconData icon, String title, String text, {Widget? action}) => 
       ),
     );
 
-/// A card with a coloured strip down its left edge.
-Widget _accentCard(Color color, Widget child) => Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      clipBehavior: Clip.antiAlias,
-      decoration: ckDeco(r: 14),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 18, 16),
-        decoration: BoxDecoration(border: Border(left: BorderSide(color: color, width: 4))),
-        child: child,
-      ),
-    );
-
 /// Who a homework went to, by id: members of its classes plus direct picks.
 Map<String, String> hwRecipients(Homework h, List<SchoolClass> classes) {
   final out = <String, String>{};
@@ -593,6 +581,244 @@ class _HomeworkProgressTileState extends State<HomeworkProgressTile> {
 }
 
 // ----------------------------------------------------------------- student
+const _weekdayShort = ['LUN', 'MAR', 'MIE', 'JOI', 'VIN', 'SÂM', 'DUM'];
+
+/// Groups of homework by how soon it is due, in the order they are shown.
+enum _Due { late, today, tomorrow, week, later, none }
+
+_Due _dueOf(Homework h) {
+  final d = h.dueAt;
+  if (d == null) return _Due.none;
+  final now = DateTime.now();
+  if (d.isBefore(now)) return _Due.late;
+  final days = DateTime(d.year, d.month, d.day).difference(DateTime(now.year, now.month, now.day)).inDays;
+  if (days == 0) return _Due.today;
+  if (days == 1) return _Due.tomorrow;
+  if (days < 7) return _Due.week;
+  return _Due.later;
+}
+
+String _dueTitle(_Due d) => const {
+      _Due.late: 'Termen depășit',
+      _Due.today: 'Azi',
+      _Due.tomorrow: 'Mâine',
+      _Due.week: 'Săptămâna aceasta',
+      _Due.later: 'Mai târziu',
+      _Due.none: 'Fără termen',
+    }[d]!;
+
+Color _dueGroupColor(_Due d) => switch (d) {
+      _Due.late || _Due.today => hwRed,
+      _Due.tomorrow => hwAmber,
+      _Due.week || _Due.later => hwBlue,
+      _Due.none => Pb.muted,
+    };
+
+int _byDue(Homework a, Homework b) {
+  if (a.dueAt == null && b.dueAt == null) return (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0));
+  if (a.dueAt == null) return 1;
+  if (b.dueAt == null) return -1;
+  return a.dueAt!.compareTo(b.dueAt!);
+}
+
+int _byDoneAt(Homework a, Homework b, String uid) => (b.done[uid] ?? DateTime(0)).compareTo(a.done[uid] ?? DateTime(0));
+
+Widget _groupLabel(String text, Color c, int n) => Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 10),
+      child: Row(
+        children: [
+          Container(width: 8, height: 8, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+          const SizedBox(width: 8),
+          Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Pb.text)),
+          const SizedBox(width: 6),
+          Text('$n', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.muted)),
+        ],
+      ),
+    );
+
+/// One homework, as the student sees it in a list: a calendar tile with the
+/// due date, the title and progress, and the steps when opened.
+class StudentHomeworkCard extends StatefulWidget {
+  final Homework homework;
+  final String uid;
+  final Set<String> solved;
+  final bool initiallyOpen;
+  final bool showClass;
+
+  const StudentHomeworkCard({super.key, required this.homework, required this.uid, required this.solved, this.initiallyOpen = false, this.showClass = true});
+
+  @override
+  State<StudentHomeworkCard> createState() => _StudentHomeworkCardState();
+}
+
+class _StudentHomeworkCardState extends State<StudentHomeworkCard> {
+  late bool _open = widget.initiallyOpen;
+
+  Homework get h => widget.homework;
+
+  Widget _dateTile(bool done, Color c) {
+    final d = h.dueAt;
+    return Container(
+      width: 52,
+      height: 56,
+      decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+      child: done
+          ? const Icon(Icons.check_rounded, color: hwGreen, size: 26)
+          : d == null
+              ? Icon(Icons.event_available_outlined, color: c, size: 22)
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(_weekdayShort[d.weekday - 1], style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: c, letterSpacing: 0.6)),
+                    Text('${d.day}', style: TextStyle(fontSize: 21, height: 1.1, fontWeight: FontWeight.w800, color: c)),
+                  ],
+                ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final done = h.isDone(widget.uid);
+    final c = hwDueColor(h, done: done);
+    final solvedN = h.problems.where((p) => widget.solved.contains(p.progressKey)).length;
+    final from = [
+      h.teacherName,
+      if (widget.showClass) ...[for (final id in h.classIds) h.classNames[id] ?? id],
+    ].join(' · ');
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
+      decoration: ckDeco(r: 16).copyWith(border: Border.all(color: _open && !done ? c.withOpacity(0.45) : Pb.border.withOpacity(0.7))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          CkHover(
+            onTap: () => setState(() => _open = !_open),
+            builder: (hv) => Container(
+              color: hv ? Pb.hoverBg : Colors.transparent,
+              padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+              child: Row(
+                children: [
+                  _dateTile(done, c),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(h.displayTitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: done ? Pb.muted : Pb.text, height: 1.3)),
+                        const SizedBox(height: 2),
+                        Text(from, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: Pb.muted)),
+                        const SizedBox(height: 7),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            if (done)
+                              hwPill('Terminată', hwGreen, icon: Icons.check)
+                            else if (h.dueAt != null)
+                              hwPill(h.overdue ? 'Întârziată · ${hwDueLabel(h.dueAt!)}' : 'Termen: ${hwDueLabel(h.dueAt!)}', c, icon: Icons.schedule)
+                            else
+                              hwPill('Fără termen', Pb.muted, icon: Icons.schedule),
+                            if (h.problems.isNotEmpty)
+                              hwPill('$solvedN/${h.problems.length} probleme', solvedN == h.problems.length ? hwGreen : Pb.muted, icon: Icons.code),
+                            if (h.material != null) hwPill('Fișă din Atelier', Pb.muted, icon: Icons.description_outlined),
+                            if (h.isHidden(widget.uid) && !done) hwPill('Ascunsă din bară', Pb.muted, icon: Icons.visibility_off_outlined),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  AnimatedRotation(
+                    turns: _open ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: Icon(Icons.expand_more, color: Pb.muted),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: !_open
+                ? const SizedBox(width: double.infinity)
+                : Container(
+                    decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border.withOpacity(0.7)))),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                    child: HomeworkDetails(homework: h, uid: widget.uid, showHeader: false, showPills: false, solved: widget.solved),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Two or three big tabs: "De făcut 3" / "Terminate 5".
+Widget _tabs(List<(String, int)> tabs, int active, ValueChanged<int> onTap) => Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: [
+          for (var i = 0; i < tabs.length; i++)
+            Expanded(
+              child: CkHover(
+                onTap: () => onTap(i),
+                builder: (hv) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  decoration: BoxDecoration(
+                    color: i == active ? Pb.surface : Colors.transparent,
+                    borderRadius: BorderRadius.circular(9),
+                    boxShadow: i == active ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 6, offset: const Offset(0, 2))] : null,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(tabs[i].$1,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: i == active ? Pb.text : Pb.muted)),
+                      ),
+                      const SizedBox(width: 7),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                        decoration: BoxDecoration(color: i == active ? Pb.primary : Pb.border, borderRadius: BorderRadius.circular(99)),
+                        child: Text('${tabs[i].$2}',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: i == active ? Colors.white : Pb.muted)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
+Widget _filterChip(String label, bool on, VoidCallback onTap, {Color? color}) => CkHover(
+      onTap: onTap,
+      builder: (hv) => AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: on ? (color ?? Pb.primary).withOpacity(0.12) : (hv ? Pb.hoverBg : Pb.surface),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(color: on ? (color ?? Pb.primary) : Pb.border),
+        ),
+        child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: on ? (color ?? Pb.primary) : Pb.text)),
+      ),
+    );
+
+Color _classColor(SchoolClass c) => c.subject.isEmpty ? ckColorFor(c.id) : ckSubjectColor(c.subject);
+IconData _classIcon(SchoolClass c) => c.subject.isEmpty ? Icons.groups_outlined : ckSubjectIcon(c.subject);
+
 class StudentClassesView extends StatefulWidget {
   final String uid;
   const StudentClassesView({super.key, required this.uid});
@@ -604,8 +830,11 @@ class StudentClassesView extends StatefulWidget {
 class _StudentClassesViewState extends State<StudentClassesView> {
   late final Stream<List<Homework>> _hw = Classes.forStudent(widget.uid);
   late final Stream<List<SchoolClass>> _classes = Classes.joinedBy(widget.uid);
+  late final Stream<Set<String>> _solved = Classes.solvedBy(widget.uid);
+  late final Future<String> _name = Classes.userName(widget.uid);
   final _code = TextEditingController();
-  bool _showDone = false;
+  int _tab = 0; // 0 to do, 1 done
+  String? _classFilter;
 
   @override
   void dispose() {
@@ -621,123 +850,287 @@ class _StudentClassesViewState extends State<StudentClassesView> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 700;
-    return StreamBuilder<List<Homework>>(
-      stream: _hw,
-      builder: (context, hs) {
-        final all = hs.data ?? const <Homework>[];
-        final todo = all.where((h) => !h.isDone(widget.uid)).toList();
-        final done = all.where((h) => h.isDone(widget.uid)).toList();
-        return ListView(
-          padding: const EdgeInsets.only(bottom: 90),
-          children: [
-            PbContainer(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 26),
-                  Text('Temele mele', style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w800, color: Pb.text)),
-                  const SizedBox(height: 6),
-                  Text(
-                    todo.isEmpty ? 'Nu ai nimic de făcut acum.' : (todo.length == 1 ? 'Ai o temă de făcut.' : 'Ai ${todo.length} teme de făcut.'),
-                    style: TextStyle(fontSize: 15, color: Pb.muted),
+    final wide = MediaQuery.of(context).size.width >= 980;
+    return StreamBuilder<List<SchoolClass>>(
+      stream: _classes,
+      builder: (context, cs) => StreamBuilder<Set<String>>(
+        stream: _solved,
+        builder: (context, ss) => StreamBuilder<List<Homework>>(
+          stream: _hw,
+          builder: (context, hs) {
+            final classes = cs.data ?? const <SchoolClass>[];
+            final solved = ss.data ?? const <String>{};
+            final all = hs.data ?? const <Homework>[];
+            final todo = all.where((h) => !h.isDone(widget.uid)).toList()..sort(_byDue);
+            final done = all.where((h) => h.isDone(widget.uid)).toList()..sort((a, b) => _byDoneAt(a, b, widget.uid));
+            final list = homeworkList(hs, todo, done, classes, solved);
+            final side = _sidebar(classes, todo);
+            return ListView(
+              padding: const EdgeInsets.only(bottom: 100),
+              children: [
+                PbContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 26),
+                      _header(todo, done),
+                      const SizedBox(height: 22),
+                      if (wide)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [Expanded(child: list), const SizedBox(width: 28), SizedBox(width: 320, child: side)],
+                        )
+                      else ...[list, const SizedBox(height: 28), side],
+                    ],
                   ),
-                  _sectionTitle('De făcut'),
-                  if (!hs.hasData && !hs.hasError)
-                    const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)))
-                  else if (hs.hasError)
-                    _emptyBox(Icons.cloud_off_outlined, 'Nu am putut încărca temele', 'Reîncarcă pagina.')
-                  else if (todo.isEmpty)
-                    _emptyBox(Icons.celebration_outlined, 'Totul e gata', 'Când profesorul îți dă o temă, apare aici și într-un buton mic în colțul ecranului, pe orice pagină.')
-                  else
-                    for (final h in todo) _card(h),
-                  if (done.isNotEmpty) ...[
-                    _sectionTitle('Terminate', trailing: PbLink(text: _showDone ? 'Ascunde' : 'Arată (${done.length})', fontSize: 14, onTap: () => setState(() => _showDone = !_showDone))),
-                    if (_showDone) for (final h in done) _card(h),
-                  ],
-                  _sectionTitle('Clasele mele'),
-                  StreamBuilder<List<SchoolClass>>(
-                    stream: _classes,
-                    builder: (context, cs) {
-                      final classes = cs.data ?? const <SchoolClass>[];
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (classes.isNotEmpty)
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                for (final c in classes)
-                                  CkHover(
-                                    onTap: () => context.go(c.path),
-                                    builder: (h) => AnimatedContainer(
-                                      duration: const Duration(milliseconds: 140),
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                      decoration: ckDeco(r: 12).copyWith(border: Border.all(color: h ? Pb.primary : Pb.border)),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(c.subject.isEmpty ? Icons.groups_outlined : ckSubjectIcon(c.subject), size: 18, color: c.subject.isEmpty ? Pb.muted : ckSubjectColor(c.subject)),
-                                          const SizedBox(width: 9),
-                                          Flexible(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(c.displayName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Pb.text)),
-                                                Text(c.teacherName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          const SizedBox(height: 14),
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
-                            child: Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(classes.isEmpty ? 'Ai primit un cod de clasă?' : 'Intră în altă clasă:', style: TextStyle(fontSize: 14, color: Pb.text)),
-                                SizedBox(
-                                  width: 150,
-                                  child: TextField(
-                                    controller: _code,
-                                    onSubmitted: (_) => _join(),
-                                    textCapitalization: TextCapitalization.characters,
-                                    style: TextStyle(fontSize: 15, letterSpacing: 2, fontWeight: FontWeight.w700, color: Pb.text),
-                                    cursorColor: Pb.primary,
-                                    decoration: Pb.input(hint: 'ex. K7M2QX').copyWith(contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
-                                  ),
-                                ),
-                                PbButton(text: 'Intră', size: PbSize.sm, onPressed: _join),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      },
+                ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 
-  Widget _card(Homework h) {
-    final c = hwDueColor(h, done: h.isDone(widget.uid));
-    return _accentCard(c, HomeworkDetails(homework: h, uid: widget.uid));
+  Widget _header(List<Homework> todo, List<Homework> done) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+    final late = todo.where((h) => h.overdue).length;
+    final soon = todo.where((h) => const {_Due.today, _Due.tomorrow}.contains(_dueOf(h))).length;
+    String line;
+    if (todo.isEmpty) {
+      line = done.isEmpty ? 'Încă nu ai primit teme.' : 'Ai terminat tot. Bravo!';
+    } else {
+      line = todo.length == 1 ? 'Ai o temă de făcut' : 'Ai ${todo.length} teme de făcut';
+      if (late > 0) {
+        line += late == 1 ? ', una a trecut de termen.' : ', $late au trecut de termen.';
+      } else if (soon > 0) {
+        line += soon == 1 ? ', una e pentru azi sau mâine.' : ', $soon sunt pentru azi sau mâine.';
+      } else {
+        line += '.';
+      }
+    }
+    Widget stat(String n, String label, Color c, IconData icon) => Container(
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 14, vertical: 10),
+          decoration: BoxDecoration(color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+          child: isMobile
+              ? Column(
+                  children: [
+                    Text(n, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: c)),
+                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.text)),
+                  ],
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon, size: 18, color: c),
+                    const SizedBox(width: 8),
+                    Text(n, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: c)),
+                    const SizedBox(width: 5),
+                    Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.text)),
+                  ],
+                ),
+        );
+    final stats = [
+      stat('${todo.length}', 'de făcut', Pb.primary, Icons.assignment_outlined),
+      if (late > 0) stat('$late', late == 1 ? 'întârziată' : 'întârziate', hwRed, Icons.error_outline),
+      stat('${done.length}', done.length == 1 ? 'terminată' : 'terminate', hwGreen, Icons.check_circle_outline),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FutureBuilder<String>(
+          future: _name,
+          builder: (context, s) {
+            final first = (s.data ?? '').split(' ').first;
+            return Text(first.isEmpty || first == 'Elev' ? 'Salut!' : 'Salut, $first!', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.primary));
+          },
+        ),
+        const SizedBox(height: 4),
+        Text('Temele mele', style: TextStyle(fontSize: isMobile ? 28 : 34, fontWeight: FontWeight.w800, color: Pb.text, height: 1.15)),
+        const SizedBox(height: 6),
+        Text(line, style: TextStyle(fontSize: 15.5, color: Pb.muted)),
+        if (todo.isNotEmpty || done.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          if (isMobile)
+            Row(children: [
+              for (var i = 0; i < stats.length; i++) ...[if (i > 0) const SizedBox(width: 8), Expanded(child: stats[i])],
+            ])
+          else
+            Wrap(spacing: 10, runSpacing: 10, children: stats),
+        ],
+      ],
+    );
+  }
+
+  Widget homeworkList(AsyncSnapshot<List<Homework>> hs, List<Homework> todo, List<Homework> done, List<SchoolClass> classes, Set<String> solved) {
+    if (!hs.hasData && !hs.hasError) {
+      return const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)));
+    }
+    if (hs.hasError) return _emptyBox(Icons.cloud_off_outlined, 'Nu am putut încărca temele', 'Reîncarcă pagina.');
+
+    bool pass(Homework h) => _classFilter == null || h.classIds.contains(_classFilter);
+    final shownTodo = todo.where(pass).toList();
+    final shownDone = done.where(pass).toList();
+    final withHw = classes.where((c) => [...todo, ...done].any((h) => h.classIds.contains(c.id))).toList();
+
+    final children = <Widget>[];
+    if (_tab == 0) {
+      if (shownTodo.isEmpty) {
+        children.add(Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _emptyBox(
+            Icons.celebration_outlined,
+            todo.isEmpty ? 'Nimic de făcut' : 'Nimic de făcut aici',
+            'Când profesorul îți dă o temă, apare aici și într-un buton mic în colțul ecranului, pe orice pagină.',
+            action: classes.isEmpty ? null : PbButton(text: 'Exersează probleme', variant: PbVariant.outlinePrimary, size: PbSize.sm, onPressed: () => context.go('/materii')),
+          ),
+        ));
+      } else {
+        var first = true;
+        for (final g in _Due.values) {
+          final items = shownTodo.where((h) => _dueOf(h) == g).toList();
+          if (items.isEmpty) continue;
+          children.add(_groupLabel(_dueTitle(g), _dueGroupColor(g), items.length));
+          for (final h in items) {
+            children.add(StudentHomeworkCard(
+              key: ValueKey('todo_${h.id}'),
+              homework: h,
+              uid: widget.uid,
+              solved: solved,
+              initiallyOpen: first,
+            ));
+            first = false;
+          }
+        }
+      }
+    } else {
+      if (shownDone.isEmpty) {
+        children.add(Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _emptyBox(Icons.check_circle_outline, 'Nicio temă terminată încă', 'Apasă „Am terminat” pe o temă când o termini. Profesorul vede asta imediat.'),
+        ));
+      } else {
+        children.add(const SizedBox(height: 16));
+        for (final h in shownDone) {
+          children.add(StudentHomeworkCard(key: ValueKey('done_${h.id}'), homework: h, uid: widget.uid, solved: solved));
+        }
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _tabs([('De făcut', todo.length), ('Terminate', done.length)], _tab, (i) => setState(() => _tab = i)),
+        if (withHw.length > 1) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _filterChip('Toate', _classFilter == null, () => setState(() => _classFilter = null)),
+              for (final c in withHw)
+                _filterChip(c.displayName, _classFilter == c.id, () => setState(() => _classFilter = _classFilter == c.id ? null : c.id), color: _classColor(c)),
+            ],
+          ),
+        ],
+        ...children,
+      ],
+    );
+  }
+
+  Widget _sidebar(List<SchoolClass> classes, List<Homework> todo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Clasele mele', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Pb.text)),
+        const SizedBox(height: 12),
+        if (classes.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(14)),
+            child: Text('Nu ești încă în nicio clasă. Deschide linkul primit de la profesor sau scrie codul mai jos.',
+                style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.5)),
+          ),
+        for (final c in classes) _classTile(c, todo.where((h) => h.classIds.contains(c.id)).length),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: ckDeco(r: 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.vpn_key_outlined, size: 18, color: Pb.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(classes.isEmpty ? 'Ai primit un cod de clasă?' : 'Intră în altă clasă',
+                        style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text('Codul are 6 caractere și e la finalul linkului.', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _code,
+                      onSubmitted: (_) => _join(),
+                      textCapitalization: TextCapitalization.characters,
+                      style: TextStyle(fontSize: 15, letterSpacing: 2, fontWeight: FontWeight.w700, color: Pb.text),
+                      cursorColor: Pb.primary,
+                      decoration: Pb.input(hint: 'ex. K7M2QX').copyWith(contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  PbButton(text: 'Intră', size: PbSize.sm, onPressed: _join),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _classTile(SchoolClass c, int todo) {
+    final col = _classColor(c);
+    return CkHover(
+      onTap: () => context.go(c.path),
+      builder: (h) => AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: ckDeco(r: 14).copyWith(border: Border.all(color: h ? col : Pb.border.withOpacity(0.7))),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: col.withOpacity(0.13), borderRadius: BorderRadius.circular(11)),
+              child: Icon(_classIcon(c), size: 20, color: col),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(c.displayName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                  Text(c.teacherName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                ],
+              ),
+            ),
+            if (todo > 0) ...[const SizedBox(width: 8), hwPill(todo == 1 ? '1 temă' : '$todo teme', col)],
+            Icon(Icons.chevron_right, size: 18, color: h ? col : Pb.muted),
+          ],
+        ),
+      ),
+    );
   }
 }
+
 
 // ----------------------------------------------------------------- /clasa/:code
 class ClassScreen extends StatelessWidget {
@@ -1169,6 +1562,8 @@ class _StudentClassView extends StatefulWidget {
 
 class _StudentClassViewState extends State<_StudentClassView> {
   late final Stream<List<Homework>> _hw = Classes.forClass(widget.c.id);
+  late final Stream<Set<String>> _solved = Classes.solvedBy(widget.uid);
+  int _tab = 0;
 
   Future<void> _leave() async {
     final ok = await showPbModal<bool>(
@@ -1189,59 +1584,127 @@ class _StudentClassViewState extends State<_StudentClassView> {
     }
   }
 
+  Widget _banner(int todo, int done) {
+    final c = widget.c;
+    final col = _classColor(c);
+    final isMobile = MediaQuery.of(context).size.width < 700;
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: ckDeco(r: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(height: 6, color: col),
+          Padding(
+            padding: EdgeInsets.all(isMobile ? 16 : 22),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: isMobile ? 48 : 58,
+                  height: isMobile ? 48 : 58,
+                  decoration: BoxDecoration(color: col.withOpacity(0.13), borderRadius: BorderRadius.circular(14)),
+                  child: Icon(_classIcon(c), size: isMobile ? 24 : 28, color: col),
+                ),
+                SizedBox(width: isMobile ? 14 : 18),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(c.displayName, style: TextStyle(fontSize: isMobile ? 23 : 29, fontWeight: FontWeight.w800, color: Pb.text, height: 1.2)),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text('cu ', style: TextStyle(fontSize: 14.5, color: Pb.muted)),
+                          PbLink(text: c.teacherName, fontSize: 14.5, onTap: () => context.go('/profesor/${c.teacherId}')),
+                          Text(
+                            [if (c.subject.isNotEmpty) ' · ${c.subject}', ' · ${c.members.length == 1 ? 'doar tu' : '${c.members.length} elevi'}'].join(),
+                            style: TextStyle(fontSize: 14.5, color: Pb.muted),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          hwPill(todo == 0 ? 'Nimic de făcut' : (todo == 1 ? '1 temă de făcut' : '$todo teme de făcut'), todo == 0 ? hwGreen : Pb.primary,
+                              icon: Icons.assignment_outlined),
+                          if (done > 0) hwPill(done == 1 ? '1 terminată' : '$done terminate', hwGreen, icon: Icons.check),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final c = widget.c;
-    final isMobile = MediaQuery.of(context).size.width < 700;
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 90),
-      children: [
-        PbContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return StreamBuilder<Set<String>>(
+      stream: _solved,
+      builder: (context, ss) => StreamBuilder<List<Homework>>(
+        stream: _hw,
+        builder: (context, s) {
+          final solved = ss.data ?? const <String>{};
+          final list = s.data ?? const <Homework>[];
+          final todo = list.where((h) => !h.isDone(widget.uid)).toList()..sort(_byDue);
+          final done = list.where((h) => h.isDone(widget.uid)).toList()..sort((a, b) => _byDoneAt(a, b, widget.uid));
+          final shown = _tab == 0 ? todo : done;
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 100),
             children: [
-              const SizedBox(height: 18),
-              Align(alignment: Alignment.centerLeft, child: PbLink(text: '← Temele mele', fontSize: 14, onTap: () => context.go('/clase'))),
-              const SizedBox(height: 12),
-              Text(c.displayName, style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w800, color: Pb.text)),
-              const SizedBox(height: 2),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text('cu ', style: TextStyle(fontSize: 15, color: Pb.muted)),
-                  PbLink(text: c.teacherName, fontSize: 15, onTap: () => context.go('/profesor/${c.teacherId}')),
-                  Text(
-                    [if (c.subject.isNotEmpty) ' · ${c.subject}', ' · ${c.members.length == 1 ? 'doar tu' : '${c.members.length} elevi'}'].join(),
-                    style: TextStyle(fontSize: 15, color: Pb.muted),
-                  ),
-                ],
-              ),
-              _sectionTitle('Temele clasei'),
-              StreamBuilder<List<Homework>>(
-                stream: _hw,
-                builder: (context, s) {
-                  final list = s.data ?? const <Homework>[];
-                  if (!s.hasData && !s.hasError) return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)));
-                  if (list.isEmpty) {
-                    return _emptyBox(Icons.assignment_outlined, 'Nicio temă deocamdată', 'Când profesorul dă o temă, o vezi aici și în colțul ecranului, pe orice pagină.');
-                  }
-                  final todo = list.where((h) => !h.isDone(widget.uid)).toList();
-                  final done = list.where((h) => h.isDone(widget.uid)).toList();
-                  return Column(
+              PbContainer(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 860),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      for (final h in [...todo, ...done])
-                        _accentCard(hwDueColor(h, done: h.isDone(widget.uid)), HomeworkDetails(homework: h, uid: widget.uid)),
+                      const SizedBox(height: 18),
+                      Align(alignment: Alignment.centerLeft, child: PbLink(text: '← Toate temele mele', fontSize: 14, onTap: () => context.go('/clase'))),
+                      const SizedBox(height: 14),
+                      _banner(todo.length, done.length),
+                      _sectionTitle('Temele clasei'),
+                      if (!s.hasData && !s.hasError)
+                        const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)))
+                      else if (list.isEmpty)
+                        _emptyBox(Icons.assignment_outlined, 'Nicio temă deocamdată', 'Când profesorul dă o temă, o vezi aici și în colțul ecranului, pe orice pagină.')
+                      else ...[
+                        _tabs([('De făcut', todo.length), ('Terminate', done.length)], _tab, (i) => setState(() => _tab = i)),
+                        const SizedBox(height: 14),
+                        if (shown.isEmpty)
+                          _emptyBox(
+                            _tab == 0 ? Icons.celebration_outlined : Icons.check_circle_outline,
+                            _tab == 0 ? 'Ai terminat tot din clasa asta' : 'Nicio temă terminată încă',
+                            _tab == 0 ? 'Temele noi apar aici imediat ce le trimite profesorul.' : 'Apasă „Am terminat” pe o temă când o termini.',
+                          )
+                        else
+                          for (var i = 0; i < shown.length; i++)
+                            StudentHomeworkCard(
+                              key: ValueKey('${_tab}_${shown[i].id}'),
+                              homework: shown[i],
+                              uid: widget.uid,
+                              solved: solved,
+                              showClass: false,
+                              initiallyOpen: _tab == 0 && i == 0,
+                            ),
+                      ],
+                      const SizedBox(height: 24),
+                      Align(alignment: Alignment.centerLeft, child: PbLink(text: 'Ieși din clasă', fontSize: 13.5, onTap: _leave)),
                     ],
-                  );
-                },
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
-              Align(alignment: Alignment.centerLeft, child: PbLink(text: 'Ieși din clasă', fontSize: 13.5, onTap: _leave)),
             ],
-          ),
-        ),
-      ],
+          );
+        },
+      ),
     );
   }
 }

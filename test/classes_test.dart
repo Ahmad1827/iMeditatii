@@ -260,6 +260,36 @@ void main() {
       expect(find.textContaining('0 din 2 au terminat'), findsOneWidget);
     });
 
+    testWidgets('the student sees solved problems, continues the next one, and finds finished homework', (tester) async {
+      final code = await Classes.create(teacherId: 't1', teacherName: 'Ana Pop', name: '9B Info', subject: 'Informatică');
+      await Classes.join(code, 's1', 'Mihai Ionescu');
+      await db.collection('users').doc('s1').update({'solvedIds': ['Informatică_9_1']});
+      final cls = SchoolClass.fromSnap(await Classes.classes.doc(code).get());
+      final id = await Classes.assign(
+        teacherId: 't1',
+        teacherName: 'Ana Pop',
+        title: 'Sume și produse',
+        toClasses: [cls],
+        problems: const [
+          HwProblem(id: '1', title: 'Suma a două numere', subject: 'Informatică', grade: '9'),
+          HwProblem(id: '2', title: 'Produsul cifrelor', subject: 'Informatică', grade: '9'),
+        ],
+        dueAt: DateTime.now().add(const Duration(days: 3)),
+      );
+      await open(tester, StudentClassesView(uid: 's1'));
+      expect(find.text('1/2 rezolvate'), findsOneWidget);
+      expect(find.text('Rezolvată'), findsOneWidget);
+      expect(find.text('Continuă'), findsOneWidget);
+
+      await tester.tap(find.text('Am terminat'));
+      await tester.pumpAndSettle();
+      expect(Homework.fromSnap(await Classes.homework.doc(id).get()).isDone('s1'), isTrue);
+      expect(find.text('Sume și produse'), findsNothing); // left the to-do tab
+      await tester.tap(find.text('Terminate'));
+      await tester.pumpAndSettle();
+      expect(find.text('Sume și produse'), findsOneWidget);
+    });
+
     testWidgets('student page and phone layouts build without overflow', (tester) async {
       final code = await Classes.create(teacherId: 't1', teacherName: 'Ana Pop', name: 'Andrei, pregătire BAC', subject: 'Informatică');
       await Classes.join(code, 's1', 'Mihai Ionescu');

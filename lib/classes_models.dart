@@ -84,6 +84,9 @@ class HwProblem {
 
   String get path => '/exercitiu/$id?materie=${Uri.encodeComponent(subject)}&clasa=${Uri.encodeComponent(grade)}';
 
+  /// The key the problem page saves in `users/{uid}.solvedIds` once solved.
+  String get progressKey => '${subject}_${grade}_$id';
+
   Map<String, dynamic> toJson() => {'id': id, 'title': title, 'subject': subject, 'grade': grade};
   static HwProblem fromJson(Map j) => HwProblem(
         id: '${j['id'] ?? ''}',
@@ -336,6 +339,11 @@ class Classes {
 
   static Future<void> setDone(String id, String uid, bool done) =>
       homework.doc(id).update({'done.$uid': done ? FieldValue.serverTimestamp() : FieldValue.delete()});
+
+  /// The problems a student has solved, as [HwProblem.progressKey]s.
+  static Stream<Set<String>> solvedBy(String uid) => _db.collection('users').doc(uid).snapshots().map(
+        (d) => {for (final k in (d.data()?['solvedIds'] as List?) ?? const []) '$k'},
+      );
 
   static Future<void> setHidden(String id, String uid, bool hidden) =>
       homework.doc(id).update({'hidden.$uid': hidden ? true : FieldValue.delete()});
