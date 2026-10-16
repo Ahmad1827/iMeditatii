@@ -32,6 +32,13 @@ A learning platform for Romanian high-school students: auto-graded problems in c
 * **Send to students.** Pick the students, add a note, send. They find it under "Materiale primite" in their dashboard.
 * **See their work.** Students write on their own layer over a handwritten page, or edit their own copy of a code file. The teacher can open either and see what they did.
 
+### Classes and homework
+
+* **Classes with an invite link.** A teacher creates a class (even one with a single student) and gets a link like `ahmad1827.github.io/clasa/K7M2QX`, which they can copy or send on WhatsApp. A student who opens it sees the class, logs in or signs up, and joins it for good. Students can also join by typing the 6-letter code.
+* **Homework in a few clicks.** Send homework to whole classes, to individual students, or both. Add a title, instructions, a deadline (tomorrow, in 3 days, in a week, or any date), problems from the site, and a page from the Atelier.
+* **Always in sight.** Students see a small homework bar on every page showing what is due and when. They can mark homework as done, hide it from the bar, and bring it back at any time from "Temele mele".
+* **Progress at a glance.** For each homework the teacher sees "X din Y au terminat" and who has finished. The class page lists the members and lets the teacher rename the class, remove students or delete it.
+
 ### Also
 
 * **Chat, whiteboard and video calls** between a student and a teacher.
@@ -94,7 +101,15 @@ The site tour is a recording of the live site. The Atelier demo is rendered from
    ```bash
    flutter test
    ```
-   They cover the Atelier end to end (editors, autosave, sending, the student's side) against an in-memory database, so no Firebase project is needed.
+   They cover the Atelier end to end (editors, autosave, sending, the student's side) and classes and homework (invite links, joining, the homework bar, the homework composer) against an in-memory database, so no Firebase project is needed.
+
+Invite links need the `classes` collection to be readable by visitors who are not logged in, so they can see the class before signing up. Add this to your Firestore rules:
+```
+match /classes/{code} {
+  allow read: if true;
+  allow write: if request.auth != null;
+}
+```
 
 ---
 
