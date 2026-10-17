@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'browser_python.dart';
+import 'browser_run.dart';
 import 'judge0.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, CodeHighlighter;
 
@@ -567,7 +567,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
     super.initState();
     _lastText = _code.text;
     _code.addListener(_onCode);
-    if (_code.lang == 'python') BrowserPython.warm();
+    BrowserRun.warm(_code.lang);
     SharedPreferences.getInstance().then((p) {
       final f = p.getDouble(_fontKey);
       if (f != null && mounted) setState(() => _font = f.clamp(11.0, 22.0).toDouble());
@@ -600,7 +600,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
   void _setLang(String lang) {
     if (lang == _code.lang) return;
     setState(() => _code.lang = lang);
-    if (lang == 'python') BrowserPython.warm();
+    BrowserRun.warm(lang);
     widget.onLangChanged?.call(lang);
   }
 
@@ -791,7 +791,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
             const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
             const SizedBox(width: 10),
             Text(
-              _code.lang == 'python' && !BrowserPython.ready ? 'Se pregătește Python (doar prima dată)...' : 'Se compilează și se rulează...',
+              _code.lang == 'python' && !BrowserRun.ready('python') ? 'Se pregătește Python (doar prima dată)...' : 'Se compilează și se rulează...',
               style: TextStyle(fontSize: 13.5, color: Pb.muted),
             ),
           ],

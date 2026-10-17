@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
 import 'classes_models.dart' show Classes;
+import 'browser_run.dart';
 import 'judge0.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
@@ -137,6 +138,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   // ===========================================================================
   void _onCodeChanged() {
     if (!_isUndoingOrRedoing) _recordHistorySnapshot(_codeController.value);
+    BrowserRun.warm('cpp'); // the student is writing code: load the compiler meanwhile
     if (mounted) setState(() {});
   }
 
@@ -397,6 +399,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return a == null || b == null || b == 0 ? null : a / b;
   }
 
+  /// Program output against the expected output, the way judges compare it:
+  /// spaces at the end of a line and blank lines at the end don't count.
+  static String normOutput(String s) => s.replaceAll('\r', '').split('\n').map((l) => l.trimRight()).join('\n').trim();
+
   static bool answersMatch(String given, String expected) {
     final g = _normAnswer(given), e = _normAnswer(expected);
     if (g.isEmpty) return false;
@@ -462,13 +468,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final expectedOutput = tests[i]["output"] ?? "";
 
         final result = await Judge0.run(code: code, stdin: inputData.toString());
-        String normalize(String s) => s.replaceAll('\r', '').trim();
-        final normOutput = normalize(result.stdout);
-        final normExpected = normalize(expectedOutput.toString());
-        final ok = normOutput == normExpected;
+        final got = normOutput(result.stdout);
+        final normExpected = normOutput(expectedOutput.toString());
+        final ok = got == normExpected;
         if (!ok) allPassed = false;
 
-        testResults.add({"index": i + 1, "passed": ok, "expected": normExpected, "got": normOutput});
+        testResults.add({"index": i + 1, "passed": ok, "expected": normExpected, "got": got});
         if (mounted) setState(() {});
       }
 
@@ -1548,14 +1553,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }
 
     var all = true;
-    String norm(String s) => s.replaceAll('\r', '').trim();
-
     try {
       for (var i = 0; i < tests.length; i++) {
         final r = await Judge0.run(code: code, stdin: tests[i]['input'] ?? '');
-        final got = norm(r.stdout);
-        final err = norm(r.error);
-        final exp = norm(tests[i]['output']!);
+        final got = normOutput(r.stdout);
+        final err = r.error.replaceAll('\r', '').trim();
+        final exp = normOutput(tests[i]['output']!);
         final ok = got == exp;
         if (!ok) all = false;
 
@@ -1593,6 +1596,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       });
     });
 
+    if (submit) _saveSolution(code, 'cpp', all);
     if (submit && all) {
       setState(() => _cCheer++);
       await _markExerciseAsDone();
