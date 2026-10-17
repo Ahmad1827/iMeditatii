@@ -18,6 +18,7 @@ import 'ui_components.dart' show Pb, PbButton, PbCodeBox, PbVariant, PbContainer
 import 'workspace_models.dart';
 import 'workspace_screen.dart' show wsDialogShell;
 import 'home_ambient.dart' show HomeSky;
+import 'math_sheet.dart' show SheetReviewCard;
 
 part 'classroom_scene.dart';
 

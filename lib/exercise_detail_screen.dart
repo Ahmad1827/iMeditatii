@@ -7,9 +7,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
-import 'classes_models.dart' show Classes;
+import 'classes_models.dart' show Classes, HwProblem;
 import 'browser_run.dart';
 import 'judge0.dart';
+import 'math_sheet.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
@@ -99,6 +100,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   String get _title => exerciseData?["title"]?.toString() ?? "Problemă fără titlu";
+
+  /// Maths is solved on a sheet and checked by a person (see math_sheet.dart).
+  bool get _isSheet => isMathSubject(widget.subject) && _kind != 'cod';
+
+  HwProblem get _problem => HwProblem(id: widget.id, title: _title, subject: widget.subject, grade: widget.grade);
+
+  Widget _sheet({bool fill = false}) => MathSheetPanel(
+        problem: _problem,
+        fill: fill,
+        onAccepted: () {
+          if (!_alreadyDone) _markExerciseAsDone();
+        },
+      );
 
   String? _str(List<String> keys) {
     for (final k in keys) {
@@ -741,7 +755,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [_cEditor(height: 340), const SizedBox(height: 14), _cConsole(fill: false)],
                         )
-                      : _cAnswerPanel(),
+                      : (_isSheet ? _sheet() : _cAnswerPanel()),
                 ),
               ),
               const SizedBox(height: 24),
@@ -794,7 +808,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                 Expanded(flex: 2, child: _cConsole(fill: true)),
                               ],
                             )
-                          : SingleChildScrollView(child: _cAnswerPanel()),
+                          : (_isSheet ? _sheet(fill: true) : SingleChildScrollView(child: _cAnswerPanel())),
                     ),
                   ),
                 ),
@@ -996,7 +1010,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final time = _str(['limita_timp', 'time_limit']);
     final mem = _str(['limita_memorie', 'memory_limit']);
     final tags = _list(['tags', 'etichete']) ?? const <String>[];
-    final kind = _kind == 'cod' ? 'C++' : (_kind == 'grila' ? 'Grilă' : 'Răspuns scurt');
+    final kind = _kind == 'cod' ? 'C++' : (_isSheet ? 'Pe foaie' : (_kind == 'grila' ? 'Grilă' : 'Răspuns scurt'));
 
     Widget chip(String label, {Color? fg, IconData? icon}) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1015,7 +1029,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       runSpacing: 8,
       children: [
         if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
-        chip(kind, icon: _kind == 'cod' ? Icons.code : Icons.quiz_outlined),
+        chip(kind, icon: _kind == 'cod' ? Icons.code : (_isSheet ? Icons.draw_outlined : Icons.quiz_outlined)),
         chip('Clasa a ${widget.grade}-a', icon: Icons.school_outlined),
         if (time != null) chip(time, icon: Icons.timer_outlined),
         if (mem != null) chip(mem, icon: Icons.memory),
@@ -2112,7 +2126,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ],
           ),
           SizedBox(height: isMobile ? 12 : 16),
-          if (_kind == "grila")
+          if (_isSheet)
+            _sheet()
+          else if (_kind == "grila")
             _retroGrila(isMobile)
           else if (_kind == "text")
             _retroTextAnswer(isMobile)

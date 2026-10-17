@@ -9,6 +9,7 @@ import 'workspace_cards.dart';
 import 'clean_kit.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky;
+import 'math_sheet.dart' show SheetReviewQueue, pendingSheetCount;
 import 'sticky_footer.dart';
 import 'ui_components.dart' show StyleBuilder, Pb, PbButton, PbVariant, PbSize, showPbModal;
 
@@ -169,6 +170,10 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   late final Stream<QuerySnapshot> _pendArticles = _isAdmin
       ? FirebaseFirestore.instance.collection('resources').where('approved', isEqualTo: false).snapshots()
       : const Stream<QuerySnapshot>.empty();
+  late final Stream<int> _pendSheets = _isAdmin ? pendingSheetCount() : const Stream<int>.empty();
+  // counts, made once (the tabs rebuild on hover); each listener gets the current count
+  late final Stream<int> _pendQuestsN = _pendQuests.map((q) => q.docs.length);
+  late final Stream<int> _pendArticlesN = _pendArticles.map((q) => q.docs.length);
 
   // ---- clean state
   final ScrollController _scroll = ScrollController();
@@ -398,10 +403,10 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   }
 
   Widget _cTabs() {
-    Widget badge(Stream<QuerySnapshot> s) => StreamBuilder<QuerySnapshot>(
+    Widget badge(Stream<int> s) => StreamBuilder<int>(
           stream: s,
           builder: (context, snap) {
-            final n = snap.data?.docs.length ?? 0;
+            final n = snap.data ?? 0;
             if (n == 0) return const SizedBox.shrink();
             return Container(
               margin: const EdgeInsets.only(left: 6),
@@ -412,7 +417,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
           },
         );
 
-    Widget seg(int i, String label, IconData icon, {List<Stream<QuerySnapshot>> badges = const []}) {
+    Widget seg(int i, String label, IconData icon, {List<Stream<int>> badges = const []}) {
       final sel = _selectedIndex == i;
       return CkHover(
         onTap: () => setState(() => _selectedIndex = i),
@@ -446,7 +451,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             seg(0, 'Conversații', Icons.forum_outlined),
-            seg(1, 'De aprobat', Icons.fact_check_outlined, badges: [_pendQuests, _pendArticles]),
+            seg(1, 'De aprobat', Icons.fact_check_outlined, badges: [_pendQuestsN, _pendArticlesN, _pendSheets]),
           ],
         ),
       ),
@@ -607,14 +612,14 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   }
 
   Widget _cPending(bool isMobile) {
-    Widget seg(int i, String label, Stream<QuerySnapshot> s) {
+    Widget seg(int i, String label, Stream<int> s) {
       final sel = _adminSubIndex == i;
       return CkHover(
         onTap: () => setState(() => _adminSubIndex = i),
-        builder: (h) => StreamBuilder<QuerySnapshot>(
+        builder: (h) => StreamBuilder<int>(
           stream: s,
           builder: (context, snap) {
-            final n = snap.data?.docs.length ?? 0;
+            final n = snap.data ?? 0;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -637,9 +642,13 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ckCardTitle(Icons.fact_check_outlined, 'De aprobat'),
-          Wrap(spacing: 6, children: [seg(0, 'Probleme', _pendQuests), seg(1, 'Lecții', _pendArticles)]),
+          Wrap(spacing: 6, runSpacing: 6, children: [
+            seg(0, 'Probleme', _pendQuestsN),
+            seg(1, 'Lecții', _pendArticlesN),
+            seg(2, 'Rezolvări', _pendSheets), // maths written on a sheet, to give the green light
+          ]),
           const SizedBox(height: 14),
-          _adminSubIndex == 0 ? _cPendingQuests() : _cPendingArticles(),
+          [_cPendingQuests, _cPendingArticles, () => const SheetReviewQueue()][_adminSubIndex](),
         ],
       ),
     );
@@ -936,10 +945,28 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                 ),
               ),
             ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _adminSubIndex = 2),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: _adminSubIndex == 2 ? AppColors.forest : AppColors.cloud,
+                    border: Border.all(color: AppColors.border, width: 2),
+                  ),
+                  child: Text(
+                    "PENDING SOLUTIONS",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: _adminSubIndex == 2 ? Colors.white : AppColors.ink),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 20),
-        _adminSubIndex == 0 ? _buildPendingQuests(isMobile) : _buildPendingArticles(isMobile),
+        [_buildPendingQuests, _buildPendingArticles, (_) => const SheetReviewQueue()][_adminSubIndex](isMobile),
       ],
     );
   }

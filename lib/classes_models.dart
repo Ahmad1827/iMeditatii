@@ -371,10 +371,6 @@ class Classes {
   /// teachers whose homework has this problem: their ids in `teachers` (only
   /// they and the student can read it), each homework's deadline in `hw`.
   static Future<void> saveSolution({required String uid, required String key, required String text, String? lang, required bool passed}) async {
-    final given = [
-      for (final h in await forStudent(uid).first)
-        if (h.problems.any((p) => p.progressKey == key)) h,
-    ];
     await solutions.doc(solutionId(uid, key)).set({
       'uid': uid,
       'key': key,
@@ -383,8 +379,80 @@ class Classes {
       'lastPassed': passed,
       'lastAt': FieldValue.serverTimestamp(),
       if (passed) ...{'passed': text, 'passedLang': lang, 'passedAt': FieldValue.serverTimestamp()},
+      ...await _recipients(uid, key),
+    }, SetOptions(merge: true));
+  }
+
+  /// The teachers whose homework for [uid] has the problem [key], and those homework's deadlines.
+  static Future<Map<String, dynamic>> _recipients(String uid, String key) async {
+    final given = [
+      for (final h in await forStudent(uid).first)
+        if (h.problems.any((p) => p.progressKey == key)) h,
+    ];
+    return {
       if (given.isNotEmpty) 'teachers': FieldValue.arrayUnion([for (final h in given) h.teacherId]),
       if (given.isNotEmpty) 'hw': {for (final h in given) h.id: {'teacher': h.teacherId, 'due': h.dueAt == null ? null : Timestamp.fromDate(h.dueAt!)}},
+    };
+  }
+
+  /// A maths solution written on a sheet ([sheet]: an ink page) and sent to be
+  /// checked by a person: the admin, or a teacher whose homework has it. The
+  /// page is stored once (a sheet can be large); sending again puts it back
+  /// in the queue.
+  static Future<void> saveSheet({required String uid, required String studentName, required HwProblem problem, required String sheet}) async {
+    await solutions.doc(solutionId(uid, problem.progressKey)).set({
+      'uid': uid,
+      'key': problem.progressKey,
+      'last': sheet,
+      'lastLang': Solution.sheet,
+      'lastPassed': false,
+      'lastAt': FieldValue.serverTimestamp(),
+      'review': 'pending',
+      'studentName': studentName,
+      'exercise': problem.toJson(),
+      ...await _recipients(uid, problem.progressKey),
+    }, SetOptions(merge: true));
+  }
+
+  /// The admin's queue: every sheet waiting to be checked, oldest first.
+  static Stream<List<Solution>> pendingSheets() => solutions.where('review', isEqualTo: 'pending').snapshots().map((q) {
+        final list = q.docs.map((d) => Solution.fromJson(d.data())).toList();
+        list.sort((a, b) => (a.lastAt ?? DateTime(3000)).compareTo(b.lastAt ?? DateTime(3000)));
+        return list;
+      });
+
+  /// What a student sent themselves, by problem key.
+  static Stream<Map<String, Solution>> mySolutions(String uid) => solutions.where('uid', isEqualTo: uid).snapshots().map(
+        (q) => {for (final d in q.docs) '${d.data()['key'] ?? ''}': Solution.fromJson(d.data())},
+      );
+
+  /// The green light, or not, on a sheet. Accepted, the problem counts as
+  /// solved for the student; turned down after being accepted, it no longer does.
+  static Future<void> reviewSheet({
+    required String uid,
+    required String key,
+    required bool accept,
+    String note = '',
+    required String reviewerId,
+    required String reviewerName,
+  }) async {
+    final ref = solutions.doc(solutionId(uid, key));
+    final before = (await ref.get()).data()?['review'];
+    await ref.update({
+      'review': accept ? 'approved' : 'rejected',
+      'reviewNote': accept ? '' : note.trim(),
+      'reviewedBy': reviewerId,
+      'reviewedName': reviewerName,
+      'reviewedAt': FieldValue.serverTimestamp(),
+      'seenBy.$reviewerId': FieldValue.serverTimestamp(),
+    });
+    if (!accept && before != 'approved') return;
+    final user = _db.collection('users').doc(uid);
+    final solved = List<String>.from((((await user.get()).data()?['solvedIds']) as List?) ?? const []);
+    if (accept == solved.contains(key)) return; // already counted, or already not
+    await user.set({
+      'solvedIds': accept ? FieldValue.arrayUnion([key]) : FieldValue.arrayRemove([key]),
+      'solvedCount': FieldValue.increment(accept ? 1 : -1),
     }, SetOptions(merge: true));
   }
 
@@ -571,6 +639,9 @@ class _Merge {
 
 /// What a student sent on one problem.
 class Solution {
+  /// [lastLang] of a maths solution written on a sheet (an ink page).
+  static const String sheet = 'ink';
+
   final String uid;
   final String key;
   final String last;
@@ -582,6 +653,13 @@ class Solution {
   final DateTime? passedAt;
   final Map<String, DateTime?> seenBy; // teacher id -> when they last opened it
   final Map<String, DateTime?> due; // teacher id -> the latest deadline of their homework with this problem
+  // a sheet: checked by a person
+  final String review; // '' | pending | approved | rejected
+  final String reviewNote; // why it wasn't accepted
+  final String reviewedName;
+  final DateTime? reviewedAt;
+  final String studentName;
+  final HwProblem? exercise;
   const Solution({
     this.uid = '',
     this.key = '',
@@ -594,7 +672,18 @@ class Solution {
     this.passedAt,
     this.seenBy = const {},
     this.due = const {},
+    this.review = '',
+    this.reviewNote = '',
+    this.reviewedName = '',
+    this.reviewedAt,
+    this.studentName = '',
+    this.exercise,
   });
+
+  bool get isSheet => lastLang == sheet;
+  bool get pending => review == 'pending';
+  bool get approved => review == 'approved';
+  bool get rejected => review == 'rejected';
 
   /// Sent since [teacherId] last opened it.
   bool isNewFor(String teacherId) {
@@ -631,6 +720,12 @@ class Solution {
       passedAt: time(j['passedAt']),
       seenBy: {for (final e in ((j['seenBy'] as Map?) ?? const {}).entries) '${e.key}': time(e.value)},
       due: due,
+      review: '${j['review'] ?? ''}',
+      reviewNote: '${j['reviewNote'] ?? ''}',
+      reviewedName: '${j['reviewedName'] ?? ''}',
+      reviewedAt: time(j['reviewedAt']),
+      studentName: '${j['studentName'] ?? ''}',
+      exercise: j['exercise'] is Map ? HwProblem.fromJson(j['exercise'] as Map) : null,
     );
   }
 }

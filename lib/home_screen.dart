@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart';
+import 'math_sheet.dart' show isMathSubject;
 import 'resources_data.dart';
 import 'ui_components.dart';
 
@@ -957,7 +958,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final diff = (e['difficulty'] ?? '').toString();
     final dc = _hDiffColor(diff);
     final sc = _hSubjectColor('${e['subject']}');
-    final kind = e['kind'] == 'grila' ? 'Grilă' : (e['kind'] == 'text' ? 'Răspuns' : 'Cod');
+    final kind = e['kind'] == 'cod' ? 'Cod' : (isMathSubject('${e['subject']}') ? 'Pe foaie' : (e['kind'] == 'grila' ? 'Grilă' : 'Răspuns'));
     final grade = '${e['grade']}';
 
     void open() => context.go(
