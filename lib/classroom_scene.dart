@@ -2,18 +2,13 @@ part of 'classes_screen.dart';
 
 // =============================================================================
 // THE CLASSROOM
-//   A room on the meadow: the board and the teacher's desk (catedra) at the
-//   front, double school desks (bănci) with chairs, empty until students come.
+//   A room sketched in ink on a sheet of paper lying on the meadow: the board
+//   and the teacher's desk (catedra) at the front, double school desks
+//   (bănci) with chairs, empty until students come.
 //   A student picks a free chair once; tapping their desk zooms in and the
 //   homework is on the desk. The teacher taps a student's desk to see how
 //   that student is doing, or the catedra for the link and all homework.
 // =============================================================================
-
-const Color _woodTop = Color(0xFFC8925A);
-const Color _woodEdge = Color(0xFF9C6A3A);
-const Color _woodLeg = Color(0xFF6E4A2A);
-const Color _chair = Color(0xFF4F7FC9);
-const Color _chairBack = Color(0xFF3E68AC);
 
 /// What is zoomed in on.
 class _Focus {
@@ -200,64 +195,74 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
   // ---------------------------------------------------------------- the room
   Widget _room(List<SchoolClass> classes, SchoolClass? c, List<Homework> hw, double width) {
     final narrow = width < 760;
+    final sheet = narrow ? 16.0 : 40.0; // the paper's margin
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(narrow ? 12 : 24, 16, narrow ? 12 : 24, 110),
+      padding: EdgeInsets.fromLTRB(narrow ? 10 : 24, 16, narrow ? 10 : 24, 110),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _signs(classes, c),
-              const SizedBox(height: 18),
-              _front(classes, c, hw, narrow),
-              const SizedBox(height: 26),
-              if (c != null) ...[
-                _benches(c, hw, narrow, width),
-                const SizedBox(height: 18),
-                Center(child: _hint(c)),
-              ] else
-                _benches(null, hw, narrow, width),
-            ],
+          constraints: const BoxConstraints(maxWidth: 1080),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(sheet, narrow ? 18 : 30, sheet, narrow ? 22 : 34),
+            decoration: BoxDecoration(
+              color: paperColor,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 30, offset: const Offset(0, 12))],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _signs(classes, c),
+                SizedBox(height: narrow ? 18 : 28),
+                _front(classes, c, hw, narrow),
+                SizedBox(height: narrow ? 26 : 40),
+                _benches(c, hw, narrow, math.min(1080.0, width - (narrow ? 20 : 48)) - sheet * 2),
+                if (c != null) ...[
+                  SizedBox(height: narrow ? 14 : 22),
+                  Center(child: _hint(c)),
+                ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  /// The classes as wooden signs, to switch between them.
+  /// The classes as words along the top of the page, the open one
+  /// underlined by hand.
   Widget _signs(List<SchoolClass> classes, SchoolClass? c) {
-    Widget sign(String text, {bool on = false, IconData? icon, VoidCallback? onTap, bool paper = false}) => CkHover(
+    Widget tab(String text, {bool on = false, IconData? icon, VoidCallback? onTap}) => CkHover(
           onTap: onTap,
-          builder: (h) => AnimatedContainer(
-            duration: const Duration(milliseconds: 140),
-            transform: Matrix4.translationValues(0, h ? -2 : 0, 0),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              gradient: paper ? null : LinearGradient(colors: on ? const [Color(0xFFD9A066), _woodTop] : const [_woodEdge, Color(0xFF8A5C32)]),
-              color: paper ? Pb.surface.withOpacity(0.92) : null,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: on ? Colors.white : Colors.black.withOpacity(0.12), width: on ? 2 : 1),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 8, offset: const Offset(0, 3))],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[Icon(icon, size: 16, color: paper ? Pb.primary : Colors.white), const SizedBox(width: 6)],
-                Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: paper ? Pb.primary : Colors.white)),
-              ],
+          builder: (h) => CustomPaint(
+            painter: on || h ? _Underline(on ? inkColor : inkColor.withOpacity(0.3), seed: text.hashCode) : null,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(2, 4, 2, 9),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[Icon(icon, size: 15, color: Pb.primary), const SizedBox(width: 5)],
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: on ? FontWeight.w700 : FontWeight.w500,
+                      color: icon != null ? Pb.primary : inkColor.withOpacity(on ? 1 : 0.55),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 22,
+      runSpacing: 8,
       children: [
-        for (final x in classes) sign(x.displayName, on: x.id == c?.id, onTap: () => setState(() => _selected = x.id)),
+        for (final x in classes) tab(x.displayName, on: x.id == c?.id, onTap: () => setState(() => _selected = x.id)),
         if (widget.teacher)
-          sign('Clasă nouă', icon: Icons.add, paper: true, onTap: _newClass)
+          tab('Clasă nouă', icon: Icons.add, onTap: _newClass)
         else
-          sign(classes.isEmpty ? 'Am un cod de clasă' : 'Altă clasă', icon: Icons.vpn_key_outlined, paper: true, onTap: _joinByCode),
+          tab(classes.isEmpty ? 'Am un cod de clasă' : 'Altă clasă', icon: Icons.vpn_key_outlined, onTap: _joinByCode),
       ],
     );
   }
@@ -275,7 +280,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
               widget.teacher
                   ? 'Fă o clasă (chiar și pentru un singur elev), trimite-i linkul și elevii își iau loc în bănci.'
                   : 'Deschide linkul primit de la profesor sau scrie codul clasei.',
-              style: chalk(narrow ? 20 : 23, color: chalkWhite.withOpacity(0.8), weight: FontWeight.w500),
+              style: chalk(narrow ? 20 : 23, color: inkColor.withOpacity(0.6), weight: FontWeight.w400),
             ),
             const SizedBox(height: 16),
             ChalkButton(
@@ -285,14 +290,14 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
               onTap: widget.teacher ? _newClass : _joinByCode,
             ),
           ] else ...[
-            Text(c.subject.isEmpty ? 'Clasa' : c.subject, style: chalk(narrow ? 22 : 25, color: chalkYellow)),
+            Text(c.subject.isEmpty ? 'Clasa' : c.subject, style: chalk(narrow ? 20 : 22, color: Pb.primary, weight: FontWeight.w600)),
             Text(c.displayName, style: chalk(narrow ? 40 : 52, height: 1.1)),
             const SizedBox(height: 4),
             Text(
               widget.teacher
                   ? '${c.members.isEmpty ? 'Niciun elev încă' : (c.members.length == 1 ? '1 elev' : '${c.members.length} elevi')} · cod ${c.id}'
                   : 'cu ${c.teacherName}',
-              style: chalk(narrow ? 20 : 23, color: chalkWhite.withOpacity(0.8), weight: FontWeight.w500),
+              style: chalk(narrow ? 20 : 23, color: inkColor.withOpacity(0.6), weight: FontWeight.w400),
             ),
             if (widget.teacher) ...[
               const SizedBox(height: 16),
@@ -307,7 +312,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
                     icon: Icons.edit_outlined,
                     onTap: () => showDialog<String>(context: context, builder: (_) => _ClassNameDialog(uid: widget.uid, teacherName: c.teacherName, existing: c)),
                   ),
-                  ChalkButton(text: 'Șterge clasa', icon: Icons.delete_outline, color: chalkPink, onTap: () => _deleteClass(c)),
+                  ChalkButton(text: 'Șterge clasa', icon: Icons.delete_outline, color: hwRed, onTap: () => _deleteClass(c)),
                 ],
               ),
             ],
@@ -328,7 +333,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
-      children: [Expanded(child: board), const SizedBox(width: 28), catedra],
+      children: [Expanded(child: board), const SizedBox(width: 36), catedra],
     );
   }
 
@@ -358,8 +363,8 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
   Widget _benches(SchoolClass? c, List<Homework> hw, bool narrow, double width) {
     final (seats, meUnseated) = c == null ? (List<ClassMember?>.filled(10, null), false) : _seating(c);
     final cols = narrow ? 2 : 3;
-    final avail = math.min(1000.0, width - (narrow ? 24 : 48));
-    final gapX = narrow ? 14.0 : 34.0;
+    final avail = math.min(1000.0, width);
+    final gapX = narrow ? 14.0 : 40.0;
     final w = math.min(240.0, (avail - gapX * (cols - 1)) / cols);
     final benches = <Widget>[];
     for (var b = 0; b < seats.length ~/ 2; b++) {
@@ -369,7 +374,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
         sides: [for (final i in [b * 2, b * 2 + 1]) _side(c, hw, seats[i], i, meUnseated, b)],
       ));
     }
-    return Wrap(alignment: WrapAlignment.center, spacing: gapX, runSpacing: narrow ? 18 : 30, children: benches);
+    return Wrap(alignment: WrapAlignment.center, spacing: gapX, runSpacing: narrow ? 18 : 34, children: benches);
   }
 
   _Side _side(SchoolClass? c, List<Homework> hw, ClassMember? m, int seat, bool meUnseated, int bench) {
@@ -410,15 +415,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     } else {
       text = meUnseated ? 'Alege-ți un loc: apasă pe un scaun liber.' : 'Apasă pe banca ta ca să-ți vezi temele.';
     }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      decoration: BoxDecoration(
-        color: Pb.surface.withOpacity(0.92),
-        borderRadius: BorderRadius.circular(99),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 3))],
-      ),
-      child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
-    );
+    return Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 13.5, fontStyle: FontStyle.italic, color: inkColor.withOpacity(0.5)));
   }
 
   // ---------------------------------------------------------------- the desk
@@ -440,7 +437,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     }
 
     return CustomPaint(
-      painter: _WoodGrain(),
+      painter: _DeskTop(ink: inkColor, wood: Color.lerp(paperColor, const Color(0xFFB08A5C), AppColors.isDark ? 0.08 : 0.12)!),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -449,38 +446,14 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
               padding: EdgeInsets.fromLTRB(isMobile ? 12 : 24, 14, isMobile ? 12 : 24, 6),
               child: Row(
                 children: [
-                  CkHover(
-                    onTap: _close,
-                    builder: (h) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 120),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(h ? 1 : 0.92),
-                        borderRadius: BorderRadius.circular(99),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 3))],
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.arrow_back, size: 17, color: Color(0xFF3D3A2A)),
-                          SizedBox(width: 6),
-                          Text('Înapoi în clasă', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF3D3A2A))),
-                        ],
-                      ),
-                    ),
-                  ),
+                  ChalkButton(text: 'Înapoi în clasă', icon: Icons.arrow_back, onTap: _close),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: isMobile ? 17 : 21,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        shadows: const [Shadow(color: Color(0x66000000), blurRadius: 6, offset: Offset(0, 2))],
-                      ),
+                      style: TextStyle(fontSize: isMobile ? 17 : 20, fontWeight: FontWeight.w600, color: inkColor),
                     ),
                   ),
                 ],
@@ -552,6 +525,8 @@ class _Side {
   final bool paperLate;
   final VoidCallback? onTap;
   const _Side({this.empty = false, this.pickable = false, this.name = '', this.me = false, this.paper, this.paperLate = false, this.onTap});
+
+  String get look => '$empty$pickable$me$name';
 }
 
 /// A double school desk with its two chairs, seen from the back of the room.
@@ -570,32 +545,9 @@ class _Bench extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // legs
-          for (final x in [0.05, 0.93]) Positioned(left: w * x, top: h * 0.3, child: Container(width: w * 0.025, height: h * 0.3, color: _woodLeg)),
-          // desk top and its front edge
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            child: Column(
-              children: [
-                Container(
-                  height: h * 0.3,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFD7A36B), _woodTop]),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                    border: Border.all(color: Colors.black.withOpacity(0.08)),
-                  ),
-                ),
-                Container(
-                  height: h * 0.07,
-                  decoration: BoxDecoration(
-                    color: _woodEdge,
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(5)),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 10, offset: const Offset(0, 6))],
-                  ),
-                ),
-              ],
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(painter: _BenchSketch(sides, ink: inkColor, paper: paperColor, accent: Pb.primary)),
             ),
           ),
           for (var i = 0; i < 2; i++) ..._sideWidgets(context, sides[i], w * (0.25 + 0.5 * i), w, h),
@@ -605,69 +557,29 @@ class _Bench extends StatelessWidget {
   }
 
   List<Widget> _sideWidgets(BuildContext context, _Side s, double cx, double w, double h) {
-    final chairW = w * 0.3;
-    final body = w * 0.25;
     final first = s.name.split(' ').first;
     return [
-      // paper on the desk
+      // a sheet of paper on the desk
       if (s.paper != null)
         Positioned(
-          left: cx - w * 0.09,
-          top: h * 0.04,
+          left: cx - w * 0.08,
+          top: h * 0.035,
           child: Transform.rotate(
-            angle: -0.08,
+            angle: -0.07,
             child: Container(
-              width: w * 0.18,
-              height: h * 0.2,
+              width: w * 0.16,
+              height: h * 0.15,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(2),
-                border: Border(left: BorderSide(color: s.paperLate ? hwRed : const Color(0xFFE5484D), width: 2)),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 3, offset: const Offset(1, 2))],
+                color: Pb.surface,
+                border: Border.all(color: (s.paperLate ? hwRed : inkColor).withOpacity(0.7), width: 0.9),
               ),
-              child: Text(s.paper!, style: TextStyle(fontSize: math.max(10, w * 0.055), fontWeight: FontWeight.w800, color: s.paperLate ? hwRed : const Color(0xFF3D3A2A))),
+              child: Text(s.paper!,
+                  style: TextStyle(fontSize: math.max(10, w * 0.05), fontWeight: FontWeight.w600, color: s.paperLate ? hwRed : inkColor)),
             ),
           ),
         ),
-      // chair seat
-      Positioned(
-        left: cx - chairW / 2,
-        top: h * 0.5,
-        child: Container(
-          width: chairW,
-          height: h * 0.13,
-          decoration: BoxDecoration(color: _chair.withOpacity(s.empty ? 0.85 : 1), borderRadius: BorderRadius.circular(6)),
-        ),
-      ),
-      // the student: shoulders and head, between the desk and the chair back
-      if (!s.empty)
-        Positioned(
-          left: cx - body * 0.6,
-          top: h * 0.2,
-          child: CustomPaint(size: Size(body * 1.2, h * 0.5), painter: _Person(s.name, back: true, ring: s.me ? Pb.primary : null)),
-        ),
-      // chair back, closest to us
-      Positioned(
-        left: cx - chairW * 0.56,
-        top: h * 0.64,
-        child: Container(
-          width: chairW * 1.12,
-          height: h * 0.15,
-          decoration: BoxDecoration(
-            color: _chairBack,
-            borderRadius: BorderRadius.circular(8),
-            border: s.pickable ? Border.all(color: Colors.white, width: 2) : null,
-            boxShadow: [
-              if (s.pickable) BoxShadow(color: Colors.white.withOpacity(0.8), blurRadius: 12, spreadRadius: 1),
-              BoxShadow(color: Colors.black.withOpacity(0.22), blurRadius: 6, offset: const Offset(0, 4)),
-            ],
-          ),
-        ),
-      ),
-      for (final x in [-0.4, 0.36])
-        Positioned(left: cx + chairW * x, top: h * 0.79, child: Container(width: w * 0.02, height: h * 0.07, color: const Color(0xFF2E3A4A))),
-      // name tag
+      // the name, written under the chair
       Positioned(
         left: cx - w * 0.24,
         width: w * 0.48,
@@ -675,19 +587,15 @@ class _Bench extends StatelessWidget {
         child: Center(
           child: s.empty && !s.pickable
               ? const SizedBox.shrink()
-              : Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: s.me ? Pb.primary : (s.pickable ? Colors.white : Pb.surface.withOpacity(0.95)),
-                    borderRadius: BorderRadius.circular(99),
-                    border: s.pickable ? Border.all(color: Pb.primary) : null,
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 4, offset: const Offset(0, 2))],
-                  ),
-                  child: Text(
-                    s.pickable ? 'Stai aici' : (s.me ? 'Tu' : first),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: math.max(10.5, w * 0.052), fontWeight: FontWeight.w700, color: s.me ? Colors.white : (s.pickable ? Pb.primary : Pb.text)),
+              : Text(
+                  s.pickable ? 'Stai aici' : (s.me ? 'Tu' : first),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: math.max(11, w * 0.054),
+                    fontWeight: s.me || s.pickable ? FontWeight.w700 : FontWeight.w500,
+                    fontStyle: s.pickable ? FontStyle.italic : null,
+                    color: s.me || s.pickable ? Pb.primary : inkColor.withOpacity(0.75),
                   ),
                 ),
         ),
@@ -701,17 +609,99 @@ class _Bench extends StatelessWidget {
         child: Semantics(
           button: s.onTap != null,
           label: s.empty ? (s.pickable ? 'Stai aici' : 'Loc liber') : (s.me ? 'Banca ta' : 'Banca lui ${s.name}'),
-          child: CkHover(onTap: s.onTap, builder: (hv) => AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
-            decoration: BoxDecoration(
-              color: hv && s.onTap != null ? Colors.white.withOpacity(0.12) : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
+          child: CkHover(
+            onTap: s.onTap,
+            builder: (hv) => AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              decoration: BoxDecoration(
+                color: hv && s.onTap != null ? inkColor.withOpacity(0.04) : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+              ),
             ),
-          )),
+          ),
         ),
       ),
     ];
   }
+}
+
+/// The bench in ink: the desk top a little wider at the front, its legs, and
+/// for each half a chair, with the student on it seen from behind.
+class _BenchSketch extends CustomPainter {
+  final List<_Side> sides;
+  final Color ink, paper, accent;
+  _BenchSketch(this.sides, {required this.ink, required this.paper, required this.accent});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width, h = size.height;
+    final pen = Pen(canvas, color: ink, seed: sides.map((s) => s.look).join().hashCode);
+    final faint = ink.withOpacity(0.35);
+
+    // legs: the far ones shorter and lighter
+    for (final x in [0.12, 0.88]) {
+      pen.line(Offset(w * x, h * 0.3), Offset(w * x, h * 0.54), color: faint, width: 1);
+    }
+    for (final x in [0.035, 0.965]) {
+      pen.line(Offset(w * x, h * 0.33), Offset(w * x, h * 0.64), over: 1);
+    }
+    // the desk top and its front edge
+    pen.shape([Offset(w * 0.05, h * 0.03), Offset(w * 0.95, h * 0.03), Offset(w * 0.99, h * 0.27), Offset(w * 0.01, h * 0.27)], fill: paper, over: 4);
+    pen.shape([Offset(w * 0.01, h * 0.27), Offset(w * 0.99, h * 0.27), Offset(w * 0.99, h * 0.33), Offset(w * 0.01, h * 0.33)], fill: paper, over: 3);
+    pen.hatch(Path()..addRect(Rect.fromLTRB(w * 0.01, h * 0.27, w * 0.99, h * 0.33)), gap: 3.4, color: ink.withOpacity(0.22), width: 0.7);
+    // the groove for pens, along the far edge
+    pen.line(Offset(w * 0.1, h * 0.075), Offset(w * 0.9, h * 0.075), color: ink.withOpacity(0.2), width: 0.8);
+
+    for (var i = 0; i < 2; i++) {
+      _side(canvas, pen, sides[i], w * (0.25 + 0.5 * i), w, h);
+    }
+  }
+
+  void _side(Canvas canvas, Pen pen, _Side s, double cx, double w, double h) {
+    final chair = s.pickable ? accent : (s.empty ? ink.withOpacity(0.32) : ink);
+    // the seat, mostly hidden
+    pen.shape([Offset(cx - w * 0.13, h * 0.52), Offset(cx + w * 0.13, h * 0.52), Offset(cx + w * 0.15, h * 0.6), Offset(cx - w * 0.15, h * 0.6)],
+        color: chair.withOpacity(chair.opacity * 0.6), width: 1, over: 1.5);
+    if (!s.empty) _person(pen, s, cx, w, h);
+    // the chair back, closest to us, and its legs
+    final back = Rect.fromLTRB(cx - w * 0.17, h * 0.64, cx + w * 0.17, h * 0.78);
+    pen.rect(back, fill: paper, color: chair, over: 3, width: s.pickable ? 1.6 : null);
+    pen.line(Offset(back.left + 6, back.center.dy), Offset(back.right - 6, back.center.dy), color: chair.withOpacity(chair.opacity * 0.45), width: 0.8);
+    for (final x in [-0.13, 0.13]) {
+      pen.line(Offset(cx + w * x, h * 0.78), Offset(cx + w * x, h * 0.86), color: chair);
+    }
+  }
+
+  /// A student from behind: shoulders and the back of the head, all hair.
+  void _person(Pen pen, _Side s, double cx, double w, double h) {
+    final c = s.me ? accent : ink;
+    final seed = s.name.hashCode.abs();
+    final shoulders = Path()
+      ..moveTo(cx - w * 0.18, h * 0.72)
+      ..cubicTo(cx - w * 0.18, h * 0.53, cx - w * 0.12, h * 0.48, cx, h * 0.48)
+      ..cubicTo(cx + w * 0.12, h * 0.48, cx + w * 0.18, h * 0.53, cx + w * 0.18, h * 0.72);
+    pen.path(shoulders, fill: paper, color: c);
+    final head = Offset(cx, h * 0.37);
+    final r = w * 0.068;
+    for (final x in [-0.028, 0.028]) {
+      pen.line(Offset(cx + w * x, head.dy + r * 0.8), Offset(cx + w * x * 1.2, h * 0.49), color: c, width: 1);
+    }
+    if (seed % 3 == 1) {
+      // a bun
+      final bun = head - Offset(0, r * 1.05);
+      pen.ring(bun, r * 0.36, fill: paper, color: c, width: 1.1);
+      pen.hatch(Path()..addOval(Rect.fromCircle(center: bun, radius: r * 0.36)), gap: 2.2, angle: 0.6, color: c.withOpacity(0.6));
+    }
+    pen.ring(head, r, fill: paper, color: c);
+    // hair over the whole head, or short with the nape showing
+    final clip = Path.combine(PathOperation.difference, Path()..addOval(Rect.fromCircle(center: head, radius: r)),
+        seed % 3 == 2 ? (Path()..addRect(Rect.fromLTRB(head.dx - r, head.dy + r * 0.45, head.dx + r, head.dy + r))) : Path());
+    pen.hatch(clip, gap: seed % 2 == 0 ? 2.8 : 3.6, angle: seed % 2 == 0 ? -1.2 : -0.7, color: c.withOpacity(0.4));
+  }
+
+  @override
+  bool shouldRepaint(covariant _BenchSketch old) =>
+      old.ink != ink || old.paper != paper || old.accent != accent || old.sides.map((s) => s.look).join('|') != sides.map((s) => s.look).join('|');
 }
 
 /// The teacher's desk at the front, with the teacher behind it.
@@ -739,66 +729,30 @@ class _Catedra extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // the teacher, behind the desk, facing the class
-              Positioned(left: w / 2 - 45, top: 0, child: CustomPaint(size: const Size(90, 100), painter: _Person(name, back: false))),
-              // desk top
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 84,
-                child: Container(
-                  height: 26,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFD7A36B), _woodTop]),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: hv ? Colors.white : Colors.black.withOpacity(0.08), width: hv ? 2 : 1),
-                  ),
-                ),
-              ),
-              // things on the desk: books, an apple, the papers
-              Positioned(left: 24, top: 70, child: _book(const Color(0xFF3B82F6), 46)),
-              Positioned(left: 30, top: 62, child: _book(const Color(0xFFE5484D), 38)),
-              Positioned(
-                right: 30,
-                top: 66,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(color: Color(0xFFE5484D), shape: BoxShape.circle),
-                  child: const Align(alignment: Alignment(0.1, -1.4), child: SizedBox(width: 3, height: 7, child: ColoredBox(color: Color(0xFF6E4A2A)))),
-                ),
-              ),
+              Positioned.fill(child: CustomPaint(painter: _CatedraSketch(name, ink: inkColor, paper: paperColor))),
               if (papers > 0)
                 Positioned(
                   right: 62,
-                  top: 72,
+                  top: 74,
                   child: Transform.rotate(
                     angle: 0.06,
                     child: Container(
                       width: 34,
                       height: 22,
                       alignment: Alignment.center,
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2), boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 3, offset: const Offset(1, 2)),
-                      ]),
-                      child: Text('$papers', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF3D3A2A))),
+                      decoration: BoxDecoration(color: Pb.surface, border: Border.all(color: inkColor.withOpacity(0.7), width: 0.9)),
+                      child: Text('$papers', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: inkColor)),
                     ),
                   ),
                 ),
-              // the front panel
               Positioned(
                 left: 8,
                 right: 8,
-                top: 108,
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_woodEdge, Color(0xFF85582F)]),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(6)),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 8))],
-                  ),
-                  alignment: Alignment.center,
-                  child: Text('CATEDRA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 3, color: Colors.white.withOpacity(0.75))),
+                top: 110,
+                height: 48,
+                child: Center(
+                  child: Text('CATEDRA',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 4, color: hv ? Pb.primary : inkColor.withOpacity(0.5))),
                 ),
               ),
               Positioned(
@@ -806,12 +760,8 @@ class _Catedra extends StatelessWidget {
                 right: 0,
                 top: 166,
                 child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(color: Pb.surface.withOpacity(0.95), borderRadius: BorderRadius.circular(99)),
-                    child: Text(teacher ? 'Tu · $name' : name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Pb.text)),
-                  ),
+                  child: Text(teacher ? 'Tu · $name' : name,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: inkColor.withOpacity(0.75))),
                 ),
               ),
             ],
@@ -820,44 +770,86 @@ class _Catedra extends StatelessWidget {
       ),
     );
   }
-
-  Widget _book(Color c, double w) => Container(
-        width: w,
-        height: 9,
-        decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(2), border: Border(right: BorderSide(color: Colors.white.withOpacity(0.8), width: 3))),
-      );
 }
 
-/// Wood for the zoomed-in desk top.
-class _WoodGrain extends CustomPainter {
+/// The catedra in ink: the teacher behind it, two books and a cup of tea
+/// on it, a panel at the front.
+class _CatedraSketch extends CustomPainter {
+  final String name;
+  final Color ink, paper;
+  _CatedraSketch(this.name, {required this.ink, required this.paper});
+
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    canvas.drawRect(
-      rect,
-      Paint()..shader = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFC99560), Color(0xFFB07B47), Color(0xFFC08A55)]).createShader(rect),
-    );
+    final pen = Pen(canvas, color: ink, seed: 5);
+    final faint = ink.withOpacity(0.4);
+    // the teacher, facing the class
+    final shoulders = Path()
+      ..moveTo(92, 88)
+      ..cubicTo(92, 62, 106, 54, 125, 54)
+      ..cubicTo(144, 54, 158, 62, 158, 88);
+    pen.path(shoulders, fill: paper);
+    pen.line(const Offset(125, 54), const Offset(125, 84), color: faint, width: 0.8); // the collar
+    const head = Offset(125, 32);
+    pen.ring(head, 16, fill: paper);
+    final hair = Path.combine(PathOperation.difference, Path()..addOval(Rect.fromCircle(center: head, radius: 16)),
+        Path()..addOval(Rect.fromCircle(center: head + const Offset(0, 9), radius: 14)));
+    pen.hatch(hair, gap: 2.4, angle: name.hashCode.isEven ? -1.0 : -0.6, color: ink.withOpacity(0.6));
+    // the desk top and the front panel
+    pen.shape(const [Offset(6, 86), Offset(244, 86), Offset(250, 110), Offset(0, 110)], fill: paper, over: 5);
+    pen.rect(const Rect.fromLTRB(8, 110, 242, 158), fill: paper, over: 4);
+    pen.rect(const Rect.fromLTRB(18, 118, 232, 150), color: ink.withOpacity(0.25), width: 0.8, over: 1);
+    pen.hatch(Path()..addRect(const Rect.fromLTRB(232, 110, 242, 158)), gap: 3, color: ink.withOpacity(0.3), width: 0.7);
+    // two books
+    pen.rect(const Rect.fromLTWH(22, 80, 50, 10), fill: paper, over: 1.5);
+    pen.rect(const Rect.fromLTWH(28, 70, 40, 10), fill: paper, over: 1.5);
+    pen.line(const Offset(64, 80), const Offset(64, 90), color: faint, width: 0.8);
+    pen.line(const Offset(31, 70), const Offset(31, 80), color: faint, width: 0.8);
+    // a cup of tea, still warm
+    pen.shape(const [Offset(198, 74), Offset(216, 74), Offset(214, 92), Offset(200, 92)], fill: paper, over: 1);
+    pen.path(Path()..addArc(const Rect.fromLTWH(210, 77, 11, 10), -math.pi / 2, math.pi), width: 1);
+    pen.wave(const Offset(203, 69), const Offset(201, 52), amp: 1.8, waves: 1.2, color: faint, width: 0.9);
+    pen.wave(const Offset(210, 68), const Offset(212, 55), amp: 1.5, waves: 1, color: faint, width: 0.9);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CatedraSketch old) => old.name != name || old.ink != ink || old.paper != paper;
+}
+
+/// The zoomed-in desk top: plain light wood, a few lines of grain.
+class _DeskTop extends CustomPainter {
+  final Color ink, wood;
+  _DeskTop({required this.ink, required this.wood});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = wood);
+    final pen = Pen(canvas, color: ink, seed: 3);
     final rnd = math.Random(3);
-    final p = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-    for (var i = 0; i < 70; i++) {
+    for (var i = 0; i < 14; i++) {
       final y = rnd.nextDouble() * size.height;
-      final amp = 2 + rnd.nextDouble() * 6;
-      final len = 40 + rnd.nextDouble() * 120;
-      p
-        ..color = const Color(0xFF7A4E26).withOpacity(0.05 + rnd.nextDouble() * 0.09)
-        ..strokeWidth = 0.8 + rnd.nextDouble() * 1.6;
-      final path = Path()..moveTo(0, y);
-      for (var x = 0.0; x <= size.width; x += 24) {
-        path.lineTo(x, y + math.sin(x / len + i) * amp);
-      }
-      canvas.drawPath(path, p);
+      final x = rnd.nextDouble() * size.width * 0.5;
+      pen.wave(Offset(x, y), Offset(x + size.width * (0.3 + rnd.nextDouble() * 0.5), y + rnd.nextDouble() * 6),
+          amp: 1 + rnd.nextDouble() * 3, waves: 1 + rnd.nextDouble() * 2, color: ink.withOpacity(0.04 + rnd.nextDouble() * 0.04), width: 0.8);
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
+  bool shouldRepaint(covariant _DeskTop old) => old.ink != ink || old.wood != wood;
+}
+
+/// A hand-drawn line under a word.
+class _Underline extends CustomPainter {
+  final Color color;
+  final int seed;
+  _Underline(this.color, {required this.seed});
+
+  @override
+  void paint(Canvas canvas, Size size) =>
+      Pen(canvas, color: color, width: 1.6, seed: seed).line(Offset(0, size.height - 2), Offset(size.width, size.height - 3.5), over: 3);
+
+  @override
+  bool shouldRepaint(covariant _Underline old) => old.color != color || old.seed != seed;
 }
 
 /// A student's desk as the teacher sees it: each homework with how far the
@@ -886,90 +878,6 @@ class _StudentDeskState extends State<_StudentDesk> {
       );
 }
 
-/// A person drawn simply: a student from behind (hair, ears, shoulders) or
-/// the teacher facing the class. Hair, skin and shirt come from the name, so
-/// everyone keeps their look.
-class _Person extends CustomPainter {
-  final String name;
-  final bool back;
-  final Color? ring;
-  _Person(this.name, {required this.back, this.ring});
-
-  static const _hair = [Color(0xFF2B1D14), Color(0xFF4A2F1E), Color(0xFF7A4B2A), Color(0xFFC9A063), Color(0xFF8E3B1F), Color(0xFF1C1C1C)];
-  static const _skin = [Color(0xFFF1C7A5), Color(0xFFE0AC85), Color(0xFFC68A62), Color(0xFF8D5A3C)];
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final seed = name.hashCode.abs();
-    final hair = _hair[seed % _hair.length];
-    final skin = _skin[(seed ~/ 7) % _skin.length];
-    final shirt = ckColorFor(name);
-    final w = size.width, h = size.height;
-    final r = w * 0.24; // head radius
-    final head = Offset(w / 2, h * 0.3);
-
-    // shoulders
-    final body = RRect.fromRectAndCorners(
-      Rect.fromLTWH(w * 0.08, h * 0.55, w * 0.84, h * 0.6),
-      topLeft: Radius.circular(w * 0.36),
-      topRight: Radius.circular(w * 0.36),
-    );
-    canvas.drawRRect(body, Paint()..color = shirt);
-    // neck
-    canvas.drawRect(Rect.fromCenter(center: Offset(w / 2, h * 0.53), width: r * 0.8, height: h * 0.14), Paint()..color = Color.lerp(skin, Colors.black, 0.08)!);
-
-    if (back) {
-      // ears, then the back of the head: all hair
-      final ear = Paint()..color = skin;
-      canvas.drawCircle(head + Offset(-r * 0.98, r * 0.15), r * 0.22, ear);
-      canvas.drawCircle(head + Offset(r * 0.98, r * 0.15), r * 0.22, ear);
-      canvas.drawCircle(head, r, Paint()..color = hair);
-      canvas.drawCircle(head + Offset(-r * 0.3, -r * 0.35), r * 0.35, Paint()..color = Colors.white.withOpacity(0.12));
-      if (seed % 3 == 0) {
-        // a ponytail
-        canvas.drawOval(Rect.fromCenter(center: head + Offset(0, r * 1.15), width: r * 0.55, height: r * 0.9), Paint()..color = hair);
-      }
-    } else {
-      // hair behind the face, the face, then the fringe
-      canvas.drawCircle(head + Offset(0, -r * 0.08), r * 1.12, Paint()..color = hair);
-      canvas.drawCircle(head, r, Paint()..color = skin);
-      final fringe = Path()
-        ..addArc(Rect.fromCircle(center: head + Offset(0, -r * 0.08), radius: r * 1.12), math.pi * 1.05, math.pi * 0.9)
-        ..quadraticBezierTo(head.dx + r * 0.2, head.dy - r * 0.35, head.dx - r * 1.05, head.dy - r * 0.2);
-      canvas.drawPath(fringe, Paint()..color = hair);
-      final ink = Paint()..color = const Color(0xFF2B1D14);
-      canvas.drawCircle(head + Offset(-r * 0.36, r * 0.08), r * 0.1, ink);
-      canvas.drawCircle(head + Offset(r * 0.36, r * 0.08), r * 0.1, ink);
-      canvas.drawArc(
-        Rect.fromCenter(center: head + Offset(0, r * 0.3), width: r * 0.8, height: r * 0.55),
-        0.2,
-        math.pi - 0.4,
-        false,
-        Paint()
-          ..color = const Color(0xFF8A3B2E)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = r * 0.09
-          ..strokeCap = StrokeCap.round,
-      );
-      canvas.drawCircle(head + Offset(-r * 0.6, r * 0.38), r * 0.14, Paint()..color = const Color(0x33E5484D));
-      canvas.drawCircle(head + Offset(r * 0.6, r * 0.38), r * 0.14, Paint()..color = const Color(0x33E5484D));
-    }
-    if (ring != null) {
-      canvas.drawCircle(
-        head,
-        r * 1.22,
-        Paint()
-          ..color = ring!
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = math.max(2.5, r * 0.16),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _Person old) => old.name != name || old.back != back || old.ring != ring;
-}
-
 /// Every exercise in [homework], soonest deadline first, each once.
 List<HwProblem> _problemsOf(List<Homework> homework) {
   final seen = <String>{};
@@ -980,15 +888,14 @@ List<HwProblem> _problemsOf(List<Homework> homework) {
   ];
 }
 
-/// A spiral notebook lying on the desk: the exercises on ruled lines, each
-/// one opens the problem, solved ones crossed off.
+/// A spiral notebook lying on the desk, drawn plainly: the exercises on
+/// ruled lines, each one opens the problem, solved ones crossed off.
 class _Notebook extends StatelessWidget {
   final List<HwProblem> problems;
   final Set<String> solved;
   final bool teacher; // the teacher's own list: nothing to cross off
   const _Notebook({required this.problems, this.solved = const {}, this.teacher = false});
-  static const Color _ink = Color(0xFF2B3A55);
-  static const Color _paper = Color(0xFFFFFEF8);
+  static Color get _ink => inkColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1001,17 +908,20 @@ class _Notebook extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          // the page underneath, a little askew
+          Positioned(
+            left: 6,
+            right: -6,
+            top: 20,
+            bottom: -6,
+            child: DecoratedBox(decoration: BoxDecoration(color: paperColor, border: Border.all(color: _ink.withOpacity(0.18), width: 0.8))),
+          ),
           Container(
             margin: const EdgeInsets.only(top: 14),
             decoration: BoxDecoration(
-              color: _paper,
-              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(6), bottomRight: Radius.circular(6)),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.28), blurRadius: 24, offset: const Offset(0, 12)),
-                // the pages underneath
-                const BoxShadow(color: Color(0xFFEDE8DA), offset: Offset(3, 4)),
-                const BoxShadow(color: Color(0xFFE2DCCB), offset: Offset(6, 8)),
-              ],
+              color: paperColor,
+              border: Border.all(color: _ink.withOpacity(0.3), width: 0.9),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 22, offset: const Offset(0, 10))],
             ),
             child: CustomPaint(
               painter: _NotebookLines(left: left, top: line * 1.6, line: line),
@@ -1028,7 +938,7 @@ class _Notebook extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
-                              child: Text('Exerciții', style: TextStyle(fontSize: isMobile ? 28 : 36, fontWeight: FontWeight.w800, color: _ink)),
+                              child: Text('Exerciții', style: TextStyle(fontSize: isMobile ? 26 : 32, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: _ink)),
                             ),
                             if (problems.isNotEmpty)
                               Padding(
@@ -1074,15 +984,7 @@ class _Notebook extends StatelessWidget {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    for (var i = 0; i < n; i++)
-                      Container(
-                        width: 10,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Color(0xFF8D96A0), Color(0xFFE3E7EB), Color(0xFF8D96A0)]),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
+                    for (var i = 0; i < n; i++) CustomPaint(size: const Size(10, 28), painter: _Ring(_ink, seed: i)),
                   ],
                 );
               },
@@ -1170,19 +1072,43 @@ class _NotebookLines extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final blue = Paint()
-      ..color = const Color(0xFF8BB4E8).withOpacity(0.55)
-      ..strokeWidth = 1;
+    final ruled = Paint()
+      ..color = inkColor.withOpacity(0.1)
+      ..strokeWidth = 0.8;
     for (var y = top; y < size.height - 4; y += line) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), blue);
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), ruled);
     }
-    final red = Paint()
-      ..color = const Color(0xFFE5484D).withOpacity(0.6)
-      ..strokeWidth = 1.4;
-    canvas.drawLine(Offset(left, 0), Offset(left, size.height), red);
-    canvas.drawLine(Offset(left + 3, 0), Offset(left + 3, size.height), red..strokeWidth = 0.8);
+    canvas.drawLine(
+      Offset(left, 0),
+      Offset(left, size.height),
+      Paint()
+        ..color = hwRed.withOpacity(0.4)
+        ..strokeWidth = 1,
+    );
   }
 
   @override
   bool shouldRepaint(covariant _NotebookLines old) => old.left != left || old.top != top || old.line != line;
+}
+
+/// One ring of the spiral: a loop of wire through a hole in the page.
+class _Ring extends CustomPainter {
+  final Color ink;
+  final int seed;
+  _Ring(this.ink, {required this.seed});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width, h = size.height;
+    canvas.drawCircle(Offset(w / 2, h - 5), 2.6, Paint()..color = ink.withOpacity(0.7));
+    Pen(canvas, color: ink.withOpacity(0.75), width: 1.3, seed: seed).path(
+      Path()
+        ..moveTo(w / 2 - 1, h - 5)
+        ..cubicTo(-2, h * 0.6, -1, 1, w / 2, 1)
+        ..cubicTo(w + 1, 1, w + 2, h * 0.5, w / 2 + 1, h - 8),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _Ring old) => old.ink != ink || old.seed != seed;
 }

@@ -7,23 +7,29 @@ import 'clean_kit.dart' show CkHover;
 import 'ui_components.dart' show Pb;
 
 // =============================================================================
-// CLASSROOM — the pieces that make the classes pages look like a classroom:
-//   Chalkboard    wooden frame, green board, chalk tray, today's date
-//   ChalkStat     a number written in chalk, with a chalk box around it
-//   ChalkButton   a button that sits on the board
+// CLASSROOM — the pieces that make the classes pages look like a classroom,
+// drawn in ink on paper, the way you'd sketch it in a notebook:
+//   Pen           a hand: lines bow a little and run past the corners
+//   Chalkboard    the board drawn as a frame, a tray with chalk under it
+//   ChalkStat     a number on the board, in a hand-drawn box
+//   ChalkButton   a button in a hand-drawn outline
 //   NotebookPaper ruled lines and the red margin of a school notebook
 //   StickyNote    a yellow note stuck on with a bit of tape
 //   BinderSpine   the coloured spine of a ring binder
 // =============================================================================
 
+/// The ink everything is drawn with, and the paper it's drawn on.
+Color get inkColor => AppColors.isDark ? const Color(0xFFE4E1D9) : const Color(0xFF26262A);
+Color get paperColor => AppColors.isDark ? const Color(0xFF1F2022) : const Color(0xFFFCFBF7);
+
 /// Text written on the board or on a note, in the site's font. Sizes are
 /// given on a handwriting scale and shrunk to match the site's type.
-TextStyle chalk(double size, {Color color = const Color(0xF2FFFFFF), FontWeight weight = FontWeight.w700, double? height}) => TextStyle(
+TextStyle chalk(double size, {Color? color, FontWeight weight = FontWeight.w600, double? height}) => TextStyle(
       fontSize: math.max(12, (size * 0.68).roundToDouble()),
-      color: color,
-      fontWeight: size >= 40 ? FontWeight.w800 : weight,
+      color: color ?? inkColor,
+      fontWeight: size >= 40 ? FontWeight.w700 : weight,
       height: height,
-      letterSpacing: size >= 40 ? -0.5 : null,
+      letterSpacing: size >= 40 ? -0.6 : null,
     );
 
 const Color chalkWhite = Color(0xF2FFFFFF);
@@ -31,10 +37,6 @@ const Color chalkYellow = Color(0xFFFFE89A);
 const Color chalkPink = Color(0xFFFFB4C8);
 const Color chalkBlue = Color(0xFFA9D8FF);
 const Color chalkGreen = Color(0xFFB6F0C2);
-const Color _board = Color(0xFF2E4A3A);
-const Color _boardDeep = Color(0xFF243D30);
-const Color _wood = Color(0xFF9A6A3F);
-const Color _woodDark = Color(0xFF7A512D);
 
 const _days = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'];
 const _months = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
@@ -45,126 +47,186 @@ String boardDate([DateTime? d]) {
   return '${_days[t.weekday - 1]}, ${t.day} ${_months[t.month - 1]}';
 }
 
+// ----------------------------------------------------------------- pen
+/// Draws like a hand holding a fine pen: every line bows a little, runs a
+/// touch past where it should end, and is gone over a second time, lightly.
+/// The same [seed] always draws the same lines.
+class Pen {
+  final Canvas canvas;
+  final Color color;
+  final double width;
+  final math.Random _rnd;
+  Pen(this.canvas, {required this.color, this.width = 1.3, int seed = 1}) : _rnd = math.Random(seed);
+
+  double _j(double a) => (_rnd.nextDouble() - 0.5) * 2 * a;
+
+  Paint _paint(Color c, double w) => Paint()
+    ..color = c
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = w
+    ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round;
+
+  Path _line(Offset a, Offset b, double over) {
+    final d = b - a;
+    final len = d.distance;
+    if (len == 0) return Path();
+    final u = d / len;
+    final n = Offset(-u.dy, u.dx);
+    final a2 = a - u * (over * (0.3 + _rnd.nextDouble() * 0.7)) + n * _j(0.5);
+    final b2 = b + u * (over * (0.3 + _rnd.nextDouble() * 0.7)) + n * _j(0.5);
+    final m = Offset.lerp(a2, b2, 0.5)! + n * _j(math.min(2.0, len * 0.02));
+    return Path()
+      ..moveTo(a2.dx, a2.dy)
+      ..quadraticBezierTo(m.dx, m.dy, b2.dx, b2.dy);
+  }
+
+  /// A line from [a] to [b], running [over] past both ends.
+  void line(Offset a, Offset b, {double over = 0, Color? color, double? width}) {
+    final c = color ?? this.color;
+    final w = width ?? this.width;
+    canvas.drawPath(_line(a, b, over), _paint(c, w));
+    canvas.drawPath(_line(a, b, over * 0.5), _paint(c.withOpacity(c.opacity * 0.3), w * 0.7));
+  }
+
+  /// Straight sides through [pts], each one drawn on its own so the corners
+  /// cross. Filled with [fill] first, so it hides what's behind it.
+  void shape(List<Offset> pts, {bool closed = true, double over = 2.5, Color? fill, Color? color, double? width}) {
+    if (fill != null) canvas.drawPath(Path()..addPolygon(pts, true), Paint()..color = fill);
+    for (var i = 0; i < pts.length - (closed ? 0 : 1); i++) {
+      line(pts[i], pts[(i + 1) % pts.length], over: over, color: color, width: width);
+    }
+  }
+
+  void rect(Rect r, {double over = 2.5, Color? fill, Color? color, double? width}) =>
+      shape([r.topLeft, r.topRight, r.bottomRight, r.bottomLeft], over: over, fill: fill, color: color, width: width);
+
+  /// Any path, gone over twice.
+  void path(Path p, {Color? fill, Color? color, double? width}) {
+    final c = color ?? this.color;
+    final w = width ?? this.width;
+    if (fill != null) canvas.drawPath(p, Paint()..color = fill);
+    canvas.drawPath(p, _paint(c, w));
+    canvas.drawPath(p.shift(Offset(_j(0.7), _j(0.7))), _paint(c.withOpacity(c.opacity * 0.3), w * 0.7));
+  }
+
+  /// A circle that doesn't quite close: it starts anywhere and overlaps itself.
+  void ring(Offset c, double r, {Color? fill, Color? color, double? width}) {
+    if (fill != null) canvas.drawCircle(c, r, Paint()..color = fill);
+    final start = _rnd.nextDouble() * math.pi * 2;
+    final phase = _rnd.nextDouble() * math.pi * 2;
+    final p = Path();
+    const steps = 40;
+    for (var i = 0; i <= steps; i++) {
+      final t = start + (math.pi * 2 + 0.45) * i / steps;
+      final rr = r * (1 + 0.035 * math.sin(2 * t + phase)) + i / steps * r * 0.04;
+      final o = c + Offset(math.cos(t), math.sin(t)) * rr;
+      i == 0 ? p.moveTo(o.dx, o.dy) : p.lineTo(o.dx, o.dy);
+    }
+    final col = color ?? this.color;
+    final w = width ?? this.width;
+    canvas.drawPath(p, _paint(col, w));
+  }
+
+  /// Parallel strokes inside [clip], for shade or hair.
+  void hatch(Path clip, {double gap = 4, double angle = -0.9, Color? color, double? width}) {
+    final b = clip.getBounds();
+    final c = color ?? this.color.withOpacity(this.color.opacity * 0.5);
+    final w = width ?? this.width * 0.7;
+    canvas.save();
+    canvas.clipPath(clip);
+    final u = Offset(math.cos(angle), math.sin(angle));
+    final n = Offset(-u.dy, u.dx);
+    final span = b.longestSide * 1.5;
+    for (var d = -span / 2; d <= span / 2; d += gap) {
+      final m = b.center + n * d;
+      canvas.drawPath(_line(m - u * span / 2, m + u * span / 2, 0), _paint(c, w));
+    }
+    canvas.restore();
+  }
+
+  /// A loose wavy line, for steam, wood grain, a smudge.
+  void wave(Offset a, Offset b, {double amp = 2, double waves = 2, Color? color, double? width}) {
+    final d = b - a;
+    final n = Offset(-d.dy, d.dx) / d.distance;
+    final p = Path()..moveTo(a.dx, a.dy);
+    for (var i = 1; i <= 24; i++) {
+      final t = i / 24;
+      final o = a + d * t + n * (math.sin(t * math.pi * 2 * waves) * amp);
+      p.lineTo(o.dx, o.dy);
+    }
+    canvas.drawPath(p, _paint(color ?? this.color, width ?? this.width));
+  }
+}
+
 // ----------------------------------------------------------------- board
 class Chalkboard extends StatelessWidget {
   final Widget child;
   final bool showDate;
   const Chalkboard({super.key, required this.child, this.showDate = true});
 
+  static const double _tray = 20;
+
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
-    final frame = isMobile ? 8.0 : 12.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: EdgeInsets.all(frame),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_wood, _woodDark, _wood]),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.22), blurRadius: 26, offset: const Offset(0, 12))],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: CustomPaint(
-              painter: _BoardTexture(),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(isMobile ? 18 : 30, isMobile ? 16 : 22, isMobile ? 18 : 30, isMobile ? 20 : 26),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (showDate)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(boardDate(), style: chalk(isMobile ? 17 : 21, color: chalkWhite.withOpacity(0.75), weight: FontWeight.w600)),
-                      ),
-                    child,
-                  ],
-                ),
+    final pad = isMobile ? 20.0 : 32.0;
+    return CustomPaint(
+      painter: _BoardSketch(ink: inkColor, tray: _tray),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(pad, isMobile ? 18 : 24, pad, (isMobile ? 22 : 28) + _tray),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (showDate)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(boardDate(), style: chalk(isMobile ? 17 : 20, color: inkColor.withOpacity(0.45), weight: FontWeight.w500)),
               ),
-            ),
-          ),
+            child,
+          ],
         ),
-        // the chalk tray under the board
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 40),
-          child: Container(
-            height: 14,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_wood, _woodDark]),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(6)),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 8, offset: const Offset(0, 4))],
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _stick(left: 30, color: chalkWhite, width: 34),
-                _stick(left: 74, color: chalkYellow, width: 24),
-                _stick(left: 106, color: chalkPink, width: 28),
-                Positioned(
-                  right: 26,
-                  top: -9,
-                  child: Container(
-                    width: 52,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF5A6A7A),
-                      borderRadius: BorderRadius.circular(3),
-                      border: const Border(bottom: BorderSide(color: Color(0xFFDADADA), width: 5)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
-
-  Widget _stick({required double left, required Color color, required double width}) => Positioned(
-        left: left,
-        top: -5,
-        child: Container(
-          width: width,
-          height: 7,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
-        ),
-      );
 }
 
-/// Green with a few faint, half-erased smudges, so it reads as a real board.
-class _BoardTexture extends CustomPainter {
+/// The board as a sketch: a double frame, its shadow side hatched, and the
+/// tray with a stick of chalk and the eraser.
+class _BoardSketch extends CustomPainter {
+  final Color ink;
+  final double tray;
+  _BoardSketch({required this.ink, required this.tray});
+
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = const RadialGradient(center: Alignment(-0.3, -0.5), radius: 1.4, colors: [_board, _boardDeep]).createShader(rect),
+    final pen = Pen(canvas, color: ink, width: 1.5, seed: 11);
+    final w = size.width, h = size.height - tray;
+    const f = 8.0; // between the two frames
+    canvas.drawRect(Rect.fromLTWH(f, f, w - f * 2, h - f * 2), Paint()..color = ink.withOpacity(0.025));
+    pen.rect(Rect.fromLTWH(0, 0, w, h), over: 7);
+    pen.rect(Rect.fromLTWH(f, f, w - f * 2, h - f * 2), over: 3, color: ink.withOpacity(0.45), width: 0.9);
+    // the frame's shadow side
+    pen.hatch(
+      Path()
+        ..addRect(Rect.fromLTWH(w - f, f, f, h - f))
+        ..addRect(Rect.fromLTWH(f, h - f, w - f * 2, f)),
+      gap: 3.2,
+      color: ink.withOpacity(0.35),
+      width: 0.8,
     );
-    final rnd = math.Random(7);
-    final smudge = Paint()..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22);
-    for (var i = 0; i < 7; i++) {
-      smudge.color = Colors.white.withOpacity(0.025 + rnd.nextDouble() * 0.03);
-      final c = Offset(rnd.nextDouble() * size.width, rnd.nextDouble() * size.height);
-      canvas.drawOval(Rect.fromCenter(center: c, width: 120 + rnd.nextDouble() * 220, height: 30 + rnd.nextDouble() * 50), smudge);
-    }
-    final wipe = Paint()
-      ..color = Colors.white.withOpacity(0.035)
-      ..strokeWidth = 18
-      ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-    for (var i = 0; i < 3; i++) {
-      final y = size.height * (0.25 + rnd.nextDouble() * 0.6);
-      final x = rnd.nextDouble() * size.width * 0.6;
-      canvas.drawLine(Offset(x, y), Offset(x + 90 + rnd.nextDouble() * 160, y - 8 + rnd.nextDouble() * 16), wipe);
-    }
+    // the tray, a stick of chalk and the eraser
+    final y = h + tray * 0.55;
+    pen.line(Offset(14, y), Offset(w - 14, y), over: 4);
+    pen.line(Offset(22, y + 4), Offset(w - 22, y + 4), color: ink.withOpacity(0.35), width: 0.8);
+    pen.rect(Rect.fromLTWH(38, y - 5, 26, 4.5), over: 1, fill: Pb.surface, width: 1);
+    final eraser = Rect.fromLTWH(w - 88, y - 10, 40, 9.5);
+    pen.rect(eraser, over: 1.5, fill: Pb.surface, width: 1.1);
+    pen.hatch(Path()..addRect(Rect.fromLTWH(eraser.left, eraser.top + 5, eraser.width, 4.5)), gap: 2.2, color: ink.withOpacity(0.5), width: 0.7);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
+  bool shouldRepaint(covariant _BoardSketch old) => old.ink != ink || old.tray != tray;
 }
 
 /// "3 de făcut" written on the board, in a hand-drawn box.
@@ -186,7 +248,7 @@ class ChalkStat extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(n, style: chalk(28, color: color, height: 1.0)),
-                  Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: chalk(17, color: chalkWhite.withOpacity(0.85), weight: FontWeight.w600)),
+                  Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: chalk(17, color: inkColor.withOpacity(0.7))),
                 ],
               )
             : Row(
@@ -195,7 +257,7 @@ class ChalkStat extends StatelessWidget {
                 children: [
                   Text(n, style: chalk(32, color: color, height: 1.0)),
                   const SizedBox(width: 8),
-                  Text(label, style: chalk(21, color: chalkWhite.withOpacity(0.85), weight: FontWeight.w600)),
+                  Text(label, style: chalk(21, color: inkColor.withOpacity(0.7))),
                 ],
               ),
       ),
@@ -205,15 +267,12 @@ class ChalkStat extends StatelessWidget {
 
 class _ChalkBox extends CustomPainter {
   final Color color;
-  _ChalkBox(this.color);
+  final Color? fill;
+  final double opacity;
+  _ChalkBox(this.color, {this.fill, this.opacity = 0.55});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color.withOpacity(0.55)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
-      ..strokeCap = StrokeCap.round;
     // slightly wobbly, like it was drawn by hand
     final w = size.width, h = size.height;
     final path = Path()
@@ -222,49 +281,58 @@ class _ChalkBox extends CustomPainter {
       ..quadraticBezierTo(w + 1, h * 0.5, w - 2, h - 1)
       ..quadraticBezierTo(w * 0.5, h + 1.5, 1, h - 2)
       ..quadraticBezierTo(-1, h * 0.5, 2, 3);
-    canvas.drawPath(path, p);
+    if (fill != null) canvas.drawPath(path, Paint()..color = fill!);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color.withOpacity(opacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4
+        ..strokeCap = StrokeCap.round,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant _ChalkBox old) => old.color != color;
+  bool shouldRepaint(covariant _ChalkBox old) => old.color != color || old.fill != fill || old.opacity != opacity;
 }
 
-/// A button that lives on the board: white chalk outline, or filled with
-/// chalk for the main action.
+/// A button in a hand-drawn outline, or filled with ink for the main action.
 class ChalkButton extends StatelessWidget {
   final String text;
   final IconData? icon;
   final VoidCallback? onTap;
   final bool filled;
-  final Color color;
-  const ChalkButton({super.key, required this.text, this.icon, this.onTap, this.filled = false, this.color = chalkWhite});
+  final Color? color;
+  const ChalkButton({super.key, required this.text, this.icon, this.onTap, this.filled = false, this.color});
 
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
+    final c = color ?? inkColor;
     return Semantics(
       button: true,
       label: text,
       child: CkHover(
         onTap: onTap,
         builder: (h) {
-          final fg = filled ? _board : color;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 140),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-            decoration: BoxDecoration(
-              color: filled ? color.withOpacity(enabled ? (h ? 1 : 0.92) : 0.5) : (h ? Colors.white.withOpacity(0.1) : Colors.transparent),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color.withOpacity(filled ? 0 : 0.7), width: 1.6),
+          final fg = filled ? paperColor : c;
+          return CustomPaint(
+            painter: _ChalkBox(
+              c,
+              fill: filled ? c.withOpacity(enabled ? (h ? 1 : 0.88) : 0.4) : (h ? c.withOpacity(0.07) : null),
+              opacity: filled ? 0 : 0.8,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 7)],
-                Flexible(
-                  child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: fg)),
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[Icon(icon, size: 17, color: fg), const SizedBox(width: 7)],
+                  Flexible(
+                    child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: fg)),
+                  ),
+                ],
+              ),
             ),
           );
         },

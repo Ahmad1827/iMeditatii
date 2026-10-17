@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'app_colors.dart';
 import 'classroom_kit.dart';
 import 'clean_kit.dart';
 import 'classes_models.dart';
