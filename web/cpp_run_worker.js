@@ -1,13 +1,14 @@
-// Runs one compiled C++ program (WebAssembly + WASI) with the given input.
-// A fresh worker for every run: the page stops it if it takes too long.
-//   in:  {wasm, stdin}
+// Runs compiled C++ programs (WebAssembly + WASI) with the given input, one
+// at a time. It stays up between runs; the page stops it if a run takes too
+// long and starts a new one.
+//   in:  {module, stdin}   module: a compiled WebAssembly.Module
 //   out: {stdout, stderr, exit, seconds}
 import { WASI, File, OpenFile, ConsoleStdout, WASIProcExit } from 'https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.4.2/dist/index.js';
 
 const LIMIT = 4 << 20; // keep at most 4 MB of output
 
 onmessage = async (e) => {
-  const { wasm, stdin } = e.data;
+  const { module, stdin } = e.data;
   const sink = () => {
     const parts = [];
     let size = 0;
@@ -25,7 +26,7 @@ onmessage = async (e) => {
   const t = performance.now();
   let exit = 0;
   try {
-    const inst = await WebAssembly.instantiate(await WebAssembly.compile(wasm), { wasi_snapshot_preview1: wasi.wasiImport });
+    const inst = await WebAssembly.instantiate(module, { wasi_snapshot_preview1: wasi.wasiImport });
     exit = wasi.start(inst);
   } catch (x) {
     if (x instanceof WASIProcExit) {

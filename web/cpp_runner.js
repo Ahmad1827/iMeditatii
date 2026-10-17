@@ -6,16 +6,17 @@
 //   imCpp.run(code, stdin, timeoutMs)  -> Promise<{stdout, stderr, status, seconds} | {notReady} | {failed, error}>
 (function () {
   let compiler = null;
+  let runner = null; // runs programs; kept between runs, replaced after one is stopped
   let isReady = false;
   let seq = 0;
   const pending = new Map(); // id -> resolve
-  let last = { code: null, result: null }; // the same code checked on many tests compiles once
+  let last = { code: null, result: null }; // the same code checked on many tests compiles once (to a WebAssembly.Module)
 
   function start() {
     compiler = new Worker(new URL('cpp_compile_worker.js', document.baseURI), { type: 'module' });
     compiler.onmessage = (e) => {
       const m = e.data;
-      if (m.ready) { isReady = true; return; }
+      if (m.ready) { isReady = true; runner ??= newRunner(); return; }
       if (m.loadError) { stop(); return; }
       const p = pending.get(m.id);
       if (p) { pending.delete(m.id); p(m); }
@@ -39,23 +40,32 @@
     return new Promise((resolve) => {
       pending.set(id, resolve);
       compiler.postMessage({ id, code });
-    }).then((r) => {
+    }).then(async (r) => {
+      if (r.wasm) r = { module: await WebAssembly.compile(r.wasm) };
       if (!r.failed) last = { code, result: r };
       return r;
     });
   }
 
-  function execute(wasm, stdin, timeoutMs) {
+  function newRunner() {
+    return new Worker(new URL('cpp_run_worker.js', document.baseURI), { type: 'module' });
+  }
+
+  function execute(module, stdin, timeoutMs) {
     return new Promise((resolve) => {
-      const w = new Worker(new URL('cpp_run_worker.js', document.baseURI), { type: 'module' });
-      const done = (r) => { clearTimeout(timer); w.terminate(); resolve(r); };
-      const timer = setTimeout(() => done({ stdout: '', stderr: '', status: 'Time Limit Exceeded', seconds: timeoutMs / 1000 }), timeoutMs);
+      const w = (runner ??= newRunner());
+      const replace = () => { w.terminate(); if (runner === w) runner = null; };
+      const done = (r) => { clearTimeout(timer); w.onmessage = w.onerror = null; resolve(r); };
+      const timer = setTimeout(() => {
+        replace(); // stuck in a loop: only stopping the worker stops it
+        done({ stdout: '', stderr: '', status: 'Time Limit Exceeded', seconds: timeoutMs / 1000 });
+      }, timeoutMs);
       w.onmessage = (e) => {
         const r = e.data;
         done({ stdout: r.stdout, stderr: r.stderr, status: r.exit === 0 ? 'Accepted' : 'Runtime Error (NZEC)', seconds: r.seconds });
       };
-      w.onerror = (e) => done({ failed: true, error: e.message || 'Programul nu a putut porni.' });
-      w.postMessage({ wasm, stdin });
+      w.onerror = (e) => { replace(); done({ failed: true, error: e.message || 'Programul nu a putut porni.' }); };
+      w.postMessage({ module, stdin });
     });
   }
 
@@ -67,7 +77,7 @@
       const c = await compile(code);
       if (c.failed) return { failed: true };
       if (c.error != null) return { stdout: '', stderr: c.error, status: 'Compilation Error' };
-      return execute(c.wasm, stdin, timeoutMs);
+      return execute(c.module, stdin, timeoutMs);
     },
   };
 })();
