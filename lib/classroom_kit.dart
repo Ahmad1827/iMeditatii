@@ -22,6 +22,17 @@ import 'ui_components.dart' show Pb;
 Color get inkColor => AppColors.isDark ? const Color(0xFFE4E1D9) : const Color(0xFF26262A);
 Color get paperColor => AppColors.isDark ? const Color(0xFF1F2022) : const Color(0xFFFCFBF7);
 
+/// Watercolour, washed in under the ink: soft, a little off the lines.
+const Color wcWood = Color(0xFFDDBB8A);
+const Color wcWoodDeep = Color(0xFFC29462);
+const Color wcBlue = Color(0xFF93B5DA);
+const Color wcSage = Color(0xFFAFCDB5);
+const Color wcTerracotta = Color(0xFFE29F7D);
+const Color wcMustard = Color(0xFFE9C46A);
+const Color wcSkin = Color(0xFFF1C8A6);
+const List<Color> wcShirts = [wcTerracotta, Color(0xFF9CC5A1), Color(0xFF97B7DE), wcMustard, Color(0xFFC4A8D8), Color(0xFFE7A5B0)];
+const List<Color> wcHair = [Color(0xFF7D5A45), Color(0xFFB07A55), Color(0xFFD5B477), Color(0xFF5E5650), Color(0xFFA2553A)];
+
 /// Text written on the board or on a note, in the site's font. Sizes are
 /// given on a handwriting scale and shrunk to match the site's type.
 TextStyle chalk(double size, {Color? color, FontWeight weight = FontWeight.w600, double? height}) => TextStyle(
@@ -60,6 +71,24 @@ class Pen {
 
   double _j(double a) => (_rnd.nextDouble() - 0.5) * 2 * a;
 
+  /// Watercolour reads lighter on dark paper.
+  static double get _washA => AppColors.isDark ? 0.3 : 0.55;
+
+  /// A watercolour wash over [p]: shifted off the ink a little, soft at the
+  /// edges, darker where the paint pooled at the rim.
+  void wash(Path p, Color c) {
+    final q = p.shift(Offset(_j(2.5), _j(2.5)));
+    final a = c.opacity * _washA;
+    canvas.drawPath(q, Paint()
+      ..color = c.withOpacity(a)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.2));
+    canvas.drawPath(q, Paint()
+      ..color = c.withOpacity(a * 0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.3
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8));
+  }
+
   Paint _paint(Color c, double w) => Paint()
     ..color = c
     ..style = PaintingStyle.stroke
@@ -91,28 +120,31 @@ class Pen {
 
   /// Straight sides through [pts], each one drawn on its own so the corners
   /// cross. Filled with [fill] first, so it hides what's behind it.
-  void shape(List<Offset> pts, {bool closed = true, double over = 2.5, Color? fill, Color? color, double? width}) {
+  void shape(List<Offset> pts, {bool closed = true, double over = 2.5, Color? fill, Color? wash, Color? color, double? width}) {
     if (fill != null) canvas.drawPath(Path()..addPolygon(pts, true), Paint()..color = fill);
+    if (wash != null) this.wash(Path()..addPolygon(pts, true), wash);
     for (var i = 0; i < pts.length - (closed ? 0 : 1); i++) {
       line(pts[i], pts[(i + 1) % pts.length], over: over, color: color, width: width);
     }
   }
 
-  void rect(Rect r, {double over = 2.5, Color? fill, Color? color, double? width}) =>
-      shape([r.topLeft, r.topRight, r.bottomRight, r.bottomLeft], over: over, fill: fill, color: color, width: width);
+  void rect(Rect r, {double over = 2.5, Color? fill, Color? wash, Color? color, double? width}) =>
+      shape([r.topLeft, r.topRight, r.bottomRight, r.bottomLeft], over: over, fill: fill, wash: wash, color: color, width: width);
 
   /// Any path, gone over twice.
-  void path(Path p, {Color? fill, Color? color, double? width}) {
+  void path(Path p, {Color? fill, Color? wash, Color? color, double? width}) {
     final c = color ?? this.color;
     final w = width ?? this.width;
     if (fill != null) canvas.drawPath(p, Paint()..color = fill);
+    if (wash != null) this.wash(p, wash);
     canvas.drawPath(p, _paint(c, w));
     canvas.drawPath(p.shift(Offset(_j(0.7), _j(0.7))), _paint(c.withOpacity(c.opacity * 0.3), w * 0.7));
   }
 
   /// A circle that doesn't quite close: it starts anywhere and overlaps itself.
-  void ring(Offset c, double r, {Color? fill, Color? color, double? width}) {
+  void ring(Offset c, double r, {Color? fill, Color? wash, Color? color, double? width}) {
     if (fill != null) canvas.drawCircle(c, r, Paint()..color = fill);
+    if (wash != null) this.wash(Path()..addOval(Rect.fromCircle(center: c, radius: r)), wash);
     final start = _rnd.nextDouble() * math.pi * 2;
     final phase = _rnd.nextDouble() * math.pi * 2;
     final p = Path();
@@ -191,8 +223,8 @@ class Chalkboard extends StatelessWidget {
   }
 }
 
-/// The board as a sketch: a double frame, its shadow side hatched, and the
-/// tray with a stick of chalk and the eraser.
+/// The board as a sketch: a pale green wash inside a double wooden frame,
+/// its shadow side hatched, and the tray with a stick of chalk and the eraser.
 class _BoardSketch extends CustomPainter {
   final Color ink;
   final double tray;
@@ -203,7 +235,8 @@ class _BoardSketch extends CustomPainter {
     final pen = Pen(canvas, color: ink, width: 1.5, seed: 11);
     final w = size.width, h = size.height - tray;
     const f = 8.0; // between the two frames
-    canvas.drawRect(Rect.fromLTWH(f, f, w - f * 2, h - f * 2), Paint()..color = ink.withOpacity(0.025));
+    pen.wash(Path()..addRect(Rect.fromLTWH(f + 2, f + 2, w - f * 2 - 4, h - f * 2 - 4)), wcSage.withOpacity(0.55));
+    pen.wash(Path()..addRect(Rect.fromLTWH(0, 0, w, h))..addRect(Rect.fromLTWH(f, f, w - f * 2, h - f * 2))..fillType = PathFillType.evenOdd, wcWood);
     pen.rect(Rect.fromLTWH(0, 0, w, h), over: 7);
     pen.rect(Rect.fromLTWH(f, f, w - f * 2, h - f * 2), over: 3, color: ink.withOpacity(0.45), width: 0.9);
     // the frame's shadow side
@@ -219,9 +252,9 @@ class _BoardSketch extends CustomPainter {
     final y = h + tray * 0.55;
     pen.line(Offset(14, y), Offset(w - 14, y), over: 4);
     pen.line(Offset(22, y + 4), Offset(w - 22, y + 4), color: ink.withOpacity(0.35), width: 0.8);
-    pen.rect(Rect.fromLTWH(38, y - 5, 26, 4.5), over: 1, fill: Pb.surface, width: 1);
+    pen.rect(Rect.fromLTWH(38, y - 5, 26, 4.5), over: 1, fill: Pb.surface, wash: wcMustard, width: 1);
     final eraser = Rect.fromLTWH(w - 88, y - 10, 40, 9.5);
-    pen.rect(eraser, over: 1.5, fill: Pb.surface, width: 1.1);
+    pen.rect(eraser, over: 1.5, fill: Pb.surface, wash: wcBlue, width: 1.1);
     pen.hatch(Path()..addRect(Rect.fromLTWH(eraser.left, eraser.top + 5, eraser.width, 4.5)), gap: 2.2, color: ink.withOpacity(0.5), width: 0.7);
   }
 

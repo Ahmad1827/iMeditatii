@@ -2,9 +2,9 @@ part of 'classes_screen.dart';
 
 // =============================================================================
 // THE CLASSROOM
-//   A room sketched in ink on a sheet of paper lying on the meadow: the board
-//   and the teacher's desk (catedra) at the front, double school desks
-//   (bănci) with chairs, empty until students come.
+//   A room sketched in ink and watercolour on a sheet of paper lying on the
+//   meadow: the board and the teacher's desk (catedra) at the front, double
+//   school desks (bănci) with chairs, empty until students come.
 //   A student picks a free chair once; tapping their desk zooms in and the
 //   homework is on the desk. The teacher taps a student's desk to see how
 //   that student is doing, or the catedra for the link and all homework.
@@ -437,7 +437,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     }
 
     return CustomPaint(
-      painter: _DeskTop(ink: inkColor, wood: Color.lerp(paperColor, const Color(0xFFB08A5C), AppColors.isDark ? 0.08 : 0.12)!),
+      painter: _DeskTop(ink: inkColor, wood: Color.lerp(paperColor, wcWood, AppColors.isDark ? 0.1 : 0.22)!),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -625,7 +625,7 @@ class _Bench extends StatelessWidget {
   }
 }
 
-/// The bench in ink: the desk top a little wider at the front, its legs, and
+/// The bench in ink and watercolour: the desk top a little wider at the front, its legs, and
 /// for each half a chair, with the student on it seen from behind.
 class _BenchSketch extends CustomPainter {
   final List<_Side> sides;
@@ -646,8 +646,8 @@ class _BenchSketch extends CustomPainter {
       pen.line(Offset(w * x, h * 0.33), Offset(w * x, h * 0.64), over: 1);
     }
     // the desk top and its front edge
-    pen.shape([Offset(w * 0.05, h * 0.03), Offset(w * 0.95, h * 0.03), Offset(w * 0.99, h * 0.27), Offset(w * 0.01, h * 0.27)], fill: paper, over: 4);
-    pen.shape([Offset(w * 0.01, h * 0.27), Offset(w * 0.99, h * 0.27), Offset(w * 0.99, h * 0.33), Offset(w * 0.01, h * 0.33)], fill: paper, over: 3);
+    pen.shape([Offset(w * 0.05, h * 0.03), Offset(w * 0.95, h * 0.03), Offset(w * 0.99, h * 0.27), Offset(w * 0.01, h * 0.27)], fill: paper, wash: wcWood, over: 4);
+    pen.shape([Offset(w * 0.01, h * 0.27), Offset(w * 0.99, h * 0.27), Offset(w * 0.99, h * 0.33), Offset(w * 0.01, h * 0.33)], fill: paper, wash: wcWoodDeep, over: 3);
     pen.hatch(Path()..addRect(Rect.fromLTRB(w * 0.01, h * 0.27, w * 0.99, h * 0.33)), gap: 3.4, color: ink.withOpacity(0.22), width: 0.7);
     // the groove for pens, along the far edge
     pen.line(Offset(w * 0.1, h * 0.075), Offset(w * 0.9, h * 0.075), color: ink.withOpacity(0.2), width: 0.8);
@@ -659,13 +659,14 @@ class _BenchSketch extends CustomPainter {
 
   void _side(Canvas canvas, Pen pen, _Side s, double cx, double w, double h) {
     final chair = s.pickable ? accent : (s.empty ? ink.withOpacity(0.32) : ink);
+    final blue = wcBlue.withOpacity(s.empty && !s.pickable ? 0.35 : 1);
     // the seat, mostly hidden
     pen.shape([Offset(cx - w * 0.13, h * 0.52), Offset(cx + w * 0.13, h * 0.52), Offset(cx + w * 0.15, h * 0.6), Offset(cx - w * 0.15, h * 0.6)],
-        color: chair.withOpacity(chair.opacity * 0.6), width: 1, over: 1.5);
+        wash: blue, color: chair.withOpacity(chair.opacity * 0.6), width: 1, over: 1.5);
     if (!s.empty) _person(pen, s, cx, w, h);
     // the chair back, closest to us, and its legs
     final back = Rect.fromLTRB(cx - w * 0.17, h * 0.64, cx + w * 0.17, h * 0.78);
-    pen.rect(back, fill: paper, color: chair, over: 3, width: s.pickable ? 1.6 : null);
+    pen.rect(back, fill: paper, wash: blue, color: chair, over: 3, width: s.pickable ? 1.6 : null);
     pen.line(Offset(back.left + 6, back.center.dy), Offset(back.right - 6, back.center.dy), color: chair.withOpacity(chair.opacity * 0.45), width: 0.8);
     for (final x in [-0.13, 0.13]) {
       pen.line(Offset(cx + w * x, h * 0.78), Offset(cx + w * x, h * 0.86), color: chair);
@@ -680,7 +681,8 @@ class _BenchSketch extends CustomPainter {
       ..moveTo(cx - w * 0.18, h * 0.72)
       ..cubicTo(cx - w * 0.18, h * 0.53, cx - w * 0.12, h * 0.48, cx, h * 0.48)
       ..cubicTo(cx + w * 0.12, h * 0.48, cx + w * 0.18, h * 0.53, cx + w * 0.18, h * 0.72);
-    pen.path(shoulders, fill: paper, color: c);
+    pen.path(shoulders, fill: paper, wash: wcShirts[seed % wcShirts.length], color: c);
+    final hairColor = wcHair[(seed ~/ 7) % wcHair.length];
     final head = Offset(cx, h * 0.37);
     final r = w * 0.068;
     for (final x in [-0.028, 0.028]) {
@@ -689,10 +691,10 @@ class _BenchSketch extends CustomPainter {
     if (seed % 3 == 1) {
       // a bun
       final bun = head - Offset(0, r * 1.05);
-      pen.ring(bun, r * 0.36, fill: paper, color: c, width: 1.1);
+      pen.ring(bun, r * 0.36, fill: paper, wash: hairColor, color: c, width: 1.1);
       pen.hatch(Path()..addOval(Rect.fromCircle(center: bun, radius: r * 0.36)), gap: 2.2, angle: 0.6, color: c.withOpacity(0.6));
     }
-    pen.ring(head, r, fill: paper, color: c);
+    pen.ring(head, r, fill: paper, wash: hairColor, color: c);
     // hair over the whole head, or short with the nape showing
     final clip = Path.combine(PathOperation.difference, Path()..addOval(Rect.fromCircle(center: head, radius: r)),
         seed % 3 == 2 ? (Path()..addRect(Rect.fromLTRB(head.dx - r, head.dy + r * 0.45, head.dx + r, head.dy + r))) : Path());
@@ -772,7 +774,7 @@ class _Catedra extends StatelessWidget {
   }
 }
 
-/// The catedra in ink: the teacher behind it, two books and a cup of tea
+/// The catedra in ink and watercolour: the teacher behind it, two books and a cup of tea
 /// on it, a panel at the front.
 class _CatedraSketch extends CustomPainter {
   final String name;
@@ -788,25 +790,27 @@ class _CatedraSketch extends CustomPainter {
       ..moveTo(92, 88)
       ..cubicTo(92, 62, 106, 54, 125, 54)
       ..cubicTo(144, 54, 158, 62, 158, 88);
-    pen.path(shoulders, fill: paper);
+    final seed = name.hashCode.abs();
+    pen.path(shoulders, fill: paper, wash: wcShirts[(seed + 2) % wcShirts.length]);
     pen.line(const Offset(125, 54), const Offset(125, 84), color: faint, width: 0.8); // the collar
     const head = Offset(125, 32);
-    pen.ring(head, 16, fill: paper);
+    pen.ring(head, 16, fill: paper, wash: wcSkin);
     final hair = Path.combine(PathOperation.difference, Path()..addOval(Rect.fromCircle(center: head, radius: 16)),
         Path()..addOval(Rect.fromCircle(center: head + const Offset(0, 9), radius: 14)));
+    pen.wash(hair, wcHair[(seed ~/ 7) % wcHair.length]);
     pen.hatch(hair, gap: 2.4, angle: name.hashCode.isEven ? -1.0 : -0.6, color: ink.withOpacity(0.6));
     // the desk top and the front panel
-    pen.shape(const [Offset(6, 86), Offset(244, 86), Offset(250, 110), Offset(0, 110)], fill: paper, over: 5);
-    pen.rect(const Rect.fromLTRB(8, 110, 242, 158), fill: paper, over: 4);
+    pen.shape(const [Offset(6, 86), Offset(244, 86), Offset(250, 110), Offset(0, 110)], fill: paper, wash: wcWood, over: 5);
+    pen.rect(const Rect.fromLTRB(8, 110, 242, 158), fill: paper, wash: wcWoodDeep, over: 4);
     pen.rect(const Rect.fromLTRB(18, 118, 232, 150), color: ink.withOpacity(0.25), width: 0.8, over: 1);
     pen.hatch(Path()..addRect(const Rect.fromLTRB(232, 110, 242, 158)), gap: 3, color: ink.withOpacity(0.3), width: 0.7);
     // two books
-    pen.rect(const Rect.fromLTWH(22, 80, 50, 10), fill: paper, over: 1.5);
-    pen.rect(const Rect.fromLTWH(28, 70, 40, 10), fill: paper, over: 1.5);
+    pen.rect(const Rect.fromLTWH(22, 80, 50, 10), fill: paper, wash: wcTerracotta, over: 1.5);
+    pen.rect(const Rect.fromLTWH(28, 70, 40, 10), fill: paper, wash: wcBlue, over: 1.5);
     pen.line(const Offset(64, 80), const Offset(64, 90), color: faint, width: 0.8);
     pen.line(const Offset(31, 70), const Offset(31, 80), color: faint, width: 0.8);
     // a cup of tea, still warm
-    pen.shape(const [Offset(198, 74), Offset(216, 74), Offset(214, 92), Offset(200, 92)], fill: paper, over: 1);
+    pen.shape(const [Offset(198, 74), Offset(216, 74), Offset(214, 92), Offset(200, 92)], fill: paper, wash: wcMustard, over: 1);
     pen.path(Path()..addArc(const Rect.fromLTWH(210, 77, 11, 10), -math.pi / 2, math.pi), width: 1);
     pen.wave(const Offset(203, 69), const Offset(201, 52), amp: 1.8, waves: 1.2, color: faint, width: 0.9);
     pen.wave(const Offset(210, 68), const Offset(212, 55), amp: 1.5, waves: 1, color: faint, width: 0.9);
