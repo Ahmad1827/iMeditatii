@@ -856,8 +856,8 @@ class _Underline extends CustomPainter {
   bool shouldRepaint(covariant _Underline old) => old.color != color || old.seed != seed;
 }
 
-/// A student's desk as the teacher sees it: each homework with how far the
-/// student got.
+/// A student's desk as the teacher sees it: the notebook with what the
+/// student solved, and for each exercise the code or answer they sent.
 class _StudentDesk extends StatefulWidget {
   final SchoolClass c;
   final String sid;
@@ -871,13 +871,17 @@ class _StudentDesk extends StatefulWidget {
 
 class _StudentDeskState extends State<_StudentDesk> {
   late final Stream<Set<String>> _solved = Classes.solvedBy(widget.sid);
+  late final Stream<Map<String, Solution>> _sent = Classes.solutionsOf(widget.sid);
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Set<String>>(
         stream: _solved,
-        builder: (context, s) => Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: _Notebook(problems: _problemsOf(widget.homework), solved: s.data ?? const <String>{}),
+        builder: (context, s) => StreamBuilder<Map<String, Solution>>(
+          stream: _sent,
+          builder: (context, sent) => Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: _Notebook(problems: _problemsOf(widget.homework), solved: s.data ?? const <String>{}, sent: sent.data ?? const {}),
+          ),
         ),
       );
 }
@@ -898,7 +902,8 @@ class _Notebook extends StatelessWidget {
   final List<HwProblem> problems;
   final Set<String> solved;
   final bool teacher; // the teacher's own list: nothing to cross off
-  const _Notebook({required this.problems, this.solved = const {}, this.teacher = false});
+  final Map<String, Solution>? sent; // a student's notebook as the teacher reads it: what they sent
+  const _Notebook({required this.problems, this.solved = const {}, this.teacher = false, this.sent});
   static Color get _ink => inkColor;
 
   @override
@@ -1002,11 +1007,12 @@ class _Notebook extends StatelessWidget {
   Widget _row(BuildContext context, int n, HwProblem p, double left, double line, bool isMobile) {
     final ok = !teacher && solved.contains(p.progressKey);
     final c = ckSubjectColor(p.subject);
+    final sol = sent?[p.progressKey];
     return Semantics(
       button: true,
       label: p.title,
       child: CkHover(
-        onTap: () => GoRouter.of(context).push(p.path),
+        onTap: () => sol != null ? _showSolution(context, p, sol) : GoRouter.of(context).push(p.path),
         builder: (h) => Container(
           height: line,
           color: h ? c.withOpacity(0.06) : Colors.transparent,
@@ -1042,7 +1048,25 @@ class _Notebook extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              if (ok)
+              if (sent != null)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (ok) ...[
+                      const Icon(Icons.check_circle, size: 20, color: hwGreen),
+                      const SizedBox(width: 5),
+                      Text('Rezolvată', style: TextStyle(fontSize: isMobile ? 14 : 15.5, fontWeight: FontWeight.w700, color: hwGreen)),
+                      const SizedBox(width: 12),
+                    ],
+                    if (sol != null) ...[
+                      Text(isMobile ? 'Vezi' : (ok || sol.passed != null ? 'Vezi soluția' : 'Vezi încercarea'),
+                          style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w700, color: h ? c : Pb.primary)),
+                      Icon(Icons.chevron_right, size: 22, color: h ? c : Pb.primary),
+                    ] else if (!ok)
+                      Text('Netrimisă', style: TextStyle(fontSize: isMobile ? 14 : 15.5, fontStyle: FontStyle.italic, color: _ink.withOpacity(0.45))),
+                  ],
+                )
+              else if (ok)
                 const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -1066,6 +1090,45 @@ class _Notebook extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The code or answer a student sent on [p]: the last version that passed,
+/// and the last attempt too if it came after and doesn't pass.
+void _showSolution(BuildContext context, HwProblem p, Solution s) {
+  String when(DateTime? d) => d == null ? '' : ' · ${d.day}.${d.month}.${d.year}, ${d.hour}:${d.minute.toString().padLeft(2, '0')}';
+  Widget part(String label, Color color, String text, String? lang) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: color)),
+          const SizedBox(height: 6),
+          PbCodeBox(text, lang: lang, fontSize: 13.5),
+        ],
+      );
+  final failedAfter = !s.lastPassed && s.passed != null && s.last != s.passed;
+  showPbModal<void>(
+    context,
+    title: p.title.isEmpty ? p.id : p.title,
+    body: ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (s.passed != null) part('A trecut toate testele${when(s.passedAt)}', hwGreen, s.passed!, s.passedLang),
+            if (failedAfter) const SizedBox(height: 16),
+            if (s.passed == null || failedAfter) part('${failedAfter ? 'Ultima încercare, ' : ''}nu trece încă testele${when(s.lastAt)}', hwRed, s.last, s.lastLang),
+          ],
+        ),
+      ),
+    ),
+    actions: (d) => [
+      PbButton(text: 'Deschide problema', variant: PbVariant.secondary, onPressed: () {
+        Navigator.of(d).pop();
+        GoRouter.of(context).push(p.path);
+      }),
+      PbButton(text: 'Închide', onPressed: () => Navigator.of(d).pop()),
+    ],
+  );
 }
 
 class _NotebookLines extends CustomPainter {

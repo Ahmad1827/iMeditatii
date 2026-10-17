@@ -183,6 +183,8 @@ void main() {
       );
       await Classes.setDone(id, 's2', true);
       await db.collection('users').doc('s2').update({'solvedIds': ['Informatică_9_1']});
+      await Classes.saveSolution(uid: 's2', key: 'Informatică_9_1', text: 'int main() { return 1; }', lang: 'cpp', passed: true);
+      await Classes.saveSolution(uid: 's2', key: 'Informatică_9_1', text: 'int main() { return 2; }', lang: 'cpp', passed: false);
       await open(tester, ClassBody(uid: 't1', code: code));
       expect(find.text('Mihai'), findsOneWidget); // sitting in a bench
       expect(find.text('Ioana'), findsOneWidget);
@@ -206,6 +208,16 @@ void main() {
       expect(find.text('Exerciții'), findsOneWidget);
       expect(find.text('1 din 1 rezolvate'), findsOneWidget);
       expect(find.text('Rezolvată'), findsOneWidget);
+
+      // What she sent: the version that passed, and the later one that doesn't.
+      await tester.tap(find.text('Vezi soluția'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('A trecut toate testele'), findsOneWidget);
+      expect(find.textContaining('Ultima încercare, nu trece'), findsOneWidget);
+      expect(find.textContaining('return 1;'), findsOneWidget);
+      expect(find.textContaining('return 2;'), findsOneWidget);
+      await tester.tap(find.text('Închide'));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('the dock: shows homework, hides it, brings it back, done makes it go away', (tester) async {

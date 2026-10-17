@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'classes_models.dart' show Classes;
 import 'judge0.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
@@ -311,6 +312,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }
   }
 
+  /// Keeps what was sent, so a teacher can read it on the student's desk.
+  void _saveSolution(String text, String? lang, bool passed) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || text.trim().isEmpty) return;
+    Classes.saveSolution(uid: uid, key: _progressKey, text: text, lang: lang, passed: passed).catchError((e) => debugPrint('Solution save: $e'));
+  }
+
   Future<bool> _isExerciseDone() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.get(_progressKey) == true;
@@ -410,6 +418,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionChecked = true;
       solutionOk = ok;
     });
+    _saveSolution(raspunsElev, null, ok);
     if (solutionOk) {
       setState(() => _cCheer++);
       await _markExerciseAsDone();
@@ -468,6 +477,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         solutionChecked = true;
         solutionOk = allPassed;
       });
+      _saveSolution(code, 'cpp', allPassed);
       if (allPassed) await _markExerciseAsDone();
     } catch (e) {
       testResults.add({"index": testResults.length + 1, "passed": false, "expected": "fără erori", "got": "$e"});

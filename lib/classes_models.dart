@@ -360,6 +360,30 @@ class Classes {
         (d) => {for (final k in (d.data()?['solvedIds'] as List?) ?? const []) '$k'},
       );
 
+  static CollectionReference<Map<String, dynamic>> get solutions => _db.collection('solutions');
+
+  /// One document per student and problem, so the teacher can read what was
+  /// sent: the last attempt, and the last one that passed.
+  static String solutionId(String uid, String key) => '${uid}__${key.replaceAll('/', '_')}';
+
+  /// Saves what the student sent on a problem page: code (C++) or an answer
+  /// ([lang] null). Saved on every check, passed or not.
+  static Future<void> saveSolution({required String uid, required String key, required String text, String? lang, required bool passed}) =>
+      solutions.doc(solutionId(uid, key)).set({
+        'uid': uid,
+        'key': key,
+        'last': text,
+        'lastLang': lang,
+        'lastPassed': passed,
+        'lastAt': FieldValue.serverTimestamp(),
+        if (passed) ...{'passed': text, 'passedLang': lang, 'passedAt': FieldValue.serverTimestamp()},
+      }, SetOptions(merge: true));
+
+  /// What a student sent, by [HwProblem.progressKey].
+  static Stream<Map<String, Solution>> solutionsOf(String uid) => solutions.where('uid', isEqualTo: uid).snapshots().map(
+        (q) => {for (final d in q.docs) '${d.data()['key'] ?? ''}': Solution.fromJson(d.data())},
+      );
+
   static Future<void> setHidden(String id, String uid, bool hidden) =>
       homework.doc(id).update({'hidden.$uid': hidden ? true : FieldValue.delete()});
 
@@ -524,4 +548,26 @@ class _Merge {
     );
     return out.stream;
   }
+}
+
+/// What a student sent on one problem.
+class Solution {
+  final String last;
+  final String? lastLang;
+  final bool lastPassed;
+  final DateTime? lastAt;
+  final String? passed; // the last version that passed, if any
+  final String? passedLang;
+  final DateTime? passedAt;
+  const Solution({required this.last, this.lastLang, this.lastPassed = false, this.lastAt, this.passed, this.passedLang, this.passedAt});
+
+  static Solution fromJson(Map<String, dynamic> j) => Solution(
+        last: '${j['last'] ?? ''}',
+        lastLang: j['lastLang'] as String?,
+        lastPassed: j['lastPassed'] == true,
+        lastAt: (j['lastAt'] as Timestamp?)?.toDate(),
+        passed: j['passed'] as String?,
+        passedLang: j['passedLang'] as String?,
+        passedAt: (j['passedAt'] as Timestamp?)?.toDate(),
+      );
 }

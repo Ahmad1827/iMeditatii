@@ -14,7 +14,7 @@ import 'classes_models.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'homework_composer.dart';
 import 'homework_dock.dart';
-import 'ui_components.dart' show Pb, PbButton, PbVariant, PbContainer, showPbModal;
+import 'ui_components.dart' show Pb, PbButton, PbCodeBox, PbVariant, PbContainer, showPbModal;
 import 'workspace_models.dart';
 import 'workspace_screen.dart' show wsDialogShell;
 import 'home_ambient.dart' show HomeSky;
