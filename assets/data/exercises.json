@@ -135,6 +135,13 @@
           "title": "Secvența de sumă maximă",
           "difficulty": "grea"
         }
+      ],
+      "6. Olimpiadă": [
+        {
+          "id": "91",
+          "title": "Macarie",
+          "difficulty": "grea"
+        }
       ]
     },
     "10": {
@@ -237,6 +244,13 @@
           "title": "Paranteze corecte",
           "difficulty": "medie"
         }
+      ],
+      "6. Olimpiadă": [
+        {
+          "id": "92",
+          "title": "Aprogressive",
+          "difficulty": "grea"
+        }
       ]
     },
     "11": {
@@ -330,6 +344,13 @@
         {
           "id": "60",
           "title": "Subșirul comun maximal (LCS)",
+          "difficulty": "grea"
+        }
+      ],
+      "5. Olimpiadă": [
+        {
+          "id": "93",
+          "title": "Birocrație",
           "difficulty": "grea"
         }
       ]
@@ -490,6 +511,13 @@
           "title": "Cea mai lungă secvență crescătoare",
           "difficulty": "grea"
         }
+      ],
+      "4. Olimpiadă": [
+        {
+          "id": "94",
+          "title": "Nestemate",
+          "difficulty": "grea"
+        }
       ]
     }
   },
@@ -575,6 +603,13 @@
         {
           "id": "15",
           "title": "Rădăcini reale distincte",
+          "difficulty": "grea"
+        }
+      ],
+      "5. Olimpiadă": [
+        {
+          "id": "62",
+          "title": "Pătrat perfect",
           "difficulty": "grea"
         }
       ]
@@ -667,6 +702,13 @@
           "title": "Aria unui triunghi",
           "difficulty": "grea"
         }
+      ],
+      "5. Olimpiadă": [
+        {
+          "id": "63",
+          "title": "Ecuație exponențială",
+          "difficulty": "grea"
+        }
       ]
     },
     "11": {
@@ -752,6 +794,13 @@
           "title": "Maxim local",
           "difficulty": "grea"
         }
+      ],
+      "5. Olimpiadă": [
+        {
+          "id": "64",
+          "title": "Un șir și un produs",
+          "difficulty": "grea"
+        }
       ]
     },
     "12": {
@@ -835,6 +884,13 @@
         {
           "id": "61",
           "title": "Produsul rădăcinilor",
+          "difficulty": "grea"
+        }
+      ],
+      "5. Olimpiadă": [
+        {
+          "id": "65",
+          "title": "Iteratele unei funcții",
           "difficulty": "grea"
         }
       ]
