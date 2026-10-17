@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'browser_python.dart';
+
 /// Result of one program run.
 class RunResult {
   final String stdout;
@@ -24,6 +26,7 @@ class RunResult {
 }
 
 /// Thin wrapper over the Judge0 CE API used by the problem judge and the IDE.
+/// Python goes to [BrowserPython] first.
 class Judge0 {
   static const String apiKey = 'YOUR_API_KEY';
   static const String _host = 'judge0-ce.p.rapidapi.com';
@@ -46,6 +49,11 @@ class Judge0 {
       .timeout(const Duration(seconds: 40));
 
   static Future<RunResult> run({required String code, String stdin = '', String lang = 'cpp'}) async {
+    // Python runs in the browser when it can: free, and no limit on runs.
+    if (lang == 'python') {
+      final r = await BrowserPython.run(code, stdin);
+      if (r != null) return r;
+    }
     try {
       final body = jsonEncode({
         'language_id': languageId(lang),
