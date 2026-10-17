@@ -6,7 +6,7 @@ enum AppStyleMode { retro, clean }
 class ThemeManager {
   // Global notifiers for Theme (Light/Dark) and Style (Retro/Clean)
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
-  static final ValueNotifier<AppStyleMode> styleNotifier = ValueNotifier(AppStyleMode.retro);
+  static final ValueNotifier<AppStyleMode> styleNotifier = ValueNotifier(AppStyleMode.clean);
 
   static bool get isDark => themeNotifier.value == ThemeMode.dark;
   static bool get isRetro => styleNotifier.value == AppStyleMode.retro;
@@ -19,8 +19,9 @@ class ThemeManager {
     final isDarkMode = prefs.getBool('is_dark_mode') ?? false;
     themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
-    final savedStyle = prefs.getString('app_style') ?? 'retro';
-    styleNotifier.value = savedStyle == 'clean' ? AppStyleMode.clean : AppStyleMode.retro;
+    // Clean unless the visitor chose Retro themselves (Retro isn't finished yet).
+    final savedStyle = prefs.getString('app_style') ?? 'clean';
+    styleNotifier.value = savedStyle == 'retro' ? AppStyleMode.retro : AppStyleMode.clean;
   }
 
   // Toggle Light / Dark mode
