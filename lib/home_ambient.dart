@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import 'app_colors.dart';
+import 'theme_manager.dart';
 import 'ui_components.dart';
 
 // ============================================================================
@@ -190,6 +192,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
 
   final _rnd = math.Random();
   final ValueNotifier<int> _frame = ValueNotifier(0);
+  final ValueNotifier<int> _fxFrame = ValueNotifier(0); // the weapon layer, only while it has something to draw
   late final Ticker _ticker;
   final GlobalKey _tabKey = GlobalKey();
   final GlobalKey _btnKey = GlobalKey();
@@ -198,6 +201,15 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   double _last = 0;
   Size _size = Size.zero;
   bool _reduce = false;
+
+  // The scene redraws at most 30 times a second. If even that is too much for
+  // this computer, the animations turn off (ThemeManager.motionTooSlow).
+  static const double _paintEvery = 1 / 30;
+  double _t0 = 0; // time already run before the ticker last started
+  double _lastPaint = -1;
+  double _runSince = 0;
+  bool _fxBusy = false;
+  final List<double> _gaps = [];
 
   final List<_Cloud> _clouds = [];
   final List<_Bird> _birds = [];
@@ -238,8 +250,44 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker(_tick)..start();
+    _ticker = createTicker(_tick);
+    ThemeManager.motionNotifier.addListener(_syncMotion);
     HardwareKeyboard.instance.addHandler(_onKey);
+  }
+
+  bool get _still => _reduce || !ThemeManager.motionNotifier.value;
+
+  // Runs the ticker while the scene moves; when it stops, the clouds stay
+  // where they are and everything else leaves.
+  void _syncMotion() {
+    if (!mounted) return;
+    if (_still) {
+      if (_ticker.isActive) {
+        _t0 = _now;
+        _ticker.stop();
+      }
+      _birds.clear();
+      _dragons.clear();
+      _drops.clear();
+      _feathers.clear();
+      _shots.clear();
+      _sparks.clear();
+      _army = null;
+      _held?.held = false;
+      _held = null;
+      _weapon = null;
+      _drawerOpen = false;
+      _armyHint = false;
+      if (_size != Size.zero) _ensureClouds();
+      _frame.value++;
+      _fxFrame.value++;
+      setState(() {});
+    } else if (!_ticker.isActive) {
+      _last = _now;
+      _runSince = _now;
+      _gaps.clear();
+      _ticker.start();
+    }
   }
 
   @override
@@ -251,8 +299,10 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_onKey);
+    ThemeManager.motionNotifier.removeListener(_syncMotion);
     _ticker.dispose();
     _frame.dispose();
+    _fxFrame.dispose();
     super.dispose();
   }
 
@@ -450,7 +500,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
 
   // ------------------------------------------------------------------ loop
   void _tick(Duration e) {
-    _now = e.inMicroseconds / 1e6;
+    _now = _t0 + e.inMicroseconds / 1e6;
     final dt = math.min(_now - _last, 0.05);
     _last = _now;
     if (_size == Size.zero) return;
@@ -567,7 +617,26 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
       if (mounted) setState(() {});
     }
 
+    final gap = _now - _lastPaint;
+    if (gap < _paintEvery - 0.002) return;
+    _lastPaint = _now;
     _frame.value++;
+    final fx = _weapon != null || _shots.isNotEmpty || _sparks.isNotEmpty;
+    if (fx || _fxBusy) _fxFrame.value++;
+    _fxBusy = fx;
+    _checkPace(gap);
+  }
+
+  // A slow computer shows up as long gaps between our own paints. Skip the
+  // first seconds (loading) and gaps from a hidden tab, then look at the median.
+  void _checkPace(double gap) {
+    if (_now - _runSince < 3 || gap > 0.5) return;
+    _gaps.add(gap);
+    if (_gaps.length < 8 || _gaps.fold(0.0, (a, b) => a + b) < 2) return;
+    _gaps.sort();
+    final median = _gaps[_gaps.length ~/ 2];
+    _gaps.clear();
+    if (median > 0.06) ThemeManager.motionTooSlow();
   }
 
   void _startle(_Bird b) {
@@ -942,6 +1011,10 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     _reduce = MediaQuery.of(context).disableAnimations;
+    if (_ticker.isActive == _still || (_still && _clouds.isEmpty)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _syncMotion());
+    }
+    final still = _still;
     final dark = AppColors.isDark;
     final hidden = widget.cardsHidden;
 
@@ -957,11 +1030,11 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         cursor: cursor,
         child: Listener(
           behavior: HitTestBehavior.translucent,
-          onPointerDown: _onDown,
-          onPointerMove: _onMove,
-          onPointerUp: (_) => _release(),
-          onPointerCancel: (_) => _release(),
-          onPointerHover: _onHover,
+          onPointerDown: still ? null : _onDown,
+          onPointerMove: still ? null : _onMove,
+          onPointerUp: still ? null : (_) => _release(),
+          onPointerCancel: still ? null : (_) => _release(),
+          onPointerHover: still ? null : _onHover,
           child: Stack(
             children: [
               Positioned.fill(child: _background()),
@@ -990,10 +1063,10 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
               ),
               Positioned.fill(
                 child: IgnorePointer(
-                  child: RepaintBoundary(child: CustomPaint(painter: _WeaponPainter(this, _frame))),
+                  child: RepaintBoundary(child: CustomPaint(painter: _WeaponPainter(this, _fxFrame))),
                 ),
               ),
-              _secretTab(),
+              if (!still) _secretTab(),
               if (widget.onToggleCards != null) _cardsButton(),
             ],
           ),
@@ -1019,9 +1092,8 @@ class _SkyPainter extends CustomPainter {
     final army = s._army;
     if (army != null) _paintArmy(canvas, s, army, dark);
 
-    final cloudPaint = Paint()
-      ..color = Colors.white.withOpacity(dark ? 0.12 : 0.62)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14);
+    final cloud = _cloudImage(dark);
+    final cloudPaint = Paint()..filterQuality = FilterQuality.low;
     final rainBelly = Paint()
       ..color = const Color(0xFF9FB4C4).withOpacity(0.28)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
@@ -1033,9 +1105,12 @@ class _SkyPainter extends CustomPainter {
       if (now < c.rainUntil) {
         canvas.drawOval(Rect.fromCenter(center: Offset(x, y + 6 * sc), width: 210 * sc, height: 44 * sc), rainBelly);
       }
-      canvas.drawOval(Rect.fromCenter(center: Offset(x, y), width: 220 * sc, height: 50 * sc), cloudPaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(x - 55 * sc, y + 6 * sc), width: 140 * sc, height: 40 * sc), cloudPaint);
-      canvas.drawOval(Rect.fromCenter(center: Offset(x + 60 * sc, y - 10 * sc), width: 130 * sc, height: 46 * sc), cloudPaint);
+      canvas.drawImageRect(
+        cloud,
+        Rect.fromLTWH(0, 0, cloud.width.toDouble(), cloud.height.toDouble()),
+        Rect.fromCenter(center: Offset(x, y), width: _cloudW * sc, height: _cloudH * sc),
+        cloudPaint,
+      );
     }
 
     final rain = Paint()
@@ -1077,6 +1152,25 @@ class _SkyPainter extends CustomPainter {
     }
 
   }
+
+  // One cloud (three soft ovals) is blurred once per theme into an image;
+  // a blur on every frame is what slow computers struggle with.
+  static const double _cloudW = 340, _cloudH = 170, _cloudRes = 1.5;
+  static final Map<bool, ui.Image> _clouds = {};
+
+  static ui.Image _cloudImage(bool dark) => _clouds[dark] ??= () {
+        final rec = ui.PictureRecorder();
+        final c = Canvas(rec);
+        c.scale(_cloudRes);
+        c.translate(_cloudW / 2, _cloudH / 2);
+        final paint = Paint()
+          ..color = Colors.white.withOpacity(dark ? 0.12 : 0.62)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14);
+        c.drawOval(Rect.fromCenter(center: Offset.zero, width: 220, height: 50), paint);
+        c.drawOval(Rect.fromCenter(center: const Offset(-55, 6), width: 140, height: 40), paint);
+        c.drawOval(Rect.fromCenter(center: const Offset(60, -10), width: 130, height: 46), paint);
+        return rec.endRecording().toImageSync((_cloudW * _cloudRes).round(), (_cloudH * _cloudRes).round());
+      }();
 
   @override
   bool shouldRepaint(covariant _SkyPainter old) => old.dark != dark;

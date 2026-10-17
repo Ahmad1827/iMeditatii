@@ -7,6 +7,10 @@ class ThemeManager {
   // Global notifiers for Theme (Light/Dark) and Style (Retro/Clean)
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
   static final ValueNotifier<AppStyleMode> styleNotifier = ValueNotifier(AppStyleMode.clean);
+  // Background animations (clouds, birds, armies). Turned off by the visitor,
+  // or by the page itself when this computer can't keep up with them.
+  static final ValueNotifier<bool> motionNotifier = ValueNotifier(true);
+  static bool _motionChosen = false;
 
   static bool get isDark => themeNotifier.value == ThemeMode.dark;
   static bool get isRetro => styleNotifier.value == AppStyleMode.retro;
@@ -22,6 +26,10 @@ class ThemeManager {
     // Clean unless the visitor chose Retro themselves (Retro isn't finished yet).
     final savedStyle = prefs.getString('app_style') ?? 'clean';
     styleNotifier.value = savedStyle == 'retro' ? AppStyleMode.retro : AppStyleMode.clean;
+
+    final motion = prefs.getString('ambient_motion'); // 'on', 'off', 'auto_off' or unset
+    motionNotifier.value = motion != 'off' && motion != 'auto_off';
+    _motionChosen = motion == 'on' || motion == 'off';
   }
 
   // Toggle Light / Dark mode
@@ -46,5 +54,22 @@ class ThemeManager {
       styleNotifier.value = AppStyleMode.retro;
       await prefs.setString('app_style', 'retro');
     }
+  }
+
+  // Toggle the background animations on / off
+  static Future<void> toggleMotion() async {
+    final prefs = await SharedPreferences.getInstance();
+    motionNotifier.value = !motionNotifier.value;
+    _motionChosen = true;
+    await prefs.setString('ambient_motion', motionNotifier.value ? 'on' : 'off');
+  }
+
+  // The animations are too slow here: stop them, unless the visitor chose
+  // themselves to keep them on.
+  static Future<void> motionTooSlow() async {
+    if (_motionChosen || !motionNotifier.value) return;
+    motionNotifier.value = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('ambient_motion', 'auto_off');
   }
 }

@@ -268,7 +268,7 @@ class IMeditatiiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier]),
+      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier, ThemeManager.motionNotifier]),
       builder: (context, _) {
         final currentMode = ThemeManager.themeNotifier.value;
         final currentStyle = ThemeManager.styleNotifier.value;
@@ -321,6 +321,7 @@ class IMeditatiiApp extends StatelessWidget {
           // DUAL FLOATING CONTROL DECK: THEME + STYLE TOGGLES
           builder: (context, child) {
             final isMobile = MediaQuery.of(context).size.width < 750;
+            final motion = ThemeManager.motionNotifier.value;
 
             return Stack(
               children: [
@@ -441,6 +442,65 @@ class IMeditatiiApp extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // 3. Motion Button (background animations on / off)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => ThemeManager.toggleMotion(),
+                            child: Tooltip(
+                              message: motion ? 'Oprește animațiile din fundal' : 'Pornește animațiile din fundal',
+                              child: Container(
+                                width: isMobile ? 40 : null,
+                                height: isMobile ? 40 : null,
+                                padding: isMobile ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF1B242B) : Colors.white,
+                                  shape: isMobile ? BoxShape.circle : BoxShape.rectangle,
+                                  borderRadius: isMobile ? null : (isRetro ? BorderRadius.zero : BorderRadius.circular(8)),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                    width: isRetro ? 2.5 : 1.2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: isDark ? Colors.black87 : const Color(0xFF2C363F).withOpacity(isRetro ? 1.0 : 0.1),
+                                      offset: Offset(isMobile ? 2.5 : 3.5, isMobile ? 2.5 : 3.5),
+                                      blurRadius: isRetro ? 0 : 6,
+                                    ),
+                                  ],
+                                ),
+                                alignment: Alignment.center,
+                                child: isMobile
+                                    ? Icon(
+                                        motion ? Icons.motion_photos_on : Icons.motion_photos_paused,
+                                        color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                        size: 18,
+                                      )
+                                    : Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            motion ? Icons.motion_photos_on : Icons.motion_photos_paused,
+                                            color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            motion ? "MOTION: ON" : "MOTION: OFF",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 11,
+                                              color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
                             ),
                           ),
                         ),
