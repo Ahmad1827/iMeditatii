@@ -333,6 +333,164 @@
           "difficulty": "grea"
         }
       ]
+    },
+    "12": {
+      "1. Subiectul III.1 · Subprograme": [
+        {
+          "id": "61",
+          "title": "Cifrele impare ale unui număr",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "62",
+          "title": "Cel mai mare divizor prim",
+          "difficulty": "medie"
+        },
+        {
+          "id": "63",
+          "title": "Dublarea cifrelor impare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "64",
+          "title": "Între doi termeni Fibonacci",
+          "difficulty": "medie"
+        },
+        {
+          "id": "65",
+          "title": "Exponentul unui prim în n!",
+          "difficulty": "medie"
+        },
+        {
+          "id": "66",
+          "title": "Numere prime gemene",
+          "difficulty": "medie"
+        },
+        {
+          "id": "67",
+          "title": "Cifre în ordine crescătoare",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "68",
+          "title": "Elemente egale cu media vecinilor",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "69",
+          "title": "Suma divizorilor impari",
+          "difficulty": "medie"
+        },
+        {
+          "id": "70",
+          "title": "Înlocuirea unei cifre",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Subiectul III.2 · Șiruri și matrice": [
+        {
+          "id": "71",
+          "title": "Cuvinte care încep și se termină la fel",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "72",
+          "title": "Prima și ultima literă mare",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "73",
+          "title": "Maximul fiecărei coloane",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "74",
+          "title": "Matricea min(i, j)",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "75",
+          "title": "Pătrate concentrice",
+          "difficulty": "medie"
+        },
+        {
+          "id": "76",
+          "title": "Linia cu suma maximă, prima",
+          "difficulty": "medie"
+        },
+        {
+          "id": "77",
+          "title": "Cuvinte palindrom",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "78",
+          "title": "Numărul de apariții ale unui cuvânt",
+          "difficulty": "medie"
+        },
+        {
+          "id": "79",
+          "title": "Linii ordonate crescător",
+          "difficulty": "medie"
+        },
+        {
+          "id": "80",
+          "title": "Sub diagonala secundară",
+          "difficulty": "ușoară"
+        }
+      ],
+      "3. Subiectul III.3 · Fișiere și algoritmi eficienți": [
+        {
+          "id": "81",
+          "title": "Cele mai lungi secvențe pare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "82",
+          "title": "Numerele de două cifre care lipsesc",
+          "difficulty": "medie"
+        },
+        {
+          "id": "83",
+          "title": "Cele mai mari două numere de două cifre",
+          "difficulty": "medie"
+        },
+        {
+          "id": "84",
+          "title": "Valorile comune a două șiruri crescătoare",
+          "difficulty": "grea"
+        },
+        {
+          "id": "85",
+          "title": "Perechi cu suma divizibilă cu 10",
+          "difficulty": "grea"
+        },
+        {
+          "id": "86",
+          "title": "Cel mai lung platou",
+          "difficulty": "medie"
+        },
+        {
+          "id": "87",
+          "title": "Secvența de sumă maximă",
+          "difficulty": "grea"
+        },
+        {
+          "id": "88",
+          "title": "Cifrele care apar cel mai des",
+          "difficulty": "medie"
+        },
+        {
+          "id": "89",
+          "title": "Valorile care apar o singură dată",
+          "difficulty": "medie"
+        },
+        {
+          "id": "90",
+          "title": "Cea mai lungă secvență crescătoare",
+          "difficulty": "grea"
+        }
+      ]
     }
   },
   "Matematică": {
