@@ -63,15 +63,23 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     final vp = _viewport.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || vp == null) return;
     // Aim at the wooden top of the desk, so the zoom ends on wood and the
-    // papers appear on it.
-    final r = box.localToGlobal(Offset.zero, ancestor: vp) & box.size;
+    // papers appear on it. As drawn on screen: the catedra is smaller on a phone.
+    final r = MatrixUtils.transformRect(box.getTransformTo(vp), Offset.zero & box.size);
     setState(() {
       _from = f.studentId == null
-          ? Rect.fromLTWH(r.left + 8, r.top + 84, r.width - 16, 26)
+          ? Rect.fromLTWH(r.left + r.width * 8 / 250, r.top + r.height * 84 / 190, r.width * 234 / 250, r.height * 26 / 190)
           : Rect.fromLTWH(r.left + r.width * 0.1, r.top + r.height * 0.02, r.width * 0.8, r.height * 0.26);
       _focus = f;
     });
     _zoom.forward(from: 0);
+  }
+
+  /// Scrolls to the desk first if it's off screen (a phone, a big class), then zooms in.
+  Future<void> _goTo(_Focus f) async {
+    final ctx = _keys[f.key]?.currentContext;
+    if (ctx == null) return;
+    await Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 450), curve: Curves.easeInOut, alignment: 0.4);
+    if (mounted) _open(f);
   }
 
   Future<void> _close() async {
@@ -225,12 +233,13 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
                 _signs(classes, c),
                 SizedBox(height: narrow ? 18 : 28),
                 _front(classes, c, hw, narrow),
-                SizedBox(height: narrow ? 26 : 40),
-                _benches(c, hw, narrow, math.min(1080.0, width - (narrow ? 20 : 48)) - sheet * 2),
+                SizedBox(height: narrow ? 22 : 36),
+                // what to do here, before the benches: on a phone they run long
                 if (c != null) ...[
-                  SizedBox(height: narrow ? 14 : 22),
                   Center(child: _hint(c)),
+                  SizedBox(height: narrow ? 14 : 20),
                 ],
+                _benches(c, hw, narrow, math.min(1080.0, width - (narrow ? 20 : 48)) - sheet * 2),
               ],
             ),
           ),
@@ -310,11 +319,11 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
                   : 'cu ${c.teacherName}',
               style: chalk(narrow ? 20 : 23, color: inkColor.withOpacity(0.6), weight: FontWeight.w400),
             ),
-            if (widget.teacher && _newIn(c) > 0)
-              Text(
-                _newIn(c) == 1 ? '1 soluție nouă: apasă pe banca elevului' : '${_newIn(c)} soluții noi: apasă pe băncile elevilor',
-                style: chalk(narrow ? 20 : 22, color: Pb.primary, weight: FontWeight.w600),
-              ),
+            // straight to the desk, without looking for it
+            if (_shortcut(c, hw) case (final label, final focus)) ...[
+              const SizedBox(height: 14),
+              ChalkButton(text: label, icon: widget.teacher ? Icons.mark_email_unread_outlined : Icons.menu_book_outlined, filled: true, color: Pb.primary, onTap: () => _goTo(focus)),
+            ],
             if (widget.teacher) ...[
               const SizedBox(height: 16),
               Wrap(
@@ -345,12 +354,33 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
       onTap: widget.teacher ? () => _open(const _Focus('catedra', null)) : () => context.go('/profesor/${c.teacherId}'),
     );
     if (narrow) {
-      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [board, const SizedBox(height: 18), Center(child: catedra)]);
+      // smaller on a phone, so the benches aren't far down
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [board, const SizedBox(height: 14), Center(child: SizedBox(width: 190, height: 190 * 190 / 250, child: FittedBox(child: catedra)))],
+      );
     }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [Expanded(child: board), const SizedBox(width: 36), catedra],
     );
+  }
+
+  /// The button on the board that opens a desk: the student's own, or for the
+  /// teacher the first student who sent something new. Null when there's none.
+  (String, _Focus)? _shortcut(SchoolClass c, List<Homework> hw) {
+    final (seats, _) = _seating(c);
+    if (widget.teacher) {
+      final n = _newIn(c);
+      final i = seats.indexWhere((m) => m != null && (_sentNow[m.id]?.values.any((s) => s.isNewFor(widget.uid)) ?? false));
+      if (n == 0 || i < 0) return null;
+      final who = seats[i]!.name.split(' ').first;
+      return (n == 1 ? 'Soluție nouă de la $who' : '$n soluții noi · prima de la $who', _Focus('bench_${i ~/ 2}', seats[i]!.id));
+    }
+    final i = seats.indexWhere((m) => m?.id == widget.uid);
+    if (i < 0) return null;
+    final todo = _homeworkOf(c, hw, widget.uid).where((h) => !h.isDone(widget.uid)).length;
+    return (todo == 0 ? 'Banca ta' : 'Banca ta · ${todo == 1 ? '1 temă' : '$todo teme'}', _Focus('bench_${i ~/ 2}', widget.uid));
   }
 
   /// Who sits where. A student who picked a chair sits there; the others take
@@ -1041,6 +1071,57 @@ class _Notebook extends StatelessWidget {
     final ok = !teacher && solved.contains(p.progressKey);
     final c = ckSubjectColor(p.subject);
     final sol = sent?[p.progressKey];
+    final subject = '${p.subject}${p.grade.isEmpty ? '' : ', a ${p.grade}-a'}';
+    final titleStyle = TextStyle(
+      fontSize: isMobile ? 17 : 22,
+      fontWeight: FontWeight.w600,
+      color: ok ? _ink.withOpacity(0.45) : _ink,
+      decoration: ok ? TextDecoration.lineThrough : null,
+      decorationColor: hwRed,
+      decorationThickness: 2.2,
+    );
+
+    // where it stands: solved, new, what to tap
+    Widget status(bool h) {
+      final link = h ? c : Pb.primary;
+      final small = isMobile ? 13.5 : 15.5;
+      Widget go(String text) => Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(text, style: TextStyle(fontSize: isMobile ? 14 : 17, fontWeight: FontWeight.w700, color: link)),
+            if (!isMobile) Icon(Icons.chevron_right, size: 22, color: link),
+          ]);
+      final solvedMark = [
+        Icon(Icons.check_circle, size: isMobile ? 16 : 20, color: hwGreen),
+        const SizedBox(width: 5),
+        Text('Rezolvată', style: TextStyle(fontSize: small, fontWeight: FontWeight.w700, color: hwGreen)),
+      ];
+      if (sent != null) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (ok) ...[...solvedMark, const SizedBox(width: 12)],
+            if (sol != null && sol.isNewFor(viewer)) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(99)),
+                child: const Text('nou', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+              ),
+              const SizedBox(width: 10),
+            ],
+            if (sol != null)
+              go(ok || sol.passed != null ? 'Vezi soluția' : 'Vezi încercarea')
+            else if (!ok)
+              Text('Netrimisă', style: TextStyle(fontSize: small, fontStyle: FontStyle.italic, color: _ink.withOpacity(0.45))),
+          ],
+        );
+      }
+      if (ok) return Row(mainAxisSize: MainAxisSize.min, children: solvedMark);
+      return go(teacher ? 'Deschide' : 'Rezolvă');
+    }
+
+    final number = SizedBox(
+      width: left,
+      child: Text('$n.', textAlign: TextAlign.center, style: TextStyle(fontSize: isMobile ? 17 : 20, fontWeight: FontWeight.w700, color: _ink.withOpacity(0.55))),
+    );
     return Semantics(
       button: true,
       label: p.title,
@@ -1049,84 +1130,46 @@ class _Notebook extends StatelessWidget {
         builder: (h) => Container(
           height: line,
           color: h ? c.withOpacity(0.06) : Colors.transparent,
-          child: Row(
-            children: [
-              SizedBox(
-                width: left,
-                child: Text('$n.', textAlign: TextAlign.center, style: TextStyle(fontSize: isMobile ? 17 : 20, fontWeight: FontWeight.w700, color: _ink.withOpacity(0.55))),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text.rich(
-                  TextSpan(children: [
-                    TextSpan(
-                      text: p.title.isEmpty ? p.id : p.title,
-                      style: TextStyle(
-                        fontSize: isMobile ? 18 : 22,
-                        fontWeight: FontWeight.w600,
-                        color: ok ? _ink.withOpacity(0.45) : _ink,
-                        decoration: ok ? TextDecoration.lineThrough : null,
-                        decorationColor: hwRed,
-                        decorationThickness: 2.2,
+          child: isMobile
+              // a phone: the title gets the whole line, where it stands goes under it
+              ? Row(
+                  children: [
+                    number,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(p.title.isEmpty ? p.id : p.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: titleStyle),
+                          const SizedBox(height: 3),
+                          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: status(h)),
+                        ],
                       ),
                     ),
-                    if (!isMobile)
-                      TextSpan(
-                        text: '   ${p.subject}${p.grade.isEmpty ? '' : ', a ${p.grade}-a'}',
-                        style: TextStyle(fontSize: 15, color: _ink.withOpacity(0.45)),
-                      ),
-                  ]),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 8),
-              if (sent != null)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (ok) ...[
-                      const Icon(Icons.check_circle, size: 20, color: hwGreen),
-                      const SizedBox(width: 5),
-                      Text('Rezolvată', style: TextStyle(fontSize: isMobile ? 14 : 15.5, fontWeight: FontWeight.w700, color: hwGreen)),
-                      const SizedBox(width: 12),
-                    ],
-                    if (sol != null && sol.isNewFor(viewer)) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(99)),
-                        child: const Text('nou', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                    if (sol != null) ...[
-                      Text(isMobile ? 'Vezi' : (ok || sol.passed != null ? 'Vezi soluția' : 'Vezi încercarea'),
-                          style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w700, color: h ? c : Pb.primary)),
-                      Icon(Icons.chevron_right, size: 22, color: h ? c : Pb.primary),
-                    ] else if (!ok)
-                      Text('Netrimisă', style: TextStyle(fontSize: isMobile ? 14 : 15.5, fontStyle: FontStyle.italic, color: _ink.withOpacity(0.45))),
+                    Icon(Icons.chevron_right, size: 22, color: _ink.withOpacity(0.35)),
+                    const SizedBox(width: 8),
                   ],
                 )
-              else if (ok)
-                const Row(
-                  mainAxisSize: MainAxisSize.min,
+              : Row(
                   children: [
-                    Icon(Icons.check_circle, size: 22, color: hwGreen),
-                    SizedBox(width: 5),
-                    Text('Rezolvată', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: hwGreen)),
-                  ],
-                )
-              else
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(teacher ? 'Deschide' : 'Rezolvă', style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w800, color: h ? c : Pb.primary)),
-                    Icon(Icons.chevron_right, size: 22, color: h ? c : Pb.primary),
+                    number,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(children: [
+                          TextSpan(text: p.title.isEmpty ? p.id : p.title, style: titleStyle),
+                          TextSpan(text: '   $subject', style: TextStyle(fontSize: 15, color: _ink.withOpacity(0.45))),
+                        ]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    status(h),
+                    const SizedBox(width: 14),
                   ],
                 ),
-              const SizedBox(width: 14),
-            ],
-          ),
         ),
       ),
     );

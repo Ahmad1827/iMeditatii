@@ -212,7 +212,7 @@ void main() {
       await Classes.saveSolution(uid: 's2', key: 'Informatică_9_1', text: 'int main() { return 1; }', lang: 'cpp', passed: true);
       await Classes.saveSolution(uid: 's2', key: 'Informatică_9_1', text: 'int main() { return 2; }', lang: 'cpp', passed: false);
       await open(tester, ClassBody(uid: 't1', code: code));
-      expect(find.text('1 soluție nouă: apasă pe banca elevului'), findsOneWidget); // on the board
+      expect(find.text('Soluție nouă de la Ioana'), findsOneWidget); // on the board, opens her desk
       expect(find.text('Mihai'), findsOneWidget); // sitting in a bench
       expect(find.text('Ioana'), findsOneWidget);
       expect(find.text('1/1'), findsOneWidget); // the paper on Ioana's desk
@@ -226,12 +226,12 @@ void main() {
       expect(find.text('Deschide'), findsOneWidget);
       expect(find.text('Linkul clasei'), findsNothing);
 
-      // Ioana's desk: her notebook, the exercise crossed off.
+      // Ioana's desk, straight from the board: her notebook, the exercise crossed off.
       await tester.tap(find.text('Înapoi în clasă'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.bySemanticsLabel('Banca lui Ioana Radu'));
-      await tester.tap(find.bySemanticsLabel('Banca lui Ioana Radu'));
+      await tester.tap(find.text('Soluție nouă de la Ioana'));
       await tester.pumpAndSettle();
+      expect(find.text('Banca lui Ioana Radu'), findsOneWidget);
       expect(find.text('Exerciții'), findsOneWidget);
       expect(find.text('1 din 1 rezolvate'), findsOneWidget);
       expect(find.text('Rezolvată'), findsOneWidget);
