@@ -31,6 +31,8 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
   late final Stream<List<SchoolClass>> _classes = widget.teacher ? Classes.taughtBy(widget.uid) : Classes.joinedBy(widget.uid);
   late final Stream<List<Homework>> _hw = widget.teacher ? Classes.assignedBy(widget.uid) : Classes.forStudent(widget.uid);
   late final Stream<Set<String>> _solved = Classes.solvedBy(widget.uid);
+  late final Stream<Map<String, Map<String, Solution>>> _sent = widget.teacher ? Classes.solutionsFor(widget.uid) : const Stream.empty();
+  Map<String, Map<String, Solution>> _sentNow = const {}; // the teacher's: student id -> problem key -> what they sent
   late final Future<String> _name =
       (widget.teacher ? Workspace.teacherName(widget.uid) : Classes.userName(widget.uid)).catchError((_) => widget.teacher ? 'Profesor' : 'Elev');
 
@@ -136,61 +138,70 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
         stream: _hw,
         builder: (context, hs) => StreamBuilder<Set<String>>(
           stream: widget.teacher ? const Stream.empty() : _solved,
-          builder: (context, ss) {
-            if (!cs.hasData && !cs.hasError) return _spinner();
-            final classes = cs.data ?? const <SchoolClass>[];
-            final c = classes.where((x) => x.id == _selected).firstOrNull ?? classes.firstOrNull;
-            final hw = hs.data ?? const <Homework>[];
-            final solved = ss.data ?? const <String>{};
-            return LayoutBuilder(
-              builder: (context, box) => Stack(
-                key: _viewport,
-                children: [
-                  Positioned.fill(
-                    child: AnimatedBuilder(
-                      animation: _t,
-                      child: _room(classes, c, hw, box.maxWidth),
-                      builder: (context, child) {
-                        final r = _from;
-                        final t = _t.value;
-                        if (r == null || t == 0) return child!;
-                        final target = math.max(box.maxWidth / r.width, box.maxHeight / r.height);
-                        final s = 1 + (target - 1) * t;
-                        final c0 = r.center;
-                        final at = Offset.lerp(c0, Offset(box.maxWidth / 2, box.maxHeight / 2), t)!;
-                        return IgnorePointer(
-                          child: Opacity(
-                            opacity: (1 - (t - 0.9) / 0.1).clamp(0.0, 1.0),
-                            child: Transform(
-                              transform: Matrix4.identity()
-                                ..translate(at.dx - c0.dx * s, at.dy - c0.dy * s)
-                                ..scale(s),
-                              child: child,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  if (_focus != null && c != null)
+          builder: (context, ss) => StreamBuilder<Map<String, Map<String, Solution>>>(
+            stream: _sent,
+            builder: (context, ns) {
+              _sentNow = ns.data ?? const {};
+              if (!cs.hasData && !cs.hasError) return _spinner();
+              final classes = cs.data ?? const <SchoolClass>[];
+              final c = classes.where((x) => x.id == _selected).firstOrNull ?? classes.firstOrNull;
+              final hw = hs.data ?? const <Homework>[];
+              final solved = ss.data ?? const <String>{};
+              return LayoutBuilder(
+                builder: (context, box) => Stack(
+                  key: _viewport,
+                  children: [
                     Positioned.fill(
                       child: AnimatedBuilder(
                         animation: _t,
-                        builder: (context, child) => IgnorePointer(
-                          ignoring: _t.value < 0.95,
-                          child: Opacity(opacity: ((_t.value - 0.72) / 0.28).clamp(0.0, 1.0), child: child),
-                        ),
-                        child: _desk(_focus!, classes, c, hw, solved),
+                        child: _room(classes, c, hw, box.maxWidth),
+                        builder: (context, child) {
+                          final r = _from;
+                          final t = _t.value;
+                          if (r == null || t == 0) return child!;
+                          final target = math.max(box.maxWidth / r.width, box.maxHeight / r.height);
+                          final s = 1 + (target - 1) * t;
+                          final c0 = r.center;
+                          final at = Offset.lerp(c0, Offset(box.maxWidth / 2, box.maxHeight / 2), t)!;
+                          return IgnorePointer(
+                            child: Opacity(
+                              opacity: (1 - (t - 0.9) / 0.1).clamp(0.0, 1.0),
+                              child: Transform(
+                                transform: Matrix4.identity()
+                                  ..translate(at.dx - c0.dx * s, at.dy - c0.dy * s)
+                                  ..scale(s),
+                                child: child,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                ],
-              ),
-            );
-          },
+                    if (_focus != null && c != null)
+                      Positioned.fill(
+                        child: AnimatedBuilder(
+                          animation: _t,
+                          builder: (context, child) => IgnorePointer(
+                            ignoring: _t.value < 0.95,
+                            child: Opacity(opacity: ((_t.value - 0.72) / 0.28).clamp(0.0, 1.0), child: child),
+                          ),
+                          child: _desk(_focus!, classes, c, hw, solved),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
   }
+
+  /// How many solutions the teacher's students in [c] sent that they haven't opened yet.
+  int _newIn(SchoolClass c) => [
+        for (final m in c.members) ...?_sentNow[m.id]?.values.where((s) => s.isNewFor(widget.uid)),
+      ].length;
 
   // ---------------------------------------------------------------- the room
   Widget _room(List<SchoolClass> classes, SchoolClass? c, List<Homework> hw, double width) {
@@ -299,6 +310,11 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
                   : 'cu ${c.teacherName}',
               style: chalk(narrow ? 20 : 23, color: inkColor.withOpacity(0.6), weight: FontWeight.w400),
             ),
+            if (widget.teacher && _newIn(c) > 0)
+              Text(
+                _newIn(c) == 1 ? '1 soluție nouă: apasă pe banca elevului' : '${_newIn(c)} soluții noi: apasă pe băncile elevilor',
+                style: chalk(narrow ? 20 : 22, color: Pb.primary, weight: FontWeight.w600),
+              ),
             if (widget.teacher) ...[
               const SizedBox(height: 16),
               Wrap(
@@ -392,6 +408,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     return _Side(
       name: m.name,
       me: me,
+      fresh: widget.teacher && (_sentNow[m.id]?.values.any((s) => s.isNewFor(widget.uid)) ?? false),
       paper: widget.teacher ? (mine.isEmpty ? null : '${mine.length - todo}/${mine.length}') : (me && mine.isNotEmpty ? (todo == 0 ? '✓' : '$todo') : null),
       paperLate: widget.teacher ? mine.any((h) => !h.isDone(m.id) && h.overdue) : (me && mine.any((h) => !h.isDone(m.id) && h.overdue)),
       onTap: widget.teacher || me
@@ -433,7 +450,7 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
     } else if (sid == widget.uid) {
       papers = _myPapers(_homeworkOf(c, hw, sid), solved);
     } else {
-      papers = [_StudentDesk(c: c, sid: sid, name: member?.name ?? 'Elev', homework: _homeworkOf(c, hw, sid))];
+      papers = [_StudentDesk(sid: sid, teacherId: widget.uid, homework: _homeworkOf(c, hw, sid), sent: _sentNow[sid] ?? const {})];
     }
 
     return CustomPaint(
@@ -523,8 +540,9 @@ class _Side {
   final bool me;
   final String? paper; // text on the paper on the desk
   final bool paperLate;
+  final bool fresh; // sent something the teacher hasn't opened yet
   final VoidCallback? onTap;
-  const _Side({this.empty = false, this.pickable = false, this.name = '', this.me = false, this.paper, this.paperLate = false, this.onTap});
+  const _Side({this.empty = false, this.pickable = false, this.name = '', this.me = false, this.paper, this.paperLate = false, this.fresh = false, this.onTap});
 
   String get look => '$empty$pickable$me$name';
 }
@@ -577,6 +595,17 @@ class _Bench extends StatelessWidget {
               child: Text(s.paper!,
                   style: TextStyle(fontSize: math.max(10, w * 0.05), fontWeight: FontWeight.w600, color: s.paperLate ? hwRed : inkColor)),
             ),
+          ),
+        ),
+      // something new to read on this desk
+      if (s.fresh)
+        Positioned(
+          left: cx + w * 0.06,
+          top: h * 0.01,
+          child: Container(
+            width: math.max(9, w * 0.045),
+            height: math.max(9, w * 0.045),
+            decoration: BoxDecoration(color: Pb.primary, shape: BoxShape.circle, border: Border.all(color: paperColor, width: 1.5)),
           ),
         ),
       // the name, written under the chair
@@ -859,11 +888,11 @@ class _Underline extends CustomPainter {
 /// A student's desk as the teacher sees it: the notebook with what the
 /// student solved, and for each exercise the code or answer they sent.
 class _StudentDesk extends StatefulWidget {
-  final SchoolClass c;
   final String sid;
-  final String name;
+  final String teacherId;
   final List<Homework> homework;
-  const _StudentDesk({required this.c, required this.sid, required this.name, required this.homework});
+  final Map<String, Solution> sent;
+  const _StudentDesk({required this.sid, required this.teacherId, required this.homework, required this.sent});
 
   @override
   State<_StudentDesk> createState() => _StudentDeskState();
@@ -871,16 +900,18 @@ class _StudentDesk extends StatefulWidget {
 
 class _StudentDeskState extends State<_StudentDesk> {
   late final Stream<Set<String>> _solved = Classes.solvedBy(widget.sid);
-  late final Stream<Map<String, Solution>> _sent = Classes.solutionsOf(widget.sid);
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Set<String>>(
         stream: _solved,
-        builder: (context, s) => StreamBuilder<Map<String, Solution>>(
-          stream: _sent,
-          builder: (context, sent) => Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: _Notebook(problems: _problemsOf(widget.homework), solved: s.data ?? const <String>{}, sent: sent.data ?? const {}),
+        builder: (context, s) => Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: _Notebook(
+            problems: _problemsOf(widget.homework),
+            solved: s.data ?? const <String>{},
+            sent: widget.sent,
+            student: widget.sid,
+            viewer: widget.teacherId,
           ),
         ),
       );
@@ -903,7 +934,9 @@ class _Notebook extends StatelessWidget {
   final Set<String> solved;
   final bool teacher; // the teacher's own list: nothing to cross off
   final Map<String, Solution>? sent; // a student's notebook as the teacher reads it: what they sent
-  const _Notebook({required this.problems, this.solved = const {}, this.teacher = false, this.sent});
+  final String student; // whose notebook, with [sent]
+  final String viewer; // the teacher reading it, with [sent]
+  const _Notebook({required this.problems, this.solved = const {}, this.teacher = false, this.sent, this.student = '', this.viewer = ''});
   static Color get _ink => inkColor;
 
   @override
@@ -1012,7 +1045,7 @@ class _Notebook extends StatelessWidget {
       button: true,
       label: p.title,
       child: CkHover(
-        onTap: () => sol != null ? _showSolution(context, p, sol) : GoRouter.of(context).push(p.path),
+        onTap: () => sol != null ? _showSolution(context, p, sol, student: student, viewer: viewer) : GoRouter.of(context).push(p.path),
         builder: (h) => Container(
           height: line,
           color: h ? c.withOpacity(0.06) : Colors.transparent,
@@ -1058,6 +1091,14 @@ class _Notebook extends StatelessWidget {
                       Text('Rezolvată', style: TextStyle(fontSize: isMobile ? 14 : 15.5, fontWeight: FontWeight.w700, color: hwGreen)),
                       const SizedBox(width: 12),
                     ],
+                    if (sol != null && sol.isNewFor(viewer)) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(color: Pb.primary, borderRadius: BorderRadius.circular(99)),
+                        child: const Text('nou', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
                     if (sol != null) ...[
                       Text(isMobile ? 'Vezi' : (ok || sol.passed != null ? 'Vezi soluția' : 'Vezi încercarea'),
                           style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.w700, color: h ? c : Pb.primary)),
@@ -1094,8 +1135,10 @@ class _Notebook extends StatelessWidget {
 
 /// The code or answer a student sent on [p]: the last version that passed,
 /// and the last attempt too if it came after and doesn't pass.
-void _showSolution(BuildContext context, HwProblem p, Solution s) {
+void _showSolution(BuildContext context, HwProblem p, Solution s, {required String student, required String viewer}) {
+  if (s.isNewFor(viewer)) Classes.markSeen(student, p.progressKey, viewer).catchError((_) {});
   String when(DateTime? d) => d == null ? '' : ' · ${d.day}.${d.month}.${d.year}, ${d.hour}:${d.minute.toString().padLeft(2, '0')}';
+  final late = s.lateFor(viewer) ? ' · după termen' : '';
   Widget part(String label, Color color, String text, String? lang) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1114,9 +1157,9 @@ void _showSolution(BuildContext context, HwProblem p, Solution s) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (s.passed != null) part('A trecut toate testele${when(s.passedAt)}', hwGreen, s.passed!, s.passedLang),
+            if (s.passed != null) part('A trecut toate testele${when(s.passedAt)}$late', hwGreen, s.passed!, s.passedLang),
             if (failedAfter) const SizedBox(height: 16),
-            if (s.passed == null || failedAfter) part('${failedAfter ? 'Ultima încercare, ' : ''}nu trece încă testele${when(s.lastAt)}', hwRed, s.last, s.lastLang),
+            if (s.passed == null || failedAfter) part('${failedAfter ? 'Ultima încercare, ' : ''}nu trece încă testele${when(s.lastAt)}${s.passed == null ? late : ''}', hwRed, s.last, s.lastLang),
           ],
         ),
       ),

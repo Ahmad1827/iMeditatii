@@ -367,22 +367,41 @@ class Classes {
   static String solutionId(String uid, String key) => '${uid}__${key.replaceAll('/', '_')}';
 
   /// Saves what the student sent on a problem page: code (C++) or an answer
-  /// ([lang] null). Saved on every check, passed or not.
-  static Future<void> saveSolution({required String uid, required String key, required String text, String? lang, required bool passed}) =>
-      solutions.doc(solutionId(uid, key)).set({
-        'uid': uid,
-        'key': key,
-        'last': text,
-        'lastLang': lang,
-        'lastPassed': passed,
-        'lastAt': FieldValue.serverTimestamp(),
-        if (passed) ...{'passed': text, 'passedLang': lang, 'passedAt': FieldValue.serverTimestamp()},
-      }, SetOptions(merge: true));
+  /// ([lang] null). Saved on every check, passed or not. It goes to the
+  /// teachers whose homework has this problem: their ids in `teachers` (only
+  /// they and the student can read it), each homework's deadline in `hw`.
+  static Future<void> saveSolution({required String uid, required String key, required String text, String? lang, required bool passed}) async {
+    final given = [
+      for (final h in await forStudent(uid).first)
+        if (h.problems.any((p) => p.progressKey == key)) h,
+    ];
+    await solutions.doc(solutionId(uid, key)).set({
+      'uid': uid,
+      'key': key,
+      'last': text,
+      'lastLang': lang,
+      'lastPassed': passed,
+      'lastAt': FieldValue.serverTimestamp(),
+      if (passed) ...{'passed': text, 'passedLang': lang, 'passedAt': FieldValue.serverTimestamp()},
+      if (given.isNotEmpty) 'teachers': FieldValue.arrayUnion([for (final h in given) h.teacherId]),
+      if (given.isNotEmpty) 'hw': {for (final h in given) h.id: {'teacher': h.teacherId, 'due': h.dueAt == null ? null : Timestamp.fromDate(h.dueAt!)}},
+    }, SetOptions(merge: true));
+  }
 
-  /// What a student sent, by [HwProblem.progressKey].
-  static Stream<Map<String, Solution>> solutionsOf(String uid) => solutions.where('uid', isEqualTo: uid).snapshots().map(
-        (q) => {for (final d in q.docs) '${d.data()['key'] ?? ''}': Solution.fromJson(d.data())},
-      );
+  /// What students sent for a teacher's homework: student id -> problem key -> solution.
+  static Stream<Map<String, Map<String, Solution>>> solutionsFor(String teacherId) =>
+      solutions.where('teachers', arrayContains: teacherId).snapshots().map((q) {
+        final out = <String, Map<String, Solution>>{};
+        for (final d in q.docs) {
+          final s = Solution.fromJson(d.data());
+          (out[s.uid] ??= {})[s.key] = s;
+        }
+        return out;
+      });
+
+  /// The teacher opened what [uid] sent on [key]: it's no longer new for them.
+  static Future<void> markSeen(String uid, String key, String teacherId) =>
+      solutions.doc(solutionId(uid, key)).update({'seenBy.$teacherId': FieldValue.serverTimestamp()});
 
   static Future<void> setHidden(String id, String uid, bool hidden) =>
       homework.doc(id).update({'hidden.$uid': hidden ? true : FieldValue.delete()});
@@ -552,6 +571,8 @@ class _Merge {
 
 /// What a student sent on one problem.
 class Solution {
+  final String uid;
+  final String key;
   final String last;
   final String? lastLang;
   final bool lastPassed;
@@ -559,15 +580,57 @@ class Solution {
   final String? passed; // the last version that passed, if any
   final String? passedLang;
   final DateTime? passedAt;
-  const Solution({required this.last, this.lastLang, this.lastPassed = false, this.lastAt, this.passed, this.passedLang, this.passedAt});
+  final Map<String, DateTime?> seenBy; // teacher id -> when they last opened it
+  final Map<String, DateTime?> due; // teacher id -> the latest deadline of their homework with this problem
+  const Solution({
+    this.uid = '',
+    this.key = '',
+    required this.last,
+    this.lastLang,
+    this.lastPassed = false,
+    this.lastAt,
+    this.passed,
+    this.passedLang,
+    this.passedAt,
+    this.seenBy = const {},
+    this.due = const {},
+  });
 
-  static Solution fromJson(Map<String, dynamic> j) => Solution(
-        last: '${j['last'] ?? ''}',
-        lastLang: j['lastLang'] as String?,
-        lastPassed: j['lastPassed'] == true,
-        lastAt: (j['lastAt'] as Timestamp?)?.toDate(),
-        passed: j['passed'] as String?,
-        passedLang: j['passedLang'] as String?,
-        passedAt: (j['passedAt'] as Timestamp?)?.toDate(),
-      );
+  /// Sent since [teacherId] last opened it.
+  bool isNewFor(String teacherId) {
+    final seen = seenBy[teacherId];
+    return lastAt != null && (seen == null || lastAt!.isAfter(seen));
+  }
+
+  /// When it was solved (or last tried, if never) came after [teacherId]'s deadline.
+  bool lateFor(String teacherId) {
+    final d = due[teacherId];
+    final at = passedAt ?? lastAt;
+    return d != null && at != null && at.isAfter(d);
+  }
+
+  static Solution fromJson(Map<String, dynamic> j) {
+    DateTime? time(dynamic v) => v is Timestamp ? v.toDate() : null;
+    final due = <String, DateTime?>{};
+    for (final h in ((j['hw'] as Map?) ?? const {}).values) {
+      if (h is! Map) continue;
+      final t = '${h['teacher'] ?? ''}';
+      final d = time(h['due']);
+      // the latest deadline wins; homework without one means it's never late
+      if (!due.containsKey(t) || (due[t] != null && (d == null || d.isAfter(due[t]!)))) due[t] = d;
+    }
+    return Solution(
+      uid: '${j['uid'] ?? ''}',
+      key: '${j['key'] ?? ''}',
+      last: '${j['last'] ?? ''}',
+      lastLang: j['lastLang'] as String?,
+      lastPassed: j['lastPassed'] == true,
+      lastAt: time(j['lastAt']),
+      passed: j['passed'] as String?,
+      passedLang: j['passedLang'] as String?,
+      passedAt: time(j['passedAt']),
+      seenBy: {for (final e in ((j['seenBy'] as Map?) ?? const {}).entries) '${e.key}': time(e.value)},
+      due: due,
+    );
+  }
 }

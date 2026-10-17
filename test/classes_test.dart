@@ -79,6 +79,32 @@ void main() {
       expect(await Classes.forStudent('s3').first, isEmpty);
     });
 
+    test('a solution goes to the teachers whose homework has the problem, and knows if it was late', () async {
+      const p1 = HwProblem(id: '1', title: 'Suma', subject: 'Informatică', grade: '9');
+      const p2 = HwProblem(id: '2', title: 'Produs', subject: 'Informatică', grade: '9');
+      final code = await Classes.create(teacherId: 't1', teacherName: 'Ana Pop', name: '9B Mate');
+      await Classes.join(code, 's1', 'Mihai Ionescu');
+      final cls = SchoolClass.fromSnap(await Classes.classes.doc(code).get());
+      await Classes.assign(teacherId: 't1', teacherName: 'Ana Pop', title: 'Ieri', toClasses: [cls], problems: const [p1], dueAt: DateTime.now().subtract(const Duration(days: 1)));
+      await Classes.assign(teacherId: 't2', teacherName: 'Dan Ion', title: 'Fără termen', toStudents: [const HwStudent('s1', 'Mihai Ionescu')], problems: const [p1]);
+
+      await Classes.saveSolution(uid: 's1', key: p1.progressKey, text: 'int main() {}', lang: 'cpp', passed: true);
+      await Classes.saveSolution(uid: 's1', key: p2.progressKey, text: 'nimic', lang: 'cpp', passed: false); // in no homework
+
+      final t1 = (await Classes.solutionsFor('t1').first)['s1']!;
+      final t2 = (await Classes.solutionsFor('t2').first)['s1']!;
+      expect(t1.keys, [p1.progressKey]);
+      expect(t2.keys, [p1.progressKey]);
+      expect(await Classes.solutionsFor('t3').first, isEmpty);
+      expect(t1[p1.progressKey]!.lateFor('t1'), isTrue); // after yesterday's deadline
+      expect(t2[p1.progressKey]!.lateFor('t2'), isFalse); // t2 gave no deadline
+
+      expect(t1[p1.progressKey]!.isNewFor('t1'), isTrue);
+      await Classes.markSeen('s1', p1.progressKey, 't1');
+      expect((await Classes.solutionsFor('t1').first)['s1']![p1.progressKey]!.isNewFor('t1'), isFalse);
+      expect((await Classes.solutionsFor('t2').first)['s1']![p1.progressKey]!.isNewFor('t2'), isTrue); // still new for t2
+    });
+
     test('the Atelier page is copied for the student the first time they open it', () async {
       final docId = await Workspace.create(ownerId: 't1', type: WsDoc.code, title: 'main.cpp', content: 'int main(){}');
       final id = await Classes.assign(
@@ -186,6 +212,7 @@ void main() {
       await Classes.saveSolution(uid: 's2', key: 'Informatică_9_1', text: 'int main() { return 1; }', lang: 'cpp', passed: true);
       await Classes.saveSolution(uid: 's2', key: 'Informatică_9_1', text: 'int main() { return 2; }', lang: 'cpp', passed: false);
       await open(tester, ClassBody(uid: 't1', code: code));
+      expect(find.text('1 soluție nouă: apasă pe banca elevului'), findsOneWidget); // on the board
       expect(find.text('Mihai'), findsOneWidget); // sitting in a bench
       expect(find.text('Ioana'), findsOneWidget);
       expect(find.text('1/1'), findsOneWidget); // the paper on Ioana's desk
@@ -210,6 +237,7 @@ void main() {
       expect(find.text('Rezolvată'), findsOneWidget);
 
       // What she sent: the version that passed, and the later one that doesn't.
+      expect(find.text('nou'), findsOneWidget);
       await tester.tap(find.text('Vezi soluția'));
       await tester.pumpAndSettle();
       expect(find.textContaining('A trecut toate testele'), findsOneWidget);
@@ -218,6 +246,7 @@ void main() {
       expect(find.textContaining('return 2;'), findsOneWidget);
       await tester.tap(find.text('Închide'));
       await tester.pumpAndSettle();
+      expect(find.text('nou'), findsNothing); // opened: not new any more
     });
 
     testWidgets('the dock: shows homework, hides it, brings it back, done makes it go away', (tester) async {
