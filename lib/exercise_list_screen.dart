@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'classes_models.dart' show Classes, Solution;
 import 'custom_navbar.dart' show CustomNavbar;
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'sticky_footer.dart';
@@ -49,6 +52,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   final ScrollController _cScroll = ScrollController();
   final TextEditingController _cSearch = TextEditingController();
   Set<String> _solved = {};
+  Map<String, Solution> _sent = {}; // maths sent to be checked, by progress key: waiting or turned down
+  StreamSubscription? _sentSub;
   String _cDiff = 'toate';
   bool _cUnsolved = false;
   bool _cHidden = false;
@@ -62,6 +67,12 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     super.initState();
     selectedGrade = widget.grade ?? "9";
     _loadAllExercises();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      _sentSub = Classes.mySolutions(uid).listen((m) {
+        if (mounted) setState(() => _sent = {for (final e in m.entries) if (e.value.isSheet) e.key: e.value});
+      }, onError: (_) {});
+    }
     if (ExerciseListScreen.subjects.any((m) => m.$2 == widget.subject)) {
       SharedPreferences.getInstance().then((p) => p.setString(ExerciseListScreen.lastSubjectKey, widget.subject));
     }
@@ -74,6 +85,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
   @override
   void dispose() {
+    _sentSub?.cancel();
     _scrollController.dispose();
     _cScroll.dispose();
     _cSearch.dispose();
@@ -275,7 +287,16 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     return 'alta';
   }
 
-  bool _isSolved(Map<String, dynamic> ex) => _solved.contains("${widget.subject}_${selectedGrade}_${ex['id']}");
+  bool _isSolved(Map<String, dynamic> ex) {
+    final key = "${widget.subject}_${selectedGrade}_${ex['id']}";
+    return _sent[key]?.approved ?? _solved.contains(key);
+  }
+
+  /// A maths solution sent and not accepted (yet): waiting, or turned down.
+  Solution? _review(Map<String, dynamic> ex) {
+    final s = _sent["${widget.subject}_${selectedGrade}_${ex['id']}"];
+    return s != null && (s.pending || s.rejected) ? s : null;
+  }
 
   BoxDecoration _cDeco({double r = 16}) => BoxDecoration(
         color: Pb.surface,
@@ -821,6 +842,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
   Widget _cRow(Map<String, dynamic> e, bool isMobile) {
     final solved = _isSolved(e);
+    final review = solved ? null : _review(e);
     final diff = '${e['difficulty'] ?? ''}';
     final dc = _diffColor(diff);
     final cat = '${e['category'] ?? ''}';
@@ -842,11 +864,20 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           children: [
             SizedBox(
               width: 36,
-              child: Icon(
-                solved ? Icons.check_circle : Icons.radio_button_unchecked,
-                size: 18,
-                color: solved ? _cGreen : Pb.border,
-              ),
+              child: review != null
+                  ? Tooltip(
+                      message: review.rejected ? 'Respinsă: corectează și trimite din nou' : 'La verificare',
+                      child: Icon(
+                        review.rejected ? Icons.cancel : Icons.hourglass_top_rounded,
+                        size: 18,
+                        color: review.rejected ? Pb.danger : const Color(0xFFB45309),
+                      ),
+                    )
+                  : Icon(
+                      solved ? Icons.check_circle : Icons.radio_button_unchecked,
+                      size: 18,
+                      color: solved ? _cGreen : Pb.border,
+                    ),
             ),
             if (!isMobile) SizedBox(width: 52, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
             Expanded(

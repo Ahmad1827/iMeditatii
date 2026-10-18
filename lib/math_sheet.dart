@@ -468,19 +468,66 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
     );
   }
 
-  Widget _status(Solution s) {
-    final by = s.reviewedName.isEmpty ? '' : ' de ${s.reviewedName}';
-    if (s.approved) {
-      return PbAlert(type: PbAlertType.success, icon: Icons.check_circle_outline, text: 'Acceptată$by. Problema e rezolvată.');
-    }
-    if (s.rejected) {
-      return PbAlert(
-        type: PbAlertType.danger,
-        icon: Icons.edit_note,
-        text: 'Nu e acceptată încă$by${s.reviewNote.isEmpty ? '' : ': ${_quoted(s.reviewNote)}'}. Corectează pe foaie și trimite din nou.',
-      );
-    }
-    return PbAlert(type: PbAlertType.info, icon: Icons.hourglass_top_rounded, text: 'Trimisă ${wsAgo(s.lastAt)}. Așteaptă verificarea.');
+  Widget _status(Solution s) => sheetStatus(s);
+}
+
+/// What became of a solution the student sent: waiting, accepted, or turned down and why.
+Widget sheetStatus(Solution s) {
+  final by = s.reviewedName.isEmpty ? '' : ' de ${s.reviewedName}';
+  if (s.approved) {
+    return PbAlert(type: PbAlertType.success, icon: Icons.check_circle_outline, text: 'Acceptată$by. Problema e rezolvată.');
+  }
+  if (s.rejected) {
+    return PbAlert(
+      type: PbAlertType.danger,
+      icon: Icons.edit_note,
+      text: 'Respinsă$by${s.reviewNote.isEmpty ? '' : ': ${_quoted(s.reviewNote)}'}. Corectează și trimite din nou.',
+    );
+  }
+  return PbAlert(type: PbAlertType.info, icon: Icons.hourglass_top_rounded, text: 'Trimisă ${wsAgo(s.lastAt)}. Așteaptă verificarea.');
+}
+
+/// The student's own view of what they sent: its status, the sheet and the pictures.
+class SheetSubmission extends StatelessWidget {
+  final Solution solution;
+  const SheetSubmission({super.key, required this.solution});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = solution;
+    String when(DateTime? d) => d == null ? '' : '${d.day}.${d.month}.${d.year}, ${d.hour}:${d.minute.toString().padLeft(2, '0')}';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        sheetStatus(s),
+        const SizedBox(height: 10),
+        Text(
+          [
+            if (s.lastAt != null) 'Trimisă ${when(s.lastAt)}',
+            if (!s.pending && s.reviewedAt != null) 'verificată ${when(s.reviewedAt)}',
+          ].join(' · '),
+          style: TextStyle(fontSize: 13, color: Pb.muted),
+        ),
+        if (s.last.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 320,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: DecoratedBox(
+                decoration: BoxDecoration(border: Border.all(color: Pb.border)),
+                child: InkPage(key: ValueKey('${s.key}${s.lastAt}'), initialContent: s.last, readOnly: true, compact: true),
+              ),
+            ),
+          ),
+        ],
+        if (s.photos.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          SolutionPhotos(photos: s.photos),
+        ],
+      ],
+    );
   }
 }
 

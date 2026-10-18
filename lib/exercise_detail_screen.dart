@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,10 +8,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
-import 'classes_models.dart' show Classes, HwProblem;
+import 'classes_models.dart' show Classes, HwProblem, Solution;
 import 'browser_run.dart';
 import 'judge0.dart';
 import 'math_sheet.dart';
+import 'workspace_screen.dart' show wsAgo;
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
@@ -59,6 +61,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   bool solutionOk = false;
   bool isRunningCode = false;
   bool _alreadyDone = false;
+  Solution? _sent; // maths: the solution sent to be checked, as it stands
+  StreamSubscription? _sentSub;
 
   bool isFullScreenCode = false;
   bool isFullScreenProblem = false;
@@ -77,10 +81,18 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     _isExerciseDone().then((done) {
       if (mounted && done) setState(() => _alreadyDone = true);
     });
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      _sentSub = Classes.solutions.doc(Classes.solutionId(uid, _progressKey)).snapshots().listen((d) {
+        final s = d.data() == null ? null : Solution.fromJson(d.data()!);
+        if (mounted) setState(() => _sent = s != null && s.isSheet ? s : null);
+      }, onError: (_) {});
+    }
   }
 
   @override
   void dispose() {
+    _sentSub?.cancel();
     _codeController.removeListener(_onCodeChanged);
     _codeController.dispose();
     _answerController.dispose();
@@ -951,7 +963,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     const ['Enunț', 'Soluție', 'Trimiterile mele'],
                     _cTab,
                     (i) => setState(() => _cTab = i),
-                    counts: [null, null, _cSubmissions.isEmpty ? null : '${_cSubmissions.length}'],
+                    counts: [null, null, _isSheet ? (_sent == null ? null : '1') : (_cSubmissions.isEmpty ? null : '${_cSubmissions.length}')],
                   ),
                 ),
               ),
@@ -964,7 +976,39 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   Widget _cStatus() {
-    final done = _alreadyDone;
+    final sent = _isSheet ? _sent : null;
+    if (sent != null && !sent.approved) {
+      // maths sent to be checked: waiting (amber) or turned down (red)
+      final bad = sent.rejected;
+      final fg = bad ? Pb.dangerText : Pb.warningText;
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: bad ? Pb.dangerBg : Pb.warningBg,
+          borderRadius: Pb.radius,
+          border: Border.all(color: bad ? Pb.dangerBorder : Pb.warningBorder),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(bad ? Icons.cancel : Icons.hourglass_top_rounded, size: 20, color: fg),
+            const SizedBox(width: 10),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(bad ? 'Respinsă' : 'La verificare', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: fg)),
+                Text(
+                  bad ? 'Corectează și trimite din nou' : 'Trimisă ${wsAgo(sent.lastAt)}',
+                  style: TextStyle(fontSize: 12.5, color: Pb.muted),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+    final done = _alreadyDone || (sent?.approved ?? false);
     final best = _cSubmissions
         .where((s) => s['submit'] == true)
         .fold<int>(0, (m, s) => (s['score'] as int) > m ? s['score'] as int : m);
@@ -1207,6 +1251,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   Widget _cSubmissionsList() {
+    if (_isSheet) {
+      final sent = _sent;
+      if (sent == null) return Text('Nu ai trimis încă o rezolvare.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
+      return SheetSubmission(solution: sent);
+    }
     if (_cSubmissions.isEmpty) {
       return Text('Nu ai trimis încă nicio soluție în această sesiune.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
     }

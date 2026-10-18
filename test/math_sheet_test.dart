@@ -181,4 +181,15 @@ void main() {
     final again = (await Classes.pendingSheets().first).single;
     expect(again.last.length, greaterThan(sent.last.length));
   });
+
+  testWidgets('the student sees what they sent and that it was turned down, in red, with why', (tester) async {
+    await Classes.saveSheet(uid: 's1', studentName: 'Mihai Ionescu', problem: p, sheet: '', photos: ['https://x/1.jpg']);
+    await Classes.reviewSheet(uid: 's1', key: p.progressKey, accept: false, note: 'Lipsește pasul 2.', reviewerId: 'admin', reviewerName: 'Ahmad');
+    final sent = (await Classes.mySolutions('s1').first)[p.progressKey]!;
+
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: SheetSubmission(solution: sent)))));
+    await tester.pumpAndSettle();
+    expect(find.text('Respinsă de Ahmad: „Lipsește pasul 2”. Corectează și trimite din nou.'), findsOneWidget);
+    expect(find.bySemanticsLabel('Poza 1'), findsOneWidget);
+  });
 }
