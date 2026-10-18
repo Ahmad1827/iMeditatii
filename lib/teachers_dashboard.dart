@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -147,6 +149,61 @@ class TeachersDashboard extends StatefulWidget {
   State<TeachersDashboard> createState() => _TeachersDashboardState();
 }
 
+/// One subscription to [source], shared: whoever listens, even after the first
+/// snapshot went by (a tab opened later), gets the latest one straight away.
+/// Firestore's streams on the web don't do that, and a late StreamBuilder
+/// would wait forever.
+class _Latest<T> {
+  final List<StreamController<T>> _out = [];
+  StreamSubscription<T>? _sub;
+  T? _last;
+  bool _has = false;
+  Object? _error;
+
+  _Latest(Stream<T> source) {
+    _sub = source.listen(
+      (v) {
+        _last = v;
+        _has = true;
+        _error = null;
+        for (final c in [..._out]) {
+          c.add(v);
+        }
+      },
+      onError: (Object e) {
+        _error = e;
+        for (final c in [..._out]) {
+          c.addError(e);
+        }
+      },
+    );
+  }
+
+  Stream<T> get stream {
+    late final StreamController<T> c;
+    c = StreamController<T>(
+      onListen: () {
+        if (_error != null) {
+          c.addError(_error!);
+        } else if (_has) {
+          c.add(_last as T);
+        }
+        _out.add(c);
+      },
+      onCancel: () => _out.remove(c),
+    );
+    return c.stream;
+  }
+
+  void dispose() {
+    _sub?.cancel();
+    for (final c in [..._out]) {
+      c.close();
+    }
+    _out.clear();
+  }
+}
+
 class _TeachersDashboardState extends State<TeachersDashboard> {
   int _selectedIndex = 0;
   int _adminSubIndex = 0; // 0 = Exercises, 1 = Articles
@@ -157,23 +214,28 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
   late final String _uid = FirebaseAuth.instance.currentUser?.uid ?? '';
   late final Future<DocumentSnapshot> _teacherFuture =
       FirebaseFirestore.instance.collection('teachers').doc(_uid.isEmpty ? 'none' : _uid).get();
-  late final Stream<QuerySnapshot> _chatsStream = _uid.isEmpty
+  late final _Latest<QuerySnapshot> _chatsL = _Latest(_uid.isEmpty
       ? const Stream<QuerySnapshot>.empty()
       : FirebaseFirestore.instance
           .collection('chats')
           .where('teacherId', isEqualTo: _uid)
           .orderBy('updatedAt', descending: true)
-          .snapshots();
-  late final Stream<QuerySnapshot> _pendQuests = _isAdmin
+          .snapshots());
+  Stream<QuerySnapshot> get _chatsStream => _chatsL.stream;
+  // what waits for the admin: each query listened to once and shared, so the
+  // badges, the sub-tabs and the lists opened later all get the current snapshot
+  late final _Latest<QuerySnapshot> _pendQuestsL = _Latest(_isAdmin
       ? FirebaseFirestore.instance.collection('exercises').where('approved', isEqualTo: false).snapshots()
-      : const Stream<QuerySnapshot>.empty();
-  late final Stream<QuerySnapshot> _pendArticles = _isAdmin
+      : const Stream<QuerySnapshot>.empty());
+  late final _Latest<QuerySnapshot> _pendArticlesL = _Latest(_isAdmin
       ? FirebaseFirestore.instance.collection('resources').where('approved', isEqualTo: false).snapshots()
-      : const Stream<QuerySnapshot>.empty();
-  late final Stream<int> _pendSheets = _isAdmin ? pendingSheetCount() : const Stream<int>.empty();
-  // counts, made once (the tabs rebuild on hover); each listener gets the current count
-  late final Stream<int> _pendQuestsN = _pendQuests.map((q) => q.docs.length);
-  late final Stream<int> _pendArticlesN = _pendArticles.map((q) => q.docs.length);
+      : const Stream<QuerySnapshot>.empty());
+  late final _Latest<int> _pendSheetsL = _Latest(_isAdmin ? pendingSheetCount() : const Stream<int>.empty());
+  Stream<QuerySnapshot> get _pendQuests => _pendQuestsL.stream;
+  Stream<QuerySnapshot> get _pendArticles => _pendArticlesL.stream;
+  Stream<int> get _pendSheets => _pendSheetsL.stream;
+  Stream<int> get _pendQuestsN => _pendQuests.map((q) => q.docs.length);
+  Stream<int> get _pendArticlesN => _pendArticles.map((q) => q.docs.length);
 
   // ---- clean state
   final ScrollController _scroll = ScrollController();
@@ -185,6 +247,10 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
 
   @override
   void dispose() {
+    _chatsL.dispose();
+    _pendQuestsL.dispose();
+    _pendArticlesL.dispose();
+    _pendSheetsL.dispose();
     _scroll.dispose();
     _search.dispose();
     super.dispose();
