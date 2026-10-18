@@ -447,13 +447,15 @@ class IMeditatiiApp extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
 
-                        // 3. Motion Button (background animations on / off)
+                        // 3. Motion Button (background animations on / off). No Tooltip:
+                        // this deck sits above the app's Overlay, and one would grey the screen.
                         MouseRegion(
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
                             onTap: () => ThemeManager.toggleMotion(),
-                            child: Tooltip(
-                              message: motion ? 'Oprește animațiile din fundal' : 'Pornește animațiile din fundal',
+                            child: Semantics(
+                              button: true,
+                              label: motion ? 'Oprește animațiile din fundal' : 'Pornește animațiile din fundal',
                               child: Container(
                                 width: isMobile ? 40 : null,
                                 height: isMobile ? 40 : null,
