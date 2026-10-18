@@ -395,15 +395,22 @@ class Classes {
     };
   }
 
-  /// A maths solution written on a sheet ([sheet]: an ink page) and sent to be
-  /// checked by a person: the admin, or a teacher whose homework has it. The
-  /// page is stored once (a sheet can be large); sending again puts it back
-  /// in the queue.
-  static Future<void> saveSheet({required String uid, required String studentName, required HwProblem problem, required String sheet}) async {
+  /// A maths solution written on a sheet ([sheet]: an ink page) and/or on
+  /// paper ([photos]: links to its pictures), sent to be checked by a person:
+  /// the admin, or a teacher whose homework has it. The page is stored once (a
+  /// sheet can be large); sending again puts it back in the queue.
+  static Future<void> saveSheet({
+    required String uid,
+    required String studentName,
+    required HwProblem problem,
+    required String sheet,
+    List<String> photos = const [],
+  }) async {
     await solutions.doc(solutionId(uid, problem.progressKey)).set({
       'uid': uid,
       'key': problem.progressKey,
       'last': sheet,
+      'photos': photos,
       'lastLang': Solution.sheet,
       'lastPassed': false,
       'lastAt': FieldValue.serverTimestamp(),
@@ -654,6 +661,7 @@ class Solution {
   final Map<String, DateTime?> seenBy; // teacher id -> when they last opened it
   final Map<String, DateTime?> due; // teacher id -> the latest deadline of their homework with this problem
   // a sheet: checked by a person
+  final List<String> photos; // pictures of the solution written on paper
   final String review; // '' | pending | approved | rejected
   final String reviewNote; // why it wasn't accepted
   final String reviewedName;
@@ -672,6 +680,7 @@ class Solution {
     this.passedAt,
     this.seenBy = const {},
     this.due = const {},
+    this.photos = const [],
     this.review = '',
     this.reviewNote = '',
     this.reviewedName = '',
@@ -720,6 +729,7 @@ class Solution {
       passedAt: time(j['passedAt']),
       seenBy: {for (final e in ((j['seenBy'] as Map?) ?? const {}).entries) '${e.key}': time(e.value)},
       due: due,
+      photos: [for (final u in (j['photos'] as List?) ?? const []) '$u'],
       review: '${j['review'] ?? ''}',
       reviewNote: '${j['reviewNote'] ?? ''}',
       reviewedName: '${j['reviewedName'] ?? ''}',

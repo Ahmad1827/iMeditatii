@@ -121,4 +121,21 @@ void main() {
     expect(find.text('Acceptată de Ahmad. Problema e rezolvată.'), findsOneWidget);
     expect((await db.collection('users').doc('s1').get()).data()!['solvedIds'], [p.progressKey]);
   });
+
+  testWidgets('a solution on paper: only pictures are sent, and the reviewer sees them', (tester) async {
+    await Classes.saveSheet(uid: 's1', studentName: 'Mihai Ionescu', problem: p, sheet: '', photos: ['https://x/1.jpg', 'https://x/2.jpg']);
+    final sent = (await Classes.pendingSheets().first).single;
+    expect(sent.isSheet, isTrue);
+    expect(sent.photos, ['https://x/1.jpg', 'https://x/2.jpg']);
+
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: SheetReviewQueue(reviewerId: 'admin')))));
+    await tester.pumpAndSettle();
+    expect(find.text('Poze cu rezolvarea (apasă ca să mărești)'), findsOneWidget);
+    expect(find.bySemanticsLabel('Poza 2'), findsOneWidget);
+
+    // the student's panel opens with what they sent
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: MathSheetPanel(problem: p, uid: 's1')))));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / $sheetMaxPhotos poze'), findsOneWidget);
+  });
 }

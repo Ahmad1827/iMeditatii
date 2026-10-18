@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'classes_models.dart';
 import 'ink_page.dart';
@@ -14,8 +16,8 @@ import 'workspace_screen.dart' show wsAgo;
 // =============================================================================
 // MATHS ON A SHEET
 //   A maths problem isn't answered with a choice or a number: the student
-//   writes the whole solution on a sheet (an ink page, like OneNote) and sends
-//   it. A person checks it: the admin in the dashboard, or a teacher whose
+//   writes the whole solution on a sheet (an ink page, like OneNote), or on
+//   paper and adds pictures of it, and sends it. A person checks it: the admin in the dashboard, or a teacher whose
 //   homework has the problem, from the student's desk. Accepted, it counts as
 //   solved; turned down, the student reads why, fixes the sheet and sends it again.
 // =============================================================================
@@ -28,6 +30,98 @@ String _quoted(String note) => '„${note.trim().replaceAll(RegExp(r'[.!]+$'), '
 
 /// The longest sheet that can be sent (a Firestore document holds 1 MB).
 const int sheetMaxLength = 400000;
+
+/// The most pictures one solution can have.
+const int sheetMaxPhotos = 6;
+
+/// Where a picture of a solution goes: [uploadSolutionPhoto]; tests swap it.
+Future<String> Function(String uid, String key, Uint8List bytes) photoUploader = uploadSolutionPhoto;
+
+/// Stores a picture of [uid]'s solution to [key] and gives back its link.
+Future<String> uploadSolutionPhoto(String uid, String key, Uint8List bytes) async {
+  final ref = FirebaseStorage.instance.ref('solution_photos/$uid/${key.replaceAll('/', '_')}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+  await ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
+  return ref.getDownloadURL();
+}
+
+/// A picture of a solution, full screen, to zoom in on.
+void showSolutionPhoto(BuildContext context, String url) => showDialog<void>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (d) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          children: [
+            InteractiveViewer(maxScale: 5, child: Center(child: Image.network(url, fit: BoxFit.contain))),
+            Positioned(
+              top: 4,
+              right: 4,
+              child: IconButton(
+                tooltip: 'Închide',
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.of(d).pop(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+/// A row of pictures of a solution; tap one to see it big. With [onRemove]
+/// (the student, before sending), each has an × to take it out.
+class SolutionPhotos extends StatelessWidget {
+  final List<String> photos;
+  final double size;
+  final void Function(String url)? onRemove;
+  const SolutionPhotos({super.key, required this.photos, this.size = 96, this.onRemove});
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final (i, url) in photos.indexed)
+            Semantics(
+              button: true,
+              label: 'Poza ${i + 1}',
+              child: Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () => showSolutionPhoto(context, url),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        width: size,
+                        height: size,
+                        decoration: BoxDecoration(color: Pb.hoverBg, border: Border.all(color: Pb.border)),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(Icons.broken_image_outlined, color: Pb.muted),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (onRemove != null)
+                    Positioned(
+                      top: 2,
+                      right: 2,
+                      child: GestureDetector(
+                        onTap: () => onRemove!(url),
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                          child: const Icon(Icons.close, size: 14, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+        ],
+      );
+}
 
 /// Where a reviewer's answer key comes from: [loadExercise]; tests swap it.
 Future<Map<String, dynamic>?> Function(String subject, String grade, String id) exerciseSource = loadExercise;
@@ -69,15 +163,57 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
   bool _dirty = false; // written on since it was sent
   bool _sending = false;
   bool _wasAccepted = false;
+  List<String>? _photos; // the pictures to send: those last sent, then as the student adds and removes them
+  bool _uploading = false;
+
+  Future<void> _addPhotos(ImageSource source) async {
+    final uid = _uid;
+    final room = sheetMaxPhotos - (_photos?.length ?? 0);
+    if (uid == null || room <= 0) return;
+    final picker = ImagePicker();
+    List<XFile> picked;
+    try {
+      picked = source == ImageSource.camera
+          ? [if (await picker.pickImage(source: source, maxWidth: 2000, maxHeight: 2000, imageQuality: 80) case final x?) x]
+          : await picker.pickMultiImage(maxWidth: 2000, maxHeight: 2000, imageQuality: 80);
+    } catch (_) {
+      picked = const [];
+    }
+    if (picked.isEmpty || !mounted) return;
+    setState(() => _uploading = true);
+    try {
+      for (final x in picked.take(room)) {
+        final url = await photoUploader(uid, widget.problem.progressKey, await x.readAsBytes());
+        if (!mounted) return;
+        setState(() {
+          _photos = [...?_photos, url];
+          _dirty = true;
+        });
+      }
+      if (picked.length > room && mounted) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
+          content: Text('Poți adăuga cel mult $sheetMaxPhotos poze.'),
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text('Nu am putut încărca poza: $e'), behavior: SnackBarBehavior.floating));
+      }
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
+  }
 
   Future<void> _send() async {
     final uid = _uid;
-    final sheet = _ink.read();
-    if (uid == null || sheet == null || _ink.isEmpty) return;
+    final photos = _photos ?? const <String>[];
+    final sheet = _ink.isEmpty ? '' : _ink.read();
+    if (uid == null || sheet == null || (sheet.isEmpty && photos.isEmpty)) return;
     setState(() => _sending = true);
     try {
       final name = await Classes.userName(uid).catchError((_) => 'Elev');
-      await Classes.saveSheet(uid: uid, studentName: name, problem: widget.problem, sheet: sheet);
+      await Classes.saveSheet(uid: uid, studentName: name, problem: widget.problem, sheet: sheet, photos: photos);
       if (!mounted) return;
       setState(() => _dirty = false);
       ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
@@ -123,6 +259,7 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
         final s = data == null ? null : Solution.fromJson(data);
         final sheet = s != null && s.isSheet ? s : null;
         _initial ??= sheet?.last ?? '';
+        _photos ??= [...?sheet?.photos];
         if (sheet != null && sheet.approved && !_wasAccepted) {
           _wasAccepted = true;
           WidgetsBinding.instance.addPostFrameCallback((_) => widget.onAccepted?.call());
@@ -143,7 +280,54 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
             ),
           ),
         );
-        final canSend = !_sending && (_dirty || sheet == null);
+        final canSend = !_sending && !_uploading && (_dirty || sheet == null);
+        final photos = _photos!;
+        final full = photos.length >= sheetMaxPhotos;
+        final paper = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (photos.isNotEmpty) ...[
+              SolutionPhotos(
+                photos: photos,
+                size: isMobile ? 80 : 96,
+                onRemove: _sending
+                    ? null
+                    : (url) => setState(() {
+                          _photos = [...photos]..remove(url);
+                          _dirty = true;
+                        }),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                PbButton(
+                  text: 'Fă o poză',
+                  icon: Icons.photo_camera_outlined,
+                  variant: PbVariant.secondary,
+                  size: PbSize.sm,
+                  onPressed: _uploading || full ? null : () => _addPhotos(ImageSource.camera),
+                ),
+                PbButton(
+                  text: 'Din galerie',
+                  icon: Icons.photo_library_outlined,
+                  variant: PbVariant.secondary,
+                  size: PbSize.sm,
+                  loading: _uploading,
+                  onPressed: _uploading || full ? null : () => _addPhotos(ImageSource.gallery),
+                ),
+                Text(
+                  photos.isEmpty ? 'Ai rezolvat pe hârtie? Adaugă poze cu foaia.' : '${photos.length} / $sheetMaxPhotos poze',
+                  style: TextStyle(fontSize: 13, color: Pb.muted),
+                ),
+              ],
+            ),
+          ],
+        );
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: card,
@@ -154,18 +338,20 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
               Text('Rezolvarea ta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
               const SizedBox(height: 4),
               Text(
-                'Scrie pe foaie ca la tablă: pașii, calculele și răspunsul. Apoi trimite-o: un profesor o verifică.',
+                'Scrie pe foaie ca la tablă: pașii, calculele și răspunsul, sau rezolvă pe hârtie și adaugă poze. Apoi trimite: un profesor verifică.',
                 style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.4),
               ),
               if (sheet != null) ...[const SizedBox(height: 12), _status(sheet)],
               const SizedBox(height: 12),
               if (widget.fill) Expanded(child: page) else SizedBox(height: isMobile ? 480 : 560, child: page),
               const SizedBox(height: 12),
+              paper,
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      _dirty && sheet != null ? 'Ai modificat foaia de când ai trimis-o.' : '',
+                      _dirty && sheet != null ? 'Ai modificat rezolvarea de când ai trimis-o.' : '',
                       style: TextStyle(fontSize: 13, color: Pb.muted),
                     ),
                   ),
@@ -296,17 +482,25 @@ class _SheetReviewCardState extends State<SheetReviewCard> {
                   : 'Respinsă de ${s.reviewedName}${s.reviewNote.isEmpty ? '' : ': ${_quoted(s.reviewNote)}'}.',
             ),
           ),
-        SizedBox(
-          height: widget.sheetHeight,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: DecoratedBox(
-              decoration: BoxDecoration(border: Border.all(color: Pb.border)),
-              child: InkPage(key: ValueKey('${s.uid}${s.key}${s.lastAt}'), initialContent: s.last, readOnly: true, compact: true),
+        if (s.last.isNotEmpty) ...[
+          SizedBox(
+            height: widget.sheetHeight,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: DecoratedBox(
+                decoration: BoxDecoration(border: Border.all(color: Pb.border)),
+                child: InkPage(key: ValueKey('${s.uid}${s.key}${s.lastAt}'), initialContent: s.last, readOnly: true, compact: true),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 10),
+          const SizedBox(height: 10),
+        ],
+        if (s.photos.isNotEmpty) ...[
+          Text('Poze cu rezolvarea (apasă ca să mărești)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.muted)),
+          const SizedBox(height: 6),
+          SolutionPhotos(photos: s.photos, size: 120),
+          const SizedBox(height: 10),
+        ],
         // the answer key, for the reviewer only
         FutureBuilder<Map<String, dynamic>?>(
           future: _key,
