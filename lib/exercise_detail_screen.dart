@@ -63,6 +63,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   bool _alreadyDone = false;
   Solution? _sent; // maths: the solution sent to be checked, as it stands
   StreamSubscription? _sentSub;
+  int _attemptsN = 0; // how many times it was sent, for the tab's count
+  StreamSubscription? _attemptsSub;
 
   bool isFullScreenCode = false;
   bool isFullScreenProblem = false;
@@ -87,12 +89,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final s = d.data() == null ? null : Solution.fromJson(d.data()!);
         if (mounted) setState(() => _sent = s != null && s.isSheet ? s : null);
       }, onError: (_) {});
+      _attemptsSub = Classes.attempts(uid, _progressKey).listen((l) {
+        if (mounted) setState(() => _attemptsN = l.length);
+      }, onError: (_) {});
     }
   }
 
   @override
   void dispose() {
     _sentSub?.cancel();
+    _attemptsSub?.cancel();
     _codeController.removeListener(_onCodeChanged);
     _codeController.dispose();
     _answerController.dispose();
@@ -963,7 +969,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     const ['Enunț', 'Soluție', 'Trimiterile mele'],
                     _cTab,
                     (i) => setState(() => _cTab = i),
-                    counts: [null, null, _isSheet ? (_sent == null ? null : '1') : (_cSubmissions.isEmpty ? null : '${_cSubmissions.length}')],
+                    counts: [null, null, _isSheet ? (_sent == null ? null : '${_attemptsN > 0 ? _attemptsN : 1}') : (_cSubmissions.isEmpty ? null : '${_cSubmissions.length}')],
                   ),
                 ),
               ),
@@ -1252,9 +1258,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   Widget _cSubmissionsList() {
     if (_isSheet) {
-      final sent = _sent;
-      if (sent == null) return Text('Nu ai trimis încă o rezolvare.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
-      return SheetSubmission(solution: sent);
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null || _sent == null) return Text('Nu ai trimis încă o rezolvare.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
+      return SheetHistory(uid: uid, problemKey: _progressKey, current: _sent);
     }
     if (_cSubmissions.isEmpty) {
       return Text('Nu ai trimis încă nicio soluție în această sesiune.', style: TextStyle(fontSize: 14.5, color: Pb.muted));

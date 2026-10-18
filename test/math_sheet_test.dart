@@ -192,4 +192,25 @@ void main() {
     expect(find.text('Respinsă de Ahmad: „Lipsește pasul 2”. Corectează și trimite din nou.'), findsOneWidget);
     expect(find.bySemanticsLabel('Poza 1'), findsOneWidget);
   });
+
+  testWidgets('every attempt is kept with its own verdict, newest first', (tester) async {
+    await Classes.saveSheet(uid: 's1', studentName: 'Mihai Ionescu', problem: p, sheet: '', photos: ['https://x/1.jpg']);
+    await Classes.reviewSheet(uid: 's1', key: p.progressKey, accept: false, note: 'Lipsește pasul 2.', reviewerId: 'admin', reviewerName: 'Ahmad');
+    await Classes.saveSheet(uid: 's1', studentName: 'Mihai Ionescu', problem: p, sheet: '', photos: ['https://x/2.jpg']);
+    await Classes.reviewSheet(uid: 's1', key: p.progressKey, accept: true, reviewerId: 'admin', reviewerName: 'Ahmad');
+
+    final all = await Classes.attempts('s1', p.progressKey).first;
+    expect(all.map((a) => a.review), ['approved', 'rejected']);
+    expect(all.map((a) => a.photos.single), ['https://x/2.jpg', 'https://x/1.jpg']);
+    expect(all.last.reviewNote, 'Lipsește pasul 2.');
+
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: SheetHistory(uid: 's1', problemKey: p.progressKey)))));
+    await tester.pumpAndSettle();
+    expect(find.text('Încercarea 2'), findsOneWidget);
+    expect(find.text('Acceptată de Ahmad. Problema e rezolvată.'), findsOneWidget); // the newest, open
+    expect(find.textContaining('Lipsește pasul 2'), findsNothing); // the older one, closed
+    await tester.tap(find.text('Încercarea 1'));
+    await tester.pumpAndSettle();
+    expect(find.text('Respinsă de Ahmad: „Lipsește pasul 2”. Corectează și trimite din nou.'), findsOneWidget);
+  });
 }

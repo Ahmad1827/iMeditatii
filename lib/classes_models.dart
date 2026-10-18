@@ -406,20 +406,38 @@ class Classes {
     required String sheet,
     List<String> photos = const [],
   }) async {
-    await solutions.doc(solutionId(uid, problem.progressKey)).set({
+    final doc = solutions.doc(solutionId(uid, problem.progressKey));
+    final attempt = doc.collection('attempts').doc();
+    final sent = {
       'uid': uid,
       'key': problem.progressKey,
       'last': sheet,
       'photos': photos,
       'lastLang': Solution.sheet,
-      'lastPassed': false,
       'lastAt': FieldValue.serverTimestamp(),
       'review': 'pending',
+    };
+    await doc.set({
+      ...sent,
+      'lastPassed': false,
+      'attempt': attempt.id,
+      'reviewNote': '',
       'studentName': studentName,
       'exercise': problem.toJson(),
       ...await _recipients(uid, problem.progressKey),
     }, SetOptions(merge: true));
+    // every one sent is kept, for the student's history; sending itself
+    // doesn't hang on it
+    await attempt.set(sent).catchError((_) {});
   }
+
+  /// Every solution [uid] sent on [key], newest first, each with its own verdict.
+  static Stream<List<Solution>> attempts(String uid, String key) => solutions
+      .doc(solutionId(uid, key))
+      .collection('attempts')
+      .orderBy('lastAt', descending: true)
+      .snapshots()
+      .map((q) => q.docs.map((d) => Solution.fromJson(d.data())).toList());
 
   /// The admin's queue: every sheet waiting to be checked, oldest first.
   static Stream<List<Solution>> pendingSheets() => solutions.where('review', isEqualTo: 'pending').snapshots().map((q) {
@@ -444,15 +462,19 @@ class Classes {
     required String reviewerName,
   }) async {
     final ref = solutions.doc(solutionId(uid, key));
-    final before = (await ref.get()).data()?['review'];
-    await ref.update({
+    final data = (await ref.get()).data();
+    final before = data?['review'];
+    final verdict = {
       'review': accept ? 'approved' : 'rejected',
       'reviewNote': accept ? '' : note.trim(),
       'reviewedBy': reviewerId,
       'reviewedName': reviewerName,
       'reviewedAt': FieldValue.serverTimestamp(),
-      'seenBy.$reviewerId': FieldValue.serverTimestamp(),
-    });
+    };
+    await ref.update({...verdict, 'seenBy.$reviewerId': FieldValue.serverTimestamp()});
+    // the same verdict on the attempt it was given to, in the student's history
+    final attempt = data?['attempt'];
+    if (attempt is String && attempt.isNotEmpty) await ref.collection('attempts').doc(attempt).update(verdict).catchError((_) {});
     if (!accept && before != 'approved') return;
     final user = _db.collection('users').doc(uid);
     final solved = List<String>.from((((await user.get()).data()?['solvedIds']) as List?) ?? const []);

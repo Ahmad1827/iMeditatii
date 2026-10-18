@@ -531,6 +531,83 @@ class SheetSubmission extends StatelessWidget {
   }
 }
 
+/// Every solution the student sent on a problem, newest first: the newest
+/// open, the older ones a line each that opens on a tap. [current] stands in
+/// for the history when there is none yet (sent before attempts were kept).
+class SheetHistory extends StatefulWidget {
+  final String uid;
+  final String problemKey;
+  final Solution? current;
+  const SheetHistory({super.key, required this.uid, required this.problemKey, this.current});
+
+  @override
+  State<SheetHistory> createState() => _SheetHistoryState();
+}
+
+class _SheetHistoryState extends State<SheetHistory> {
+  late final Stream<List<Solution>> _attempts = Classes.attempts(widget.uid, widget.problemKey);
+  final Set<int> _open = {}; // by attempt number
+
+  @override
+  Widget build(BuildContext context) => StreamBuilder<List<Solution>>(
+        stream: _attempts,
+        builder: (context, snap) {
+          var list = snap.data ?? const <Solution>[];
+          if (list.isEmpty && widget.current != null) list = [widget.current!];
+          if (list.isEmpty) {
+            if (!snap.hasData && !snap.hasError) return const Center(child: CircularProgressIndicator(color: Pb.primary));
+            return Text('Nu ai trimis încă o rezolvare.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final (i, a) in list.indexed) _attempt(list.length - i, a, newest: i == 0),
+            ],
+          );
+        },
+      );
+
+  Widget _attempt(int n, Solution a, {required bool newest}) {
+    final open = newest || _open.contains(n);
+    final (label, color) = a.approved
+        ? ('Acceptată', Pb.success)
+        : a.rejected
+            ? ('Respinsă', Pb.danger)
+            : ('La verificare', const Color(0xFFB45309));
+    final head = Row(
+      children: [
+        Text('Încercarea $n', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Pb.text)),
+        const SizedBox(width: 10),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+        const Spacer(),
+        Text(wsAgo(a.lastAt), style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+        if (!newest) ...[
+          const SizedBox(width: 6),
+          Icon(open ? Icons.expand_less : Icons.expand_more, size: 18, color: Pb.muted),
+        ],
+      ],
+    );
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: newest ? color.withOpacity(0.5) : Pb.border)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (newest)
+            head
+          else
+            InkWell(
+              onTap: () => setState(() => open ? _open.remove(n) : _open.add(n)),
+              child: head,
+            ),
+          if (open) ...[const SizedBox(height: 10), SheetSubmission(solution: a)],
+        ],
+      ),
+    );
+  }
+}
+
 // ---------------------------------------------------------------- the reviewer
 /// One sheet to check: what the student wrote, the answer key, and the green light or not.
 class SheetReviewCard extends StatefulWidget {
