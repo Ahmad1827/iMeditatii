@@ -138,4 +138,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('2 / $sheetMaxPhotos poze'), findsOneWidget);
   });
+
+  testWidgets('the sheet opens big in the middle of the screen; what is written there comes back and is sent', (tester) async {
+    tester.view.physicalSize = const Size(1280, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Future<void> draw(Offset at) async {
+      final g = await tester.startGesture(at, kind: PointerDeviceKind.stylus);
+      for (var i = 1; i <= 12; i++) {
+        await g.moveBy(const Offset(12, 4));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await g.up();
+      await tester.pumpAndSettle();
+    }
+
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: MathSheetPanel(problem: p, uid: 's1')))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mărește foaia'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsOneWidget);
+    await draw(tester.getCenter(find.byType(Dialog)));
+    await tester.tap(find.text('Micșorează'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsNothing);
+    expect(find.text('Trimite la verificare'), findsOneWidget);
+
+    // sent from the small sheet: it has what was written big
+    await tester.tap(find.text('Trimite la verificare'));
+    await tester.pumpAndSettle();
+    final sent = (await Classes.pendingSheets().first).single;
+    expect(sent.last, isNotEmpty);
+    expect(sent.last, isNot(contains('"strokes":[]')));
+
+    // and from the big view straight away
+    await tester.tap(find.text('Mărește foaia'));
+    await tester.pumpAndSettle();
+    await draw(tester.getCenter(find.byType(Dialog)) + const Offset(0, 80));
+    await tester.tap(find.text('Trimite'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsNothing);
+    final again = (await Classes.pendingSheets().first).single;
+    expect(again.last.length, greaterThan(sent.last.length));
+  });
 }

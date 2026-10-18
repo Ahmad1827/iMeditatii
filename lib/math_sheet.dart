@@ -158,8 +158,9 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
   late final String? _uid = widget.uid ?? FirebaseAuth.instance.currentUser?.uid;
   late final Stream<DocumentSnapshot<Map<String, dynamic>>>? _sent =
       _uid == null ? null : Classes.solutions.doc(Classes.solutionId(_uid, widget.problem.progressKey)).snapshots();
-  final InkPageHandle _ink = InkPageHandle();
-  String? _initial; // what the sheet opened with: the last one sent
+  InkPageHandle _ink = InkPageHandle();
+  String? _initial; // what the sheet opened with: the last one sent, or what was written in the big view
+  int _page = 0; // bumped to rebuild the sheet with [_initial]
   bool _dirty = false; // written on since it was sent
   bool _sending = false;
   bool _wasAccepted = false;
@@ -205,10 +206,94 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
     }
   }
 
-  Future<void> _send() async {
+  /// The sheet big, in the middle of the screen. What's written there comes
+  /// back to the small one; it can be sent from there too.
+  Future<void> _enlarge() async {
+    final big = InkPageHandle();
+    final start = _ink.read() ?? _initial ?? '';
+    final send = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (d) {
+        final narrow = MediaQuery.of(d).size.width < 700;
+        return Dialog(
+          insetPadding: EdgeInsets.all(narrow ? 0 : 24),
+          backgroundColor: Pb.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(narrow ? 0 : 16)),
+          clipBehavior: Clip.antiAlias,
+          child: Padding(
+            padding: EdgeInsets.all(narrow ? 10 : 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.problem.title.isEmpty ? 'Rezolvarea ta' : widget.problem.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    PbButton(
+                      text: 'Micșorează',
+                      icon: Icons.close_fullscreen,
+                      variant: PbVariant.secondary,
+                      size: PbSize.sm,
+                      onPressed: () => Navigator.of(d).pop(false),
+                    ),
+                    const SizedBox(width: 8),
+                    PbButton(
+                      text: 'Trimite',
+                      icon: Icons.send_outlined,
+                      variant: PbVariant.success,
+                      size: PbSize.sm,
+                      onPressed: () => Navigator.of(d).pop(true),
+                    ),
+                  ],
+                ),
+                SizedBox(height: narrow ? 8 : 12),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(border: Border.all(color: Pb.border)),
+                      child: InkPage(
+                        initialContent: start,
+                        handle: big,
+                        onDirty: () {
+                          if (!_dirty && mounted) setState(() => _dirty = true);
+                        },
+                        compact: narrow,
+                        maxLength: sheetMaxLength,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    if (!mounted) return;
+    // the small sheet starts again from what was written big, with its own handle
+    // (the old page, going away, leaves its last state on the old one)
+    setState(() {
+      _initial = big.read() ?? start;
+      _ink = InkPageHandle();
+      _page++;
+    });
+    if (send == true) await _send(from: big);
+  }
+
+  Future<void> _send({InkPageHandle? from}) async {
     final uid = _uid;
+    final ink = from ?? _ink;
     final photos = _photos ?? const <String>[];
-    final sheet = _ink.isEmpty ? '' : _ink.read();
+    final sheet = ink.isEmpty ? '' : ink.read();
     if (uid == null || sheet == null || (sheet.isEmpty && photos.isEmpty)) return;
     setState(() => _sending = true);
     try {
@@ -270,6 +355,7 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
           child: DecoratedBox(
             decoration: BoxDecoration(border: Border.all(color: Pb.border)),
             child: InkPage(
+              key: ValueKey(_page),
               initialContent: _initial!,
               handle: _ink,
               onDirty: () {
@@ -335,7 +421,18 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: widget.fill ? MainAxisSize.max : MainAxisSize.min,
             children: [
-              Text('Rezolvarea ta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
+              Row(
+                children: [
+                  Expanded(child: Text('Rezolvarea ta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text))),
+                  PbButton(
+                    text: 'Mărește foaia',
+                    icon: Icons.open_in_full,
+                    variant: PbVariant.secondary,
+                    size: PbSize.sm,
+                    onPressed: _sending ? null : _enlarge,
+                  ),
+                ],
+              ),
               const SizedBox(height: 4),
               Text(
                 'Scrie pe foaie ca la tablă: pașii, calculele și răspunsul, sau rezolvă pe hârtie și adaugă poze. Apoi trimite: un profesor verifică.',
