@@ -41,7 +41,7 @@ void main() {
         }
       }
     }
-    expect(problems, 159);
+    expect(problems, 375);
     // and nothing for a problem that doesn't exist
     for (final subject in bank.keys) {
       for (final grade in (bank[subject] as Map<String, dynamic>).keys) {

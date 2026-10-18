@@ -1130,7 +1130,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
         );
 
-    return Wrap(
+    final sursa = _str(['sursa']);
+    final why = _str(['dificultate_motiv']);
+    final chips = Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -1141,6 +1143,26 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         if (time != null) chip(time, icon: Icons.timer_outlined),
         if (mem != null) chip(mem, icon: Icons.memory),
         for (final t in tags) chip(t, icon: Icons.sell_outlined),
+      ],
+    );
+    if (sursa == null && why == null) return chips;
+    Widget line(IconData icon, String text) => Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 15, color: Pb.muted)),
+              const SizedBox(width: 6),
+              Expanded(child: Text(text, style: TextStyle(fontSize: 13, height: 1.4, color: Pb.muted))),
+            ],
+          ),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        chips,
+        if (sursa != null) line(Icons.history_edu_outlined, 'Sursa: $sursa'),
+        if (why != null) line(Icons.insights_outlined, 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why'),
       ],
     );
   }
@@ -2497,6 +2519,20 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         Text(_title.toUpperCase(),
             style: TextStyle(fontSize: isMobile ? 20 : 26, fontWeight: FontWeight.w900, color: AppColors.ink, height: 1.2)),
+        if (_str(['sursa']) != null) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(border: Border.all(color: AppColors.border, width: 2)),
+            child: Text(_str(['sursa'])!.toUpperCase(),
+                style: TextStyle(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w900, color: AppColors.ink, letterSpacing: 0.6)),
+          ),
+        ],
+        if (_str(['dificultate_motiv']) != null) ...[
+          const SizedBox(height: 8),
+          Text('${(_str(['dificultate', 'difficulty']) ?? 'Nivel').toUpperCase()}: ${_str(['dificultate_motiv'])}',
+              style: TextStyle(fontSize: isMobile ? 12.5 : 14, color: AppColors.textMuted, fontWeight: FontWeight.w700, height: 1.4)),
+        ],
         SizedBox(height: isMobile ? 14 : 24),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

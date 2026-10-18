@@ -358,165 +358,1494 @@
     "12": {
       "1. Subiectul III.1 · Subprograme": [
         {
-          "id": "61",
-          "title": "Cifrele impare ale unui număr",
-          "difficulty": "ușoară"
+          "id": "101",
+          "title": "Fiecare 25 devine 26",
+          "difficulty": "medie",
+          "sursa": "BAC 2026 · Model · Subiectul III.1"
         },
         {
-          "id": "62",
+          "id": "102",
+          "title": "Raftul echilibrat",
+          "difficulty": "medie",
+          "sursa": "BAC 2026 · Simulare clasa a XII-a · Subiectul III.1"
+        },
+        {
+          "id": "103",
+          "title": "Primul costum la parada modei",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "104",
+          "title": "Întâi cifrele impare, apoi cele pare",
+          "difficulty": "medie",
+          "sursa": "BAC 2026 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "105",
+          "title": "Setul turistic din n pagini",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Sesiunea iunie–iulie (rezervă) · Subiectul III.1"
+        },
+        {
+          "id": "106",
+          "title": "Reprezentat în baza b",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "107",
+          "title": "Numere par-oglindite",
+          "difficulty": "medie",
+          "sursa": "BAC 2025 · Model · Subiectul III.1"
+        },
+        {
+          "id": "108",
+          "title": "Cel mai mare număr harsad",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Simulare clasa a XII-a · Subiectul III.1"
+        },
+        {
+          "id": "109",
+          "title": "Cel mai mare divizor pătrat perfect",
+          "difficulty": "medie",
+          "sursa": "BAC 2025 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "110",
+          "title": "Suma ascendenților",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "111",
+          "title": "Între două produse consecutive",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea iunie–iulie (rezervă) · Subiectul III.1"
+        },
+        {
+          "id": "112",
+          "title": "Împărțirea terenului în parcele",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "113",
+          "title": "Produsul divizorilor comuni",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2024 · Model · Subiectul III.1"
+        },
+        {
+          "id": "114",
+          "title": "Cifrele impare dublate",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Simulare clasa a XII-a · Subiectul III.1"
+        },
+        {
+          "id": "115",
+          "title": "Aglomerarea de fulgi de nea",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2024 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "116",
+          "title": "Cel mai mic număr major impar",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "117",
+          "title": "Număr moderat",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "118",
+          "title": "Doar cifre de 2 și 3",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2023 · Model · Subiectul III.1"
+        },
+        {
+          "id": "119",
+          "title": "Numere cu trei divizori impari",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Simulare clasa a XII-a · Subiectul III.1"
+        },
+        {
+          "id": "120",
+          "title": "Cea mai mică bază a unei puteri",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "121",
+          "title": "Număr abundent",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "122",
+          "title": "Divizorii impari care nu sunt primi",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "123",
+          "title": "Mozaicul cu trei benzi",
+          "difficulty": "medie",
+          "sursa": "BAC 2022 · Model · Subiectul III.1"
+        },
+        {
+          "id": "124",
+          "title": "Restul 2 la ambele împărțiri",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Simulare clasa a XII-a · Subiectul III.1"
+        },
+        {
+          "id": "125",
+          "title": "n = x² · y²",
+          "difficulty": "medie",
+          "sursa": "BAC 2022 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "126",
+          "title": "Fiecare 22 devine 20",
+          "difficulty": "medie",
+          "sursa": "BAC 2022 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "127",
+          "title": "Înlocuirea cifrei de pe poziția p",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "128",
+          "title": "Cele mai mari două numere prime sub n",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Model · Subiectul III.1"
+        },
+        {
+          "id": "129",
+          "title": "Primul factor cu puterea minimă",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Simulare clasa a XII-a · Subiectul III.1"
+        },
+        {
+          "id": "130",
+          "title": "Numere impar-oglindite",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Sesiunea specială · Subiectul III.1 (identic: Testul de antrenament 11 din 2021)"
+        },
+        {
+          "id": "131",
+          "title": "Suma factorilor primi la putere impară",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "132",
+          "title": "Primele n cuburi perfecte, descrescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "133",
+          "title": "Primii n multipli ai lui x, descrescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 1 · Subiectul III.1"
+        },
+        {
+          "id": "134",
+          "title": "Factori primi cu aceeași putere",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 2 · Subiectul III.1"
+        },
+        {
+          "id": "135",
+          "title": "Suma divizorilor care nu sunt primi",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 3 · Subiectul III.1"
+        },
+        {
+          "id": "136",
+          "title": "În câte grupe se pot împărți jetoanele",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 4 · Subiectul III.1"
+        },
+        {
+          "id": "137",
+          "title": "Toate cifrele egale",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 5 · Subiectul III.1"
+        },
+        {
+          "id": "138",
+          "title": "Eliminarea unei cifre",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 6 · Subiectul III.1"
+        },
+        {
+          "id": "139",
+          "title": "Numerele în secvențe de câte k",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 7 · Subiectul III.1"
+        },
+        {
+          "id": "140",
+          "title": "Numărul cu cei mai mulți factori primi",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 8 · Subiectul III.1"
+        },
+        {
+          "id": "141",
+          "title": "Divizibile cu k și terminate în k",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 9 · Subiectul III.1"
+        },
+        {
+          "id": "142",
+          "title": "Numere în armonie",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 10 · Subiectul III.1"
+        },
+        {
+          "id": "143",
+          "title": "Fratele mai mare al unui număr",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 12 · Subiectul III.1"
+        },
+        {
+          "id": "144",
+          "title": "Duplicarea cifrelor impare",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Model · Subiectul III.1"
+        },
+        {
+          "id": "145",
+          "title": "Cel mai mic multiplu pătrat perfect",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "146",
+          "title": "Suma divizorilor comuni",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "147",
+          "title": "Al k-lea p-număr",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Sesiunea august · Subiectul III.1"
+        },
+        {
+          "id": "148",
+          "title": "Factorul prim cu puterea cea mai mare",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 1 · Subiectul III.1"
+        },
+        {
+          "id": "149",
+          "title": "Perechile d-fii ale lui n",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 2 · Subiectul III.1"
+        },
+        {
+          "id": "150",
+          "title": "Factori primi comuni",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 3 · Subiectul III.1"
+        },
+        {
+          "id": "151",
+          "title": "Numerele generatoare",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 4 · Subiectul III.1"
+        },
+        {
+          "id": "152",
+          "title": "Cea mai mică bază posibilă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 5 · Subiectul III.1"
+        },
+        {
+          "id": "153",
+          "title": "Produsul divizorilor primi",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 6 · Subiectul III.1"
+        },
+        {
+          "id": "154",
+          "title": "Puterea unui prim în descompunere",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 7 · Subiectul III.1"
+        },
+        {
+          "id": "155",
+          "title": "Suma divizorilor primi",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 8 · Subiectul III.1"
+        },
+        {
+          "id": "156",
+          "title": "Suma cifrelor impare distincte",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 9 · Subiectul III.1"
+        },
+        {
+          "id": "157",
+          "title": "Produsul cifrelor pare distincte",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 10 · Subiectul III.1"
+        },
+        {
+          "id": "158",
+          "title": "Suma pătratelor perfecte dintr-un interval",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 11 · Subiectul III.1"
+        },
+        {
+          "id": "159",
+          "title": "Cea mai mare putere a lui 2",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 12 · Subiectul III.1"
+        },
+        {
+          "id": "160",
+          "title": "Factorul prim cu puterea cea mai mică",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 13 · Subiectul III.1"
+        },
+        {
+          "id": "161",
+          "title": "Divizori pereche de paritate diferită",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 14 · Subiectul III.1"
+        },
+        {
+          "id": "162",
           "title": "Cel mai mare divizor prim",
-          "difficulty": "medie"
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 15 · Subiectul III.1"
         },
         {
-          "id": "63",
-          "title": "Dublarea cifrelor impare",
-          "difficulty": "medie"
+          "id": "163",
+          "title": "Factori primi la putere impară",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 16 · Subiectul III.1"
         },
         {
-          "id": "64",
-          "title": "Între doi termeni Fibonacci",
-          "difficulty": "medie"
+          "id": "164",
+          "title": "Cea mai mare cifră impară",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 17 · Subiectul III.1"
         },
         {
-          "id": "65",
-          "title": "Exponentul unui prim în n!",
-          "difficulty": "medie"
+          "id": "165",
+          "title": "Suma cifrelor pare distincte",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 18 · Subiectul III.1"
         },
         {
-          "id": "66",
-          "title": "Numere prime gemene",
-          "difficulty": "medie"
+          "id": "166",
+          "title": "Divizorii cu aceeași paritate ca n",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 19 · Subiectul III.1"
         },
         {
-          "id": "67",
-          "title": "Cifre în ordine crescătoare",
-          "difficulty": "ușoară"
+          "id": "167",
+          "title": "Din baza b în baza 10",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 20 · Subiectul III.1"
         },
         {
-          "id": "68",
-          "title": "Elemente egale cu media vecinilor",
-          "difficulty": "ușoară"
+          "id": "168",
+          "title": "Suma cifrelor prime",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Model · Subiectul III.1"
         },
         {
-          "id": "69",
-          "title": "Suma divizorilor impari",
-          "difficulty": "medie"
+          "id": "169",
+          "title": "Inserarea diferențelor dintre cifre",
+          "difficulty": "medie",
+          "sursa": "BAC 2019 · Simulare clasa a XII-a · Subiectul III.1"
         },
         {
-          "id": "70",
-          "title": "Înlocuirea unei cifre",
-          "difficulty": "medie"
+          "id": "170",
+          "title": "Cifrele impare egale",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Sesiunea specială · Subiectul III.1"
+        },
+        {
+          "id": "171",
+          "title": "Cifrele impare micșorate",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Sesiunea iunie–iulie · Subiectul III.1"
+        },
+        {
+          "id": "172",
+          "title": "Produsul divizorilor impari",
+          "difficulty": "medie",
+          "sursa": "BAC 2019 · Sesiunea august · Subiectul III.1"
         }
       ],
       "2. Subiectul III.2 · Șiruri și matrice": [
         {
-          "id": "71",
-          "title": "Cuvinte care încep și se termină la fel",
-          "difficulty": "ușoară"
+          "id": "173",
+          "title": "Fără jucăriile de pe diagonala secundară",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Model · Subiectul III.2"
         },
         {
-          "id": "72",
-          "title": "Prima și ultima literă mare",
-          "difficulty": "ușoară"
+          "id": "174",
+          "title": "Criptarea cu cifru circular",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Simulare clasa a XII-a · Subiectul III.2"
         },
         {
-          "id": "73",
-          "title": "Maximul fiecărei coloane",
-          "difficulty": "ușoară"
+          "id": "175",
+          "title": "Minimul fiecărei coloane la un capăt",
+          "difficulty": "medie",
+          "sursa": "BAC 2026 · Sesiunea specială · Subiectul III.2"
         },
         {
-          "id": "74",
-          "title": "Matricea min(i, j)",
-          "difficulty": "ușoară"
+          "id": "176",
+          "title": "Vocalele și consoanele alternează",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Sesiunea iunie–iulie · Subiectul III.2"
         },
         {
-          "id": "75",
-          "title": "Pătrate concentrice",
-          "difficulty": "medie"
+          "id": "177",
+          "title": "Coloane stabile",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Sesiunea iunie–iulie (rezervă) · Subiectul III.2"
         },
         {
-          "id": "76",
-          "title": "Linia cu suma maximă, prima",
-          "difficulty": "medie"
+          "id": "178",
+          "title": "Floarea cu cel mai mic necesar de lumină",
+          "difficulty": "medie",
+          "sursa": "BAC 2026 · Sesiunea august · Subiectul III.2"
         },
         {
-          "id": "77",
-          "title": "Cuvinte palindrom",
-          "difficulty": "ușoară"
+          "id": "179",
+          "title": "Diagonala cu multipli, linii descrescătoare",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Model · Subiectul III.2"
         },
         {
-          "id": "78",
-          "title": "Numărul de apariții ale unui cuvânt",
-          "difficulty": "medie"
+          "id": "180",
+          "title": "Cuvinte asemenea cu ultimul",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Simulare clasa a XII-a · Subiectul III.2"
         },
         {
-          "id": "79",
-          "title": "Linii ordonate crescător",
-          "difficulty": "medie"
+          "id": "181",
+          "title": "Cuvinte despărțite prin cratimă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea specială · Subiectul III.2"
         },
         {
-          "id": "80",
-          "title": "Sub diagonala secundară",
-          "difficulty": "ușoară"
+          "id": "182",
+          "title": "Cuvinte semioglindite",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "183",
+          "title": "Trei locuri libere alăturate",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea iunie–iulie (rezervă) · Subiectul III.2"
+        },
+        {
+          "id": "184",
+          "title": "Coloana minimului înlocuită",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea august · Subiectul III.2"
+        },
+        {
+          "id": "185",
+          "title": "Cuvinte mai scurte și mai lungi decât n",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2024 · Model · Subiectul III.2"
+        },
+        {
+          "id": "186",
+          "title": "Fraza generată dintr-un șablon",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Simulare clasa a XII-a · Subiectul III.2"
+        },
+        {
+          "id": "187",
+          "title": "Cea mai mică valoare generată",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea specială · Subiectul III.2"
+        },
+        {
+          "id": "188",
+          "title": "Toate cuvintele au aceeași lungime",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2024 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "189",
+          "title": "Tunderea gazonului",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea august · Subiectul III.2"
+        },
+        {
+          "id": "190",
+          "title": "Caruselele departe de tobogane",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Model · Subiectul III.2"
+        },
+        {
+          "id": "191",
+          "title": "Denumirea științifică a unei păsări",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Simulare clasa a XII-a · Subiectul III.2"
+        },
+        {
+          "id": "192",
+          "title": "Parcelele cu flori",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea specială · Subiectul III.2"
+        },
+        {
+          "id": "193",
+          "title": "Talvegul râului",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2023 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "194",
+          "title": "Pătratul 2 × 2 de valoare maximă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2023 · Sesiunea august · Subiectul III.2"
+        },
+        {
+          "id": "195",
+          "title": "Numerele din text au tot atâtea cifre",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Model · Subiectul III.2"
+        },
+        {
+          "id": "196",
+          "title": "Numele invitaților cu prenumele dat",
+          "difficulty": "medie",
+          "sursa": "BAC 2022 · Simulare clasa a XII-a · Subiectul III.2"
+        },
+        {
+          "id": "197",
+          "title": "Fără instrumentele de pe diagonală",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Sesiunea specială · Subiectul III.2"
+        },
+        {
+          "id": "198",
+          "title": "Înnisiparea plajei",
+          "difficulty": "medie",
+          "sursa": "BAC 2022 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "199",
+          "title": "Parola codificată cu vocalele prietene",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Sesiunea august · Subiectul III.2"
+        },
+        {
+          "id": "200",
+          "title": "Pătratele pare, descrescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Model · Subiectul III.2"
+        },
+        {
+          "id": "201",
+          "title": "Deplasare circulară spre dreapta pe linia k",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Simulare clasa a XII-a · Subiectul III.2"
+        },
+        {
+          "id": "202",
+          "title": "Schimbul dintre linia k și coloana k",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Sesiunea specială · Subiectul III.2 (identic: Testul de antrenament 11 din 2021)"
+        },
+        {
+          "id": "203",
+          "title": "Primele k cuvinte terminate în vocală",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "204",
+          "title": "Diagonala cu multipli de k",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Sesiunea august · Subiectul III.2"
+        },
+        {
+          "id": "205",
+          "title": "Primul pătrat concentric, invers acelor de ceasornic",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 1 · Subiectul III.2"
+        },
+        {
+          "id": "206",
+          "title": "Valoarea n pe diagonala secundară",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 2 · Subiectul III.2"
+        },
+        {
+          "id": "207",
+          "title": "Persoane cu locuri pe primul și pe ultimul rând",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 3 · Subiectul III.2"
+        },
+        {
+          "id": "208",
+          "title": "Cea mai mare valoare sub 21 pe fiecare linie",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 4 · Subiectul III.2"
+        },
+        {
+          "id": "209",
+          "title": "Ultima cifră a produsului i · j",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 5 · Subiectul III.2"
+        },
+        {
+          "id": "210",
+          "title": "Zerouri pe diagonala secundară",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 6 · Subiectul III.2"
+        },
+        {
+          "id": "211",
+          "title": "Tabloul cu cifrele lui x pe fiecare linie",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 7 · Subiectul III.2"
+        },
+        {
+          "id": "212",
+          "title": "Zona dintre diagonale și ultima coloană",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 8 · Subiectul III.2"
+        },
+        {
+          "id": "213",
+          "title": "Cuvinte cu o singură vocală distinctă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 9 · Subiectul III.2"
+        },
+        {
+          "id": "214",
+          "title": "Valorile care filtrează prima linie și ultima coloană",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 10 · Subiectul III.2"
+        },
+        {
+          "id": "215",
+          "title": "Deplasare circulară lângă diagonala secundară",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 12 · Subiectul III.2"
+        },
+        {
+          "id": "216",
+          "title": "Cuvintele lungi, apoi celelalte",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Model · Subiectul III.2"
+        },
+        {
+          "id": "217",
+          "title": "Citatele scrise cu litere mari",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Sesiunea specială · Subiectul III.2"
+        },
+        {
+          "id": "218",
+          "title": "Rotirea cuvintelor spre stânga",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "219",
+          "title": "Cuvinte în oglindă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Sesiunea august · Subiectul III.2"
+        },
+        {
+          "id": "220",
+          "title": "Fiecare valoare de k ori",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 1 · Subiectul III.2"
+        },
+        {
+          "id": "221",
+          "title": "Eliminarea numerelor negative din text",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 2 · Subiectul III.2"
+        },
+        {
+          "id": "222",
+          "title": "Distanța față de diagonala secundară",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 3 · Subiectul III.2"
+        },
+        {
+          "id": "223",
+          "title": "Coloane complementare cu prima",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 4 · Subiectul III.2"
+        },
+        {
+          "id": "224",
+          "title": "Câte numere întregi sunt în text",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 5 · Subiectul III.2"
+        },
+        {
+          "id": "225",
+          "title": "Mai puține vocale decât consoane",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 6 · Subiectul III.2"
+        },
+        {
+          "id": "226",
+          "title": "Valorile care polarizează prima și ultima coloană",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 7 · Subiectul III.2"
+        },
+        {
+          "id": "227",
+          "title": "Deplasare circulară spre stânga pe linia k",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 8 · Subiectul III.2"
+        },
+        {
+          "id": "228",
+          "title": "Cuvintele care încep cu ultimul cuvânt",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 9 · Subiectul III.2"
+        },
+        {
+          "id": "229",
+          "title": "Succes între cuvintele cu aceeași terminație",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 10 · Subiectul III.2"
+        },
+        {
+          "id": "230",
+          "title": "Fiecare cuvânt cu inițială mare",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 11 · Subiectul III.2"
+        },
+        {
+          "id": "231",
+          "title": "Eliminarea ultimei vocale",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 12 · Subiectul III.2"
+        },
+        {
+          "id": "232",
+          "title": "Fiecare valoare de k ori, pe coloane",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 13 · Subiectul III.2"
+        },
+        {
+          "id": "233",
+          "title": "Numerele negative înlocuite cu modulul",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 14 · Subiectul III.2"
+        },
+        {
+          "id": "234",
+          "title": "Cuvinte cu tot atâtea vocale cât consoane",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 15 · Subiectul III.2"
+        },
+        {
+          "id": "235",
+          "title": "Pătratele impare, descrescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 16 · Subiectul III.2"
+        },
+        {
+          "id": "236",
+          "title": "Dublarea cuvintelor formate doar din vocale",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 17 · Subiectul III.2"
+        },
+        {
+          "id": "237",
+          "title": "Cuvintele care se termină cu al k-lea cuvânt",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 18 · Subiectul III.2"
+        },
+        {
+          "id": "238",
+          "title": "O linie complementară cu linia k",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 19 · Subiectul III.2"
+        },
+        {
+          "id": "239",
+          "title": "Numerele reale înlocuite cu partea întreagă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 20 · Subiectul III.2"
+        },
+        {
+          "id": "240",
+          "title": "Consoană, vocală, ultima literă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Model · Subiectul III.2"
+        },
+        {
+          "id": "241",
+          "title": "Numele instituției fără prescurtări",
+          "difficulty": "medie",
+          "sursa": "BAC 2019 · Simulare clasa a XII-a · Subiectul III.2"
+        },
+        {
+          "id": "242",
+          "title": "Cuvintele cu exact n litere",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Sesiunea specială · Subiectul III.2"
+        },
+        {
+          "id": "243",
+          "title": "Tablou simetric față de coloana din mijloc",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Sesiunea iunie–iulie · Subiectul III.2"
+        },
+        {
+          "id": "244",
+          "title": "Cel mai mare pătrat cu elemente egale",
+          "difficulty": "medie",
+          "sursa": "BAC 2019 · Sesiunea august · Subiectul III.2"
         }
       ],
       "3. Subiectul III.3 · Fișiere și algoritmi eficienți": [
         {
-          "id": "81",
-          "title": "Cele mai lungi secvențe pare",
-          "difficulty": "medie"
+          "id": "245",
+          "title": "Cea mai mare putere a lui 26 care divide n!",
+          "difficulty": "grea",
+          "sursa": "BAC 2026 · Model · Subiectul III.3"
         },
         {
-          "id": "82",
-          "title": "Numerele de două cifre care lipsesc",
-          "difficulty": "medie"
+          "id": "246",
+          "title": "Valori pare distincte dintr-un interval",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Simulare clasa a XII-a · Subiectul III.3"
         },
         {
-          "id": "83",
-          "title": "Cele mai mari două numere de două cifre",
-          "difficulty": "medie"
+          "id": "247",
+          "title": "Pachetele firmei de curierat, invers",
+          "difficulty": "medie",
+          "sursa": "BAC 2026 · Sesiunea specială · Subiectul III.3"
         },
         {
-          "id": "84",
-          "title": "Valorile comune a două șiruri crescătoare",
-          "difficulty": "grea"
+          "id": "248",
+          "title": "Rezultatele motivante la șah și go",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2026 · Sesiunea iunie–iulie · Subiectul III.3"
         },
         {
-          "id": "85",
-          "title": "Perechi cu suma divizibilă cu 10",
-          "difficulty": "grea"
+          "id": "249",
+          "title": "Șirul cu două reguli, invers",
+          "difficulty": "grea",
+          "sursa": "BAC 2026 · Sesiunea iunie–iulie (rezervă) · Subiectul III.3"
         },
         {
-          "id": "86",
-          "title": "Cel mai lung platou",
-          "difficulty": "medie"
+          "id": "250",
+          "title": "Cel mai lung mesaj de avertisment",
+          "difficulty": "grea",
+          "sursa": "BAC 2026 · Sesiunea august · Subiectul III.3"
         },
         {
-          "id": "87",
-          "title": "Secvența de sumă maximă",
-          "difficulty": "grea"
+          "id": "251",
+          "title": "Ultimele două mașini din același an",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Model · Subiectul III.3"
         },
         {
-          "id": "88",
-          "title": "Cifrele care apar cel mai des",
-          "difficulty": "medie"
+          "id": "252",
+          "title": "Seturi de bijuterii potrivite",
+          "difficulty": "medie",
+          "sursa": "BAC 2025 · Simulare clasa a XII-a · Subiectul III.3"
         },
         {
-          "id": "89",
-          "title": "Valorile care apar o singură dată",
-          "difficulty": "medie"
+          "id": "253",
+          "title": "Triunghiuri dreptunghice cu aceeași ipotenuză",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea specială · Subiectul III.3"
         },
         {
-          "id": "90",
-          "title": "Cea mai lungă secvență crescătoare",
-          "difficulty": "grea"
+          "id": "254",
+          "title": "Muzeele convenabile",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2025 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "255",
+          "title": "Extragerea de la loterie",
+          "difficulty": "medie",
+          "sursa": "BAC 2025 · Sesiunea iunie–iulie (rezervă) · Subiectul III.3"
+        },
+        {
+          "id": "256",
+          "title": "Perioadele de producție validate",
+          "difficulty": "medie",
+          "sursa": "BAC 2025 · Sesiunea august · Subiectul III.3"
+        },
+        {
+          "id": "257",
+          "title": "Prețurile cărților pentru premii",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Model · Subiectul III.3"
+        },
+        {
+          "id": "258",
+          "title": "Șir de tip api",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2024 · Simulare clasa a XII-a · Subiectul III.3"
+        },
+        {
+          "id": "259",
+          "title": "Primul și ultimul număr cu cifra maximă",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea specială · Subiectul III.3"
+        },
+        {
+          "id": "260",
+          "title": "Cea mai lungă scară pe traseu",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "261",
+          "title": "Termenii șirului cu trei termeni, invers",
+          "difficulty": "medie",
+          "sursa": "BAC 2024 · Sesiunea august · Subiectul III.3"
+        },
+        {
+          "id": "262",
+          "title": "Șir p-ordonat",
+          "difficulty": "grea",
+          "sursa": "BAC 2023 · Model · Subiectul III.3"
+        },
+        {
+          "id": "263",
+          "title": "Pașii reprezentativi",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Simulare clasa a XII-a · Subiectul III.3"
+        },
+        {
+          "id": "264",
+          "title": "p-intervale care nu se schimbă",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea specială · Subiectul III.3"
+        },
+        {
+          "id": "265",
+          "title": "Valori de două cifre: tot atâtea prefixe cât sufixe",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "266",
+          "title": "Perechi de poziții cu valori egale",
+          "difficulty": "medie",
+          "sursa": "BAC 2023 · Sesiunea august · Subiectul III.3"
+        },
+        {
+          "id": "267",
+          "title": "Secvențe par-încadrate de lungime maximă",
+          "difficulty": "medie",
+          "sursa": "BAC 2022 · Model · Subiectul III.3"
+        },
+        {
+          "id": "268",
+          "title": "Cea mai mare putere a lui 45 care divide n!",
+          "difficulty": "grea",
+          "sursa": "BAC 2022 · Simulare clasa a XII-a · Subiectul III.3"
+        },
+        {
+          "id": "269",
+          "title": "Secvența progresivă cea mai lungă",
+          "difficulty": "grea",
+          "sursa": "BAC 2022 · Sesiunea specială · Subiectul III.3"
+        },
+        {
+          "id": "270",
+          "title": "Valori distincte dintr-un interval",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "271",
+          "title": "Secvențele paritare de lungime maximă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2022 · Sesiunea august · Subiectul III.3"
+        },
+        {
+          "id": "272",
+          "title": "Tipul de produs cu cheltuiala maximă",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Model · Subiectul III.3"
+        },
+        {
+          "id": "273",
+          "title": "Costul elementelor grafice",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Simulare clasa a XII-a · Subiectul III.3"
+        },
+        {
+          "id": "274",
+          "title": "Termenii șirului cu pas 2n, invers",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Sesiunea specială · Subiectul III.3 (identic: Testul de antrenament 11 din 2021)"
+        },
+        {
+          "id": "275",
+          "title": "Ultimii doi termeni consecutivi cu sufixul x",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "276",
+          "title": "Perechi asemenea",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Sesiunea august · Subiectul III.3"
+        },
+        {
+          "id": "277",
+          "title": "Numere cu două cifre distincte care lipsesc",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 1 · Subiectul III.3"
+        },
+        {
+          "id": "278",
+          "title": "Cea mai lungă secvență cu un capăt pozitiv",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 2 · Subiectul III.3"
+        },
+        {
+          "id": "279",
+          "title": "Precedați de cei mai mulți z-prieteni",
+          "difficulty": "grea",
+          "sursa": "BAC 2021 · Test de antrenament 3 · Subiectul III.3"
+        },
+        {
+          "id": "280",
+          "title": "Multiplii de 5 dintr-un singur șir",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 4 · Subiectul III.3"
+        },
+        {
+          "id": "281",
+          "title": "Maximul fiecărui început de șir",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 5 · Subiectul III.3"
+        },
+        {
+          "id": "282",
+          "title": "Secvența cu un singur negativ",
+          "difficulty": "medie",
+          "sursa": "BAC 2021 · Test de antrenament 6 · Subiectul III.3"
+        },
+        {
+          "id": "283",
+          "title": "Toate cifrele pare din șir",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 7 · Subiectul III.3"
+        },
+        {
+          "id": "284",
+          "title": "Ultimele două numere impare",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 8 · Subiectul III.3"
+        },
+        {
+          "id": "285",
+          "title": "Cel mai mare număr din toate cifrele",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 9 · Subiectul III.3"
+        },
+        {
+          "id": "286",
+          "title": "Cea mai mică poziție a primului termen după ordonare",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 10 · Subiectul III.3"
+        },
+        {
+          "id": "287",
+          "title": "Cea mai mare poziție a primului termen după ordonare",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2021 · Test de antrenament 12 · Subiectul III.3"
+        },
+        {
+          "id": "288",
+          "title": "Valorile care lipsesc din șirul ordonat",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Model · Subiectul III.3"
+        },
+        {
+          "id": "289",
+          "title": "Vârful cu vecinii cei mai apropiați",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Sesiunea specială · Subiectul III.3"
+        },
+        {
+          "id": "290",
+          "title": "Rearanjare în șir palindromic",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "291",
+          "title": "Cel mai strâns interval pentru numerele de două cifre",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Sesiunea august · Subiectul III.3"
+        },
+        {
+          "id": "292",
+          "title": "Termenii șirului în ordine descrescătoare",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 1 · Subiectul III.3"
+        },
+        {
+          "id": "293",
+          "title": "Cele mai mari trei numere terminate în 20",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 2 · Subiectul III.3"
+        },
+        {
+          "id": "294",
+          "title": "Cea mai lungă secvență cu un capăt negativ",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 3 · Subiectul III.3"
+        },
+        {
+          "id": "295",
+          "title": "Numerele care apar exact de două ori",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 4 · Subiectul III.3"
+        },
+        {
+          "id": "296",
+          "title": "Suma maximă a unei secvențe",
+          "difficulty": "grea",
+          "sursa": "BAC 2020 · Test de antrenament 5 · Subiectul III.3"
+        },
+        {
+          "id": "297",
+          "title": "Numerele de 7 cifre cu produse date",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 6 · Subiectul III.3"
+        },
+        {
+          "id": "298",
+          "title": "Suma minimă a unei secvențe",
+          "difficulty": "grea",
+          "sursa": "BAC 2020 · Test de antrenament 7 · Subiectul III.3"
+        },
+        {
+          "id": "299",
+          "title": "Precedați de cei mai mulți cu aceeași ultimă cifră",
+          "difficulty": "grea",
+          "sursa": "BAC 2020 · Test de antrenament 8 · Subiectul III.3"
+        },
+        {
+          "id": "300",
+          "title": "Cele mai lungi k-secvențe",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 9 · Subiectul III.3"
+        },
+        {
+          "id": "301",
+          "title": "Cea mai lungă progresie aritmetică",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 10 · Subiectul III.3"
+        },
+        {
+          "id": "302",
+          "title": "Fiecare valoare cu numărul ei de apariții",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 11 · Subiectul III.3"
+        },
+        {
+          "id": "303",
+          "title": "Șirul cu dublări, invers",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 12 · Subiectul III.3"
+        },
+        {
+          "id": "304",
+          "title": "Puterile lui 2, descrescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 13 · Subiectul III.3"
+        },
+        {
+          "id": "305",
+          "title": "Cele mai mici trei numere terminate în 20",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 14 · Subiectul III.3"
+        },
+        {
+          "id": "306",
+          "title": "Numerele de 7 cifre, crescător",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 15 · Subiectul III.3"
+        },
+        {
+          "id": "307",
+          "title": "Șir alternant din două șiruri ordonate",
+          "difficulty": "grea",
+          "sursa": "BAC 2020 · Test de antrenament 16 · Subiectul III.3"
+        },
+        {
+          "id": "308",
+          "title": "Intervale fără termeni din șir",
+          "difficulty": "medie",
+          "sursa": "BAC 2020 · Test de antrenament 17 · Subiectul III.3"
+        },
+        {
+          "id": "309",
+          "title": "Cele mai lungi secvențe de multipli de 10",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 18 · Subiectul III.3"
+        },
+        {
+          "id": "310",
+          "title": "Numerele pare distincte dintr-un șir crescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 19 · Subiectul III.3"
+        },
+        {
+          "id": "311",
+          "title": "Suma maximă cu aceeași paritate",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2020 · Test de antrenament 20 · Subiectul III.3"
+        },
+        {
+          "id": "312",
+          "title": "Intervalul prieten de grad maxim",
+          "difficulty": "medie",
+          "sursa": "BAC 2019 · Model · Subiectul III.3"
+        },
+        {
+          "id": "313",
+          "title": "Șir paritar",
+          "difficulty": "grea",
+          "sursa": "BAC 2019 · Simulare clasa a XII-a · Subiectul III.3"
+        },
+        {
+          "id": "314",
+          "title": "Șirul invers fără tablou",
+          "difficulty": "grea",
+          "sursa": "BAC 2019 · Sesiunea specială · Subiectul III.3"
+        },
+        {
+          "id": "315",
+          "title": "Vârfurile locale ale unui șir",
+          "difficulty": "medie",
+          "sursa": "BAC 2019 · Sesiunea iunie–iulie · Subiectul III.3"
+        },
+        {
+          "id": "316",
+          "title": "Întâi imparii, apoi parii, crescător",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2019 · Sesiunea august · Subiectul III.3"
         }
       ],
       "4. Olimpiadă": [
         {
           "id": "94",
           "title": "Nestemate",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "OJI 2024 · clasele XI–XII"
+        }
+      ],
+      "5. Exerciții suplimentare · în stilul Subiectului III": [
+        {
+          "id": "61",
+          "title": "Cifrele impare ale unui număr",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "62",
+          "title": "Cel mai mare divizor prim",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC); varianta oficială: BAC 2020 · Test de antrenament 15 · Subiectul III.1"
+        },
+        {
+          "id": "63",
+          "title": "Dublarea cifrelor impare",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC); varianta oficială: BAC 2020 · Model · Subiectul III.1"
+        },
+        {
+          "id": "64",
+          "title": "Între doi termeni Fibonacci",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "65",
+          "title": "Exponentul unui prim în n!",
+          "difficulty": "grea",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "66",
+          "title": "Numere prime gemene",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "67",
+          "title": "Cifre în ordine crescătoare",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "68",
+          "title": "Elemente egale cu media vecinilor",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "69",
+          "title": "Suma divizorilor impari",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "70",
+          "title": "Înlocuirea unei cifre",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "71",
+          "title": "Cuvinte care încep și se termină la fel",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "72",
+          "title": "Prima și ultima literă mare",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "73",
+          "title": "Maximul fiecărei coloane",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "74",
+          "title": "Matricea min(i, j)",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "75",
+          "title": "Pătrate concentrice",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "76",
+          "title": "Linia cu suma maximă, prima",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "77",
+          "title": "Cuvinte palindrom",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "78",
+          "title": "Numărul de apariții ale unui cuvânt",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "79",
+          "title": "Linii ordonate crescător",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "80",
+          "title": "Sub diagonala secundară",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "81",
+          "title": "Cele mai lungi secvențe pare",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "82",
+          "title": "Numerele de două cifre care lipsesc",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "83",
+          "title": "Cele mai mari două numere de două cifre",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "84",
+          "title": "Valorile comune a două șiruri crescătoare",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "85",
+          "title": "Perechi cu suma divizibilă cu 10",
+          "difficulty": "grea",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "86",
+          "title": "Cel mai lung platou",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "87",
+          "title": "Secvența de sumă maximă",
+          "difficulty": "grea",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC); varianta oficială: BAC 2020 · Test de antrenament 5 · Subiectul III.3"
+        },
+        {
+          "id": "88",
+          "title": "Cifrele care apar cel mai des",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "89",
+          "title": "Valorile care apar o singură dată",
+          "difficulty": "ușoară",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
+        },
+        {
+          "id": "90",
+          "title": "Cea mai lungă secvență crescătoare",
+          "difficulty": "medie",
+          "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
         }
       ]
     }

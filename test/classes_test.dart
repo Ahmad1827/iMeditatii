@@ -322,6 +322,9 @@ void main() {
       await tester.enterText(find.byWidgetPredicate((w) => w is TextField && (w.decoration?.hintText ?? '').startsWith('Titlu')), 'Ecuații');
       await tester.tap(find.text('Mâine'));
       await tester.tap(find.text('Probleme din bancă'));
+      await tester.pump();
+      // the bank is over 50 KB, so Flutter decodes it on another isolate: let it really finish
+      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 500)));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Informatică').first);
       await tester.pumpAndSettle();

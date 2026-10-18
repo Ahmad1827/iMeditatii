@@ -114,6 +114,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 'category': categoryName,
                 'title': ex['title'] ?? "Fără titlu",
                 'difficulty': ex['difficulty'] ?? "ușoară",
+                'sursa': ex['sursa'] ?? '',
                 'source': 'json',
               });
             }
@@ -141,6 +142,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           'category': data['category'] ?? "General",
           'title': data['title'] ?? "Fără titlu",
           'difficulty': data['difficulty'] ?? "ușoară",
+          'sursa': data['sursa'] ?? '',
           'source': 'firebase',
         });
         tempGrades.add(gradeStr);
@@ -199,16 +201,28 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
         filtered = filtered.where((ex) => ex['category'] == selectedCategory).toList();
       }
 
-      if (searchQuery.isNotEmpty) {
+      if (searchQuery.trim().isNotEmpty) {
+        // every word typed, anywhere in the title, chapter or source: "2024 iunie", "simulare"
+        final words = _fold(searchQuery).split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
         filtered = filtered.where((ex) {
-          final t = (ex['title'] as String).toLowerCase();
-          final c = (ex['category'] as String).toLowerCase();
-          return t.contains(searchQuery.toLowerCase()) || c.contains(searchQuery.toLowerCase());
+          final hay = _fold('${ex['title']} ${ex['category']} ${ex['sursa'] ?? ''}');
+          return words.every(hay.contains);
         }).toList();
       }
 
       displayedExercises = filtered;
     });
+  }
+
+  /// Lowercase and without diacritics, so "sesiunea speciala" finds "Sesiunea specială".
+  static String _fold(String s) {
+    const from = 'ăâîșşțţ', to = 'aaissstt';
+    final b = StringBuffer();
+    for (final ch in s.toLowerCase().split('')) {
+      final k = from.indexOf(ch);
+      b.write(k < 0 ? ch : to[k]);
+    }
+    return b.toString();
   }
 
   Future<bool> _isExerciseDone(String id) async {
@@ -536,7 +550,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       },
       style: TextStyle(fontSize: 14.5, color: Pb.text),
       cursorColor: Pb.primary,
-      decoration: Pb.input(hint: 'Caută după titlu sau capitol').copyWith(
+      decoration: Pb.input(hint: 'Caută după titlu, capitol sau sursă (ex. 2024 iunie)').copyWith(
         prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
         prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
         suffixIcon: searchQuery.isEmpty
@@ -847,6 +861,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     final dc = _diffColor(diff);
     final cat = '${e['category'] ?? ''}';
     final cc = _catColor(cat);
+    final sursa = '${e['sursa'] ?? ''}';
 
     return _LHover(
       onTap: () => _openExercise(e),
@@ -892,8 +907,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   ),
                   if (isMobile) ...[
                     const SizedBox(height: 2),
-                    Text('#${e['id']}, ${AppStyle.sentence(cat)}, ${AppStyle.sentence(diff)}',
+                    Text('#${e['id']}, ${sursa.isNotEmpty ? sursa : AppStyle.sentence(cat)}, ${AppStyle.sentence(diff)}',
                         style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                  ] else if (sursa.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(sursa, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
                   ],
                 ],
               ),
@@ -1511,6 +1529,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
     final category = widget.exercise["category"] ?? "";
     final diff = widget.exercise["difficulty"] ?? "ușoară";
     final id = widget.exercise["id"] ?? "";
+    final String sursa = widget.exercise["sursa"] ?? "";
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -1586,7 +1605,7 @@ class _SingleColumnQuestCardState extends State<SingleColumnQuestCard> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          category.toUpperCase(),
+                          (sursa.isNotEmpty ? sursa : category).toUpperCase(),
                           style: TextStyle(
                             fontSize: widget.isMobile ? 11 : 12,
                             color: AppColors.textMuted,

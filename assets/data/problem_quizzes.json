@@ -3264,6 +3264,6829 @@
      "a": 0,
      "e": "Prima dată când atingi o valoare, toate nestematele ei primesc distanța; după aceea lista nu mai aduce nimic nou."
     }
+   ],
+   "101": [
+    {
+     "q": "Care cifră din 25 se schimbă?",
+     "o": [
+      "5, care devine 6",
+      "2, care devine 3",
+      "amândouă"
+     ],
+     "a": 0,
+     "e": "25 devine 26."
+    },
+    {
+     "q": "Se schimbă ceva în 52?",
+     "o": [
+      "Nu, 5 nu are un 2 în stânga",
+      "Da, devine 62"
+     ],
+     "a": 0,
+     "e": "Secvența trebuie să fie 2 urmat de 5."
+    },
+    {
+     "q": "Ce devine 2525?",
+     "o": [
+      "2626",
+      "2625",
+      "2525"
+     ],
+     "a": 0,
+     "e": "Ambele secvențe 25 se înlocuiesc."
+    }
+   ],
+   "102": [
+    {
+     "q": "Ce proprietate are lungimea unei polițe pline?",
+     "o": [
+      "E multiplu al lățimii cutiilor de pe ea",
+      "E divizor al lățimii",
+      "E pară"
+     ],
+     "a": 0,
+     "e": "Cutiile întregi umplu exact polița."
+    },
+    {
+     "q": "Ce reprezintă lungimea minimă comună?",
+     "o": [
+      "Cel mai mic multiplu comun",
+      "Cel mai mare divizor comun",
+      "Produsul"
+     ],
+     "a": 0,
+     "e": "E cea mai mică lungime multiplu pentru toate trei."
+    },
+    {
+     "q": "Cum se leagă cmmmc de cmmdc pentru două numere?",
+     "o": [
+      "cmmmc(a, b) = a · b / cmmdc(a, b)",
+      "cmmmc = cmmdc",
+      "cmmmc = a + b"
+     ],
+     "a": 0,
+     "e": "Împărțind întâi, a / cmmdc · b, eviți numere prea mari."
+    }
+   ],
+   "103": [
+    {
+     "q": "Care e primul costum în 576798?",
+     "o": [
+      "6, al treilea model",
+      "8, ultimul",
+      "5"
+     ],
+     "a": 0,
+     "e": "Cifrele pare sunt costume: 6 e prima pară de la stânga."
+    },
+    {
+     "q": "Ce returnează pentru n = 0?",
+     "o": [
+      "1",
+      "0",
+      "-1"
+     ],
+     "a": 0,
+     "e": "0 are o cifră, 0, care e pară."
+    },
+    {
+     "q": "Dacă parcurgi cifrele de la dreapta, pe care cifră pară o păstrezi?",
+     "o": [
+      "Ultima întâlnită",
+      "Prima întâlnită",
+      "Pe cea mai mare"
+     ],
+     "a": 0,
+     "e": "Ultima găsită de la dreapta e prima de la stânga."
+    }
+   ],
+   "104": [
+    {
+     "q": "Care sunt numerele uniforme asociate lui 19472?",
+     "o": [
+      "197 și 42",
+      "19 și 472",
+      "1974 și 2"
+     ],
+     "a": 0,
+     "e": "Păstrezi fie doar cifrele impare, fie doar pe cele pare, în ordinea lor."
+    },
+    {
+     "q": "Cum alipești 197 și 42?",
+     "o": [
+      "197 · 100 + 42",
+      "197 + 42",
+      "42 · 1000 + 197"
+     ],
+     "a": 0,
+     "e": "42 are 2 cifre, deci 197 se mută cu două poziții."
+    },
+    {
+     "q": "De ce e important că cifrele sunt nenule?",
+     "o": [
+      "Un 0 la începutul părții pare s-ar pierde la alipire",
+      "Nu e important",
+      "Pentru că 0 e par"
+     ],
+     "a": 0,
+     "e": "Enunțul elimină cazul ca să nu apară zerouri nesemnificative."
+    }
+   ],
+   "105": [
+    {
+     "q": "Câte pagini are în total un set cu broșura de p pagini?",
+     "o": [
+      "4p",
+      "3p",
+      "p + 3"
+     ],
+     "a": 0,
+     "e": "p pentru broșură și 3p pentru catalog."
+    },
+    {
+     "q": "De ce 48 dă 0?",
+     "o": [
+      "48 / 4 = 12 nu e prim",
+      "48 nu se împarte la 4",
+      "Pentru că e par"
+     ],
+     "a": 0,
+     "e": "Broșura ar avea 12 pagini."
+    },
+    {
+     "q": "Ce returnează pentru n = 4?",
+     "o": [
+      "0, pentru că p = 1 nu e prim",
+      "1"
+     ],
+     "a": 0,
+     "e": "1 nu e număr prim."
+    }
+   ],
+   "106": [
+    {
+     "q": "De ce 32412 nu e reprezentat în baza 3?",
+     "o": [
+      "Are cifrele 3 și 4, mai mari decât 2",
+      "Pentru că e par",
+      "Este"
+     ],
+     "a": 0,
+     "e": "În baza 3 cifrele sunt doar 0, 1, 2."
+    },
+    {
+     "q": "Ce cifre are baza 8?",
+     "o": [
+      "0..7",
+      "1..8",
+      "0..8"
+     ],
+     "a": 0,
+     "e": "Intervalul [0, b − 1]."
+    },
+    {
+     "q": "E reprezentat 0 în orice bază?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Cifra 0 e permisă în orice bază."
+    }
+   ],
+   "107": [
+    {
+     "q": "Ce rămâne din 7003485 după ce scoți cifrele impare și zerourile?",
+     "o": [
+      "48",
+      "0048",
+      "7348"
+     ],
+     "a": 0,
+     "e": "Cifrele pare nenule, în ordine: 4 și 8."
+    },
+    {
+     "q": "Este 0 o cifră care se păstrează?",
+     "o": [
+      "Nu, cifrele nule se îndepărtează",
+      "Da, 0 e par"
+     ],
+     "a": 0,
+     "e": "Enunțul cere îndepărtarea cifrelor impare sau nule."
+    },
+    {
+     "q": "De ce 15 și 510 nu sunt par-oglindite?",
+     "o": [
+      "Nu rămâne nicio cifră, deci nu se obțin numere",
+      "Pentru că sunt impare",
+      "Sunt"
+     ],
+     "a": 0,
+     "e": "Ca la x = 40, y = 86 la varianta cu cifre impare din 2021."
+    }
+   ],
+   "108": [
+    {
+     "q": "Este 2026 harsad?",
+     "o": [
+      "Nu: suma cifrelor e 10, iar 2026 nu se împarte la 10",
+      "Da"
+     ],
+     "a": 0,
+     "e": "De aceea pentru k = 2027 răspunsul coboară la 2025."
+    },
+    {
+     "q": "De ce găsești mereu un număr harsad?",
+     "o": [
+      "Orice număr de o cifră se împarte la el însuși",
+      "Pentru că k e mare",
+      "Nu găsești mereu"
+     ],
+     "a": 0,
+     "e": "De exemplu 1 are suma cifrelor 1."
+    },
+    {
+     "q": "Ce returnează pentru k = 11?",
+     "o": [
+      "10",
+      "11",
+      "9"
+     ],
+     "a": 0,
+     "e": "11 are suma 2 și nu se împarte la 2; 10 are suma 1."
+    }
+   ],
+   "109": [
+    {
+     "q": "Care divizori ai lui 72 sunt pătrate perfecte?",
+     "o": [
+      "1, 4, 9, 36",
+      "1, 4, 9",
+      "36 și 72"
+     ],
+     "a": 0,
+     "e": "72 = 2³ · 3²; cel mai mare pătrat care îl divide e 2² · 3² = 36."
+    },
+    {
+     "q": "De ce 15 dă 1?",
+     "o": [
+      "15 = 3 · 5 nu se împarte la niciun pătrat mai mare ca 1",
+      "Din greșeală",
+      "Pentru că e impar"
+     ],
+     "a": 0,
+     "e": "1 = 1² e mereu divizor."
+    },
+    {
+     "q": "Până unde poate merge d în d²?",
+     "o": [
+      "Până la √n",
+      "Până la n",
+      "Până la n / 2"
+     ],
+     "a": 0,
+     "e": "d² trebuie să fie cel mult n."
+    }
+   ],
+   "110": [
+    {
+     "q": "Ce cifră contează la n = 827?",
+     "o": [
+      "Cifra unităților, 7",
+      "Prima cifră, 8",
+      "Toate cifrele"
+     ],
+     "a": 0,
+     "e": "Fiecare cifră a ascendentului trebuie să fie ≥ 7."
+    },
+    {
+     "q": "De ce 857 nu e ascendent al lui 827?",
+     "o": [
+      "Are cifra 5 < 7",
+      "E mai mare decât 827",
+      "Este"
+     ],
+     "a": 0,
+     "e": "Toate cifrele trebuie să fie cel puțin 7."
+    },
+    {
+     "q": "Dacă n se termină în 0, care numere din interval sunt ascendenți?",
+     "o": [
+      "Toate",
+      "Niciunul",
+      "Doar cele pare"
+     ],
+     "a": 0,
+     "e": "Orice cifră e ≥ 0."
+    }
+   ],
+   "111": [
+    {
+     "q": "Pentru n = 20, cât e f?",
+     "o": [
+      "4, pentru că 12 < 20 ≤ 20",
+      "5",
+      "3"
+     ],
+     "a": 0,
+     "e": "Inegalitatea din dreapta permite egalitatea."
+    },
+    {
+     "q": "Pentru n = 1, cât e f?",
+     "o": [
+      "1: 0 · 1 < 1 ≤ 1 · 2",
+      "0",
+      "2"
+     ],
+     "a": 0,
+     "e": "f = 1 e prima valoare încercată."
+    },
+    {
+     "q": "Când oprești bucla?",
+     "o": [
+      "Când f · (f + 1) ≥ n",
+      "Când f · f > n",
+      "După n pași"
+     ],
+     "a": 0,
+     "e": "Atunci n ≤ f · (f + 1), iar valoarea anterioară era prea mică."
+    }
+   ],
+   "112": [
+    {
+     "q": "De ce 8 parcele de arie 6 nu e soluție?",
+     "o": [
+      "Numărul de parcele trebuie să fie mai mic decât aria",
+      "Pentru că 8 e par",
+      "Este"
+     ],
+     "a": 0,
+     "e": "8 > 6."
+    },
+    {
+     "q": "De ce 3 parcele de arie 16 nu e soluție?",
+     "o": [
+      "Numărul de parcele trebuie să fie par",
+      "Pentru că 16 e pătrat",
+      "Este"
+     ],
+     "a": 0,
+     "e": "3 e impar."
+    },
+    {
+     "q": "Ce condiție echivalentă are k < A / k?",
+     "o": [
+      "k · k < A",
+      "k < A",
+      "k · 2 < A"
+     ],
+     "a": 0,
+     "e": "Înmulțind cu k (pozitiv), evităm împărțirea."
+    }
+   ],
+   "113": [
+    {
+     "q": "Care sunt divizorii comuni ai lui 20 și 12?",
+     "o": [
+      "1, 2, 4",
+      "1, 2, 3, 4",
+      "2, 4"
+     ],
+     "a": 0,
+     "e": "Sunt exact divizorii lui cmmdc(20, 12) = 4."
+    },
+    {
+     "q": "Cu ce valoare pornește produsul?",
+     "o": [
+      "1",
+      "0",
+      "a"
+     ],
+     "a": 0,
+     "e": "Cu 0, orice produs ar rămâne 0."
+    },
+    {
+     "q": "De ce long long?",
+     "o": [
+      "Produsul divizorilor crește foarte repede",
+      "Pentru că a și b sunt mari",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "Pentru cmmdc 120, produsul divizorilor are 17 cifre."
+    }
+   ],
+   "114": [
+    {
+     "q": "Ce devine 3361?",
+     "o": [
+      "3333611",
+      "336611",
+      "33661"
+     ],
+     "a": 0,
+     "e": "Cifrele impare 3, 3 și 1 apar fiecare de două ori; 6 rămâne o dată."
+    },
+    {
+     "q": "Ce se returnează pentru 2468?",
+     "o": [
+      "-1",
+      "2468",
+      "0"
+     ],
+     "a": 0,
+     "e": "Nu are cifre impare."
+    },
+    {
+     "q": "Când crește puterea lui 10 de două ori pentru aceeași cifră?",
+     "o": [
+      "Când cifra e impară, pentru că o pui de două ori",
+      "Niciodată",
+      "La fiecare cifră"
+     ],
+     "a": 0,
+     "e": "Fiecare cifră pusă în rezultat ocupă o poziție."
+    }
+   ],
+   "115": [
+    {
+     "q": "De ce 12314 nu e o aglomerare?",
+     "o": [
+      "Are doar 5 cristale, nu 9",
+      "Lipsește tipul 4",
+      "Are cifra 5"
+     ],
+     "a": 0,
+     "e": "Aglomerările studiate au exact nouă cristale."
+    },
+    {
+     "q": "De ce 111122223 nu e o aglomerare?",
+     "o": [
+      "Lipsește tipul 4",
+      "Are prea multe cifre",
+      "Are cifra 0"
+     ],
+     "a": 0,
+     "e": "Din fiecare tip trebuie să existe cel puțin un cristal."
+    },
+    {
+     "q": "Ce cifre pot apărea?",
+     "o": [
+      "Doar 1, 2, 3, 4",
+      "Orice cifră nenulă",
+      "0..4"
+     ],
+     "a": 0,
+     "e": "Fiecare cifră e tipul unui cristal."
+    }
+   ],
+   "116": [
+    {
+     "q": "Care sunt divizorii proprii ai lui 18?",
+     "o": [
+      "2, 3, 6, 9",
+      "1, 2, 3, 6, 9, 18",
+      "3, 9"
+     ],
+     "a": 0,
+     "e": "Fără 1 și fără 18."
+    },
+    {
+     "q": "Este 9 major impar?",
+     "o": [
+      "Da: are doar divizorul propriu 3, iar 3 > 0",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Suma divizorilor proprii pari e 0."
+    },
+    {
+     "q": "Ce returnează pentru un interval cu doar numere prime, ca [2, 3]?",
+     "o": [
+      "0",
+      "2",
+      "3"
+     ],
+     "a": 0,
+     "e": "Un prim nu are divizori proprii: 0 nu e strict mai mare decât 0."
+    }
+   ],
+   "117": [
+    {
+     "q": "De ce 55 = 5 · 11 nu e moderat?",
+     "o": [
+      "Între 5 și 11 mai e numărul prim 7",
+      "55 e impar",
+      "11 nu e prim"
+     ],
+     "a": 0,
+     "e": "Factorii trebuie să fie numere prime consecutive."
+    },
+    {
+     "q": "De ce 4 = 2 · 2 nu e moderat?",
+     "o": [
+      "Factorii trebuie să fie două prime consecutive, deci diferite",
+      "4 e pătrat",
+      "E moderat"
+     ],
+     "a": 0,
+     "e": "Șirul primelor nu are două valori egale alăturate."
+    },
+    {
+     "q": "Cum afli primul factor?",
+     "o": [
+      "Cel mai mic divizor ≥ 2 al lui n, care e mereu prim",
+      "Cel mai mare divizor",
+      "Radicalul lui n"
+     ],
+     "a": 0,
+     "e": "Cel mai mic divizor mai mare ca 1 nu poate avea alți divizori."
+    }
+   ],
+   "118": [
+    {
+     "q": "Ce returnează DoiTrei(0)?",
+     "o": [
+      "0, pentru că are cifra 0",
+      "1, pentru că n-are cifre greșite"
+     ],
+     "a": 0,
+     "e": "Numărul 0 are o cifră, 0, care nu e din {2, 3}."
+    },
+    {
+     "q": "De ce do ... while și nu while?",
+     "o": [
+      "Ca bucla să ruleze o dată și pentru n = 0",
+      "Pentru viteză",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Cu while, n = 0 n-ar intra în buclă și s-ar returna 1."
+    },
+    {
+     "q": "Ce returnează pentru 2023?",
+     "o": [
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "Conține cifra 0."
+    }
+   ],
+   "119": [
+    {
+     "q": "Care sunt divizorii impari ai lui 18?",
+     "o": [
+      "1, 3, 9",
+      "1, 3",
+      "1, 2, 3, 6, 9, 18"
+     ],
+     "a": 0,
+     "e": "Exact trei, deci 18 se numără."
+    },
+    {
+     "q": "De ce 36 are aceiași divizori impari ca 9?",
+     "o": [
+      "36 = 4 · 9, iar factorul 4 nu aduce divizori impari",
+      "Din întâmplare",
+      "Nu are"
+     ],
+     "a": 0,
+     "e": "Divizorii impari sunt divizorii părții impare."
+    },
+    {
+     "q": "Ce fel de număr are exact trei divizori?",
+     "o": [
+      "Pătratul unui număr prim",
+      "Un număr prim",
+      "Un cub"
+     ],
+     "a": 0,
+     "e": "q² are divizorii 1, q, q²."
+    }
+   ],
+   "120": [
+    {
+     "q": "Pentru n = 64, ce x e cel mai mic?",
+     "o": [
+      "2, cu p = 6",
+      "8, cu p = 2",
+      "4, cu p = 3"
+     ],
+     "a": 0,
+     "e": "64 = 2⁶ = 4³ = 8², iar cel mai mic x e 2."
+    },
+    {
+     "q": "Cum verifici dacă n este o putere a lui x?",
+     "o": [
+      "Împarți la x cât se poate și vezi dacă rămâne 1",
+      "Verifici n % x == 0",
+      "Calculezi radicalul"
+     ],
+     "a": 0,
+     "e": "De exemplu 12 se împarte la 2 de două ori și rămâne 3."
+    },
+    {
+     "q": "Ce se furnizează pentru n = 12?",
+     "o": [
+      "x = 12, p = 1",
+      "x = 2, p = 2",
+      "x = 3, p = 1"
+     ],
+     "a": 0,
+     "e": "12 nu e putere a unui număr mai mic, deci 12 = 12¹."
+    }
+   ],
+   "121": [
+    {
+     "q": "Cât face S(4)/4?",
+     "o": [
+      "1.75",
+      "1.5",
+      "2"
+     ],
+     "a": 0,
+     "e": "S(4) = 1 + 2 + 4 = 7, iar 7/4 = 1.75."
+    },
+    {
+     "q": "De ce compari S(n) · k > S(k) · n în loc de rapoarte?",
+     "o": [
+      "Eviți împărțirea și erorile de rotunjire",
+      "E mai lent",
+      "Nu se poate altfel"
+     ],
+     "a": 0,
+     "e": "Înmulțirile sunt exacte cu long long."
+    },
+    {
+     "q": "Pentru n = 8, ce raport mai mic sau egal e depășit?",
+     "o": [
+      "Niciunul nu e depășit: S(6)/6 = 2 > 1.87",
+      "S(4)/4",
+      "S(1)/1"
+     ],
+     "a": 0,
+     "e": "De aceea 8 nu e abundent."
+    }
+   ],
+   "122": [
+    {
+     "q": "Care sunt divizorii impari ai lui 90?",
+     "o": [
+      "1, 3, 5, 9, 15, 45",
+      "1, 9, 15, 45",
+      "2, 6, 10"
+     ],
+     "a": 0,
+     "e": "Dintre ei, 3 și 5 sunt primi, deci nu se afișează."
+    },
+    {
+     "q": "Se afișează 1?",
+     "o": [
+      "Da, 1 nu e prim",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "1 e impar și nu e prim."
+    },
+    {
+     "q": "Cum afișezi divizorii crescător dacă îi găsești în perechi?",
+     "o": [
+      "Întâi cei ≤ √n crescător, apoi perechile lor, parcurgând înapoi",
+      "Îi sortezi",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "Perechile lui d mic sunt mari și vin în ordine inversă."
+    }
+   ],
+   "123": [
+    {
+     "q": "Ce proprietate trebuie să aibă lungimea unei benzi?",
+     "o": [
+      "Să fie multiplu al lungimii plăcuței folosite",
+      "Să fie divizor al ei",
+      "Să fie pară"
+     ],
+     "a": 0,
+     "e": "Banda e formată numai din plăcuțe întregi de același tip."
+    },
+    {
+     "q": "Ce reprezintă lungimea minimă comună celor trei benzi?",
+     "o": [
+      "Cel mai mic multiplu comun",
+      "Cel mai mare divizor comun",
+      "Suma lungimilor"
+     ],
+     "a": 0,
+     "e": "Toate benzile au aceeași lungime: un multiplu comun, cât mai mic."
+    },
+    {
+     "q": "Ce rezultat dă 199, 197, 193 (numere prime)?",
+     "o": [
+      "Produsul lor",
+      "199",
+      "1"
+     ],
+     "a": 0,
+     "e": "Pentru numere prime între ele, cmmmc e produsul: aproape 7,6 milioane, încape în int."
+    }
+   ],
+   "124": [
+    {
+     "q": "Ce rest dă 2022 la împărțirea cu 101?",
+     "o": [
+      "2",
+      "0",
+      "20"
+     ],
+     "a": 0,
+     "e": "101 · 20 = 2020, iar 2022 − 2020 = 2."
+    },
+    {
+     "q": "De ce pentru x = 2 răspunsul e mereu 0?",
+     "o": [
+      "Restul împărțirii la 2 e doar 0 sau 1",
+      "Pentru că 2 e prim",
+      "Nu e mereu 0"
+     ],
+     "a": 0,
+     "e": "Restul e mereu mai mic decât împărțitorul."
+    },
+    {
+     "q": "De ce cauți de la n în jos?",
+     "o": [
+      "Primul număr bun găsit e cel mai mare",
+      "E obligatoriu"
+     ],
+     "a": 0,
+     "e": "Te oprești imediat."
+    }
+   ],
+   "125": [
+    {
+     "q": "Cu ce e egal x² · y²?",
+     "o": [
+      "(x · y)²",
+      "x · y²",
+      "(x + y)²"
+     ],
+     "a": 0,
+     "e": "Deci n trebuie să fie pătratul unui număr m = x · y."
+    },
+    {
+     "q": "De ce pentru n = 16 răspunsul e 0 0?",
+     "o": [
+      "16 = 4², iar 4 = 2 · 2 nu are x < y",
+      "16 nu e pătrat",
+      "Pentru că 16 e par"
+     ],
+     "a": 0,
+     "e": "Singura scriere ar fi x = y = 2."
+    },
+    {
+     "q": "Ce înseamnă „valoarea minimă a lui x”?",
+     "o": [
+      "Cel mai mic divizor x ≥ 2 al lui m cu x < m / x",
+      "x = 2 mereu",
+      "Cel mai mare divizor"
+     ],
+     "a": 0,
+     "e": "De exemplu, pentru m = 36 ar fi x = 2, y = 18."
+    }
+   ],
+   "126": [
+    {
+     "q": "Care cifră din 22 se schimbă?",
+     "o": [
+      "A doua (cea din dreapta) devine 0",
+      "Prima devine 0",
+      "Amândouă"
+     ],
+     "a": 0,
+     "e": "22 devine 20."
+    },
+    {
+     "q": "Cum știi, la cifra curentă, ce cifră are în stânga?",
+     "o": [
+      "n / 10 % 10",
+      "n % 100",
+      "n / 10"
+     ],
+     "a": 0,
+     "e": "Scoți ultima cifră, apoi iei ultima cifră a ce rămâne."
+    },
+    {
+     "q": "De ce contează că nu există 222?",
+     "o": [
+      "Ar fi neclar care pereche se înlocuiește",
+      "Ar ieși număr negativ",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Enunțul elimină acest caz."
+    }
+   ],
+   "127": [
+    {
+     "q": "Ce cifră e pe poziția 3 în 12587?",
+     "o": [
+      "2",
+      "5",
+      "1"
+     ],
+     "a": 0,
+     "e": "Pozițiile de la dreapta: 7 (0), 8 (1), 5 (2), 2 (3), 1 (4)."
+    },
+    {
+     "q": "Cum obții cifra de pe poziția p?",
+     "o": [
+      "n / 10ᵖ % 10",
+      "n % 10ᵖ",
+      "n / p"
+     ],
+     "a": 0,
+     "e": "Împărțirea la 10ᵖ aduce cifra pe poziția unităților."
+    },
+    {
+     "q": "Cu cât se schimbă n când cifra de pe poziția p trece din c în x?",
+     "o": [
+      "Cu (x − c) · 10ᵖ",
+      "Cu x − c",
+      "Cu x · c"
+     ],
+     "a": 0,
+     "e": "O cifră pe poziția p valorează de 10ᵖ ori cât ea."
+    }
+   ],
+   "128": [
+    {
+     "q": "Intră n în interval pentru n = 47?",
+     "o": [
+      "Nu, intervalul [1, n) se oprește înainte de n",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Pentru n = 47 răspunsul ar fi 41 și 43."
+    },
+    {
+     "q": "Pentru n = 4, care sunt cele două numere?",
+     "o": [
+      "2 și 3",
+      "3 și 4",
+      "1 și 3"
+     ],
+     "a": 0,
+     "e": "4 nu intră în interval, iar 1 nu e prim."
+    },
+    {
+     "q": "De ce cauți de la n − 1 în jos?",
+     "o": [
+      "Primele numere prime găsite sunt cele mai mari",
+      "E mai simplu de scris",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Te oprești după ce ai găsit două."
+    }
+   ],
+   "129": [
+    {
+     "q": "În 880 = 2⁴ · 5 · 11, care factori au puterea minimă?",
+     "o": [
+      "5 și 11",
+      "2",
+      "11"
+     ],
+     "a": 0,
+     "e": "Ambii la puterea 1; se returnează cel mai mic, 5."
+    },
+    {
+     "q": "Pentru 72 = 2³ · 3², ce se returnează?",
+     "o": [
+      "3",
+      "2",
+      "6"
+     ],
+     "a": 0,
+     "e": "3 are puterea 2, mai mică decât 3."
+    },
+    {
+     "q": "Ce exponent are un factor rămas > 1 după bucla cu f · f ≤ n?",
+     "o": [
+      "1",
+      "2",
+      "oricât"
+     ],
+     "a": 0,
+     "e": "Un prim mai mare decât √n poate apărea o singură dată."
+    }
+   ],
+   "130": [
+    {
+     "q": "Ce rămâne din 84356 după ce scoți cifrele pare?",
+     "o": [
+      "35",
+      "53",
+      "8436"
+     ],
+     "a": 0,
+     "e": "Cifrele impare, în ordinea lor: 3 și 5."
+    },
+    {
+     "q": "De ce x = 40 și y = 86 nu sunt impar-oglindite?",
+     "o": [
+      "Nu rămâne nicio cifră, deci nu obții numere",
+      "Pentru că sunt pare",
+      "Sunt"
+     ],
+     "a": 0,
+     "e": "După îndepărtarea cifrelor pare nu mai rămâne nimic din ele."
+    },
+    {
+     "q": "Cum construiești inversul cifrelor impare ale lui x?",
+     "o": [
+      "Le iei de la unități și faci r = r · 10 + c",
+      "Cu r = r + c · p",
+      "Le aduni"
+     ],
+     "a": 0,
+     "e": "Luate de la unități, ies în ordine inversă."
+    }
+   ],
+   "131": [
+    {
+     "q": "În 360 = 2³ · 3² · 5, care factori se adună?",
+     "o": [
+      "2 și 5",
+      "3",
+      "2, 3 și 5"
+     ],
+     "a": 0,
+     "e": "3 are puterea 2, pară."
+    },
+    {
+     "q": "Cât e s pentru n = 16 = 2⁴?",
+     "o": [
+      "0",
+      "2",
+      "4"
+     ],
+     "a": 0,
+     "e": "Exponentul 4 e par."
+    },
+    {
+     "q": "Ce faci cu factorul rămas la final, dacă n > 1?",
+     "o": [
+      "Îl aduni",
+      "Îl ignori",
+      "Îl scazi"
+     ],
+     "a": 0,
+     "e": "Are exponentul 1, impar."
+    }
+   ],
+   "132": [
+    {
+     "q": "Care e cel mai mare cub pentru n = 5?",
+     "o": [
+      "125 = 5³",
+      "25",
+      "64"
+     ],
+     "a": 0,
+     "e": "Primele cinci cuburi nenule sunt 1, 8, 27, 64, 125."
+    },
+    {
+     "q": "Încape 1000³ în int?",
+     "o": [
+      "Da, 10⁹ < 2 · 10⁹",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "int ajunge până la aproximativ 2,1 · 10⁹."
+    },
+    {
+     "q": "Se afișează 0?",
+     "o": [
+      "Nu, se cer cuburile nenule",
+      "Da"
+     ],
+     "a": 0,
+     "e": "0 = 0³ e exclus."
+    }
+   ],
+   "133": [
+    {
+     "q": "Care e cel mai mare număr afișat pentru n = 4, x = 15?",
+     "o": [
+      "60 = 4 · 15",
+      "15",
+      "45"
+     ],
+     "a": 0,
+     "e": "Al n-lea multiplu nenul este n · x."
+    },
+    {
+     "q": "Se afișează 0?",
+     "o": [
+      "Nu, se cer numere nenule",
+      "Da"
+     ],
+     "a": 0,
+     "e": "0 e divizibil cu x, dar e exclus."
+    },
+    {
+     "q": "Ce face bucla?",
+     "o": [
+      "i merge de la n la 1 și afișează i · x",
+      "caută numerele divizibile cu x de la 1 la 10⁹"
+     ],
+     "a": 0,
+     "e": "Nu trebuie căutați multiplii; îi calculezi direct."
+    }
+   ],
+   "134": [
+    {
+     "q": "În exemplu, de ce 5 nu se numără?",
+     "o": [
+      "Apare la puterea 3 în 16500 și la puterea 1 în 10780",
+      "Nu apare în ambele",
+      "Pentru că e impar"
+     ],
+     "a": 0,
+     "e": "Puterile trebuie să fie egale."
+    },
+    {
+     "q": "Se numără 3?",
+     "o": [
+      "Nu, apare doar în 16500",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Un factor trebuie să apară în ambele descompuneri."
+    },
+    {
+     "q": "Ce returnează pentru n = m?",
+     "o": [
+      "Numărul de factori primi distincți ai lui n",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "Toți factorii au aceleași puteri."
+    }
+   ],
+   "135": [
+    {
+     "q": "Este 1 prim?",
+     "o": [
+      "Nu, deci 1 se adună",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Un număr prim are exact doi divizori."
+    },
+    {
+     "q": "Pentru n = 12, care divizori sunt primi?",
+     "o": [
+      "2 și 3",
+      "2, 3 și 1",
+      "4 și 6"
+     ],
+     "a": 0,
+     "e": "Restul (1, 4, 6, 12) se adună: 23."
+    },
+    {
+     "q": "Ce returnează suma(999983), dacă 999983 e prim?",
+     "o": [
+      "1",
+      "0",
+      "999984"
+     ],
+     "a": 0,
+     "e": "Divizorii lui sunt 1 și el însuși, iar el e prim."
+    }
+   ],
+   "136": [
+    {
+     "q": "Ce condiție trebuie să îndeplinească k?",
+     "o": [
+      "k să dividă n",
+      "k < n",
+      "k să fie prim"
+     ],
+     "a": 0,
+     "e": "Fiecare jucător primește n / k jetoane, deci împărțirea trebuie să fie exactă."
+    },
+    {
+     "q": "Se numără k = 1?",
+     "o": [
+      "Nu, un grup are cel puțin 2 jucători",
+      "Da"
+     ],
+     "a": 0,
+     "e": "De aceea pentru 12 rezultatul e 5, nu 6."
+    },
+    {
+     "q": "Ce returnează joc(n) pentru n prim?",
+     "o": [
+      "1",
+      "0",
+      "2"
+     ],
+     "a": 0,
+     "e": "Singurul k bun e chiar n."
+    }
+   ],
+   "137": [
+    {
+     "q": "Cu ce cifră compari toate cifrele?",
+     "o": [
+      "Cu oricare dintre ele, de exemplu ultima",
+      "Cu 0",
+      "Cu 9"
+     ],
+     "a": 0,
+     "e": "Dacă toate sunt egale cu una, sunt egale între ele."
+    },
+    {
+     "q": "Ce returnează identice(10)?",
+     "o": [
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "1 și 0 sunt diferite."
+    },
+    {
+     "q": "Când te poți opri?",
+     "o": [
+      "La prima cifră diferită",
+      "Doar la final"
+     ],
+     "a": 0,
+     "e": "Răspunsul 0 e sigur din acel moment."
+    }
+   ],
+   "138": [
+    {
+     "q": "Ce devine 500 fără cifrele 5?",
+     "o": [
+      "0, din cifrele 0 0",
+      "-1",
+      "00"
+     ],
+     "a": 0,
+     "e": "Rămân două zerouri, iar zerourile nesemnificative se ignoră."
+    },
+    {
+     "q": "Când e m = -1?",
+     "o": [
+      "Când toate cifrele lui n sunt egale cu c",
+      "Când rezultatul e 0",
+      "Când c = 0"
+     ],
+     "a": 0,
+     "e": "Atunci nu rămâne nicio cifră."
+    },
+    {
+     "q": "De ce do ... while în loc de while?",
+     "o": [
+      "Ca n = 0 să aibă și el o cifră, 0",
+      "E mai rapid",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Cu while, n = 0 n-ar intra în buclă și n = 0, c = 5 ar da -1 în loc de 0."
+    }
+   ],
+   "139": [
+    {
+     "q": "După 19 20 21 din exemplu, de ce apare *, deși sunt doar 3 numere?",
+     "o": [
+      "Și ultima secvență, chiar incompletă, se încheie cu *",
+      "Din greșeală",
+      "Pentru că k = 3"
+     ],
+     "a": 0,
+     "e": "Fiecare secvență se încheie cu un simbol *."
+    },
+    {
+     "q": "Ce se afișează pentru x = 1, y = 4, k = 2?",
+     "o": [
+      "1 2 * 3 4 *",
+      "1 2 3 4 *",
+      "1 2 * 3 4 * *"
+     ],
+     "a": 0,
+     "e": "Ultima secvență e completă, deci nu mai trebuie un * în plus."
+    },
+    {
+     "q": "Ce reții în buclă?",
+     "o": [
+      "Câte numere ai pus în secvența curentă",
+      "Suma numerelor",
+      "Ultimul număr"
+     ],
+     "a": 0,
+     "e": "Când contorul ajunge la k, pui * și îl resetezi."
+    }
+   ],
+   "140": [
+    {
+     "q": "Câți factori primi are 64 = 2⁶ în sensul problemei?",
+     "o": [
+      "1, doar 2",
+      "6",
+      "2"
+     ],
+     "a": 0,
+     "e": "Factorii primi se numără o singură dată; altfel răspunsul pentru n = 100 ar fi fost 64 sau 96."
+    },
+    {
+     "q": "De ce 90 și nu 84, deși ambele au 3 factori primi?",
+     "o": [
+      "La egalitate se alege cel mai mare",
+      "84 are mai puțini",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "84 = 2² · 3 · 7 are tot 3 factori."
+    },
+    {
+     "q": "Ce comparație folosești ca să păstrezi cel mai mare la egalitate, parcurgând crescător?",
+     "o": [
+      "k ≥ best",
+      "k > best",
+      "k == best"
+     ],
+     "a": 0,
+     "e": "Numerele vin crescător, deci ultimul cu maximul e cel mai mare."
+    }
+   ],
+   "141": [
+    {
+     "q": "Care numere din [3, 50] se termină în 4 și se împart la 4?",
+     "o": [
+      "4, 24, 44",
+      "4, 14, 24, 34, 44",
+      "4, 8, 12"
+     ],
+     "a": 0,
+     "e": "14 și 34 se termină în 4, dar nu se împart la 4."
+    },
+    {
+     "q": "Ce condiții verifici pentru x?",
+     "o": [
+      "x % k == 0 și x % 10 == k",
+      "x % 10 == 0",
+      "x / 10 == k"
+     ],
+     "a": 0,
+     "e": "Divizibil cu k și cu ultima cifră k."
+    },
+    {
+     "q": "Cum poți merge mai repede prin interval?",
+     "o": [
+      "Doar prin numerele terminate în k, din 10 în 10",
+      "Din 2 în 2",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "Celelalte numere nu au cum să fie bune."
+    }
+   ],
+   "142": [
+    {
+     "q": "Care e suma divizorilor lui 12?",
+     "o": [
+      "28",
+      "25",
+      "16"
+     ],
+     "a": 0,
+     "e": "1 + 2 + 3 + 4 + 6 + 12 = 28."
+    },
+    {
+     "q": "Ce înseamnă interval deschis (a, b)?",
+     "o": [
+      "Capetele nu fac parte din el: a < s < b",
+      "a ≤ s ≤ b",
+      "s = a sau s = b"
+     ],
+     "a": 0,
+     "e": "De exemplu, s = a nu e în (a, b)."
+    },
+    {
+     "q": "Contează ordinea lui x și y?",
+     "o": [
+      "Nu, intervalul se formează cu suma mai mică la stânga",
+      "Da"
+     ],
+     "a": 0,
+     "e": "armonie(8, 12) și armonie(12, 8) dau același rezultat."
+    }
+   ],
+   "143": [
+    {
+     "q": "De ce 9027 nu are frate mai mare?",
+     "o": [
+      "9 + 1 = 10 nu mai e o cifră",
+      "Pentru că are 0",
+      "Are"
+     ],
+     "a": 0,
+     "e": "Fiecare poziție trebuie să rămână o singură cifră."
+    },
+    {
+     "q": "Care e fratele mai mare al lui 0?",
+     "o": [
+      "1",
+      "-1",
+      "0"
+     ],
+     "a": 0,
+     "e": "0 are o cifră, iar 0 + 1 = 1."
+    },
+    {
+     "q": "Ce legătură are y cu x când nu sunt cifre de 9?",
+     "o": [
+      "y = x + 11...1 (atâția de 1 câte cifre are x)",
+      "y = x + 1",
+      "y = 2x"
+     ],
+     "a": 0,
+     "e": "Fiecare cifră crește cu 1."
+    }
+   ],
+   "144": [
+    {
+     "q": "Ce obții pentru n = 135?",
+     "o": [
+      "113355",
+      "135135",
+      "1355"
+     ],
+     "a": 0,
+     "e": "Fiecare cifră impară apare de două ori, pe loc: 1 1 3 3 5 5."
+    },
+    {
+     "q": "Ce furnizează subprogramul pentru n = 2468?",
+     "o": [
+      "-1",
+      "2468",
+      "0"
+     ],
+     "a": 0,
+     "e": "Nu are nicio cifră impară, deci d = -1."
+    },
+    {
+     "q": "Încape rezultatul în int pentru n ≤ 10⁴?",
+     "o": [
+      "Da, are cel mult 8 cifre",
+      "Nu, trebuie long long"
+     ],
+     "a": 0,
+     "e": "Cel mult 4 cifre dublate dau 8 cifre: 99999999 < 2 · 10⁹."
+    }
+   ],
+   "145": [
+    {
+     "q": "Când este un număr pătrat perfect, privind descompunerea lui?",
+     "o": [
+      "Când toți exponenții sunt pari",
+      "Când are un singur factor prim",
+      "Când e par"
+     ],
+     "a": 0,
+     "e": "144 = 2⁴ · 3², exponenți pari."
+    },
+    {
+     "q": "72 = 2³ · 3². Cu ce trebuie înmulțit ca să devină pătrat perfect?",
+     "o": [
+      "Cu 2",
+      "Cu 3",
+      "Cu 6"
+     ],
+     "a": 0,
+     "e": "Doar exponentul lui 2 e impar; 72 · 2 = 144 = 12²."
+    },
+    {
+     "q": "Cât returnează multiplu(1)?",
+     "o": [
+      "1",
+      "0",
+      "4"
+     ],
+     "a": 0,
+     "e": "1 = 1², deci e deja pătrat perfect și e multiplu nenul al lui 1."
+    }
+   ],
+   "146": [
+    {
+     "q": "Care sunt divizorii comuni ai lui 20 și 12?",
+     "o": [
+      "1, 2, 4",
+      "1, 2, 4, 6",
+      "2, 4"
+     ],
+     "a": 0,
+     "e": "Divizorii lui 20: 1, 2, 4, 5, 10, 20; ai lui 12: 1, 2, 3, 4, 6, 12."
+    },
+    {
+     "q": "Până unde merge căutarea divizorilor comuni?",
+     "o": [
+      "Până la min(a, b)",
+      "Până la a · b",
+      "Până la 10"
+     ],
+     "a": 0,
+     "e": "Un divizor comun nu poate fi mai mare decât cel mai mic dintre numere."
+    },
+    {
+     "q": "Divizorii comuni ai lui a și b sunt exact divizorii cărui număr?",
+     "o": [
+      "cmmdc(a, b)",
+      "a + b",
+      "cmmmc(a, b)"
+     ],
+     "a": 0,
+     "e": "O variantă: calculezi cmmdc și aduni divizorii lui."
+    }
+   ],
+   "147": [
+    {
+     "q": "Care e suma divizorilor lui 10 și ce paritate are?",
+     "o": [
+      "18, pară, ca 10",
+      "17, impară",
+      "8, pară"
+     ],
+     "a": 0,
+     "e": "1 + 2 + 5 + 10 = 18; și 10, și 18 sunt pare, deci 10 e p-număr."
+    },
+    {
+     "q": "Cum calculezi repede suma divizorilor lui x?",
+     "o": [
+      "Adunând perechile d și x / d pentru d · d ≤ x",
+      "Încercând toți d de la 1 la 10⁶",
+      "Doar divizorii primi"
+     ],
+     "a": 0,
+     "e": "Divizorii vin în perechi; ai grijă să nu-l aduni de două ori pe d când d · d = x."
+    },
+    {
+     "q": "Ce returnează kpn(1, 1, 1)?",
+     "o": [
+      "1",
+      "-1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Suma divizorilor lui 1 este 1, aceeași paritate; deci 1 e primul p-număr din [1, 1]."
+    }
+   ],
+   "148": [
+    {
+     "q": "În 10780 = 2² · 5 · 7² · 11, de ce răspunsul e 7, nu 2?",
+     "o": [
+      "Ambele au puterea 2, iar la egalitate se alege cel mai mare",
+      "7 apare mai des",
+      "2 nu e prim"
+     ],
+     "a": 0,
+     "e": "Enunțul cere cel mai mare divizor dintre cei cu puterea maximă."
+    },
+    {
+     "q": "Ce înseamnă dacă după împărțiri n > 1 la final?",
+     "o": [
+      "Ce a rămas e un factor prim cu puterea 1",
+      "Ai greșit descompunerea",
+      "n era pătrat perfect"
+     ],
+     "a": 0,
+     "e": "Un factor mai mare decât √n poate apărea o singură dată."
+    },
+    {
+     "q": "De ce compari cu e ≥ p, nu cu e > p?",
+     "o": [
+      "Factorii vin crescător, deci la egalitate îl păstrezi pe ultimul, cel mai mare",
+      "Ca să fie mai rapid",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Cu > ai păstra primul factor (cel mai mic) la egalitate."
+    }
+   ],
+   "149": [
+    {
+     "q": "De ce pentru n = 16 nu se afișează (4 4)?",
+     "o": [
+      "Numerele trebuie să fie distincte",
+      "Pentru că 4 e par",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "d-fiii sunt prin definiție două numere distincte."
+    },
+    {
+     "q": "Până unde merge d?",
+     "o": [
+      "Cât timp d · d < n",
+      "Până la n",
+      "Până la n / 2"
+     ],
+     "a": 0,
+     "e": "Al doilea număr al perechii, n / d, e atunci mai mare decât d."
+    },
+    {
+     "q": "Câte perechi are n = 12?",
+     "o": [
+      "3",
+      "6",
+      "2"
+     ],
+     "a": 0,
+     "e": "12 = 12 · 1 = 6 · 2 = 4 · 3."
+    }
+   ],
+   "150": [
+    {
+     "q": "Care sunt factorii primi comuni ai lui 750 și 490?",
+     "o": [
+      "2 și 5",
+      "2, 3, 5, 7",
+      "5"
+     ],
+     "a": 0,
+     "e": "750 are 2, 3, 5; 490 are 2, 5, 7."
+    },
+    {
+     "q": "Ce returnează pentru n = 1?",
+     "o": [
+      "0",
+      "1",
+      "-1"
+     ],
+     "a": 0,
+     "e": "1 nu are niciun factor prim."
+    },
+    {
+     "q": "Cum verifici dacă factorul prim f al lui n e și în descompunerea lui m?",
+     "o": [
+      "m % f == 0",
+      "n % m == 0",
+      "f < m"
+     ],
+     "a": 0,
+     "e": "Un număr prim apare în descompunere exact dacă divide numărul."
+    }
+   ],
+   "151": [
+    {
+     "q": "Cât face 96 · 21 + [96 / 21]?",
+     "o": [
+      "2020",
+      "2016",
+      "2021"
+     ],
+     "a": 0,
+     "e": "96 · 21 = 2016, iar [96 / 21] = 4; în total 2020."
+    },
+    {
+     "q": "Dacă a < b, cât este [a / b]?",
+     "o": [
+      "0",
+      "1",
+      "a"
+     ],
+     "a": 0,
+     "e": "Un număr mai mic împărțit la unul mai mare dă partea întreagă 0, deci a · b = n."
+    },
+    {
+     "q": "Pentru un a fixat, câte valori b bune pot exista?",
+     "o": [
+      "Cel mult una",
+      "Oricâte",
+      "Exact două"
+     ],
+     "a": 0,
+     "e": "a · b + [a / b] crește strict odată cu b."
+    }
+   ],
+   "152": [
+    {
+     "q": "În ce bază se poate scrie 50731 cel mai devreme?",
+     "o": [
+      "8, pentru că cifra maximă e 7",
+      "7",
+      "10"
+     ],
+     "a": 0,
+     "e": "În baza b cifrele sunt 0..b − 1, deci b trebuie să fie cel puțin 7 + 1."
+    },
+    {
+     "q": "Ce returnează baza(0) sau baza(1010)?",
+     "o": [
+      "2",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Cifrele sunt doar 0 și 1, iar cea mai mică bază permisă este 2."
+    },
+    {
+     "q": "Ce reții în parcurgerea cifrelor?",
+     "o": [
+      "Cifra maximă",
+      "Suma cifrelor",
+      "Numărul de cifre"
+     ],
+     "a": 0,
+     "e": "Doar ea decide baza minimă."
+    }
+   ],
+   "153": [
+    {
+     "q": "Care sunt divizorii primi ai lui 2000?",
+     "o": [
+      "2 și 5",
+      "2, 4, 5",
+      "2, 5, 10"
+     ],
+     "a": 0,
+     "e": "2000 = 2⁴ · 5³; 4 și 10 nu sunt prime."
+    },
+    {
+     "q": "De câte ori se înmulțește un factor prim în produs?",
+     "o": [
+      "O singură dată",
+      "De câte ori apare",
+      "De două ori"
+     ],
+     "a": 0,
+     "e": "Se cere produsul divizorilor primi, nu al factorilor din descompunere."
+    },
+    {
+     "q": "Ce rezultat dă un n prim?",
+     "o": [
+      "n însuși",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Singurul lui divizor prim e chiar el; îl prinde verificarea de la final (n > 1)."
+    }
+   ],
+   "154": [
+    {
+     "q": "Ce returnează putere(80, 4)?",
+     "o": [
+      "-1, pentru că 4 nu e prim",
+      "2",
+      "1"
+     ],
+     "a": 0,
+     "e": "Chiar dacă 80 se împarte la 4, se cere -1 pentru un p care nu e prim."
+    },
+    {
+     "q": "Ce returnează putere(80, 3)?",
+     "o": [
+      "0",
+      "-1",
+      "1"
+     ],
+     "a": 0,
+     "e": "3 e prim, dar nu apare în descompunerea lui 80, deci puterea e 0."
+    },
+    {
+     "q": "Sunt 0 și 1 numere prime?",
+     "o": [
+      "Nu",
+      "Doar 1",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Un număr prim are exact doi divizori: 1 și el însuși."
+    }
+   ],
+   "155": [
+    {
+     "q": "Care sunt divizorii primi ai lui 12?",
+     "o": [
+      "2 și 3",
+      "2, 3, 4, 6",
+      "2, 2, 3"
+     ],
+     "a": 0,
+     "e": "12 = 2² · 3; fiecare prim se adună o singură dată."
+    },
+    {
+     "q": "Ce rămâne de făcut dacă după bucla cu f · f ≤ n avem n > 1?",
+     "o": [
+      "Se adună n, e un factor prim",
+      "Nimic",
+      "Se scade n"
+     ],
+     "a": 0,
+     "e": "De exemplu pentru 2 · 9999991 rămâne factorul mare."
+    },
+    {
+     "q": "De ce se împarte n la f cât timp se poate?",
+     "o": [
+      "Ca să nu mai fie găsiți multiplii lui f drept divizori",
+      "Ca să fie mai lent",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "După ce scoți toți factorii 2, 4 sau 6 nu mai divid n, deci nu sunt adunați greșit."
+    }
+   ],
+   "156": [
+    {
+     "q": "Pentru 4713835, de ce 3 se adună o singură dată?",
+     "o": [
+      "Se cer cifrele impare distincte",
+      "Din greșeală",
+      "Pentru că 3 e prim"
+     ],
+     "a": 0,
+     "e": "3 apare de două ori, dar ca cifră distinctă contează o dată."
+    },
+    {
+     "q": "Ce structură te ajută să nu aduni de două ori aceeași cifră?",
+     "o": [
+      "Un vector de 10 marcaje",
+      "O matrice",
+      "Un șir de caractere"
+     ],
+     "a": 0,
+     "e": "v[c] = 1 după ce ai adunat cifra c."
+    },
+    {
+     "q": "Cât e s pentru n = 48?",
+     "o": [
+      "0",
+      "12",
+      "-1"
+     ],
+     "a": 0,
+     "e": "Nu are cifre impare, deci suma e 0."
+    }
+   ],
+   "157": [
+    {
+     "q": "Ce produs dă n = 1622325?",
+     "o": [
+      "12",
+      "24",
+      "6"
+     ],
+     "a": 0,
+     "e": "Cifrele pare distincte sunt 6 și 2: 6 · 2 = 12 (2 se ia o singură dată)."
+    },
+    {
+     "q": "Ce produs dă un număr care conține cifra 0 și alte cifre pare?",
+     "o": [
+      "0",
+      "-1",
+      "produsul celorlalte"
+     ],
+     "a": 0,
+     "e": "0 e cifră pară, deci produsul devine 0."
+    },
+    {
+     "q": "Pentru n = 0, câte cifre are numărul?",
+     "o": [
+      "Una, cifra 0",
+      "Niciuna"
+     ],
+     "a": 0,
+     "e": "De aceea parcurgerea se face cu do ... while: altfel 0 nu ar fi văzut."
+    }
+   ],
+   "158": [
+    {
+     "q": "Care sunt pătratele perfecte din [10, 50]?",
+     "o": [
+      "16, 25, 36, 49",
+      "9, 16, 25, 36, 49",
+      "16, 25, 36"
+     ],
+     "a": 0,
+     "e": "9 < 10, iar 64 > 50."
+    },
+    {
+     "q": "De ce generezi i · i în loc să verifici fiecare număr din interval?",
+     "o": [
+      "Intervalul poate avea 10⁹ numere, dar sunt doar vreo 31 600 de pătrate",
+      "Așa cere enunțul",
+      "Pentru că sqrt e interzis"
+     ],
+     "a": 0,
+     "e": "Pătratele sunt puține, iar fiecare se obține direct."
+    },
+    {
+     "q": "Ce tip folosești pentru sumă?",
+     "o": [
+      "long long",
+      "int",
+      "char"
+     ],
+     "a": 0,
+     "e": "Suma tuturor pătratelor până la 10⁹ trece mult de 2 · 10⁹."
+    }
+   ],
+   "159": [
+    {
+     "q": "Este 1 o putere a lui 2?",
+     "o": [
+      "Da, 1 = 2⁰",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Pentru n = 1 răspunsul este 1."
+    },
+    {
+     "q": "De ce condiția p ≤ n / 2 în loc de p · 2 ≤ n?",
+     "o": [
+      "Evită depășirea lui int când p e mare",
+      "E mai rapidă",
+      "Nu e nicio diferență"
+     ],
+     "a": 0,
+     "e": "Pentru n aproape de 10⁹ ambele merg, dar n / 2 nu poate depăși niciodată."
+    },
+    {
+     "q": "Ce returnează pDoi(1024)?",
+     "o": [
+      "1024",
+      "512",
+      "2048"
+     ],
+     "a": 0,
+     "e": "1024 = 2¹⁰ și e chiar n."
+    }
+   ],
+   "160": [
+    {
+     "q": "În 10780 = 2² · 5 · 7² · 11, care factori au puterea minimă 1?",
+     "o": [
+      "5 și 11",
+      "2 și 7",
+      "doar 11"
+     ],
+     "a": 0,
+     "e": "Dintre ei se alege cel mai mic, 5."
+    },
+    {
+     "q": "Cu ce comparație păstrezi cel mai mic factor la egalitate?",
+     "o": [
+      "e < p (strict)",
+      "e ≤ p",
+      "e > p"
+     ],
+     "a": 0,
+     "e": "Factorii vin crescător; cu ≤ l-ai înlocui pe cel mic cu unul mai mare."
+    },
+    {
+     "q": "Ce rezultat dă 36 = 2² · 3²?",
+     "o": [
+      "2 2",
+      "3 2",
+      "2 1"
+     ],
+     "a": 0,
+     "e": "Ambii au puterea 2; se alege factorul mai mic."
+    }
+   ],
+   "161": [
+    {
+     "q": "De ce perechea [2 6] nu se afișează pentru n = 12?",
+     "o": [
+      "2 și 6 sunt ambele pare",
+      "2 · 6 ≠ 12",
+      "Pentru că 2 < 6"
+     ],
+     "a": 0,
+     "e": "Se cer doar perechile cu paritate diferită."
+    },
+    {
+     "q": "Ce se afișează pentru n = 9?",
+     "o": [
+      "nu exista",
+      "[1 9]",
+      "[3 3]"
+     ],
+     "a": 0,
+     "e": "1 și 9 sunt impare, iar 3 · 3 nu are numere distincte."
+    },
+    {
+     "q": "Dacă n e impar, pot exista perechi de paritate diferită?",
+     "o": [
+      "Nu, toți divizorii lui n sunt impari",
+      "Da, mereu"
+     ],
+     "a": 0,
+     "e": "Un număr par nu poate divide un număr impar."
+    }
+   ],
+   "162": [
+    {
+     "q": "Care e cel mai mare divizor prim al lui 2000?",
+     "o": [
+      "5",
+      "2",
+      "125"
+     ],
+     "a": 0,
+     "e": "2000 = 2⁴ · 5³, iar 125 nu e prim."
+    },
+    {
+     "q": "Dacă după împărțiri n > 1, ce reprezintă n?",
+     "o": [
+      "Un factor prim, mai mare decât toți cei găsiți",
+      "O greșeală",
+      "Un pătrat perfect"
+     ],
+     "a": 0,
+     "e": "Un număr fără divizori până la √n este prim."
+    },
+    {
+     "q": "Pentru n prim, ce se returnează?",
+     "o": [
+      "n",
+      "1",
+      "2"
+     ],
+     "a": 0,
+     "e": "Singurul lui divizor prim e chiar el."
+    }
+   ],
+   "163": [
+    {
+     "q": "În 9000 = 2³ · 3² · 5³, care factori au putere impară?",
+     "o": [
+      "2 și 5",
+      "3",
+      "2, 3 și 5"
+     ],
+     "a": 0,
+     "e": "3 apare la puterea 2, pară."
+    },
+    {
+     "q": "Ce returnează pentru un pătrat perfect, de exemplu 36?",
+     "o": [
+      "0",
+      "2",
+      "1"
+     ],
+     "a": 0,
+     "e": "36 = 2² · 3², toți exponenții pari."
+    },
+    {
+     "q": "De ce se numără factorul rămas la final?",
+     "o": [
+      "Apare o singură dată, iar 1 e impar",
+      "Nu se numără",
+      "Pentru că e cel mai mare"
+     ],
+     "a": 0,
+     "e": "Un factor prim mai mare decât √n are exponentul 1."
+    }
+   ],
+   "164": [
+    {
+     "q": "Ce returnează maxim(2468)?",
+     "o": [
+      "-1",
+      "8",
+      "0"
+     ],
+     "a": 0,
+     "e": "Nu are cifre impare."
+    },
+    {
+     "q": "Cu ce valoare pornește maximul?",
+     "o": [
+      "-1, care e și răspunsul când nu găsești nimic",
+      "0",
+      "9"
+     ],
+     "a": 0,
+     "e": "Dacă nu se schimbă, înseamnă că nu există cifre impare."
+    },
+    {
+     "q": "Ce returnează maxim(0)?",
+     "o": [
+      "-1",
+      "0"
+     ],
+     "a": 0,
+     "e": "0 e cifră pară."
+    }
+   ],
+   "165": [
+    {
+     "q": "Pentru 67638825, de ce 6 și 8 se adună o singură dată?",
+     "o": [
+      "Se cer cifrele pare distincte",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "6 + 8 + 2 = 16."
+    },
+    {
+     "q": "Contează cifra 0 în sumă?",
+     "o": [
+      "Nu, adunarea lui 0 nu schimbă nimic",
+      "Da, adaugă 10"
+     ],
+     "a": 0,
+     "e": "0 e pară, dar valoarea ei e 0."
+    },
+    {
+     "q": "Cât e s pentru n = 15?",
+     "o": [
+      "0",
+      "6",
+      "-1"
+     ],
+     "a": 0,
+     "e": "Nu are cifre pare."
+    }
+   ],
+   "166": [
+    {
+     "q": "Care divizori ai lui 20 sunt pari?",
+     "o": [
+      "2, 4, 10, 20",
+      "1, 5",
+      "2, 4"
+     ],
+     "a": 0,
+     "e": "20 e par, deci se numără divizorii pari: 4."
+    },
+    {
+     "q": "Dacă n e impar, câți dintre divizorii lui sunt impari?",
+     "o": [
+      "Toți",
+      "Jumătate",
+      "Niciunul"
+     ],
+     "a": 0,
+     "e": "Un număr impar nu are divizori pari."
+    },
+    {
+     "q": "Cum găsești repede toți divizorii lui n?",
+     "o": [
+      "În perechi d și n / d, pentru d · d ≤ n",
+      "Cu d de la 1 la 10⁹",
+      "Doar cei primi"
+     ],
+     "a": 0,
+     "e": "Ai grijă la d · d = n, să nu-l numeri de două ori."
+    }
+   ],
+   "167": [
+    {
+     "q": "Cât face 777 interpretat în baza 8?",
+     "o": [
+      "511",
+      "777",
+      "448"
+     ],
+     "a": 0,
+     "e": "7 · 64 + 7 · 8 + 7 = 448 + 56 + 7 = 511."
+    },
+    {
+     "q": "Ce face p la fiecare pas?",
+     "o": [
+      "Se înmulțește cu b",
+      "Se înmulțește cu 10",
+      "Crește cu 1"
+     ],
+     "a": 0,
+     "e": "p ia pe rând valorile b⁰, b¹, b², ..."
+    },
+    {
+     "q": "Ce se returnează pentru b = 10?",
+     "o": [
+      "Chiar n",
+      "0",
+      "10 · n"
+     ],
+     "a": 0,
+     "e": "În baza 10 cifrele au chiar valorile din scrierea zecimală."
+    }
+   ],
+   "168": [
+    {
+     "q": "Care sunt cifrele prime?",
+     "o": [
+      "2, 3, 5, 7",
+      "1, 2, 3, 5, 7",
+      "2, 3, 5, 7, 9",
+      "3, 5, 7"
+     ],
+     "a": 0,
+     "e": "1 nu e prim (are un singur divizor), iar 9 = 3 · 3."
+    },
+    {
+     "q": "Cât returnează subprogramul pentru n = 0?",
+     "o": [
+      "0",
+      "-1",
+      "nimic, n trebuie să fie nenul"
+     ],
+     "a": 0,
+     "e": "Nu are nicio cifră primă, deci suma rămâne 0; bucla nici nu pornește."
+    },
+    {
+     "q": "Pentru n = 1235405, care cifre se adună?",
+     "o": [
+      "2, 3, 5, 5",
+      "1, 2, 3, 5, 4, 0, 5",
+      "2, 3, 5",
+      "3, 5, 5"
+     ],
+     "a": 0,
+     "e": "Cifra 5 apare de două ori și se adună de două ori: 2 + 3 + 5 + 5 = 15."
+    }
+   ],
+   "169": [
+    {
+     "q": "Câte cifre are rezultatul pentru un n cu k cifre?",
+     "o": [
+      "2k − 1",
+      "2k",
+      "k + 1"
+     ],
+     "a": 0,
+     "e": "Între k cifre sunt k − 1 locuri, deci se adaugă k − 1 cifre."
+    },
+    {
+     "q": "Ce cifră se inserează între 5 și 5?",
+     "o": [
+      "0",
+      "5",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "|5 − 5| = 0, iar 0 trebuie pus în număr: 7255 → 7 5 2 3 5 0 5."
+    },
+    {
+     "q": "Încape rezultatul în int?",
+     "o": [
+      "Da, are cel mult 9 cifre",
+      "Nu, trebuie long long",
+      "Doar dacă n < 1000"
+     ],
+     "a": 0,
+     "e": "n are cel mult 5 cifre, deci rezultatul are cel mult 9 cifre, sub 2 · 10⁹."
+    }
+   ],
+   "170": [
+    {
+     "q": "Ce returnează Egal(7240)?",
+     "o": [
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Singura cifră impară este 7, deci toate cifrele impare (una singură) sunt egale."
+    },
+    {
+     "q": "Cu ce compari fiecare cifră impară?",
+     "o": [
+      "Cu prima cifră impară găsită",
+      "Cu ultima cifră a lui n",
+      "Cu cifra 1"
+     ],
+     "a": 0,
+     "e": "Dacă toate sunt egale cu prima, sunt egale între ele."
+    },
+    {
+     "q": "Ce faci cu cifrele pare?",
+     "o": [
+      "Le sari",
+      "Le compari și pe ele",
+      "Opresc parcurgerea"
+     ],
+     "a": 0,
+     "e": "Condiția privește doar cifrele impare."
+    }
+   ],
+   "171": [
+    {
+     "q": "În ce se transformă cifra 9?",
+     "o": [
+      "8",
+      "0",
+      "9"
+     ],
+     "a": 0,
+     "e": "Cea mai mare cifră pară strict mai mică decât 9 este 8."
+    },
+    {
+     "q": "De ce 15690 devine 4680, nu 04680?",
+     "o": [
+      "Prima cifră devine 0, iar un număr nu se scrie cu zerouri în față",
+      "Se pierde o cifră din greșeală",
+      "Pentru că 1 se șterge"
+     ],
+     "a": 0,
+     "e": "1 devine 0 și se află pe prima poziție, deci numărul are cu o cifră mai puțin."
+    },
+    {
+     "q": "Cu cât scade n când cifra impară este pe poziția zecilor?",
+     "o": [
+      "Cu 10",
+      "Cu 1",
+      "Cu 100"
+     ],
+     "a": 0,
+     "e": "Cifra scade cu 1, iar ea valorează de 10 ori cât cifra; deci n scade cu 10."
+    }
+   ],
+   "172": [
+    {
+     "q": "Care sunt divizorii impari ai lui 18?",
+     "o": [
+      "1, 3, 9",
+      "1, 2, 3, 6, 9, 18",
+      "3, 9"
+     ],
+     "a": 0,
+     "e": "Divizorii lui 18 sunt 1, 2, 3, 6, 9, 18; impari sunt 1, 3 și 9."
+    },
+    {
+     "q": "De ce parcurgi intervalul de la b spre a?",
+     "o": [
+      "Primul număr bun găsit e cel mai mare și te poți opri",
+      "E obligatoriu la BAC",
+      "Ca să eviți împărțirea la 0"
+     ],
+     "a": 0,
+     "e": "Se cere cel mai mare număr; de sus în jos îl găsești primul."
+    },
+    {
+     "q": "Ce problemă poate apărea la produsul divizorilor?",
+     "o": [
+      "Depășește repede tipul int",
+      "Iese mereu 0",
+      "Iese negativ doar pentru numere pare"
+     ],
+     "a": 0,
+     "e": "Pentru 315 produsul divizorilor impari e uriaș; oprește-te când produsul a depășit numărul."
+    }
+   ],
+   "173": [
+    {
+     "q": "Ce element dispare de pe prima linie?",
+     "o": [
+      "Ultimul, de pe diagonala secundară",
+      "Primul",
+      "Cel din mijloc"
+     ],
+     "a": 0,
+     "e": "Pe linia 0 diagonala secundară e pe coloana n − 1."
+    },
+    {
+     "q": "Ce element dispare de pe ultima linie?",
+     "o": [
+      "Primul",
+      "Ultimul",
+      "Niciunul"
+     ],
+     "a": 0,
+     "e": "Pe linia n − 1 diagonala secundară e pe coloana 0."
+    },
+    {
+     "q": "Câte coloane are tabloul obținut?",
+     "o": [
+      "n − 1",
+      "n",
+      "n − 2"
+     ],
+     "a": 0,
+     "e": "Fiecare linie pierde un element."
+    }
+   ],
+   "174": [
+    {
+     "q": "Ce devine X deplasat circular cu 6 poziții?",
+     "o": [
+      "D",
+      "Z",
+      "F"
+     ],
+     "a": 0,
+     "e": "X → Y, Z, A, B, C, D."
+    },
+    {
+     "q": "Ce cod primește a patra literă?",
+     "o": [
+      "Primul cod, din nou",
+      "Al patrulea",
+      "Ultimul"
+     ],
+     "a": 0,
+     "e": "Codurile se reiau circular: litera k primește codul k % 3."
+    },
+    {
+     "q": "Contează spațiile la numărarea literelor?",
+     "o": [
+      "Nu, se elimină înainte",
+      "Da"
+     ],
+     "a": 0,
+     "e": "De aceea B din BINE primește codul 3, după PIXEL."
+    }
+   ],
+   "175": [
+    {
+     "q": "Unde ajunge minimul 1 din prima coloană (7 1 2 5)?",
+     "o": [
+      "Pe ultima linie, pentru că 1 e impar",
+      "Pe prima linie",
+      "Rămâne pe loc"
+     ],
+     "a": 0,
+     "e": "Se interschimbă cu ultimul element: 7 5 2 1."
+    },
+    {
+     "q": "Unde ajunge minimul 0 din a treia coloană?",
+     "o": [
+      "Pe prima linie, pentru că 0 e par",
+      "Pe ultima linie"
+     ],
+     "a": 0,
+     "e": "Se interschimbă cu primul element: 0 1 3 1."
+    },
+    {
+     "q": "Ce faci dacă minimul e deja la capătul potrivit?",
+     "o": [
+      "Interschimbarea cu el însuși nu schimbă nimic",
+      "Îl muți la celălalt capăt",
+      "Afișezi mesaj"
+     ],
+     "a": 0,
+     "e": "Ca în coloana a patra din exemplu."
+    }
+   ],
+   "176": [
+    {
+     "q": "De ce aer nu alternează?",
+     "o": [
+      "a și e sunt două vocale alăturate",
+      "Are trei litere",
+      "Se termină în r"
+     ],
+     "a": 0,
+     "e": "Ajunge o singură pereche de același tip."
+    },
+    {
+     "q": "Ce compari la fiecare pas?",
+     "o": [
+      "Tipul literei curente cu tipul celei anterioare",
+      "Litera curentă cu prima",
+      "Numărul de vocale"
+     ],
+     "a": 0,
+     "e": "Tip = vocală sau consoană."
+    },
+    {
+     "q": "Alternează banana?",
+     "o": [
+      "Da: b-a-n-a-n-a",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Consoană, vocală, consoană, ... fără două la fel alăturate."
+    }
+   ],
+   "177": [
+    {
+     "q": "Ce coloane pot fi stabile?",
+     "o": [
+      "Doar coloane vecine, cu sume egale",
+      "Orice două coloane cu sume egale",
+      "Coloanele egale element cu element"
+     ],
+     "a": 0,
+     "e": "Coloanele trebuie să fie consecutive."
+    },
+    {
+     "q": "Cât e suma coloanei 0 din exemplu?",
+     "o": [
+      "12",
+      "6",
+      "2"
+     ],
+     "a": 0,
+     "e": "2 + 0 + 2 + 6 + 1 + 1 = 12; și coloana 1 are 12."
+    },
+    {
+     "q": "Ce se afișează pentru un tablou cu o singură coloană?",
+     "o": [
+      "nu exista",
+      "0 0",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Nu există două coloane consecutive."
+    }
+   ],
+   "178": [
+    {
+     "q": "Care flori au necesarul minim, 3 ore, în exemplu?",
+     "o": [
+      "impatiens și begonie",
+      "doar begonie",
+      "iris"
+     ],
+     "a": 0,
+     "e": "Dintre ele se alege prima în ordine alfabetică."
+    },
+    {
+     "q": "Ce funcție compară alfabetic două șiruri?",
+     "o": [
+      "strcmp",
+      "strlen",
+      "strcat"
+     ],
+     "a": 0,
+     "e": "strcmp(a, b) < 0 înseamnă că a e înaintea lui b."
+    },
+    {
+     "q": "Cum transformi caracterul cifră în valoare?",
+     "o": [
+      "p[0] − '0'",
+      "p[0]",
+      "strlen(p)"
+     ],
+     "a": 0,
+     "e": "'3' − '0' = 3."
+    }
+   ],
+   "179": [
+    {
+     "q": "Ce element e pe linia 1, coloana 0 (de la 0), pentru k = 5?",
+     "o": [
+      "11",
+      "10",
+      "9"
+     ],
+     "a": 0,
+     "e": "Pe diagonală e 10, iar la stânga lui e cu 1 mai mare."
+    },
+    {
+     "q": "De ce se cere k ≥ n?",
+     "o": [
+      "Ca prima linie să nu ajungă la valori negative sau nule",
+      "Din întâmplare",
+      "Ca tabloul să fie pătratic"
+     ],
+     "a": 0,
+     "e": "Pe prima linie ultimul element e k − (n − 1), care trebuie să rămână natural."
+    },
+    {
+     "q": "Ce relație au două elemente vecine pe o linie?",
+     "o": [
+      "Cel din dreapta e cu 1 mai mic",
+      "Cel din dreapta e cu k mai mic",
+      "Sunt egale"
+     ],
+     "a": 0,
+     "e": "Liniile sunt descrescătoare, cu numere consecutive."
+    }
+   ],
+   "180": [
+    {
+     "q": "Câte vocale are primavara?",
+     "o": [
+      "4: i, a, a, a",
+      "3",
+      "5"
+     ],
+     "a": 0,
+     "e": "Fiecare a se numără."
+    },
+    {
+     "q": "De ce primul primavara nu se afișează, deși are 4 vocale?",
+     "o": [
+      "E același cuvânt cu ultimul, deci nu sunt distincte",
+      "E primul",
+      "Se afișează"
+     ],
+     "a": 0,
+     "e": "Cuvintele asemenea trebuie să fie distincte."
+    },
+    {
+     "q": "Câte vocale are brandusele?",
+     "o": [
+      "4: a, u, e, e",
+      "3",
+      "5"
+     ],
+     "a": 0,
+     "e": "De aceea apare în răspuns."
+    }
+   ],
+   "181": [
+    {
+     "q": "Ce face strtok cu mai multe spații alăturate?",
+     "o": [
+      "Le tratează ca pe un singur separator",
+      "Creează cuvinte goale",
+      "Se oprește"
+     ],
+     "a": 0,
+     "e": "De aceea spațiile multiple nu creează probleme."
+    },
+    {
+     "q": "Ce pui între două cuvinte?",
+     "o": [
+      "Spațiu, cratimă, spațiu",
+      "Doar o cratimă",
+      "Două spații"
+     ],
+     "a": 0,
+     "e": "Cratima e încadrată de câte un spațiu."
+    },
+    {
+     "q": "Se pune cratimă înainte de primul cuvânt?",
+     "o": [
+      "Nu, doar între cuvinte",
+      "Da"
+     ],
+     "a": 0,
+     "e": "De aceea verifici dacă rezultatul e încă gol."
+    }
+   ],
+   "182": [
+    {
+     "q": "Ce devine fotografii?",
+     "o": [
+      "rafiifotog",
+      "iifargotof",
+      "fotografii"
+     ],
+     "a": 0,
+     "e": "Are 10 litere: fotog și rafii își schimbă locul."
+    },
+    {
+     "q": "Ce se întâmplă cu cuvintele cu număr impar de litere?",
+     "o": [
+      "Rămân neschimbate",
+      "Se inversează",
+      "Se șterg"
+     ],
+     "a": 0,
+     "e": "De exemplu facut și flori."
+    },
+    {
+     "q": "Ce devine un cuvânt de 2 litere, ca am?",
+     "o": [
+      "ma",
+      "am",
+      "a"
+     ],
+     "a": 0,
+     "e": "Fiecare jumătate are o literă."
+    }
+   ],
+   "183": [
+    {
+     "q": "Câte triplete are o linie 0 0 0 0?",
+     "o": [
+      "2",
+      "1",
+      "4"
+     ],
+     "a": 0,
+     "e": "Pozițiile 1-2-3 și 2-3-4: tripletele se pot suprapune."
+    },
+    {
+     "q": "Contează rândurile din mijloc?",
+     "o": [
+      "Nu, doar primul și ultimul",
+      "Da, toate"
+     ],
+     "a": 0,
+     "e": "Prietenii caută doar pe primul sau pe ultimul rând."
+    },
+    {
+     "q": "Până la ce indice merge începutul unui triplet (de la 0)?",
+     "o": [
+      "np − 3",
+      "np − 1",
+      "np"
+     ],
+     "a": 0,
+     "e": "Tripletul ocupă pozițiile j, j + 1, j + 2."
+    }
+   ],
+   "184": [
+    {
+     "q": "Pe ce coloană e minimul din exemplu?",
+     "o": [
+      "A treia (cu 5, 2, 8)",
+      "A doua",
+      "Ultima"
+     ],
+     "a": 0,
+     "e": "Minimul tabloului e 2."
+    },
+    {
+     "q": "De ce reții valoarea din colțul dreapta-jos înainte de modificare?",
+     "o": [
+      "Dacă minimul e pe ultima coloană, colțul se schimbă și el",
+      "Nu e nevoie",
+      "Ca să fie mai rapid"
+     ],
+     "a": 0,
+     "e": "În acest caz valoarea ar fi suprascrisă înainte să o folosești peste tot."
+    },
+    {
+     "q": "Ce se înlocuiește?",
+     "o": [
+      "Toată coloana minimului",
+      "Doar minimul",
+      "Toată linia minimului"
+     ],
+     "a": 0,
+     "e": "Toate elementele de pe acea coloană."
+    }
+   ],
+   "185": [
+    {
+     "q": "Unde apar cuvintele cu exact n litere?",
+     "o": [
+      "Nicăieri",
+      "Pe prima linie",
+      "Pe a doua linie"
+     ],
+     "a": 0,
+     "e": "O linie are cuvintele cu mai puțin de n litere, cealaltă pe cele cu mai mult."
+    },
+    {
+     "q": "Ce se afișează pentru n = 2 și textul ab cd ef?",
+     "o": [
+      "nu exista",
+      "ab cd ef pe prima linie",
+      "o linie goală"
+     ],
+     "a": 0,
+     "e": "Toate au exact 2 litere, deci ambele mulțimi sunt vide."
+    },
+    {
+     "q": "De ce copiezi textul înainte de strtok?",
+     "o": [
+      "strtok pune 0 în locul spațiilor și strică textul",
+      "Ca să fie mai rapid",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "Pentru a doua parcurgere ai nevoie de textul întreg."
+    }
+   ],
+   "186": [
+    {
+     "q": "Ce înlocuiește un cuvânt generic?",
+     "o": [
+      "Un cuvânt din listă cu aceeași lungime",
+      "Orice cuvânt din listă",
+      "Primul cuvânt din listă"
+     ],
+     "a": 0,
+     "e": "******* are 7 caractere, deci se înlocuiește cu un cuvânt de 7 litere."
+    },
+    {
+     "q": "De ce al doilea șablon din exemplu e imposibil?",
+     "o": [
+      "Nu există în listă cuvinte de 3 sau de 12 litere",
+      "Are prea multe cuvinte",
+      "Începe cu *"
+     ],
+     "a": 0,
+     "e": "Un singur cuvânt generic fără pereche face fraza imposibilă."
+    },
+    {
+     "q": "Poate același cuvânt din listă să fie folosit de două ori?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "În exemplu soare (sau acasa) apare de două ori."
+    }
+   ],
+   "187": [
+    {
+     "q": "Care e cea mai mică valoare generată de 10 și 2?",
+     "o": [
+      "102",
+      "210",
+      "12"
+     ],
+     "a": 0,
+     "e": "Alipirile sunt 102 și 210."
+    },
+    {
+     "q": "Cum alipești b la dreapta lui a, ca număr?",
+     "o": [
+      "a · 10ᵏ + b, unde k e numărul de cifre ale lui b",
+      "a + b",
+      "a · b"
+     ],
+     "a": 0,
+     "e": "De exemplu 123 · 100 + 45 = 12345."
+    },
+    {
+     "q": "Este tabloul simetric pe porțiunea pătrată?",
+     "o": [
+      "Da, t[i][j] = t[j][i]",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Aceleași două alipiri, doar în altă ordine."
+    }
+   ],
+   "188": [
+    {
+     "q": "Ce se afișează pentru Ana are cel mai dulce mar?",
+     "o": [
+      "NU",
+      "DA 3",
+      "DA 5"
+     ],
+     "a": 0,
+     "e": "dulce are 5 litere, celelalte 3."
+    },
+    {
+     "q": "Cu ce lungime compari fiecare cuvânt?",
+     "o": [
+      "Cu lungimea primului cuvânt",
+      "Cu 3",
+      "Cu media lungimilor"
+     ],
+     "a": 0,
+     "e": "Toate trebuie să fie egale între ele."
+    },
+    {
+     "q": "Ce mai afișezi lângă DA?",
+     "o": [
+      "Lungimea comună n",
+      "Numărul de cuvinte",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Exact ca în exemplu: DA 3."
+    }
+   ],
+   "189": [
+    {
+     "q": "Ce rânduri sunt cu gazon (numerotare de la 0)?",
+     "o": [
+      "0, 2, 4, ...",
+      "1, 3, 5, ...",
+      "toate"
+     ],
+     "a": 0,
+     "e": "Primul rând e gazon, iar tipurile alternează."
+    },
+    {
+     "q": "Pentru rândul de flori 7 8 5 9 8 5, cât de înalt poate fi gazonul de deasupra?",
+     "o": [
+      "4",
+      "5",
+      "6"
+     ],
+     "a": 0,
+     "e": "Floarea cea mai scundă are 5, iar florile trebuie să fie cu cel puțin 1 mai înalte."
+    },
+    {
+     "q": "Ce se întâmplă cu un ultim rând de gazon, fără flori după el?",
+     "o": [
+      "Rămâne neschimbat",
+      "Se tunde la 1",
+      "Se șterge"
+     ],
+     "a": 0,
+     "e": "Nu există flori care să-l limiteze."
+    }
+   ],
+   "190": [
+    {
+     "q": "Ce înseamnă că două zone au o latură comună?",
+     "o": [
+      "Sunt vecine sus-jos sau stânga-dreapta",
+      "Sunt pe aceeași diagonală",
+      "Sunt pe același rând"
+     ],
+     "a": 0,
+     "e": "Colțurile nu contează."
+    },
+    {
+     "q": "Cum eviți ieșirea din tablou la margini?",
+     "o": [
+      "Bordezi tabloul cu o valoare care nu e 0 sau verifici indicii",
+      "Nu e nevoie",
+      "Citești n + 2 linii"
+     ],
+     "a": 0,
+     "e": "O bordură de -1 face toate zonele să aibă 4 vecini."
+    },
+    {
+     "q": "Ce se afișează pentru fiecare carusel bun?",
+     "o": [
+      "Numărul rândului lui",
+      "Numărul coloanei",
+      "Codul 3"
+     ],
+     "a": 0,
+     "e": "Un rând poate apărea de mai multe ori, ca 3 în exemplu."
+    }
+   ],
+   "191": [
+    {
+     "q": "Cum știi ce cuvânt de clasificare e SP.?",
+     "o": [
+      "După prima literă, S, deci SPECIA",
+      "Numărând literele",
+      "Nu se poate ști"
+     ],
+     "a": 0,
+     "e": "Cele trei cuvinte încep cu litere diferite: F, G, S."
+    },
+    {
+     "q": "Ce devine G.?",
+     "o": [
+      "gen.",
+      "g.",
+      "GEN."
+     ],
+     "a": 0,
+     "e": "Primele trei litere ale lui GENUL, cu litere mici și punct."
+    },
+    {
+     "q": "Ce se întâmplă cu PHASIANIDAE?",
+     "o": [
+      "Rămâne neschimbat",
+      "Devine pha.",
+      "Se scrie cu litere mici"
+     ],
+     "a": 0,
+     "e": "Doar cuvintele de clasificare se transformă."
+    }
+   ],
+   "192": [
+    {
+     "q": "Ce cod are parcela de pe rândul 2, coloana 1 din exemplu?",
+     "o": [
+      "0, din 90 + 10 = 100",
+      "100",
+      "10"
+     ],
+     "a": 0,
+     "e": "Se păstrează ultimele două cifre, 00, iar 0 din față se ignoră."
+    },
+    {
+     "q": "Cum obții ultimele două cifre ale unei sume?",
+     "o": [
+      "Restul împărțirii la 100",
+      "Împărțirea la 100",
+      "Restul la 10"
+     ],
+     "a": 0,
+     "e": "(a + b) % 100."
+    },
+    {
+     "q": "Ce parcele sunt gazon (indici de la 0)?",
+     "o": [
+      "Cele cu i + j > n − 1",
+      "Cele cu i > j",
+      "Ultima coloană"
+     ],
+     "a": 0,
+     "e": "Adică cele din dreapta diagonalei secundare."
+    }
+   ],
+   "193": [
+    {
+     "q": "De ce secțiunea 2 dă punctul 2, nu 3, deși ambele au adâncimea 6?",
+     "o": [
+      "Se ia primul punct cu adâncimea maximă",
+      "Din greșeală",
+      "Pentru că 3 e impar"
+     ],
+     "a": 0,
+     "e": "Comparația strictă păstrează prima poziție."
+    },
+    {
+     "q": "Ce comparație folosești ca să păstrezi primul maxim?",
+     "o": [
+      "a[i][j] > max",
+      "a[i][j] ≥ max",
+      "a[i][j] == max"
+     ],
+     "a": 0,
+     "e": "Cu ≥ ai lua ultimul."
+    },
+    {
+     "q": "Cum arată o pereche afișată?",
+     "o": [
+      "secțiune:punct, urmat de spațiu",
+      "punct:secțiune",
+      "secțiune punct"
+     ],
+     "a": 0,
+     "e": "De exemplu 1:3."
+    }
+   ],
+   "194": [
+    {
+     "q": "Câte pătrate 2 × 2 are o tablă cu m linii și n coloane?",
+     "o": [
+      "(m − 1) · (n − 1)",
+      "m · n",
+      "m · n / 4"
+     ],
+     "a": 0,
+     "e": "Colțul stânga-sus nu poate fi pe ultima linie sau ultima coloană."
+    },
+    {
+     "q": "Unde se termină buclele după i și j?",
+     "o": [
+      "La m − 2, respectiv n − 2",
+      "La m − 1 și n − 1",
+      "La m și n"
+     ],
+     "a": 0,
+     "e": "Altfel a[i+1] sau a[j+1] ar ieși din tablou."
+    },
+    {
+     "q": "Ce valoare inițială pui pentru maxim?",
+     "o": [
+      "Ceva mai mic decât orice sumă posibilă, de exemplu -1",
+      "100",
+      "Primul element"
+     ],
+     "a": 0,
+     "e": "Sumele sunt cel puțin 0."
+    }
+   ],
+   "195": [
+    {
+     "q": "Cum recunoști un număr în text?",
+     "o": [
+      "Primul lui caracter e o cifră",
+      "Are mai puțin de 4 caractere",
+      "Se termină în 0"
+     ],
+     "a": 0,
+     "e": "Cuvintele sunt doar din litere."
+    },
+    {
+     "q": "Cu ce compari lungimea fiecărui număr?",
+     "o": [
+      "Cu lungimea primului număr găsit",
+      "Cu 3",
+      "Cu lungimea textului"
+     ],
+     "a": 0,
+     "e": "Toate numerele trebuie să aibă aceeași lungime."
+    },
+    {
+     "q": "Ce se afișează dacă textul are un singur număr, 7?",
+     "o": [
+      "1",
+      "NU",
+      "7"
+     ],
+     "a": 0,
+     "e": "Toate numerele (unul singur) au câte 1 cifră."
+    }
+   ],
+   "196": [
+    {
+     "q": "De ce DANILA PREPELEAC nu se afișează?",
+     "o": [
+      "Prenumele trebuie să fie exact DAN, nu doar să înceapă cu DAN",
+      "Pentru că e al doilea",
+      "Se afișează"
+     ],
+     "a": 0,
+     "e": "Compari cuvinte întregi cu strcmp."
+    },
+    {
+     "q": "De ce EDANA DAN nu se afișează?",
+     "o": [
+      "DAN e numele, nu prenumele",
+      "E ultimul",
+      "Se afișează"
+     ],
+     "a": 0,
+     "e": "Doar primul cuvânt al fiecărui invitat e prenume."
+    },
+    {
+     "q": "Ce separatori dai lui strtok?",
+     "o": [
+      "Spațiul și ;",
+      "Doar spațiul",
+      "Doar ;"
+     ],
+     "a": 0,
+     "e": "Așa cuvintele ies pe rând: prenume, nume, prenume, nume..."
+    }
+   ],
+   "197": [
+    {
+     "q": "Care elemente se mută pe linia i?",
+     "o": [
+      "Cele din dreapta diagonalei",
+      "Cele din stânga diagonalei",
+      "Toate"
+     ],
+     "a": 0,
+     "e": "Cele din stânga rămân pe loc, iar golul de pe diagonală se umple din dreapta."
+    },
+    {
+     "q": "Câte coloane are tabloul afișat?",
+     "o": [
+      "n − 1",
+      "n",
+      "n + 1"
+     ],
+     "a": 0,
+     "e": "Pe fiecare linie s-a eliminat exact un element."
+    },
+    {
+     "q": "Ce se întâmplă pe ultima linie?",
+     "o": [
+      "Nimic nu se mută; doar ultimul element (de pe diagonală) dispare",
+      "Toată linia se mută"
+     ],
+     "a": 0,
+     "e": "Pe ultima linie elementul de pe diagonală e ultimul."
+    }
+   ],
+   "198": [
+    {
+     "q": "Câți vecini are o parcelă din colț?",
+     "o": [
+      "2",
+      "4",
+      "3"
+     ],
+     "a": 0,
+     "e": "Doar parcelele din interior au 4 vecini."
+    },
+    {
+     "q": "Cât nisip primește parcela cu nivelul 1 de pe ultima linie a exemplului?",
+     "o": [
+      "2",
+      "0",
+      "3"
+     ],
+     "a": 0,
+     "e": "Vecinii ei au nivelurile 5, 3 și 4; se aduce la nivelul celei mai joase, 3."
+    },
+    {
+     "q": "Se folosesc nivelurile modificate pentru celelalte parcele?",
+     "o": [
+      "Nu, toate comparațiile se fac cu nivelurile inițiale",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Altfel rezultatul ar depinde de ordinea parcurgerii."
+    }
+   ],
+   "199": [
+    {
+     "q": "Care e vocala prietenă a lui m?",
+     "o": [
+      "i",
+      "o",
+      "e"
+     ],
+     "a": 0,
+     "e": "Înaintea lui m în alfabet: l, k, j, i — prima vocală e i."
+    },
+    {
+     "q": "Ce se întâmplă cu vocalele din parolă?",
+     "o": [
+      "Rămân la fel",
+      "Se înlocuiesc cu a",
+      "Se șterg"
+     ],
+     "a": 0,
+     "e": "Se înlocuiesc doar consoanele."
+    },
+    {
+     "q": "Poate o consoană să nu aibă vocală prietenă?",
+     "o": [
+      "Nu, a e prima literă și e vocală",
+      "Da, b"
+     ],
+     "a": 0,
+     "e": "Pentru b, c, d vocala prietenă e a."
+    }
+   ],
+   "200": [
+    {
+     "q": "Este 0 un pătrat perfect par?",
+     "o": [
+      "Da, 0 = 0²",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "De aceea tabloul se termină cu 0."
+    },
+    {
+     "q": "Care e cel mai mare element pentru m = 2, n = 3?",
+     "o": [
+      "100 = 10²",
+      "36",
+      "144"
+     ],
+     "a": 0,
+     "e": "Sunt 6 pătrate pare: 0², 2², 4², 6², 8², 10²."
+    },
+    {
+     "q": "Ce formulă dă al k-lea pătrat par (de la 0)?",
+     "o": [
+      "(2k)²",
+      "2k²",
+      "(k + 2)²"
+     ],
+     "a": 0,
+     "e": "Numerele pare sunt 2k."
+    }
+   ],
+   "201": [
+    {
+     "q": "Ce devine 3 0 6 4 (stânga diagonalei, linia 5) după deplasarea spre dreapta?",
+     "o": [
+      "4 3 0 6",
+      "0 6 4 3",
+      "3 0 6 4"
+     ],
+     "a": 0,
+     "e": "Ultimul element trece pe prima poziție."
+    },
+    {
+     "q": "În ce ordine muți elementele spre dreapta?",
+     "o": [
+      "De la dreapta spre stânga, ca să nu suprascrii valori",
+      "De la stânga spre dreapta",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Mutând de la stânga ai copia aceeași valoare peste tot."
+    },
+    {
+     "q": "Când citești k?",
+     "o": [
+      "După elementele tabloului",
+      "Înainte de tablou"
+     ],
+     "a": 0,
+     "e": "Ordinea citirii e n, tabloul, apoi k."
+    }
+   ],
+   "202": [
+    {
+     "q": "Care elemente se schimbă între ele pentru k = 4 (de la 1)?",
+     "o": [
+      "a[4][j] cu a[j][4], pentru j = 1, 2, 3",
+      "a[4][j] cu a[j][j]",
+      "linia 4 cu coloana 1"
+     ],
+     "a": 0,
+     "e": "Al j-lea element din linie cu al j-lea din coloană."
+    },
+    {
+     "q": "Este atinsă diagonala principală?",
+     "o": [
+      "Nu, doar elementele din stânga și de deasupra ei",
+      "Da"
+     ],
+     "a": 0,
+     "e": "a[k][k] rămâne pe loc."
+    },
+    {
+     "q": "Ce devine linia 4 în exemplu?",
+     "o": [
+      "5 8 0 6 9",
+      "6 1 3 6 9",
+      "5 8 0 5 9"
+     ],
+     "a": 0,
+     "e": "Primele trei elemente vin din coloana 4: 5, 8, 0."
+    }
+   ],
+   "203": [
+    {
+     "q": "De ce nu poți afișa cuvintele pe măsură ce le găsești?",
+     "o": [
+      "Dacă la final sunt mai puțin de k, trebuie afișat doar mesajul",
+      "Pentru că sunt prea multe",
+      "Poți"
+     ],
+     "a": 0,
+     "e": "Întâi numeri, apoi afișezi."
+    },
+    {
+     "q": "Cum iei ultima literă a cuvântului w?",
+     "o": [
+      "w[strlen(w) − 1]",
+      "w[strlen(w)]",
+      "w[0]"
+     ],
+     "a": 0,
+     "e": "w[strlen(w)] este caracterul de final, 0."
+    },
+    {
+     "q": "Ce se afișează pentru k = 2 și cuvintele norii, pe, pluteau?",
+     "o": [
+      "norii și pe",
+      "norii și pluteau",
+      "toate trei"
+     ],
+     "a": 0,
+     "e": "Primele două, în ordinea citirii."
+    }
+   ],
+   "204": [
+    {
+     "q": "Ce element e pe diagonală pe linia 3 (de la 0), pentru k = 3?",
+     "o": [
+      "12",
+      "9",
+      "10"
+     ],
+     "a": 0,
+     "e": "(3 + 1) · 3 = 12."
+    },
+    {
+     "q": "Ce relație au două elemente vecine pe o linie?",
+     "o": [
+      "Al doilea e cu 1 mai mare",
+      "Diferă cu k",
+      "Sunt egale"
+     ],
+     "a": 0,
+     "e": "Liniile sunt șiruri de numere consecutive."
+    },
+    {
+     "q": "Pentru k = 2 și n = 5, poate apărea un număr negativ în colțul din stânga jos?",
+     "o": [
+      "Nu: (4 + 1) · 2 − 4 = 6",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Valoarea minimă pe linia i este (i + 1)·k − i, care e pozitivă pentru k ≥ 2."
+    }
+   ],
+   "205": [
+    {
+     "q": "Câte elemente are conturul unui tablou n × n?",
+     "o": [
+      "4n − 4",
+      "4n",
+      "n²"
+     ],
+     "a": 0,
+     "e": "Fiecare colț aparține la două laturi, deci se scad 4."
+    },
+    {
+     "q": "În ce direcție pornești din colțul stânga-sus, în sens invers acelor de ceasornic?",
+     "o": [
+      "În jos, pe prima coloană",
+      "La dreapta, pe prima linie",
+      "În sus"
+     ],
+     "a": 0,
+     "e": "Invers acelor de ceasornic: jos, dreapta, sus, stânga."
+    },
+    {
+     "q": "De ce ultima bucată (prima linie spre stânga) se oprește la coloana 1?",
+     "o": [
+      "Colțul stânga-sus a fost deja afișat la început",
+      "Din greșeală",
+      "Pentru că a[0][0] e 0"
+     ],
+     "a": 0,
+     "e": "Altfel ai afișa primul element de două ori."
+    }
+   ],
+   "206": [
+    {
+     "q": "Ce valoare are a[0][0] pentru n = 5?",
+     "o": [
+      "1",
+      "5",
+      "0"
+     ],
+     "a": 0,
+     "e": "Distanța până la diagonala secundară e 4, deci 5 − 4 = 1."
+    },
+    {
+     "q": "Ce se întâmplă de o parte și de alta a diagonalei secundare?",
+     "o": [
+      "Valorile scad cu 1 la fiecare pas",
+      "Cresc",
+      "Rămân n"
+     ],
+     "a": 0,
+     "e": "Șirurile pornesc de la n și sunt strict descrescătoare."
+    },
+    {
+     "q": "Pot apărea valori ≤ 0?",
+     "o": [
+      "Nu, distanța maximă e n − 1, deci minimul e 1",
+      "Da"
+     ],
+     "a": 0,
+     "e": "De exemplu, colțurile a[0][0] și a[n−1][n−1] au valoarea 1."
+    }
+   ],
+   "207": [
+    {
+     "q": "Unde e primul rând al sălii în tablou?",
+     "o": [
+      "În prima coloană",
+      "În prima linie",
+      "Pe diagonală"
+     ],
+     "a": 0,
+     "e": "Enunțul spune că prima coloană corespunde primului rând de scaune."
+    },
+    {
+     "q": "De ce nu se afișează 0, deși e în ambele coloane?",
+     "o": [
+      "0 înseamnă loc liber, nu o persoană",
+      "Din greșeală",
+      "Se afișează"
+     ],
+     "a": 0,
+     "e": "Doar numerele nenule reprezintă persoane."
+    },
+    {
+     "q": "Ce dimensiune au vectorii de marcaj?",
+     "o": [
+      "401, pentru valorile 0..400",
+      "20",
+      "21"
+     ],
+     "a": 0,
+     "e": "Valorile din tablou sunt până la 400."
+    }
+   ],
+   "208": [
+    {
+     "q": "De ce pe prima linie nu se afișează 21?",
+     "o": [
+      "Se cer valorile strict mai mici decât 21",
+      "Pentru că 21 e impar",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "21 nu e strict mai mic decât el însuși."
+    },
+    {
+     "q": "Cu ce valoare pornește maximul pe fiecare linie?",
+     "o": [
+      "0, mai mic decât orice element",
+      "primul element al liniei",
+      "21"
+     ],
+     "a": 0,
+     "e": "Dacă ai porni cu primul element, el ar putea fi ≥ 21."
+    },
+    {
+     "q": "Câte rânduri afișează programul?",
+     "o": [
+      "Câte unul pentru fiecare linie a tabloului",
+      "Unul singur",
+      "Câte unul pentru fiecare coloană"
+     ],
+     "a": 0,
+     "e": "Fie un număr, fie mesajul nu exista."
+    }
+   ],
+   "209": [
+    {
+     "q": "Ce element e pe linia 3, coloana 4?",
+     "o": [
+      "2, ultima cifră a lui 12",
+      "12",
+      "7"
+     ],
+     "a": 0,
+     "e": "3 · 4 = 12."
+    },
+    {
+     "q": "Cum obții ultima cifră a unui număr?",
+     "o": [
+      "Restul împărțirii la 10",
+      "Câtul împărțirii la 10",
+      "Împărțirea la 100"
+     ],
+     "a": 0,
+     "e": "x % 10."
+    },
+    {
+     "q": "De unde pornesc indicii aici?",
+     "o": [
+      "De la 1",
+      "De la 0"
+     ],
+     "a": 0,
+     "e": "Enunțul numerotează liniile și coloanele de la 1; altfel prima linie ar fi numai zerouri."
+    }
+   ],
+   "210": [
+    {
+     "q": "Ce element e pe linia 0, coloana 0, pentru n = 4?",
+     "o": [
+      "3",
+      "0",
+      "4"
+     ],
+     "a": 0,
+     "e": "|0 + 0 − 3| = 3."
+    },
+    {
+     "q": "Unde e 0 pe linia i?",
+     "o": [
+      "Pe coloana n − 1 − i",
+      "Pe coloana i",
+      "Pe ultima coloană"
+     ],
+     "a": 0,
+     "e": "Acolo e diagonala secundară."
+    },
+    {
+     "q": "Ce reprezintă fiecare element?",
+     "o": [
+      "Distanța pe linie până la diagonala secundară",
+      "Suma indicilor",
+      "Produsul indicilor"
+     ],
+     "a": 0,
+     "e": "Valorile cresc cu 1 la fiecare pas depărtându-te de diagonală."
+    }
+   ],
+   "211": [
+    {
+     "q": "Câte linii are tabloul pentru x = 1359?",
+     "o": [
+      "4, câte cifre are x",
+      "1359",
+      "9"
+     ],
+     "a": 0,
+     "e": "Tabloul are k × k elemente, unde k e numărul de cifre."
+    },
+    {
+     "q": "În ce ordine scoți cifrele cu x % 10?",
+     "o": [
+      "De la ultima la prima, deci le pui în vector de la dreapta",
+      "De la prima la ultima"
+     ],
+     "a": 0,
+     "e": "De aceea le așezi pe pozițiile k − 1, k − 2, ..., 0."
+    },
+    {
+     "q": "Ce se afișează pentru x = 10?",
+     "o": [
+      "1 0 pe două linii",
+      "10",
+      "0 1 pe două linii"
+     ],
+     "a": 0,
+     "e": "Cifrele 1 și 0, în ordine, pe fiecare dintre cele 2 linii."
+    }
+   ],
+   "212": [
+    {
+     "q": "Când e a[i][j] în dreapta diagonalei principale (indici de la 0)?",
+     "o": [
+      "j > i",
+      "j < i",
+      "i + j > n"
+     ],
+     "a": 0,
+     "e": "Pe diagonala principală j = i."
+    },
+    {
+     "q": "Când e a[i][j] în dreapta diagonalei secundare?",
+     "o": [
+      "j > n − 1 − i",
+      "j < n − 1 − i",
+      "j = n − 1"
+     ],
+     "a": 0,
+     "e": "Pe diagonala secundară i + j = n − 1."
+    },
+    {
+     "q": "Pentru n = 5, câte elemente are zona?",
+     "o": [
+      "1, a[2][3]",
+      "0",
+      "4"
+     ],
+     "a": 0,
+     "e": "Doar pe linia din mijloc rămâne un element între diagonale și ultima coloană."
+    }
+   ],
+   "213": [
+    {
+     "q": "De ce lalele nu se afișează?",
+     "o": [
+      "Are două vocale distincte, a și e",
+      "Are prea multe litere",
+      "Nu are vocale"
+     ],
+     "a": 0,
+     "e": "Vocalele se numără o singură dată fiecare, dar trebuie să fie una singură."
+    },
+    {
+     "q": "Contează de câte ori apare vocala?",
+     "o": [
+      "Nu, contează doar câte vocale diferite sunt",
+      "Da"
+     ],
+     "a": 0,
+     "e": "plantat are de două ori a, dar o singură vocală distinctă."
+    },
+    {
+     "q": "Se afișează un cuvânt fără vocale, ca brr?",
+     "o": [
+      "Nu, are 0 vocale distincte",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Se cere exact una."
+    }
+   ],
+   "214": [
+    {
+     "q": "Ce elemente are al doilea șir?",
+     "o": [
+      "Ultimele m − 1 elemente ale ultimei coloane, fără cel de pe prima linie",
+      "Toată ultima coloană",
+      "Ultima linie"
+     ],
+     "a": 0,
+     "e": "a[0][n−1] e exclus din ambele șiruri."
+    },
+    {
+     "q": "De ce nu se afișează 2 în exemplu?",
+     "o": [
+      "2 e pe prima linie, dar în ultimul element al ei, exclus",
+      "Nu apare deloc",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "Primul șir are doar primele n − 1 elemente: 4 5 7."
+    },
+    {
+     "q": "Ce mesaj se afișează când nu sunt valori comune?",
+     "o": [
+      "nu exista",
+      "nefiltrate",
+      "0"
+     ],
+     "a": 0,
+     "e": "Așa cere enunțul."
+    }
+   ],
+   "215": [
+    {
+     "q": "Pe ce coloană (de la 1) e diagonala secundară pe linia k?",
+     "o": [
+      "n − k + 1",
+      "k",
+      "n − k"
+     ],
+     "a": 0,
+     "e": "Pentru n = 5, k = 2: coloana 4."
+    },
+    {
+     "q": "Ce devine 2 4 6 după deplasarea circulară spre dreapta?",
+     "o": [
+      "6 2 4",
+      "4 6 2",
+      "2 4 6"
+     ],
+     "a": 0,
+     "e": "Ultimul element trece primul."
+    },
+    {
+     "q": "Ce se întâmplă pe linia n?",
+     "o": [
+      "Nimic, nu are elemente în stânga diagonalei secundare",
+      "Se rotește toată"
+     ],
+     "a": 0,
+     "e": "Pe linia n diagonala secundară e chiar pe coloana 1."
+    }
+   ],
+   "216": [
+    {
+     "q": "Ce trebuie făcut între cin >> n și cin.getline?",
+     "o": [
+      "cin.get(), ca să consumi Enter-ul",
+      "Nimic",
+      "cin.clear()"
+     ],
+     "a": 0,
+     "e": "Altfel getline citește linia goală rămasă după n."
+    },
+    {
+     "q": "Pentru n = 3 și textul ana are mere ce se afișează?",
+     "o": [
+      "nu exista",
+      "ana are mere, pe linii separate",
+      "mere"
+     ],
+     "a": 0,
+     "e": "Toate cuvintele au cel puțin 3 litere, deci mulțimea celorlalte e vidă."
+    },
+    {
+     "q": "Cuvântul tot are 3 litere; pentru n = 5 în ce grupă intră?",
+     "o": [
+      "A doua, a celor cu mai puțin de n litere",
+      "Prima",
+      "Niciuna"
+     ],
+     "a": 0,
+     "e": "Prima grupă cere cel puțin n = 5 litere."
+    }
+   ],
+   "217": [
+    {
+     "q": "Cum transformi o literă mică în literă mare?",
+     "o": [
+      "s[i] = s[i] − 'a' + 'A'",
+      "s[i] = s[i] + 32",
+      "s[i] = 'A'"
+     ],
+     "a": 0,
+     "e": "Literele mari sunt înaintea celor mici în codul ASCII, cu 32 mai puțin."
+    },
+    {
+     "q": "Ce reține indicatorul din parcurgere?",
+     "o": [
+      "Dacă ești între < și >",
+      "Câte litere ai schimbat",
+      "Lungimea textului"
+     ],
+     "a": 0,
+     "e": "Doar literele dintr-un citat se schimbă."
+    },
+    {
+     "q": "Se schimbă spațiile din interiorul citatului?",
+     "o": [
+      "Nu, doar literele mici",
+      "Da, devin _",
+      "Se șterg"
+     ],
+     "a": 0,
+     "e": "Spațiile rămân pe loc, ca în exemplu."
+    }
+   ],
+   "218": [
+    {
+     "q": "Ce se obține prin rotirea spre stânga a cuvântului mic?",
+     "o": [
+      "icm",
+      "cmi",
+      "mic"
+     ],
+     "a": 0,
+     "e": "Prima literă, m, trece la final: i c m."
+    },
+    {
+     "q": "Ce se întâmplă cu cuvintele de două litere?",
+     "o": [
+      "Rămân la fel",
+      "Se rotesc și ele",
+      "Se șterg"
+     ],
+     "a": 0,
+     "e": "Rotirea se aplică doar cuvintelor cu cel puțin trei litere."
+    },
+    {
+     "q": "Când se afișează nu exista?",
+     "o": [
+      "Când niciun cuvânt nu are cel puțin trei litere",
+      "Când textul are spații",
+      "Când primul cuvânt e scurt"
+     ],
+     "a": 0,
+     "e": "Atunci nu s-ar roti nimic."
+    }
+   ],
+   "219": [
+    {
+     "q": "De ce cuvântul reper nu se înlocuiește?",
+     "o": [
+      "Citit invers e tot reper, iar cuvintele în oglindă trebuie să fie distincte",
+      "Are număr par de litere",
+      "Pentru că e la mijloc"
+     ],
+     "a": 0,
+     "e": "Un palindrom nu are pereche în oglindă."
+    },
+    {
+     "q": "Ce cuvinte se schimbă în era o selectie?",
+     "o": [
+      "doar era",
+      "era și o",
+      "toate"
+     ],
+     "a": 0,
+     "e": "o e palindrom, selectie are 8 litere; era devine are."
+    },
+    {
+     "q": "Cum inversezi un cuvânt pe loc?",
+     "o": [
+      "Interschimbi literele simetrice până la mijloc",
+      "Îl copiezi de la final la început în același șir",
+      "Cu strrev pe tot textul"
+     ],
+     "a": 0,
+     "e": "Schimbi s[i+k] cu s[j−1−k] pentru k < L / 2."
+    }
+   ],
+   "220": [
+    {
+     "q": "Câte coloane are tabloul pentru n = 4 și k = 3?",
+     "o": [
+      "12",
+      "7",
+      "4"
+     ],
+     "a": 0,
+     "e": "Tabloul are n·k coloane."
+    },
+    {
+     "q": "Ce valoare e pe linia 2, coloana 4 (de la 1), pentru k = 3?",
+     "o": [
+      "3",
+      "2",
+      "4"
+     ],
+     "a": 0,
+     "e": "2 + (4 − 1) / 3 = 2 + 1 = 3."
+    },
+    {
+     "q": "Câte valori diferite are fiecare linie?",
+     "o": [
+      "n",
+      "k",
+      "n·k"
+     ],
+     "a": 0,
+     "e": "n·k termeni, fiecare valoare de k ori: n valori."
+    }
+   ],
+   "221": [
+    {
+     "q": "După ce recunoști un număr negativ?",
+     "o": [
+      "Începe cu semnul -",
+      "Are virgulă",
+      "Are două cifre"
+     ],
+     "a": 0,
+     "e": "Cuvintele și numerele pozitive nu conțin minus."
+    },
+    {
+     "q": "Ce se întâmplă cu spațiile din jurul unui număr eliminat?",
+     "o": [
+      "Rămân, de aceea apar două spații alăturate",
+      "Se elimină și ele",
+      "Se înlocuiesc cu virgulă"
+     ],
+     "a": 0,
+     "e": "Se elimină doar caracterele numărului, ca în exemplu."
+    },
+    {
+     "q": "Este 3,5 un număr negativ în textul exemplului?",
+     "o": [
+      "Nu, nu are minus în față",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Doar -3,5 se elimină; 3,5 rămâne."
+    }
+   ],
+   "222": [
+    {
+     "q": "Ce relație au i și j pe diagonala secundară (indici de la 0)?",
+     "o": [
+      "i + j = n − 1",
+      "i = j",
+      "i − j = 1"
+     ],
+     "a": 0,
+     "e": "Pentru n = 5: (0,4), (1,3), (2,2), ..."
+    },
+    {
+     "q": "Ce element e pe linia 0, coloana 0, pentru n = 5?",
+     "o": [
+      "4",
+      "0",
+      "5"
+     ],
+     "a": 0,
+     "e": "|0 + 0 − 4| = 4."
+    },
+    {
+     "q": "De ce e nevoie de valoarea absolută?",
+     "o": [
+      "Elementele de după diagonală ar ieși negative",
+      "Nu e nevoie",
+      "Pentru că n e impar"
+     ],
+     "a": 0,
+     "e": "Distanța față de diagonală e pozitivă de ambele părți."
+    }
+   ],
+   "223": [
+    {
+     "q": "Ce înseamnă că o coloană e complementară cu prima?",
+     "o": [
+      "Pe fiecare linie are valoarea opusă",
+      "Are aceeași sumă",
+      "E identică"
+     ],
+     "a": 0,
+     "e": "Oricare două elemente de pe aceeași linie sunt diferite: 0 cu 1, 1 cu 0."
+    },
+    {
+     "q": "Se numără și prima coloană?",
+     "o": [
+      "Nu, ea are pe fiecare linie aceeași valoare cu ea însăși",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Comparația pornește de la a doua coloană."
+    },
+    {
+     "q": "Când te poți opri cu verificarea unei coloane?",
+     "o": [
+      "La prima linie unde valorile sunt egale",
+      "Niciodată înainte de final",
+      "După prima linie"
+     ],
+     "a": 0,
+     "e": "O singură egalitate o face necomplementară."
+    }
+   ],
+   "224": [
+    {
+     "q": "Este 1,40 o valoare întreagă?",
+     "o": [
+      "Nu, are parte zecimală",
+      "Da, 1,40 = 1"
+     ],
+     "a": 0,
+     "e": "Valorile întregi sunt scrise doar cu partea întreagă."
+    },
+    {
+     "q": "Cum recunoști un număr printre cuvinte?",
+     "o": [
+      "Începe cu o cifră",
+      "Are mai mult de 2 caractere",
+      "Se termină în 0"
+     ],
+     "a": 0,
+     "e": "Cuvintele sunt doar din litere."
+    },
+    {
+     "q": "Cu ce funcție cauți virgula într-un cuvânt?",
+     "o": [
+      "strchr",
+      "strcat",
+      "strlen"
+     ],
+     "a": 0,
+     "e": "strchr(p, ',') întoarce NULL dacă virgula nu apare."
+    }
+   ],
+   "225": [
+    {
+     "q": "De ce adus nu se afișează?",
+     "o": [
+      "Are 2 vocale și 2 consoane, iar condiția e strictă",
+      "Are mai multe vocale",
+      "E prea scurt"
+     ],
+     "a": 0,
+     "e": "a, u vocale; d, s consoane: 2 nu e strict mai mic decât 2."
+    },
+    {
+     "q": "Cum afli numărul de consoane dacă știi vocalele?",
+     "o": [
+      "Lungimea cuvântului minus vocalele",
+      "Numeri doar literele b..z",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "Cuvintele au doar litere, deci orice literă ne-vocală e consoană."
+    },
+    {
+     "q": "Care e condiția de afișare?",
+     "o": [
+      "vocale < consoane",
+      "vocale ≤ consoane",
+      "vocale > consoane"
+     ],
+     "a": 0,
+     "e": "Strict mai mic."
+    }
+   ],
+   "226": [
+    {
+     "q": "Ce valori compari?",
+     "o": [
+      "Valorile din prima coloană cu cele din ultima coloană",
+      "Prima linie cu ultima linie",
+      "Diagonalele"
+     ],
+     "a": 0,
+     "e": "Cele două șiruri sunt prima și ultima coloană."
+    },
+    {
+     "q": "De ce e comod un vector de marcaj?",
+     "o": [
+      "Valorile sunt doar de la 1 la 20",
+      "Tabloul e pătratic",
+      "Pentru că valorile se repetă"
+     ],
+     "a": 0,
+     "e": "v[x] = 1 dacă x apare; apoi verifici fiecare valoare posibilă."
+    },
+    {
+     "q": "Ce se afișează dacă nicio valoare nu apare în ambele coloane?",
+     "o": [
+      "nepolarizate",
+      "nu exista",
+      "0"
+     ],
+     "a": 0,
+     "e": "Mesajul cerut de enunț este nepolarizate."
+    }
+   ],
+   "227": [
+    {
+     "q": "Ce coloane are linia k în stânga diagonalei principale (numerotare de la 1)?",
+     "o": [
+      "1 .. k − 1",
+      "k + 1 .. n",
+      "doar k"
+     ],
+     "a": 0,
+     "e": "Diagonala principală e pe coloana k a liniei k."
+    },
+    {
+     "q": "Ce se întâmplă cu linia 1?",
+     "o": [
+      "Nimic, nu are elemente în stânga diagonalei",
+      "Se rotește toată",
+      "Se golește"
+     ],
+     "a": 0,
+     "e": "Pentru k = 1 nu e nimic de mutat."
+    },
+    {
+     "q": "Ce face deplasarea circulară spre stânga cu 1 3 5?",
+     "o": [
+      "3 5 1",
+      "5 1 3",
+      "1 3 5"
+     ],
+     "a": 0,
+     "e": "Primul element ajunge ultimul, celelalte avansează o poziție."
+    }
+   ],
+   "228": [
+    {
+     "q": "Este grai un cuvânt care îl are prefix pe rai?",
+     "o": [
+      "Nu, rai apare în el, dar nu la început",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Prefixul trebuie să fie chiar începutul cuvântului."
+    },
+    {
+     "q": "Ce funcție compară doar primele L litere?",
+     "o": [
+      "strncmp",
+      "strcmp",
+      "strstr"
+     ],
+     "a": 0,
+     "e": "strncmp(w, u, L) compară primele L caractere."
+    },
+    {
+     "q": "Contează ultimul cuvânt însuși?",
+     "o": [
+      "Nu, prefixul se obține eliminând litere, deci cuvântul trebuie să fie mai lung",
+      "Da, mereu"
+     ],
+     "a": 0,
+     "e": "De aceea se cere strlen(w) > strlen(u)."
+    }
+   ],
+   "229": [
+    {
+     "q": "Între care cuvinte din exemplu se inserează succes?",
+     "o": [
+      "testez–validez, validez–utilizez, date–corecte",
+      "doar testez–validez",
+      "între toate"
+     ],
+     "a": 0,
+     "e": "Doar perechile de cuvinte alăturate cu aceeași ultimă literă."
+    },
+    {
+     "q": "De ce e mai simplu să construiești un text nou?",
+     "o": [
+      "Inserările mută tot ce urmează; în alt șir doar adaugi la final",
+      "E obligatoriu",
+      "Ca să ocupe mai puțin"
+     ],
+     "a": 0,
+     "e": "strcat la finalul rezultatului e mai simplu decât mutări în șirul inițial."
+    },
+    {
+     "q": "Ce se afișează pentru ana are mere?",
+     "o": [
+      "nu exista",
+      "ana succes are mere",
+      "ana are succes mere"
+     ],
+     "a": 0,
+     "e": "ana se termină în a, are în e, mere în e: are și mere au aceeași terminație."
+    }
+   ],
+   "230": [
+    {
+     "q": "Cum recunoști prima literă a unui cuvânt?",
+     "o": [
+      "E pe poziția 0 sau după un spațiu",
+      "E majusculă",
+      "E vocală"
+     ],
+     "a": 0,
+     "e": "Cuvintele sunt separate prin câte un spațiu."
+    },
+    {
+     "q": "Ce funcție transformă o literă în literă mare?",
+     "o": [
+      "toupper",
+      "strupr",
+      "tolower"
+     ],
+     "a": 0,
+     "e": "toupper din <cctype>; tolower face invers."
+    },
+    {
+     "q": "Ce devine lA?",
+     "o": [
+      "La",
+      "LA",
+      "la"
+     ],
+     "a": 0,
+     "e": "Prima literă mare, restul mici."
+    }
+   ],
+   "231": [
+    {
+     "q": "Care e ultima vocală din cuvantul ritm poate fi tradus rhythm?",
+     "o": [
+      "u din tradus",
+      "y din rhythm",
+      "i din fi"
+     ],
+     "a": 0,
+     "e": "y nu e vocală în enunț; ultima vocală e u din tradus."
+    },
+    {
+     "q": "Din ce direcție cauți?",
+     "o": [
+      "De la sfârșitul textului spre început",
+      "De la început",
+      "Din mijloc"
+     ],
+     "a": 0,
+     "e": "Prima vocală întâlnită de la final e ultima din text."
+    },
+    {
+     "q": "Cum ștergi caracterul de pe poziția i?",
+     "o": [
+      "Muți tot ce urmează cu o poziție la stânga",
+      "Pui un spațiu",
+      "Pui 0 pe poziția i"
+     ],
+     "a": 0,
+     "e": "Un 0 ar tăia tot textul de acolo încolo."
+    }
+   ],
+   "232": [
+    {
+     "q": "Câte linii are tabloul pentru n = 4, k = 3?",
+     "o": [
+      "12",
+      "4",
+      "7"
+     ],
+     "a": 0,
+     "e": "Tabloul are n·k linii."
+    },
+    {
+     "q": "Ce valoare e pe linia 4, coloana 1 (de la 1), pentru k = 3?",
+     "o": [
+      "2",
+      "1",
+      "4"
+     ],
+     "a": 0,
+     "e": "1 + (4 − 1) / 3 = 2."
+    },
+    {
+     "q": "De câte ori se repetă fiecare linie?",
+     "o": [
+      "De k ori",
+      "De n ori",
+      "O dată"
+     ],
+     "a": 0,
+     "e": "Valoarea crește cu 1 la fiecare k linii."
+    }
+   ],
+   "233": [
+    {
+     "q": "Ce înseamnă valoarea absolută a lui -3,24?",
+     "o": [
+      "3,24",
+      "-3,24",
+      "0,24"
+     ],
+     "a": 0,
+     "e": "Modulul unui număr negativ e opusul lui."
+    },
+    {
+     "q": "În text, ce trebuie schimbat concret?",
+     "o": [
+      "Doar semnul minus se șterge",
+      "Tot numărul se rescrie",
+      "Virgula devine punct"
+     ],
+     "a": 0,
+     "e": "Cifrele rămân aceleași."
+    },
+    {
+     "q": "De ce strcpy(s + i, s + i + 1) poate fi riscant?",
+     "o": [
+      "Zonele se suprapun; o buclă care mută caracterele e mai sigură",
+      "Nu e riscant niciodată",
+      "Pentru că șterge tot"
+     ],
+     "a": 0,
+     "e": "Multe compilatoare o acceptă, dar standardul nu garantează rezultatul pentru zone suprapuse."
+    }
+   ],
+   "234": [
+    {
+     "q": "Are consoane un număr egal de vocale și consoane?",
+     "o": [
+      "Da: o, o, a, e și c, n, s, n",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "4 vocale și 4 consoane."
+    },
+    {
+     "q": "Ce condiție echivalentă poți verifica?",
+     "o": [
+      "2 · vocale == lungimea cuvântului",
+      "vocale == 2",
+      "lungimea pară"
+     ],
+     "a": 0,
+     "e": "Dacă vocalele sunt jumătate din litere, consoanele sunt cealaltă jumătate."
+    },
+    {
+     "q": "Poate un cuvânt cu număr impar de litere să fie numărat?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Două numere egale au suma pară."
+    }
+   ],
+   "235": [
+    {
+     "q": "Care e cel mai mare element pentru n = 2, m = 3?",
+     "o": [
+      "121 = 11²",
+      "36",
+      "49"
+     ],
+     "a": 0,
+     "e": "Sunt 6 pătrate impare: 1², 3², 5², 7², 9², 11²."
+    },
+    {
+     "q": "Ce formulă dă al k-lea pătrat impar (numărând de la 0)?",
+     "o": [
+      "(2k + 1)²",
+      "2k²",
+      "k² + 1"
+     ],
+     "a": 0,
+     "e": "Numerele impare sunt 2k + 1."
+    },
+    {
+     "q": "Încape cel mai mare element în int pentru n = m = 100?",
+     "o": [
+      "Da, e 19999² ≈ 4 · 10⁸",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Sunt 10⁴ pătrate, ultimul este (2 · 9999 + 1)² = 399960001."
+    }
+   ],
+   "236": [
+    {
+     "q": "Care cuvinte din exemplu nu se dublează?",
+     "o": [
+      "doar alba",
+      "alba și ei",
+      "niciunul"
+     ],
+     "a": 0,
+     "e": "alba are consoanele l și b."
+    },
+    {
+     "q": "Cât spațiu poate ocupa textul nou?",
+     "o": [
+      "Cel mult de două ori cât cel vechi",
+      "Tot 100 de caractere",
+      "Oricât"
+     ],
+     "a": 0,
+     "e": "Fiecare cuvânt apare cel mult de două ori."
+    },
+    {
+     "q": "Ce face strspn(p, \"aeiou\")?",
+     "o": [
+      "Numără câte caractere de la început sunt vocale",
+      "Caută prima vocală",
+      "Șterge vocalele"
+     ],
+     "a": 0,
+     "e": "Dacă rezultatul e lungimea cuvântului, toate literele sunt vocale."
+    }
+   ],
+   "237": [
+    {
+     "q": "De ce isihast nu se afișează, deși începe cu isi?",
+     "o": [
+      "Sufixul trebuie să fie la final, nu la început",
+      "E prea lung",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "isihast se termină în ast."
+    },
+    {
+     "q": "Ce reprezintă w + strlen(w) − L?",
+     "o": [
+      "Ultimele L caractere ale lui w",
+      "Primele L caractere",
+      "Litera din mijloc"
+     ],
+     "a": 0,
+     "e": "Un pointer în interiorul șirului, de unde mai sunt exact L caractere."
+    },
+    {
+     "q": "Se afișează și al k-lea cuvânt?",
+     "o": [
+      "Nu, sufixul se obține eliminând litere, deci cuvântul trebuie să fie mai lung",
+      "Da"
+     ],
+     "a": 0,
+     "e": "De aceea condiția strlen(w) > L."
+    }
+   ],
+   "238": [
+    {
+     "q": "Ce linie e complementară cu 1 1 0?",
+     "o": [
+      "0 0 1",
+      "1 1 1",
+      "0 0 0"
+     ],
+     "a": 0,
+     "e": "Pe fiecare coloană valoarea opusă."
+    },
+    {
+     "q": "Poate linia k să fie complementară cu ea însăși?",
+     "o": [
+      "Nu, elementele ei sunt egale cu ele însele",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Nu trebuie exclusă separat: testul o respinge oricum."
+    },
+    {
+     "q": "Când te oprești din căutare?",
+     "o": [
+      "La prima linie complementară găsită",
+      "Niciodată înainte de final"
+     ],
+     "a": 0,
+     "e": "O singură linie ajunge pentru DA."
+    }
+   ],
+   "239": [
+    {
+     "q": "Care e partea întreagă a lui 5,75?",
+     "o": [
+      "5",
+      "6",
+      "75"
+     ],
+     "a": 0,
+     "e": "Partea întreagă a unui număr pozitiv se obține tăind zecimalele."
+    },
+    {
+     "q": "Unde se termină partea fracționară într-un text?",
+     "o": [
+      "La următorul spațiu sau la finalul textului",
+      "După două cifre",
+      "La următoarea virgulă"
+     ],
+     "a": 0,
+     "e": "Numerele sunt separate prin câte un spațiu."
+    },
+    {
+     "q": "Se schimbă numerele întregi, ca 5?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Nu au virgulă, deci rămân la fel."
+    }
+   ],
+   "240": [
+    {
+     "q": "Cum desparți textul în cuvinte când pot fi mai multe spații între ele?",
+     "o": [
+      "strtok(s, \" \") le sare pe toate",
+      "Numeri spațiile și împarți la 2",
+      "Cu s[i] == ' ' doar o dată"
+     ],
+     "a": 0,
+     "e": "strtok tratează un grup de separatori ca pe unul singur, deci spațiile multiple nu creează cuvinte goale."
+    },
+    {
+     "q": "Pentru ei prefera sa mearga la schi, de ce se afișează nu exista?",
+     "o": [
+      "ei nu are nicio consoană",
+      "prefera nu are vocale",
+      "schi se termină cu vocală"
+     ],
+     "a": 0,
+     "e": "Șirul nu se poate forma dacă primul cuvânt nu are consoane sau al doilea nu are vocale."
+    },
+    {
+     "q": "Care literă din el prefera sa mearga la schi vine de la ultimul cuvânt?",
+     "o": [
+      "i",
+      "s",
+      "h"
+     ],
+     "a": 0,
+     "e": "Ultima literă a lui schi este i, deci rezultatul e l + e + i = lei."
+    }
+   ],
+   "241": [
+    {
+     "q": "După ce recunoști că un cuvânt e prescurtat?",
+     "o": [
+      "Se termină cu punct",
+      "Are cel mult 3 litere",
+      "Începe cu C"
+     ],
+     "a": 0,
+     "e": "Doar cuvintele prescurtate au punct la final."
+    },
+    {
+     "q": "Ce cuvânt întreg corespunde lui TEOR.?",
+     "o": [
+      "TEORETIC",
+      "TEHNOLOGIC",
+      "TEOR"
+     ],
+     "a": 0,
+     "e": "Se caută în listă cuvântul care începe cu literele rămase: TEOR."
+    },
+    {
+     "q": "Cu ce funcție compari doar primele k litere a două șiruri?",
+     "o": [
+      "strncmp",
+      "strcmp",
+      "strcat"
+     ],
+     "a": 0,
+     "e": "strncmp(a, b, k) compară doar primele k caractere; strcmp compară tot."
+    }
+   ],
+   "242": [
+    {
+     "q": "În ce ordine citești datele?",
+     "o": [
+      "Întâi textul (getline), apoi n",
+      "Întâi n, apoi textul",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Textul vine primul. Dacă ai citi n întâi cu cin, ar rămâne Enter-ul în buffer."
+    },
+    {
+     "q": "Câte cuvinte cu 3 litere are Fat Frumos este cel mai viteaz?",
+     "o": [
+      "3 (Fat, cel, mai)",
+      "2",
+      "4"
+     ],
+     "a": 0,
+     "e": "Fat, cel și mai au câte 3 litere."
+    },
+    {
+     "q": "Când afișezi nu exista?",
+     "o": [
+      "După parcurgere, dacă n-ai afișat niciun cuvânt",
+      "La fiecare cuvânt care nu are n litere",
+      "Dacă n > 10"
+     ],
+     "a": 0,
+     "e": "Un indicator (gasit) spune la final dacă s-a afișat ceva."
+    }
+   ],
+   "243": [
+    {
+     "q": "Cu ce element se compară a[i][1] dacă n = 5 (indici de la 0)?",
+     "o": [
+      "a[i][3]",
+      "a[i][4]",
+      "a[i][2]"
+     ],
+     "a": 0,
+     "e": "Simetricul coloanei j este n − 1 − j = 5 − 1 − 1 = 3."
+    },
+    {
+     "q": "Contează valoarea elementului din mijloc?",
+     "o": [
+      "Nu, el e simetricul lui însuși",
+      "Da, trebuie să fie 0",
+      "Da, trebuie să fie maximul liniei"
+     ],
+     "a": 0,
+     "e": "Coloana din mijloc este axa de simetrie."
+    },
+    {
+     "q": "Câte perechi verifici pe o linie cu n coloane?",
+     "o": [
+      "n / 2",
+      "n",
+      "n − 1"
+     ],
+     "a": 0,
+     "e": "Ajunge să mergi până la mijloc; a doua jumătate e verificată prin perechi."
+    }
+   ],
+   "244": [
+    {
+     "q": "Cu ce valoare trebuie să fie egale toate elementele pătratului?",
+     "o": [
+      "Cu a[0][0], colțul din stânga sus",
+      "Cu maximul tabloului",
+      "Cu a[n−1][n−1]"
+     ],
+     "a": 0,
+     "e": "Orice pătrat începe din colțul stânga-sus, deci acel element e mereu inclus."
+    },
+    {
+     "q": "Ce elemente noi apar trecând de la pătratul de dimensiune 2 la cel de dimensiune 3?",
+     "o": [
+      "Linia 2 și coloana 2, până la indicele 2",
+      "Tot tabloul",
+      "Doar a[2][2]"
+     ],
+     "a": 0,
+     "e": "Pătratul 3 × 3 adaugă o linie și o coloană nouă (cu indicii de la 0)."
+    },
+    {
+     "q": "Care e cea mai mică valoare posibilă a răspunsului?",
+     "o": [
+      "1",
+      "0",
+      "2"
+     ],
+     "a": 0,
+     "e": "Pătratul de dimensiune 1 conține doar a[0][0], deci are mereu elementele egale."
+    }
+   ],
+   "245": [
+    {
+     "q": "Cum se descompune 26?",
+     "o": [
+      "2 · 13",
+      "2 · 3 · 4",
+      "13 · 2 · 1"
+     ],
+     "a": 0,
+     "e": "Deci 26ᵖ = 2ᵖ · 13ᵖ."
+    },
+    {
+     "q": "De ce contează doar factorul 13?",
+     "o": [
+      "Numerele pare sunt mult mai dese decât multiplii lui 13",
+      "Pentru că 13 e mai mare",
+      "Contează și 2"
+     ],
+     "a": 0,
+     "e": "În n! sunt mereu cel puțin tot atâția factori 2 câți factori 13."
+    },
+    {
+     "q": "De câte ori apare 13 în 169!?",
+     "o": [
+      "14: 169/13 + 169/169",
+      "13",
+      "1"
+     ],
+     "a": 0,
+     "e": "169 = 13² aduce un factor 13 în plus."
+    }
+   ],
+   "246": [
+    {
+     "q": "Care sunt valorile pare distincte din [6, 11] în exemplu?",
+     "o": [
+      "6, 8, 10",
+      "6, 8, 10, 12",
+      "6, 7, 8"
+     ],
+     "a": 0,
+     "e": "12 > 11."
+    },
+    {
+     "q": "Cum eviți să numeri 6 de două ori?",
+     "o": [
+      "Îl numeri doar când diferă de termenul anterior",
+      "Cu un vector de 10⁹",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "Șirul fiind crescător, repetițiile sunt alăturate."
+    },
+    {
+     "q": "Când te poți opri?",
+     "o": [
+      "La primul termen mai mare decât y",
+      "Niciodată",
+      "La primul termen par"
+     ],
+     "a": 0,
+     "e": "Toți termenii de după sunt mai mari."
+    }
+   ],
+   "247": [
+    {
+     "q": "Cât face 93 + 2 · |93 − 45|?",
+     "o": [
+      "189",
+      "141",
+      "186"
+     ],
+     "a": 0,
+     "e": "93 + 2 · 48 = 189."
+    },
+    {
+     "q": "Cum afli luna dinainte, știind ultimele două valori a (ultima) și b (penultima)?",
+     "o": [
+      "(3·b − a) / 2",
+      "a − b",
+      "2·b − a"
+     ],
+     "a": 0,
+     "e": "Din a = 3·b − 2·c rezultă c = (3·b − a) / 2."
+    },
+    {
+     "q": "Când te oprești?",
+     "o": [
+      "Când ai afișat 0, prima lună",
+      "După 10 luni",
+      "Când valoarea e 3"
+     ],
+     "a": 0,
+     "e": "Prima lună are 0 pachete."
+    }
+   ],
+   "248": [
+    {
+     "q": "De ce poziția 7 la șah, după 6, nu e motivantă?",
+     "o": [
+      "7 e o poziție mai slabă decât 6",
+      "Pentru că e impară",
+      "Este"
+     ],
+     "a": 0,
+     "e": "Motivant înseamnă un număr mai mic în clasament."
+    },
+    {
+     "q": "Cu ce se compară un rezultat la go?",
+     "o": [
+      "Cu ultimul rezultat la go",
+      "Cu ultimul rezultat, de orice tip",
+      "Cu primul rezultat"
+     ],
+     "a": 0,
+     "e": "Comparația se face doar între concursuri de același tip."
+    },
+    {
+     "q": "E motivant un rezultat egal cu cel anterior?",
+     "o": [
+      "Nu, trebuie strict mai bun",
+      "Da"
+     ],
+     "a": 0,
+     "e": "1 după 1 nu e o îmbunătățire."
+    }
+   ],
+   "249": [
+    {
+     "q": "Ce termeni sunt pe pozițiile pare (f₀, f₂, f₄, ...)?",
+     "o": [
+      "1, 2, 4, 8, 16, ... puterile lui 2",
+      "2, 5, 11, 23",
+      "numerele pare"
+     ],
+     "a": 0,
+     "e": "Fiecare e dublul celui de cu două poziții înainte."
+    },
+    {
+     "q": "Ce termen e înaintea lui 8 = f₆?",
+     "o": [
+      "11 = 3 · 4 − 1",
+      "4",
+      "16"
+     ],
+     "a": 0,
+     "e": "f₅ = 3 · f₄ − 1 = 3 · 4 − 1."
+    },
+    {
+     "q": "Ce termen e înaintea lui 11 = f₅?",
+     "o": [
+      "4 = (11 + 1) / 3",
+      "5",
+      "8"
+     ],
+     "a": 0,
+     "e": "Din f₅ = 3·f₄ − 1 rezultă f₄ = (f₅ + 1) / 3."
+    }
+   ],
+   "250": [
+    {
+     "q": "Câți biți de 0 are un mesaj de avertisment?",
+     "o": [
+      "Exact unul",
+      "Cel puțin unul",
+      "Niciunul"
+     ],
+     "a": 0,
+     "e": "Restul biților sunt 1."
+    },
+    {
+     "q": "Până unde se poate întinde mesajul în jurul unui 0?",
+     "o": [
+      "Până la 0-urile vecine, fără ele",
+      "Până la capetele șirului",
+      "Doar 0-ul"
+     ],
+     "a": 0,
+     "e": "Un alt 0 l-ar face să aibă doi biți 0."
+    },
+    {
+     "q": "Ce lungime are mesajul cel mai lung din exemplu?",
+     "o": [
+      "8",
+      "7",
+      "9"
+     ],
+     "a": 0,
+     "e": "De exemplu primul 0 urmat de șapte biți 1."
+    }
+   ],
+   "251": [
+    {
+     "q": "Ce an și ce colecționar are codul 8931925?",
+     "o": [
+      "Anul 1925, colecționarul 893",
+      "Anul 8931, colecționarul 925",
+      "Anul 1925, colecționarul 8931"
+     ],
+     "a": 0,
+     "e": "Anul are mereu 4 cifre, la final."
+    },
+    {
+     "q": "Cum desparți codul?",
+     "o": [
+      "an = cod % 10000, colecționar = cod / 10000",
+      "an = cod / 10000",
+      "an = cod % 1000"
+     ],
+     "a": 0,
+     "e": "Ultimele 4 cifre sunt anul."
+    },
+    {
+     "q": "Care e ultima pereche de mașini alăturate din 1925 în exemplu?",
+     "o": [
+      "31925 151925",
+      "201925 și cea de dinainte",
+      "11925 31925"
+     ],
+     "a": 0,
+     "e": "61950 o întrerupe pe următoarea."
+    }
+   ],
+   "252": [
+    {
+     "q": "Care sunt cele mai importante două pietre ale bijuteriei 258?",
+     "o": [
+      "2 și 5",
+      "5 și 8",
+      "2 și 8"
+     ],
+     "a": 0,
+     "e": "Pietrele sunt în ordinea descrescătoare a importanței, deci primele două cifre."
+    },
+    {
+     "q": "Se potrivesc 125 și 21?",
+     "o": [
+      "Da: 1, 2 și 2, 1, aceleași tipuri în altă ordine",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Ordinea importanței nu contează."
+    },
+    {
+     "q": "Ce cheie comună le dai lui 52 și 25?",
+     "o": [
+      "25, cu cifra mai mică în față",
+      "52",
+      "7"
+     ],
+     "a": 0,
+     "e": "Ordonând cele două cifre, ordinea nu mai contează."
+    }
+   ],
+   "253": [
+    {
+     "q": "Care latură e ipotenuza?",
+     "o": [
+      "Cea mai lungă",
+      "Prima din triplet",
+      "A treia din triplet"
+     ],
+     "a": 0,
+     "e": "În 7 25 24 ipotenuza e 25, deși e la mijloc."
+    },
+    {
+     "q": "Este 6 10 6 un triunghi dreptunghic?",
+     "o": [
+      "Nu: 36 + 36 ≠ 100",
+      "Da"
+     ],
+     "a": 0,
+     "e": "6² + 6² = 72."
+    },
+    {
+     "q": "Ce structură folosești?",
+     "o": [
+      "Un vector de frecvență pentru ipotenuzele 1..100",
+      "Un tablou cu toate tripletele",
+      "Sortarea tripletelor"
+     ],
+     "a": 0,
+     "e": "Lungimile sunt mici."
+    }
+   ],
+   "254": [
+    {
+     "q": "Cât timp comun are intervalul 16-19 cu 19-21?",
+     "o": [
+      "0 ore, se ating doar la ora 19",
+      "1 oră",
+      "2 ore"
+     ],
+     "a": 0,
+     "e": "De aceea muzeul 3 nu e convenabil."
+    },
+    {
+     "q": "Cum calculezi lungimea intersecției a două intervale?",
+     "o": [
+      "min(capete drepte) − max(capete stângi)",
+      "diferența capetelor stângi",
+      "suma lungimilor"
+     ],
+     "a": 0,
+     "e": "Dacă rezultatul e mai mic de 1, nu e destul timp."
+    },
+    {
+     "q": "Ce reții în timpul citirii?",
+     "o": [
+      "Câte muzee sunt convenabile și numărul ultimului",
+      "Toate intervalele",
+      "Doar primul muzeu"
+     ],
+     "a": 0,
+     "e": "Fără tablou."
+    }
+   ],
+   "255": [
+    {
+     "q": "Ce devine 7309 după inversarea cifrelor?",
+     "o": [
+      "9037",
+      "7309",
+      "937"
+     ],
+     "a": 0,
+     "e": "Ultima cifră nenulă garantează că rezultatul are tot 4 cifre."
+    },
+    {
+     "q": "În ce ordine se extrag numerele?",
+     "o": [
+      "Cel mai mic, cel mai mare, apoi al doilea cel mai mic",
+      "Crescător",
+      "Descrescător"
+     ],
+     "a": 0,
+     "e": "După ce iei minimul și maximul, din rest se ia minimul."
+    },
+    {
+     "q": "De ce e potrivit un vector de marcaj?",
+     "o": [
+      "Valorile inversate sunt între 1000 și 9999",
+      "Pentru că șirul e scurt",
+      "Nu e potrivit"
+     ],
+     "a": 0,
+     "e": "Marcajul elimină și dublurile."
+    }
+   ],
+   "256": [
+    {
+     "q": "De ce ziua 1 (65) nu formează o perioadă validată?",
+     "o": [
+      "O perioadă are cel puțin două zile, iar ziua 2 nu e validată",
+      "65 < 40",
+      "Formează"
+     ],
+     "a": 0,
+     "e": "O singură zi nu e o perioadă."
+    },
+    {
+     "q": "De ce zilele 9-11 nu formează o perioadă validată?",
+     "o": [
+      "Suma lor, 38, e sub minP = 40",
+      "Au zile nevalidate",
+      "Formează"
+     ],
+     "a": 0,
+     "e": "Toate zilele sunt ≥ 10, dar totalul nu ajunge."
+    },
+    {
+     "q": "Când verifici o perioadă?",
+     "o": [
+      "Când secvența de zile validate se termină, inclusiv la finalul datelor",
+      "La fiecare zi",
+      "Doar la final"
+     ],
+     "a": 0,
+     "e": "Nu uita ultima secvență."
+    }
+   ],
+   "257": [
+    {
+     "q": "De ce premiul I nu primește cartea de 500 lei?",
+     "o": [
+      "E o singură carte de 500, iar premiul I are 3 câștigători",
+      "E prea scumpă",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "Trebuie cel puțin n1 cărți cu același preț."
+    },
+    {
+     "q": "De unde începe căutarea pentru premiul al II-lea?",
+     "o": [
+      "De sub prețul ales pentru premiul I",
+      "De la 1000",
+      "De la 10"
+     ],
+     "a": 0,
+     "e": "Prețurile trebuie să fie strict descrescătoare."
+    },
+    {
+     "q": "Ce structură te ajută?",
+     "o": [
+      "Un vector de frecvență pentru prețurile 10..1000",
+      "Sortarea celor 10⁶ prețuri",
+      "O matrice"
+     ],
+     "a": 0,
+     "e": "Prețurile sunt puține ca valori."
+    }
+   ],
+   "258": [
+    {
+     "q": "Este 1 1 un șir de tip api?",
+     "o": [
+      "Nu: 1 apare de 2 ori, iar 2 > 1",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Ambele condiții trebuie îndeplinite."
+    },
+    {
+     "q": "Este 2 un șir de tip api?",
+     "o": [
+      "Nu: apare o dată, iar 1 e impar, 2 e par",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Paritatea numărului de apariții trebuie să fie a termenului."
+    },
+    {
+     "q": "Ce reții în timpul citirii?",
+     "o": [
+      "Numărul de apariții al fiecărei valori",
+      "Tot șirul",
+      "Doar maximul"
+     ],
+     "a": 0,
+     "e": "Valorile sunt doar 1..1000."
+    }
+   ],
+   "259": [
+    {
+     "q": "Care e cifra maximă din primul exemplu?",
+     "o": [
+      "8",
+      "7",
+      "9"
+     ],
+     "a": 0,
+     "e": "Apare în 38, 87, 8 și 82."
+    },
+    {
+     "q": "De ce în al treilea exemplu se afișează nu exista?",
+     "o": [
+      "Doar 38 conține cifra maximă, 8",
+      "Șirul e prea scurt",
+      "Nu are cifra 9"
+     ],
+     "a": 0,
+     "e": "Trebuie două numere pe poziții distincte."
+    },
+    {
+     "q": "Ce faci când găsești o cifră mai mare decât maximul de până atunci?",
+     "o": [
+      "Pornești din nou cu numărul curent ca prim și ultim",
+      "Îl ignori",
+      "Afișezi rezultatul"
+     ],
+     "a": 0,
+     "e": "Numerele de dinainte nu conțin noua cifră maximă."
+    }
+   ],
+   "260": [
+    {
+     "q": "Este 600 601 o scară?",
+     "o": [
+      "Da, cote consecutive crescătoare, de lungime 2",
+      "Nu, e prea scurtă"
+     ],
+     "a": 0,
+     "e": "O scară are cel puțin două marcaje."
+    },
+    {
+     "q": "Ce reții ca să poți afișa scara maximă fără tablou?",
+     "o": [
+      "Lungimea ei și ultima cotă",
+      "Toate cotele",
+      "Prima cotă a traseului"
+     ],
+     "a": 0,
+     "e": "Cotele unei scări sunt consecutive, deci le reconstruiești."
+    },
+    {
+     "q": "La două scări de aceeași lungime maximă, pe care o afișezi aici?",
+     "o": [
+      "Prima, pentru că actualizezi doar la o lungime strict mai mare",
+      "Ultima",
+      "Ambele"
+     ],
+     "a": 0,
+     "e": "La examen orice scară maximă era corectă."
+    }
+   ],
+   "261": [
+    {
+     "q": "Cât face f₆ = 4·f₅ − 3·f₄ − 2·f₃?",
+     "o": [
+      "38",
+      "39",
+      "52"
+     ],
+     "a": 0,
+     "e": "4 · 13 − 3 · 4 − 2 · 1 = 52 − 12 − 2 = 38."
+    },
+    {
+     "q": "Cum afli termenul de dinaintea lui x, din x, y, z consecutivi?",
+     "o": [
+      "(4·y − 3·x − z) / 2",
+      "4·y − 3·x − 2·z",
+      "z − y − x"
+     ],
+     "a": 0,
+     "e": "Se scoate fₙ₋₃ din relația de recurență."
+    },
+    {
+     "q": "Când te oprești?",
+     "o": [
+      "Când ai ajuns la primii doi termeni, 0 și 0",
+      "La primul 0",
+      "După 10 termeni"
+     ],
+     "a": 0,
+     "e": "Cei doi 0 de la început trebuie afișați amândoi."
+    }
+   ],
+   "262": [
+    {
+     "q": "Care perechi pun condiții?",
+     "o": [
+      "Doar cele de paritate diferită",
+      "Toate",
+      "Doar cele de aceeași paritate"
+     ],
+     "a": 0,
+     "e": "Perechile de aceeași paritate sunt mereu p-ordonate."
+    },
+    {
+     "q": "Pentru un x par din prima jumătate, ce trebuie să fie adevărat?",
+     "o": [
+      "x > cel mai mare impar din a doua jumătate",
+      "x > cel mai mare par din a doua jumătate",
+      "x să fie maxim"
+     ],
+     "a": 0,
+     "e": "x trebuie să fie mai mare decât toți y impari, deci decât maximul lor."
+    },
+    {
+     "q": "Ce înlocuiește verificarea tuturor x pari din prima jumătate?",
+     "o": [
+      "Verificarea celui mai mic dintre ei",
+      "Verificarea celui mai mare",
+      "Suma lor"
+     ],
+     "a": 0,
+     "e": "Dacă cel mai mic e destul de mare, toți sunt."
+    }
+   ],
+   "263": [
+    {
+     "q": "De ce pasul 10 (temperatura 10) e reprezentativ, deși au mai fost pași cu 10?",
+     "o": [
+      "Niciun pas anterior nu are temperatura strict mai mare, iar pasul 9 avea alta",
+      "E o greșeală",
+      "Pentru că e par"
+     ],
+     "a": 0,
+     "e": "Condiția e „strict mai mare”, iar secvența de 10-uri de dinainte s-a întrerupt."
+    },
+    {
+     "q": "De ce pașii 5 și 6 nu sunt reprezentativi?",
+     "o": [
+      "Continuă secvența de 10-uri începută la pasul 4",
+      "Au temperatura mai mică",
+      "Sunt reprezentativi"
+     ],
+     "a": 0,
+     "e": "Dintr-o secvență de valori egale, doar primul pas contează."
+    },
+    {
+     "q": "Ce trebuie reținut în timpul citirii?",
+     "o": [
+      "Maximul de până acum și temperatura anterioară",
+      "Toate temperaturile",
+      "Doar suma"
+     ],
+     "a": 0,
+     "e": "Fără tablou."
+    }
+   ],
+   "264": [
+    {
+     "q": "Care e 4-intervalul pentru 2, 7, -1, 8?",
+     "o": [
+      "[-1, 8]",
+      "[2, 8]",
+      "[-1, 7]"
+     ],
+     "a": 0,
+     "e": "Cel mai mic interval care conține toți termenii: de la minim la maxim."
+    },
+    {
+     "q": "Când rămâne p-intervalul la fel ca (p−1)-intervalul?",
+     "o": [
+      "Când termenul p e între minimul și maximul celor dinainte",
+      "Când termenul p e egal cu cel dinainte",
+      "Când p e par"
+     ],
+     "a": 0,
+     "e": "Altfel s-ar schimba unul dintre capete."
+    },
+    {
+     "q": "Ce valoare are p pentru al doilea termen egal cu primul, ca în 4 4?",
+     "o": [
+      "2, se afișează 2 2",
+      "nu exista",
+      "1 2"
+     ],
+     "a": 0,
+     "e": "Al doilea 4 e în [4, 4], deci p = 2 e bun."
+    }
+   ],
+   "265": [
+    {
+     "q": "Este 34 sufix al lui 3405?",
+     "o": [
+      "Nu, sufixul de două cifre al lui 3405 e 05, adică 5",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Eliminând cifre de la stânga obții 405 și 05; 05 e valoarea 5, de o cifră."
+    },
+    {
+     "q": "De ce numerele de două cifre, ca 98, nu contează?",
+     "o": [
+      "Prefixul trebuie obținut eliminând cel puțin o cifră",
+      "Pentru că sunt mari",
+      "Contează"
+     ],
+     "a": 0,
+     "e": "Un număr nu e prefix al lui însuși."
+    },
+    {
+     "q": "Pentru 1010, ce prefix și ce sufix de două cifre are?",
+     "o": [
+      "Prefix 10 și sufix 10",
+      "Prefix 10 și sufix 01",
+      "Prefix 101"
+     ],
+     "a": 0,
+     "e": "1010 / 100 = 10, iar 1010 % 100 = 10."
+    }
+   ],
+   "266": [
+    {
+     "q": "Câte perechi se pot forma cu valoarea 5 în exemplu?",
+     "o": [
+      "2: în A apare de 3 ori, în B de 2 ori",
+      "3",
+      "6"
+     ],
+     "a": 0,
+     "e": "Fiecare poziție poate fi folosită o singură dată."
+    },
+    {
+     "q": "Ce formulă dă răspunsul?",
+     "o": [
+      "Suma, după valori, a lui min(fA, fB)",
+      "Suma produselor fA · fB",
+      "min(m, n)"
+     ],
+     "a": 0,
+     "e": "Produsul ar număra toate combinațiile, cu poziții refolosite."
+    },
+    {
+     "q": "De ce e potrivit un vector de frecvență?",
+     "o": [
+      "Valorile sunt doar 0..99",
+      "Șirurile sunt sortate",
+      "Nu e potrivit"
+     ],
+     "a": 0,
+     "e": "Indiferent cât de lungi sunt șirurile."
+    }
+   ],
+   "267": [
+    {
+     "q": "Care e cea mai lungă secvență care începe și se termină cu 4 în exemplu?",
+     "o": [
+      "De la primul 4 la ultimul 4: 9 termeni",
+      "4 3 3 2 8 9 7 3 4 și altele mai lungi",
+      "Doar 4"
+     ],
+     "a": 0,
+     "e": "Prima și ultima apariție dau secvența cea mai lungă."
+    },
+    {
+     "q": "Ce reții pentru fiecare cifră?",
+     "o": [
+      "Poziția primei și a ultimei apariții",
+      "Toate pozițiile",
+      "Doar numărul de apariții"
+     ],
+     "a": 0,
+     "e": "Lungimea maximă pentru cifra v e ultim − prim + 1."
+    },
+    {
+     "q": "Contează o cifră pară care apare o singură dată?",
+     "o": [
+      "Nu, o secvență par-încadrată are nevoie de două capete",
+      "Da"
+     ],
+     "a": 0,
+     "e": "În exemplu 0 apare o singură dată."
+    }
+   ],
+   "268": [
+    {
+     "q": "Cum se descompune 45?",
+     "o": [
+      "3² · 5",
+      "9 · 5 · 1",
+      "3 · 15"
+     ],
+     "a": 0,
+     "e": "Deci 45ᵖ = 3²ᵖ · 5ᵖ."
+    },
+    {
+     "q": "De câte ori apare 5 în descompunerea lui 25!?",
+     "o": [
+      "6: 25/5 + 25/25",
+      "5",
+      "2"
+     ],
+     "a": 0,
+     "e": "Fiecare multiplu de 5 dă un 5, iar fiecare multiplu de 25 încă unul."
+    },
+    {
+     "q": "De ce nu calculezi n! direct?",
+     "o": [
+      "Pentru n mare are miliarde de cifre",
+      "E interzis",
+      "Ar da 0"
+     ],
+     "a": 0,
+     "e": "Formula lui Legendre lucrează doar cu împărțiri."
+    }
+   ],
+   "269": [
+    {
+     "q": "Este grupul 7 7 7 complet?",
+     "o": [
+      "Nu, 7 ar trebui să apară de 7 ori",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Un grup e complet când valoarea v apare exact de v ori."
+    },
+    {
+     "q": "Care e secvența progresivă de lungime 10 din exemplu?",
+     "o": [
+      "4 4 4 4 6 6 6 6 6 6",
+      "1 2 2",
+      "8 de opt ori"
+     ],
+     "a": 0,
+     "e": "Grupurile 4 și 6 sunt complete și alăturate."
+    },
+    {
+     "q": "Poate o secvență progresivă să conțină doar o parte dintr-un grup?",
+     "o": [
+      "Nu, fiecare valoare are cel mult v apariții, deci trebuie luate toate",
+      "Da"
+     ],
+     "a": 0,
+     "e": "O parte dintr-un grup ar avea mai puțin de v termeni."
+    }
+   ],
+   "270": [
+    {
+     "q": "Care sunt valorile distincte din [2, 9] în exemplu?",
+     "o": [
+      "2, 3, 5, 6, 7, 8",
+      "2, 3, 5, 6, 7, 8, 10",
+      "1, 2, 3"
+     ],
+     "a": 0,
+     "e": "Șase valori."
+    },
+    {
+     "q": "Cum eviți să numeri de două ori aceeași valoare?",
+     "o": [
+      "O numeri doar când diferă de termenul anterior",
+      "Cu un vector de 10⁹",
+      "Nu se poate evita"
+     ],
+     "a": 0,
+     "e": "Șirul e crescător, deci repetițiile sunt alăturate."
+    },
+    {
+     "q": "Când te poți opri din citit?",
+     "o": [
+      "Când un termen depășește y",
+      "Niciodată",
+      "La primul termen din interval"
+     ],
+     "a": 0,
+     "e": "Toți termenii de după sunt și mai mari."
+    }
+   ],
+   "271": [
+    {
+     "q": "În ce ordine se afișează rezultatele?",
+     "o": [
+      "Numărul secvențelor, apoi lungimea maximă",
+      "Lungimea, apoi numărul"
+     ],
+     "a": 0,
+     "e": "În exemplu: 4 secvențe de lungime 5."
+    },
+    {
+     "q": "Când începe un grup nou?",
+     "o": [
+      "Când paritatea termenului se schimbă",
+      "La fiecare număr par",
+      "După 5 termeni"
+     ],
+     "a": 0,
+     "e": "Un grup are termeni consecutivi de aceeași paritate."
+    },
+    {
+     "q": "Ce lungime are grupul 8 4 4 din exemplu?",
+     "o": [
+      "3",
+      "2",
+      "5"
+     ],
+     "a": 0,
+     "e": "Trei pare consecutive, între 9 și 11."
+    }
+   ],
+   "272": [
+    {
+     "q": "Cât s-a cheltuit pe tipul 4 în exemplu?",
+     "o": [
+      "26 = 1 · 10 + 2 · 8",
+      "18",
+      "3"
+     ],
+     "a": 0,
+     "e": "Fiecare linie adaugă număr · preț la tipul ei."
+    },
+    {
+     "q": "De ce long long pentru sume?",
+     "o": [
+      "10⁶ linii · 100 · 100 = 10¹⁰ depășește int",
+      "Pentru prețuri cu zecimale",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "Un singur tip poate aduna toate liniile."
+    },
+    {
+     "q": "Ce structură folosești?",
+     "o": [
+      "Un vector de sume indexat după tip",
+      "O matrice 10⁶ × 3",
+      "Sortare"
+     ],
+     "a": 0,
+     "e": "Tipurile sunt doar 1..100."
+    }
+   ],
+   "273": [
+    {
+     "q": "Cât se plătește pentru modelul de 7 cm din exemplu?",
+     "o": [
+      "10 + 2 · 49 = 108",
+      "49",
+      "10 + 49 = 59"
+     ],
+     "a": 0,
+     "e": "Taxa unică de 10 lei plus aria fiecăruia dintre cele 2 elemente."
+    },
+    {
+     "q": "De câte ori se plătește taxa de 10 lei pentru un model?",
+     "o": [
+      "O singură dată, oricâte elemente ar fi",
+      "Pentru fiecare element",
+      "Niciodată"
+     ],
+     "a": 0,
+     "e": "Taxa e unică pe model."
+    },
+    {
+     "q": "Ce structură e potrivită?",
+     "o": [
+      "Un vector de frecvență pentru laturile 1..10",
+      "Sortarea șirului",
+      "O matrice"
+     ],
+     "a": 0,
+     "e": "Laturile sunt doar 1..10."
+    }
+   ],
+   "274": [
+    {
+     "q": "Cât face 31 − 21 și ce îți spune?",
+     "o": [
+      "10 = 2 · 5, deci 31 este f₅",
+      "10, nimic",
+      "5"
+     ],
+     "a": 0,
+     "e": "fₙ − fₙ₋₁ = 2n."
+    },
+    {
+     "q": "Ce termen e înaintea lui 21 = f₄?",
+     "o": [
+      "21 − 8 = 13",
+      "21 − 10 = 11",
+      "21 − 2 = 19"
+     ],
+     "a": 0,
+     "e": "f₄ = f₃ + 8."
+    },
+    {
+     "q": "De ce nu ai nevoie de tablou?",
+     "o": [
+      "Fiecare termen anterior se calculează din cel curent și indice",
+      "Pentru că șirul e scurt",
+      "Ai nevoie"
+     ],
+     "a": 0,
+     "e": "Se cere eficiență ca memorie."
+    }
+   ],
+   "275": [
+    {
+     "q": "Cum verifici că t îl are pe x (de trei cifre) drept sufix?",
+     "o": [
+      "t % 1000 == x",
+      "t % 100 == x",
+      "t / 1000 == x"
+     ],
+     "a": 0,
+     "e": "Ultimele trei cifre ale lui t trebuie să fie exact x."
+    },
+    {
+     "q": "Îl are 20210 sufix pe 210?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "20210 % 1000 = 210."
+    },
+    {
+     "q": "De ce nu ai nevoie de tablou?",
+     "o": [
+      "Reții doar termenul anterior și ultima pereche găsită",
+      "Pentru că șirul e scurt",
+      "Ai nevoie"
+     ],
+     "a": 0,
+     "e": "Ultima pereche se suprascrie de fiecare dată când găsești una nouă."
+    }
+   ],
+   "276": [
+    {
+     "q": "Formează 20 și 402 o pereche asemenea?",
+     "o": [
+      "Da: 20 se termină în 2, 0, iar 402 în 0, 2",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Ultimele două cifre pot fi în altă ordine."
+    },
+    {
+     "q": "Ce cheie comună au 112 și 321?",
+     "o": [
+      "12 (cifrele 1 și 2, ordonate)",
+      "112",
+      "21 și 12, diferite"
+     ],
+     "a": 0,
+     "e": "Ordonând cele două cifre, ordinea lor nu mai contează."
+    },
+    {
+     "q": "De ce înmulțești frecvențele fA[c] · fB[c]?",
+     "o": [
+      "Fiecare număr din A cu cheia c face pereche cu fiecare din B cu aceeași cheie",
+      "Ca să fie mai mare",
+      "Pentru că sunt două șiruri"
+     ],
+     "a": 0,
+     "e": "Exact ca la numărarea perechilor dintre două grupe."
+    }
+   ],
+   "277": [
+    {
+     "q": "De ce 99 nu e răspuns în exemplu, deși lipsește din șir?",
+     "o": [
+      "Are cele două cifre egale",
+      "E prea mare",
+      "Apare în șir"
+     ],
+     "a": 0,
+     "e": "Se cer numere de două cifre distincte, adică cu cifre diferite."
+    },
+    {
+     "q": "Din ce capăt cauți numerele lipsă?",
+     "o": [
+      "De la 99 în jos",
+      "De la 10 în sus"
+     ],
+     "a": 0,
+     "e": "Se cer cele mai mari, deci primele două găsite coborând."
+    },
+    {
+     "q": "De ce e potrivit un vector de marcaj?",
+     "o": [
+      "Numerele de două cifre sunt doar 90: 10..99",
+      "Pentru că șirul e ordonat",
+      "Nu e potrivit"
+     ],
+     "a": 0,
+     "e": "Celelalte numere nu contează deloc."
+    }
+   ],
+   "278": [
+    {
+     "q": "Este 0 un număr pozitiv?",
+     "o": [
+      "Nu, pozitive sunt numerele strict mai mari decât 0",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Pentru 0 7 0 răspunsul e 2, nu 3."
+    },
+    {
+     "q": "Care e cea mai lungă secvență care se încheie cu un pozitiv?",
+     "o": [
+      "De la începutul șirului până la ultimul pozitiv",
+      "De la primul pozitiv la ultimul",
+      "Doar ultimul pozitiv"
+     ],
+     "a": 0,
+     "e": "Pornești cât mai devreme posibil."
+    },
+    {
+     "q": "Câte variabile îți trebuie?",
+     "o": [
+      "Câteva: numărul de termeni și pozițiile primului și ultimului pozitiv",
+      "Un tablou de 10⁶",
+      "Două tablouri"
+     ],
+     "a": 0,
+     "e": "Fără tablou."
+    }
+   ],
+   "279": [
+    {
+     "q": "Care e cifra zecilor lui 726?",
+     "o": [
+      "2",
+      "7",
+      "6"
+     ],
+     "a": 0,
+     "e": "726 / 10 = 72, iar 72 % 10 = 2."
+    },
+    {
+     "q": "De câți z-prieteni e precedat 128 (poziția 7)?",
+     "o": [
+      "2: 726 și 20",
+      "3",
+      "1"
+     ],
+     "a": 0,
+     "e": "Toate au cifra zecilor 2."
+    },
+    {
+     "q": "Ce reții pentru fiecare cifră 0..9?",
+     "o": [
+      "Câte numere au avut-o și poziția ultimului",
+      "Toate pozițiile",
+      "Suma numerelor"
+     ],
+     "a": 0,
+     "e": "Ajung pentru răspuns."
+    }
+   ],
+   "280": [
+    {
+     "q": "De ce 20 nu se afișează în exemplu?",
+     "o": [
+      "Apare în ambele șiruri",
+      "Nu e divizibil cu 5",
+      "E prea mare"
+     ],
+     "a": 0,
+     "e": "Se cer numerele care apar doar într-un șir."
+    },
+    {
+     "q": "Ce faci când primele elemente rămase sunt egale?",
+     "o": [
+      "Le sari pe amândouă",
+      "Afișezi valoarea",
+      "Avansezi doar în primul șir"
+     ],
+     "a": 0,
+     "e": "Valoarea e în ambele, deci nu se afișează."
+    },
+    {
+     "q": "De ce interclasarea dă rezultatul crescător?",
+     "o": [
+      "La fiecare pas iei cea mai mică valoare rămasă",
+      "Pentru că sortezi la final",
+      "Din întâmplare"
+     ],
+     "a": 0,
+     "e": "Ca la contopirea a două liste ordonate."
+    }
+   ],
+   "281": [
+    {
+     "q": "Ce e primul număr afișat?",
+     "o": [
+      "Primul termen",
+      "Maximul întregului șir",
+      "0"
+     ],
+     "a": 0,
+     "e": "Pentru i = 1 e doar un termen."
+    },
+    {
+     "q": "Ai nevoie să păstrezi șirul?",
+     "o": [
+      "Nu, ajunge maximul curent",
+      "Da, tot"
+     ],
+     "a": 0,
+     "e": "Maximul primelor i valori se obține din maximul primelor i − 1 și din termenul i."
+    },
+    {
+     "q": "Poate scădea șirul afișat?",
+     "o": [
+      "Nu, maximul doar crește sau rămâne la fel",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Fiecare valoare nouă poate doar să-l mărească."
+    }
+   ],
+   "282": [
+    {
+     "q": "Care secvență cu un singur negativ conține -23 și e cât mai lungă?",
+     "o": [
+      "De după -61 până înainte de -81",
+      "De la început până la -23",
+      "Doar -23"
+     ],
+     "a": 0,
+     "e": "Se întinde până la negativele vecine, fără să le includă."
+    },
+    {
+     "q": "Câte secvențe candidate trebuie comparate?",
+     "o": [
+      "Trei, câte una pentru fiecare negativ",
+      "Toate secvențele",
+      "Două"
+     ],
+     "a": 0,
+     "e": "Fiecare negativ dă o singură secvență maximală."
+    },
+    {
+     "q": "Ce reții în timpul citirii?",
+     "o": [
+      "Pozițiile celor trei negative și numărul de termeni",
+      "Tot șirul",
+      "Suma"
+     ],
+     "a": 0,
+     "e": "Lungimile se calculează din ele."
+    }
+   ],
+   "283": [
+    {
+     "q": "Se afișează o cifră de mai multe ori dacă apare de mai multe ori?",
+     "o": [
+      "Da, de câte ori apare",
+      "Nu, o singură dată"
+     ],
+     "a": 0,
+     "e": "În exemplu 2 apare de 4 ori."
+    },
+    {
+     "q": "Ce structură ajunge?",
+     "o": [
+      "Un vector de 10 frecvențe",
+      "Un tablou de 10⁶ cifre",
+      "O matrice"
+     ],
+     "a": 0,
+     "e": "Cifrele sunt doar 0..9."
+    },
+    {
+     "q": "Este 0 cifră pară?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "De aceea apare primul."
+    }
+   ],
+   "284": [
+    {
+     "q": "Ce faci când găsești un număr impar nou?",
+     "o": [
+      "Fostul ultim devine penultim, iar cel nou devine ultim",
+      "Îl compari cu maximul",
+      "Îl adaugi la sumă"
+     ],
+     "a": 0,
+     "e": "a = b, apoi b = x."
+    },
+    {
+     "q": "Ce se afișează pentru 7 7?",
+     "o": [
+      "7 7",
+      "nu exista",
+      "7"
+     ],
+     "a": 0,
+     "e": "Numerele nu trebuie să fie distincte."
+    },
+    {
+     "q": "De ce nu păstrezi tot șirul?",
+     "o": [
+      "Ajung două variabile",
+      "Nu încape",
+      "E interzis"
+     ],
+     "a": 0,
+     "e": "Se cere eficiență ca memorie."
+    }
+   ],
+   "285": [
+    {
+     "q": "Cum obții cel mai mare număr dintr-un set de cifre?",
+     "o": [
+      "Pui cifrele în ordine descrescătoare",
+      "Le aduni",
+      "Le pui în ordinea citirii"
+     ],
+     "a": 0,
+     "e": "Cifrele mari trebuie să stea cât mai în stânga."
+    },
+    {
+     "q": "De ce nu poți calcula numărul ca valoare?",
+     "o": [
+      "Poate avea până la un milion de cifre",
+      "Pentru că are zerouri",
+      "Poți"
+     ],
+     "a": 0,
+     "e": "Îl afișezi cifră cu cifră."
+    },
+    {
+     "q": "Unde ajung cifrele 0?",
+     "o": [
+      "La final",
+      "La început",
+      "Se elimină"
+     ],
+     "a": 0,
+     "e": "Sunt cele mai mici."
+    }
+   ],
+   "286": [
+    {
+     "q": "Ce numere stau înaintea lui 15 în șirul ordonat 4, 6, 7, 15, 15, 17?",
+     "o": [
+      "Cele mai mici decât 15",
+      "Toate",
+      "Cele egale cu 15"
+     ],
+     "a": 0,
+     "e": "Sunt 3, deci prima poziție posibilă e 4."
+    },
+    {
+     "q": "Trebuie sortat șirul?",
+     "o": [
+      "Nu, ajunge o numărare",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Sortarea ar cere memorarea tuturor termenilor."
+    },
+    {
+     "q": "Ce se afișează pentru 9 8 7 6?",
+     "o": [
+      "4",
+      "1",
+      "9"
+     ],
+     "a": 0,
+     "e": "Trei termeni sunt mai mici decât 9."
+    }
+   ],
+   "287": [
+    {
+     "q": "Ce termeni stau înaintea lui 15 sau pe locul lui în șirul descrescător?",
+     "o": [
+      "Cei mai mari sau egali cu 15",
+      "Cei mai mici",
+      "Toți"
+     ],
+     "a": 0,
+     "e": "Sunt 21, 17, 15, 15: 4 termeni."
+    },
+    {
+     "q": "De ce se numără și ceilalți termeni egali cu primul?",
+     "o": [
+      "Se cere cea mai mare poziție, deci primul stă după toate valorile egale",
+      "Nu se numără",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "Valorile egale pot fi așezate în orice ordine între ele."
+    },
+    {
+     "q": "Ce se afișează pentru 6 7 8 9?",
+     "o": [
+      "4",
+      "1",
+      "6"
+     ],
+     "a": 0,
+     "e": "Toți patru sunt ≥ 6."
+    }
+   ],
+   "288": [
+    {
+     "q": "Cum numeri valorile distincte fără să le memorezi?",
+     "o": [
+      "Șirul e ordonat: numeri termenii diferiți de cel anterior",
+      "Cu un vector de frecvență de 10⁹",
+      "Le sortezi"
+     ],
+     "a": 0,
+     "e": "Valorile egale stau una lângă alta, deci o valoare nouă începe acolo unde termenul se schimbă."
+    },
+    {
+     "q": "Ce formulă dă răspunsul?",
+     "o": [
+      "n − numărul de valori distincte",
+      "n − numărul de termeni",
+      "numărul de termeni − n"
+     ],
+     "a": 0,
+     "e": "Din cele n valori posibile scazi cele care apar."
+    },
+    {
+     "q": "De ce un vector de frecvență nu e o idee bună aici?",
+     "o": [
+      "n poate fi 10⁹, prea mult pentru memorie",
+      "Pentru că numerele sunt negative",
+      "E o idee bună"
+     ],
+     "a": 0,
+     "e": "Un tablou de 10⁹ elemente nu încape; ordonarea șirului face tabloul inutil."
+    }
+   ],
+   "289": [
+    {
+     "q": "Care sunt vârfurile șirului 1 5 1 1 9 1?",
+     "o": [
+      "5 și 9",
+      "doar 9",
+      "5, 1 și 9"
+     ],
+     "a": 0,
+     "e": "Fiecare e strict mai mare decât ambii vecini."
+    },
+    {
+     "q": "Ce valoare se compară pentru un vârf?",
+     "o": [
+      "|vecin stâng − vecin drept|",
+      "Vârful minus vecinii",
+      "Suma vecinilor"
+     ],
+     "a": 0,
+     "e": "Se caută vârful cu vecinii cei mai apropiați ca valoare."
+    },
+    {
+     "q": "Cât de mult din șir trebuie ținut în memorie?",
+     "o": [
+      "Doar ultimii trei termeni",
+      "Tot șirul",
+      "Ultimii zece"
+     ],
+     "a": 0,
+     "e": "Un vârf depinde doar de el și de cei doi vecini."
+    }
+   ],
+   "290": [
+    {
+     "q": "Într-un șir palindromic, de câte ori poate apărea o valoare un număr impar de ori?",
+     "o": [
+      "Pentru cel mult o valoare",
+      "Pentru oricâte",
+      "Pentru niciuna"
+     ],
+     "a": 0,
+     "e": "Termenii stau în perechi simetrice; doar termenul din mijloc (dacă lungimea e impară) nu are pereche."
+    },
+    {
+     "q": "Ce reții în timpul citirii?",
+     "o": [
+      "Frecvența fiecărei valori 1..1000",
+      "Tot șirul, ca să-l rearanjezi",
+      "Doar maximul"
+     ],
+     "a": 0,
+     "e": "Nu trebuie construit palindromul, doar numărate aparițiile."
+    },
+    {
+     "q": "Pentru 1 2 ce se afișează?",
+     "o": [
+      "NU",
+      "DA"
+     ],
+     "a": 0,
+     "e": "Și 1, și 2 apar o dată (de un număr impar de ori): două valori, prea multe."
+    }
+   ],
+   "291": [
+    {
+     "q": "Ce înseamnă că x aparține intervalului deschis (a, b)?",
+     "o": [
+      "a < x < b",
+      "a ≤ x ≤ b",
+      "x = a sau x = b"
+     ],
+     "a": 0,
+     "e": "Capetele nu fac parte din interval, de aceea a = min − 1 și b = max + 1."
+    },
+    {
+     "q": "Ce condiție are un număr cu exact două cifre?",
+     "o": [
+      "10 ≤ x ≤ 99",
+      "x < 100",
+      "x % 100 == x"
+     ],
+     "a": 0,
+     "e": "x < 100 ar include și numerele de o cifră."
+    },
+    {
+     "q": "Ce trebuie reținut în timpul citirii?",
+     "o": [
+      "Minimul și maximul termenilor de două cifre",
+      "Toți termenii",
+      "Suma lor"
+     ],
+     "a": 0,
+     "e": "Doar extremele determină intervalul."
+    }
+   ],
+   "292": [
+    {
+     "q": "Cum afli termenul dinaintea perechii consecutive (a, b)?",
+     "o": [
+      "3·a − b",
+      "b − a",
+      "3·b − a"
+     ],
+     "a": 0,
+     "e": "Din b = 3·a − c rezultă c = 3·a − b."
+    },
+    {
+     "q": "Ce se afișează pentru x = 1 și y = 2?",
+     "o": [
+      "2 1 1",
+      "2 1",
+      "1 2"
+     ],
+     "a": 0,
+     "e": "Termenii mai mici sau egali cu 2 sunt 2, 1, 1 (f₃, f₂, f₁)."
+    },
+    {
+     "q": "De ce nu memorezi tot șirul?",
+     "o": [
+      "Se cere eficiență ca memorie, iar fiecare termen se poate calcula din următorii doi",
+      "Șirul e infinit",
+      "Nu se poate în C++"
+     ],
+     "a": 0,
+     "e": "Ajung doi termeni consecutivi ca să cobori pas cu pas."
+    }
+   ],
+   "293": [
+    {
+     "q": "Cum verifici că x are penultima cifră 2 și ultima cifră 0?",
+     "o": [
+      "x % 100 == 20",
+      "x % 20 == 0",
+      "x / 10 == 2"
+     ],
+     "a": 0,
+     "e": "Ultimele două cifre ale lui x sunt x % 100."
+    },
+    {
+     "q": "Ce se întâmplă când vine un număr mai mare decât m1?",
+     "o": [
+      "m3 = m2, m2 = m1, m1 = x",
+      "m1 = x și atât",
+      "Se ignoră"
+     ],
+     "a": 0,
+     "e": "Fostul maxim devine al doilea, fostul al doilea devine al treilea."
+    },
+    {
+     "q": "De ce nu sortezi șirul?",
+     "o": [
+      "Ar trebui memorat tot; trei variabile ajung",
+      "Sortarea e interzisă",
+      "Șirul e deja sortat"
+     ],
+     "a": 0,
+     "e": "Eficient ca memorie înseamnă să nu păstrezi termenii."
+    }
+   ],
+   "294": [
+    {
+     "q": "Care e cea mai lungă secvență care începe cu un număr negativ?",
+     "o": [
+      "De la primul negativ până la sfârșitul șirului",
+      "De la ultimul negativ până la sfârșit",
+      "Doar negativul"
+     ],
+     "a": 0,
+     "e": "Pornind cât mai devreme și mergând până la capăt obții cea mai lungă."
+    },
+    {
+     "q": "Ce trebuie reținut în timpul citirii?",
+     "o": [
+      "Poziția primului și a ultimului negativ și câți termeni sunt",
+      "Toți termenii",
+      "Suma lor"
+     ],
+     "a": 0,
+     "e": "Cu acestea afli ambele lungimi candidate."
+    },
+    {
+     "q": "Pentru 1 2 3 -1 care e răspunsul?",
+     "o": [
+      "4",
+      "1",
+      "3"
+     ],
+     "a": 0,
+     "e": "Tot șirul se termină cu un negativ."
+    }
+   ],
+   "295": [
+    {
+     "q": "De ce nu ai nevoie de vector de frecvență?",
+     "o": [
+      "Șirul e ordonat, deci valorile egale sunt alăturate",
+      "Pentru că valorile sunt mici",
+      "Ai nevoie"
+     ],
+     "a": 0,
+     "e": "Valorile sunt până la 10⁹, dar ordonarea le grupează."
+    },
+    {
+     "q": "Când afli lungimea finală a unui grup?",
+     "o": [
+      "Când apare o valoare diferită sau se termină șirul",
+      "La primul element",
+      "Niciodată"
+     ],
+     "a": 0,
+     "e": "Nu uita grupul de la sfârșit, verificat după buclă."
+    },
+    {
+     "q": "Se afișează 50 în exemplu?",
+     "o": [
+      "Nu, apare de trei ori",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Doar valorile cu exact două apariții."
+    }
+   ],
+   "296": [
+    {
+     "q": "Care secvență din exemplu are suma 12?",
+     "o": [
+      "7 2 -1 4",
+      "9 2",
+      "4 -6 7 2 -1 4"
+     ],
+     "a": 0,
+     "e": "7 + 2 − 1 + 4 = 12."
+    },
+    {
+     "q": "Când nu mai merită continuată secvența curentă?",
+     "o": [
+      "Când suma ei a devenit negativă",
+      "Când întâlnești un negativ",
+      "Niciodată"
+     ],
+     "a": 0,
+     "e": "O sumă negativă doar ar micșora ce urmează; mai bine începi o secvență nouă."
+    },
+    {
+     "q": "Ce se afișează pentru -5 -2 -9?",
+     "o": [
+      "-2",
+      "0",
+      "-16"
+     ],
+     "a": 0,
+     "e": "Secvența trebuie să aibă cel puțin un termen, iar cel mai bun e -2 singur."
+    }
+   ],
+   "297": [
+    {
+     "q": "Pentru p1 = 12, care perechi de cifre pot începe numărul?",
+     "o": [
+      "26, 34, 43, 62",
+      "26, 34, 43, 62, 112",
+      "doar 34 și 43"
+     ],
+     "a": 0,
+     "e": "Prima cifră nu poate fi 0, iar ambele cifre trebuie să fie de la 1 la 9."
+    },
+    {
+     "q": "De ce numerele ies descrescătoare dacă alegi cifrele de la 9 în jos?",
+     "o": [
+      "Cifrele mai din stânga contează mai mult, iar fiecare e aleasă descrescător",
+      "Din întâmplare",
+      "Nu ies"
+     ],
+     "a": 0,
+     "e": "Ordinea alegerii cifrelor, de la stânga la dreapta și de la mare la mic, dă ordinea numerelor."
+    },
+    {
+     "q": "Câte variante are blocul din mijloc?",
+     "o": [
+      "10: 000, 111, ..., 999",
+      "9",
+      "1"
+     ],
+     "a": 0,
+     "e": "Cifrele din mijloc sunt egale, de la 0 la 9."
+    }
+   ],
+   "298": [
+    {
+     "q": "Care secvență din exemplu are suma -12?",
+     "o": [
+      "-7 -2 1 -4",
+      "-9 -2",
+      "-4 6 -7 -2"
+     ],
+     "a": 0,
+     "e": "−7 − 2 + 1 − 4 = −12."
+    },
+    {
+     "q": "Când începi o secvență nouă?",
+     "o": [
+      "Când suma secvenței curente a devenit pozitivă",
+      "La fiecare număr pozitiv",
+      "Niciodată"
+     ],
+     "a": 0,
+     "e": "O sumă pozitivă doar ar mări ce urmează."
+    },
+    {
+     "q": "Ce se afișează pentru 5 2 9?",
+     "o": [
+      "2",
+      "0",
+      "16"
+     ],
+     "a": 0,
+     "e": "Secvența are cel puțin un termen; cea mai mică sumă e 2, singur."
+    }
+   ],
+   "299": [
+    {
+     "q": "De câte valori cu aceeași ultimă cifră e precedat termenul 32 din exemplu?",
+     "o": [
+      "3 (112, 12, 2)",
+      "4",
+      "2"
+     ],
+     "a": 0,
+     "e": "Înaintea lui 32 apar 112, 12 și 2, toate terminate în 2."
+    },
+    {
+     "q": "Unde se atinge maximul pentru o cifră care apare de f ori?",
+     "o": [
+      "La ultima ei apariție, precedată de f − 1 valori",
+      "La prima apariție",
+      "Oriunde"
+     ],
+     "a": 0,
+     "e": "Fiecare apariție nouă e precedată de una în plus."
+    },
+    {
+     "q": "Ce reții pentru fiecare cifră de la 0 la 9?",
+     "o": [
+      "De câte ori a apărut și poziția ultimei apariții",
+      "Toate pozițiile",
+      "Doar suma"
+     ],
+     "a": 0,
+     "e": "Asta e tot ce trebuie pentru răspuns."
+    }
+   ],
+   "300": [
+    {
+     "q": "Este 0 divizibil cu k?",
+     "o": [
+      "Da, 0 = k · 0",
+      "Nu",
+      "Doar pentru k = 1"
+     ],
+     "a": 0,
+     "e": "În exemplu, 0 face parte din secvența 0 10 60 15."
+    },
+    {
+     "q": "Ce faci cu lungimea curentă la un termen nedivizibil cu k?",
+     "o": [
+      "O resetezi la 0",
+      "O scazi cu 1",
+      "Nu se schimbă"
+     ],
+     "a": 0,
+     "e": "Secvența se întrerupe acolo."
+    },
+    {
+     "q": "Când crește numărul de secvențe de lungime maximă?",
+     "o": [
+      "Când lungimea curentă devine egală cu maximul",
+      "La fiecare termen divizibil",
+      "La final"
+     ],
+     "a": 0,
+     "e": "O secvență ajunge la lungimea maximă o singură dată, deci e numărată o singură dată."
+    }
+   ],
+   "301": [
+    {
+     "q": "Ce lungime minimă are o progresie aritmetică în această problemă?",
+     "o": [
+      "3 termeni",
+      "2 termeni",
+      "1 termen"
+     ],
+     "a": 0,
+     "e": "Enunțul cere cel puțin trei termeni; doi termeni au mereu o diferență."
+    },
+    {
+     "q": "Când începe o progresie nouă?",
+     "o": [
+      "Când diferența dintre ultimii doi termeni se schimbă",
+      "La fiecare număr negativ",
+      "După 3 termeni"
+     ],
+     "a": 0,
+     "e": "Noua progresie pornește cu ultimii doi termeni (lungime 2)."
+    },
+    {
+     "q": "Pentru 1 2 3 10 20 30, ce rație se afișează?",
+     "o": [
+      "10",
+      "1",
+      "nu exista"
+     ],
+     "a": 0,
+     "e": "Ambele progresii au 3 termeni; la egalitate se alege rația mai mare."
+    }
+   ],
+   "302": [
+    {
+     "q": "De ce nu ai nevoie de vector de frecvență?",
+     "o": [
+      "Șirul e crescător, deci valorile egale sunt alăturate",
+      "Pentru că valorile sunt mici",
+      "Ai nevoie"
+     ],
+     "a": 0,
+     "e": "Un vector de 10⁹ nici n-ar încăpea."
+    },
+    {
+     "q": "Când afișezi o valoare și numărul ei de apariții?",
+     "o": [
+      "Când se termină grupul ei: apare o valoare nouă sau s-a terminat șirul",
+      "La prima apariție",
+      "La fiecare apariție"
+     ],
+     "a": 0,
+     "e": "Abia atunci știi numărul complet."
+    },
+    {
+     "q": "Ce se afișează pentru șirul 7?",
+     "o": [
+      "7 1",
+      "7",
+      "1 7"
+     ],
+     "a": 0,
+     "e": "Valoarea urmată de numărul de apariții."
+    }
+   ],
+   "303": [
+    {
+     "q": "Din ce termen provine 42?",
+     "o": [
+      "Din 21, prin dublare",
+      "Din 41, adunând 1",
+      "Din 43"
+     ],
+     "a": 0,
+     "e": "42 e par, deci a fost obținut dublând termenul anterior."
+    },
+    {
+     "q": "Din ce termen provine 43?",
+     "o": [
+      "Din 42, adunând 1",
+      "Din 21,5"
+     ],
+     "a": 0,
+     "e": "Termenii impari de după 10 se obțin adunând 1."
+    },
+    {
+     "q": "Ce faci după ce x ajunge la 10?",
+     "o": [
+      "Afișezi 10, 9, ..., 1",
+      "Te oprești",
+      "Continui cu x / 2"
+     ],
+     "a": 0,
+     "e": "Primii 10 termeni sunt chiar 1..10."
+    }
+   ],
+   "304": [
+    {
+     "q": "Cât face f₃ = 3·f₂ − 2·f₁?",
+     "o": [
+      "4",
+      "5",
+      "3"
+     ],
+     "a": 0,
+     "e": "3 · 2 − 2 · 1 = 4."
+    },
+    {
+     "q": "Ce legătură are fiecare termen cu cel dinainte?",
+     "o": [
+      "E dublul lui",
+      "E cu 2 mai mare",
+      "E pătratul lui"
+     ],
+     "a": 0,
+     "e": "Dacă fₙ₋₁ = 2·fₙ₋₂, atunci 3·fₙ₋₁ − 2·fₙ₋₂ = 3·fₙ₋₁ − fₙ₋₁ = 2·fₙ₋₁."
+    },
+    {
+     "q": "Ce se afișează pentru x = 1?",
+     "o": [
+      "1",
+      "1 1",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "f₁ = 1 e singurul termen ≤ 1."
+    }
+   ],
+   "305": [
+    {
+     "q": "Cu ce valori pornesc m1, m2, m3?",
+     "o": [
+      "Cu o valoare mai mare decât orice număr din șir",
+      "Cu 0",
+      "Cu primul număr citit"
+     ],
+     "a": 0,
+     "e": "Pornind de la 0, niciun număr n-ar fi mai mic decât ele."
+    },
+    {
+     "q": "Ce se întâmplă când x < m2, dar x ≥ m1?",
+     "o": [
+      "m3 = m2, apoi m2 = x",
+      "m1 = x",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "x devine al doilea cel mai mic, iar fostul al doilea coboară pe locul trei."
+    },
+    {
+     "q": "Se termină 120 în 20?",
+     "o": [
+      "Da, 120 % 100 = 20",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Ultimele două cifre sunt 2 și 0."
+    }
+   ],
+   "306": [
+    {
+     "q": "Poate prima cifră să fie 0?",
+     "o": [
+      "Nu, numărul n-ar mai avea 7 cifre",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Oricum produsul ar fi 0, iar p1 ≥ 1."
+    },
+    {
+     "q": "Pentru p2 = 8, care perechi de cifre pot încheia numărul?",
+     "o": [
+      "18, 24, 42, 81",
+      "18, 24, 42, 81, 08",
+      "doar 24 și 42"
+     ],
+     "a": 0,
+     "e": "0 nu poate apărea, pentru că produsul ar fi 0."
+    },
+    {
+     "q": "Ce diferă față de varianta cu ordine descrescătoare?",
+     "o": [
+      "Doar sensul în care alegi cifrele",
+      "Tot algoritmul",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Cifrele alese de la mic la mare dau numerele crescător."
+    }
+   ],
+   "307": [
+    {
+     "q": "Cum obții valorile din ambele șiruri în ordine crescătoare, fără să le sortezi din nou?",
+     "o": [
+      "Prin interclasare",
+      "Cu sortare prin selecție",
+      "Concatenându-le"
+     ],
+     "a": 0,
+     "e": "Ambele sunt deja ordonate; compari mereu primele elemente rămase."
+    },
+    {
+     "q": "În reuniunea 2 3 4 5 8 10 11 14, de câte termeni e răspunsul maxim?",
+     "o": [
+      "7, câte unul din fiecare grup de aceeași paritate",
+      "8",
+      "4"
+     ],
+     "a": 0,
+     "e": "Grupurile sunt 2 | 3 | 4 | 5 | 8 10 | 11 | 14: 8 și 10 sunt alăturate și ambele pare, deci doar unul poate fi luat."
+    },
+    {
+     "q": "Ce faci cu o valoare care apare în ambele șiruri?",
+     "o": [
+      "O iei cel mult o dată, șirul fiind strict crescător",
+      "O iei de două ori"
+     ],
+     "a": 0,
+     "e": "Valorile egale cu ultima luată se sar."
+    }
+   ],
+   "308": [
+    {
+     "q": "Conține intervalul [9, 15] vreun termen din 4 8 9 16 25?",
+     "o": [
+      "Da, pe 9",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Intervalul e închis, deci capetele fac parte din el."
+    },
+    {
+     "q": "Ce înseamnă c[b] − c[a − 1] dacă c[v] = câți termeni sunt ≤ v?",
+     "o": [
+      "Câți termeni sunt în [a, b]",
+      "Câte intervale sunt",
+      "Lungimea intervalului"
+     ],
+     "a": 0,
+     "e": "Termenii ≤ b fără cei ≤ a − 1."
+    },
+    {
+     "q": "De ce e mai bine decât să parcurgi șirul pentru fiecare interval?",
+     "o": [
+      "Fiecare interval se verifică într-un pas",
+      "Ocupă mai puțină memorie",
+      "Nu e mai bine"
+     ],
+     "a": 0,
+     "e": "Cu multe intervale, a parcurge șirul de fiecare dată ar fi lent."
+    }
+   ],
+   "309": [
+    {
+     "q": "Este 0 multiplu de 10?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "0 = 10 · 0."
+    },
+    {
+     "q": "Care sunt 10-secvențele de lungime 3 din exemplu?",
+     "o": [
+      "200 100 10 și 100 1000 40",
+      "doar 200 100 10",
+      "20 30"
+     ],
+     "a": 0,
+     "e": "1002 nu e multiplu de 10, deci întrerupe."
+    },
+    {
+     "q": "Ce reții în timpul citirii?",
+     "o": [
+      "Lungimea curentă, maximul și de câte ori a apărut maximul",
+      "Toți termenii",
+      "Suma"
+     ],
+     "a": 0,
+     "e": "Nu e nevoie de tablou."
+    }
+   ],
+   "310": [
+    {
+     "q": "Cum eviți să afișezi de două ori 8?",
+     "o": [
+      "Îl afișezi doar când diferă de termenul anterior",
+      "Cu un vector de 10⁹",
+      "Îl afișezi la final"
+     ],
+     "a": 0,
+     "e": "Șirul fiind crescător, repetițiile sunt alăturate."
+    },
+    {
+     "q": "Este 0 număr par?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Pentru 0 0 0 se afișează 0."
+    },
+    {
+     "q": "Ce valoare inițială pui pentru termenul anterior?",
+     "o": [
+      "O valoare care nu poate apărea, de exemplu -1",
+      "0",
+      "Primul termen"
+     ],
+     "a": 0,
+     "e": "Cu 0, un șir care începe cu 0 n-ar afișa nimic."
+    }
+   ],
+   "311": [
+    {
+     "q": "Care e secvența cu suma 122 din exemplu?",
+     "o": [
+      "100 20 2",
+      "115 1 5",
+      "2 2 2 4"
+     ],
+     "a": 0,
+     "e": "115 + 1 + 5 = 121 e foarte aproape, dar 100 + 20 + 2 = 122."
+    },
+    {
+     "q": "De ce e bine să iei tot grupul de aceeași paritate?",
+     "o": [
+      "Numerele nu sunt negative, deci fiecare termen în plus nu scade suma",
+      "Așa cere enunțul",
+      "Nu e bine"
+     ],
+     "a": 0,
+     "e": "Dacă ar fi și numere negative, ar trebui o idee ca la Kadane."
+    },
+    {
+     "q": "Ce faci când paritatea se schimbă?",
+     "o": [
+      "Pornești o sumă nouă de la termenul curent",
+      "Resetezi suma la 0 și sari termenul",
+      "Continui suma"
+     ],
+     "a": 0,
+     "e": "Termenul curent începe noul grup."
+    }
+   ],
+   "312": [
+    {
+     "q": "Ce structură te ajută cel mai mult aici?",
+     "o": [
+      "Un vector de frecvență pentru valorile 0..100",
+      "Sortarea întregului șir",
+      "O matrice 10⁶ × 10⁶"
+     ],
+     "a": 0,
+     "e": "Valorile sunt mici (cel mult 100), deci poți număra aparițiile fiecăreia direct, într-o singură parcurgere."
+    },
+    {
+     "q": "Este [2, 6] un interval prieten pentru șirul din exemplu?",
+     "o": [
+      "Nu, 6 nu apare în șir",
+      "Da, are 8 termeni",
+      "Da, are 9 termeni"
+     ],
+     "a": 0,
+     "e": "Toate numerele întregi din interval trebuie să apară în șir; 6 lipsește."
+    },
+    {
+     "q": "Ce faci cu suma curentă când dai de o valoare care nu apare?",
+     "o": [
+      "O resetezi la 0",
+      "O păstrezi",
+      "O înmulțești cu 2"
+     ],
+     "a": 0,
+     "e": "Un interval prieten nu poate trece peste o valoare lipsă, deci bucata se termină acolo."
+    }
+   ],
+   "313": [
+    {
+     "q": "Pentru un termen par x din prima jumătate, ce trebuie verificat?",
+     "o": [
+      "x < cel mai mic impar din a doua jumătate",
+      "x < cel mai mic par din a doua jumătate",
+      "x să fie mai mic decât toți termenii"
+     ],
+     "a": 0,
+     "e": "Doar termenii de paritate diferită contează, iar a fi mai mic decât toți înseamnă a fi mai mic decât minimul lor."
+    },
+    {
+     "q": "Ce înlocuiește verificarea fiecărui termen din prima jumătate?",
+     "o": [
+      "Maximul parelor și maximul imparelor din prima jumătate",
+      "Suma lor",
+      "Primul și ultimul termen"
+     ],
+     "a": 0,
+     "e": "Dacă cel mai mare par e mai mic decât minimul imparelor, toți parii sunt."
+    },
+    {
+     "q": "Dacă în a doua jumătate nu e niciun număr impar, ce condiție au parii din prima jumătate?",
+     "o": [
+      "Niciuna, sunt mereu în regulă",
+      "Trebuie să fie 0",
+      "Șirul nu e paritar"
+     ],
+     "a": 0,
+     "e": "Nu există niciun număr de paritate diferită de care să fie mai mici; pornește minimul de la o valoare foarte mare."
+    }
+   ],
+   "314": [
+    {
+     "q": "De ce nu păstrăm toți termenii într-un tablou?",
+     "o": [
+      "Se cere eficiență ca memorie, iar recurența se poate parcurge și înapoi",
+      "Nu încap 10⁴ numere în memorie",
+      "Tabloul ar da altă ordine"
+     ],
+     "a": 0,
+     "e": "Din fᵢ = fᵢ₋₁ + fᵢ₋₂ − fᵢ₋₃ rezultă fᵢ₋₃ = fᵢ₋₁ + fᵢ₋₂ − fᵢ: cu trei termeni consecutivi îl afli pe cel dinainte."
+    },
+    {
+     "q": "Cât este f₄ pentru x = 1, y = 2, z = 4?",
+     "o": [
+      "5",
+      "7",
+      "3"
+     ],
+     "a": 0,
+     "e": "f₄ = f₃ + f₂ − f₁ = 4 + 2 − 1 = 5."
+    },
+    {
+     "q": "Pot fi termenii negativi?",
+     "o": [
+      "Da, de exemplu x = 99, y = 1, z = 1 dă f₄ = −97",
+      "Nu, sunt mereu naturali"
+     ],
+     "a": 0,
+     "e": "Enunțul nu garantează că șirul rămâne pozitiv, deci folosește tipuri cu semn."
+    }
+   ],
+   "315": [
+    {
+     "q": "Este primul termen mereu vârf local?",
+     "o": [
+      "Da, niciun termen nu îl precede",
+      "Nu, doar dacă e maxim",
+      "Doar dacă e nenul"
+     ],
+     "a": 0,
+     "e": "Nu există niciun termen dinaintea lui, deci condiția e îndeplinită."
+    },
+    {
+     "q": "De ce al treilea 10 din exemplu este vârf, deși îl preced 10-uri?",
+     "o": [
+      "E egal cu vecinul anterior, care e vârf",
+      "E strict mai mare decât toți",
+      "Nu este vârf"
+     ],
+     "a": 0,
+     "e": "A doua parte a definiției: egal cu anteriorul, iar anteriorul e vârf local."
+    },
+    {
+     "q": "Ce reții în timp ce citești?",
+     "o": [
+      "Maximul de până acum, termenul anterior și dacă acela a fost vârf",
+      "Tot șirul",
+      "Doar suma"
+     ],
+     "a": 0,
+     "e": "Cu aceste trei informații decizi pentru fiecare termen, fără tablou."
+    }
+   ],
+   "316": [
+    {
+     "q": "De ce e potrivit un vector de frecvență?",
+     "o": [
+      "Valorile sunt cel mult 1000, deci f[v] numără direct",
+      "Șirul are cel mult 1000 de termeni",
+      "Pentru că numerele sunt distincte"
+     ],
+     "a": 0,
+     "e": "Cu f[v] = numărul de apariții ale lui v, ordonarea înseamnă doar parcurgerea valorilor în ordine."
+    },
+    {
+     "q": "Ce faci cu o valoare care apare de 3 ori?",
+     "o": [
+      "O afișezi de 3 ori",
+      "O afișezi o dată",
+      "O sari"
+     ],
+     "a": 0,
+     "e": "Se afișează toți termenii șirului, deci și repetițiile."
+    },
+    {
+     "q": "De unde pornește parcurgerea valorilor pare?",
+     "o": [
+      "De la 0",
+      "De la 2",
+      "De la 1000"
+     ],
+     "a": 0,
+     "e": "0 este număr par și poate apărea în șir."
+    }
    ]
   }
  },
