@@ -13,6 +13,7 @@ import 'classes_models.dart' show Classes, HwProblem, Solution;
 import 'browser_run.dart';
 import 'judge0.dart';
 import 'math_sheet.dart';
+import 'problem_quiz.dart';
 import 'statement.dart';
 import 'workspace_screen.dart' show wsAgo;
 import 'custom_navbar.dart';
@@ -68,6 +69,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   int _attemptsN = 0; // how many times it was sent, for the tab's count
   StreamSubscription? _attemptsSub;
 
+  List<QuizQuestion> _quiz = const []; // the questions asked on opening the problem
   bool isFullScreenCode = false;
   bool isFullScreenProblem = false;
   String? _selectedGrilaOption;
@@ -320,6 +322,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   // ===========================================================================
   // DATA / PROGRESS
   // ===========================================================================
+  /// The problem's questions, asked as soon as it opens (they can be skipped).
+  Future<void> _offerQuiz() async {
+    final qs = await ProblemQuiz.load(widget.subject, widget.grade, widget.id, problem: exerciseData);
+    if (!mounted || qs.isEmpty) return;
+    setState(() => _quiz = qs);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showProblemQuiz(context, qs);
+    });
+  }
+
   Future<void> _loadExerciseDetails() async {
     try {
       final String response = await rootBundle.loadString('assets/data/exercise_details.json');
@@ -330,6 +342,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         if (!mounted) return;
         setState(() => exerciseData = data[widget.subject][widget.grade][widget.id]);
         _fileTemplate();
+        _offerQuiz();
         return;
       }
     } catch (e) {
@@ -342,6 +355,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         if (!mounted) return;
         setState(() => exerciseData = docSnap.data());
         _fileTemplate();
+        _offerQuiz();
         return;
       }
     } catch (e) {
@@ -1218,6 +1232,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           _cSection(examples.length == 1 ? 'Exemplu' : 'Exemplul ${i + 1}', _cExample(examples[i], i == 0 ? explained : const [])),
         if (examples.isEmpty && explained.isNotEmpty) _cSection('Exemplu', _cExplanation(explained)),
         if (hint != null) _cHint(hint),
+        if (_quiz.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: PbButton(
+              text: 'Întrebări ajutătoare (${_quiz.length})',
+              icon: Icons.quiz_outlined,
+              variant: PbVariant.outlineSecondary,
+              size: PbSize.sm,
+              onPressed: () => showProblemQuiz(context, _quiz),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -2507,6 +2534,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           _retroSpecBlock(_file == null ? "INPUT FORMAT" : "INPUT FILE: $_file.in", exerciseData!["input"]?.toString() ?? "-", isMobile),
           const SizedBox(height: 12),
           _retroSpecBlock(_file == null ? "OUTPUT FORMAT" : "OUTPUT FILE: $_file.out", exerciseData!["output"]?.toString() ?? "-", isMobile),
+        ],
+        if (_quiz.isNotEmpty) ...[
+          SizedBox(height: isMobile ? 16 : 22),
+          RetroButton(
+            text: "ÎNTREBĂRI AJUTĂTOARE (${_quiz.length})",
+            icon: Icons.quiz_outlined,
+            bgColor: AppColors.mustard,
+            textColor: AppColors.ink,
+            fontSize: 13,
+            onPressed: () => showProblemQuiz(context, _quiz),
+          ),
         ],
       ],
     );

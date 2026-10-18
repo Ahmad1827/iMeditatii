@@ -8,6 +8,7 @@ import 'clean_kit.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'math_sheet.dart' show isMathSubject;
+import 'problem_quiz.dart' show QuizQuestion;
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbAlert, PbAlertType;
 
 class RetroBlock extends StatelessWidget {
@@ -171,6 +172,10 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   /// solution are optional, shown only to the reviewer.
   bool get _isMath => isMathSubject(_selectedSubject);
 
+  /// The questions asked when the problem opens (optional, at most [_maxQuiz]).
+  final List<_QuizDraft> _quiz = [];
+  static const _maxQuiz = 5;
+
   final List<Map<String, TextEditingController>> _testCases = [
     {'input': TextEditingController(), 'output': TextEditingController()}
   ];
@@ -225,6 +230,9 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     _solutionCodeController.dispose();
     _workedController.dispose();
     _fileController.dispose();
+    for (final q in _quiz) {
+      q.dispose();
+    }
     for (var tc in _testCases) {
       tc['input']?.dispose();
       tc['output']?.dispose();
@@ -262,6 +270,22 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
         return;
       }
       _correctAnswerController.text = _opts[_correctIdx!].text.trim();
+    }
+
+    final quiz = <QuizQuestion>[];
+    for (final (i, d) in _quiz.indexed) {
+      if (d.isEmpty) continue;
+      final (q, problem) = d.build();
+      if (q == null) {
+        final msg = 'Întrebarea ${i + 1}: $problem';
+        if (clean) {
+          setState(() => _error = msg);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg.toUpperCase()), backgroundColor: AppColors.sunset));
+        }
+        return;
+      }
+      quiz.add(q);
     }
 
     setState(() {
@@ -307,6 +331,8 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
         exerciseData['tests'] = testsToSave;
         if (_fileName.isNotEmpty) exerciseData['fisier'] = _fileName;
       }
+
+      if (quiz.isNotEmpty) exerciseData['intrebari'] = [for (final q in quiz) q.toJson()];
 
       await FirebaseFirestore.instance.collection('exercises').add(exerciseData);
 
@@ -527,6 +553,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                 child: _selectedType == 'text' ? _cText() : (_selectedType == 'grila' ? _cGrila() : _cCode()),
               ),
             ]),
+          _section(4, 'Întrebări ajutătoare', [_quizEditor(retro: false)]),
           if (_error != null) ...[
             PbAlert(type: PbAlertType.danger, icon: Icons.error_outline, child: Text(_error!, style: const TextStyle(fontSize: 14))),
             const SizedBox(height: 12),
@@ -1115,6 +1142,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                                 ],
                               ],
                             ),
+                            _buildRetroCard(title: 'Helper questions', accentColor: AppColors.purple, children: [_quizEditor(retro: true)]),
                             const SizedBox(height: 16),
                             RetroButton(text: 'SUBMIT QUEST', bgColor: AppColors.forest, textColor: Colors.white, isFullWidth: true, onPressed: _saveExercise),
                             const SizedBox(height: 60),
@@ -1126,6 +1154,109 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                 ),
         );
       },
+    );
+  }
+
+  /// Writing the questions asked when the problem opens: each with up to 4
+  /// options, the right one marked, and why (shown after answering).
+  Widget _quizEditor({required bool retro}) {
+    final text = retro ? AppColors.ink : Pb.text;
+    final muted = retro ? AppColors.textMuted : Pb.muted;
+    final accent = retro ? AppColors.forest : Pb.primary;
+    InputDecoration dec(String hint) => retro ? _inputStyle(hint) : _dec(hint);
+    final style = TextStyle(fontSize: 15, color: text, fontWeight: retro ? FontWeight.w600 : FontWeight.w400);
+
+    Widget draft(int i, _QuizDraft d) => Container(
+          margin: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(retro ? 0 : 12),
+            border: Border.all(color: retro ? AppColors.border : Pb.border, width: retro ? 2.5 : 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: Text('Întrebarea ${i + 1}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: text))),
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: 19, color: muted),
+                    tooltip: 'Șterge întrebarea',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => setState(() => _quiz.removeAt(i).dispose()),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              TextFormField(controller: d.question, style: style, maxLines: null, decoration: dec('Întrebarea')),
+              const SizedBox(height: 10),
+              for (var k = 0; k < 4; k++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      InkResponse(
+                        radius: 20,
+                        onTap: () => setState(() => d.correct = k),
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: retro ? BoxShape.rectangle : BoxShape.circle,
+                            color: d.correct == k ? accent : Colors.transparent,
+                            border: Border.all(color: d.correct == k ? accent : (retro ? AppColors.border : Pb.border), width: retro ? 2.5 : 1.6),
+                          ),
+                          child: d.correct == k
+                              ? const Icon(Icons.check, size: 15, color: Colors.white)
+                              : Text(String.fromCharCode(65 + k), style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: muted)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: d.options[k],
+                          style: style,
+                          decoration: dec(k < 2 ? 'Varianta ${String.fromCharCode(65 + k)}' : 'Varianta ${String.fromCharCode(65 + k)} (opțional)'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 2),
+              TextFormField(controller: d.explanation, style: style, maxLines: null, decoration: dec('De ce (apare după ce elevul răspunde)')),
+            ],
+          ),
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Opțional. Elevul le primește când deschide problema și le poate sări. Bifează varianta corectă.',
+          style: TextStyle(fontSize: 13, color: muted, height: 1.4),
+        ),
+        const SizedBox(height: 12),
+        for (final (i, d) in _quiz.indexed) draft(i, d),
+        if (_quiz.length < _maxQuiz)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: retro
+                ? RetroButton(
+                    text: '+ ADD QUESTION',
+                    bgColor: AppColors.mustard,
+                    textColor: AppColors.ink,
+                    onPressed: () => setState(() => _quiz.add(_QuizDraft())),
+                  )
+                : PbButton(
+                    text: 'Adaugă o întrebare',
+                    icon: Icons.add,
+                    variant: PbVariant.outlineSecondary,
+                    size: PbSize.sm,
+                    onPressed: () => setState(() => _quiz.add(_QuizDraft())),
+                  ),
+          ),
+      ],
     );
   }
 
@@ -1283,5 +1414,34 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
         ),
       ],
     );
+  }
+}
+
+/// A question being written in the form.
+class _QuizDraft {
+  final question = TextEditingController();
+  final options = List.generate(4, (_) => TextEditingController());
+  final explanation = TextEditingController();
+  int? correct;
+
+  bool get isEmpty => [question, ...options, explanation].every((c) => c.text.trim().isEmpty);
+
+  /// The question as saved, or null and what's missing.
+  (QuizQuestion?, String) build() {
+    final q = question.text.trim();
+    if (q.isEmpty) return (null, 'scrie întrebarea.');
+    final filled = [for (var k = 0; k < 4; k++) if (options[k].text.trim().isNotEmpty) k];
+    if (filled.length < 2) return (null, 'scrie cel puțin două variante.');
+    if (correct == null || !filled.contains(correct)) return (null, 'bifează varianta corectă (una completată).');
+    return (
+      QuizQuestion(q, [for (final k in filled) options[k].text.trim()], filled.indexOf(correct!), explanation.text.trim()),
+      '',
+    );
+  }
+
+  void dispose() {
+    for (final c in [question, ...options, explanation]) {
+      c.dispose();
+    }
   }
 }

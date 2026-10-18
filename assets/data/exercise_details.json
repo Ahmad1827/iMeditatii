@@ -2909,7 +2909,7 @@
         "title": "Elemente egale cu media vecinilor",
         "category": "1. Subiectul III.1 · Subprograme",
         "difficulty": "ușoară",
-        "description": "Subprogramul medie are doi parametri: v, un tablou de numere naturale, și n, numărul de elemente ale tabloului (v[0], v[1], ..., v[n-1]). Subprogramul returnează câte elemente ale tabloului, în afară de primul și de ultimul, sunt egale cu media aritmetică a celor doi vecini ai lor.\n\nScrie definiția completă a subprogramului:\nint medie(int v[], int n)\n\nExemplu: pentru n = 6 și v = (2, 4, 6, 5, 4, 1) subprogramul returnează 3 (4, 6 și 5). Pentru verificare, programul citește datele, apelează subprogramul și afișează rezultatul.",
+        "description": "Subprogramul medie are doi parametri: v, un tablou de numere naturale, și n, numărul de elemente ale tabloului (v[0], v[1], ..., v[n-1]). Subprogramul returnează câte elemente ale tabloului, în afară de primul și de ultimul, sunt egale cu media aritmetică a celor doi vecini ai lor.\n\nScrie definiția completă a subprogramului:\nint medie(int v[], int n)\n\nExemplu: pentru n = 6 și v = (2, 4, 6, 5, 4, 1) subprogramul returnează 2 (4 și 5). Pentru verificare, programul citește datele, apelează subprogramul și afișează rezultatul.",
         "input": "Numărul n, apoi cele n elemente ale tabloului.",
         "output": "Valoarea returnată de medie(v, n).",
         "hint": "Ca să nu lucrezi cu numere reale, compară 2 · v[i] cu v[i-1] + v[i+1].",
