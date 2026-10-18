@@ -420,8 +420,7 @@ class Classes {
     await doc.set({
       ...sent,
       'lastPassed': false,
-      'attempt': attempt.id,
-      'reviewNote': '',
+      'attempt': attempt.id, // no verdict fields: only a reviewer writes those (Firestore rules)
       'studentName': studentName,
       'exercise': problem.toJson(),
       ...await _recipients(uid, problem.progressKey),
