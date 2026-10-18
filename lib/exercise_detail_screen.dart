@@ -12,6 +12,7 @@ import 'classes_models.dart' show Classes, HwProblem, Solution;
 import 'browser_run.dart';
 import 'judge0.dart';
 import 'math_sheet.dart';
+import 'statement.dart';
 import 'workspace_screen.dart' show wsAgo;
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
@@ -1123,8 +1124,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   // ---------------------------------------------------------------- left pane
-  Widget _cSection(String title, Widget child) => Padding(
-        padding: const EdgeInsets.only(top: 22),
+  Widget _cSection(String title, Widget child, {bool first = false}) => Padding(
+        padding: EdgeInsets.only(top: first ? 0 : 22),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -1143,6 +1144,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final hint = _str(['hint', 'indicatie']);
     final expl = _str(['explicatie', 'explanation']);
     final examples = _examples;
+    final parts = StatementParts.parse(exerciseData!['description']?.toString() ?? '', file: _file);
+    // what explains the first example: its own field, then the statement's "Exemplu: ..." paragraphs
+    final explained = [if (expl != null) expl, ...parts.examples];
 
     Widget bullets(List<String> items) => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1175,49 +1179,126 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
           const SizedBox(height: 14),
         ],
-        PbRichText(exerciseData!['description']?.toString() ?? 'Fără enunț.', fontSize: 15.5, height: 1.7),
+        if (parts.source.isNotEmpty) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(padding: const EdgeInsets.only(top: 2), child: Icon(Icons.emoji_events_outlined, size: 16, color: Pb.muted)),
+              const SizedBox(width: 8),
+              Expanded(child: Text(parts.source, style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.5))),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
+        _cSection(
+          'Cerința',
+          parts.body.isEmpty
+              ? Text('Fără enunț.', style: TextStyle(fontSize: 15.5, color: Pb.muted))
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final (i, p) in parts.body.indexed) Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 12), child: _cProse(p)),
+                  ],
+                ),
+          first: true,
+        ),
         if (input != null) _cSection(_file == null ? 'Date de intrare' : 'Date de intrare ($_file.in)', PbRichText(input, fontSize: 15.5, height: 1.7)),
         if (output != null) _cSection(_file == null ? 'Date de ieșire' : 'Date de ieșire ($_file.out)', PbRichText(output, fontSize: 15.5, height: 1.7)),
         if (cList != null || cText != null)
           _cSection('Restricții', cList != null ? bullets(cList) : PbRichText(cText!, fontSize: 15.5, height: 1.7)),
         for (var i = 0; i < examples.length; i++)
-          _cSection('Exemplul ${i + 1}', _cExample(examples[i], i == 0 ? expl : null)),
+          _cSection(examples.length == 1 ? 'Exemplu' : 'Exemplul ${i + 1}', _cExample(examples[i], i == 0 ? explained : const [])),
+        if (examples.isEmpty && explained.isNotEmpty) _cSection('Exemplu', _cExplanation(explained)),
         if (hint != null) _cHint(hint),
       ],
     );
   }
 
-  Widget _cExample(Map<String, String> ex, String? explanation) {
-    Widget row(String label, Widget value) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+  /// Statement text: prose, with function headers and rows of numbers in monospace.
+  Widget _cProse(String text, {double fontSize = 15.5}) {
+    final runs = StatementParts.runs(text);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final (code, t) in runs)
+          code
+              ? Container(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                  decoration: BoxDecoration(color: Pb.codeBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: Pb.border)),
+                  child: SelectableText(t, style: Pb.mono(fontSize - 1.5, color: Pb.text)),
+                )
+              : PbRichText(t, fontSize: fontSize, height: 1.7),
+      ],
+    );
+  }
+
+  /// One example: what goes in and what comes out side by side (named after
+  /// the files when the problem has them), with what explains it underneath.
+  Widget _cExample(Map<String, String> ex, List<String> explanation) {
+    Widget box(IconData icon, String label, String v) => Container(
+          decoration: BoxDecoration(color: Pb.codeBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: Pb.border)),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Pb.muted)),
-              const SizedBox(height: 4),
-              value,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+                child: Row(
+                  children: [
+                    Icon(icon, size: 14, color: Pb.muted),
+                    const SizedBox(width: 6),
+                    Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted)),
+                  ],
+                ),
+              ),
+              Container(height: 1, color: Pb.border),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: SelectableText(v.isEmpty ? ' ' : v, style: Pb.mono(14, color: Pb.text)),
+              ),
             ],
           ),
         );
-    Widget mono(String v) => SelectableText(v.isEmpty ? ' ' : v, style: Pb.mono(14, color: Pb.text));
-
-    return ClipRRect(
-      borderRadius: Pb.radius,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 2),
-        decoration: BoxDecoration(color: Pb.codeBg, border: Border(left: BorderSide(color: Pb.primary, width: 3))),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            row('Intrare', mono(ex['input']!)),
-            row('Ieșire', mono(ex['output']!)),
-            if (explanation != null) row('Explicație', PbRichText(explanation, fontSize: 14.5, height: 1.6)),
-          ],
+    final input = box(Icons.login, _file == null ? 'Intrare' : '$_file.in', ex['input']!);
+    final output = box(Icons.logout, _file == null ? 'Ieșire' : '$_file.out', ex['output']!);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LayoutBuilder(
+          builder: (context, c) => c.maxWidth >= 440
+              ? IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [Expanded(child: input), const SizedBox(width: 10), Expanded(child: output)],
+                  ),
+                )
+              : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [input, const SizedBox(height: 10), output]),
         ),
-      ),
+        if (explanation.isNotEmpty) ...[const SizedBox(height: 10), _cExplanation(explanation)],
+      ],
     );
   }
+
+  Widget _cExplanation(List<String> paragraphs) => ClipRRect(
+        borderRadius: BorderRadius.circular(10), // a one-sided border can't be rounded itself
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+          decoration: BoxDecoration(
+            color: Pb.primary.withOpacity(0.05),
+            border: Border(left: BorderSide(color: Pb.primary, width: 3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // "Exemplu (cerința 3): ..." is a case of its own, not this example explained
+            Text(paragraphs.every((p) => p.startsWith('Exemplu (')) ? 'Alt exemplu' : 'Explicație',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.primary)),
+              const SizedBox(height: 6),
+              for (final (i, p) in paragraphs.indexed) Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 8), child: _cProse(p, fontSize: 14.5)),
+            ],
+          ),
+        ),
+      );
 
   Widget _cHint(String hint) => Padding(
         padding: const EdgeInsets.only(top: 22),
