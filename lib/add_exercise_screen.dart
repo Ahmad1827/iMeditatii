@@ -7,6 +7,7 @@ import 'app_colors.dart';
 import 'clean_kit.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
+import 'math_sheet.dart' show isMathSubject;
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbAlert, PbAlertType;
 
 class RetroBlock extends StatelessWidget {
@@ -150,6 +151,12 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   final TextEditingController _inputFormatController = TextEditingController();
   final TextEditingController _outputFormatController = TextEditingController();
   final TextEditingController _solutionCodeController = TextEditingController();
+  final TextEditingController _workedController = TextEditingController(); // maths: the worked solution, for whoever checks
+
+  /// Maths isn't checked against an answer: the student sends their solution
+  /// (on a sheet or in pictures) and a person reviews it. Its answer and worked
+  /// solution are optional, shown only to the reviewer.
+  bool get _isMath => isMathSubject(_selectedSubject);
 
   final List<Map<String, TextEditingController>> _testCases = [
     {'input': TextEditingController(), 'output': TextEditingController()}
@@ -203,6 +210,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     _inputFormatController.dispose();
     _outputFormatController.dispose();
     _solutionCodeController.dispose();
+    _workedController.dispose();
     for (var tc in _testCases) {
       tc['input']?.dispose();
       tc['output']?.dispose();
@@ -230,7 +238,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
       if (clean) setState(() => _error = 'Completează câmpurile marcate cu roșu.');
       return;
     }
-    if (clean && _selectedType == 'grila') {
+    if (clean && !_isMath && _selectedType == 'grila') {
       if (_opts.any((c) => c.text.trim().isEmpty)) {
         setState(() => _error = 'Completează toate cele 4 variante.');
         return;
@@ -254,13 +262,17 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
         'category': _categoryController.text.trim(),
         'title': _titleController.text.trim(),
         'description': _descController.text.trim(),
-        'tip_exercitiu': _selectedType,
+        'tip_exercitiu': _isMath ? 'text' : _selectedType,
         'difficulty': _difficulty,
         'approved': false,
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      if (_selectedType == 'text') {
+      if (_isMath) {
+        // for the reviewer only; both may be left empty
+        exerciseData['raspuns_corect'] = _correctAnswerController.text.trim();
+        exerciseData['solutie'] = _workedController.text.trim();
+      } else if (_selectedType == 'text') {
         exerciseData['raspuns_corect'] = _correctAnswerController.text.trim();
       } else if (_selectedType == 'grila') {
         exerciseData['variante'] = _opts.map((c) => c.text.trim()).toList();
@@ -487,16 +499,19 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
               validator: (v) => v!.trim().isEmpty ? 'Scrie enunțul.' : null,
             ),
           ]),
-          _section(3, 'Răspunsul', [
-            typeCards,
-            const SizedBox(height: 16),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              alignment: Alignment.topCenter,
-              child: _selectedType == 'text' ? _cText() : (_selectedType == 'grila' ? _cGrila() : _cCode()),
-            ),
-          ]),
+          if (_isMath)
+            _section(3, 'Pentru cine verifică', [_cMath()])
+          else
+            _section(3, 'Răspunsul', [
+              typeCards,
+              const SizedBox(height: 16),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: _selectedType == 'text' ? _cText() : (_selectedType == 'grila' ? _cGrila() : _cCode()),
+              ),
+            ]),
           if (_error != null) ...[
             PbAlert(type: PbAlertType.danger, icon: Icons.error_outline, child: Text(_error!, style: const TextStyle(fontSize: 14))),
             const SizedBox(height: 12),
@@ -568,6 +583,32 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
       ),
     );
   }
+
+  Widget _cMath() => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PbAlert(
+            type: PbAlertType.info,
+            icon: Icons.draw_outlined,
+            text: 'La matematică nu se verifică automat: elevul trimite rezolvarea (pe foaie sau în poze), iar tu sau profesorul ei o acceptați. Ce scrii aici vede doar cine verifică.',
+          ),
+          const SizedBox(height: 14),
+          _label('Răspunsul', hint: 'opțional'),
+          TextFormField(
+            controller: _correctAnswerController,
+            style: TextStyle(fontSize: 15, color: Pb.text, fontWeight: FontWeight.w600),
+            decoration: _dec('Ex.: x = 3', icon: Icons.check_circle_outline),
+          ),
+          const SizedBox(height: 14),
+          _label('Rezolvarea', hint: 'opțional'),
+          TextFormField(
+            controller: _workedController,
+            maxLines: 5,
+            style: TextStyle(fontSize: 15, color: Pb.text, height: 1.5),
+            decoration: _dec('Pașii pe scurt, ca să fie ușor de verificat.').copyWith(contentPadding: const EdgeInsets.all(14)),
+          ),
+        ],
+      );
 
   Widget _cText() => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -723,7 +764,24 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
         );
 
     Widget answer;
-    if (_selectedType == 'grila') {
+    if (_isMath) {
+      answer = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: Pb.border)),
+        child: Row(
+          children: [
+            Icon(Icons.draw_outlined, size: 16, color: Pb.muted),
+            const SizedBox(width: 8),
+            Expanded(child: Text('Foaia elevului, sau poze cu rezolvarea…', style: TextStyle(fontSize: 14, color: Pb.muted))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(8)),
+              child: const Text('Trimite la verificare', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+    } else if (_selectedType == 'grila') {
       answer = Column(
         children: [
           for (var i = 0; i < 4; i++)
@@ -986,29 +1044,33 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                               title: 'Response Format',
                               accentColor: AppColors.sunset,
                               children: [
-                                DropdownButtonFormField<String>(
-                                  decoration: _inputStyle('Exercise Type'),
-                                  value: _selectedType,
-                                  dropdownColor: AppColors.cardBg,
-                                  iconEnabledColor: AppColors.ink,
-                                  items: types.entries
-                                      .map((e) => DropdownMenuItem(
-                                          value: e.key, child: Text(e.value.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink))))
-                                      .toList(),
-                                  onChanged: (val) => setState(() => _selectedType = val!),
-                                ),
-                                const SizedBox(height: 32),
-                                AnimatedSize(
-                                  duration: const Duration(milliseconds: 300),
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    child: _selectedType == 'text'
-                                        ? _buildTextSection()
-                                        : _selectedType == 'grila'
-                                            ? _buildGrilaSection()
-                                            : _buildCodeSection(),
+                                if (_isMath)
+                                  _buildMathSection()
+                                else ...[
+                                  DropdownButtonFormField<String>(
+                                    decoration: _inputStyle('Exercise Type'),
+                                    value: _selectedType,
+                                    dropdownColor: AppColors.cardBg,
+                                    iconEnabledColor: AppColors.ink,
+                                    items: types.entries
+                                        .map((e) => DropdownMenuItem(
+                                            value: e.key, child: Text(e.value.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink))))
+                                        .toList(),
+                                    onChanged: (val) => setState(() => _selectedType = val!),
                                   ),
-                                ),
+                                  const SizedBox(height: 32),
+                                  AnimatedSize(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: _selectedType == 'text'
+                                          ? _buildTextSection()
+                                          : _selectedType == 'grila'
+                                              ? _buildGrilaSection()
+                                              : _buildCodeSection(),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                             const SizedBox(height: 16),
@@ -1022,6 +1084,33 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
                 ),
         );
       },
+    );
+  }
+
+  Widget _buildMathSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'NO AUTO-CHECK FOR MATHS: THE STUDENT SENDS A SHEET OR PHOTOS, AN ADMIN OR THE TEACHER REVIEWS IT. FIELDS BELOW ARE OPTIONAL, SEEN ONLY BY THE REVIEWER.',
+          style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.ink, fontSize: 15, height: 1.4),
+        ),
+        const SizedBox(height: 24),
+        TextFormField(
+          controller: _correctAnswerController,
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 18),
+          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+          decoration: _inputStyle('Answer (optional)', icon: Icons.check_circle),
+        ),
+        const SizedBox(height: 24),
+        TextFormField(
+          controller: _workedController,
+          maxLines: 5,
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, height: 1.5),
+          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+          decoration: _inputStyle('Worked solution (optional)'),
+        ),
+      ],
     );
   }
 

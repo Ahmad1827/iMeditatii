@@ -46,26 +46,17 @@ void main() {
     }
   });
 
-  test('maths problems can be answered', () {
+  test('maths problems are checked by a person, who has the worked solution to hand', () {
+    // no answer is compared automatically: the student sends a sheet or photos
+    // and an admin or the homework's teacher reviews it, with this beside them
     final ids = <String>{};
     (details['Matematică'] as Map<String, dynamic>).forEach((grade, problems) {
       (problems as Map<String, dynamic>).forEach((id, p) {
         expect(ids.add(id), true, reason: 'duplicate id $id');
-        final answer = '${p['raspuns_corect']}';
-        expect(answer, isNotEmpty, reason: id);
-        expect('${p['solutie']}'.trim(), isNotEmpty, reason: id);
-        if (p['tip_exercitiu'] == 'grila') {
-          final options = (p['variante'] as List).cast<String>();
-          expect(options.length, 4, reason: id);
-          expect(options.toSet().length, 4, reason: id);
-          expect(options.where((o) => o == answer).length, 1, reason: id);
-        } else {
-          expect(p['tip_exercitiu'], 'text', reason: id);
-          expect(ExerciseDetailScreen.answersMatch(answer, answer), true, reason: id);
-          expect(double.tryParse(answer), isNotNull, reason: '$id: short answers are numbers');
-        }
+        expect('${p['solutie'] ?? ''}'.trim(), isNotEmpty, reason: id);
+        expect(p['tip_exercitiu'], isNot('cod'), reason: id);
       });
     });
-    expect(ids.length, 61);
+    expect(ids.length, 65);
   });
 }
