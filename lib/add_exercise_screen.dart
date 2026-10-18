@@ -129,6 +129,15 @@ class _RetroButtonState extends State<RetroButton> {
 class AddExerciseScreen extends StatefulWidget {
   const AddExerciseScreen({super.key});
 
+  /// A problem's file name as typed, as stored: trimmed, without `.in`/`.out`.
+  static String fileName(String typed) => typed.trim().replaceAll(RegExp(r'\.(in|out)$'), '');
+
+  /// Empty (no files), or a plain name: letters, digits, _ and -.
+  static bool fileNameOk(String typed) {
+    final n = fileName(typed);
+    return n.isEmpty || RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(n);
+  }
+
   @override
   State<AddExerciseScreen> createState() => _AddExerciseScreenState();
 }
@@ -152,6 +161,10 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   final TextEditingController _outputFormatController = TextEditingController();
   final TextEditingController _solutionCodeController = TextEditingController();
   final TextEditingController _workedController = TextEditingController(); // maths: the worked solution, for whoever checks
+  final TextEditingController _fileController = TextEditingController(); // C++: a problem with files, like at the olympiad
+
+  /// What's typed as the file name, as stored: without `.in`/`.out`, '' for none.
+  String get _fileName => AddExerciseScreen.fileName(_fileController.text);
 
   /// Maths isn't checked against an answer: the student sends their solution
   /// (on a sheet or in pictures) and a person reviews it. Its answer and worked
@@ -184,7 +197,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   void initState() {
     super.initState();
     // live preview
-    for (final c in [_categoryController, _titleController, _descController, _correctAnswerController, ..._opts, _inputFormatController, _outputFormatController]) {
+    for (final c in [_categoryController, _titleController, _descController, _correctAnswerController, ..._opts, _inputFormatController, _outputFormatController, _fileController]) {
       c.addListener(_refresh);
     }
     for (final tc in _testCases) {
@@ -211,6 +224,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     _outputFormatController.dispose();
     _solutionCodeController.dispose();
     _workedController.dispose();
+    _fileController.dispose();
     for (var tc in _testCases) {
       tc['input']?.dispose();
       tc['output']?.dispose();
@@ -291,6 +305,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
           }
         }
         exerciseData['tests'] = testsToSave;
+        if (_fileName.isNotEmpty) exerciseData['fisier'] = _fileName;
       }
 
       await FirebaseFirestore.instance.collection('exercises').add(exerciseData);
@@ -669,6 +684,23 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   Widget _cCode() => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _label('Fișiere', hint: 'opțional, ca la olimpiadă'),
+          TextFormField(
+            controller: _fileController,
+            style: TextStyle(fontSize: 14.5, color: Pb.text, fontFamily: 'monospace'),
+            decoration: _dec('Ex.: macarie  →  macarie.in și macarie.out', icon: Icons.description_outlined),
+            validator: (v) => _selectedType == 'cod' && !AddExerciseScreen.fileNameOk(v ?? '')
+                ? 'Doar litere, cifre, _ și -, fără spații (ex.: macarie).'
+                : null,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _fileName.isEmpty
+                ? 'Gol: se citește de la tastatură și se afișează pe ecran.'
+                : 'Se citește din $_fileName.in și se scrie în $_fileName.out; tastatura și ecranul nu se iau în calcul.',
+            style: TextStyle(fontSize: 12.5, color: Pb.muted),
+          ),
+          const SizedBox(height: 12),
           _label('Date de intrare'),
           TextFormField(controller: _inputFormatController, maxLines: 2, style: TextStyle(fontSize: 14.5, color: Pb.text), decoration: _dec('Ex.: Pe prima linie se află n.')),
           const SizedBox(height: 12),
@@ -826,6 +858,16 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
       answer = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_fileName.isNotEmpty) ...[
+            Row(
+              children: [
+                Icon(Icons.description_outlined, size: 15, color: Pb.muted),
+                const SizedBox(width: 6),
+                Text('$_fileName.in / $_fileName.out', style: Pb.mono(13)),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
           if (_inputFormatController.text.trim().isNotEmpty) ...[
             Text('Date de intrare', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.text)),
             Text(_inputFormatController.text.trim(), style: TextStyle(fontSize: 13.5, color: Pb.text, height: 1.45)),
@@ -1157,6 +1199,14 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        TextFormField(
+          controller: _fileController,
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontFamily: 'monospace'),
+          cursorColor: AppColors.isDark ? const Color(0xFF55EFC4) : AppColors.ink,
+          decoration: _inputStyle('Files (optional): name -> name.in / name.out', icon: Icons.description),
+          validator: (v) => _selectedType == 'cod' && !AddExerciseScreen.fileNameOk(v ?? '') ? 'LETTERS, DIGITS, _ AND - ONLY' : null,
+        ),
+        const SizedBox(height: 16),
         TextFormField(
           controller: _inputFormatController,
           maxLines: 2,

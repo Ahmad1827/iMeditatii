@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:iMeditatii/add_exercise_screen.dart';
 import 'package:iMeditatii/judge0.dart';
 
 void main() {
@@ -101,4 +102,14 @@ void main() {
     }
     expect(problems, 4);
   }, skip: !gpp, timeout: const Timeout(Duration(minutes: 5)));
+
+  test('the file name a teacher types for a new problem', () {
+    expect(AddExerciseScreen.fileName('  macarie '), 'macarie');
+    expect(AddExerciseScreen.fileName('macarie.in'), 'macarie');
+    expect(AddExerciseScreen.fileName('macarie.out'), 'macarie');
+    expect(AddExerciseScreen.fileNameOk(''), isTrue); // no files
+    expect(AddExerciseScreen.fileNameOk('sir_2-b'), isTrue);
+    expect(AddExerciseScreen.fileNameOk('doua cuvinte'), isFalse);
+    expect(AddExerciseScreen.fileNameOk('../x'), isFalse);
+  });
 }
