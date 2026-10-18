@@ -73,6 +73,31 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   final String defaultCppBoilerplate =
       "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Scrie codul aici\n    \n    return 0;\n}";
 
+  /// A problem with files, like at the olympiad: its name, so the program
+  /// reads `name.in` and writes `name.out` (the keyboard and screen don't count).
+  String? get _file {
+    final f = _str(['fisier', 'file'])?.trim();
+    return f == null || f.isEmpty ? null : f;
+  }
+
+  String get _boilerplate => _file == null
+      ? defaultCppBoilerplate
+      : '#include <fstream>\nusing namespace std;\n\nifstream fin("$_file.in");\nofstream fout("$_file.out");\n\nint main() {\n    // Citește cu fin >> ..., scrie cu fout << ...\n    \n    return 0;\n}';
+
+  /// Why a test of a problem with files has nothing to compare, if it's that.
+  String _fileNote(RunResult r) {
+    final f = _file;
+    if (f == null || r.status == 'Compilation Error') return '';
+    final screen = r.console.trim();
+    if (r.noFile) {
+      return screen.isEmpty
+          ? 'Programul nu a creat $f.out. Rezultatul se scrie în fișierul $f.out, nu pe ecran.'
+          : 'Ai afișat pe ecran ($screen), dar la această problemă rezultatul se scrie în $f.out.';
+    }
+    if (r.stdout.trim().isEmpty && screen.isNotEmpty) return 'Ai afișat pe ecran ($screen); în $f.out nu ai scris nimic.';
+    return '';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -203,8 +228,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   void _resetCode() => setState(() {
-        _codeController.text = defaultCppBoilerplate;
+        _codeController.text = _boilerplate;
       });
+
+  /// A problem with files starts from a program that opens them, unless something's written already.
+  void _fileTemplate() {
+    if (_file != null && _codeController.text.trim() == defaultCppBoilerplate.trim()) _codeController.text = _boilerplate;
+  }
 
   int _getCurrentLine() {
     final pos = _codeController.selection.baseOffset;
@@ -296,6 +326,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           data[widget.subject][widget.grade][widget.id] != null) {
         if (!mounted) return;
         setState(() => exerciseData = data[widget.subject][widget.grade][widget.id]);
+        _fileTemplate();
         return;
       }
     } catch (e) {
@@ -307,6 +338,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (docSnap.exists) {
         if (!mounted) return;
         setState(() => exerciseData = docSnap.data());
+        _fileTemplate();
         return;
       }
     } catch (e) {
@@ -499,13 +531,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final inputData = tests[i]["input"] ?? "";
         final expectedOutput = tests[i]["output"] ?? "";
 
-        final result = await Judge0.run(code: code, stdin: inputData.toString());
+        final result = await Judge0.run(code: code, stdin: inputData.toString(), file: _file);
         final got = normOutput(result.stdout);
         final normExpected = normOutput(expectedOutput.toString());
         final ok = got == normExpected;
         if (!ok) allPassed = false;
+        final note = ok ? '' : _fileNote(result);
 
-        testResults.add({"index": i + 1, "passed": ok, "expected": normExpected, "got": got});
+        testResults.add({"index": i + 1, "passed": ok, "expected": normExpected, "got": note.isEmpty ? got : '$got  [$note]'});
         if (mounted) setState(() {});
       }
 
@@ -1080,6 +1113,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       children: [
         if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
         chip(kind, icon: _kind == 'cod' ? Icons.code : (_isSheet ? Icons.draw_outlined : Icons.quiz_outlined)),
+        if (_file != null) chip('$_file.in / $_file.out', icon: Icons.description_outlined),
         chip('Clasa a ${widget.grade}-a', icon: Icons.school_outlined),
         if (time != null) chip(time, icon: Icons.timer_outlined),
         if (mem != null) chip(mem, icon: Icons.memory),
@@ -1133,9 +1167,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (_file != null) ...[
+          PbAlert(
+            type: PbAlertType.info,
+            icon: Icons.description_outlined,
+            text: 'Problemă cu fișiere: citești din $_file.in și scrii în $_file.out. Ce citești de la tastatură e gol, iar ce afișezi pe ecran nu se ia în calcul.',
+          ),
+          const SizedBox(height: 14),
+        ],
         PbRichText(exerciseData!['description']?.toString() ?? 'Fără enunț.', fontSize: 15.5, height: 1.7),
-        if (input != null) _cSection('Date de intrare', PbRichText(input, fontSize: 15.5, height: 1.7)),
-        if (output != null) _cSection('Date de ieșire', PbRichText(output, fontSize: 15.5, height: 1.7)),
+        if (input != null) _cSection(_file == null ? 'Date de intrare' : 'Date de intrare ($_file.in)', PbRichText(input, fontSize: 15.5, height: 1.7)),
+        if (output != null) _cSection(_file == null ? 'Date de ieșire' : 'Date de ieșire ($_file.out)', PbRichText(output, fontSize: 15.5, height: 1.7)),
         if (cList != null || cText != null)
           _cSection('Restricții', cList != null ? bullets(cList) : PbRichText(cText!, fontSize: 15.5, height: 1.7)),
         for (var i = 0; i < examples.length; i++)
@@ -1529,6 +1571,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               ],
             ),
           ),
+        if ('${t['note'] ?? ''}'.isNotEmpty) detailBox('De ce nu e corect', '${t['note']}'),
         if ('${t['error'] ?? ''}'.isNotEmpty) detailBox('Erori de compilare / execuție', '${t['error']}'),
       ],
     );
@@ -1624,11 +1667,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     var all = true;
     try {
       for (var i = 0; i < tests.length; i++) {
-        final r = await Judge0.run(code: code, stdin: tests[i]['input'] ?? '');
+        final r = await Judge0.run(code: code, stdin: tests[i]['input'] ?? '', file: _file);
         final got = normOutput(r.stdout);
         final err = r.error.replaceAll('\r', '').trim();
         final exp = normOutput(tests[i]['output']!);
         final ok = got == exp;
+        final note = ok ? '' : _fileNote(r);
         if (!ok) all = false;
 
         testResults.add({
@@ -1639,6 +1683,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           'expected': exp,
           'got': got,
           'error': err,
+          'note': note,
         });
         if (mounted) setState(() {});
       }
@@ -1903,9 +1948,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                       style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600)),
                                   if (exerciseData!["input"] != null) ...[
                                     const SizedBox(height: 20),
-                                    _retroSpecBlock("INPUT FORMAT", exerciseData!["input"].toString(), isMobile),
+                                    _retroSpecBlock(_file == null ? "INPUT FORMAT" : "INPUT FILE: $_file.in", exerciseData!["input"].toString(), isMobile),
                                     const SizedBox(height: 14),
-                                    _retroSpecBlock("OUTPUT FORMAT", exerciseData!["output"]?.toString() ?? "-", isMobile),
+                                    _retroSpecBlock(_file == null ? "OUTPUT FORMAT" : "OUTPUT FILE: $_file.out", exerciseData!["output"]?.toString() ?? "-", isMobile),
                                   ],
                                 ],
                               ),
@@ -2103,9 +2148,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           SizedBox(height: isMobile ? 18 : 28),
           Container(height: 2, color: AppColors.border),
           SizedBox(height: isMobile ? 14 : 20),
-          _retroSpecBlock("INPUT FORMAT", exerciseData!["input"]?.toString() ?? "-", isMobile),
+          _retroSpecBlock(_file == null ? "INPUT FORMAT" : "INPUT FILE: $_file.in", exerciseData!["input"]?.toString() ?? "-", isMobile),
           const SizedBox(height: 12),
-          _retroSpecBlock("OUTPUT FORMAT", exerciseData!["output"]?.toString() ?? "-", isMobile),
+          _retroSpecBlock(_file == null ? "OUTPUT FORMAT" : "OUTPUT FILE: $_file.out", exerciseData!["output"]?.toString() ?? "-", isMobile),
         ],
       ],
     );

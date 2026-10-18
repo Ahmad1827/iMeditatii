@@ -15,7 +15,10 @@ class BrowserRun {
   /// [lang] is loaded and the next run starts right away.
   static bool ready(String lang) => impl.ready(_runner(lang));
 
-  static Future<RunResult?> run(String lang, String code, String stdin) => impl.run(_runner(lang), code, stdin, timeLimit);
+  /// With [file] (C++ only), [stdin] goes in `file.in` and the result's
+  /// stdout is `file.out`; see [Judge0.run].
+  static Future<RunResult?> run(String lang, String code, String stdin, {String? file}) =>
+      impl.run(_runner(lang), code, stdin, timeLimit, lang == 'python' ? null : file);
 
   static String _runner(String lang) => lang == 'python' ? 'imPython' : 'imCpp';
 }

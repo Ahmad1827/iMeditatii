@@ -3,7 +3,9 @@
 // it's in, run() answers {notReady} and the app runs the code on the server.
 //   imCpp.warm()                       start loading Clang now
 //   imCpp.isReady()                    loaded and waiting
-//   imCpp.run(code, stdin, timeoutMs)  -> Promise<{stdout, stderr, status, seconds} | {notReady} | {failed, error}>
+//   imCpp.run(code, stdin, timeoutMs, file)  -> Promise<{stdout, stderr, status, seconds} | {notReady} | {failed, error}>
+//     file: a problem with files: stdin goes in <file>.in, the keyboard is
+//     empty, and stdout is <file>.out (plus console: the screen, noFile)
 (function () {
   let compiler = null;
   let runner = null; // runs programs; kept between runs, replaced after one is stopped
@@ -51,7 +53,7 @@
     return new Worker(new URL('cpp_run_worker.js', document.baseURI), { type: 'module' });
   }
 
-  function execute(module, stdin, timeoutMs) {
+  function execute(module, stdin, timeoutMs, file) {
     return new Promise((resolve) => {
       const w = (runner ??= newRunner());
       const replace = () => { w.terminate(); if (runner === w) runner = null; };
@@ -62,22 +64,25 @@
       }, timeoutMs);
       w.onmessage = (e) => {
         const r = e.data;
-        done({ stdout: r.stdout, stderr: r.stderr, status: r.exit === 0 ? 'Accepted' : 'Runtime Error (NZEC)', seconds: r.seconds });
+        const status = r.exit === 0 ? 'Accepted' : 'Runtime Error (NZEC)';
+        done(file
+          ? { stdout: r.file ?? '', console: r.stdout, noFile: r.file == null, stderr: r.stderr, status, seconds: r.seconds }
+          : { stdout: r.stdout, stderr: r.stderr, status, seconds: r.seconds });
       };
       w.onerror = (e) => { replace(); done({ failed: true, error: e.message || 'Programul nu a putut porni.' }); };
-      w.postMessage({ module, stdin });
+      w.postMessage({ module, stdin, file });
     });
   }
 
   window.imCpp = {
     warm() { if (!compiler) start(); },
     isReady() { return isReady; },
-    async run(code, stdin, timeoutMs) {
+    async run(code, stdin, timeoutMs, file) {
       if (!isReady) { this.warm(); return { notReady: true }; }
       const c = await compile(code);
       if (c.failed) return { failed: true };
       if (c.error != null) return { stdout: '', stderr: c.error, status: 'Compilation Error' };
-      return execute(c.module, stdin, timeoutMs);
+      return execute(c.module, stdin, timeoutMs, file || null);
     },
   };
 })();
