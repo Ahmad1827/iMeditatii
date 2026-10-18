@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
+import 'theme_manager.dart';
 import 'classes_models.dart' show Classes, HwProblem, Solution;
 import 'browser_run.dart';
 import 'judge0.dart';
@@ -125,6 +126,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   void dispose() {
     _sentSub?.cancel();
     _attemptsSub?.cancel();
+    if (_cFocus) Future.microtask(() => ThemeManager.focusNotifier.value = false); // not while the tree is locked
     _codeController.removeListener(_onCodeChanged);
     _codeController.dispose();
     _answerController.dispose();
@@ -704,6 +706,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   final List<Map<String, dynamic>> _cSubmissions = [];
   int _cCheer = 0; // bump -> the army cheers, dragons breathe fire
   bool _cHidden = false; // panes slid out to show the scene
+  bool _cFocus = false; // focus mode: the editor alone, the statement and the terminal at hand
+  bool _fStatement = false; // focus: the statement open beside the code
+  bool _fTerminal = false; // focus: the terminal open under the code
+  double _fStatementW = 420;
+  double _fTerminalH = 240;
   final GlobalKey _cHeadKey = GlobalKey();
   final GlobalKey _cLeftKey = GlobalKey();
   final GlobalKey _cRightKey = GlobalKey();
@@ -771,6 +778,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     final tabContent = _cTab == 0 ? _cStatement() : (_cTab == 1 ? _cSolution() : _cSubmissionsList());
     final isCode = _kind == 'cod';
+    if (_cFocus && isCode) return _cFocusView(isMobile);
 
     Widget slide(double dx, Widget child) => AnimatedSlide(
           duration: const Duration(milliseconds: 650),
@@ -1471,6 +1479,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 PopupMenuItem(value: 'tab', child: Text('Tab (4 spații)', style: TextStyle(fontSize: 13, color: Pb.text))),
               ],
             ),
+            iconBtn(Icons.fullscreen, 'Mod focus', _cEnterFocus),
             iconBtn(Icons.undo, 'Anulează (Ctrl+Z)', _performUndo),
             iconBtn(Icons.redo, 'Refă (Ctrl+Y)', _performRedo),
             iconBtn(Icons.restart_alt, 'Resetează codul', _resetCode),
@@ -1540,6 +1549,272 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       child: _cBottom == 0 ? _cSampleView() : _cResultView(),
     );
     return _cCard(header: header, fill: fill, child: fill ? SingleChildScrollView(child: body) : body);
+  }
+
+  // ---------------------------------------------------------------- focus mode
+  //   The editor takes the screen. The statement waits in a bar on the left
+  //   (open it to reread, close it again), and the console is a terminal at the
+  //   bottom that opens by itself on Rulează or Trimite.
+  void _cEnterFocus() {
+    setState(() {
+      _cFocus = true;
+      _fTerminal = testResults.isNotEmpty || isRunningCode;
+    });
+    ThemeManager.focusNotifier.value = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _editorFocusNode.requestFocus());
+  }
+
+  void _cExitFocus() {
+    setState(() => _cFocus = false);
+    ThemeManager.focusNotifier.value = false;
+  }
+
+  void _fRun({required bool submit}) {
+    if (isRunningCode) return;
+    setState(() => _fTerminal = true);
+    _checkAuthAndExecute(() => _cRun(submit: submit));
+  }
+
+  Widget _cFocusView(bool isMobile) {
+    final size = MediaQuery.of(context).size;
+    final passed = testResults.where((t) => t['passed'] == true).length;
+
+    Widget iconBtn(IconData i, String tip, VoidCallback f, {bool on = false}) => IconButton(
+          icon: Icon(i, size: 19),
+          color: on ? Pb.primary : Pb.muted,
+          tooltip: tip,
+          splashRadius: 18,
+          visualDensity: VisualDensity.compact,
+          onPressed: f,
+        );
+
+    final bar = Container(
+      height: 52,
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 12),
+      decoration: BoxDecoration(color: Pb.surface, border: Border(bottom: BorderSide(color: Pb.border))),
+      child: Row(
+        children: [
+          iconBtn(Icons.fullscreen_exit, 'Ieși din modul focus (Esc)', _cExitFocus),
+          iconBtn(Icons.article_outlined, _fStatement ? 'Ascunde enunțul' : 'Arată enunțul', () => setState(() => _fStatement = !_fStatement), on: _fStatement),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              '${widget.id}. $_title',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Pb.text),
+            ),
+          ),
+          if (!isMobile) ...[
+            if (_file != null) ...[
+              Icon(Icons.insert_drive_file_outlined, size: 15, color: Pb.muted),
+              const SizedBox(width: 4),
+              Text('$_file.in → $_file.out', style: Pb.mono(12.5, color: Pb.muted)),
+              const SizedBox(width: 14),
+            ],
+            Text('Ln ${_getCurrentLine()}, Col ${_getCurrentCol()}', style: TextStyle(color: Pb.muted, fontSize: 12.5)),
+            const SizedBox(width: 6),
+            iconBtn(Icons.undo, 'Anulează (Ctrl+Z)', _performUndo),
+            iconBtn(Icons.redo, 'Refă (Ctrl+Y)', _performRedo),
+            const SizedBox(width: 6),
+          ],
+          isMobile
+              ? iconBtn(Icons.play_arrow, 'Rulează (Ctrl+Enter)', () => _fRun(submit: false))
+              : PbButton(
+                  text: 'Rulează',
+                  icon: Icons.play_arrow,
+                  variant: PbVariant.outlineSecondary,
+                  size: PbSize.sm,
+                  onPressed: isRunningCode ? null : () => _fRun(submit: false),
+                ),
+          const SizedBox(width: 8),
+          PbButton(
+            text: isMobile ? 'Trimite' : (isRunningCode ? 'Se evaluează...' : 'Trimite'),
+            icon: Icons.cloud_upload_outlined,
+            variant: PbVariant.success,
+            size: PbSize.sm,
+            loading: isRunningCode,
+            onPressed: isRunningCode ? null : () => _fRun(submit: true),
+          ),
+        ],
+      ),
+    );
+
+    // The statement: a slim bar when closed, a panel to reread it when open.
+    final statementBar = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => setState(() => _fStatement = true),
+        child: Container(
+          width: 38,
+          decoration: BoxDecoration(color: Pb.surface, border: Border(right: BorderSide(color: Pb.border))),
+          padding: const EdgeInsets.only(top: 14),
+          child: Column(
+            children: [
+              Icon(Icons.chevron_right, size: 18, color: Pb.muted),
+              const SizedBox(height: 10),
+              RotatedBox(
+                quarterTurns: 1,
+                child: Text('ENUNȚ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 2, color: Pb.muted)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    final statementPanel = Container(
+      color: Pb.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            height: 42,
+            padding: const EdgeInsets.only(left: 16, right: 4),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Pb.border))),
+            child: Row(
+              children: [
+                Icon(Icons.article_outlined, size: 16, color: Pb.primary),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Enunț', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text))),
+                iconBtn(isMobile ? Icons.close : Icons.chevron_left, 'Ascunde enunțul', () => setState(() => _fStatement = false)),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 28),
+              child: _cStatement(),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    // The terminal: a strip when closed (with the last result), the console when open.
+    final termHeader = Container(
+      height: 38,
+      padding: const EdgeInsets.only(left: 6, right: 4),
+      decoration: BoxDecoration(
+        color: Pb.editorGutter,
+        border: Border(top: BorderSide(color: Pb.border), bottom: _fTerminal ? BorderSide(color: Pb.border) : BorderSide.none),
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Icon(Icons.terminal, size: 16, color: Pb.muted),
+          ),
+          if (_fTerminal)
+            _cTabs(
+              const ['Exemplu', 'Rezultat'],
+              _cBottom,
+              (i) => setState(() => _cBottom = i),
+              counts: [null, testResults.isEmpty ? null : '$passed/${testResults.length}'],
+            )
+          else
+            Expanded(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _fTerminal = true),
+                  child: Row(
+                    children: [
+                      Text('Terminal', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.text)),
+                      const SizedBox(width: 12),
+                      if (isRunningCode)
+                        Text('se rulează...', style: TextStyle(fontSize: 13, color: Pb.muted))
+                      else if (testResults.isNotEmpty) ...[
+                        Icon(solutionOk ? Icons.check_circle : Icons.cancel, size: 15, color: solutionOk ? Pb.success : Pb.danger),
+                        const SizedBox(width: 5),
+                        Text('$passed/${testResults.length} teste', style: TextStyle(fontSize: 13, color: Pb.muted)),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (_fTerminal) const Spacer(),
+          iconBtn(
+            _fTerminal ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+            _fTerminal ? 'Închide terminalul' : 'Deschide terminalul',
+            () => setState(() => _fTerminal = !_fTerminal),
+          ),
+        ],
+      ),
+    );
+    final maxTerm = size.height * 0.7;
+    final termH = _fTerminalH.clamp(120.0, maxTerm < 120 ? 120.0 : maxTerm);
+    final terminal = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_fTerminal)
+          MouseRegion(
+            cursor: SystemMouseCursors.resizeRow,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onVerticalDragUpdate: (d) => setState(() => _fTerminalH = (termH - d.delta.dy).clamp(120.0, maxTerm)),
+              child: const SizedBox(height: 6),
+            ),
+          ),
+        termHeader,
+        if (_fTerminal)
+          Container(
+            height: termH,
+            color: Pb.surface,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(14),
+              child: _cBottom == 0 ? _cSampleView() : _cResultView(),
+            ),
+          ),
+      ],
+    );
+
+    final code = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [Expanded(child: _buildEditor(clean: true, isMobile: isMobile)), terminal],
+    );
+
+    final maxW = size.width * 0.6;
+    final statementW = _fStatementW.clamp(260.0, maxW < 260 ? 260.0 : maxW);
+    final Widget body = isMobile
+        ? Stack(
+            children: [
+              Positioned.fill(child: code),
+              if (_fStatement) Positioned.fill(child: statementPanel),
+            ],
+          )
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_fStatement) ...[
+                SizedBox(width: statementW, child: statementPanel),
+                MouseRegion(
+                  cursor: SystemMouseCursors.resizeColumn,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onHorizontalDragUpdate: (d) => setState(() => _fStatementW = (statementW + d.delta.dx).clamp(260.0, maxW)),
+                    child: Container(width: 6, color: Pb.border),
+                  ),
+                ),
+              ] else
+                statementBar,
+              Expanded(child: code),
+            ],
+          );
+
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): _cExitFocus,
+        const SingleActivator(LogicalKeyboardKey.enter, control: true): () => _fRun(submit: false),
+        const SingleActivator(LogicalKeyboardKey.enter, meta: true): () => _fRun(submit: false),
+      },
+      child: Scaffold(
+        backgroundColor: Pb.editorBg,
+        body: SafeArea(child: Column(children: [bar, Expanded(child: body)])),
+      ),
+    );
   }
 
   Widget _cSampleView() {

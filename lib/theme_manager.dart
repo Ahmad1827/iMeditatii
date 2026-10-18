@@ -10,6 +10,9 @@ class ThemeManager {
   // Background animations (clouds, birds, armies). Turned off by the visitor,
   // or by the page itself when this computer can't keep up with them.
   static final ValueNotifier<bool> motionNotifier = ValueNotifier(true);
+  // A page showing only its work (the editor's focus mode): the floating
+  // buttons step aside.
+  static final ValueNotifier<bool> focusNotifier = ValueNotifier(false);
   static bool _motionChosen = false;
 
   static bool get isDark => themeNotifier.value == ThemeMode.dark;

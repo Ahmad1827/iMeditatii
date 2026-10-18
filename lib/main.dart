@@ -268,7 +268,7 @@ class IMeditatiiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier, ThemeManager.motionNotifier]),
+      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier, ThemeManager.motionNotifier, ThemeManager.focusNotifier]),
       builder: (context, _) {
         final currentMode = ThemeManager.themeNotifier.value;
         final currentStyle = ThemeManager.styleNotifier.value;
@@ -322,11 +322,13 @@ class IMeditatiiApp extends StatelessWidget {
           builder: (context, child) {
             final isMobile = MediaQuery.of(context).size.width < 750;
             final motion = ThemeManager.motionNotifier.value;
+            final focus = ThemeManager.focusNotifier.value;
 
             return Stack(
               children: [
                 AppStyleScope(child: child ?? const SizedBox()),
-                HomeworkDock(router: _router),
+                if (!focus) HomeworkDock(router: _router),
+                if (!focus)
                 Positioned(
                   bottom: isMobile ? 14 : 20,
                   left: isMobile ? 14 : 20,
