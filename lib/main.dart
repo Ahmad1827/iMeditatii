@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -44,6 +46,7 @@ import 'material_screen.dart';
 import 'seed_problems.dart';
 import 'classes_screen.dart';
 import 'homework_dock.dart';
+import 'offline.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,6 +62,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Lessons, problems and conversations already opened stay readable offline
+    // (the app itself is kept by web/sw.js).
+    if (kIsWeb) FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
   } catch (e) {
     debugPrint("Firebase init error: $e");
   }
@@ -198,8 +204,9 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/lista-exercitii',
       builder: (context, state) {
-        final materie = state.uri.queryParameters['materie'] ?? 'Matematică';
-        return ExerciseListScreen(key: ValueKey(materie), subject: materie);
+        final q = state.uri.queryParameters;
+        final materie = q['materie'] ?? 'Matematică';
+        return ExerciseListScreen(key: ValueKey(state.uri.query), subject: materie, grade: q['clasa'], category: q['capitol']);
       },
     ),
     GoRoute(
@@ -328,6 +335,7 @@ class IMeditatiiApp extends StatelessWidget {
               children: [
                 AppStyleScope(child: child ?? const SizedBox()),
                 if (!focus) HomeworkDock(router: _router),
+                const OfflineBanner(),
                 if (!focus)
                 Positioned(
                   bottom: isMobile ? 14 : 20,

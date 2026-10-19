@@ -17,8 +17,9 @@ import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
   final String? grade;
+  final String? category; // a chapter to open on, as in exercises.json
 
-  const ExerciseListScreen({super.key, required this.subject, this.grade});
+  const ExerciseListScreen({super.key, required this.subject, this.grade, this.category});
 
   /// Last subject opened, so /exercitii lands back on it.
   static const String lastSubjectKey = 'exercises_last_subject';
@@ -66,6 +67,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   void initState() {
     super.initState();
     selectedGrade = widget.grade ?? "9";
+    selectedCategory = widget.category ?? "Toate";
     _loadAllExercises();
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {

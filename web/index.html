@@ -321,5 +321,25 @@
   <script src="py_runner.js" defer></script>
   <script src="cpp_runner.js" defer></script>
   <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Offline: web/sw.js keeps what was opened. On the first visit it starts
+       after the app has loaded, so it is told what the page fetched before it. -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register(new URL('sw.js', document.baseURI).href).catch(function (e) {
+          console.warn('Service worker:', e);
+        });
+      });
+      window.addEventListener('flutter-first-frame', function () {
+        navigator.serviceWorker.ready.then(function (reg) {
+          setTimeout(function () {
+            var urls = performance.getEntriesByType('resource').map(function (e) { return e.name; });
+            if (reg.active) reg.active.postMessage({ type: 'keep', urls: urls });
+          }, 3000);
+        });
+      }, { once: true });
+    }
+  </script>
 </body>
 </html>

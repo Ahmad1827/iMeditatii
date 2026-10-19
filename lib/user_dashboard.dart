@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
+import 'bac_progress.dart';
 import 'workspace_cards.dart';
 import 'clean_kit.dart';
 import 'custom_navbar.dart';
@@ -294,6 +295,7 @@ class _UserDashboardState extends State<UserDashboard> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_uid.isNotEmpty) ...[ReceivedMaterialsCard(uid: _uid), const SizedBox(height: 14)],
+        if (_uid.isNotEmpty) ...[BacProgressCard(uid: _uid), const SizedBox(height: 14)],
         _cChats(docs, loading),
       ],
     );

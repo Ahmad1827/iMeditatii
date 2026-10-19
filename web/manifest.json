@@ -1,11 +1,11 @@
 {
-  "name": "iMeditatii // Guild Academy",
-  "short_name": "iMeditatii",
+  "name": "iMeditații",
+  "short_name": "iMeditații",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#141A1F",
   "theme_color": "#141A1F",
-  "description": "Platformă de meditații și exerciții.",
+  "description": "Probleme, lecții și meditații pentru liceu. Ce ai deschis o dată merge și fără internet.",
   "orientation": "any",
   "prefer_related_applications": false,
   "icons": [

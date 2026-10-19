@@ -862,20 +862,14 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
 
   // ------------------------------------------------------------------ UI
   Widget _background() => Image.asset(
-        'assets/images/background.png',
+        'assets/images/background.jpg',
         fit: BoxFit.cover,
         alignment: Alignment.bottomCenter,
         filterQuality: FilterQuality.medium,
-        errorBuilder: (_, __, ___) => Image.asset(
-          'assets/images/background.jpg',
-          fit: BoxFit.cover,
-          alignment: Alignment.bottomCenter,
-          filterQuality: FilterQuality.medium,
-          errorBuilder: (_, __, ___) {
-            debugPrint('iMeditatii: nu găsesc assets/images/background.png sau .jpg (verifică pubspec.yaml)');
-            return const SizedBox.shrink();
-          },
-        ),
+        errorBuilder: (_, __, ___) {
+          debugPrint('iMeditatii: nu găsesc assets/images/background.jpg (verifică pubspec.yaml)');
+          return const SizedBox.shrink();
+        },
       );
 
   Widget _cardsButton() {
