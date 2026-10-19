@@ -1563,6 +1563,321 @@
      "a": 1,
      "e": "Maximul 20 apare pe liniile 1 și 3, afișate în ordine crescătoare."
     }
+   ],
+   "317": [
+    {
+     "q": "De ce a n-a dreaptă adaugă exact n regiuni?",
+     "o": [
+      "Pentru că are n capete",
+      "Pentru că taie celelalte n − 1 drepte în n − 1 puncte, deci trece prin n regiuni și le împarte în două",
+      "Pentru că e paralelă cu toate celelalte",
+      "Pentru că fiecare dreaptă adaugă 2 regiuni"
+     ],
+     "a": 1,
+     "e": "Cele n − 1 puncte de intersecție o împart în n bucăți, iar fiecare bucată taie în două o regiune."
+    },
+    {
+     "q": "Care e cazul de bază al funcției?",
+     "o": [
+      "L(1) = 1",
+      "L(0) = 0",
+      "L(0) = 1",
+      "L(1) = 3"
+     ],
+     "a": 2,
+     "e": "Fără nicio dreaptă, planul e o singură regiune."
+    },
+    {
+     "q": "Ce formulă închisă dă aceeași valoare?",
+     "o": [
+      "n²",
+      "n(n + 1)/2 + 1",
+      "2ⁿ",
+      "n + 1"
+     ],
+     "a": 1,
+     "e": "L(n) = 1 + (1 + 2 + … + n) = 1 + n(n + 1)/2."
+    }
+   ],
+   "318": [
+    {
+     "q": "Cât este f(99)?",
+     "o": [
+      "89",
+      "91",
+      "99",
+      "109"
+     ],
+     "a": 1,
+     "e": "f(99) = f(f(110)) = f(100) = f(f(111)) = f(101) = 91."
+    },
+    {
+     "q": "Cât este f(150)?",
+     "o": [
+      "91",
+      "150",
+      "140",
+      "160"
+     ],
+     "a": 2,
+     "e": "150 > 100, deci f(150) = 150 − 10 = 140, într-un singur apel."
+    },
+    {
+     "q": "Cum numeri apelurile funcției?",
+     "o": [
+      "Cu o variabilă globală crescută la începutul fiecărui apel",
+      "Cu o variabilă locală în f",
+      "Cu return-ul funcției",
+      "Nu se pot număra"
+     ],
+     "a": 0,
+     "e": "O variabilă locală ar porni de la 0 la fiecare apel. Cea globală e una singură pentru toate apelurile."
+    }
+   ],
+   "319": [
+    {
+     "q": "Cât este A(1, n)?",
+     "o": [
+      "n + 1",
+      "n + 2",
+      "2n",
+      "2n + 3"
+     ],
+     "a": 1,
+     "e": "A(1, n) = A(0, A(1, n − 1)) = A(1, n − 1) + 1, iar A(1, 0) = A(0, 1) = 2."
+    },
+    {
+     "q": "Cât este A(2, 3)?",
+     "o": [
+      "7",
+      "9",
+      "11",
+      "29"
+     ],
+     "a": 1,
+     "e": "A(2, n) = 2n + 3, deci A(2, 3) = 9."
+    },
+    {
+     "q": "De ce problema nu cere A(4, 2)?",
+     "o": [
+      "Pentru că funcția nu e definită acolo",
+      "Pentru că are 19 729 de cifre și nu încape în niciun tip întreg",
+      "Pentru că m trebuie să fie par",
+      "Pentru că recursivitatea se oprește la m = 3"
+     ],
+     "a": 1,
+     "e": "A(4, 2) = 2^65536 − 3. Funcția e definită, dar valoarea e uriașă."
+    }
+   ],
+   "320": [
+    {
+     "q": "Pentru n = 2k, după primul tur rămân persoanele 1, 3, 5, …, 2k − 1. Ce relație rezultă?",
+     "o": [
+      "J(2k) = J(k) + 1",
+      "J(2k) = 2·J(k) − 1",
+      "J(2k) = 2·J(k)",
+      "J(2k) = J(k)"
+     ],
+     "a": 1,
+     "e": "A i-a persoană din cercul rămas are numărul 2i − 1, iar numărătoarea reîncepe de la persoana 1."
+    },
+    {
+     "q": "De ce nu merge simularea cu un vector pentru n = 10¹⁸?",
+     "o": [
+      "Pentru că nu încape n în long long",
+      "Pentru că ar avea nevoie de 10¹⁸ elemente în memorie și de tot atâția pași",
+      "Pentru că persoanele nu pot fi numerotate",
+      "Merge, doar că e mai greu de scris"
+     ],
+     "a": 1,
+     "e": "Recurența înjumătățește n la fiecare apel, deci face cel mult 60 de apeluri."
+    },
+    {
+     "q": "Cât este J(16)?",
+     "o": [
+      "1",
+      "9",
+      "15",
+      "16"
+     ],
+     "a": 0,
+     "e": "Pentru n putere a lui 2, fiecare tur se încheie exact înainte de persoana 1, deci rămâne 1."
+    }
+   ],
+   "321": [
+    {
+     "q": "Cum poate F să apeleze M dacă M e scrisă după F?",
+     "o": [
+      "Nu se poate în C++",
+      "Declari M înainte de F, doar antetul: int M(int n);",
+      "Pui M în main",
+      "Faci M variabilă globală"
+     ],
+     "a": 1,
+     "e": "Prototipul îi spune compilatorului că M există; definiția poate veni mai jos."
+    },
+    {
+     "q": "De ce varianta fără memorare e prea lentă pentru n mare?",
+     "o": [
+      "Pentru că face împărțiri",
+      "Pentru că aceleași valori F(k) și M(k) se recalculează de un număr uriaș de ori",
+      "Pentru că folosește int",
+      "Pentru că n trebuie citit de două ori"
+     ],
+     "a": 1,
+     "e": "Fiecare valoare e calculată o dată și păstrată; apoi orice apel cu același argument se oprește imediat."
+    },
+    {
+     "q": "Cât este F(3)?",
+     "o": [
+      "1",
+      "2",
+      "3",
+      "0"
+     ],
+     "a": 1,
+     "e": "F(1) = 1 − M(1) = 1, F(2) = 2 − M(1) = 2, F(3) = 3 − M(F(2)) = 3 − M(2) = 3 − 1 = 2."
+    }
+   ],
+   "322": [
+    {
+     "q": "Ce înseamnă al doilea apel, moduri(n − valoare[k], k)?",
+     "o": [
+      "Că nu mai folosim moneda k",
+      "Că folosim moneda k măcar o dată și ne rămâne de format n − valoare[k], tot cu primele k monede",
+      "Că folosim fiecare monedă exact o dată",
+      "Că scădem 1 din n"
+     ],
+     "a": 1,
+     "e": "Al doilea parametru rămâne k, pentru că moneda k poate fi folosită de mai multe ori."
+    },
+    {
+     "q": "De ce moduri(0, k) = 1?",
+     "o": [
+      "Pentru că 0 nu se poate forma",
+      "Pentru că suma 0 se formează într-un singur fel: fără nicio monedă",
+      "Pentru că k ≥ 1",
+      "Este o convenție fără motiv"
+     ],
+     "a": 1,
+     "e": "Când n ajunge exact la 0, drumul de alegeri făcut până acolo e un fel valid de a da restul."
+    },
+    {
+     "q": "În câte feluri se formează 5 bani?",
+     "o": [
+      "1",
+      "2",
+      "5",
+      "6"
+     ],
+     "a": 1,
+     "e": "O monedă de 5 sau cinci monede de 1."
+    }
+   ],
+   "323": [
+    {
+     "q": "Câți vecini are o parcelă din mijlocul terenului?",
+     "o": [
+      "4",
+      "6",
+      "8",
+      "9"
+     ],
+     "a": 2,
+     "e": "Sus, jos, stânga, dreapta și cele 4 diagonale."
+    },
+    {
+     "q": "De ce funcția recursivă schimbă @ în * când trece printr-o parcelă?",
+     "o": [
+      "Ca să afișeze terenul la final",
+      "Ca să nu fie vizitată din nou: altfel apelurile s-ar întoarce la nesfârșit între doi vecini",
+      "Ca să numere petrolul",
+      "Nu e nevoie, e doar o optimizare"
+     ],
+     "a": 1,
+     "e": "Fără marcare, A îl apelează pe vecinul B, B îl apelează înapoi pe A și tot așa."
+    },
+    {
+     "q": "Când crește contorul de zăcăminte?",
+     "o": [
+      "La fiecare @ din matrice",
+      "La fiecare apel recursiv",
+      "În main, la fiecare @ găsit care n-a fost șters de un apel anterior",
+      "La fiecare linie"
+     ],
+     "a": 2,
+     "e": "Un apel din main șterge tot zăcământul; parcelele lui nu mai pornesc alt zăcământ."
+    }
+   ],
+   "324": [
+    {
+     "q": "Care e cazul de bază al funcției lungime?",
+     "o": [
+      "lungime(0) = 0",
+      "lungime(1) = 1",
+      "lungime(2) = 1",
+      "lungime(n) = n"
+     ],
+     "a": 1,
+     "e": "Șirul se oprește la 1, care e numărat și el."
+    },
+    {
+     "q": "Ce se întâmplă cu perechea 10 1?",
+     "o": [
+      "Nu e validă",
+      "Se caută între 1 și 10, dar se afișează 10 1 și maximul",
+      "Se afișează 1 10 și maximul",
+      "Maximul e 0"
+     ],
+     "a": 1,
+     "e": "Intervalul e același, dar ordinea din ieșire trebuie să fie cea din intrare."
+    },
+    {
+     "q": "Cum citești perechi până la sfârșitul datelor?",
+     "o": [
+      "for (int k = 0; k < 10; k++)",
+      "while (cin >> i >> j)",
+      "cin >> i >> j o singură dată",
+      "while (i != 0)"
+     ],
+     "a": 1,
+     "e": "Citirea eșuează la sfârșitul datelor, iar condiția devine falsă."
+    }
+   ],
+   "325": [
+    {
+     "q": "De ce * și / sunt tratate în termen(), iar + și − în expresie()?",
+     "o": [
+      "Din întâmplare",
+      "Pentru că funcția de mai jos (termen) se termină înainte ca cea de mai sus să vadă un + sau −, deci * și / se fac primele",
+      "Pentru că + e mai rapid",
+      "Pentru că așa sunt citite din fișier"
+     ],
+     "a": 1,
+     "e": "Fiecare nivel al gramaticii corespunde unei priorități; nivelul mai adânc leagă mai strâns."
+    },
+    {
+     "q": "Ce face factor() când găsește '('?",
+     "o": [
+      "Ignoră paranteza",
+      "Apelează expresie() pentru ce e înăuntru, apoi trece peste ')'",
+      "Citește un număr",
+      "Se oprește"
+     ],
+     "a": 1,
+     "e": "Aici apare recursivitatea indirectă: expresie → termen → factor → expresie."
+    },
+    {
+     "q": "Cât este 2+3*(4-1)/2?",
+     "o": [
+      "6",
+      "7",
+      "7.5",
+      "8"
+     ],
+     "a": 0,
+     "e": "4 − 1 = 3, 3 · 3 = 9, 9 / 2 = 4 (împărțire întreagă), 2 + 4 = 6."
+    }
    ]
   },
   "11": {
