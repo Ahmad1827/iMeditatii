@@ -1921,6 +1921,41 @@
           "id": "3",
           "title": "Inecuație cu modul",
           "difficulty": "medie"
+        },
+        {
+          "id": "66",
+          "title": "Partea întreagă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "67",
+          "title": "Partea fracționară",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "68",
+          "title": "Ecuație cu parte întreagă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "69",
+          "title": "Mulțime definită printr-o condiție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "70",
+          "title": "Diferența a două mulțimi",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "71",
+          "title": "Valoarea de adevăr a unei propoziții",
+          "difficulty": "medie"
+        },
+        {
+          "id": "72",
+          "title": "Sumă de părți întregi",
+          "difficulty": "grea"
         }
       ],
       "2. Progresii": [
@@ -1942,6 +1977,36 @@
         {
           "id": "7",
           "title": "Doi termeni cunoscuți",
+          "difficulty": "grea"
+        },
+        {
+          "id": "73",
+          "title": "Rația din primii doi termeni",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "74",
+          "title": "Trei numere în progresie aritmetică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "75",
+          "title": "Trei numere în progresie geometrică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "76",
+          "title": "Suma puterilor lui 2",
+          "difficulty": "medie"
+        },
+        {
+          "id": "77",
+          "title": "Progresie geometrică din două sume",
+          "difficulty": "grea"
+        },
+        {
+          "id": "78",
+          "title": "Ecuație cu o sumă",
           "difficulty": "grea"
         }
       ],
@@ -1965,6 +2030,36 @@
           "id": "11",
           "title": "Punct pe grafic",
           "difficulty": "medie"
+        },
+        {
+          "id": "79",
+          "title": "Monotonia funcției de gradul I",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "80",
+          "title": "Intersecția a două grafice",
+          "difficulty": "medie"
+        },
+        {
+          "id": "81",
+          "title": "Funcția din două valori",
+          "difficulty": "medie"
+        },
+        {
+          "id": "82",
+          "title": "Inecuație de gradul I",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "83",
+          "title": "Suma valorilor unei funcții",
+          "difficulty": "medie"
+        },
+        {
+          "id": "84",
+          "title": "Aria triunghiului format cu axele",
+          "difficulty": "grea"
         }
       ],
       "4. Funcția de gradul II": [
@@ -1987,9 +2082,247 @@
           "id": "15",
           "title": "Rădăcini reale distincte",
           "difficulty": "grea"
+        },
+        {
+          "id": "85",
+          "title": "Vârful parabolei",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "86",
+          "title": "Suma pătratelor rădăcinilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "87",
+          "title": "Inecuație de gradul II",
+          "difficulty": "medie"
+        },
+        {
+          "id": "88",
+          "title": "Parametru și relațiile lui Viète",
+          "difficulty": "grea"
+        },
+        {
+          "id": "89",
+          "title": "Funcția din trei valori",
+          "difficulty": "grea"
+        },
+        {
+          "id": "90",
+          "title": "Parabolă tangentă la axa Ox",
+          "difficulty": "medie"
         }
       ],
-      "5. Olimpiadă": [
+      "5. Inducție matematică": [
+        {
+          "id": "91",
+          "title": "Suma primelor 100 de numere",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "92",
+          "title": "Suma pătratelor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "93",
+          "title": "Suma cuburilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "94",
+          "title": "Sumă telescopică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "95",
+          "title": "O formulă demonstrată prin inducție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "96",
+          "title": "Divizibilitate cu 6",
+          "difficulty": "medie"
+        },
+        {
+          "id": "97",
+          "title": "Când devine 2ⁿ mai mare decât n²",
+          "difficulty": "grea"
+        },
+        {
+          "id": "98",
+          "title": "Produs telescopic",
+          "difficulty": "medie"
+        },
+        {
+          "id": "99",
+          "title": "Șir definit prin recurență",
+          "difficulty": "medie"
+        },
+        {
+          "id": "100",
+          "title": "Divizibilitate cu 9",
+          "difficulty": "grea"
+        }
+      ],
+      "6. Vectori în plan": [
+        {
+          "id": "101",
+          "title": "Suma a doi vectori",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "102",
+          "title": "Modulul unui vector",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "103",
+          "title": "Vectori coliniari",
+          "difficulty": "medie"
+        },
+        {
+          "id": "104",
+          "title": "Mijlocul unui segment",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "105",
+          "title": "Centrul de greutate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "106",
+          "title": "Vectorul determinat de două puncte",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "107",
+          "title": "Al patrulea vârf al paralelogramului",
+          "difficulty": "medie"
+        },
+        {
+          "id": "108",
+          "title": "Relația lui Chasles",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "109",
+          "title": "Lungimea unei mediane",
+          "difficulty": "medie"
+        },
+        {
+          "id": "110",
+          "title": "Punct care împarte un segment",
+          "difficulty": "grea"
+        }
+      ],
+      "7. Trigonometrie": [
+        {
+          "id": "111",
+          "title": "Valori remarcabile",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "112",
+          "title": "Cosinusul din sinus",
+          "difficulty": "medie"
+        },
+        {
+          "id": "113",
+          "title": "Tangenta din cosinus",
+          "difficulty": "medie"
+        },
+        {
+          "id": "114",
+          "title": "Reducerea la primul cadran",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "115",
+          "title": "Sinusul unghiului dublu",
+          "difficulty": "medie"
+        },
+        {
+          "id": "116",
+          "title": "Din grade în radiani",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "117",
+          "title": "Unghiuri complementare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "118",
+          "title": "Un produs de tangente",
+          "difficulty": "grea"
+        },
+        {
+          "id": "119",
+          "title": "Ecuație trigonometrică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "120",
+          "title": "Suma cosinusurilor",
+          "difficulty": "grea"
+        }
+      ],
+      "8. Produs scalar și rezolvarea triunghiurilor": [
+        {
+          "id": "121",
+          "title": "Produsul scalar în coordonate",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "122",
+          "title": "Vectori perpendiculari",
+          "difficulty": "medie"
+        },
+        {
+          "id": "123",
+          "title": "Unghiul a doi vectori",
+          "difficulty": "medie"
+        },
+        {
+          "id": "124",
+          "title": "Teorema cosinusului",
+          "difficulty": "medie"
+        },
+        {
+          "id": "125",
+          "title": "Raza cercului circumscris",
+          "difficulty": "medie"
+        },
+        {
+          "id": "126",
+          "title": "Aria cu sinusul",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "127",
+          "title": "Formula lui Heron",
+          "difficulty": "medie"
+        },
+        {
+          "id": "128",
+          "title": "Natura unui triunghi",
+          "difficulty": "medie"
+        },
+        {
+          "id": "129",
+          "title": "Raza cercului înscris",
+          "difficulty": "grea"
+        },
+        {
+          "id": "130",
+          "title": "Lungimea unei mediane",
+          "difficulty": "grea"
+        }
+      ],
+      "9. Olimpiadă": [
         {
           "id": "62",
           "title": "Pătrat perfect",
@@ -2018,6 +2351,36 @@
           "id": "19",
           "title": "Radicali asemenea",
           "difficulty": "medie"
+        },
+        {
+          "id": "131",
+          "title": "Raționalizarea numitorului",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "132",
+          "title": "Radicali de ordinul trei",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "133",
+          "title": "Logaritmi în baze diferite",
+          "difficulty": "medie"
+        },
+        {
+          "id": "134",
+          "title": "Ordonarea unor radicali",
+          "difficulty": "grea"
+        },
+        {
+          "id": "135",
+          "title": "Logaritm cu bază subunitară",
+          "difficulty": "medie"
+        },
+        {
+          "id": "136",
+          "title": "Exprimarea printr-un logaritm dat",
+          "difficulty": "grea"
         }
       ],
       "2. Ecuații exponențiale și logaritmice": [
@@ -2039,6 +2402,36 @@
         {
           "id": "23",
           "title": "Inecuație logaritmică",
+          "difficulty": "grea"
+        },
+        {
+          "id": "137",
+          "title": "Aceeași bază",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "138",
+          "title": "Factor comun",
+          "difficulty": "medie"
+        },
+        {
+          "id": "139",
+          "title": "Ecuație de gradul II în 2ˣ",
+          "difficulty": "medie"
+        },
+        {
+          "id": "140",
+          "title": "Ecuație logaritmică cu condiții",
+          "difficulty": "medie"
+        },
+        {
+          "id": "141",
+          "title": "Inecuație exponențială",
+          "difficulty": "medie"
+        },
+        {
+          "id": "142",
+          "title": "Logaritm cu baza necunoscută",
           "difficulty": "grea"
         }
       ],
@@ -2062,6 +2455,36 @@
           "id": "27",
           "title": "Binomul lui Newton",
           "difficulty": "grea"
+        },
+        {
+          "id": "143",
+          "title": "Aranjamente",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "144",
+          "title": "Ecuație cu combinări",
+          "difficulty": "medie"
+        },
+        {
+          "id": "145",
+          "title": "Funcții injective",
+          "difficulty": "medie"
+        },
+        {
+          "id": "146",
+          "title": "Submulțimi cu un element fixat",
+          "difficulty": "medie"
+        },
+        {
+          "id": "147",
+          "title": "Diagonalele unui poligon",
+          "difficulty": "medie"
+        },
+        {
+          "id": "148",
+          "title": "Ecuație cu aranjamente și combinări",
+          "difficulty": "grea"
         }
       ],
       "4. Geometrie analitică": [
@@ -2084,9 +2507,247 @@
           "id": "31",
           "title": "Aria unui triunghi",
           "difficulty": "grea"
+        },
+        {
+          "id": "149",
+          "title": "Dreapta prin două puncte",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "150",
+          "title": "Paralela printr-un punct",
+          "difficulty": "medie"
+        },
+        {
+          "id": "151",
+          "title": "Perpendiculara printr-un punct",
+          "difficulty": "medie"
+        },
+        {
+          "id": "152",
+          "title": "Distanța de la un punct la o dreaptă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "153",
+          "title": "Puncte coliniare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "154",
+          "title": "Simetricul față de o dreaptă",
+          "difficulty": "grea"
         }
       ],
-      "5. Olimpiadă": [
+      "5. Numere complexe": [
+        {
+          "id": "155",
+          "title": "Produs de numere complexe",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "156",
+          "title": "O putere mare a lui i",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "157",
+          "title": "Modulul unei puteri",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "158",
+          "title": "Câtul a două numere complexe",
+          "difficulty": "medie"
+        },
+        {
+          "id": "159",
+          "title": "Ecuație cu z și conjugatul său",
+          "difficulty": "medie"
+        },
+        {
+          "id": "160",
+          "title": "Ecuație de gradul II cu Δ negativ",
+          "difficulty": "medie"
+        },
+        {
+          "id": "161",
+          "title": "O putere a lui 1 + i",
+          "difficulty": "grea"
+        },
+        {
+          "id": "162",
+          "title": "Rădăcina pătrată a unui număr complex",
+          "difficulty": "grea"
+        },
+        {
+          "id": "163",
+          "title": "Când este produsul real",
+          "difficulty": "medie"
+        },
+        {
+          "id": "164",
+          "title": "Rădăcinile cubice ale unității",
+          "difficulty": "grea"
+        }
+      ],
+      "6. Funcții: injectivitate, surjectivitate, inversă": [
+        {
+          "id": "165",
+          "title": "Compunerea a două funcții",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "166",
+          "title": "Compunere în ordine inversă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "167",
+          "title": "Inversa unei funcții de gradul I",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "168",
+          "title": "Funcție injectivă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "169",
+          "title": "Paritatea unei funcții",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "170",
+          "title": "Inversa unei funcții exponențiale",
+          "difficulty": "medie"
+        },
+        {
+          "id": "171",
+          "title": "Funcție surjectivă",
+          "difficulty": "grea"
+        },
+        {
+          "id": "172",
+          "title": "Inversa unei funcții pe ramuri",
+          "difficulty": "grea"
+        },
+        {
+          "id": "173",
+          "title": "Funcții trigonometrice inverse",
+          "difficulty": "medie"
+        },
+        {
+          "id": "174",
+          "title": "Perioada principală",
+          "difficulty": "medie"
+        }
+      ],
+      "7. Binomul lui Newton": [
+        {
+          "id": "175",
+          "title": "Numărul de termeni",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "176",
+          "title": "Suma coeficienților binomiali",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "177",
+          "title": "Coeficientul lui x³",
+          "difficulty": "medie"
+        },
+        {
+          "id": "178",
+          "title": "Termenul liber",
+          "difficulty": "medie"
+        },
+        {
+          "id": "179",
+          "title": "Termenul liber cu radicali",
+          "difficulty": "grea"
+        },
+        {
+          "id": "180",
+          "title": "Suma coeficienților unei dezvoltări",
+          "difficulty": "medie"
+        },
+        {
+          "id": "181",
+          "title": "Termeni raționali",
+          "difficulty": "grea"
+        },
+        {
+          "id": "182",
+          "title": "Coeficienți cu semne alternante",
+          "difficulty": "medie"
+        },
+        {
+          "id": "183",
+          "title": "Coeficienții de rang par",
+          "difficulty": "medie"
+        },
+        {
+          "id": "184",
+          "title": "Termenul din mijloc",
+          "difficulty": "medie"
+        }
+      ],
+      "8. Matematici financiare și probabilități": [
+        {
+          "id": "185",
+          "title": "Scumpire cu un procent",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "186",
+          "title": "Scumpire, apoi ieftinire",
+          "difficulty": "medie"
+        },
+        {
+          "id": "187",
+          "title": "Probabilitatea unui multiplu de 3",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "188",
+          "title": "Pătrate perfecte de două cifre",
+          "difficulty": "medie"
+        },
+        {
+          "id": "189",
+          "title": "Două zaruri",
+          "difficulty": "medie"
+        },
+        {
+          "id": "190",
+          "title": "Dobândă simplă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "191",
+          "title": "Dobândă compusă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "192",
+          "title": "Prețul fără TVA",
+          "difficulty": "medie"
+        },
+        {
+          "id": "193",
+          "title": "Submulțime cu două elemente",
+          "difficulty": "grea"
+        },
+        {
+          "id": "194",
+          "title": "O funcție aleasă la întâmplare",
+          "difficulty": "grea"
+        }
+      ],
+      "9. Olimpiadă": [
         {
           "id": "63",
           "title": "Ecuație exponențială",
@@ -2115,6 +2776,36 @@
           "id": "35",
           "title": "Matrice neinversabilă",
           "difficulty": "medie"
+        },
+        {
+          "id": "195",
+          "title": "Operații cu matrice",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "196",
+          "title": "Relația Cayley–Hamilton",
+          "difficulty": "medie"
+        },
+        {
+          "id": "197",
+          "title": "Inversa unei matrice de ordinul 2",
+          "difficulty": "medie"
+        },
+        {
+          "id": "198",
+          "title": "Determinantul Vandermonde",
+          "difficulty": "grea"
+        },
+        {
+          "id": "199",
+          "title": "Ecuație cu un determinant",
+          "difficulty": "medie"
+        },
+        {
+          "id": "200",
+          "title": "O putere mare a unei matrice",
+          "difficulty": "grea"
         }
       ],
       "2. Sisteme de ecuații liniare": [
@@ -2131,6 +2822,41 @@
         {
           "id": "38",
           "title": "O infinitate de soluții",
+          "difficulty": "grea"
+        },
+        {
+          "id": "201",
+          "title": "Regula lui Cramer",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "202",
+          "title": "Determinantul unui sistem",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "203",
+          "title": "Sistem cu trei ecuații",
+          "difficulty": "medie"
+        },
+        {
+          "id": "204",
+          "title": "Sistem compatibil determinat",
+          "difficulty": "medie"
+        },
+        {
+          "id": "205",
+          "title": "Sistem incompatibil",
+          "difficulty": "grea"
+        },
+        {
+          "id": "206",
+          "title": "Sistem omogen",
+          "difficulty": "medie"
+        },
+        {
+          "id": "207",
+          "title": "Metoda lui Gauss",
           "difficulty": "grea"
         }
       ],
@@ -2154,6 +2880,36 @@
           "id": "42",
           "title": "Limită remarcabilă",
           "difficulty": "grea"
+        },
+        {
+          "id": "208",
+          "title": "Limită cu radical",
+          "difficulty": "medie"
+        },
+        {
+          "id": "209",
+          "title": "Diferență cu radical la infinit",
+          "difficulty": "medie"
+        },
+        {
+          "id": "210",
+          "title": "Limita care duce la e",
+          "difficulty": "grea"
+        },
+        {
+          "id": "211",
+          "title": "Limite laterale",
+          "difficulty": "medie"
+        },
+        {
+          "id": "212",
+          "title": "Asimptota oblică",
+          "difficulty": "grea"
+        },
+        {
+          "id": "213",
+          "title": "Asimptota orizontală",
+          "difficulty": "ușoară"
         }
       ],
       "4. Derivate": [
@@ -2176,9 +2932,195 @@
           "id": "46",
           "title": "Maxim local",
           "difficulty": "grea"
+        },
+        {
+          "id": "214",
+          "title": "Derivata unui cât",
+          "difficulty": "medie"
+        },
+        {
+          "id": "215",
+          "title": "Derivata funcției compuse",
+          "difficulty": "medie"
+        },
+        {
+          "id": "216",
+          "title": "Ecuația tangentei",
+          "difficulty": "medie"
+        },
+        {
+          "id": "217",
+          "title": "Derivata lui x ln x",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "218",
+          "title": "Derivata a doua",
+          "difficulty": "medie"
+        },
+        {
+          "id": "219",
+          "title": "Funcție derivabilă pe ramuri",
+          "difficulty": "grea"
         }
       ],
-      "5. Olimpiadă": [
+      "5. Șiruri și limite de șiruri": [
+        {
+          "id": "220",
+          "title": "Limita unui raport de polinoame",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "221",
+          "title": "Monotonia unui șir",
+          "difficulty": "medie"
+        },
+        {
+          "id": "222",
+          "title": "Limită cu radical",
+          "difficulty": "medie"
+        },
+        {
+          "id": "223",
+          "title": "Limita unei sume de pătrate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "224",
+          "title": "Limita lui (1 + 1/n)³ⁿ",
+          "difficulty": "medie"
+        },
+        {
+          "id": "225",
+          "title": "Suma unei progresii geometrice infinite",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "226",
+          "title": "Criteriul cleștelui",
+          "difficulty": "medie"
+        },
+        {
+          "id": "227",
+          "title": "Șir definit recurent",
+          "difficulty": "grea"
+        },
+        {
+          "id": "228",
+          "title": "Limită cu puteri",
+          "difficulty": "medie"
+        },
+        {
+          "id": "229",
+          "title": "O sumă telescopică",
+          "difficulty": "grea"
+        }
+      ],
+      "6. Continuitate": [
+        {
+          "id": "230",
+          "title": "Continuitate pe ramuri",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "231",
+          "title": "Prelungire prin continuitate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "232",
+          "title": "Continuitate cu o limită remarcabilă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "233",
+          "title": "Puncte de discontinuitate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "234",
+          "title": "Proprietatea lui Darboux",
+          "difficulty": "medie"
+        },
+        {
+          "id": "235",
+          "title": "Semnul unei funcții continue",
+          "difficulty": "medie"
+        },
+        {
+          "id": "236",
+          "title": "Doi parametri",
+          "difficulty": "grea"
+        },
+        {
+          "id": "237",
+          "title": "Prelungire cu exponențiala",
+          "difficulty": "medie"
+        },
+        {
+          "id": "238",
+          "title": "Prelungire cu radical",
+          "difficulty": "medie"
+        },
+        {
+          "id": "239",
+          "title": "Soluție unică",
+          "difficulty": "grea"
+        }
+      ],
+      "7. Studiul funcțiilor cu ajutorul derivatelor": [
+        {
+          "id": "240",
+          "title": "Intervale de monotonie",
+          "difficulty": "medie"
+        },
+        {
+          "id": "241",
+          "title": "Puncte de extrem",
+          "difficulty": "medie"
+        },
+        {
+          "id": "242",
+          "title": "Valoarea minimă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "243",
+          "title": "O inegalitate demonstrată cu derivate",
+          "difficulty": "grea"
+        },
+        {
+          "id": "244",
+          "title": "Punct de inflexiune",
+          "difficulty": "medie"
+        },
+        {
+          "id": "245",
+          "title": "Convexitatea logaritmului",
+          "difficulty": "medie"
+        },
+        {
+          "id": "246",
+          "title": "Numărul de soluții",
+          "difficulty": "grea"
+        },
+        {
+          "id": "247",
+          "title": "Maxim și minim pe un interval",
+          "difficulty": "medie"
+        },
+        {
+          "id": "248",
+          "title": "Regula lui l’Hôpital",
+          "difficulty": "medie"
+        },
+        {
+          "id": "249",
+          "title": "O problemă de optim",
+          "difficulty": "grea"
+        }
+      ],
+      "8. Olimpiadă": [
         {
           "id": "64",
           "title": "Un șir și un produs",
@@ -2207,6 +3149,36 @@
           "id": "50",
           "title": "Simetricul unui element",
           "difficulty": "grea"
+        },
+        {
+          "id": "250",
+          "title": "O ecuație cu o lege asociativă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "251",
+          "title": "Lege scrisă ca produs",
+          "difficulty": "grea"
+        },
+        {
+          "id": "252",
+          "title": "Lege comutativă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "253",
+          "title": "Elemente simetrizabile în ℤ",
+          "difficulty": "grea"
+        },
+        {
+          "id": "254",
+          "title": "Element absorbant",
+          "difficulty": "grea"
+        },
+        {
+          "id": "255",
+          "title": "Parte stabilă",
+          "difficulty": "medie"
         }
       ],
       "2. Primitive": [
@@ -2224,6 +3196,41 @@
           "id": "53",
           "title": "Primitiva cosinusului",
           "difficulty": "medie"
+        },
+        {
+          "id": "256",
+          "title": "Primitivele lui 1/x",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "257",
+          "title": "Primitivele unui polinom",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "258",
+          "title": "Integrare prin părți",
+          "difficulty": "medie"
+        },
+        {
+          "id": "259",
+          "title": "Substituție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "260",
+          "title": "Primitivele logaritmului",
+          "difficulty": "medie"
+        },
+        {
+          "id": "261",
+          "title": "Descompunere în fracții simple",
+          "difficulty": "grea"
+        },
+        {
+          "id": "262",
+          "title": "O primitivă de o formă dată",
+          "difficulty": "grea"
         }
       ],
       "3. Integrale definite": [
@@ -2245,6 +3252,36 @@
         {
           "id": "57",
           "title": "Aria de sub grafic",
+          "difficulty": "grea"
+        },
+        {
+          "id": "263",
+          "title": "Formula Leibniz–Newton",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "264",
+          "title": "Integrare prin părți",
+          "difficulty": "medie"
+        },
+        {
+          "id": "265",
+          "title": "Schimbare de variabilă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "266",
+          "title": "Integrala unei funcții impare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "267",
+          "title": "Integrala sinusului",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "268",
+          "title": "Integrala unui modul",
           "difficulty": "grea"
         }
       ],
@@ -2268,9 +3305,195 @@
           "id": "61",
           "title": "Produsul rădăcinilor",
           "difficulty": "grea"
+        },
+        {
+          "id": "269",
+          "title": "Restul împărțirii",
+          "difficulty": "medie"
+        },
+        {
+          "id": "270",
+          "title": "Suma pătratelor rădăcinilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "271",
+          "title": "O rădăcină complexă",
+          "difficulty": "grea"
+        },
+        {
+          "id": "272",
+          "title": "Rădăcină dublă",
+          "difficulty": "grea"
+        },
+        {
+          "id": "273",
+          "title": "Rădăcini în ℤ₅",
+          "difficulty": "medie"
+        },
+        {
+          "id": "274",
+          "title": "Restul la un produs",
+          "difficulty": "grea"
         }
       ],
-      "5. Olimpiadă": [
+      "5. Grupuri": [
+        {
+          "id": "275",
+          "title": "Simetricul într-un grup",
+          "difficulty": "medie"
+        },
+        {
+          "id": "276",
+          "title": "Ordinul unui element",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "277",
+          "title": "Elemente inversabile în ℤ₈",
+          "difficulty": "medie"
+        },
+        {
+          "id": "278",
+          "title": "Un grup de matrice",
+          "difficulty": "grea"
+        },
+        {
+          "id": "279",
+          "title": "Morfism de grupuri",
+          "difficulty": "grea"
+        },
+        {
+          "id": "280",
+          "title": "Generatorii lui ℤ₁₂",
+          "difficulty": "medie"
+        },
+        {
+          "id": "281",
+          "title": "Subgrup",
+          "difficulty": "medie"
+        },
+        {
+          "id": "282",
+          "title": "Ecuație în ℤ₇*",
+          "difficulty": "medie"
+        },
+        {
+          "id": "283",
+          "title": "Teorema lui Lagrange",
+          "difficulty": "medie"
+        },
+        {
+          "id": "284",
+          "title": "Compunere repetată",
+          "difficulty": "grea"
+        }
+      ],
+      "6. Inele și corpuri": [
+        {
+          "id": "285",
+          "title": "Calcul în ℤ₆",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "286",
+          "title": "Divizori ai lui zero",
+          "difficulty": "medie"
+        },
+        {
+          "id": "287",
+          "title": "Inversul în ℤ₁₁",
+          "difficulty": "medie"
+        },
+        {
+          "id": "288",
+          "title": "Ecuație în ℤ₉",
+          "difficulty": "medie"
+        },
+        {
+          "id": "289",
+          "title": "Sistem în ℤ₅",
+          "difficulty": "grea"
+        },
+        {
+          "id": "290",
+          "title": "Ecuație de gradul II în ℤ₇",
+          "difficulty": "medie"
+        },
+        {
+          "id": "291",
+          "title": "Când este ℤₙ corp",
+          "difficulty": "medie"
+        },
+        {
+          "id": "292",
+          "title": "Inversabilele lui ℤ[i]",
+          "difficulty": "grea"
+        },
+        {
+          "id": "293",
+          "title": "Elemente nilpotente",
+          "difficulty": "medie"
+        },
+        {
+          "id": "294",
+          "title": "Elementele neutre ale unui corp",
+          "difficulty": "grea"
+        }
+      ],
+      "7. Aplicații ale integralei": [
+        {
+          "id": "295",
+          "title": "Aria de sub o parabolă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "296",
+          "title": "Aria dintre două curbe",
+          "difficulty": "medie"
+        },
+        {
+          "id": "297",
+          "title": "Aria de sub logaritm",
+          "difficulty": "medie"
+        },
+        {
+          "id": "298",
+          "title": "Volumul unui corp de rotație",
+          "difficulty": "medie"
+        },
+        {
+          "id": "299",
+          "title": "Volum cu exponențiala",
+          "difficulty": "grea"
+        },
+        {
+          "id": "300",
+          "title": "Aria de sub hiperbolă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "301",
+          "title": "Aria cu parametru",
+          "difficulty": "grea"
+        },
+        {
+          "id": "302",
+          "title": "Volumul unui con",
+          "difficulty": "medie"
+        },
+        {
+          "id": "303",
+          "title": "Aria dintre o parabolă și o dreaptă",
+          "difficulty": "grea"
+        },
+        {
+          "id": "304",
+          "title": "O sumă Riemann",
+          "difficulty": "grea"
+        }
+      ],
+      "8. Olimpiadă": [
         {
           "id": "65",
           "title": "Iteratele unei funcții",

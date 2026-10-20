@@ -57,7 +57,22 @@ void main() {
         expect(p['tip_exercitiu'], isNot('cod'), reason: id);
       });
     });
-    expect(ids.length, 65);
+    expect(ids.length, 304);
+  });
+
+  test('every maths chapter of IX–XII has 10 problems, from ușoară to grea, and the olympiad comes last', () {
+    (list['Matematică'] as Map<String, dynamic>).forEach((grade, chapters) {
+      final names = (chapters as Map<String, dynamic>).keys.toList();
+      expect(names.last, endsWith('Olimpiadă'), reason: grade);
+      for (var i = 0; i < names.length; i++) {
+        expect(names[i], startsWith('${i + 1}. '), reason: '$grade: ${names[i]}');
+      }
+      for (final name in names.take(names.length - 1)) {
+        final items = chapters[name] as List;
+        expect(items.length, 10, reason: '$grade $name');
+        expect({for (final it in items) it['difficulty']}, {'ușoară', 'medie', 'grea'}, reason: '$grade $name');
+      }
+    });
   });
 
   group('grade 12 informatics: Subiectul III from every BAC paper, 2019 to 2026', () {

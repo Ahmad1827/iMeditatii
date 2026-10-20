@@ -10962,6 +10962,1753 @@
      "a": 1,
      "e": "Doar câteva valori mici mai pot fi soluții."
     }
+   ],
+   "66": [
+    {
+     "q": "Cât este [−2,7]?",
+     "o": [
+      "−2",
+      "−3",
+      "−2,7",
+      "3"
+     ],
+     "a": 1,
+     "e": "Cel mai mare întreg mai mic sau egal cu −2,7 este −3, nu −2 (−2 > −2,7)."
+    },
+    {
+     "q": "Care inegalitate definește [a] = k?",
+     "o": [
+      "k ≤ a < k + 1",
+      "k < a ≤ k + 1",
+      "k − 1 < a < k",
+      "a ≤ k < a + 1"
+     ],
+     "a": 0,
+     "e": "Partea întreagă este întregul k cu k ≤ a < k + 1."
+    },
+    {
+     "q": "Cât este [3,2]?",
+     "o": [
+      "4",
+      "3",
+      "3,2",
+      "0,2"
+     ],
+     "a": 1,
+     "e": "3 ≤ 3,2 < 4."
+    }
+   ],
+   "67": [
+    {
+     "q": "În ce interval se află mereu {a}?",
+     "o": [
+      "(−1, 1)",
+      "[0, 1)",
+      "[0, 1]",
+      "(0, 1)"
+     ],
+     "a": 1,
+     "e": "{a} = a − [a], iar 0 ≤ a − [a] < 1."
+    },
+    {
+     "q": "Cât este [−1,25]?",
+     "o": [
+      "−1",
+      "−2",
+      "1",
+      "0"
+     ],
+     "a": 1,
+     "e": "−2 ≤ −1,25 < −1."
+    },
+    {
+     "q": "Poate fi {−1,25} = 0,25?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 1,
+     "e": "Ar însemna că [−1,25] = −1,5, care nu e întreg; răspunsul corect este 0,75."
+    }
+   ],
+   "68": [
+    {
+     "q": "Ce înseamnă [u] = 2?",
+     "o": [
+      "u = 2",
+      "2 ≤ u < 3",
+      "2 < u ≤ 3",
+      "1 < u ≤ 2"
+     ],
+     "a": 1,
+     "e": "u este între 2 (inclusiv) și 3 (exclusiv)."
+    },
+    {
+     "q": "După ce înmulțești cu 3, ce obții?",
+     "o": [
+      "6 ≤ 2x + 1 < 9",
+      "2 ≤ 2x + 1 < 3",
+      "6 < 2x + 1 ≤ 9",
+      "6 ≤ 2x < 9"
+     ],
+     "a": 0,
+     "e": "Înmulțești toate cele trei părți cu 3 > 0, sensul se păstrează."
+    },
+    {
+     "q": "Aparține 4 mulțimii soluțiilor?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 1,
+     "e": "Pentru x = 4, (2x + 1)/3 = 3 și [3] = 3, nu 2."
+    }
+   ],
+   "69": [
+    {
+     "q": "Ce interval dă |2x − 1| < 5?",
+     "o": [
+      "(−2, 3)",
+      "[−2, 3]",
+      "(−3, 2)",
+      "(−∞, 3)"
+     ],
+     "a": 0,
+     "e": "−5 < 2x − 1 < 5 ⇔ −2 < x < 3."
+    },
+    {
+     "q": "Aparține −2 lui A?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 1,
+     "e": "|2 · (−2) − 1| = 5, iar 5 < 5 este fals."
+    },
+    {
+     "q": "Care sunt elementele lui A?",
+     "o": [
+      "{−1, 0, 1, 2}",
+      "{−2, −1, 0, 1, 2, 3}",
+      "{0, 1, 2}",
+      "{−1, 0, 1, 2, 3}"
+     ],
+     "a": 0,
+     "e": "Întregii strict între −2 și 3."
+    }
+   ],
+   "70": [
+    {
+     "q": "Ce conține A \\ B?",
+     "o": [
+      "Elementele din A care nu sunt în B",
+      "Elementele comune",
+      "Elementele din B care nu sunt în A",
+      "Toate elementele"
+     ],
+     "a": 0,
+     "e": "Diferența păstrează din A doar ce nu apare în B."
+    },
+    {
+     "q": "Este 0 element al lui A?",
+     "o": [
+      "Da, 0 ∈ ℕ și e par",
+      "Nu, 0 nu e natural"
+     ],
+     "a": 0,
+     "e": "În manualele românești ℕ = {0, 1, 2, ...}, iar 0 este par."
+    },
+    {
+     "q": "Câți divizori naturali are 12?",
+     "o": [
+      "4",
+      "5",
+      "6",
+      "12"
+     ],
+     "a": 2,
+     "e": "1, 2, 3, 4, 6, 12."
+    }
+   ],
+   "71": [
+    {
+     "q": "Cum arăți că o propoziție cu „∀” e falsă?",
+     "o": [
+      "Cu un contraexemplu",
+      "Cu un exemplu care o verifică",
+      "Nu se poate arăta"
+     ],
+     "a": 0,
+     "e": "Ajunge un singur x pentru care afirmația nu are loc."
+    },
+    {
+     "q": "Cum scrii x² − 2x + 2 ca să-i vezi semnul?",
+     "o": [
+      "(x − 1)² + 1",
+      "(x + 1)² + 1",
+      "(x − 2)² − 2",
+      "x(x − 2) − 2"
+     ],
+     "a": 0,
+     "e": "(x − 1)² = x² − 2x + 1, deci adaugi 1."
+    },
+    {
+     "q": "Este „∀ x ∈ ℝ, x² > 0” adevărată?",
+     "o": [
+      "Da",
+      "Nu, pentru x = 0"
+     ],
+     "a": 1,
+     "e": "0² = 0, care nu e strict pozitiv."
+    }
+   ],
+   "72": [
+    {
+     "q": "Cât este [√10]?",
+     "o": [
+      "3",
+      "4",
+      "10",
+      "√10"
+     ],
+     "a": 0,
+     "e": "9 ≤ 10 < 16, deci 3 ≤ √10 < 4."
+    },
+    {
+     "q": "Pentru câte valori ale lui n este [√n] = 2?",
+     "o": [
+      "2",
+      "4",
+      "5",
+      "3"
+     ],
+     "a": 2,
+     "e": "n = 4, 5, 6, 7, 8."
+    },
+    {
+     "q": "De ce se oprește suma frumos la 24?",
+     "o": [
+      "24 = 5² − 1, ultimul n cu [√n] = 4",
+      "24 e par",
+      "întâmplător"
+     ],
+     "a": 0,
+     "e": "Grupele sunt complete: ultima grupă se termină la 5² − 1."
+    }
+   ],
+   "73": [
+    {
+     "q": "Cât este rația?",
+     "o": [
+      "4",
+      "5",
+      "9",
+      "14"
+     ],
+     "a": 0,
+     "e": "r = 9 − 5."
+    },
+    {
+     "q": "Care formulă dă a₂₀?",
+     "o": [
+      "a₁ + 20r",
+      "a₁ + 19r",
+      "a₁ · r¹⁹",
+      "20a₁"
+     ],
+     "a": 1,
+     "e": "aₙ = a₁ + (n − 1)r."
+    }
+   ],
+   "74": [
+    {
+     "q": "Ce relație au a, b, c consecutivi într-o progresie aritmetică?",
+     "o": [
+      "2b = a + c",
+      "b² = ac",
+      "b = a + c",
+      "a + b + c = 0"
+     ],
+     "a": 0,
+     "e": "b − a = c − b, deci 2b = a + c."
+    },
+    {
+     "q": "Ce ecuație obții?",
+     "o": [
+      "4x + 2 = 5x − 4",
+      "2x + 1 = 5x − 4",
+      "(2x + 1)² = (x − 1)(4x − 3)",
+      "4x + 2 = 5x + 4"
+     ],
+     "a": 0,
+     "e": "2(2x + 1) = (x − 1) + (4x − 3)."
+    },
+    {
+     "q": "Ce rație are progresia pentru x = 6?",
+     "o": [
+      "6",
+      "8",
+      "13",
+      "5"
+     ],
+     "a": 1,
+     "e": "Numerele sunt 5, 13, 21."
+    }
+   ],
+   "75": [
+    {
+     "q": "Ce relație au a, b, c consecutivi într-o progresie geometrică?",
+     "o": [
+      "2b = a + c",
+      "b² = ac",
+      "b = ac",
+      "a² = bc"
+     ],
+     "a": 1,
+     "e": "b/a = c/b, deci b² = ac."
+    },
+    {
+     "q": "Ce rămâne după ce reduci x² din ambele părți?",
+     "o": [
+      "6x + 9 = 10x + 9",
+      "6x = 9",
+      "x = 9",
+      "6x + 9 = 10x"
+     ],
+     "a": 0,
+     "e": "Termenii x² se reduc, apoi și 9."
+    },
+    {
+     "q": "Ce rație are progresia obținută?",
+     "o": [
+      "2",
+      "3",
+      "9",
+      "1/3"
+     ],
+     "a": 1,
+     "e": "1, 3, 9."
+    }
+   ],
+   "76": [
+    {
+     "q": "Câți termeni are suma?",
+     "o": [
+      "9",
+      "10",
+      "11",
+      "2⁹"
+     ],
+     "a": 1,
+     "e": "Exponenții merg de la 0 la 9."
+    },
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "Sₙ = b₁(qⁿ − 1)/(q − 1)",
+      "Sₙ = n(b₁ + bₙ)/2",
+      "Sₙ = b₁qⁿ",
+      "Sₙ = nb₁"
+     ],
+     "a": 0,
+     "e": "Este suma unei progresii geometrice."
+    },
+    {
+     "q": "Cât este 2¹⁰?",
+     "o": [
+      "1000",
+      "1024",
+      "512",
+      "2048"
+     ],
+     "a": 1,
+     "e": "2¹⁰ = 1024."
+    }
+   ],
+   "77": [
+    {
+     "q": "Cum se scrie b₃ + b₄ cu b₁ + b₂?",
+     "o": [
+      "q²(b₁ + b₂)",
+      "q(b₁ + b₂)",
+      "2(b₁ + b₂)",
+      "b₁ + b₂ + 2q"
+     ],
+     "a": 0,
+     "e": "b₃ = b₁q², b₄ = b₂q²."
+    },
+    {
+     "q": "De ce q = 3 și nu q = −3?",
+     "o": [
+      "Termenii sunt pozitivi",
+      "q e mereu pozitiv",
+      "Din enunț b₁ = 3"
+     ],
+     "a": 0,
+     "e": "Cu q = −3 ar alterna semnele."
+    },
+    {
+     "q": "Cât este b₁?",
+     "o": [
+      "2",
+      "3",
+      "8/3",
+      "4"
+     ],
+     "a": 0,
+     "e": "b₁(1 + 3) = 8."
+    }
+   ],
+   "78": [
+    {
+     "q": "Care este termenul de rang n?",
+     "o": [
+      "4n − 3",
+      "4n + 1",
+      "5n − 4",
+      "4n"
+     ],
+     "a": 0,
+     "e": "a₁ = 1, r = 4: 1 + (n − 1) · 4."
+    },
+    {
+     "q": "Cât este Sₙ?",
+     "o": [
+      "n(2n − 1)",
+      "n(4n − 3)",
+      "2n²",
+      "n(n + 1)/2"
+     ],
+     "a": 0,
+     "e": "Sₙ = n(a₁ + aₙ)/2 = n(4n − 2)/2."
+    },
+    {
+     "q": "Câți termeni are suma?",
+     "o": [
+      "10",
+      "11",
+      "21",
+      "231"
+     ],
+     "a": 1,
+     "e": "2n² − n − 231 = 0 are rădăcina naturală n = 11."
+    }
+   ],
+   "79": [
+    {
+     "q": "Ce decide monotonia lui ax + b?",
+     "o": [
+      "Semnul lui a",
+      "Semnul lui b",
+      "Valoarea f(0)"
+     ],
+     "a": 0,
+     "e": "a > 0 crescătoare, a < 0 descrescătoare."
+    },
+    {
+     "q": "Ce se întâmplă pentru m = 2?",
+     "o": [
+      "f e strict crescătoare",
+      "f e constantă",
+      "f e strict descrescătoare"
+     ],
+     "a": 1,
+     "e": "f(x) = 3."
+    }
+   ],
+   "80": [
+    {
+     "q": "Ce ecuație rezolvi?",
+     "o": [
+      "f(x) = g(x)",
+      "f(x) = 0",
+      "f(x) + g(x) = 0",
+      "f(0) = g(0)"
+     ],
+     "a": 0,
+     "e": "Punctul este pe ambele grafice."
+    },
+    {
+     "q": "După ce afli x = 2, cum afli y?",
+     "o": [
+      "y = f(2) sau g(2)",
+      "y = 2",
+      "y = 0"
+     ],
+     "a": 0,
+     "e": "Ambele dau 3."
+    }
+   ],
+   "81": [
+    {
+     "q": "Ce sistem obții?",
+     "o": [
+      "a + b = 3, 3a + b = 7",
+      "a + 3b = 1, 7a + b = 3",
+      "a = 3, b = 7"
+     ],
+     "a": 0,
+     "e": "Înlocuiești x = 1 și x = 3."
+    },
+    {
+     "q": "Cât este a?",
+     "o": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "a": 1,
+     "e": "(7 − 3)/(3 − 1) = 2."
+    }
+   ],
+   "82": [
+    {
+     "q": "Ce obții după ce rezolvi?",
+     "o": [
+      "x ≤ 6",
+      "x ≥ 6",
+      "x ≤ −4",
+      "x < 6"
+     ],
+     "a": 0,
+     "e": "Scazi 2x și aduni 5."
+    },
+    {
+     "q": "Se numără și 0?",
+     "o": [
+      "Da, 0 ∈ ℕ",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "0 ∈ ℕ și 0 ≤ 6."
+    }
+   ],
+   "83": [
+    {
+     "q": "Cât este 1 + 2 + ... + 20?",
+     "o": [
+      "200",
+      "210",
+      "220",
+      "420"
+     ],
+     "a": 1,
+     "e": "20 · 21 / 2."
+    },
+    {
+     "q": "De câte ori apare termenul liber 1?",
+     "o": [
+      "O dată",
+      "De 20 de ori",
+      "De 21 de ori"
+     ],
+     "a": 1,
+     "e": "Câte o dată în fiecare f(k)."
+    },
+    {
+     "q": "Valorile f(1), f(2), ... formează o:",
+     "o": [
+      "progresie aritmetică cu rația 2",
+      "progresie geometrică",
+      "nimic special"
+     ],
+     "a": 0,
+     "e": "f(k + 1) − f(k) = 2."
+    }
+   ],
+   "84": [
+    {
+     "q": "Unde taie graficul axa Ox?",
+     "o": [
+      "(m, 0)",
+      "(0, m)",
+      "(−m, 0)",
+      "(1, 0)"
+     ],
+     "a": 0,
+     "e": "f(x) = 0 ⇔ x = m."
+    },
+    {
+     "q": "Ce fel de triunghi este?",
+     "o": [
+      "Dreptunghic în origine",
+      "Echilateral",
+      "Obtuzunghic"
+     ],
+     "a": 0,
+     "e": "Axele sunt perpendiculare."
+    },
+    {
+     "q": "Ce ecuație obții?",
+     "o": [
+      "m²/2 = 18",
+      "m² = 18",
+      "2m = 18",
+      "m/2 = 18"
+     ],
+     "a": 0,
+     "e": "Aria = cateta · cateta / 2."
+    }
+   ],
+   "85": [
+    {
+     "q": "Cât este −b/(2a)?",
+     "o": [
+      "3",
+      "−3",
+      "6",
+      "5"
+     ],
+     "a": 0,
+     "e": "a = 1, b = −6."
+    },
+    {
+     "q": "Cum afli ordonata vârfului mai simplu?",
+     "o": [
+      "f(x_V)",
+      "Δ",
+      "b²"
+     ],
+     "a": 0,
+     "e": "Înlocuiești x = 3 în funcție."
+    }
+   ],
+   "86": [
+    {
+     "q": "Cât este x₁ + x₂?",
+     "o": [
+      "5",
+      "−5",
+      "3",
+      "−3"
+     ],
+     "a": 0,
+     "e": "S = −b/a."
+    },
+    {
+     "q": "Cât este x₁x₂?",
+     "o": [
+      "5",
+      "3",
+      "−3",
+      "1"
+     ],
+     "a": 1,
+     "e": "P = c/a."
+    },
+    {
+     "q": "Trebuie să afli rădăcinile explicit?",
+     "o": [
+      "Da",
+      "Nu, ajung S și P"
+     ],
+     "a": 1,
+     "e": "Expresia e simetrică în x₁, x₂."
+    }
+   ],
+   "87": [
+    {
+     "q": "Care sunt rădăcinile?",
+     "o": [
+      "2 și 3",
+      "−2 și −3",
+      "1 și 6",
+      "−1 și 6"
+     ],
+     "a": 0,
+     "e": "2 + 3 = 5, 2 · 3 = 6."
+    },
+    {
+     "q": "Ce semn are expresia între rădăcini?",
+     "o": [
+      "Semnul lui a",
+      "Semn contrar lui a"
+     ],
+     "a": 1,
+     "e": "Regula semnului pentru funcția de gradul II."
+    },
+    {
+     "q": "Intervalul e închis?",
+     "o": [
+      "Da, inegalitatea e ≤",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "În 2 și 3 expresia e 0."
+    }
+   ],
+   "88": [
+    {
+     "q": "Cât este S = x₁ + x₂?",
+     "o": [
+      "m",
+      "−m",
+      "m − 1",
+      "1"
+     ],
+     "a": 0,
+     "e": "S = −b/a = m."
+    },
+    {
+     "q": "Ce ecuație în m obții?",
+     "o": [
+      "m² − 2m − 8 = 0",
+      "m² − 2m + 2 = 0",
+      "m² = 10",
+      "2m − 2 = 10"
+     ],
+     "a": 0,
+     "e": "m² − 2(m − 1) = 10."
+    },
+    {
+     "q": "De ce trebuie verificat Δ?",
+     "o": [
+      "Ca rădăcinile să fie reale",
+      "Nu trebuie",
+      "Ca m să fie pozitiv"
+     ],
+     "a": 0,
+     "e": "Relațiile lui Viète au sens și pentru rădăcini complexe; aici Δ = (m − 2)² ≥ 0."
+    }
+   ],
+   "89": [
+    {
+     "q": "Cât este c?",
+     "o": [
+      "0",
+      "1",
+      "4",
+      "−1"
+     ],
+     "a": 1,
+     "e": "f(0) = c."
+    },
+    {
+     "q": "Ce obții adunând a + b = 3 și a − b = −1?",
+     "o": [
+      "2a = 2",
+      "2b = 4",
+      "a = 3"
+     ],
+     "a": 0,
+     "e": "Deci a = 1."
+    }
+   ],
+   "90": [
+    {
+     "q": "Ce condiție pui?",
+     "o": [
+      "Δ = 0",
+      "Δ > 0",
+      "Δ < 0",
+      "f(0) = 0"
+     ],
+     "a": 0,
+     "e": "Ecuația f(x) = 0 are o singură rădăcină (dublă)."
+    },
+    {
+     "q": "Cât este Δ?",
+     "o": [
+      "m² − 36",
+      "m² + 36",
+      "m − 36",
+      "36 − m²"
+     ],
+     "a": 0,
+     "e": "b² − 4ac = m² − 4 · 9."
+    }
+   ],
+   "91": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "n(n + 1)/2",
+      "n²",
+      "n(n − 1)/2",
+      "2ⁿ"
+     ],
+     "a": 0,
+     "e": "Suma primelor n numere naturale nenule."
+    },
+    {
+     "q": "Câte perechi cu suma 101 există?",
+     "o": [
+      "50",
+      "100",
+      "101",
+      "49"
+     ],
+     "a": 0,
+     "e": "(1, 100), (2, 99), ..., (50, 51)."
+    }
+   ],
+   "92": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "n(n + 1)(2n + 1)/6",
+      "(n(n + 1)/2)²",
+      "n³/3",
+      "n(n + 1)/2"
+     ],
+     "a": 0,
+     "e": "Suma pătratelor, demonstrată prin inducție."
+    },
+    {
+     "q": "Cât este 2n + 1 pentru n = 10?",
+     "o": [
+      "20",
+      "21",
+      "11",
+      "22"
+     ],
+     "a": 1,
+     "e": "2 · 10 + 1."
+    }
+   ],
+   "93": [
+    {
+     "q": "Ce formulă are suma cuburilor?",
+     "o": [
+      "(n(n + 1)/2)²",
+      "n(n + 1)(2n + 1)/6",
+      "n⁴/4",
+      "n²(n + 1)"
+     ],
+     "a": 0,
+     "e": "Se demonstrează prin inducție."
+    },
+    {
+     "q": "Cât este 1 + 2 + ... + 10?",
+     "o": [
+      "55",
+      "45",
+      "100",
+      "110"
+     ],
+     "a": 0,
+     "e": "10 · 11 / 2."
+    }
+   ],
+   "94": [
+    {
+     "q": "Cum se descompune 1/(k(k + 1))?",
+     "o": [
+      "1/k − 1/(k + 1)",
+      "1/k + 1/(k + 1)",
+      "1/k · 1/(k + 1)",
+      "1/(k + 1) − 1/k"
+     ],
+     "a": 0,
+     "e": "Aduci la același numitor: (k + 1 − k)/(k(k + 1))."
+    },
+    {
+     "q": "Ce termeni rămân după reducere?",
+     "o": [
+      "Primul și ultimul",
+      "Doar primul",
+      "Toți"
+     ],
+     "a": 0,
+     "e": "1 − 1/100."
+    },
+    {
+     "q": "Cât este suma până la n?",
+     "o": [
+      "n/(n + 1)",
+      "1/n",
+      "(n − 1)/n",
+      "n"
+     ],
+     "a": 0,
+     "e": "1 − 1/(n + 1)."
+    }
+   ],
+   "95": [
+    {
+     "q": "Ce verifici la primul pas?",
+     "o": [
+      "P(1)",
+      "P(0)",
+      "P(10)",
+      "P(n + 1)"
+     ],
+     "a": 0,
+     "e": "Formula e enunțată pentru n ∈ ℕ*."
+    },
+    {
+     "q": "Ce adaugi în pasul de inducție?",
+     "o": [
+      "(n + 1)(n + 2)",
+      "n(n + 1)",
+      "(n + 2)(n + 3)"
+     ],
+     "a": 0,
+     "e": "Termenul de rang n + 1."
+    },
+    {
+     "q": "Ce factor comun dai?",
+     "o": [
+      "(n + 1)(n + 2)",
+      "n + 3",
+      "n/3"
+     ],
+     "a": 0,
+     "e": "Apare în ambii termeni."
+    }
+   ],
+   "96": [
+    {
+     "q": "Ce este 7ⁿ⁺¹ − 1 scris cu 7ⁿ − 1?",
+     "o": [
+      "7(7ⁿ − 1) + 6",
+      "7(7ⁿ − 1) − 6",
+      "(7ⁿ − 1) + 7",
+      "7ⁿ − 1 + 6"
+     ],
+     "a": 0,
+     "e": "7 · 7ⁿ − 1 = 7 · 7ⁿ − 7 + 6."
+    },
+    {
+     "q": "Este 0 divizibil cu 6?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "0 = 6 · 0."
+    },
+    {
+     "q": "Există și o justificare fără inducție?",
+     "o": [
+      "Da: 7 ≡ 1 (mod 6), deci 7ⁿ ≡ 1",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Sau a − 1 | aⁿ − 1."
+    }
+   ],
+   "97": [
+    {
+     "q": "Este adevărat 2⁴ > 4²?",
+     "o": [
+      "Da",
+      "Nu, sunt egale"
+     ],
+     "a": 1,
+     "e": "16 = 16."
+    },
+    {
+     "q": "Ce trebuie arătat la pasul de inducție?",
+     "o": [
+      "2n² ≥ (n + 1)²",
+      "n² > 2n",
+      "2ⁿ > n"
+     ],
+     "a": 0,
+     "e": "Atunci 2ⁿ⁺¹ > 2n² ≥ (n + 1)²."
+    },
+    {
+     "q": "De ce nu e n₀ = 0, deși 2⁰ > 0²?",
+     "o": [
+      "Pentru că inegalitatea nu ține pentru n = 2, 3, 4",
+      "Pentru că 0 nu e natural"
+     ],
+     "a": 0,
+     "e": "n₀ trebuie să meargă pentru toți n ≥ n₀."
+    }
+   ],
+   "98": [
+    {
+     "q": "Cum se descompune 1 − 1/k²?",
+     "o": [
+      "(k − 1)(k + 1)/k²",
+      "(k − 1)²/k²",
+      "(k² − 1)/k",
+      "1/(k² − 1)"
+     ],
+     "a": 0,
+     "e": "Diferență de pătrate la numărător."
+    },
+    {
+     "q": "Cât este (1/2)(2/3)(3/4) · ... · (9/10)?",
+     "o": [
+      "1/10",
+      "9/10",
+      "1/2",
+      "1/9"
+     ],
+     "a": 0,
+     "e": "Se simplifică totul în afară de 1 și 10."
+    },
+    {
+     "q": "Ce formulă generală obții?",
+     "o": [
+      "(n + 1)/(2n)",
+      "n/(n + 1)",
+      "1/n",
+      "(n − 1)/n"
+     ],
+     "a": 0,
+     "e": "Pentru n = 10 dă 11/20."
+    }
+   ],
+   "99": [
+    {
+     "q": "Cât este a₃?",
+     "o": [
+      "5",
+      "9",
+      "7",
+      "16"
+     ],
+     "a": 1,
+     "e": "a₂ = 1 + 3 = 4, a₃ = 4 + 5 = 9."
+    },
+    {
+     "q": "Ce formulă bănuiești?",
+     "o": [
+      "aₙ = n²",
+      "aₙ = 2n − 1",
+      "aₙ = 2ⁿ",
+      "aₙ = n(n + 1)"
+     ],
+     "a": 0,
+     "e": "1, 4, 9, 16, ..."
+    },
+    {
+     "q": "Ce identitate închide pasul de inducție?",
+     "o": [
+      "n² + 2n + 1 = (n + 1)²",
+      "n² + 1 = (n + 1)²",
+      "2n + 1 = n²"
+     ],
+     "a": 0,
+     "e": "Pătratul unei sume."
+    }
+   ],
+   "100": [
+    {
+     "q": "Care este expresia pentru n + 1?",
+     "o": [
+      "4ⁿ⁺¹ + 15n + 14",
+      "4ⁿ⁺¹ + 15n − 1",
+      "4ⁿ + 15n + 14"
+     ],
+     "a": 0,
+     "e": "15(n + 1) − 1 = 15n + 14."
+    },
+    {
+     "q": "Ce rămâne după ce scazi 4(4ⁿ + 15n − 1)?",
+     "o": [
+      "−45n + 18",
+      "15n + 14",
+      "45n",
+      "18"
+     ],
+     "a": 0,
+     "e": "15n + 14 − 60n + 4."
+    },
+    {
+     "q": "Este −45n + 18 divizibil cu 9?",
+     "o": [
+      "Da, = −9(5n − 2)",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "45 și 18 sunt multipli de 9."
+    }
+   ],
+   "101": [
+    {
+     "q": "Cum aduni doi vectori dați prin coordonate?",
+     "o": [
+      "Aduni coordonatele corespunzătoare",
+      "Înmulțești coordonatele",
+      "Aduni modulele"
+     ],
+     "a": 0,
+     "e": "(x₁ + x₂)i⃗ + (y₁ + y₂)j⃗."
+    },
+    {
+     "q": "Ce coeficient are i⃗?",
+     "o": [
+      "1",
+      "3",
+      "−2",
+      "2"
+     ],
+     "a": 0,
+     "e": "2 + (−1)."
+    }
+   ],
+   "102": [
+    {
+     "q": "Ce formulă are modulul?",
+     "o": [
+      "√(x² + y²)",
+      "x + y",
+      "x² + y²",
+      "|x| · |y|"
+     ],
+     "a": 0,
+     "e": "Teorema lui Pitagora."
+    },
+    {
+     "q": "Cât este 5² + 12²?",
+     "o": [
+      "169",
+      "144",
+      "17",
+      "119"
+     ],
+     "a": 0,
+     "e": "25 + 144."
+    }
+   ],
+   "103": [
+    {
+     "q": "Ce condiție au doi vectori coliniari?",
+     "o": [
+      "Coordonate proporționale",
+      "Același modul",
+      "Produs scalar zero"
+     ],
+     "a": 0,
+     "e": "x₁/x₂ = y₁/y₂ (sau x₁y₂ = x₂y₁)."
+    },
+    {
+     "q": "Ce ecuație obții?",
+     "o": [
+      "(a − 1)/3 = 2/6",
+      "(a − 1) · 3 = 2 · 6",
+      "a − 1 = 6",
+      "(a − 1)/2 = 3/6"
+     ],
+     "a": 0,
+     "e": "Raportul coordonatelor pe x egal cu cel pe y."
+    }
+   ],
+   "104": [
+    {
+     "q": "Ce formulă dă x_M?",
+     "o": [
+      "(x_A + x_B)/2",
+      "x_B − x_A",
+      "(x_B − x_A)/2"
+     ],
+     "a": 0,
+     "e": "Media coordonatelor."
+    },
+    {
+     "q": "Cât este y_M?",
+     "o": [
+      "2",
+      "3",
+      "−3",
+      "4"
+     ],
+     "a": 0,
+     "e": "(−1 + 5)/2."
+    }
+   ],
+   "105": [
+    {
+     "q": "Ce formulă dă x_G?",
+     "o": [
+      "(x_A + x_B + x_C)/3",
+      "(x_A + x_B + x_C)/2",
+      "x_A + x_B + x_C"
+     ],
+     "a": 0,
+     "e": "Media celor trei abscise."
+    },
+    {
+     "q": "Ce relație vectorială are G?",
+     "o": [
+      "GA⃗ + GB⃗ + GC⃗ = 0⃗",
+      "GA⃗ = GB⃗",
+      "AG⃗ = AB⃗ + AC⃗"
+     ],
+     "a": 0,
+     "e": "Proprietatea centrului de greutate."
+    }
+   ],
+   "106": [
+    {
+     "q": "În ce ordine scazi coordonatele?",
+     "o": [
+      "Capăt minus origine: B − A",
+      "Origine minus capăt: A − B"
+     ],
+     "a": 0,
+     "e": "AB⃗ pleacă din A și ajunge în B."
+    },
+    {
+     "q": "Ce coeficient are j⃗?",
+     "o": [
+      "−4",
+      "4",
+      "2",
+      "−2"
+     ],
+     "a": 0,
+     "e": "−1 − 3."
+    }
+   ],
+   "107": [
+    {
+     "q": "Ce vectori sunt egali în paralelogramul ABCD?",
+     "o": [
+      "AD⃗ = BC⃗",
+      "AD⃗ = CB⃗",
+      "AB⃗ = CD⃗"
+     ],
+     "a": 0,
+     "e": "Laturile opuse au aceeași direcție, sens și lungime: AB⃗ = DC⃗ și AD⃗ = BC⃗."
+    },
+    {
+     "q": "Cât este BC⃗?",
+     "o": [
+      "i⃗ + 3j⃗",
+      "−i⃗ − 3j⃗",
+      "4i⃗ + 2j⃗"
+     ],
+     "a": 0,
+     "e": "(5 − 4, 5 − 2)."
+    },
+    {
+     "q": "Ce au în comun diagonalele?",
+     "o": [
+      "Același mijloc",
+      "Aceeași lungime",
+      "Sunt perpendiculare"
+     ],
+     "a": 0,
+     "e": "Se înjumătățesc."
+    }
+   ],
+   "108": [
+    {
+     "q": "Cât este AB⃗ + BC⃗?",
+     "o": [
+      "AC⃗",
+      "CA⃗",
+      "BA⃗",
+      "0⃗"
+     ],
+     "a": 0,
+     "e": "Pleci din A, treci prin B, ajungi în C."
+    },
+    {
+     "q": "Cât este AC⃗ + CA⃗?",
+     "o": [
+      "0⃗",
+      "2AC⃗",
+      "AC⃗"
+     ],
+     "a": 0,
+     "e": "Sunt vectori opuși."
+    }
+   ],
+   "109": [
+    {
+     "q": "Cum se scrie vectorul median?",
+     "o": [
+      "AM⃗ = (AB⃗ + AC⃗)/2",
+      "AM⃗ = AB⃗ + AC⃗",
+      "AM⃗ = (AB⃗ − AC⃗)/2"
+     ],
+     "a": 0,
+     "e": "M este mijlocul lui BC."
+    },
+    {
+     "q": "Cât este AM⃗?",
+     "o": [
+      "3i⃗ − 2j⃗",
+      "6i⃗ − 4j⃗",
+      "i⃗ + 4j⃗"
+     ],
+     "a": 0,
+     "e": "Jumătate din 6i⃗ − 4j⃗."
+    }
+   ],
+   "110": [
+    {
+     "q": "Ce înseamnă AP⃗ = 2PB⃗?",
+     "o": [
+      "P împarte AB în raportul 2 : 1, mai aproape de B",
+      "P este mijlocul lui AB",
+      "P e în afara segmentului"
+     ],
+     "a": 0,
+     "e": "AP este dublul lui PB."
+    },
+    {
+     "q": "Ce formulă obții pentru P?",
+     "o": [
+      "(A + 2B)/3",
+      "(2A + B)/3",
+      "(A + B)/2",
+      "(A + 2B)/2"
+     ],
+     "a": 0,
+     "e": "P − A = 2B − 2P."
+    }
+   ],
+   "111": [
+    {
+     "q": "Cât este sin 30°?",
+     "o": [
+      "1/2",
+      "√3/2",
+      "√2/2",
+      "1"
+     ],
+     "a": 0,
+     "e": "Cateta opusă unghiului de 30° este jumătate din ipotenuză."
+    },
+    {
+     "q": "De ce sin 30° = cos 60°?",
+     "o": [
+      "30° și 60° sunt complementare",
+      "Întâmplător"
+     ],
+     "a": 0,
+     "e": "sin x = cos(90° − x)."
+    }
+   ],
+   "112": [
+    {
+     "q": "Ce relație folosești?",
+     "o": [
+      "sin² x + cos² x = 1",
+      "sin x + cos x = 1",
+      "tg x = sin x · cos x"
+     ],
+     "a": 0,
+     "e": "Identitatea fundamentală."
+    },
+    {
+     "q": "Ce semn are cosinusul în cadranul al II-lea?",
+     "o": [
+      "Negativ",
+      "Pozitiv"
+     ],
+     "a": 0,
+     "e": "Între 90° și 180° abscisa punctului de pe cerc e negativă."
+    }
+   ],
+   "113": [
+    {
+     "q": "Cât este sin x?",
+     "o": [
+      "12/13",
+      "−12/13",
+      "8/13",
+      "5/12"
+     ],
+     "a": 0,
+     "e": "Pozitiv în primul cadran."
+    },
+    {
+     "q": "Ce formulă are tangenta?",
+     "o": [
+      "sin x / cos x",
+      "cos x / sin x",
+      "sin x · cos x"
+     ],
+     "a": 0,
+     "e": "Definiția tangentei."
+    }
+   ],
+   "114": [
+    {
+     "q": "Cât este cos 120°?",
+     "o": [
+      "−1/2",
+      "1/2",
+      "−√3/2",
+      "√3/2"
+     ],
+     "a": 0,
+     "e": "120° = 180° − 60°, iar cosinusul schimbă semnul."
+    },
+    {
+     "q": "Cât este sin 150°?",
+     "o": [
+      "1/2",
+      "−1/2",
+      "√3/2"
+     ],
+     "a": 0,
+     "e": "sin(180° − 30°) = sin 30°."
+    }
+   ],
+   "115": [
+    {
+     "q": "Ce formulă are sin 2x?",
+     "o": [
+      "2 sin x cos x",
+      "2 sin x",
+      "sin² x − cos² x",
+      "sin x + cos x"
+     ],
+     "a": 0,
+     "e": "Formula unghiului dublu."
+    },
+    {
+     "q": "Cât este cos x?",
+     "o": [
+      "3/5",
+      "−3/5",
+      "1/5"
+     ],
+     "a": 0,
+     "e": "x e în primul cadran."
+    }
+   ],
+   "116": [
+    {
+     "q": "Câți radiani are 180°?",
+     "o": [
+      "π",
+      "2π",
+      "π/2",
+      "180"
+     ],
+     "a": 0,
+     "e": "Un semicerc."
+    },
+    {
+     "q": "Cât este 135/180 simplificat?",
+     "o": [
+      "3/4",
+      "2/3",
+      "3/5"
+     ],
+     "a": 0,
+     "e": "Împarte la 45."
+    }
+   ],
+   "117": [
+    {
+     "q": "Cu ce e egal sin 73°?",
+     "o": [
+      "cos 17°",
+      "sin 17°",
+      "−cos 17°"
+     ],
+     "a": 0,
+     "e": "sin(90° − x) = cos x."
+    },
+    {
+     "q": "Ce identitate folosești la final?",
+     "o": [
+      "sin² x + cos² x = 1",
+      "sin 2x = 2 sin x cos x"
+     ],
+     "a": 0,
+     "e": "Identitatea fundamentală."
+    }
+   ],
+   "118": [
+    {
+     "q": "Cât este tg 1° · tg 89°?",
+     "o": [
+      "1",
+      "0",
+      "tg 90°"
+     ],
+     "a": 0,
+     "e": "tg 89° = ctg 1°."
+    },
+    {
+     "q": "Ce factor rămâne fără pereche?",
+     "o": [
+      "tg 45°",
+      "tg 1°",
+      "tg 89°"
+     ],
+     "a": 0,
+     "e": "45 = 90 − 45."
+    },
+    {
+     "q": "Cât este tg 45°?",
+     "o": [
+      "1",
+      "√3",
+      "√2/2"
+     ],
+     "a": 0,
+     "e": "Triunghi dreptunghic isoscel."
+    }
+   ],
+   "119": [
+    {
+     "q": "În ce cadrane e sinusul pozitiv?",
+     "o": [
+      "I și II",
+      "I și IV",
+      "II și III"
+     ],
+     "a": 0,
+     "e": "Ordonata e pozitivă deasupra axei Ox."
+    },
+    {
+     "q": "Câte soluții are ecuația pe [0, 2π)?",
+     "o": [
+      "1",
+      "2",
+      "4",
+      "O infinitate"
+     ],
+     "a": 1,
+     "e": "Una în fiecare din cadranele I și II."
+    }
+   ],
+   "120": [
+    {
+     "q": "Cât este cos 1° + cos 179°?",
+     "o": [
+      "0",
+      "2 cos 1°",
+      "1"
+     ],
+     "a": 0,
+     "e": "cos 179° = −cos 1°."
+    },
+    {
+     "q": "Ce termen rămâne fără pereche?",
+     "o": [
+      "cos 90°",
+      "cos 1°",
+      "cos 179°"
+     ],
+     "a": 0,
+     "e": "90 = 180 − 90."
+    }
+   ],
+   "121": [
+    {
+     "q": "Ce formulă are produsul scalar în coordonate?",
+     "o": [
+      "x₁x₂ + y₁y₂",
+      "x₁y₂ − x₂y₁",
+      "x₁x₂ · y₁y₂"
+     ],
+     "a": 0,
+     "e": "Produsul coordonatelor corespunzătoare, adunate."
+    },
+    {
+     "q": "Produsul scalar este:",
+     "o": [
+      "Un număr",
+      "Un vector"
+     ],
+     "a": 0,
+     "e": "De aceea se numește scalar."
+    }
+   ],
+   "122": [
+    {
+     "q": "Când sunt doi vectori nenuli perpendiculari?",
+     "o": [
+      "u⃗ · v⃗ = 0",
+      "u⃗ · v⃗ = 1",
+      "|u⃗| = |v⃗|"
+     ],
+     "a": 0,
+     "e": "cos 90° = 0."
+    },
+    {
+     "q": "Cât este u⃗ · v⃗?",
+     "o": [
+      "3a − 12",
+      "3a + 12",
+      "−6a + 6"
+     ],
+     "a": 0,
+     "e": "a · 3 + 2 · (−6)."
+    }
+   ],
+   "123": [
+    {
+     "q": "Cât este |u⃗|?",
+     "o": [
+      "2",
+      "√3 + 1",
+      "4",
+      "√2"
+     ],
+     "a": 0,
+     "e": "√(3 + 1)."
+    },
+    {
+     "q": "Ce unghi are cosinusul √3/2?",
+     "o": [
+      "30°",
+      "60°",
+      "45°"
+     ],
+     "a": 0,
+     "e": "cos 30° = √3/2."
+    }
+   ],
+   "124": [
+    {
+     "q": "Ce teoremă folosești?",
+     "o": [
+      "Teorema cosinusului",
+      "Teorema sinusurilor",
+      "Teorema lui Pitagora"
+     ],
+     "a": 0,
+     "e": "Știi două laturi și unghiul dintre ele."
+    },
+    {
+     "q": "Cât este cos 60°?",
+     "o": [
+      "1/2",
+      "√3/2",
+      "0"
+     ],
+     "a": 0,
+     "e": "Valoare remarcabilă."
+    }
+   ],
+   "125": [
+    {
+     "q": "Ce spune teorema sinusurilor?",
+     "o": [
+      "a / sin A = 2R",
+      "a · sin A = R",
+      "a / sin A = R"
+     ],
+     "a": 0,
+     "e": "Raportul este diametrul cercului circumscris."
+    },
+    {
+     "q": "Cât este sin 30°?",
+     "o": [
+      "1/2",
+      "√3/2",
+      "1"
+     ],
+     "a": 0,
+     "e": "Valoare remarcabilă."
+    }
+   ],
+   "126": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "AB · AC · sin A / 2",
+      "AB · AC / 2",
+      "AB · AC · cos A / 2"
+     ],
+     "a": 0,
+     "e": "Două laturi și unghiul dintre ele."
+    },
+    {
+     "q": "Aria ar fi 24 dacă unghiul A ar fi:",
+     "o": [
+      "90°",
+      "60°",
+      "45°"
+     ],
+     "a": 0,
+     "e": "sin 90° = 1."
+    }
+   ],
+   "127": [
+    {
+     "q": "Cât este semiperimetrul?",
+     "o": [
+      "21",
+      "42",
+      "14"
+     ],
+     "a": 0,
+     "e": "42/2."
+    },
+    {
+     "q": "Ce produs apare sub radical?",
+     "o": [
+      "21 · 8 · 7 · 6",
+      "13 · 14 · 15",
+      "21 · 13 · 14 · 15"
+     ],
+     "a": 0,
+     "e": "p − a = 8, p − b = 7, p − c = 6."
+    }
+   ],
+   "128": [
+    {
+     "q": "Ce compari?",
+     "o": [
+      "9² cu 5² + 7²",
+      "9 cu 5 + 7",
+      "5 · 7 cu 9"
+     ],
+     "a": 0,
+     "e": "Teorema cosinusului pentru cel mai mare unghi."
+    },
+    {
+     "q": "Ce înseamnă c² > a² + b²?",
+     "o": [
+      "Unghiul opus lui c este obtuz",
+      "Unghiul e drept",
+      "Unghiul e ascuțit"
+     ],
+     "a": 0,
+     "e": "cos C = (a² + b² − c²)/(2ab) < 0."
+    }
+   ],
+   "129": [
+    {
+     "q": "Ce relație leagă aria de raza cercului înscris?",
+     "o": [
+      "S = p · r",
+      "S = abc / (4r)",
+      "S = r²π"
+     ],
+     "a": 0,
+     "e": "Triunghiul se împarte în trei triunghiuri cu înălțimea r."
+    },
+    {
+     "q": "Cât este aria?",
+     "o": [
+      "84",
+      "42",
+      "168"
+     ],
+     "a": 0,
+     "e": "Formula lui Heron."
+    }
+   ],
+   "130": [
+    {
+     "q": "Ce fel de triunghi este?",
+     "o": [
+      "Dreptunghic în A",
+      "Echilateral",
+      "Obtuzunghic"
+     ],
+     "a": 0,
+     "e": "6² + 8² = 10²."
+    },
+    {
+     "q": "Cât este mediana pe ipotenuză?",
+     "o": [
+      "Jumătate din ipotenuză",
+      "O treime",
+      "Egală cu ipotenuza"
+     ],
+     "a": 0,
+     "e": "Mijlocul ipotenuzei este centrul cercului circumscris."
+    }
    ]
   },
   "10": {
@@ -11559,6 +13306,1523 @@
      "a": 0,
      "e": "Pentru x < 0, ecuația devine 5 = f(x), cu f strict crescătoare, deci găsești soluția prin încercare și ea e unică."
     }
+   ],
+   "131": [
+    {
+     "q": "Care este conjugatul lui √2 − 1?",
+     "o": [
+      "√2 + 1",
+      "1 − √2",
+      "−√2 − 1",
+      "√2"
+     ],
+     "a": 0,
+     "e": "Schimbi semnul dintre termeni."
+    },
+    {
+     "q": "Cât este (√2 − 1)(√2 + 1)?",
+     "o": [
+      "1",
+      "2",
+      "3",
+      "√2"
+     ],
+     "a": 0,
+     "e": "Diferență de pătrate: 2 − 1."
+    }
+   ],
+   "132": [
+    {
+     "q": "Cât este ∛(−8)?",
+     "o": [
+      "−2",
+      "nu există",
+      "2",
+      "−4"
+     ],
+     "a": 0,
+     "e": "(−2)³ = −8."
+    },
+    {
+     "q": "Există √(−8) în ℝ?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Ordinul par cere număr nenegativ sub radical."
+    }
+   ],
+   "133": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "log_b c = log_a c / log_a b",
+      "log(bc) = log b · log c",
+      "log_b c = log_c b"
+     ],
+     "a": 0,
+     "e": "Schimbarea bazei."
+    },
+    {
+     "q": "Cât este log₂ 8?",
+     "o": [
+      "3",
+      "4",
+      "2",
+      "8"
+     ],
+     "a": 0,
+     "e": "2³ = 8."
+    }
+   ],
+   "134": [
+    {
+     "q": "La ce ordin comun aduci radicalii?",
+     "o": [
+      "6",
+      "5",
+      "3",
+      "2"
+     ],
+     "a": 0,
+     "e": "cmmmc(2, 3, 6) = 6."
+    },
+    {
+     "q": "Cât este √3 ca radical de ordin 6?",
+     "o": [
+      "⁶√27",
+      "⁶√9",
+      "⁶√3",
+      "⁶√729"
+     ],
+     "a": 0,
+     "e": "√3 = 3^(1/2) = 3^(3/6)."
+    },
+    {
+     "q": "Cât este ∛5 ca radical de ordin 6?",
+     "o": [
+      "⁶√25",
+      "⁶√125",
+      "⁶√10"
+     ],
+     "a": 0,
+     "e": "5^(1/3) = 5^(2/6)."
+    }
+   ],
+   "135": [
+    {
+     "q": "Cum scrii 8 ca putere a lui 1/2?",
+     "o": [
+      "(1/2)⁻³",
+      "(1/2)³",
+      "(1/2)⁸",
+      "(1/2)⁻⁸"
+     ],
+     "a": 0,
+     "e": "(1/2)⁻¹ = 2."
+    },
+    {
+     "q": "Poate un logaritm să fie negativ?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Aici chiar este: −3."
+    }
+   ],
+   "136": [
+    {
+     "q": "Cum se scrie log₂ 12?",
+     "o": [
+      "2 + a",
+      "2a",
+      "4 + a",
+      "3 + a"
+     ],
+     "a": 0,
+     "e": "12 = 4 · 3, log₂ 4 = 2."
+    },
+    {
+     "q": "Cum se scrie log₂ 6?",
+     "o": [
+      "1 + a",
+      "a",
+      "2 + a",
+      "2a"
+     ],
+     "a": 0,
+     "e": "6 = 2 · 3."
+    }
+   ],
+   "137": [
+    {
+     "q": "Cât este 81 ca putere a lui 3?",
+     "o": [
+      "3⁴",
+      "3³",
+      "3⁵",
+      "9³"
+     ],
+     "a": 0,
+     "e": "3 · 3 · 3 · 3 = 81."
+    },
+    {
+     "q": "De ce poți egala exponenții?",
+     "o": [
+      "Funcția 3ˣ este injectivă",
+      "Întotdeauna se poate"
+     ],
+     "a": 0,
+     "e": "Puteri egale ale aceleiași baze (pozitive, diferite de 1) au exponenți egali."
+    }
+   ],
+   "138": [
+    {
+     "q": "Cum scrii 3ˣ⁺¹?",
+     "o": [
+      "3 · 3ˣ",
+      "3ˣ + 1",
+      "3ˣ + 3",
+      "(3ˣ)¹"
+     ],
+     "a": 0,
+     "e": "aᵐ⁺ⁿ = aᵐ · aⁿ."
+    },
+    {
+     "q": "Ce factor comun dai?",
+     "o": [
+      "3ˣ",
+      "3",
+      "x"
+     ],
+     "a": 0,
+     "e": "3ˣ(1 + 3) = 36."
+    }
+   ],
+   "139": [
+    {
+     "q": "Cum scrii 4ˣ cu t = 2ˣ?",
+     "o": [
+      "t²",
+      "2t",
+      "t + 2",
+      "4t"
+     ],
+     "a": 0,
+     "e": "4ˣ = (2²)ˣ = (2ˣ)²."
+    },
+    {
+     "q": "Ce condiție are t?",
+     "o": [
+      "t > 0",
+      "t ≥ 1",
+      "t ∈ ℝ"
+     ],
+     "a": 0,
+     "e": "O putere a lui 2 e strict pozitivă."
+    },
+    {
+     "q": "Care sunt soluțiile în t?",
+     "o": [
+      "2 și 4",
+      "−2 și −4",
+      "1 și 8"
+     ],
+     "a": 0,
+     "e": "2 + 4 = 6, 2 · 4 = 8."
+    }
+   ],
+   "140": [
+    {
+     "q": "Care sunt condițiile de existență?",
+     "o": [
+      "x > 1",
+      "x > −1",
+      "x ≠ ±1",
+      "x ≥ 1"
+     ],
+     "a": 0,
+     "e": "Ambele argumente trebuie să fie strict pozitive."
+    },
+    {
+     "q": "Ce ecuație obții?",
+     "o": [
+      "x² − 1 = 8",
+      "x² − 1 = 3",
+      "2x = 8",
+      "x² − 1 = 6"
+     ],
+     "a": 0,
+     "e": "log₂(x² − 1) = 3 ⇔ x² − 1 = 2³."
+    },
+    {
+     "q": "De ce eliminăm x = −3?",
+     "o": [
+      "Nu respectă condiția x > 1",
+      "Nu verifică ecuația x² = 9"
+     ],
+     "a": 0,
+     "e": "log₂(−2) nu există."
+    }
+   ],
+   "141": [
+    {
+     "q": "Cum se scrie 8 ca putere a lui 1/2?",
+     "o": [
+      "(1/2)⁻³",
+      "(1/2)³",
+      "(1/2)⁸"
+     ],
+     "a": 0,
+     "e": "(1/2)⁻³ = 2³."
+    },
+    {
+     "q": "Ce se întâmplă cu sensul inegalității?",
+     "o": [
+      "Se schimbă, baza e subunitară",
+      "Rămâne la fel"
+     ],
+     "a": 0,
+     "e": "(1/2)ˣ este descrescătoare."
+    }
+   ],
+   "142": [
+    {
+     "q": "Ce relație leagă logₓ 4 și log₄ x?",
+     "o": [
+      "logₓ 4 = 1/log₄ x",
+      "logₓ 4 = −log₄ x",
+      "Sunt egale"
+     ],
+     "a": 0,
+     "e": "Schimbarea bazei."
+    },
+    {
+     "q": "Ce condiții are baza x?",
+     "o": [
+      "x > 0 și x ≠ 1",
+      "x > 1",
+      "x ≠ 0"
+     ],
+     "a": 0,
+     "e": "Baza unui logaritm este pozitivă și diferită de 1."
+    },
+    {
+     "q": "Ce ecuație în t obții?",
+     "o": [
+      "2t² − 5t + 2 = 0",
+      "t² − 5t + 2 = 0",
+      "2t² + 5t + 2 = 0"
+     ],
+     "a": 0,
+     "e": "Înmulțești 1/t + t = 5/2 cu 2t."
+    }
+   ],
+   "143": [
+    {
+     "q": "Câți factori are produsul A₅³?",
+     "o": [
+      "3",
+      "5",
+      "2"
+     ],
+     "a": 0,
+     "e": "k factori consecutivi descrescători, începând cu n."
+    },
+    {
+     "q": "Contează ordinea la aranjamente?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Spre deosebire de combinări."
+    }
+   ],
+   "144": [
+    {
+     "q": "Cât este Cₙ²?",
+     "o": [
+      "n(n − 1)/2",
+      "n(n − 1)",
+      "n²/2",
+      "n!/2"
+     ],
+     "a": 0,
+     "e": "Perechi neordonate."
+    },
+    {
+     "q": "Ce ecuație obții?",
+     "o": [
+      "n² − n − 56 = 0",
+      "n² − n − 28 = 0",
+      "n² = 56"
+     ],
+     "a": 0,
+     "e": "n(n − 1) = 56."
+    }
+   ],
+   "145": [
+    {
+     "q": "Câte funcții (oarecare) există?",
+     "o": [
+      "64",
+      "24",
+      "12",
+      "81"
+     ],
+     "a": 0,
+     "e": "4³: fiecare element are 4 imagini posibile."
+    },
+    {
+     "q": "Ce număr dă funcțiile injective?",
+     "o": [
+      "A₄³",
+      "C₄³",
+      "4³",
+      "3⁴"
+     ],
+     "a": 0,
+     "e": "Alegeri ordonate de valori distincte."
+    }
+   ],
+   "146": [
+    {
+     "q": "Din câte elemente alegi restul?",
+     "o": [
+      "9",
+      "10",
+      "8"
+     ],
+     "a": 0,
+     "e": "Toate în afară de 1."
+    },
+    {
+     "q": "Cât este C₉²?",
+     "o": [
+      "36",
+      "72",
+      "18",
+      "81"
+     ],
+     "a": 0,
+     "e": "9 · 8 / 2."
+    }
+   ],
+   "147": [
+    {
+     "q": "Câte segmente unesc 12 puncte?",
+     "o": [
+      "66",
+      "132",
+      "144"
+     ],
+     "a": 0,
+     "e": "C₁₂² = 12 · 11 / 2."
+    },
+    {
+     "q": "Ce formulă dă numărul de diagonale?",
+     "o": [
+      "n(n − 3)/2",
+      "n(n − 1)/2",
+      "n − 3"
+     ],
+     "a": 0,
+     "e": "C_n² − n."
+    }
+   ],
+   "148": [
+    {
+     "q": "Ce relație e între Aₙ² și Cₙ²?",
+     "o": [
+      "Aₙ² = 2 · Cₙ²",
+      "Aₙ² = Cₙ²",
+      "Aₙ² = Cₙ²/2"
+     ],
+     "a": 0,
+     "e": "Fiecare pereche neordonată dă 2! perechi ordonate."
+    },
+    {
+     "q": "Ce condiție pui pe n?",
+     "o": [
+      "n ≥ 2",
+      "n ≥ 0",
+      "n ≥ 30"
+     ],
+     "a": 0,
+     "e": "Altfel Aₙ² nu are sens."
+    }
+   ],
+   "149": [
+    {
+     "q": "Cât este panta?",
+     "o": [
+      "2",
+      "1/2",
+      "4",
+      "3"
+     ],
+     "a": 0,
+     "e": "4/2."
+    },
+    {
+     "q": "Trece dreapta prin origine?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Pentru x = 0 obții y = 0."
+    }
+   ],
+   "150": [
+    {
+     "q": "Ce pantă are paralela?",
+     "o": [
+      "3",
+      "−1/3",
+      "−1",
+      "1/3"
+     ],
+     "a": 0,
+     "e": "Aceeași ca a lui d."
+    },
+    {
+     "q": "Cum scrii dreapta prin A(x₀, y₀) cu panta m?",
+     "o": [
+      "y − y₀ = m(x − x₀)",
+      "y = mx + x₀",
+      "y − x₀ = m(x − y₀)"
+     ],
+     "a": 0,
+     "e": "Ecuația dreptei printr-un punct, de pantă dată."
+    }
+   ],
+   "151": [
+    {
+     "q": "Ce pantă are perpendiculara?",
+     "o": [
+      "−1/2",
+      "1/2",
+      "−2",
+      "2"
+     ],
+     "a": 0,
+     "e": "m₁ · m₂ = −1."
+    },
+    {
+     "q": "Verifică A în ecuația finală:",
+     "o": [
+      "2 + 6 − 8 = 0, merge",
+      "Nu merge"
+     ],
+     "a": 0,
+     "e": "A aparține dreptei."
+    }
+   ],
+   "152": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "|ax₀ + by₀ + c| / √(a² + b²)",
+      "|ax₀ + by₀ + c|",
+      "√(x₀² + y₀²)"
+     ],
+     "a": 0,
+     "e": "Distanța de la un punct la o dreaptă."
+    },
+    {
+     "q": "Cât este √(3² + 4²)?",
+     "o": [
+      "5",
+      "7",
+      "25"
+     ],
+     "a": 0,
+     "e": "√25."
+    }
+   ],
+   "153": [
+    {
+     "q": "Cât este panta lui AB?",
+     "o": [
+      "2",
+      "4",
+      "1/2"
+     ],
+     "a": 0,
+     "e": "4/2."
+    },
+    {
+     "q": "Ce altă metodă există?",
+     "o": [
+      "Determinantul cu coordonatele să fie 0",
+      "AB = AC",
+      "Produs scalar 0"
+     ],
+     "a": 0,
+     "e": "Se studiază în clasa a XI-a."
+    }
+   ],
+   "154": [
+    {
+     "q": "Ce pantă are d?",
+     "o": [
+      "−1",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "y = −x + 1."
+    },
+    {
+     "q": "Ce pantă are perpendiculara?",
+     "o": [
+      "1",
+      "−1",
+      "2"
+     ],
+     "a": 0,
+     "e": "(−1) · 1 = −1."
+    },
+    {
+     "q": "Ce rol are proiecția M?",
+     "o": [
+      "Mijlocul lui AA′",
+      "Este A′",
+      "Un vârf oarecare"
+     ],
+     "a": 0,
+     "e": "Simetria față de o dreaptă."
+    }
+   ],
+   "155": [
+    {
+     "q": "Cât este i²?",
+     "o": [
+      "−1",
+      "1",
+      "i",
+      "−i"
+     ],
+     "a": 0,
+     "e": "Definiția unității imaginare."
+    },
+    {
+     "q": "Cât este −3i²?",
+     "o": [
+      "3",
+      "−3",
+      "3i"
+     ],
+     "a": 0,
+     "e": "−3 · (−1)."
+    }
+   ],
+   "156": [
+    {
+     "q": "Cât este i⁴?",
+     "o": [
+      "1",
+      "−1",
+      "i"
+     ],
+     "a": 0,
+     "e": "i² · i² = (−1)(−1)."
+    },
+    {
+     "q": "Ce rest dă 2026 la împărțirea cu 4?",
+     "o": [
+      "2",
+      "0",
+      "1",
+      "3"
+     ],
+     "a": 0,
+     "e": "2024 se divide cu 4."
+    }
+   ],
+   "157": [
+    {
+     "q": "Cât este |1 + i|?",
+     "o": [
+      "√2",
+      "2",
+      "1"
+     ],
+     "a": 0,
+     "e": "√(1² + 1²)."
+    },
+    {
+     "q": "Cât este (1 + i)²?",
+     "o": [
+      "2i",
+      "2",
+      "1 + 2i"
+     ],
+     "a": 0,
+     "e": "1 + 2i + i² = 2i."
+    }
+   ],
+   "158": [
+    {
+     "q": "Care este conjugatul lui 1 − i?",
+     "o": [
+      "1 + i",
+      "−1 + i",
+      "−1 − i"
+     ],
+     "a": 0,
+     "e": "Schimbi semnul părții imaginare."
+    },
+    {
+     "q": "Cât este (1 − i)(1 + i)?",
+     "o": [
+      "2",
+      "0",
+      "1",
+      "2i"
+     ],
+     "a": 0,
+     "e": "1 − i² = 2."
+    }
+   ],
+   "159": [
+    {
+     "q": "Ce este z̄ pentru z = a + bi?",
+     "o": [
+      "a − bi",
+      "−a + bi",
+      "b + ai"
+     ],
+     "a": 0,
+     "e": "Conjugatul."
+    },
+    {
+     "q": "Ce obții pentru partea reală?",
+     "o": [
+      "3a = 6",
+      "a = 6",
+      "2a = 6"
+     ],
+     "a": 0,
+     "e": "a + 2a."
+    }
+   ],
+   "160": [
+    {
+     "q": "Cât este Δ?",
+     "o": [
+      "−16",
+      "16",
+      "−24",
+      "24"
+     ],
+     "a": 0,
+     "e": "(−2)² − 4 · 5."
+    },
+    {
+     "q": "Ce relație au cele două soluții?",
+     "o": [
+      "Sunt conjugate",
+      "Sunt opuse",
+      "Sunt egale"
+     ],
+     "a": 0,
+     "e": "Coeficienții sunt reali."
+    }
+   ],
+   "161": [
+    {
+     "q": "Cât este (1 + i)²?",
+     "o": [
+      "2i",
+      "2",
+      "1 + i²"
+     ],
+     "a": 0,
+     "e": "1 + 2i − 1."
+    },
+    {
+     "q": "Cât este i⁵?",
+     "o": [
+      "i",
+      "−i",
+      "1"
+     ],
+     "a": 0,
+     "e": "i⁴ = 1."
+    }
+   ],
+   "162": [
+    {
+     "q": "Ce sistem obții?",
+     "o": [
+      "a² − b² = 3, 2ab = 4",
+      "a² + b² = 3, ab = 4",
+      "a − b = 3, a + b = 4"
+     ],
+     "a": 0,
+     "e": "(a + bi)² = a² − b² + 2abi."
+    },
+    {
+     "q": "Ce informație suplimentară dă modulul?",
+     "o": [
+      "a² + b² = 5",
+      "a² + b² = 25",
+      "a + b = 5"
+     ],
+     "a": 0,
+     "e": "|z|² = |3 + 4i| = 5."
+    }
+   ],
+   "163": [
+    {
+     "q": "Care este partea imaginară?",
+     "o": [
+      "2 + a",
+      "2 − a",
+      "a",
+      "2"
+     ],
+     "a": 0,
+     "e": "Coeficienții lui i: 2 și a."
+    },
+    {
+     "q": "Cât este produsul pentru a = −2?",
+     "o": [
+      "4",
+      "0",
+      "2"
+     ],
+     "a": 0,
+     "e": "(2 − 2i)(1 + i) = 2 + 2 = 4."
+    }
+   ],
+   "164": [
+    {
+     "q": "Cât este ε³?",
+     "o": [
+      "1",
+      "−1",
+      "ε"
+     ],
+     "a": 0,
+     "e": "ε³ − 1 = (ε − 1)(ε² + ε + 1) = 0."
+    },
+    {
+     "q": "Cât este ε¹⁰?",
+     "o": [
+      "ε",
+      "ε²",
+      "1"
+     ],
+     "a": 0,
+     "e": "10 = 3 · 3 + 1."
+    },
+    {
+     "q": "Cât este ε + ε²?",
+     "o": [
+      "−1",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "Din ecuație."
+    }
+   ],
+   "165": [
+    {
+     "q": "Ce aplici primul în f ∘ g?",
+     "o": [
+      "g",
+      "f"
+     ],
+     "a": 0,
+     "e": "(f ∘ g)(x) = f(g(x))."
+    },
+    {
+     "q": "Cât ar fi (g ∘ f)(2)?",
+     "o": [
+      "25",
+      "9",
+      "16"
+     ],
+     "a": 0,
+     "e": "f(2) = 5, g(5) = 25: compunerea nu e comutativă."
+    }
+   ],
+   "166": [
+    {
+     "q": "Cât este (g ∘ f)(x)?",
+     "o": [
+      "2x + 5",
+      "2x + 2",
+      "2x + 6",
+      "x + 2"
+     ],
+     "a": 0,
+     "e": "g(x + 3) = 2(x + 3) − 1."
+    },
+    {
+     "q": "Este g ∘ f = f ∘ g aici?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "2x + 5 ≠ 2x + 2."
+    }
+   ],
+   "167": [
+    {
+     "q": "Ce înseamnă f⁻¹(3) = x?",
+     "o": [
+      "f(x) = 3",
+      "f(3) = x",
+      "x = 1/f(3)"
+     ],
+     "a": 0,
+     "e": "Definiția inversei."
+    },
+    {
+     "q": "Este f⁻¹(x) același lucru cu 1/f(x)?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Inversa la compunere, nu la înmulțire."
+    }
+   ],
+   "168": [
+    {
+     "q": "Este x² injectivă pe ℝ?",
+     "o": [
+      "Nu: (−1)² = 1²",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Contraexemplu."
+    },
+    {
+     "q": "Ce proprietate garantează injectivitatea?",
+     "o": [
+      "Strict monotonă",
+      "Continuă",
+      "Pară"
+     ],
+     "a": 0,
+     "e": "O funcție strict monotonă nu repetă valori."
+    }
+   ],
+   "169": [
+    {
+     "q": "Ce înseamnă funcție impară?",
+     "o": [
+      "f(−x) = −f(x)",
+      "f(−x) = f(x)",
+      "f(x) < 0"
+     ],
+     "a": 0,
+     "e": "Graficul simetric față de origine."
+    },
+    {
+     "q": "Cât este (−x)³?",
+     "o": [
+      "−x³",
+      "x³"
+     ],
+     "a": 0,
+     "e": "Putere impară."
+    }
+   ],
+   "170": [
+    {
+     "q": "Care e inversa lui 2ˣ?",
+     "o": [
+      "log₂ x",
+      "x²",
+      "1/2ˣ",
+      "√x"
+     ],
+     "a": 0,
+     "e": "Exponențiala și logaritmul în aceeași bază sunt inverse."
+    },
+    {
+     "q": "Verificare: cât este f(4)?",
+     "o": [
+      "8",
+      "16",
+      "4"
+     ],
+     "a": 0,
+     "e": "2³ = 8."
+    }
+   ],
+   "171": [
+    {
+     "q": "Ce înseamnă surjectivă?",
+     "o": [
+      "Imaginea este tot codomeniul",
+      "Valori diferite în puncte diferite",
+      "Strict crescătoare"
+     ],
+     "a": 0,
+     "e": "Fiecare element al codomeniului e atins."
+    },
+    {
+     "q": "Care este valoarea minimă a lui f?",
+     "o": [
+      "3",
+      "7",
+      "2",
+      "−4"
+     ],
+     "a": 0,
+     "e": "În vârf, x = 2."
+    },
+    {
+     "q": "De ce nu merge a = 0?",
+     "o": [
+      "Valorile 0, 1, 2 nu ar fi atinse",
+      "Merge și a = 0"
+     ],
+     "a": 0,
+     "e": "f(x) ≥ 3."
+    }
+   ],
+   "172": [
+    {
+     "q": "Ce valori ia prima ramură?",
+     "o": [
+      "(−∞, 2]",
+      "(−∞, 1]",
+      "[2, +∞)"
+     ],
+     "a": 0,
+     "e": "2x cu x ≤ 1."
+    },
+    {
+     "q": "Pe ce ramură cauți f⁻¹(5)?",
+     "o": [
+      "A doua",
+      "Prima"
+     ],
+     "a": 0,
+     "e": "5 > 2."
+    },
+    {
+     "q": "Cât este f⁻¹(1)?",
+     "o": [
+      "1/2",
+      "0",
+      "2"
+     ],
+     "a": 0,
+     "e": "2x = 1."
+    }
+   ],
+   "173": [
+    {
+     "q": "Cât este arcsin(√3/2)?",
+     "o": [
+      "π/3",
+      "π/6",
+      "2π/3"
+     ],
+     "a": 0,
+     "e": "sin π/3 = √3/2 și π/3 ∈ [−π/2, π/2]."
+    },
+    {
+     "q": "Cât este arctg 1?",
+     "o": [
+      "π/4",
+      "π/2",
+      "0"
+     ],
+     "a": 0,
+     "e": "tg π/4 = 1."
+    }
+   ],
+   "174": [
+    {
+     "q": "Ce perioadă principală are sin x?",
+     "o": [
+      "2π",
+      "π",
+      "π/2"
+     ],
+     "a": 0,
+     "e": "Un cerc complet."
+    },
+    {
+     "q": "Ce perioadă are sin(ax), a > 0?",
+     "o": [
+      "2π/a",
+      "2πa",
+      "π/a"
+     ],
+     "a": 0,
+     "e": "Graficul e comprimat de a ori."
+    }
+   ],
+   "175": [
+    {
+     "q": "Câți termeni are (a + b)²?",
+     "o": [
+      "3",
+      "2",
+      "4"
+     ],
+     "a": 0,
+     "e": "a² + 2ab + b²."
+    },
+    {
+     "q": "Câți termeni are (a + b)ⁿ?",
+     "o": [
+      "n + 1",
+      "n",
+      "2ⁿ"
+     ],
+     "a": 0,
+     "e": "k = 0, 1, ..., n."
+    }
+   ],
+   "176": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "2ⁿ",
+      "n!",
+      "n²"
+     ],
+     "a": 0,
+     "e": "(1 + 1)ⁿ."
+    },
+    {
+     "q": "Ce mai numără această sumă?",
+     "o": [
+      "Toate submulțimile unei mulțimi cu 8 elemente",
+      "Permutările a 8 elemente"
+     ],
+     "a": 0,
+     "e": "C₈ᵏ numără submulțimile cu k elemente."
+    }
+   ],
+   "177": [
+    {
+     "q": "Pentru ce k apare x³?",
+     "o": [
+      "k = 2",
+      "k = 3",
+      "k = 5"
+     ],
+     "a": 0,
+     "e": "5 − k = 3."
+    },
+    {
+     "q": "Cât este C₅²?",
+     "o": [
+      "10",
+      "5",
+      "20"
+     ],
+     "a": 0,
+     "e": "5 · 4 / 2."
+    }
+   ],
+   "178": [
+    {
+     "q": "Ce exponent are x în Tₖ₊₁?",
+     "o": [
+      "6 − 2k",
+      "6 − k",
+      "6 + k"
+     ],
+     "a": 0,
+     "e": "x⁶⁻ᵏ · x⁻ᵏ."
+    },
+    {
+     "q": "Ce termen e cel liber?",
+     "o": [
+      "T₄",
+      "T₃",
+      "T₆"
+     ],
+     "a": 0,
+     "e": "k = 3, deci rangul k + 1 = 4."
+    }
+   ],
+   "179": [
+    {
+     "q": "Cum scrii 1/∛x ca putere?",
+     "o": [
+      "x^(−1/3)",
+      "x^(1/3)",
+      "x^(−3)"
+     ],
+     "a": 0,
+     "e": "∛x = x^(1/3)."
+    },
+    {
+     "q": "Ce ecuație dă k?",
+     "o": [
+      "(10 − k)/2 = k/3",
+      "10 − k = k",
+      "(10 − k)/3 = k/2"
+     ],
+     "a": 0,
+     "e": "Exponentul total este 0."
+    },
+    {
+     "q": "Cât este C₁₀⁶?",
+     "o": [
+      "210",
+      "120",
+      "252"
+     ],
+     "a": 0,
+     "e": "= C₁₀⁴ = 10 · 9 · 8 · 7 / 24."
+    }
+   ],
+   "180": [
+    {
+     "q": "Cum obții suma coeficienților unui polinom?",
+     "o": [
+      "Calculezi P(1)",
+      "Calculezi P(0)",
+      "Aduni exponenții"
+     ],
+     "a": 0,
+     "e": "Toate puterile lui x devin 1."
+    },
+    {
+     "q": "Ce dă P(0)?",
+     "o": [
+      "Termenul liber",
+      "Suma coeficienților"
+     ],
+     "a": 0,
+     "e": "P(0) = (−1)⁵ = −1."
+    }
+   ],
+   "181": [
+    {
+     "q": "Ce condiție pune √2?",
+     "o": [
+      "12 − k par",
+      "k multiplu de 3",
+      "k impar"
+     ],
+     "a": 0,
+     "e": "2^((12 − k)/2) e rațional când exponentul e întreg."
+    },
+    {
+     "q": "Ce condiție pune ∛3?",
+     "o": [
+      "k multiplu de 3",
+      "k par",
+      "k = 3"
+     ],
+     "a": 0,
+     "e": "3^(k/3)."
+    },
+    {
+     "q": "Care valori ale lui k merg?",
+     "o": [
+      "0, 6, 12",
+      "0, 3, 6, 9, 12",
+      "6"
+     ],
+     "a": 0,
+     "e": "Multiplii de 6 din [0, 12]."
+    }
+   ],
+   "182": [
+    {
+     "q": "Ce valori dai lui a și b?",
+     "o": [
+      "a = 1, b = −1",
+      "a = b = 1",
+      "a = 0, b = 1"
+     ],
+     "a": 0,
+     "e": "Apar semnele alternante."
+    },
+    {
+     "q": "Rezultă că suma coeficienților de rang par este:",
+     "o": [
+      "Egală cu cea a celor de rang impar",
+      "Dublul ei",
+      "0"
+     ],
+     "a": 0,
+     "e": "Diferența lor este 0."
+    }
+   ],
+   "183": [
+    {
+     "q": "Cât este suma tuturor coeficienților?",
+     "o": [
+      "1024",
+      "512",
+      "100"
+     ],
+     "a": 0,
+     "e": "2¹⁰."
+    },
+    {
+     "q": "Cât este diferența dintre cele pare și cele impare?",
+     "o": [
+      "0",
+      "1",
+      "512"
+     ],
+     "a": 0,
+     "e": "(1 − 1)¹⁰."
+    }
+   ],
+   "184": [
+    {
+     "q": "Câți termeni are dezvoltarea?",
+     "o": [
+      "7",
+      "6",
+      "8"
+     ],
+     "a": 0,
+     "e": "n + 1."
+    },
+    {
+     "q": "Ce semn are (−2)³?",
+     "o": [
+      "Negativ",
+      "Pozitiv"
+     ],
+     "a": 0,
+     "e": "Putere impară a unui număr negativ."
+    }
+   ],
+   "185": [
+    {
+     "q": "Cât este 15% din 200?",
+     "o": [
+      "30",
+      "15",
+      "20",
+      "3"
+     ],
+     "a": 0,
+     "e": "0,15 · 200."
+    },
+    {
+     "q": "Cu ce număr înmulțești direct prețul?",
+     "o": [
+      "1,15",
+      "0,15",
+      "0,85"
+     ],
+     "a": 0,
+     "e": "100% + 15%."
+    }
+   ],
+   "186": [
+    {
+     "q": "Cât costă după scumpire?",
+     "o": [
+      "600",
+      "520",
+      "400"
+     ],
+     "a": 0,
+     "e": "500 · 1,2."
+    },
+    {
+     "q": "De ce nu revine prețul la 500?",
+     "o": [
+      "A doua reducere se calculează din 600",
+      "Procentele se adună"
+     ],
+     "a": 0,
+     "e": "1,2 · 0,8 = 0,96."
+    }
+   ],
+   "187": [
+    {
+     "q": "Câte cazuri posibile sunt?",
+     "o": [
+      "30",
+      "10",
+      "3"
+     ],
+     "a": 0,
+     "e": "Toate numerele mulțimii."
+    },
+    {
+     "q": "Câți multipli de 3 sunt până la 30?",
+     "o": [
+      "10",
+      "9",
+      "11"
+     ],
+     "a": 0,
+     "e": "30/3."
+    }
+   ],
+   "188": [
+    {
+     "q": "Câte numere de două cifre există?",
+     "o": [
+      "90",
+      "99",
+      "100",
+      "89"
+     ],
+     "a": 0,
+     "e": "99 − 10 + 1."
+    },
+    {
+     "q": "Este 100 de două cifre?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "100 are trei cifre, iar 9 o singură cifră."
+    }
+   ],
+   "189": [
+    {
+     "q": "Câte rezultate posibile sunt?",
+     "o": [
+      "36",
+      "12",
+      "21"
+     ],
+     "a": 0,
+     "e": "6 · 6."
+    },
+    {
+     "q": "Sunt (1, 6) și (6, 1) cazuri diferite?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Zarurile sunt distincte."
+    }
+   ],
+   "190": [
+    {
+     "q": "Din ce sumă se calculează dobânda în anul al doilea?",
+     "o": [
+      "Din suma inițială",
+      "Din suma cu dobânda"
+     ],
+     "a": 0,
+     "e": "Asta e dobânda simplă."
+    },
+    {
+     "q": "Cât este dobânda pe un an?",
+     "o": [
+      "100",
+      "50",
+      "200"
+     ],
+     "a": 0,
+     "e": "0,05 · 2000."
+    }
+   ],
+   "191": [
+    {
+     "q": "Ce formulă are dobânda compusă?",
+     "o": [
+      "S₀(1 + p)ⁿ",
+      "S₀(1 + np)",
+      "S₀ + p"
+     ],
+     "a": 0,
+     "e": "Dobânda se adaugă la sumă în fiecare an."
+    },
+    {
+     "q": "Cât e dobânda în al doilea an?",
+     "o": [
+      "110",
+      "100",
+      "210"
+     ],
+     "a": 0,
+     "e": "10% din 1100."
+    }
+   ],
+   "192": [
+    {
+     "q": "Ce ecuație scrii?",
+     "o": [
+      "1,19x = 238",
+      "x = 238 − 0,19 · 238",
+      "x = 0,81 · 238"
+     ],
+     "a": 0,
+     "e": "TVA se adaugă la prețul fără TVA."
+    },
+    {
+     "q": "De ce nu scazi 19% din 238?",
+     "o": [
+      "19% se calculează din prețul fără TVA",
+      "Ar ieși la fel"
+     ],
+     "a": 0,
+     "e": "0,81 · 238 ≈ 192,78."
+    }
+   ],
+   "193": [
+    {
+     "q": "Câte submulțimi are mulțimea?",
+     "o": [
+      "32",
+      "25",
+      "10",
+      "31"
+     ],
+     "a": 0,
+     "e": "2⁵, inclusiv ∅ și mulțimea însăși."
+    },
+    {
+     "q": "Câte au două elemente?",
+     "o": [
+      "10",
+      "20",
+      "5"
+     ],
+     "a": 0,
+     "e": "C₅²."
+    }
+   ],
+   "194": [
+    {
+     "q": "Câte funcții sunt în total?",
+     "o": [
+      "64",
+      "81",
+      "12"
+     ],
+     "a": 0,
+     "e": "4 valori posibile pentru fiecare din cele 3 elemente."
+    },
+    {
+     "q": "Câte sunt injective?",
+     "o": [
+      "24",
+      "4",
+      "12"
+     ],
+     "a": 0,
+     "e": "4 · 3 · 2."
+    }
    ]
   },
   "11": {
@@ -12119,6 +15383,1285 @@
      "a": 1,
      "e": "Șirul e crescător, mărginit de 1, iar limita ℓ verifică (ℓ − 1)²(ℓ + 1) = 0. De aceea produsul tinde la 0."
     }
+   ],
+   "195": [
+    {
+     "q": "Cum înmulțești o matrice cu 2?",
+     "o": [
+      "Înmulțești fiecare element cu 2",
+      "Doar diagonala",
+      "Doar prima linie"
+     ],
+     "a": 0,
+     "e": "Operație element cu element."
+    },
+    {
+     "q": "Care e elementul de pe linia 2, coloana 1 al lui A + 2B?",
+     "o": [
+      "7",
+      "5",
+      "3",
+      "4"
+     ],
+     "a": 0,
+     "e": "3 + 2 · 2."
+    }
+   ],
+   "196": [
+    {
+     "q": "Cât este urma lui A?",
+     "o": [
+      "5",
+      "6",
+      "4"
+     ],
+     "a": 0,
+     "e": "Suma elementelor de pe diagonala principală."
+    },
+    {
+     "q": "Cât este det A?",
+     "o": [
+      "5",
+      "7",
+      "6"
+     ],
+     "a": 0,
+     "e": "2 · 3 − 1 · 1."
+    },
+    {
+     "q": "Ce spune relația Cayley–Hamilton?",
+     "o": [
+      "A² − (tr A)A + (det A)I₂ = O₂",
+      "A² = I₂",
+      "A² = (det A)A"
+     ],
+     "a": 0,
+     "e": "Pentru matrice de ordinul 2."
+    }
+   ],
+   "197": [
+    {
+     "q": "Cât este det A?",
+     "o": [
+      "1",
+      "11",
+      "−1"
+     ],
+     "a": 0,
+     "e": "2 · 3 − 1 · 5."
+    },
+    {
+     "q": "Când e o matrice inversabilă?",
+     "o": [
+      "det A ≠ 0",
+      "det A = 0",
+      "Mereu"
+     ],
+     "a": 0,
+     "e": "Determinant nenul."
+    },
+    {
+     "q": "Ce faci cu elementele de pe diagonala principală?",
+     "o": [
+      "Le schimbi între ele",
+      "Le schimbi semnul",
+      "Rămân pe loc"
+     ],
+     "a": 0,
+     "e": "a și d își schimbă locul, b și c își schimbă semnul."
+    }
+   ],
+   "198": [
+    {
+     "q": "Care sunt a, b, c?",
+     "o": [
+      "1, 2, 4",
+      "1, 4, 16",
+      "1, 1, 1"
+     ],
+     "a": 0,
+     "e": "A doua linie; a treia e formată din pătratele lor."
+    },
+    {
+     "q": "Ce formulă are determinantul Vandermonde de ordin 3?",
+     "o": [
+      "(b − a)(c − a)(c − b)",
+      "abc",
+      "(a + b + c)²"
+     ],
+     "a": 0,
+     "e": "Produsul diferențelor."
+    }
+   ],
+   "199": [
+    {
+     "q": "Cât este determinantul?",
+     "o": [
+      "x² − 6",
+      "x² + 6",
+      "2x − 6"
+     ],
+     "a": 0,
+     "e": "x · x − 2 · 3."
+    },
+    {
+     "q": "Câte soluții reale are ecuația?",
+     "o": [
+      "2",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "x² = 16."
+    }
+   ],
+   "200": [
+    {
+     "q": "Ce linii are A²?",
+     "o": [
+      "(1, 2) și (0, 1)",
+      "(1, 1) și (0, 1)",
+      "(2, 2) și (0, 2)"
+     ],
+     "a": 0,
+     "e": "Înmulțire linie cu coloană."
+    },
+    {
+     "q": "Ce formulă bănuiești pentru Aⁿ?",
+     "o": [
+      "Liniile (1, n) și (0, 1)",
+      "Liniile (1, 2ⁿ) și (0, 1)",
+      "Liniile (n, n) și (0, n)"
+     ],
+     "a": 0,
+     "e": "Elementul din dreapta sus crește cu 1."
+    }
+   ],
+   "201": [
+    {
+     "q": "Cât este determinantul sistemului?",
+     "o": [
+      "−3",
+      "3",
+      "−1"
+     ],
+     "a": 0,
+     "e": "Coeficienții: (2, 1) și (1, −1)."
+    },
+    {
+     "q": "Cum obții Δx?",
+     "o": [
+      "Înlocuiești coloana lui x cu termenii liberi",
+      "Înlocuiești coloana lui y",
+      "Ștergi o linie"
+     ],
+     "a": 0,
+     "e": "Regula lui Cramer."
+    }
+   ],
+   "202": [
+    {
+     "q": "Ce este matricea sistemului?",
+     "o": [
+      "Matricea coeficienților necunoscutelor",
+      "Coloana termenilor liberi",
+      "Matricea extinsă"
+     ],
+     "a": 0,
+     "e": "Fără termenii liberi."
+    },
+    {
+     "q": "Ce înseamnă Δ ≠ 0?",
+     "o": [
+      "Sistemul are soluție unică",
+      "Sistemul e incompatibil",
+      "Infinitate de soluții"
+     ],
+     "a": 0,
+     "e": "Sistem de tip Cramer."
+    }
+   ],
+   "203": [
+    {
+     "q": "Ce obții scăzând a doua ecuație din prima?",
+     "o": [
+      "2y = 2",
+      "2x = 2",
+      "2z = 2"
+     ],
+     "a": 0,
+     "e": "x și z se reduc."
+    },
+    {
+     "q": "Este soluția unică?",
+     "o": [
+      "Da, Δ = 4 ≠ 0",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Determinantul sistemului e nenul."
+    }
+   ],
+   "204": [
+    {
+     "q": "Cât este Δ?",
+     "o": [
+      "m² − 1",
+      "m² + 1",
+      "2m"
+     ],
+     "a": 0,
+     "e": "m · m − 1 · 1."
+    },
+    {
+     "q": "Pentru ce m e Δ = 0?",
+     "o": [
+      "m = ±1",
+      "m = 0",
+      "m = 1"
+     ],
+     "a": 0,
+     "e": "m² = 1."
+    }
+   ],
+   "205": [
+    {
+     "q": "Ce se întâmplă pentru m = 1?",
+     "o": [
+      "Ecuațiile coincid",
+      "Sistemul e incompatibil"
+     ],
+     "a": 0,
+     "e": "x + y = 1 de două ori."
+    },
+    {
+     "q": "Ce obții adunând ecuațiile pentru m = −1?",
+     "o": [
+      "0 = 2",
+      "0 = 0",
+      "2x = 2"
+     ],
+     "a": 0,
+     "e": "Contradicție."
+    }
+   ],
+   "206": [
+    {
+     "q": "Ce soluție are mereu un sistem omogen?",
+     "o": [
+      "(0, 0)",
+      "(1, 1)",
+      "Niciuna"
+     ],
+     "a": 0,
+     "e": "Termenii liberi sunt 0."
+    },
+    {
+     "q": "Cât este Δ?",
+     "o": [
+      "m − 6",
+      "m + 6",
+      "6 − 2m"
+     ],
+     "a": 0,
+     "e": "1 · m − 2 · 3."
+    }
+   ],
+   "207": [
+    {
+     "q": "Ce faci la primul pas al metodei lui Gauss?",
+     "o": [
+      "Elimini x din ecuațiile 2 și 3",
+      "Calculezi determinantul",
+      "Aduni toate ecuațiile"
+     ],
+     "a": 0,
+     "e": "Se aduce sistemul la formă triunghiulară."
+    },
+    {
+     "q": "Ce obții din a doua minus de două ori prima?",
+     "o": [
+      "−3y − z = −9",
+      "3y + z = 9",
+      "−y − z = −3"
+     ],
+     "a": 0,
+     "e": "(2x − y + z) − 2(x + y + z) = 3 − 12."
+    }
+   ],
+   "208": [
+    {
+     "q": "Ce caz de nedeterminare apare?",
+     "o": [
+      "0/0",
+      "∞/∞",
+      "1^∞"
+     ],
+     "a": 0,
+     "e": "Numărătorul și numitorul tind la 0."
+    },
+    {
+     "q": "Cum descompui x − 4?",
+     "o": [
+      "(√x − 2)(√x + 2)",
+      "(x − 2)(x + 2)",
+      "(√x − 4)²"
+     ],
+     "a": 0,
+     "e": "Diferență de pătrate."
+    }
+   ],
+   "209": [
+    {
+     "q": "Ce nedeterminare apare?",
+     "o": [
+      "∞ − ∞",
+      "0/0",
+      "0 · ∞"
+     ],
+     "a": 0,
+     "e": "Ambii termeni tind la +∞."
+    },
+    {
+     "q": "Ce rămâne la numărător după amplificare?",
+     "o": [
+      "4x",
+      "x² + 4x",
+      "2x"
+     ],
+     "a": 0,
+     "e": "(x² + 4x) − x²."
+    }
+   ],
+   "210": [
+    {
+     "q": "Ce nedeterminare apare?",
+     "o": [
+      "1^∞",
+      "∞/∞",
+      "0⁰"
+     ],
+     "a": 0,
+     "e": "Baza tinde la 1, exponentul la ∞."
+    },
+    {
+     "q": "Ce substituție folosești?",
+     "o": [
+      "u = x/2",
+      "u = 2x",
+      "u = x²"
+     ],
+     "a": 0,
+     "e": "Ca să apară 1 + 1/u."
+    }
+   ],
+   "211": [
+    {
+     "q": "Cât este |x − 1| pentru x < 1?",
+     "o": [
+      "1 − x",
+      "x − 1",
+      "x + 1"
+     ],
+     "a": 0,
+     "e": "x − 1 e negativ."
+    },
+    {
+     "q": "Când are o funcție limită într-un punct?",
+     "o": [
+      "Când limitele laterale există și sunt egale",
+      "Mereu",
+      "Când e definită acolo"
+     ],
+     "a": 0,
+     "e": "ls = ld."
+    }
+   ],
+   "212": [
+    {
+     "q": "Cum calculezi panta m?",
+     "o": [
+      "lim f(x)/x",
+      "lim f(x)",
+      "f′(0)"
+     ],
+     "a": 0,
+     "e": "Pentru x → +∞."
+    },
+    {
+     "q": "Cât este f(x) − x?",
+     "o": [
+      "(x + 1)/(x − 1)",
+      "1/(x − 1)",
+      "x + 1"
+     ],
+     "a": 0,
+     "e": "(x² + 1 − x² + x)/(x − 1)."
+    }
+   ],
+   "213": [
+    {
+     "q": "Când are graficul asimptotă orizontală y = ℓ?",
+     "o": [
+      "lim f(x) = ℓ finit la ±∞",
+      "f(ℓ) = 0",
+      "f′(ℓ) = 0"
+     ],
+     "a": 0,
+     "e": "Definiția."
+    },
+    {
+     "q": "Ce asimptotă verticală are graficul?",
+     "o": [
+      "x = 3",
+      "x = −1/2",
+      "Niciuna"
+     ],
+     "a": 0,
+     "e": "Numitorul se anulează în 3."
+    }
+   ],
+   "214": [
+    {
+     "q": "Ce formulă folosești?",
+     "o": [
+      "(u′v − uv′)/v²",
+      "(u′v + uv′)/v²",
+      "u′/v′"
+     ],
+     "a": 0,
+     "e": "Derivata câtului."
+    },
+    {
+     "q": "Cât este f′(x)?",
+     "o": [
+      "1/(x + 1)²",
+      "1/(x + 1)",
+      "x/(x + 1)²"
+     ],
+     "a": 0,
+     "e": "Numărătorul se reduce la 1."
+    }
+   ],
+   "215": [
+    {
+     "q": "Ce nu trebuie uitat la derivarea lui (2x + 1)⁵?",
+     "o": [
+      "Factorul u′ = 2",
+      "Termenul liber",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Regula lanțului."
+    },
+    {
+     "q": "Cât este f′(x)?",
+     "o": [
+      "10(2x + 1)⁴",
+      "5(2x + 1)⁴",
+      "(2x + 1)⁴"
+     ],
+     "a": 0,
+     "e": "5 · 2 = 10."
+    }
+   ],
+   "216": [
+    {
+     "q": "Ce reprezintă f′(x₀)?",
+     "o": [
+      "Panta tangentei",
+      "Ordonata punctului",
+      "Aria"
+     ],
+     "a": 0,
+     "e": "Interpretarea geometrică a derivatei."
+    },
+    {
+     "q": "Cât este f(1)?",
+     "o": [
+      "2",
+      "1",
+      "3"
+     ],
+     "a": 0,
+     "e": "1 + 1."
+    }
+   ],
+   "217": [
+    {
+     "q": "Cât este (ln x)′?",
+     "o": [
+      "1/x",
+      "ln x",
+      "eˣ"
+     ],
+     "a": 0,
+     "e": "Derivată elementară."
+    },
+    {
+     "q": "Cât este ln e?",
+     "o": [
+      "1",
+      "0",
+      "e"
+     ],
+     "a": 0,
+     "e": "e¹ = e."
+    }
+   ],
+   "218": [
+    {
+     "q": "Cât este f′(x)?",
+     "o": [
+      "3x² − 6x",
+      "3x² − 6x + 2",
+      "x² − 3x"
+     ],
+     "a": 0,
+     "e": "Derivata unei constante este 0."
+    },
+    {
+     "q": "Cât este f″(x)?",
+     "o": [
+      "6x − 6",
+      "6x",
+      "3x − 6"
+     ],
+     "a": 0,
+     "e": "Derivezi încă o dată."
+    }
+   ],
+   "219": [
+    {
+     "q": "Ce condiție pui întâi?",
+     "o": [
+      "Continuitatea în 1",
+      "f(0) = 0",
+      "a = b"
+     ],
+     "a": 0,
+     "e": "O funcție derivabilă este continuă."
+    },
+    {
+     "q": "Cât este derivata la stânga în 1?",
+     "o": [
+      "2",
+      "1",
+      "a"
+     ],
+     "a": 0,
+     "e": "(x²)′ = 2x în x = 1."
+    }
+   ],
+   "220": [
+    {
+     "q": "Ce contează la ∞ într-un raport de polinoame de același grad?",
+     "o": [
+      "Raportul coeficienților dominanți",
+      "Termenii liberi",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Termenii de grad mic devin neglijabili."
+    },
+    {
+     "q": "Ce ar fi dat dacă numărătorul avea grad mai mic?",
+     "o": [
+      "0",
+      "∞",
+      "1"
+     ],
+     "a": 0,
+     "e": "Numitorul crește mai repede."
+    }
+   ],
+   "221": [
+    {
+     "q": "Ce semn are aₙ₊₁ − aₙ?",
+     "o": [
+      "Pozitiv",
+      "Negativ",
+      "Variază"
+     ],
+     "a": 0,
+     "e": "1/((n + 1)(n + 2))."
+    },
+    {
+     "q": "Este șirul mărginit?",
+     "o": [
+      "Da, între 1/2 și 1",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "aₙ = 1 − 1/(n + 1)."
+    }
+   ],
+   "222": [
+    {
+     "q": "Ce nedeterminare apare?",
+     "o": [
+      "∞ − ∞",
+      "0/0",
+      "1^∞"
+     ],
+     "a": 0,
+     "e": "Ambii termeni tind la ∞."
+    },
+    {
+     "q": "Cu ce amplifici?",
+     "o": [
+      "√(n² + n) + n",
+      "√(n² + n) − n",
+      "n"
+     ],
+     "a": 0,
+     "e": "Conjugatul."
+    }
+   ],
+   "223": [
+    {
+     "q": "Ce grad are numărătorul după formula sumei?",
+     "o": [
+      "3",
+      "2",
+      "6"
+     ],
+     "a": 0,
+     "e": "n · n · 2n."
+    },
+    {
+     "q": "Ce coeficient dominant are numărătorul?",
+     "o": [
+      "2/6",
+      "1",
+      "1/6"
+     ],
+     "a": 0,
+     "e": "2n³/6."
+    }
+   ],
+   "224": [
+    {
+     "q": "Ce nedeterminare apare?",
+     "o": [
+      "1^∞",
+      "0/0",
+      "∞/∞"
+     ],
+     "a": 0,
+     "e": "Baza tinde la 1, exponentul la ∞."
+    },
+    {
+     "q": "Cât este lim (1 + 1/n)ⁿ?",
+     "o": [
+      "e",
+      "1",
+      "∞"
+     ],
+     "a": 0,
+     "e": "Definiția lui e."
+    }
+   ],
+   "225": [
+    {
+     "q": "Ce rație are progresia?",
+     "o": [
+      "1/2",
+      "2",
+      "1/4"
+     ],
+     "a": 0,
+     "e": "Fiecare termen e jumătate din precedentul."
+    },
+    {
+     "q": "Cât este lim (1/2)ⁿ?",
+     "o": [
+      "0",
+      "1",
+      "1/2"
+     ],
+     "a": 0,
+     "e": "|q| < 1."
+    }
+   ],
+   "226": [
+    {
+     "q": "Între ce valori e sin n?",
+     "o": [
+      "−1 și 1",
+      "0 și 1",
+      "0 și n"
+     ],
+     "a": 0,
+     "e": "Sinusul e mărginit."
+    },
+    {
+     "q": "Există lim sin n?",
+     "o": [
+      "Nu",
+      "Da, 0"
+     ],
+     "a": 0,
+     "e": "Dar înmulțit cu 1/n → 0, produsul tinde la 0."
+    }
+   ],
+   "227": [
+    {
+     "q": "Ce teoremă asigură convergența?",
+     "o": [
+      "Weierstrass: monoton și mărginit",
+      "Criteriul cleștelui",
+      "Cesàro–Stolz"
+     ],
+     "a": 0,
+     "e": "Un șir monoton și mărginit este convergent."
+    },
+    {
+     "q": "Ce ecuație verifică limita?",
+     "o": [
+      "ℓ = √(2 + ℓ)",
+      "ℓ = 2 + ℓ",
+      "ℓ² = 2"
+     ],
+     "a": 0,
+     "e": "Treci la limită în recurență."
+    },
+    {
+     "q": "De ce se elimină ℓ = −1?",
+     "o": [
+      "Termenii sunt pozitivi",
+      "Nu verifică ecuația"
+     ],
+     "a": 0,
+     "e": "ℓ ≥ 0."
+    }
+   ],
+   "228": [
+    {
+     "q": "La ce împarți?",
+     "o": [
+      "3ⁿ",
+      "2ⁿ",
+      "n"
+     ],
+     "a": 0,
+     "e": "Puterea cu baza cea mai mare."
+    },
+    {
+     "q": "Cât este lim (2/3)ⁿ?",
+     "o": [
+      "0",
+      "1",
+      "∞"
+     ],
+     "a": 0,
+     "e": "0 < 2/3 < 1."
+    }
+   ],
+   "229": [
+    {
+     "q": "Cum se descompune 1/((2k − 1)(2k + 1))?",
+     "o": [
+      "(1/(2k − 1) − 1/(2k + 1))/2",
+      "1/(2k − 1) − 1/(2k + 1)",
+      "1/(2k − 1) + 1/(2k + 1)"
+     ],
+     "a": 0,
+     "e": "Diferența numitorilor e 2."
+    },
+    {
+     "q": "La ce se reduce suma?",
+     "o": [
+      "n/(2n + 1)",
+      "1/(2n + 1)",
+      "n/(n + 1)"
+     ],
+     "a": 0,
+     "e": "(1 − 1/(2n + 1))/2."
+    }
+   ],
+   "230": [
+    {
+     "q": "În ce punct poate apărea o problemă?",
+     "o": [
+      "x = 1",
+      "x = 0",
+      "nicăieri"
+     ],
+     "a": 0,
+     "e": "Punctul de legătură al ramurilor."
+    },
+    {
+     "q": "Cât este limita la dreapta în 1?",
+     "o": [
+      "2",
+      "1",
+      "1 + a"
+     ],
+     "a": 0,
+     "e": "2 · 1."
+    }
+   ],
+   "231": [
+    {
+     "q": "Cum simplifici (x² − 4)/(x − 2)?",
+     "o": [
+      "x + 2",
+      "x − 2",
+      "x²"
+     ],
+     "a": 0,
+     "e": "x² − 4 = (x − 2)(x + 2)."
+    },
+    {
+     "q": "Ce condiție are continuitatea în 2?",
+     "o": [
+      "lim f(x) = f(2)",
+      "f(2) = 0",
+      "f′(2) = 0"
+     ],
+     "a": 0,
+     "e": "Definiția."
+    }
+   ],
+   "232": [
+    {
+     "q": "Ce limită remarcabilă folosești?",
+     "o": [
+      "sin u / u → 1",
+      "sin u → 1",
+      "u / sin u → 0"
+     ],
+     "a": 0,
+     "e": "Pentru u → 0."
+    },
+    {
+     "q": "Cu ce amplifici ca să apară 3x la numitor?",
+     "o": [
+      "3",
+      "x",
+      "1/3"
+     ],
+     "a": 0,
+     "e": "sin(3x)/x = 3 · sin(3x)/(3x)."
+    }
+   ],
+   "233": [
+    {
+     "q": "Cât este limita la stânga în 2?",
+     "o": [
+      "1",
+      "2",
+      "0"
+     ],
+     "a": 0,
+     "e": "Pentru x ∈ [1, 2), [x] = 1."
+    },
+    {
+     "q": "De ce e f continuă în 0 pe [0, 3]?",
+     "o": [
+      "Doar limita la dreapta contează",
+      "Nu este"
+     ],
+     "a": 0,
+     "e": "0 e capătul din stânga al domeniului."
+    }
+   ],
+   "234": [
+    {
+     "q": "Cât este f(0)?",
+     "o": [
+      "−1",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "0 + 0 − 1."
+    },
+    {
+     "q": "Ce ingredient e esențial?",
+     "o": [
+      "Continuitatea lui f",
+      "Derivabilitatea",
+      "Paritatea"
+     ],
+     "a": 0,
+     "e": "Fără continuitate funcția ar putea sări peste 0."
+    }
+   ],
+   "235": [
+    {
+     "q": "Ce puncte pui în tabel?",
+     "o": [
+      "1, 2, 3",
+      "1 și 3",
+      "doar 2"
+     ],
+     "a": 0,
+     "e": "Zerourile numărătorului și ale numitorului."
+    },
+    {
+     "q": "Aparține 2 mulțimii soluțiilor?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Numitorul se anulează."
+    }
+   ],
+   "236": [
+    {
+     "q": "Ce condiție dă continuitatea în 0?",
+     "o": [
+      "b = 1",
+      "a = 1",
+      "a = b"
+     ],
+     "a": 0,
+     "e": "a · 0 + 1 = 0² + b."
+    },
+    {
+     "q": "Ce condiție dă continuitatea în 1?",
+     "o": [
+      "1 + b = 3 − a",
+      "1 + b = 3",
+      "a = 3"
+     ],
+     "a": 0,
+     "e": "1² + b = 3 · 1 − a."
+    }
+   ],
+   "237": [
+    {
+     "q": "Ce nedeterminare apare în 0?",
+     "o": [
+      "0/0",
+      "∞/∞",
+      "1^∞"
+     ],
+     "a": 0,
+     "e": "e⁰ − 1 = 0."
+    },
+    {
+     "q": "Ce reprezintă această limită?",
+     "o": [
+      "Derivata lui eˣ în 0",
+      "Valoarea lui e",
+      "Nimic special"
+     ],
+     "a": 0,
+     "e": "(eˣ)′ = eˣ, iar în 0 dă 1."
+    }
+   ],
+   "238": [
+    {
+     "q": "Cu ce amplifici?",
+     "o": [
+      "√(x + 1) + 1",
+      "√(x + 1) − 1",
+      "x"
+     ],
+     "a": 0,
+     "e": "Conjugatul numărătorului."
+    },
+    {
+     "q": "Ce rămâne după simplificare?",
+     "o": [
+      "1/(√(x + 1) + 1)",
+      "√(x + 1) + 1",
+      "1/x"
+     ],
+     "a": 0,
+     "e": "x se reduce."
+    }
+   ],
+   "239": [
+    {
+     "q": "Ce obții împărțind la 5ˣ?",
+     "o": [
+      "(2/5)ˣ + (3/5)ˣ = 1",
+      "2ˣ + 3ˣ = 1",
+      "(2/5)ˣ = (3/5)ˣ"
+     ],
+     "a": 0,
+     "e": "5ˣ > 0."
+    },
+    {
+     "q": "De ce soluția e unică?",
+     "o": [
+      "g e strict descrescătoare",
+      "g e pară",
+      "g e continuă"
+     ],
+     "a": 0,
+     "e": "O funcție strict monotonă e injectivă."
+    },
+    {
+     "q": "Care e soluția evidentă?",
+     "o": [
+      "x = 1",
+      "x = 0",
+      "x = 2"
+     ],
+     "a": 0,
+     "e": "2 + 3 = 5."
+    }
+   ],
+   "240": [
+    {
+     "q": "Cât este f′(x)?",
+     "o": [
+      "3x² − 3",
+      "3x² − 3x",
+      "x² − 3"
+     ],
+     "a": 0,
+     "e": "Derivata lui x³ este 3x²."
+    },
+    {
+     "q": "Unde se anulează f′?",
+     "o": [
+      "−1 și 1",
+      "0 și 3",
+      "doar 0"
+     ],
+     "a": 0,
+     "e": "x² = 1."
+    },
+    {
+     "q": "Ce semn are f′ între rădăcini?",
+     "o": [
+      "Negativ",
+      "Pozitiv"
+     ],
+     "a": 0,
+     "e": "Funcție de gradul II cu a > 0."
+    }
+   ],
+   "241": [
+    {
+     "q": "Cât este f′(x)?",
+     "o": [
+      "eˣ(x² + 2x)",
+      "2xeˣ",
+      "x²eˣ"
+     ],
+     "a": 0,
+     "e": "Regula produsului."
+    },
+    {
+     "q": "Ce semn are eˣ?",
+     "o": [
+      "Mereu pozitiv",
+      "Variază"
+     ],
+     "a": 0,
+     "e": "Deci semnul lui f′ e semnul lui x(x + 2)."
+    }
+   ],
+   "242": [
+    {
+     "q": "Unde se anulează f′?",
+     "o": [
+      "x = 1",
+      "x = 0",
+      "x = e"
+     ],
+     "a": 0,
+     "e": "1 − 1/x = 0."
+    },
+    {
+     "q": "Ce consecință are pentru ln x?",
+     "o": [
+      "ln x ≤ x − 1",
+      "ln x ≥ x",
+      "ln x = x − 1"
+     ],
+     "a": 0,
+     "e": "Din x − ln x ≥ 1."
+    }
+   ],
+   "243": [
+    {
+     "q": "Ce funcție studiezi?",
+     "o": [
+      "eˣ − x − 1",
+      "eˣ",
+      "x + 1"
+     ],
+     "a": 0,
+     "e": "Diferența celor două părți."
+    },
+    {
+     "q": "Unde se anulează g′?",
+     "o": [
+      "x = 0",
+      "x = 1",
+      "nicăieri"
+     ],
+     "a": 0,
+     "e": "eˣ = 1."
+    },
+    {
+     "q": "Ce înseamnă geometric inegalitatea?",
+     "o": [
+      "Graficul lui eˣ e deasupra tangentei în 0",
+      "Graficele se intersectează de două ori"
+     ],
+     "a": 0,
+     "e": "y = x + 1 este tangenta în (0, 1)."
+    }
+   ],
+   "244": [
+    {
+     "q": "Ce derivată studiezi?",
+     "o": [
+      "f″",
+      "f′",
+      "f‴"
+     ],
+     "a": 0,
+     "e": "Convexitatea e dată de semnul lui f″."
+    },
+    {
+     "q": "Ce mai trebuie verificat în afară de f″(2) = 0?",
+     "o": [
+      "Că f″ schimbă semnul",
+      "Că f′(2) = 0",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "De exemplu x⁴ are f″(0) = 0, dar nu are inflexiune în 0."
+    }
+   ],
+   "245": [
+    {
+     "q": "Cât este f″(x)?",
+     "o": [
+      "−1/x²",
+      "1/x²",
+      "1/x"
+     ],
+     "a": 0,
+     "e": "(1/x)′ = −1/x²."
+    },
+    {
+     "q": "Ce înseamnă f″ < 0?",
+     "o": [
+      "f e concavă",
+      "f e convexă",
+      "f e descrescătoare"
+     ],
+     "a": 0,
+     "e": "Graficul e sub tangente."
+    }
+   ],
+   "246": [
+    {
+     "q": "Ce funcție studiezi?",
+     "o": [
+      "g(x) = x³ − 3x",
+      "g(x) = x³",
+      "g(x) = m"
+     ],
+     "a": 0,
+     "e": "Separi parametrul."
+    },
+    {
+     "q": "Care sunt valorile extreme locale ale lui g?",
+     "o": [
+      "2 și −2",
+      "1 și −1",
+      "3 și −3"
+     ],
+     "a": 0,
+     "e": "g(−1) = 2, g(1) = −2."
+    },
+    {
+     "q": "Ce se întâmplă pentru m = 2?",
+     "o": [
+      "O rădăcină dublă",
+      "Trei rădăcini distincte",
+      "Nicio rădăcină"
+     ],
+     "a": 0,
+     "e": "−m = −2 este exact minimul."
+    }
+   ],
+   "247": [
+    {
+     "q": "Care sunt punctele critice?",
+     "o": [
+      "0 și 2",
+      "−1 și 4",
+      "0 și 3"
+     ],
+     "a": 0,
+     "e": "f′(x) = 3x² − 6x."
+    },
+    {
+     "q": "De ce verifici și capetele?",
+     "o": [
+      "Extremul global poate fi într-un capăt",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "Aici maximul e chiar în capătul 4."
+    }
+   ],
+   "248": [
+    {
+     "q": "Ce nedeterminare apare?",
+     "o": [
+      "0/0",
+      "∞/∞",
+      "0 · ∞"
+     ],
+     "a": 0,
+     "e": "Numărătorul și numitorul tind la 0."
+    },
+    {
+     "q": "Ce derivezi la regula lui l’Hôpital?",
+     "o": [
+      "Separat numărătorul și numitorul",
+      "Fracția întreagă"
+     ],
+     "a": 0,
+     "e": "Nu se derivează câtul!"
+    }
+   ],
+   "249": [
+    {
+     "q": "Cât e suma a două laturi alăturate?",
+     "o": [
+      "10",
+      "20",
+      "5"
+     ],
+     "a": 0,
+     "e": "Jumătate din perimetru."
+    },
+    {
+     "q": "Unde se anulează A′?",
+     "o": [
+      "x = 5",
+      "x = 10",
+      "x = 0"
+     ],
+     "a": 0,
+     "e": "10 − 2x = 0."
+    },
+    {
+     "q": "Ce dreptunghi obții?",
+     "o": [
+      "Un pătrat",
+      "Unul foarte lung",
+      "Depinde"
+     ],
+     "a": 0,
+     "e": "Laturile 5 și 5."
+    }
    ]
   },
   "12": {
@@ -12676,6 +17219,1223 @@
      ],
      "a": 0,
      "e": "fₙ₊₁(x) = f(fₙ(x)) < fₙ(x); limita lui trebuie să fie un punct fix, iar singurul posibil e 0."
+    }
+   ],
+   "250": [
+    {
+     "q": "Cât este x ∗ x?",
+     "o": [
+      "2x − 3",
+      "x² − 3",
+      "2x − 6"
+     ],
+     "a": 0,
+     "e": "x + x − 3."
+    },
+    {
+     "q": "De ce nu contează parantezele în x ∗ x ∗ x?",
+     "o": [
+      "Legea este asociativă",
+      "Legea este comutativă"
+     ],
+     "a": 0,
+     "e": "(x ∗ x) ∗ x = x ∗ (x ∗ x)."
+    }
+   ],
+   "251": [
+    {
+     "q": "Cum se scrie legea restrânsă?",
+     "o": [
+      "(x − 2)(y − 2) + 2",
+      "(x + 2)(y + 2) − 2",
+      "(x − 2)(y − 2) − 2"
+     ],
+     "a": 0,
+     "e": "Dezvoltă și compară."
+    },
+    {
+     "q": "Ce ecuație obții?",
+     "o": [
+      "(x − 2)² = 9",
+      "(x − 2)² = 11",
+      "x² = 9"
+     ],
+     "a": 0,
+     "e": "(x − 2)² + 2 = 11."
+    }
+   ],
+   "252": [
+    {
+     "q": "Ce înseamnă comutativă?",
+     "o": [
+      "x ∗ y = y ∗ x",
+      "(x ∗ y) ∗ z = x ∗ (y ∗ z)",
+      "x ∗ e = x"
+     ],
+     "a": 0,
+     "e": "Ordinea nu contează."
+    },
+    {
+     "q": "Este scăderea comutativă?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "1 − 2 ≠ 2 − 1."
+    }
+   ],
+   "253": [
+    {
+     "q": "Cât este x′?",
+     "o": [
+      "−x/(1 + x)",
+      "−x",
+      "1/x"
+     ],
+     "a": 0,
+     "e": "Din x + x′ + xx′ = 0."
+    },
+    {
+     "q": "Când e 1/(1 + x) întreg?",
+     "o": [
+      "1 + x = ±1",
+      "x par",
+      "mereu"
+     ],
+     "a": 0,
+     "e": "Doar divizorii lui 1."
+    }
+   ],
+   "254": [
+    {
+     "q": "Cât este 2 ∗ y?",
+     "o": [
+      "2",
+      "y",
+      "y − 2"
+     ],
+     "a": 0,
+     "e": "Primul factor este 0."
+    },
+    {
+     "q": "Ce rol are asociativitatea?",
+     "o": [
+      "Poți grupa factorii cum vrei",
+      "Niciunul"
+     ],
+     "a": 0,
+     "e": "Așa poți pune 2 în orice paranteză."
+    }
+   ],
+   "255": [
+    {
+     "q": "Ce înseamnă parte stabilă?",
+     "o": [
+      "x, y ∈ H ⇒ x ∗ y ∈ H",
+      "H are element neutru",
+      "H e finită"
+     ],
+     "a": 0,
+     "e": "Compunerea nu iese din H."
+    },
+    {
+     "q": "Ce semn are (x − 2)(y − 2) pentru x, y ≥ 2?",
+     "o": [
+      "Nenegativ",
+      "Negativ"
+     ],
+     "a": 0,
+     "e": "Produs de numere nenegative."
+    }
+   ],
+   "256": [
+    {
+     "q": "Cât este (ln x)′?",
+     "o": [
+      "1/x",
+      "ln x",
+      "x"
+     ],
+     "a": 0,
+     "e": "Derivată elementară."
+    },
+    {
+     "q": "De ce nu merge formula xⁿ⁺¹/(n + 1)?",
+     "o": [
+      "Pentru n = −1 împarți la 0",
+      "Merge"
+     ],
+     "a": 0,
+     "e": "De aceea 1/x are o primitivă separată."
+    }
+   ],
+   "257": [
+    {
+     "q": "Cât este o primitivă a lui 3x²?",
+     "o": [
+      "x³",
+      "6x",
+      "3x³"
+     ],
+     "a": 0,
+     "e": "3 · x³/3."
+    },
+    {
+     "q": "Cum verifici rezultatul?",
+     "o": [
+      "Îl derivezi",
+      "Îl integrezi",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "F′ = f."
+    }
+   ],
+   "258": [
+    {
+     "q": "Pe cine alegi ca f (cel derivat)?",
+     "o": [
+      "x",
+      "eˣ"
+     ],
+     "a": 0,
+     "e": "Derivata lui x e 1, iar eˣ rămâne la fel."
+    },
+    {
+     "q": "Cum verifici?",
+     "o": [
+      "((x − 1)eˣ)′ = xeˣ",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "eˣ + (x − 1)eˣ = xeˣ."
+    }
+   ],
+   "259": [
+    {
+     "q": "Ce observi la numărător?",
+     "o": [
+      "E derivata numitorului",
+      "E egal cu numitorul",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "(x² + 1)′ = 2x."
+    },
+    {
+     "q": "De ce nu scrii modul?",
+     "o": [
+      "x² + 1 > 0",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "Argumentul e mereu pozitiv."
+    }
+   ],
+   "260": [
+    {
+     "q": "Cum scrii ln x ca să integrezi prin părți?",
+     "o": [
+      "x′ · ln x",
+      "ln x · ln x",
+      "(1/x) · x"
+     ],
+     "a": 0,
+     "e": "Un factor 1 = x′."
+    },
+    {
+     "q": "Cât este ∫ x · (1/x) dx?",
+     "o": [
+      "x + C",
+      "ln x + C",
+      "1 + C"
+     ],
+     "a": 0,
+     "e": "x · 1/x = 1."
+    }
+   ],
+   "261": [
+    {
+     "q": "Cum se descompune 1/(x(x + 1))?",
+     "o": [
+      "1/x − 1/(x + 1)",
+      "1/x + 1/(x + 1)",
+      "1/x · 1/(x + 1)"
+     ],
+     "a": 0,
+     "e": "Aduci la același numitor."
+    },
+    {
+     "q": "Cât este ∫ 1/(x + 1) dx pe (0, +∞)?",
+     "o": [
+      "ln(x + 1) + C",
+      "1/(x + 1)² + C",
+      "ln x + C"
+     ],
+     "a": 0,
+     "e": "u′/u cu u = x + 1."
+    }
+   ],
+   "262": [
+    {
+     "q": "Ce condiție pui?",
+     "o": [
+      "F′(x) = f(x)",
+      "F(x) = f(x)",
+      "F(0) = 0"
+     ],
+     "a": 0,
+     "e": "Definiția primitivei."
+    },
+    {
+     "q": "Ce coeficient are x în F′(x)/eˣ?",
+     "o": [
+      "2a + b",
+      "b",
+      "2a"
+     ],
+     "a": 0,
+     "e": "Din (2ax + b) + bx."
+    }
+   ],
+   "263": [
+    {
+     "q": "Ce primitivă are x² + 1?",
+     "o": [
+      "x³/3 + x",
+      "2x",
+      "x³ + x"
+     ],
+     "a": 0,
+     "e": "Câte o primitivă pentru fiecare termen."
+    },
+    {
+     "q": "Cât este F(0)?",
+     "o": [
+      "0",
+      "1",
+      "1/3"
+     ],
+     "a": 0,
+     "e": "0 + 0."
+    }
+   ],
+   "264": [
+    {
+     "q": "Cât este (x − 1)eˣ în x = 1?",
+     "o": [
+      "0",
+      "e",
+      "1"
+     ],
+     "a": 0,
+     "e": "(1 − 1)e."
+    },
+    {
+     "q": "Cât este (x − 1)eˣ în x = 0?",
+     "o": [
+      "−1",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "(−1) · 1."
+    }
+   ],
+   "265": [
+    {
+     "q": "Ce primitivă are x/(x² + 1)?",
+     "o": [
+      "ln(x² + 1)/2",
+      "ln(x² + 1)",
+      "arctg x"
+     ],
+     "a": 0,
+     "e": "(x² + 1)′ = 2x."
+    },
+    {
+     "q": "Cât este ln 1?",
+     "o": [
+      "0",
+      "1",
+      "e"
+     ],
+     "a": 0,
+     "e": "e⁰ = 1."
+    }
+   ],
+   "266": [
+    {
+     "q": "Ce paritate are x³?",
+     "o": [
+      "Impară",
+      "Pară"
+     ],
+     "a": 0,
+     "e": "(−x)³ = −x³."
+    },
+    {
+     "q": "Ce paritate are cos x?",
+     "o": [
+      "Pară",
+      "Impară"
+     ],
+     "a": 0,
+     "e": "cos(−x) = cos x."
+    },
+    {
+     "q": "Ce proprietate folosești?",
+     "o": [
+      "∫₋ₐᵃ f = 0 pentru f impară",
+      "∫₋ₐᵃ f = 2∫₀ᵃ f pentru f impară"
+     ],
+     "a": 0,
+     "e": "Ariile cu semn se anulează."
+    }
+   ],
+   "267": [
+    {
+     "q": "Ce primitivă are sin x?",
+     "o": [
+      "−cos x",
+      "cos x",
+      "−sin x"
+     ],
+     "a": 0,
+     "e": "(−cos x)′ = sin x."
+    },
+    {
+     "q": "Cât este cos π?",
+     "o": [
+      "−1",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "Valoare remarcabilă."
+    }
+   ],
+   "268": [
+    {
+     "q": "Unde schimbă semnul x − 1?",
+     "o": [
+      "În 1",
+      "În 0",
+      "În 3"
+     ],
+     "a": 0,
+     "e": "x − 1 = 0."
+    },
+    {
+     "q": "Cât este |x − 1| pe [0, 1]?",
+     "o": [
+      "1 − x",
+      "x − 1",
+      "x + 1"
+     ],
+     "a": 0,
+     "e": "x − 1 ≤ 0."
+    }
+   ],
+   "269": [
+    {
+     "q": "Ce grad poate avea restul?",
+     "o": [
+      "Cel mult 1",
+      "Exact 2",
+      "Cel mult 2"
+     ],
+     "a": 0,
+     "e": "Mai mic decât gradul împărțitorului."
+    },
+    {
+     "q": "Cât este câtul?",
+     "o": [
+      "X",
+      "X²",
+      "X − 2"
+     ],
+     "a": 0,
+     "e": "X · X² = X³."
+    }
+   ],
+   "270": [
+    {
+     "q": "Cât este x₁ + x₂ + x₃?",
+     "o": [
+      "2",
+      "−2",
+      "3"
+     ],
+     "a": 0,
+     "e": "−b/a."
+    },
+    {
+     "q": "Cât este x₁x₂ + x₁x₃ + x₂x₃?",
+     "o": [
+      "3",
+      "−3",
+      "4"
+     ],
+     "a": 0,
+     "e": "c/a."
+    },
+    {
+     "q": "Ce spune rezultatul negativ?",
+     "o": [
+      "Polinomul are rădăcini complexe nereale",
+      "Am greșit"
+     ],
+     "a": 0,
+     "e": "Pătratele unor numere reale ar avea suma ≥ 0."
+    }
+   ],
+   "271": [
+    {
+     "q": "Ce altă rădăcină are sigur f?",
+     "o": [
+      "1 − i",
+      "−1 + i",
+      "−1 − i"
+     ],
+     "a": 0,
+     "e": "Conjugatul, pentru coeficienți reali."
+    },
+    {
+     "q": "Cât este suma rădăcinilor?",
+     "o": [
+      "0",
+      "1",
+      "−a"
+     ],
+     "a": 0,
+     "e": "Coeficientul lui X² este 0."
+    },
+    {
+     "q": "Cât este (1 + i)(1 − i)?",
+     "o": [
+      "2",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "1 − i²."
+    }
+   ],
+   "272": [
+    {
+     "q": "Ce proprietate are o rădăcină dublă?",
+     "o": [
+      "Este rădăcină și a lui f′",
+      "Este 0",
+      "Este reală mereu"
+     ],
+     "a": 0,
+     "e": "f = (X − α)²g ⇒ f′(α) = 0."
+    },
+    {
+     "q": "Care sunt rădăcinile lui f′?",
+     "o": [
+      "±1",
+      "±3",
+      "0"
+     ],
+     "a": 0,
+     "e": "3X² = 3."
+    }
+   ],
+   "273": [
+    {
+     "q": "Cât este −1̂ în ℤ₅?",
+     "o": [
+      "4̂",
+      "1̂",
+      "0̂"
+     ],
+     "a": 0,
+     "e": "−1 + 5 = 4."
+    },
+    {
+     "q": "Câte valori trebuie încercate?",
+     "o": [
+      "5",
+      "O infinitate",
+      "2"
+     ],
+     "a": 0,
+     "e": "ℤ₅ are 5 elemente."
+    }
+   ],
+   "274": [
+    {
+     "q": "Ce formă are restul?",
+     "o": [
+      "aX + b",
+      "a",
+      "aX² + bX + c"
+     ],
+     "a": 0,
+     "e": "Grad cel mult 1."
+    },
+    {
+     "q": "Cât este f(1)?",
+     "o": [
+      "3",
+      "5",
+      "0"
+     ],
+     "a": 0,
+     "e": "Teorema restului."
+    }
+   ],
+   "275": [
+    {
+     "q": "Care e elementul neutru?",
+     "o": [
+      "4",
+      "0",
+      "−4"
+     ],
+     "a": 0,
+     "e": "x + e − 4 = x."
+    },
+    {
+     "q": "Ce formulă are simetricul?",
+     "o": [
+      "8 − x",
+      "−x",
+      "4 − x"
+     ],
+     "a": 0,
+     "e": "x + x′ − 4 = 4."
+    }
+   ],
+   "276": [
+    {
+     "q": "Ce este elementul neutru în (ℤ₆, +)?",
+     "o": [
+      "0̂",
+      "1̂",
+      "6̂"
+     ],
+     "a": 0,
+     "e": "Adunarea modulo 6."
+    },
+    {
+     "q": "Ce relație are ordinul cu numărul de elemente al grupului?",
+     "o": [
+      "Îl divide",
+      "E mai mare",
+      "Nicio legătură"
+     ],
+     "a": 0,
+     "e": "Teorema lui Lagrange: 3 | 6."
+    }
+   ],
+   "277": [
+    {
+     "q": "Când e â inversabil în (ℤₙ, ·)?",
+     "o": [
+      "(a, n) = 1",
+      "a par",
+      "a < n/2"
+     ],
+     "a": 0,
+     "e": "Există b cu ab ≡ 1 (mod n)."
+    },
+    {
+     "q": "Este 2̂ inversabil în ℤ₈?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "2b e mereu par, nu poate fi ≡ 1 (mod 8)."
+    }
+   ],
+   "278": [
+    {
+     "q": "Cât este A(x)A(y)?",
+     "o": [
+      "A(x + y)",
+      "A(xy)",
+      "A(x) + A(y)"
+     ],
+     "a": 0,
+     "e": "Elementul din dreapta sus devine x + y."
+    },
+    {
+     "q": "Cât este 1 + 2 + ... + 10?",
+     "o": [
+      "55",
+      "45",
+      "100"
+     ],
+     "a": 0,
+     "e": "10 · 11 / 2."
+    }
+   ],
+   "279": [
+    {
+     "q": "Ce condiție are un morfism?",
+     "o": [
+      "f(x + y) = f(x) ∗ f(y)",
+      "f(x + y) = f(x) + f(y)",
+      "f(0) = 0"
+     ],
+     "a": 0,
+     "e": "Legea din stânga în domeniu, cea din dreapta în codomeniu."
+    },
+    {
+     "q": "Unde trebuie să ajungă neutrul 0?",
+     "o": [
+      "În neutrul lui ∗, 4",
+      "În 0"
+     ],
+     "a": 0,
+     "e": "Un morfism de grupuri păstrează neutrul."
+    }
+   ],
+   "280": [
+    {
+     "q": "Ce ordin are un generator al lui ℤ₁₂?",
+     "o": [
+      "12",
+      "1",
+      "6"
+     ],
+     "a": 0,
+     "e": "Multiplii lui trebuie să dea tot grupul."
+    },
+    {
+     "q": "Este 3̂ generator?",
+     "o": [
+      "Nu, are ordinul 4",
+      "Da"
+     ],
+     "a": 0,
+     "e": "3̂, 6̂, 9̂, 0̂."
+    }
+   ],
+   "281": [
+    {
+     "q": "Este ℕ subgrup al lui (ℤ, +)?",
+     "o": [
+      "Nu, −1 ∉ ℕ",
+      "Da"
+     ],
+     "a": 0,
+     "e": "1 nu are opus în ℕ."
+    },
+    {
+     "q": "Conțin numerele impare elementul neutru?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "0 e par."
+    }
+   ],
+   "282": [
+    {
+     "q": "Care este inversul lui 3̂ în ℤ₇?",
+     "o": [
+      "5̂",
+      "3̂",
+      "4̂"
+     ],
+     "a": 0,
+     "e": "3 · 5 = 15 ≡ 1 (mod 7)."
+    },
+    {
+     "q": "Cât este 25 modulo 7?",
+     "o": [
+      "4",
+      "3",
+      "5"
+     ],
+     "a": 0,
+     "e": "25 = 21 + 4."
+    }
+   ],
+   "283": [
+    {
+     "q": "Ce spune teorema lui Lagrange?",
+     "o": [
+      "Ordinul unui subgrup divide ordinul grupului",
+      "Orice grup e comutativ"
+     ],
+     "a": 0,
+     "e": "Și ordinul unui element = ordinul subgrupului generat."
+    },
+    {
+     "q": "Ce element are ordinul 1?",
+     "o": [
+      "Doar elementul neutru",
+      "Toate"
+     ],
+     "a": 0,
+     "e": "e¹ = e."
+    }
+   ],
+   "284": [
+    {
+     "q": "Cum se scrie 1 + x ∗ y?",
+     "o": [
+      "(1 + x)(1 + y)",
+      "(1 + x) + (1 + y)",
+      "xy"
+     ],
+     "a": 0,
+     "e": "1 + x + y + xy."
+    },
+    {
+     "q": "Cât este 1 ∗ 1?",
+     "o": [
+      "3",
+      "2",
+      "1"
+     ],
+     "a": 0,
+     "e": "1 + 1 + 1."
+    }
+   ],
+   "285": [
+    {
+     "q": "Ce rest dă 23 la împărțirea cu 6?",
+     "o": [
+      "5",
+      "3",
+      "2"
+     ],
+     "a": 0,
+     "e": "23 = 18 + 5."
+    },
+    {
+     "q": "Cât este 6̂ în ℤ₆?",
+     "o": [
+      "0̂",
+      "6̂",
+      "1̂"
+     ],
+     "a": 0,
+     "e": "6 ≡ 0 (mod 6)."
+    }
+   ],
+   "286": [
+    {
+     "q": "Este 3̂ divizor al lui zero în ℤ₁₂?",
+     "o": [
+      "Da, 3̂ · 4̂ = 0̂",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "12 ≡ 0."
+    },
+    {
+     "q": "Câte elemente inversabile are ℤ₁₂?",
+     "o": [
+      "4",
+      "6",
+      "11"
+     ],
+     "a": 0,
+     "e": "1, 5, 7, 11."
+    }
+   ],
+   "287": [
+    {
+     "q": "De ce are 3̂ invers în ℤ₁₁?",
+     "o": [
+      "11 e prim",
+      "3 e impar"
+     ],
+     "a": 0,
+     "e": "ℤₚ e corp pentru p prim."
+    },
+    {
+     "q": "Ce verifici?",
+     "o": [
+      "3̂ · x = 1̂",
+      "3̂ + x = 0̂"
+     ],
+     "a": 0,
+     "e": "Inversul la înmulțire."
+    }
+   ],
+   "288": [
+    {
+     "q": "Cât este −4̂ în ℤ₉?",
+     "o": [
+      "5̂",
+      "4̂",
+      "3̂"
+     ],
+     "a": 0,
+     "e": "−4 + 9 = 5."
+    },
+    {
+     "q": "Care e inversul lui 2̂ în ℤ₉?",
+     "o": [
+      "5̂",
+      "2̂",
+      "nu există"
+     ],
+     "a": 0,
+     "e": "2 · 5 = 10 ≡ 1."
+    }
+   ],
+   "289": [
+    {
+     "q": "Cât este 6̂ în ℤ₅?",
+     "o": [
+      "1̂",
+      "6̂",
+      "0̂"
+     ],
+     "a": 0,
+     "e": "6 = 5 + 1."
+    },
+    {
+     "q": "Care e inversul lui 3̂ în ℤ₅?",
+     "o": [
+      "2̂",
+      "3̂",
+      "4̂"
+     ],
+     "a": 0,
+     "e": "3 · 2 = 6 ≡ 1."
+    }
+   ],
+   "290": [
+    {
+     "q": "Cât este 3̂² în ℤ₇?",
+     "o": [
+      "2̂",
+      "9̂",
+      "3̂"
+     ],
+     "a": 0,
+     "e": "9 = 7 + 2."
+    },
+    {
+     "q": "De ce soluțiile vin în perechi?",
+     "o": [
+      "(−x)² = x²",
+      "Întâmplător"
+     ],
+     "a": 0,
+     "e": "4̂ = −3̂."
+    }
+   ],
+   "291": [
+    {
+     "q": "Ce condiție are n pentru ca ℤₙ să fie corp?",
+     "o": [
+      "n prim",
+      "n impar",
+      "n par"
+     ],
+     "a": 0,
+     "e": "Altfel există divizori ai lui zero."
+    },
+    {
+     "q": "Este ℤ₉ corp?",
+     "o": [
+      "Nu, 3̂ · 3̂ = 0̂",
+      "Da, 9 e impar"
+     ],
+     "a": 0,
+     "e": "9 nu e prim."
+    }
+   ],
+   "292": [
+    {
+     "q": "Ce valori poate lua a² + b² pentru a, b întregi?",
+     "o": [
+      "Numere naturale",
+      "Orice real"
+     ],
+     "a": 0,
+     "e": "Suma a două pătrate de întregi."
+    },
+    {
+     "q": "Este 2 inversabil în ℤ[i]?",
+     "o": [
+      "Nu, 1/2 ∉ ℤ[i]",
+      "Da"
+     ],
+     "a": 0,
+     "e": "|2|² = 4 ≠ 1."
+    },
+    {
+     "q": "Cât este i⁻¹?",
+     "o": [
+      "−i",
+      "i",
+      "1"
+     ],
+     "a": 0,
+     "e": "i · (−i) = 1."
+    }
+   ],
+   "293": [
+    {
+     "q": "Este 2̂ nilpotent?",
+     "o": [
+      "Da, 2̂³ = 0̂",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "8 ≡ 0 (mod 8)."
+    },
+    {
+     "q": "Poate fi nilpotent un element impar?",
+     "o": [
+      "Nu, puterile lui sunt impare",
+      "Da"
+     ],
+     "a": 0,
+     "e": "8 nu divide un număr impar."
+    }
+   ],
+   "294": [
+    {
+     "q": "Cum se scrie x ∘ y restrâns?",
+     "o": [
+      "(x − 1)(y − 1) + 1",
+      "(x + 1)(y + 1) − 1",
+      "(x − 2)(y − 2)"
+     ],
+     "a": 0,
+     "e": "Dezvoltă și compară."
+    },
+    {
+     "q": "Ce rol are neutrul lui ⊥ în corp?",
+     "o": [
+      "Este „zero”-ul corpului",
+      "Este „unu”-ul"
+     ],
+     "a": 0,
+     "e": "Elementul neutru al primei legi."
+    }
+   ],
+   "295": [
+    {
+     "q": "Ce semn are f pe [0, 2]?",
+     "o": [
+      "Nenegativ",
+      "Negativ"
+     ],
+     "a": 0,
+     "e": "x² ≥ 0, deci aria e chiar integrala."
+    },
+    {
+     "q": "Ce primitivă are x²?",
+     "o": [
+      "x³/3",
+      "2x",
+      "x³"
+     ],
+     "a": 0,
+     "e": "xⁿ⁺¹/(n + 1)."
+    }
+   ],
+   "296": [
+    {
+     "q": "Unde se intersectează graficele?",
+     "o": [
+      "În 0 și 1",
+      "În 0 și 2",
+      "Doar în 0"
+     ],
+     "a": 0,
+     "e": "x² − x = 0."
+    },
+    {
+     "q": "Care funcție e deasupra pe [0, 1]?",
+     "o": [
+      "x",
+      "x²"
+     ],
+     "a": 0,
+     "e": "De exemplu în 1/2: 1/2 > 1/4."
+    }
+   ],
+   "297": [
+    {
+     "q": "Ce semn are ln x pe [1, e]?",
+     "o": [
+      "Nenegativ",
+      "Negativ"
+     ],
+     "a": 0,
+     "e": "ln 1 = 0 și ln e crește."
+    },
+    {
+     "q": "Cât este x ln x − x în x = e?",
+     "o": [
+      "0",
+      "e",
+      "1"
+     ],
+     "a": 0,
+     "e": "e · 1 − e."
+    }
+   ],
+   "298": [
+    {
+     "q": "Ce formulă are volumul?",
+     "o": [
+      "π ∫ f²(x) dx",
+      "∫ f(x) dx",
+      "2π ∫ f(x) dx"
+     ],
+     "a": 0,
+     "e": "Corp de rotație în jurul lui Ox."
+    },
+    {
+     "q": "Cât este f²(x)?",
+     "o": [
+      "x",
+      "√x",
+      "x²"
+     ],
+     "a": 0,
+     "e": "(√x)² = x."
+    }
+   ],
+   "299": [
+    {
+     "q": "Cât este f²(x)?",
+     "o": [
+      "e²ˣ",
+      "eˣ²",
+      "2eˣ"
+     ],
+     "a": 0,
+     "e": "(eˣ)² = e²ˣ."
+    },
+    {
+     "q": "Ce primitivă are e²ˣ?",
+     "o": [
+      "e²ˣ/2",
+      "2e²ˣ",
+      "e²ˣ"
+     ],
+     "a": 0,
+     "e": "Derivata lui e²ˣ/2 este e²ˣ."
+    }
+   ],
+   "300": [
+    {
+     "q": "Cât este ln e²?",
+     "o": [
+      "2",
+      "e",
+      "1"
+     ],
+     "a": 0,
+     "e": "ln eᵏ = k."
+    },
+    {
+     "q": "Ce primitivă are 1/x?",
+     "o": [
+      "ln x",
+      "−1/x²",
+      "x"
+     ],
+     "a": 0,
+     "e": "(ln x)′ = 1/x."
+    }
+   ],
+   "301": [
+    {
+     "q": "Cât este aria în funcție de a?",
+     "o": [
+      "a³/3",
+      "a²",
+      "2a"
+     ],
+     "a": 0,
+     "e": "[x³/3]₀ᵃ."
+    },
+    {
+     "q": "Câte soluții reale are a³ = 27?",
+     "o": [
+      "Una",
+      "Trei",
+      "Două"
+     ],
+     "a": 0,
+     "e": "Funcția x³ e injectivă."
+    }
+   ],
+   "302": [
+    {
+     "q": "Ce corp se obține?",
+     "o": [
+      "Un con",
+      "Un cilindru",
+      "O sferă"
+     ],
+     "a": 0,
+     "e": "Un segment care pleacă din origine se rotește."
+    },
+    {
+     "q": "Cât este volumul conului cu r = h = 3?",
+     "o": [
+      "9π",
+      "27π",
+      "3π"
+     ],
+     "a": 0,
+     "e": "π · 9 · 3 / 3."
+    }
+   ],
+   "303": [
+    {
+     "q": "Care sunt abscisele punctelor de intersecție?",
+     "o": [
+      "−1 și 3",
+      "1 și −3",
+      "0 și 2"
+     ],
+     "a": 0,
+     "e": "x² − 2x − 3 = 0."
+    },
+    {
+     "q": "Cine e deasupra pe [−1, 3]?",
+     "o": [
+      "Dreapta",
+      "Parabola"
+     ],
+     "a": 0,
+     "e": "De exemplu în 0: 3 > 0."
+    }
+   ],
+   "304": [
+    {
+     "q": "Ce funcție apare?",
+     "o": [
+      "1/(1 + x)",
+      "1/x",
+      "x"
+     ],
+     "a": 0,
+     "e": "1/(n + k) = (1/n) · 1/(1 + k/n)."
+    },
+    {
+     "q": "Pe ce interval?",
+     "o": [
+      "[0, 1]",
+      "[1, 2]",
+      "[0, n]"
+     ],
+     "a": 0,
+     "e": "k/n merge de la 1/n la 1."
     }
    ]
   }
