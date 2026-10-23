@@ -11,6 +11,7 @@ import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart';
 import 'math_sheet.dart' show isMathSubject;
+import 'progress.dart';
 import 'resources_data.dart';
 import 'ui_components.dart';
 
@@ -28,13 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showNotice = true;
   String _grade = '9';
 
-  // Progress keys look like "<materie>_<clasa>_<id>" (see ExerciseDetailScreen).
-  static final RegExp _progressKey = RegExp(r'^.+_\d+_.+$');
-
   @override
   void initState() {
     super.initState();
     _loadPlayerStats();
+    solvedChanged.addListener(_loadPlayerStats);
     _hFactTimer = Timer.periodic(const Duration(seconds: 15), (_) {
       if (mounted) setState(() => _hFactIdx++);
     });
@@ -43,15 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _hFactTimer?.cancel();
+    solvedChanged.removeListener(_loadPlayerStats);
     _scrollController.dispose();
     super.dispose();
   }
 
   Future<void> _loadPlayerStats() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      // prefs.get(), not getBool(): getBool throws on String values (e.g. 'app_style').
-      final completed = prefs.getKeys().where((k) => _progressKey.hasMatch(k) && prefs.get(k) == true).length;
+      final completed = (await solvedKeys()).length;
       if (!mounted) return;
       setState(() {
         _completedQuests = completed;
@@ -74,8 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
     context.go('/lista-exercitii?materie=${Uri.encodeComponent(route)}');
   }
 
-  double get _progressValue =>
-      (_completedQuests % 5) / 5.0 == 0 && _completedQuests > 0 ? 1.0 : (_completedQuests % 5) / 5.0;
+  // a level every 5 problems, as on the profile: 0-4 is level 1, 5-9 level 2, ...
+  int get _level => _completedQuests ~/ 5 + 1;
+  double get _progressValue => (_completedQuests % 5) / 5.0;
 
   @override
   Widget build(BuildContext context) {
@@ -485,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
         : (first.isEmpty ? 'Bine ai revenit' : 'Bine ai revenit, $first');
     final rank = _completedQuests > 10 ? 'Avansat' : (_completedQuests > 3 ? 'Intermediar' : 'Începător');
     final rankColor = _completedQuests > 10 ? _cViolet : (_completedQuests > 3 ? _cBlue : _cGreen);
-    final inLevel = _completedQuests % 5 == 0 && _completedQuests > 0 ? 5 : _completedQuests % 5;
+    final left = 5 - _completedQuests % 5;
 
     final fact = _hFacts[_hFactIdx % _hFacts.length];
 
@@ -566,7 +565,8 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(color: rankColor.withOpacity(0.15), borderRadius: BorderRadius.circular(999)),
               child: Text(rank, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: rankColor)),
             ),
-            Text('$inLevel din 5 spre nivelul următor', style: TextStyle(fontSize: 14, color: Pb.muted)),
+            Text('Nivelul $_level · ${left == 1 ? 'încă o problemă' : 'încă $left probleme'} până la nivelul ${_level + 1}',
+                style: TextStyle(fontSize: 14, color: Pb.muted)),
           ],
         ),
         const SizedBox(height: 16),
