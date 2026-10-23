@@ -536,7 +536,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     final c = _subjectColor(subject);
 
     final right = <Widget>[
-      _cStats(price, experience, c, isMobile),
+      _cStats(price, experience, _solvedOf(userData), c, isMobile),
       const SizedBox(height: 16),
       _cAbout(bio, c),
       const SizedBox(height: 16),
@@ -757,7 +757,20 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _cStats(String price, String exp, Color c, bool isMobile) {
+  // problems solved, counted on the user document as for a student
+  static int _solvedOf(Map<String, dynamic> userData) =>
+      (userData['solvedCount'] as num?)?.toInt() ?? ((userData['solvedIds'] as List?) ?? const []).length;
+
+  // four stat tiles: one row on a wide screen, two rows of two on a phone
+  Widget _statRows(List<Widget> tiles, double gap, bool isMobile) {
+    Widget row(List<Widget> ts) => Row(children: [
+          for (var i = 0; i < ts.length; i++) ...[if (i > 0) SizedBox(width: gap), Expanded(child: ts[i])],
+        ]);
+    if (!isMobile) return row(tiles);
+    return Column(children: [row(tiles.sublist(0, 2)), SizedBox(height: gap), row(tiles.sublist(2))]);
+  }
+
+  Widget _cStats(String price, String exp, int solved, Color c, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: _fire.collection('teachers').doc(widget.teacherId).collection('reviews').snapshots(),
       builder: (context, snap) {
@@ -797,23 +810,18 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               ),
             );
 
-        return Row(
-          children: [
-            Expanded(child: tile(Icons.payments_outlined, 'Tarif', '$price RON', 'pe oră', Pb.primary)),
-            SizedBox(width: isMobile ? 8 : 12),
-            Expanded(child: tile(Icons.military_tech_outlined, 'Experiență', expN == 0 ? 'Nou' : '$expN ${expN == 1 ? 'an' : 'ani'}', 'de predare', _cAmber)),
-            SizedBox(width: isMobile ? 8 : 12),
-            Expanded(
-              child: tile(
-                Icons.star_rounded,
-                'Rating',
-                ratings.isEmpty ? '–' : avg.toStringAsFixed(1),
-                ratings.isEmpty ? 'fără recenzii' : '${ratings.length} ${ratings.length == 1 ? 'recenzie' : 'recenzii'}',
-                _cRose,
-              ),
-            ),
-          ],
-        );
+        return _statRows([
+          tile(Icons.payments_outlined, 'Tarif', '$price RON', 'pe oră', Pb.primary),
+          tile(Icons.military_tech_outlined, 'Experiență', expN == 0 ? 'Nou' : '$expN ${expN == 1 ? 'an' : 'ani'}', 'de predare', _cAmber),
+          tile(
+            Icons.star_rounded,
+            'Rating',
+            ratings.isEmpty ? '–' : avg.toStringAsFixed(1),
+            ratings.isEmpty ? 'fără recenzii' : '${ratings.length} ${ratings.length == 1 ? 'recenzie' : 'recenzii'}',
+            _cRose,
+          ),
+          tile(Icons.check_circle_outline, 'Rezolvate', '$solved', solved == 1 ? 'problemă' : 'probleme', _cBlue),
+        ], isMobile ? 8 : 12, isMobile);
       },
     );
   }
@@ -1338,7 +1346,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
-                                            _buildStatsGrid(subject, experience, price, isMobile),
+                                            _buildStatsGrid(subject, experience, price, _solvedOf(userData), isMobile),
                                             const SizedBox(height: 24),
                                             _buildLoreAndFeaturesBlock(bio, subject),
                                             const SizedBox(height: 24),
@@ -1358,7 +1366,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                     children: [
                                       _buildIdentityCard(name, email, image, subject, contact, isMyProfile, currentUserId ?? '', isMobile),
                                       const SizedBox(height: 20),
-                                      _buildStatsGrid(subject, experience, price, isMobile),
+                                      _buildStatsGrid(subject, experience, price, _solvedOf(userData), isMobile),
                                       const SizedBox(height: 20),
                                       _buildLoreAndFeaturesBlock(bio, subject),
                                       const SizedBox(height: 20),
@@ -1607,7 +1615,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     );
   }
 
-  Widget _buildStatsGrid(String subject, String exp, String price, bool isMobile) {
+  Widget _buildStatsGrid(String subject, String exp, String price, int solved, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: _fire.collection('teachers').doc(widget.teacherId).collection('reviews').snapshots(),
       builder: (context, snap) {
@@ -1617,15 +1625,12 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           avg = docs.map((d) => (d['rating'] as num).toDouble()).reduce((a, b) => a + b) / docs.length;
         }
 
-        return Row(
-          children: [
-            Expanded(child: _buildStatTile("RATE", "$price RON", Icons.payments, AppColors.forest, isMobile)),
-            SizedBox(width: isMobile ? 8 : 14),
-            Expanded(child: _buildStatTile("EXP", "$exp YRS", Icons.military_tech, AppColors.mustard, isMobile)),
-            SizedBox(width: isMobile ? 8 : 14),
-            Expanded(child: _buildStatTile("RATING", "${avg.toStringAsFixed(1)} ★", Icons.star, AppColors.sunset, isMobile)),
-          ],
-        );
+        return _statRows([
+          _buildStatTile("RATE", "$price RON", Icons.payments, AppColors.forest, isMobile),
+          _buildStatTile("EXP", "$exp YRS", Icons.military_tech, AppColors.mustard, isMobile),
+          _buildStatTile("RATING", "${avg.toStringAsFixed(1)} ★", Icons.star, AppColors.sunset, isMobile),
+          _buildStatTile("SOLVED", "$solved", Icons.check_circle, AppColors.sky, isMobile),
+        ], isMobile ? 8 : 14, isMobile);
       },
     );
   }
