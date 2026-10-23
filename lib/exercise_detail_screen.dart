@@ -341,7 +341,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     if (!mounted || qs.isEmpty) return;
     setState(() => _quiz = qs);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) showProblemQuiz(context, qs);
+      if (mounted) showProblemQuiz(context, qs, intro: true, statement: _quizStatement());
     });
   }
 
@@ -743,6 +743,51 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   final GlobalKey _cLeftKey = GlobalKey();
   final GlobalKey _cRightKey = GlobalKey();
 
+  /// The statement, short, for the questions asked when the problem opens.
+  Widget _quizStatement() {
+    final parts = StatementParts.of(exerciseData ?? const {}, file: _file);
+    final options = _kind == 'grila' ? (_list(['variante']) ?? const <String>[]) : const <String>[];
+    final input = _str(['input', 'date_intrare']);
+    final output = _str(['output', 'date_iesire']);
+    Widget label(String t) => Padding(
+          padding: const EdgeInsets.only(top: 10, bottom: 4),
+          child: Text(t, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Pb.muted)),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final p in [...parts.context, ...parts.body]) Padding(padding: const EdgeInsets.only(bottom: 8), child: StatementText(p, fontSize: 14, height: 1.55)),
+        for (final (i, o) in options.indexed) StatementText('**${String.fromCharCode(65 + i)}.** $o', fontSize: 14, height: 1.55),
+        if (input != null) ...[label('Date de intrare'), StatementText(input, fontSize: 14, height: 1.55)],
+        if (output != null) ...[label('Date de ieșire'), StatementText(output, fontSize: 14, height: 1.55)],
+      ],
+    );
+  }
+
+  /// This problem's own address, to send to someone.
+  String get _shareLink =>
+      '${Uri.base.origin}/exercitiu/${Uri.encodeComponent(widget.id)}?materie=${Uri.encodeComponent(widget.subject)}&clasa=${Uri.encodeComponent(widget.grade)}';
+
+  bool _linkCopied = false;
+
+  Widget _cShareLink() => Padding(
+        padding: const EdgeInsets.only(left: 8, bottom: 6),
+        child: PbButton(
+          text: _linkCopied ? 'Link copiat' : 'Copiază linkul',
+          icon: _linkCopied ? Icons.check : Icons.link,
+          variant: PbVariant.outlineSecondary,
+          size: PbSize.sm,
+          onPressed: () async {
+            await Clipboard.setData(ClipboardData(text: _shareLink));
+            if (!mounted) return;
+            setState(() => _linkCopied = true);
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) setState(() => _linkCopied = false);
+            });
+          },
+        ),
+      );
+
   Widget _cSceneToggle() => Padding(
         padding: const EdgeInsets.only(left: 8, bottom: 6),
         child: Tooltip(
@@ -1043,6 +1088,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ),
                 ),
               ),
+              _cShareLink(),
               _cSceneToggle(),
             ],
           ),
@@ -1236,7 +1282,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 icon: Icons.quiz_outlined,
                 variant: PbVariant.outlineSecondary,
                 size: PbSize.sm,
-                onPressed: () => showProblemQuiz(context, _quiz),
+                onPressed: () => showProblemQuiz(context, _quiz, statement: _quizStatement()),
               ),
             ),
           ],

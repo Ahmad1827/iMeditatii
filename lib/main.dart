@@ -50,6 +50,8 @@ import 'offline.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // a page opened with push (a problem from the list) shows its own address, so it can be shared
+  GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
   try {

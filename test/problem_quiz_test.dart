@@ -166,4 +166,48 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Corect!'), findsOneWidget);
   });
+
+  testWidgets('when the problem opens it asks first, and the statement can be read beside the questions', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(900, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: Center(
+            child: TextButton(
+              onPressed: () => showProblemQuiz(context, qs, random: Random(1), intro: true, statement: const Text('Se dă un șir de paranteze.')),
+              child: const Text('deschide'),
+            ),
+          ),
+        ),
+      ),
+    ));
+    await tester.tap(find.text('deschide'));
+    await tester.pumpAndSettle();
+    expect(find.text('Vrei câteva întrebări de încălzire?'), findsOneWidget);
+    expect(find.text('Ce structură folosești?'), findsNothing);
+
+    await tester.tap(find.text('Da, să încep'));
+    await tester.pumpAndSettle();
+    expect(find.text('Ce structură folosești?'), findsOneWidget);
+    expect(find.text('Se dă un șir de paranteze.'), findsNothing);
+    await tester.tap(find.text('Enunțul'));
+    await tester.pumpAndSettle();
+    expect(find.text('Se dă un șir de paranteze.'), findsOneWidget);
+  });
+
+  testWidgets('"Nu, mulțumesc" goes straight to the problem', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: TextButton(onPressed: () => showProblemQuiz(context, qs, intro: true), child: const Text('deschide')),
+        ),
+      ),
+    ));
+    await tester.tap(find.text('deschide'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Nu, mulțumesc'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsNothing);
+  });
 }

@@ -1,6 +1,7 @@
 // The site offline: whatever a visitor has opened once (the app, its assets,
 // the C++ and Python runners) is kept here and served when the network is
-// gone. Online, the network always wins, so a deploy shows up as before.
+// gone. Online, the network always wins (checked with the server, not the
+// browser's own copy), so a deploy shows up on the next load.
 // Lessons and problems stored in Firestore are kept by Firestore itself
 // (persistence is on, see main.dart), not here.
 'use strict';
@@ -92,7 +93,9 @@ self.addEventListener('fetch', (event) => {
 async function page(req) {
   const cache = await caches.open(CACHE);
   try {
-    const res = await fetch(req);
+    // no-cache: ask the server (a small 304 when nothing changed), so a deploy
+    // shows at once instead of after the browser's 10-minute copy expires
+    const res = await fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' });
     if (res.status < 500) cache.put(SHELL, res.clone());
     return res;
   } catch (e) {
@@ -105,7 +108,7 @@ async function page(req) {
 async function networkFirst(req) {
   const cache = await caches.open(CACHE);
   try {
-    const res = await fetch(req);
+    const res = await fetch(req, { cache: 'no-cache' });
     if (res.ok) cache.put(req, res.clone());
     return res;
   } catch (e) {

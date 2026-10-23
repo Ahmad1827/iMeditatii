@@ -60,7 +60,10 @@ class ProblemQuiz {
 }
 
 /// Asks [questions] in a dialog; returns when the student finishes or skips.
-Future<void> showProblemQuiz(BuildContext context, List<QuizQuestion> questions, {Random? random}) {
+/// With [intro] (when the problem has just opened) it first asks whether the
+/// student wants them; [statement] can be opened beside the questions, since
+/// some ask about it.
+Future<void> showProblemQuiz(BuildContext context, List<QuizQuestion> questions, {Random? random, bool intro = false, Widget? statement}) {
   return showDialog<void>(
     context: context,
     barrierColor: Colors.black.withValues(alpha: 0.45),
@@ -70,7 +73,7 @@ Future<void> showProblemQuiz(BuildContext context, List<QuizQuestion> questions,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 580),
-        child: ProblemQuizCard(questions: questions, random: random),
+        child: ProblemQuizCard(questions: questions, random: random, intro: intro, statement: statement),
       ),
     ),
   );
@@ -79,7 +82,9 @@ Future<void> showProblemQuiz(BuildContext context, List<QuizQuestion> questions,
 class ProblemQuizCard extends StatefulWidget {
   final List<QuizQuestion> questions;
   final Random? random; // tests fix the order of the options
-  const ProblemQuizCard({super.key, required this.questions, this.random});
+  final bool intro; // first ask whether to answer them at all
+  final Widget? statement; // the problem's statement, shown on demand
+  const ProblemQuizCard({super.key, required this.questions, this.random, this.intro = false, this.statement});
 
   @override
   State<ProblemQuizCard> createState() => _ProblemQuizCardState();
@@ -90,6 +95,8 @@ class _ProblemQuizCardState extends State<ProblemQuizCard> {
   int? _picked; // index into the shown order
   int _right = 0;
   late final List<List<int>> _order; // the options of each question, shuffled
+  late bool _asking = widget.intro; // still on the "do you want them?" screen
+  bool _showStatement = false;
 
   @override
   void initState() {
@@ -125,7 +132,93 @@ class _ProblemQuizCardState extends State<ProblemQuizCard> {
     return StyleBuilder(builder: (context, s) => _card(s.isClean));
   }
 
+  Widget _frame(bool clean, Widget child) => Container(
+        decoration: clean
+            ? BoxDecoration(
+                color: Pb.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Pb.border),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 30, offset: const Offset(0, 12))],
+              )
+            : BoxDecoration(
+                color: AppColors.cardBg,
+                border: Border.all(color: AppColors.border, width: 3),
+                boxShadow: AppStyle.hardShadow(6),
+              ),
+        child: SingleChildScrollView(padding: const EdgeInsets.fromLTRB(20, 18, 20, 14), child: child),
+      );
+
+  /// Before the questions: whether the student wants them.
+  Widget _invite(bool clean) {
+    final text = clean ? Pb.text : AppColors.ink;
+    final muted = clean ? Pb.muted : AppColors.textMuted;
+    final accent = clean ? Pb.primary : AppColors.sunset;
+    final n = widget.questions.length;
+    return _frame(
+      clean,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(clean ? 12 : 0)),
+            child: Icon(Icons.lightbulb_outline, size: 26, color: accent),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            clean ? 'Vrei câteva întrebări de încălzire?' : 'VREI CÂTEVA ÎNTREBĂRI DE ÎNCĂLZIRE?',
+            style: TextStyle(fontSize: 19, height: 1.3, fontWeight: clean ? FontWeight.w700 : FontWeight.w900, color: text),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${n == 1 ? 'O întrebare scurtă' : '$n întrebări scurte'}, cu variante de răspuns, care te ajută să pornești. Poți citi enunțul oricând, iar ele rămân la butonul „Întrebări ajutătoare”.',
+            style: TextStyle(fontSize: 14.5, height: 1.5, color: muted),
+          ),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 8,
+              spacing: 12,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(foregroundColor: muted),
+                  child: const Text('Nu, mulțumesc', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
+                ),
+                RetroButton(
+                  text: 'Da, să încep',
+                  icon: Icons.arrow_forward,
+                  bgColor: AppColors.forest,
+                  fontSize: 14,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                  onPressed: () => setState(() => _asking = false),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The problem's statement, opened above the question.
+  Widget _statementPanel(bool clean) => Container(
+        margin: const EdgeInsets.only(top: 12),
+        constraints: const BoxConstraints(maxHeight: 280),
+        decoration: BoxDecoration(
+          color: clean ? Pb.hoverBg : AppColors.cloud.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(clean ? 10 : 0),
+          border: Border.all(color: clean ? Pb.border : AppColors.border, width: clean ? 1 : 2),
+        ),
+        child: SingleChildScrollView(padding: const EdgeInsets.all(12), child: widget.statement),
+      );
+
   Widget _card(bool clean) {
+    if (_asking) return _invite(clean);
     final text = clean ? Pb.text : AppColors.ink;
     final muted = clean ? Pb.muted : AppColors.textMuted;
     final accent = clean ? Pb.primary : AppColors.sunset;
@@ -158,6 +251,17 @@ class _ProblemQuizCardState extends State<ProblemQuizCard> {
         Text('${_i + 1} / $n', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: muted)),
       ],
     );
+    final statementToggle = widget.statement == null
+        ? null
+        : Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => setState(() => _showStatement = !_showStatement),
+              style: TextButton.styleFrom(foregroundColor: accent, padding: const EdgeInsets.symmetric(horizontal: 6)),
+              icon: Icon(_showStatement ? Icons.expand_less : Icons.article_outlined, size: 18),
+              label: Text(_showStatement ? 'Ascunde enunțul' : 'Enunțul', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            ),
+          );
 
     Widget option(int shown) {
       final real = _order[_i][shown];
@@ -285,7 +389,9 @@ class _ProblemQuizCardState extends State<ProblemQuizCard> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         head,
-        const SizedBox(height: 16),
+        if (statementToggle != null) ...[const SizedBox(height: 6), statementToggle],
+        if (_showStatement && widget.statement != null) _statementPanel(clean),
+        const SizedBox(height: 12),
         Text(
           _q.question,
           style: TextStyle(fontSize: 18, height: 1.4, fontWeight: clean ? FontWeight.w600 : FontWeight.w800, color: text),
@@ -303,23 +409,7 @@ class _ProblemQuizCardState extends State<ProblemQuizCard> {
       ],
     );
 
-    return Container(
-      decoration: clean
-          ? BoxDecoration(
-              color: Pb.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Pb.border),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 30, offset: const Offset(0, 12))],
-            )
-          : BoxDecoration(
-              color: AppColors.cardBg,
-              border: Border.all(color: AppColors.border, width: 3),
-              boxShadow: AppStyle.hardShadow(6),
-            ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-        child: KeyedSubtree(key: ValueKey(_i), child: body),
-      ),
-    );
+    // the statement stays open from one question to the next
+    return _frame(clean, KeyedSubtree(key: ValueKey(_i), child: body));
   }
 }
