@@ -144,6 +144,18 @@ int main() {
       expect(CodeKeys.format(messy), tidy);
       expect(CodeKeys.format(tidy), tidy); // already aligned: nothing changes
     });
+    test('a block inside a one-line body keeps the body\'s indent; a { on its own line too', () {
+      const nested = 'int main() {\nfor (int i = 0; i < n; i++)\nfor (int j = 0; j < n; j++) {\ncin >> x;\n}\ncout << s;\n}';
+      expect(CodeKeys.format(nested),
+          'int main() {\n    for (int i = 0; i < n; i++)\n        for (int j = 0; j < n; j++) {\n            cin >> x;\n        }\n    cout << s;\n}');
+      const allman = 'int main()\n{\nif (x)\n{\na;\n}\nb;\n}';
+      expect(CodeKeys.format(allman), 'int main()\n{\n    if (x)\n    {\n        a;\n    }\n    b;\n}');
+      expect(CodeKeys.format('}\nint x;'), '}\nint x;'); // a stray } does not break it
+      const dangling = 'for (i = 0; i < n; i++)\nif (a) x = 1;\nelse x = 2;\ny = 3;';
+      expect(CodeKeys.format(dangling), 'for (i = 0; i < n; i++)\n    if (a) x = 1;\n    else x = 2;\ny = 3;');
+      const elseBody = 'if (a)\nx = 1;\nelse\nx = 2;\ny = 3;';
+      expect(CodeKeys.format(elseBody), 'if (a)\n    x = 1;\nelse\n    x = 2;\ny = 3;');
+    });
     test('the caret stays on its token', () {
       final r = CodeKeys.apply(v('int main() {\nreturn |0;\n}'), key: LogicalKeyboardKey.keyF, shift: true, alt: true);
       expect(show(r), 'int main() {\n    return |0;\n}');

@@ -37,6 +37,7 @@ import 'all_reviews_screen.dart';
 
 import 'exercise_list_screen.dart';
 import 'exercise_detail_screen.dart';
+import 'ide_screen.dart';
 import 'add_exercise_screen.dart';
 import 'resources_screen.dart';
 import 'resource_detail_screen.dart';
@@ -138,6 +139,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/panou-profesor',
       builder: (context, state) => const TeachersDashboard(),
+    ),
+    GoRoute(
+      path: '/ide',
+      builder: (context, state) => IdeScreen(
+        code: state.uri.queryParameters['cod'],
+        lang: state.uri.queryParameters['limbaj'],
+        input: state.uri.queryParameters['in'],
+      ),
     ),
     GoRoute(
       path: '/profesor/:id',

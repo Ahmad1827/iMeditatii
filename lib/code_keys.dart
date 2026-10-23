@@ -157,6 +157,10 @@ class CodeKeys {
 
   /// [text] with strings, characters and comments blanked out (same length), so
   /// only real braces and parentheses are counted.
+  /// [text] with comments and the inside of strings blanked out (same
+  /// length, newlines kept), so a brace or an operator in them doesn't count.
+  static String mask(String text) => _code(text);
+
   static String _code(String text) {
     final b = StringBuffer();
     var i = 0;
@@ -257,10 +261,13 @@ class CodeKeys {
     final lines = code.replaceAll('\t', tab).split('\n');
     final blank = _code(code).split('\n');
     final out = <String>[];
-    var depth = 0; // open braces before this line
+    // for each open brace, the level of the line that opened it: its body is one
+    // deeper, its } on that level (a brace opened in a one-line body keeps it)
+    final open = <int>[];
     var paren = 0; // open parentheses before this line (a call split over lines)
     final caseAt = <int>{}; // depths at which a "case" label was seen
     var lone = 0; // pending one-statement bodies (if (…) without braces)
+    var ifLone = 0; // the bodies around the last "if": its "else" goes on the same level
     for (var i = 0; i < lines.length; i++) {
       final raw = lines[i];
       final t = raw.trim();
@@ -275,20 +282,24 @@ class CodeKeys {
       }
       final closesFirst = b.startsWith('}');
       final isCase = RegExp(r'^(case\b.*|default\s*):').hasMatch(t);
-      var level = depth - (closesFirst ? 1 : 0);
+      final depth = open.length;
+      var level = closesFirst && open.isNotEmpty ? open.last : (open.isEmpty ? 0 : open.last + 1);
       if (closesFirst) caseAt.removeWhere((d) => d >= depth);
       if (!isCase && !closesFirst && caseAt.contains(depth)) level++;
       if (isCase) caseAt.add(depth);
       level += paren > 0 ? 1 : 0;
+      final isElse = RegExp(r'^else\b').hasMatch(b);
+      if (isElse) lone = ifLone; // the body of the "if" is over: back to the "if"'s level
+      if (RegExp(r'^(\}\s*)?(else\s+)?if\b').hasMatch(b)) ifLone = lone;
       if (lone > 0 && !b.startsWith('{')) level += lone;
       out.add('${tab * math.max(0, level)}$t');
 
       // what this line opens and closes
       for (final c in b.split('')) {
-        if (c == '{') depth++;
-        if (c == '}') {
-          depth = math.max(0, depth - 1);
-          caseAt.removeWhere((d) => d > depth);
+        if (c == '{') open.add(math.max(0, level));
+        if (c == '}' && open.isNotEmpty) {
+          open.removeLast();
+          caseAt.removeWhere((d) => d > open.length);
         }
         if (c == '(') paren++;
         if (c == ')') paren = math.max(0, paren - 1);
@@ -298,11 +309,8 @@ class CodeKeys {
           !b.endsWith('{') &&
           !b.endsWith(';') &&
           (RegExp(r'^(\}\s*)?(else\s+)?(if|for|while)\b.*\)$').hasMatch(b) || RegExp(r'^(\}\s*)?else$').hasMatch(b));
-      if (opensLone) {
-        lone++;
-      } else if (!b.startsWith('{')) {
-        lone = 0;
-      }
+      // a { (at the end, or alone on the next line) takes the pending bodies' level with it
+      lone = opensLone ? lone + 1 : 0;
     }
     return out.join('\n');
   }

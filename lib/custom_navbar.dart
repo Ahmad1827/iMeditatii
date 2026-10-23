@@ -448,6 +448,12 @@ class CustomNavbar extends StatelessWidget {
                         onTap: () => context.go('/resurse'),
                       ),
                       _PbNavLink(
+                        label: 'IDE',
+                        icon: Icons.terminal,
+                        active: path.startsWith('/ide'),
+                        onTap: () => context.go('/ide'),
+                      ),
+                      _PbNavLink(
                         label: 'Profesori',
                         icon: Icons.school_outlined,
                         active: path.startsWith('/materii') || path.startsWith('/profesor'),
@@ -708,6 +714,7 @@ class CustomNavbar extends StatelessWidget {
                     active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii')),
                 item(Icons.menu_book_outlined, 'Lecții', blue, () => context.go('/resurse'),
                     active: path.startsWith('/resurse')),
+                item(Icons.terminal, 'IDE', const Color(0xFF10B981), () => context.go('/ide'), active: path.startsWith('/ide')),
                 item(Icons.school_outlined, 'Profesori', violet, () => context.go('/materii'),
                     active: path.startsWith('/materii') || path.startsWith('/profesor')),
                 if (user != null)

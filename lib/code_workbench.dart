@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'browser_run.dart';
 import 'code_keys.dart';
+import 'code_style.dart';
 import 'judge0.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, CodeHighlighter;
 
@@ -62,6 +64,7 @@ class CodeEditor extends StatefulWidget {
   final bool readOnly;
   final double fontSize;
   final VoidCallback? onRun; // Ctrl/Cmd + Enter
+  final List<StyleIssue> issues; // drawn as squiggles, explained on hover
 
   const CodeEditor({
     super.key,
@@ -71,7 +74,14 @@ class CodeEditor extends StatefulWidget {
     this.readOnly = false,
     this.fontSize = 14.5,
     this.onRun,
+    this.issues = const [],
   });
+
+  static Color colorOf(IssueLevel l) => switch (l) {
+        IssueLevel.error => const Color(0xFFE5484D),
+        IssueLevel.warning => const Color(0xFFF59E0B),
+        IssueLevel.hint => const Color(0xFF3B82F6),
+      };
 
   @override
   State<CodeEditor> createState() => _CodeEditorState();
@@ -80,6 +90,7 @@ class CodeEditor extends StatefulWidget {
 class _CodeEditorState extends State<CodeEditor> {
   static const double _lineH = 1.55;
   static const double _padV = 12;
+  static const double _padH = 12;
 
   final ScrollController _v = ScrollController();
   final ScrollController _h = ScrollController();
@@ -87,6 +98,7 @@ class _CodeEditorState extends State<CodeEditor> {
   FocusNode get _focus => widget.focusNode ?? (_ownFocus ??= FocusNode());
 
   CodeController get _c => widget.controller;
+  StyleIssue? _hover;
 
   @override
   void initState() {
@@ -141,6 +153,58 @@ class _CodeEditorState extends State<CodeEditor> {
     if (next == null) return KeyEventResult.ignored;
     _c.value = next;
     return KeyEventResult.handled;
+  }
+
+  /// The issue under the mouse at [p] (in the text's coordinates).
+  StyleIssue? _issueAt(Offset p, double rowH, double charW, List<String> lines) {
+    final line = ((p.dy - _padV) / rowH).floor() + 1;
+    final col = ((p.dx - _padH) / charW).floor();
+    StyleIssue? best;
+    for (final i in widget.issues) {
+      if (i.line != line) continue;
+      final len = i.len == 0 ? (line <= lines.length ? lines[line - 1].length : 0) : i.len;
+      if (col < i.col - 1 || col > i.col + math.max(1, len)) continue;
+      if (best == null || i.level.index < best.level.index) best = i;
+    }
+    return best;
+  }
+
+  Map<int, Color> _worstByLine() {
+    final worst = <int, IssueLevel>{};
+    for (final i in widget.issues) {
+      final w = worst[i.line];
+      if (w == null || i.level.index < w.index) worst[i.line] = i.level;
+    }
+    return worst.map((k, v) => MapEntry(k, CodeEditor.colorOf(v)));
+  }
+
+  Widget _bubble(StyleIssue i) {
+    final c = CodeEditor.colorOf(i.level);
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 340),
+      padding: const EdgeInsets.fromLTRB(10, 7, 10, 8),
+      decoration: BoxDecoration(
+        color: Pb.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border(left: BorderSide(color: c, width: 3), top: BorderSide(color: Pb.border), right: BorderSide(color: Pb.border), bottom: BorderSide(color: Pb.border)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 14, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(i.message.replaceAll('`', ''), style: TextStyle(fontSize: 13, color: Pb.text, height: 1.35)),
+          if (i.detail.isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Text(i.detail, style: Pb.mono(11.5, color: Pb.muted)),
+          ],
+          if (i.fix != null) ...[
+            const SizedBox(height: 3),
+            Text('Se poate repara din tab-ul Stil.', style: TextStyle(fontSize: 11.5, color: Pb.muted)),
+          ],
+        ],
+      ),
+    );
   }
 
   // ---------------------------------------------------------------- build
@@ -204,7 +268,7 @@ class _CodeEditorState extends State<CodeEditor> {
               decoration: const InputDecoration(
                 isDense: true,
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: _padV),
+                contentPadding: EdgeInsets.symmetric(horizontal: _padH, vertical: _padV),
               ),
             ),
           ),
@@ -245,6 +309,7 @@ class _CodeEditorState extends State<CodeEditor> {
                               style: Pb.mono(fs - 2, color: Pb.muted, height: _lineH),
                               activeStyle: Pb.mono(fs - 2, color: Pb.text, height: _lineH),
                               activeBg: Pb.editorActiveLine,
+                              marks: _worstByLine(),
                             ),
                           ),
                         ),
@@ -264,7 +329,35 @@ class _CodeEditorState extends State<CodeEditor> {
                                       height: rowH,
                                       child: ColoredBox(color: Pb.editorActiveLine.withOpacity(0.35)),
                                     ),
-                                  Positioned.fill(child: field),
+                                  Positioned.fill(
+                                    child: MouseRegion(
+                                      opaque: false,
+                                      onHover: widget.issues.isEmpty
+                                          ? null
+                                          : (e) {
+                                              final h = _issueAt(e.localPosition, rowH, charW, lines);
+                                              if (h != _hover) setState(() => _hover = h);
+                                            },
+                                      onExit: (_) {
+                                        if (_hover != null) setState(() => _hover = null);
+                                      },
+                                      child: field,
+                                    ),
+                                  ),
+                                  if (widget.issues.isNotEmpty)
+                                    Positioned.fill(
+                                      child: IgnorePointer(
+                                        child: CustomPaint(
+                                          painter: _SquigglePainter(widget.issues, lines, rowH: rowH, charW: charW, padV: _padV, padH: _padH),
+                                        ),
+                                      ),
+                                    ),
+                                  if (_hover != null && widget.issues.contains(_hover))
+                                    Positioned(
+                                      left: math.max(0, math.min(_padH + _hover!.col * charW, textW - 340)),
+                                      top: _padV + _hover!.line * rowH + 2,
+                                      child: IgnorePointer(child: _bubble(_hover!)),
+                                    ),
                                 ],
                               ),
                             ),
@@ -293,6 +386,7 @@ class _GutterPainter extends CustomPainter {
   final TextStyle style;
   final TextStyle activeStyle;
   final Color activeBg;
+  final Map<int, Color> marks; // line -> colour of its worst issue
 
   _GutterPainter({
     required this.scroll,
@@ -304,6 +398,7 @@ class _GutterPainter extends CustomPainter {
     required this.style,
     required this.activeStyle,
     required this.activeBg,
+    this.marks = const {},
   }) : super(repaint: scroll);
 
   @override
@@ -321,6 +416,8 @@ class _GutterPainter extends CustomPainter {
       )..layout();
       tp.paint(canvas, Offset(size.width - 10 - tp.width, top + (rowH - tp.height) / 2));
       tp.dispose();
+      final m = marks[i + 1];
+      if (m != null) canvas.drawCircle(Offset(5, top + rowH / 2), 3, Paint()..color = m);
     }
   }
 
@@ -331,7 +428,62 @@ class _GutterPainter extends CustomPainter {
       old.rowH != rowH ||
       old.viewH != viewH ||
       old.style != style ||
-      old.activeBg != activeBg;
+      old.activeBg != activeBg ||
+      !_sameMarks(old.marks, marks);
+
+  static bool _sameMarks(Map<int, Color> a, Map<int, Color> b) =>
+      a.length == b.length && a.entries.every((e) => b[e.key] == e.value);
+}
+
+/// Wavy underlines under the issues (a whole-line issue: under the line's text).
+class _SquigglePainter extends CustomPainter {
+  final List<StyleIssue> issues;
+  final List<String> lines;
+  final double rowH, charW, padV, padH;
+
+  _SquigglePainter(this.issues, this.lines, {required this.rowH, required this.charW, required this.padV, required this.padH});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final i in issues) {
+      if (i.line < 1 || i.line > lines.length) continue;
+      final text = lines[i.line - 1];
+      var col = i.col;
+      var len = i.len;
+      if (len == 0) {
+        col = text.length - text.trimLeft().length;
+        len = math.max(1, text.trim().length);
+      }
+      final x0 = padH + col * charW;
+      final x1 = x0 + math.max(1, len) * charW;
+      final y = padV + i.line * rowH - 3;
+      final c = CodeEditor.colorOf(i.level);
+      if (text.trim().isEmpty && i.len == 0) {
+        canvas.drawRect(Rect.fromLTWH(0, y - rowH + 3, size.width, rowH), Paint()..color = c.withOpacity(0.07));
+        continue;
+      }
+      final path = Path()..moveTo(x0, y);
+      const w = 3.0, h = 1.6;
+      var up = true;
+      for (var x = x0; x < x1; x += w) {
+        path.lineTo(math.min(x + w, x1), y + (up ? -h : h));
+        up = !up;
+      }
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = i.level == IssueLevel.error ? 1.5 : 1.2,
+      );
+      if (i.level == IssueLevel.error) {
+        canvas.drawRect(Rect.fromLTRB(x0 - 1, y - rowH + 4, x1 + 1, y + 1), Paint()..color = c.withOpacity(0.10));
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SquigglePainter old) => true; // cheap, and the text under it moves
 }
 
 // =============================================================================
@@ -348,6 +500,8 @@ class CodeWorkbench extends StatefulWidget {
   final ValueChanged<String>? onLangChanged; // null = language is fixed
   final ValueChanged<String>? onStdinChanged;
   final List<Widget> actions; // extra buttons before "Rulează"
+  final bool styleCheck; // the Stil tab: the coding style, drawn in the code
+  final bool sideConsole; // on a wide screen, input and output beside the code
 
   const CodeWorkbench({
     super.key,
@@ -360,6 +514,8 @@ class CodeWorkbench extends StatefulWidget {
     this.onLangChanged,
     this.onStdinChanged,
     this.actions = const [],
+    this.styleCheck = false,
+    this.sideConsole = false,
   });
 
   @override
@@ -402,16 +558,21 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
 
   double _font = 14.5;
   double _consoleH = 190;
-  int _tab = 0; // 0 input, 1 output
+  double _sideW = 420;
+  int _tab = 0; // 0 input, 1 output, 2 style
   bool _running = false;
   RunResult? _result;
   String _lastText = '';
+  List<StyleIssue> _style = const [];
+  List<StyleIssue> _compile = const []; // the last run's errors, until the code changes
+  Timer? _lint;
 
   @override
   void initState() {
     super.initState();
     _lastText = _code.text;
     _code.addListener(_onCode);
+    _relint();
     BrowserRun.warm(_code.lang);
     SharedPreferences.getInstance().then((p) {
       final f = p.getDouble(_fontKey);
@@ -421,6 +582,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
 
   @override
   void dispose() {
+    _lint?.cancel();
     _code.removeListener(_onCode);
     _code.dispose();
     _stdin.dispose();
@@ -433,8 +595,57 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
     if (_code.text != _lastText) {
       _lastText = _code.text;
       widget.onCodeChanged?.call(_code.text);
+      _compile = const [];
+      _lint?.cancel();
+      _lint = Timer(const Duration(milliseconds: 400), _relint);
     }
     if (mounted) setState(() {}); // Ln / Col
+  }
+
+  void _relint() {
+    if (!widget.styleCheck) return;
+    final issues = CodeStyle.check(_code.text, lang: _code.lang);
+    if (mounted) setState(() => _style = issues);
+  }
+
+  List<StyleIssue> get _issues => [..._compile, if (widget.styleCheck) ..._style];
+
+  /// Puts the caret at [i] in the code.
+  void _jump(StyleIssue i) {
+    final lines = _code.text.split('\n');
+    if (i.line < 1 || i.line > lines.length) return;
+    var at = 0;
+    for (var k = 0; k < i.line - 1; k++) {
+      at += lines[k].length + 1;
+    }
+    at += math.min(i.col, lines[i.line - 1].length);
+    _code.selection = TextSelection.collapsed(offset: at);
+    _focus.requestFocus();
+  }
+
+  void _applyFix(StyleIssue i) {
+    final f = i.fix;
+    if (f == null || f.end > _code.text.length) return;
+    _code.value = TextEditingValue(
+      text: _code.text.replaceRange(f.start, f.end, f.text),
+      selection: TextSelection.collapsed(offset: f.start + f.text.length),
+    );
+    _lint?.cancel();
+    _relint();
+  }
+
+  void _fixAll() {
+    // fixes can make new ones possible (an indent after a line was split): a few rounds
+    var t = _code.text;
+    for (var round = 0; round < 4; round++) {
+      final issues = CodeStyle.check(t, lang: _code.lang);
+      if (!issues.any((i) => i.fix != null)) break;
+      t = CodeStyle.fixAll(t, issues);
+    }
+    if (t == _code.text) return;
+    _code.value = TextEditingValue(text: t, selection: TextSelection.collapsed(offset: math.min(_code.selection.baseOffset, t.length).clamp(0, t.length)));
+    _lint?.cancel();
+    _relint();
   }
 
   void _setFont(double d) {
@@ -445,6 +656,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
   void _setLang(String lang) {
     if (lang == _code.lang) return;
     setState(() => _code.lang = lang);
+    _relint();
     BrowserRun.warm(lang);
     widget.onLangChanged?.call(lang);
   }
@@ -455,11 +667,13 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
       _running = true;
       _tab = 1;
     });
-    final r = await Judge0.run(code: _code.text, stdin: _stdin.text, lang: _code.lang);
+    final code = _code.text;
+    final r = await Judge0.run(code: code, stdin: _stdin.text, lang: _code.lang);
     if (!mounted) return;
     setState(() {
       _running = false;
       _result = r;
+      _compile = code == _code.text ? CodeStyle.fromCompiler(r.error, code, lang: _code.lang) : const [];
     });
   }
 
@@ -674,6 +888,10 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
           const SizedBox(height: 10),
           Text('Programul nu a afișat nimic.', style: TextStyle(fontSize: 13.5, color: Pb.muted)),
         ],
+        if (_compile.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          for (final i in _compile) _issueRow(i),
+        ],
         if (r.error.isNotEmpty) ...[
           const SizedBox(height: 10),
           Container(
@@ -682,6 +900,117 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
             child: SelectableText(r.error, style: Pb.mono(12.5, color: Pb.dangerText)),
           ),
         ],
+      ],
+    );
+  }
+
+  Color get _worstColor => _style.isEmpty ? _green : CodeEditor.colorOf(_style.map((i) => i.level).reduce((a, b) => a.index < b.index ? a : b));
+
+  Widget _issueRow(StyleIssue i) {
+    final c = CodeEditor.colorOf(i.level);
+    final icon = switch (i.level) { IssueLevel.error => Icons.error_outline, IssueLevel.warning => Icons.warning_amber_rounded, IssueLevel.hint => Icons.lightbulb_outline };
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () => _jump(i),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 16, color: c)),
+            const SizedBox(width: 8),
+            SizedBox(width: 58, child: Text('Linia ${i.line}', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted))),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(i.message.replaceAll('`', ''), style: TextStyle(fontSize: 13, color: Pb.text, height: 1.35)),
+                  if (i.detail.isNotEmpty) Text(i.detail, style: Pb.mono(11.5, color: Pb.muted)),
+                ],
+              ),
+            ),
+            if (i.fix != null && !widget.readOnly)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: TextButton(
+                  onPressed: () => _applyFix(i),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 28),
+                    foregroundColor: Pb.primary,
+                  ),
+                  child: const Text('Repară', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _styleView() {
+    final score = CodeStyle.score(_style);
+    final color = score >= 90 ? _green : (score >= 70 ? _amber : _red);
+    final fixable = _style.where((i) => i.fix != null).length;
+    int count(IssueLevel l) => _style.where((i) => i.level == l).length;
+    Widget chip(IssueLevel l, String label) {
+      final n = count(l);
+      if (n == 0) return const SizedBox.shrink();
+      final c = CodeEditor.colorOf(l);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(color: c.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+        child: Text('$n $label', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: c)),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      children: [
+        Row(
+          children: [
+            SizedBox(
+              width: 46,
+              height: 46,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CircularProgressIndicator(value: score / 100, strokeWidth: 4.5, color: color, backgroundColor: color.withOpacity(0.15)),
+                  Center(child: Text('$score', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text))),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _style.isEmpty ? 'Cod scris îngrijit' : (score >= 90 ? 'Aproape perfect' : (score >= 70 ? 'Câteva lucruri de aranjat' : 'Codul are nevoie de ordine')),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Pb.text),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(spacing: 6, runSpacing: 4, children: [
+                    chip(IssueLevel.error, count(IssueLevel.error) == 1 ? 'eroare' : 'erori'),
+                    chip(IssueLevel.warning, count(IssueLevel.warning) == 1 ? 'avertisment' : 'avertismente'),
+                    chip(IssueLevel.hint, count(IssueLevel.hint) == 1 ? 'sugestie' : 'sugestii'),
+                  ]),
+                ],
+              ),
+            ),
+            if (fixable > 0 && !widget.readOnly)
+              PbButton(text: 'Repară tot ($fixable)', icon: Icons.auto_fix_high, variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: _fixAll),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (_style.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text('Indentarea, spațiile și parantezele sunt în regulă.', style: TextStyle(fontSize: 13.5, color: Pb.muted)),
+          )
+        else
+          for (final i in _style) _issueRow(i),
       ],
     );
   }
@@ -706,6 +1035,20 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
                       : Container(width: 7, height: 7, decoration: BoxDecoration(color: _statusOf(r).$2, shape: BoxShape.circle)),
                 ),
               ),
+              if (widget.styleCheck)
+                Flexible(
+                  child: _consoleTab(
+                    2,
+                    'Stil',
+                    trailing: _style.isEmpty
+                        ? const Icon(Icons.check, size: 14, color: _green)
+                        : Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(color: _worstColor.withOpacity(0.15), borderRadius: BorderRadius.circular(999)),
+                            child: Text('${_style.length}', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: _worstColor)),
+                          ),
+                  ),
+                ),
               const Spacer(),
               if (_tab == 1 && r != null && r.stdout.isNotEmpty) _icon(Icons.copy_outlined, 'Copiază rezultatul', () => _copy(r.stdout, 'Rezultatul a fost')),
               if (_tab == 1 && r != null) _icon(Icons.delete_sweep_outlined, 'Golește', () => setState(() => _result = null)),
@@ -713,7 +1056,9 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
           ),
         ),
         Expanded(
-          child: _tab == 0
+          child: _tab == 2
+              ? _styleView()
+              : _tab == 0
               ? TextField(
                   controller: _stdin,
                   onChanged: widget.onStdinChanged,
@@ -742,9 +1087,89 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
   Widget build(BuildContext context) {
     final (ln, col) = _lnCol;
     final lines = '\n'.allMatches(_code.text).length + 1;
+    final here = _issues.where((i) => i.line == ln).toList()..sort((a, b) => a.level.index - b.level.index);
+
+    final editor = CodeEditor(
+      controller: _code,
+      undoController: _undo,
+      focusNode: _focus,
+      readOnly: widget.readOnly,
+      fontSize: widget.compact ? math.min(_font, 13.5) : _font,
+      onRun: _run,
+      issues: _issues,
+    );
+
+    final status = Container(
+      decoration: BoxDecoration(color: Pb.hoverBg, border: Border(top: BorderSide(color: Pb.border))),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        children: [
+          Text('Ln $ln, Col $col', style: TextStyle(fontSize: 12, color: Pb.muted)),
+          const SizedBox(width: 14),
+          Text('$lines ${lines == 1 ? 'linie' : 'linii'}', style: TextStyle(fontSize: 12, color: Pb.muted)),
+          const SizedBox(width: 14),
+          // the issue on the caret's line, so it is read without the mouse (on a phone too)
+          Expanded(
+            child: here.isEmpty
+                ? (widget.compact
+                    ? const SizedBox.shrink()
+                    : Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Tab: 4 spații  ·  Ctrl+/ comentează', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Pb.muted)),
+                      ))
+                : InkWell(
+                    onTap: () => setState(() => _tab = here.first.fromCompiler ? 1 : 2),
+                    child: Row(
+                      children: [
+                        Icon(Icons.circle, size: 8, color: CodeEditor.colorOf(here.first.level)),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(here.first.message.replaceAll('`', ''),
+                              maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Pb.text)),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
 
     return LayoutBuilder(
       builder: (context, box) {
+        final side = widget.sideConsole && box.maxWidth >= 900;
+        if (side) {
+          final sideW = _sideW.clamp(300.0, box.maxWidth * 0.55).toDouble();
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _header(),
+              Container(height: 1, color: Pb.border),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: editor), status])),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.resizeColumn,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onHorizontalDragUpdate: (d) => setState(() => _sideW = (sideW - d.delta.dx).clamp(300.0, box.maxWidth * 0.55).toDouble()),
+                        child: Container(
+                          width: 9,
+                          decoration: BoxDecoration(color: Pb.surface, border: Border(left: BorderSide(color: Pb.border))),
+                          alignment: Alignment.center,
+                          child: Container(width: 3, height: 34, decoration: BoxDecoration(color: Pb.inputBorder, borderRadius: BorderRadius.circular(2))),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: sideW, child: ColoredBox(color: Pb.surface, child: _console())),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
         final maxConsole = box.maxHeight.isFinite ? math.max(110.0, box.maxHeight * 0.65) : 320.0;
         final consoleH = _consoleH.clamp(96.0, maxConsole).toDouble();
         return Column(
@@ -752,30 +1177,8 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
           children: [
             _header(),
             Container(height: 1, color: Pb.border),
-            Expanded(
-              child: CodeEditor(
-                controller: _code,
-                undoController: _undo,
-                focusNode: _focus,
-                readOnly: widget.readOnly,
-                fontSize: widget.compact ? math.min(_font, 13.5) : _font,
-                onRun: _run,
-              ),
-            ),
-            // status bar
-            Container(
-              decoration: BoxDecoration(color: Pb.hoverBg, border: Border(top: BorderSide(color: Pb.border))),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Row(
-                children: [
-                  Text('Ln $ln, Col $col', style: TextStyle(fontSize: 12, color: Pb.muted)),
-                  const SizedBox(width: 14),
-                  Text('$lines ${lines == 1 ? 'linie' : 'linii'}', style: TextStyle(fontSize: 12, color: Pb.muted)),
-                  const Spacer(),
-                  if (!widget.compact) Text('Tab: 4 spații  ·  Ctrl+/ comentează', style: TextStyle(fontSize: 12, color: Pb.muted)),
-                ],
-              ),
-            ),
+            Expanded(child: editor),
+            status,
             // drag handle
             MouseRegion(
               cursor: SystemMouseCursors.resizeRow,
