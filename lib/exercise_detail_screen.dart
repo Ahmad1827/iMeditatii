@@ -15,6 +15,7 @@ import 'judge0.dart';
 import 'math_sheet.dart';
 import 'problem_quiz.dart';
 import 'statement.dart';
+import 'statement_text.dart';
 import 'workspace_screen.dart' show wsAgo;
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
@@ -1130,7 +1131,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
         );
 
-    final sursa = _str(['sursa']);
     final why = _str(['dificultate_motiv']);
     final chips = Wrap(
       spacing: 8,
@@ -1145,7 +1145,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         for (final t in tags) chip(t, icon: Icons.sell_outlined),
       ],
     );
-    if (sursa == null && why == null) return chips;
+    if (why == null) return chips; // the source is shown above the statement
     Widget line(IconData icon, String text) => Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Row(
@@ -1161,25 +1161,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         chips,
-        if (sursa != null) line(Icons.history_edu_outlined, 'Sursa: $sursa'),
-        if (why != null) line(Icons.insights_outlined, 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why'),
+        line(Icons.insights_outlined, 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why'),
       ],
     );
   }
 
   // ---------------------------------------------------------------- left pane
-  Widget _cSection(String title, Widget child, {bool first = false}) => Padding(
-        padding: EdgeInsets.only(top: first ? 0 : 22),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
-            const SizedBox(height: 8),
-            child,
-          ],
-        ),
-      );
-
   Widget _cStatement() {
     final input = _str(['input', 'date_intrare']);
     final output = _str(['output', 'date_iesire']);
@@ -1188,107 +1175,275 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final hint = _str(['hint', 'indicatie']);
     final expl = _str(['explicatie', 'explanation']);
     final examples = _examples;
-    final parts = StatementParts.parse(exerciseData!['description']?.toString() ?? '', file: _file);
+    final parts = StatementParts.of(exerciseData!, file: _file);
+    final options = _isSheet && _kind == 'grila' ? (_list(['variante']) ?? const <String>[]) : const <String>[];
     // what explains the first example: its own field, then the statement's "Exemplu: ..." paragraphs
     final explained = [if (expl != null) expl, ...parts.examples];
+    final source = parts.source.isNotEmpty ? parts.source : _str(['sursa']);
+    final pictures = _list(['imagine_originala']) ?? [if (_str(['imagine_originala']) != null) _str(['imagine_originala'])!];
 
-    Widget bullets(List<String> items) => Column(
+    return SelectionArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (source != null || pictures.isNotEmpty) ...[_cOrigin(source, pictures), const SizedBox(height: 16)],
+          if (_file != null) ...[
+            PbAlert(
+              type: PbAlertType.info,
+              icon: Icons.description_outlined,
+              text: 'Problemă cu fișiere: citești din $_file.in și scrii în $_file.out. Ce citești de la tastatură e gol, iar ce afișezi pe ecran nu se ia în calcul.',
+            ),
+            const SizedBox(height: 16),
+          ],
+          if (parts.context.isNotEmpty) ...[_cContext(parts.context), const SizedBox(height: 14)],
+          _cTask(parts.body),
+          if (options.isNotEmpty) _cSection('Variante de răspuns', Icons.checklist_rtl, _cOptions(options)),
+          if (input != null || output != null) _cSection('Date', Icons.swap_horiz, _cInOut(input, output)),
+          if (cList != null || cText != null) _cSection('Restricții', Icons.rule, _cConstraints(cList ?? [cText!])),
+          for (var i = 0; i < examples.length; i++)
+            _cSection(examples.length == 1 ? 'Exemplu' : 'Exemplul ${i + 1}', Icons.science_outlined, _cExample(examples[i], i == 0 ? explained : const [])),
+          if (examples.isEmpty && explained.isNotEmpty) _cSection('Exemplu', Icons.science_outlined, _cExplanation(explained)),
+          if (hint != null) _cHint(hint),
+          if (_quiz.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: PbButton(
+                text: 'Întrebări ajutătoare (${_quiz.length})',
+                icon: Icons.quiz_outlined,
+                variant: PbVariant.outlineSecondary,
+                size: PbSize.sm,
+                onPressed: () => showProblemQuiz(context, _quiz),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _cSection(String title, IconData icon, Widget child) => Padding(
+        padding: const EdgeInsets.only(top: 24),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final it in items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Text('•', style: TextStyle(fontSize: 15.5, color: Pb.muted)),
-                    ),
-                    Expanded(child: PbRichText(it, fontSize: 15, height: 1.6)),
-                  ],
-                ),
-              ),
+            Row(
+              children: [
+                Icon(icon, size: 17, color: Pb.primary),
+                const SizedBox(width: 8),
+                Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            child,
           ],
-        );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (_file != null) ...[
-          PbAlert(
-            type: PbAlertType.info,
-            icon: Icons.description_outlined,
-            text: 'Problemă cu fișiere: citești din $_file.in și scrii în $_file.out. Ce citești de la tastatură e gol, iar ce afișezi pe ecran nu se ia în calcul.',
-          ),
-          const SizedBox(height: 14),
-        ],
-        if (parts.source.isNotEmpty) ...[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(padding: const EdgeInsets.only(top: 2), child: Icon(Icons.emoji_events_outlined, size: 16, color: Pb.muted)),
-              const SizedBox(width: 8),
-              Expanded(child: Text(parts.source, style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.5))),
-            ],
-          ),
-          const SizedBox(height: 16),
-        ],
-        _cSection(
-          'Cerința',
-          parts.body.isEmpty
-              ? Text('Fără enunț.', style: TextStyle(fontSize: 15.5, color: Pb.muted))
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (final (i, p) in parts.body.indexed) Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 12), child: _cProse(p)),
-                  ],
-                ),
-          first: true,
         ),
-        if (input != null) _cSection(_file == null ? 'Date de intrare' : 'Date de intrare ($_file.in)', PbRichText(input, fontSize: 15.5, height: 1.7)),
-        if (output != null) _cSection(_file == null ? 'Date de ieșire' : 'Date de ieșire ($_file.out)', PbRichText(output, fontSize: 15.5, height: 1.7)),
-        if (cList != null || cText != null)
-          _cSection('Restricții', cList != null ? bullets(cList) : PbRichText(cText!, fontSize: 15.5, height: 1.7)),
-        for (var i = 0; i < examples.length; i++)
-          _cSection(examples.length == 1 ? 'Exemplu' : 'Exemplul ${i + 1}', _cExample(examples[i], i == 0 ? explained : const [])),
-        if (examples.isEmpty && explained.isNotEmpty) _cSection('Exemplu', _cExplanation(explained)),
-        if (hint != null) _cHint(hint),
-        if (_quiz.isNotEmpty) ...[
-          const SizedBox(height: 14),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: PbButton(
-              text: 'Întrebări ajutătoare (${_quiz.length})',
-              icon: Icons.quiz_outlined,
-              variant: PbVariant.outlineSecondary,
-              size: PbSize.sm,
-              onPressed: () => showProblemQuiz(context, _quiz),
+      );
+
+  /// Where the problem comes from, and the page of the paper it was set on.
+  Widget _cOrigin(String? source, List<String> pictures) => Container(
+        padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+        decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: Pb.border)),
+        child: Row(
+          children: [
+            Icon(source != null && source.startsWith('BAC') ? Icons.history_edu_outlined : Icons.emoji_events_outlined, size: 18, color: Pb.muted),
+            const SizedBox(width: 10),
+            Expanded(child: Text(source ?? 'Subiectul original', style: TextStyle(fontSize: 13.5, color: Pb.text, height: 1.4, fontWeight: FontWeight.w500))),
+            if (pictures.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              PbButton(
+                text: 'Subiectul original',
+                icon: Icons.image_outlined,
+                variant: PbVariant.outlineSecondary,
+                size: PbSize.sm,
+                onPressed: () => _showOriginal(pictures, source),
+              ),
+            ],
+          ],
+        ),
+      );
+
+  void _showOriginal(List<String> pictures, String? source) => showDialog<void>(
+        context: context,
+        barrierColor: Colors.black87,
+        builder: (d) => Dialog(
+          backgroundColor: Pb.surface,
+          insetPadding: const EdgeInsets.all(16),
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 980),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 10, 6, 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(source ?? 'Subiectul original', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Pb.text)),
+                      ),
+                      IconButton(tooltip: 'Închide', icon: Icon(Icons.close, color: Pb.muted), onPressed: () => Navigator.of(d).pop()),
+                    ],
+                  ),
+                ),
+                Container(height: 1, color: Pb.border),
+                Flexible(
+                  child: InteractiveViewer(
+                    maxScale: 4,
+                    child: SingleChildScrollView(
+                      child: Container(
+                        color: Colors.white, // the paper is white in the dark theme too
+                        padding: const EdgeInsets.all(8),
+                        child: Column(children: [for (final p in pictures) Image.asset(p, fit: BoxFit.fitWidth, width: double.infinity)]),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+                  child: Text('Din varianta oficială a Ministerului Educației. Mărește cu două degete sau cu rotița.',
+                      style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+                ),
+              ],
             ),
           ),
-        ],
-      ],
+        ),
+      );
+
+  /// The story and the definitions: what the words of the task mean.
+  Widget _cContext(List<String> paragraphs) => Container(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+        decoration: BoxDecoration(color: Pb.hoverBg, borderRadius: BorderRadius.circular(12)),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(padding: const EdgeInsets.only(top: 3), child: Icon(Icons.menu_book_outlined, size: 18, color: Pb.muted)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final (i, p) in paragraphs.indexed)
+                    Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 10), child: StatementText(p, fontSize: 15)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  /// What the student has to do, on a card of its own.
+  Widget _cTask(List<String> paragraphs) => ClipRRect(
+        borderRadius: BorderRadius.circular(12), // a one-sided border can't be rounded itself
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          decoration: BoxDecoration(
+            color: Pb.primary.withOpacity(AppColors.isDark ? 0.10 : 0.05),
+            border: const Border(left: BorderSide(color: Pb.primary, width: 4)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('CERINȚA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Pb.primary, letterSpacing: 1.2)),
+              const SizedBox(height: 8),
+              if (paragraphs.isEmpty) Text('Fără enunț.', style: TextStyle(fontSize: 15.5, color: Pb.muted)),
+              for (final (i, p) in paragraphs.indexed)
+                Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 12), child: StatementText(p, fontSize: 16)),
+            ],
+          ),
+        ),
+      );
+
+  /// A maths multiple-choice problem's options, A to D, as on the paper.
+  Widget _cOptions(List<String> options) => LayoutBuilder(
+        builder: (context, c) {
+          final w = c.maxWidth >= 440 ? (c.maxWidth - 10) / 2 : c.maxWidth;
+          return Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final (i, o) in options.indexed)
+                Container(
+                  width: w,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: Pb.border)),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 26,
+                        height: 26,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: Pb.primary.withOpacity(0.12), shape: BoxShape.circle),
+                        child: Text(String.fromCharCode(65 + i), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Pb.primary)),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(child: StatementText(o, fontSize: 15, height: 1.5)),
+                    ],
+                  ),
+                ),
+            ],
+          );
+        },
+      );
+
+  /// What is read and what is written, side by side.
+  Widget _cInOut(String? input, String? output) {
+    Widget card(IconData icon, Color tint, String label, String text) => Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+          decoration: BoxDecoration(color: Pb.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: Pb.border)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(color: tint.withOpacity(0.13), borderRadius: BorderRadius.circular(7)),
+                    child: Icon(icon, size: 15, color: tint),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.text))),
+                ],
+              ),
+              const SizedBox(height: 8),
+              StatementText(text, fontSize: 14.5, height: 1.6),
+            ],
+          ),
+        );
+    final cards = [
+      if (input != null) card(Icons.login, const Color(0xFF2563EB), _file == null ? 'Date de intrare' : 'Date de intrare · $_file.in', input),
+      if (output != null) card(Icons.logout, Pb.primary, _file == null ? 'Date de ieșire' : 'Date de ieșire · $_file.out', output),
+    ];
+    return LayoutBuilder(
+      builder: (context, c) => c.maxWidth >= 480 && cards.length == 2
+          ? IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [Expanded(child: cards[0]), const SizedBox(width: 10), Expanded(child: cards[1])],
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [for (final (i, c) in cards.indexed) Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 10), child: c)],
+            ),
     );
   }
 
-  /// Statement text: prose, with function headers and rows of numbers in monospace.
-  Widget _cProse(String text, {double fontSize = 15.5}) {
-    final runs = StatementParts.runs(text);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (final (code, t) in runs)
-          code
-              ? Container(
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                  decoration: BoxDecoration(color: Pb.codeBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: Pb.border)),
-                  child: SelectableText(t, style: Pb.mono(fontSize - 1.5, color: Pb.text)),
-                )
-              : PbRichText(t, fontSize: fontSize, height: 1.7),
-      ],
-    );
-  }
+  /// The limits, one chip each.
+  Widget _cConstraints(List<String> items) => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final it in items)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(color: Pb.codeBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: Pb.border)),
+              child: StatementText.line(it, TextStyle(fontSize: 14, height: 1.45, color: Pb.text)),
+            ),
+        ],
+      );
 
   /// One example: what goes in and what comes out side by side (named after
   /// the files when the problem has them), with what explains it underneath.
@@ -1311,7 +1466,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               Container(height: 1, color: Pb.border),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                child: SelectableText(v.isEmpty ? ' ' : v, style: Pb.mono(14, color: Pb.text)),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text(v.isEmpty ? ' ' : v, style: Pb.mono(14, color: Pb.text)),
+                ),
               ),
             ],
           ),
@@ -1326,7 +1484,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               ? IntrinsicHeight(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [Expanded(child: input), const SizedBox(width: 10), Expanded(child: output)],
+                    children: [
+                      Expanded(child: input),
+                      Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Icon(Icons.arrow_forward, size: 18, color: Pb.muted)),
+                      Expanded(child: output),
+                    ],
                   ),
                 )
               : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [input, const SizedBox(height: 10), output]),
@@ -1341,17 +1503,18 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         child: Container(
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
           decoration: BoxDecoration(
-            color: Pb.primary.withOpacity(0.05),
-            border: Border(left: BorderSide(color: Pb.primary, width: 3)),
+            color: const Color(0xFF2563EB).withOpacity(0.06),
+            border: const Border(left: BorderSide(color: Color(0xFF2563EB), width: 3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // "Exemplu (cerința 3): ..." is a case of its own, not this example explained
-            Text(paragraphs.every((p) => p.startsWith('Exemplu (')) ? 'Alt exemplu' : 'Explicație',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Pb.primary)),
+              Text(paragraphs.every((p) => p.startsWith('Exemplu (')) ? 'Alt exemplu' : 'De ce',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
               const SizedBox(height: 6),
-              for (final (i, p) in paragraphs.indexed) Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 8), child: _cProse(p, fontSize: 14.5)),
+              for (final (i, p) in paragraphs.indexed)
+                Padding(padding: EdgeInsets.only(top: i == 0 ? 0 : 8), child: StatementText(p, fontSize: 14.5, height: 1.6)),
             ],
           ),
         ),
@@ -1385,7 +1548,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               ),
               if (_cHintOpen) ...[
                 Container(height: 1, color: Pb.border),
-                Padding(padding: const EdgeInsets.all(14), child: PbRichText(hint, fontSize: 15, height: 1.6)),
+                Padding(padding: const EdgeInsets.all(14), child: StatementText(hint, fontSize: 15, height: 1.6)),
               ],
             ],
           ),
@@ -1425,10 +1588,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PbRichText(worked!, fontSize: 15.5, height: 1.7),
+          SelectionArea(child: StatementText(worked!, fontSize: 15.5, height: 1.7)),
           if (answer != null && answer.isNotEmpty) ...[
             const SizedBox(height: 14),
-            PbAlert(type: PbAlertType.success, text: 'Răspuns: $answer'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(color: Pb.successBg, borderRadius: Pb.radius, border: Border.all(color: Pb.successBorder)),
+              child: StatementText('**Răspuns:** $answer', fontSize: 15, height: 1.5, color: Pb.successText),
+            ),
           ],
         ],
       );
@@ -2349,8 +2516,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                   const SizedBox(height: 14),
                                   Text(_title.toUpperCase(), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink)),
                                   const SizedBox(height: 16),
-                                  Text(exerciseData!["description"]?.toString() ?? "",
-                                      style: TextStyle(fontSize: 16, color: AppColors.ink, height: 1.6, fontWeight: FontWeight.w600)),
+                                  StatementText(exerciseData!["description"]?.toString() ?? "",
+                                      fontSize: 16, color: AppColors.ink, height: 1.6, weight: FontWeight.w600),
                                   if (exerciseData!["input"] != null) ...[
                                     const SizedBox(height: 20),
                                     _retroSpecBlock(_file == null ? "INPUT FORMAT" : "INPUT FILE: $_file.in", exerciseData!["input"].toString(), isMobile),
@@ -2541,9 +2708,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 1.2)),
         ),
         const SizedBox(height: 10),
-        Text(
+        StatementText(
           exerciseData!["description"]?.toString() ?? "Fără descriere disponibilă.",
-          style: TextStyle(fontSize: isMobile ? 15 : 18, color: AppColors.ink, fontWeight: FontWeight.w600, height: 1.55, letterSpacing: 0.2),
+          fontSize: isMobile ? 15 : 18,
+          color: AppColors.ink,
+          weight: FontWeight.w600,
+          height: 1.55,
         ),
         if (exerciseData!["hint"] != null) ...[
           SizedBox(height: isMobile ? 16 : 24),
@@ -2556,8 +2726,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 Icon(Icons.lightbulb, color: AppColors.ink, size: 22),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(exerciseData!["hint"].toString(),
-                      style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.4)),
+                  child: StatementText(exerciseData!["hint"].toString(),
+                      fontSize: isMobile ? 13 : 16, color: AppColors.ink, weight: FontWeight.bold, height: 1.4),
                 ),
               ],
             ),
@@ -2624,7 +2794,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 14, vertical: isMobile ? 10 : 14),
           decoration: BoxDecoration(color: AppColors.cloud, border: Border.all(color: AppColors.border, width: 1.5)),
-          child: Text(content, style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.w700, height: 1.4)),
+          child: StatementText(content, fontSize: isMobile ? 13 : 16, color: AppColors.ink, weight: FontWeight.w700, height: 1.4),
         ),
       ],
     );

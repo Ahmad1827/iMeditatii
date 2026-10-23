@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'classes_models.dart';
 import 'ink_page.dart';
+import 'statement_text.dart';
 import 'ui_components.dart';
 import 'workspace_screen.dart' show wsAgo;
 
@@ -737,10 +738,10 @@ class _SheetReviewCardState extends State<SheetReviewCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (answer != null && answer.isNotEmpty)
-                    Text('Răspunsul corect: $answer', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Pb.text)),
+                    StatementText('**Răspunsul corect:** $answer', fontSize: 14, height: 1.45),
                   if (worked != null && worked.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(worked, style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
+                    StatementText(worked, fontSize: 13.5, color: Pb.muted, height: 1.45),
                   ],
                 ],
               ),

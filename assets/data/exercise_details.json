@@ -5,10 +5,10 @@
         "title": "Suma a două numere",
         "category": "1. Structuri secvențiale",
         "difficulty": "ușoară",
-        "description": "Se dau două numere întregi. Să se calculeze și să se afișeze suma lor.",
-        "input": "Citirea de la tastatură a două numere întregi a și b.",
-        "output": "Afișarea pe ecran a sumei rezultate.",
-        "hint": "Folosește operatorul standard + pentru adunare.",
+        "description": "Se citesc două numere întregi, a și b. Scrie un program care afișează suma lor, a + b.",
+        "input": "Pe o singură linie, numerele a și b, separate printr-un spațiu.",
+        "output": "Un singur număr: suma a + b.",
+        "hint": "Suma poate ajunge la 2 · 10⁹, peste limita tipului `int`: folosește `long long`.",
         "constraints": [
           "-10⁹ ≤ a, b ≤ 10⁹"
         ],
@@ -37,16 +37,18 @@
             "input": "1000000000 1000000000",
             "output": "2000000000"
           }
-        ]
+        ],
+        "cerinta": "Se citesc două numere întregi, a și b. Scrie un program care afișează suma lor, a + b.",
+        "explicatie": "5 + 7 = 12."
       },
       "2": {
         "title": "Aria și perimetrul dreptunghiului",
         "category": "1. Structuri secvențiale",
         "difficulty": "ușoară",
-        "description": "Se dau lungimile laturilor unui dreptunghi a și b. Să se calculeze aria și perimetrul său.",
-        "input": "Două numere naturale a și b.",
-        "output": "Aria și perimetrul separate prin spațiu.",
-        "hint": "Aria = a * b, Perimetrul = 2 * (a + b).",
+        "description": "Un dreptunghi are laturile de lungimi a și b. Scrie un program care afișează aria și perimetrul dreptunghiului.",
+        "input": "Pe o singură linie, numerele naturale a și b.",
+        "output": "Aria și perimetrul, în această ordine, separate printr-un spațiu.",
+        "hint": "Aria = a · b, perimetrul = 2 · (a + b).",
         "constraints": [
           "1 ≤ a, b ≤ 10⁴"
         ],
@@ -75,16 +77,18 @@
             "input": "10000 10000",
             "output": "100000000 40000"
           }
-        ]
+        ],
+        "cerinta": "Un dreptunghi are laturile de lungimi a și b. Scrie un program care afișează aria și perimetrul dreptunghiului.",
+        "explicatie": "Aria este 4 · 5 = 20, iar perimetrul este 2 · (4 + 5) = 18."
       },
       "3": {
         "title": "Media aritmetică",
         "category": "1. Structuri secvențiale",
         "difficulty": "ușoară",
-        "description": "Se dau trei numere naturale. Să se calculeze media lor aritmetică și să se afișeze cu exact două zecimale.",
-        "input": "Trei numere întregi x, y și z.",
-        "output": "Media aritmetică, cu exact două zecimale.",
-        "hint": "Suma trebuie convertită la tipul float sau double înainte de împărțire.",
+        "description": "Se citesc trei numere naturale, x, y și z. Scrie un program care afișează media lor aritmetică, cu exact două zecimale.",
+        "input": "Pe o singură linie, numerele x, y și z.",
+        "output": "Media aritmetică $\\frac{x + y + z}{3}$, cu exact două zecimale (de exemplu 3.67 sau 10.00).",
+        "hint": "Împarte la 3.0, nu la 3: împărțirea a două numere întregi pierde zecimalele. Pentru două zecimale: `cout << fixed << setprecision(2)`.",
         "constraints": [
           "1 ≤ x, y, z ≤ 10⁴"
         ],
@@ -113,16 +117,18 @@
             "input": "10000 9999 1",
             "output": "6666.67"
           }
-        ]
+        ],
+        "cerinta": "Se citesc trei numere naturale, x, y și z. Scrie un program care afișează media lor aritmetică, cu exact două zecimale.",
+        "explicatie": "(2 + 4 + 5) : 3 = 11 : 3 = 3,666…, care se afișează rotunjit la două zecimale: 3.67."
       },
       "4": {
         "title": "Interschimbarea a două valori",
         "category": "1. Structuri secvențiale",
         "difficulty": "ușoară",
-        "description": "Se dau două numere întregi a și b. Să se interschimbe valorile celor două variabile și să se afișeze noile valori ale lui a și b.",
-        "input": "Două numere întregi a și b.",
-        "output": "Valorile inversate separate prin spațiu.",
-        "hint": "Poți folosi o variabilă auxiliară pentru a nu pierde valoarea lui a.",
+        "description": "Se citesc două numere întregi în variabilele a și b. Scrie un program care interschimbă valorile celor două variabile și apoi afișează a și b, în această ordine.",
+        "input": "Pe o singură linie, numerele a și b.",
+        "output": "Noile valori ale lui a și b, separate printr-un spațiu.",
+        "hint": "Păstrează valoarea lui a într-o variabilă auxiliară înainte să o suprascrii: aux = a; a = b; b = aux.",
         "constraints": [
           "-10⁵ ≤ a, b ≤ 10⁵"
         ],
@@ -151,16 +157,18 @@
             "input": "-100000 100000",
             "output": "100000 -100000"
           }
-        ]
+        ],
+        "cerinta": "Se citesc două numere întregi în variabilele a și b. Scrie un program care interschimbă valorile celor două variabile și apoi afișează a și b, în această ordine.",
+        "explicatie": "Inițial a = 3 și b = 9. După interschimbare a = 9 și b = 3, deci se afișează 9 3."
       },
       "5": {
         "title": "Maximul a două numere",
         "category": "2. Structuri alternative",
         "difficulty": "ușoară",
-        "description": "Se dau două numere întregi. Să se determine valoarea maximă.",
-        "input": "Două numere întregi a și b.",
+        "description": "Se citesc două numere întregi, a și b. Scrie un program care afișează cel mai mare dintre ele. Dacă numerele sunt egale, se afișează valoarea lor comună.",
+        "input": "Pe o singură linie, numerele a și b.",
         "output": "Cel mai mare dintre cele două numere.",
-        "hint": "Folosește o structură de decizie if-else.",
+        "hint": "O singură instrucțiune if-else: dacă a > b, afișezi a, altfel afișezi b.",
         "constraints": [
           "-10⁹ ≤ a, b ≤ 10⁹"
         ],
@@ -189,18 +197,21 @@
             "input": "8 15",
             "output": "15"
           }
-        ]
+        ],
+        "cerinta": "Se citesc două numere întregi, a și b. Scrie un program care afișează cel mai mare dintre ele. Dacă numerele sunt egale, se afișează valoarea lor comună.",
+        "explicatie": "Dintre 15 și 8, cel mai mare este 15."
       },
       "6": {
         "title": "Par sau impar",
         "category": "2. Structuri alternative",
         "difficulty": "ușoară",
-        "description": "Se citește un număr natural n. Să se afișeze PAR dacă numărul este par sau IMPAR altfel.",
+        "description": "Se citește un număr natural n. Scrie un program care afișează mesajul `PAR` dacă n este par, respectiv `IMPAR` dacă n este impar.",
         "input": "Numărul natural n.",
-        "output": "PAR sau IMPAR.",
-        "hint": "Verifică restul împărțirii la 2: n % 2 == 0.",
+        "output": "Unul dintre mesajele `PAR` sau `IMPAR`, scris cu majuscule.",
+        "hint": "Un număr este par când restul împărțirii lui la 2 este 0: n % 2 == 0.",
         "constraints": [
-          "0 ≤ n ≤ 2*10⁹"
+          "0 ≤ n ≤ 2 · 10⁹",
+          "0 este considerat număr par"
         ],
         "examples": {
           "input": "24",
@@ -231,16 +242,18 @@
             "input": "1",
             "output": "IMPAR"
           }
-        ]
+        ],
+        "cerinta": "Se citește un număr natural n. Scrie un program care afișează mesajul `PAR` dacă n este par, respectiv `IMPAR` dacă n este impar.",
+        "explicatie": "24 se împarte exact la 2, deci este par."
       },
       "7": {
         "title": "Semnul unui număr",
         "category": "2. Structuri alternative",
         "difficulty": "ușoară",
-        "description": "Se dă un număr întreg x. Să se afișeze pozitiv, negativ sau nul în funcție de valoarea sa.",
-        "input": "Un număr întreg x.",
-        "output": "pozitiv, negativ sau nul.",
-        "hint": "Compară numărul cu 0.",
+        "description": "Se citește un număr întreg x. Scrie un program care afișează `pozitiv` dacă x > 0, `negativ` dacă x < 0, respectiv `nul` dacă x = 0.",
+        "input": "Numărul întreg x.",
+        "output": "Unul dintre cuvintele `pozitiv`, `negativ` sau `nul`, scris cu litere mici.",
+        "hint": "Ai trei cazuri, deci două comparații cu 0: if, else if, else.",
         "constraints": [
           "-10⁹ ≤ x ≤ 10⁹"
         ],
@@ -273,16 +286,18 @@
             "input": "-1",
             "output": "negativ"
           }
-        ]
+        ],
+        "cerinta": "Se citește un număr întreg x. Scrie un program care afișează `pozitiv` dacă x > 0, `negativ` dacă x < 0, respectiv `nul` dacă x = 0.",
+        "explicatie": "−5 este mai mic decât 0, deci se afișează negativ."
       },
       "8": {
         "title": "An bisect",
         "category": "2. Structuri alternative",
         "difficulty": "ușoară",
-        "description": "Se dă un număr natural reprezentând un an. Să se determine dacă anul este bisect (afișează 1) sau nu (afișează 0).",
-        "input": "Un număr natural reprezentând anul.",
-        "output": "1 pentru bisect, 0 pentru nebisect.",
-        "hint": "Un an este bisect dacă este divizibil cu 4 dar nu cu 100, sau este divizibil cu 400.",
+        "description": "Un an este **bisect** (are 366 de zile, cu 29 februarie) dacă este divizibil cu 4, dar nu cu 100, sau dacă este divizibil cu 400. De exemplu, 2024 și 2000 sunt ani bisecți, iar 1900 și 2023 nu sunt.\n\nSe citește un număr natural an. Scrie un program care afișează 1 dacă anul este bisect, respectiv 0 dacă nu este.",
+        "input": "Numărul natural an.",
+        "output": "1 dacă anul este bisect, 0 în caz contrar.",
+        "hint": "Scrie condiția dintr-o singură expresie: (an % 4 == 0 && an % 100 != 0) || an % 400 == 0.",
         "constraints": [
           "1 ≤ an ≤ 3000"
         ],
@@ -315,16 +330,19 @@
             "input": "400",
             "output": "1"
           }
-        ]
+        ],
+        "context": "Un an este **bisect** (are 366 de zile, cu 29 februarie) dacă este divizibil cu 4, dar nu cu 100, sau dacă este divizibil cu 400. De exemplu, 2024 și 2000 sunt ani bisecți, iar 1900 și 2023 nu sunt.",
+        "cerinta": "Se citește un număr natural an. Scrie un program care afișează 1 dacă anul este bisect, respectiv 0 dacă nu este.",
+        "explicatie": "2024 se împarte la 4 și nu se împarte la 100, deci este bisect."
       },
       "9": {
         "title": "Laturile unui triunghi",
         "category": "2. Structuri alternative",
         "difficulty": "medie",
-        "description": "Se dau trei numere reale pozitive a, b, c. Să se verifice dacă pot fi lungimile laturilor unui triunghi. Se afișează DA sau NU.",
-        "input": "Trei numere reale.",
-        "output": "DA sau NU.",
-        "hint": "Fiecare latură trebuie să fie strict mai mică decât suma celorlalte două.",
+        "description": "Trei lungimi pot fi laturile unui triunghi doar dacă fiecare dintre ele este **strict mai mică** decât suma celorlalte două. Dacă una dintre ele este egală cu suma celorlalte, „triunghiul” ar fi turtit într-un segment și nu se acceptă.\n\nSe citesc trei numere reale pozitive, a, b și c. Scrie un program care afișează `DA` dacă a, b și c pot fi lungimile laturilor unui triunghi, respectiv `NU` în caz contrar.",
+        "input": "Pe o singură linie, numerele reale a, b și c.",
+        "output": "Mesajul `DA` sau `NU`.",
+        "hint": "Verifică toate trei inegalitățile: a < b + c, b < a + c și c < a + b. Citește numerele în variabile `double`.",
         "constraints": [
           "0 < a, b, c ≤ 10⁴"
         ],
@@ -357,18 +375,21 @@
             "input": "7 7 7",
             "output": "DA"
           }
-        ]
+        ],
+        "context": "Trei lungimi pot fi laturile unui triunghi doar dacă fiecare dintre ele este **strict mai mică** decât suma celorlalte două. Dacă una dintre ele este egală cu suma celorlalte, „triunghiul” ar fi turtit într-un segment și nu se acceptă.",
+        "cerinta": "Se citesc trei numere reale pozitive, a, b și c. Scrie un program care afișează `DA` dacă a, b și c pot fi lungimile laturilor unui triunghi, respectiv `NU` în caz contrar.",
+        "explicatie": "3 < 4 + 5, 4 < 3 + 5 și 5 < 3 + 4, deci 3, 4 și 5 sunt laturile unui triunghi (chiar unul dreptunghic)."
       },
       "10": {
         "title": "Ultima cifră",
         "category": "3. Prelucrarea cifrelor",
         "difficulty": "ușoară",
-        "description": "Se dă un număr natural n. Să se determine ultima cifră a sa.",
-        "input": "Un număr natural n.",
-        "output": "Ultima cifră a numărului.",
-        "hint": "Folosește operatorul modulo: n % 10.",
+        "description": "Se citește un număr natural n. Scrie un program care afișează ultima cifră a lui n (cifra unităților).",
+        "input": "Numărul natural n.",
+        "output": "Ultima cifră a lui n.",
+        "hint": "Ultima cifră este restul împărțirii la 10: n % 10.",
         "constraints": [
-          "0 ≤ n ≤ 2*10⁹"
+          "0 ≤ n ≤ 2 · 10⁹"
         ],
         "examples": {
           "input": "583",
@@ -399,18 +420,20 @@
             "input": "7",
             "output": "7"
           }
-        ]
+        ],
+        "cerinta": "Se citește un număr natural n. Scrie un program care afișează ultima cifră a lui n (cifra unităților).",
+        "explicatie": "Ultima cifră a lui 583 este 3."
       },
       "11": {
         "title": "Suma cifrelor",
         "category": "3. Prelucrarea cifrelor",
         "difficulty": "ușoară",
-        "description": "Se dă un număr natural N. Să se calculeze suma cifrelor sale.",
-        "input": "Un număr natural N.",
+        "description": "Se citește un număr natural N. Scrie un program care afișează suma cifrelor lui N.",
+        "input": "Numărul natural N.",
         "output": "Suma cifrelor lui N.",
-        "hint": "Folosește o structură repetitivă while și operatorii % 10 și / 10.",
+        "hint": "Cât timp N > 0: adaugi la sumă ultima cifră (N % 10) și o elimini (N = N / 10).",
         "constraints": [
-          "0 ≤ N ≤ 2*10⁹"
+          "0 ≤ N ≤ 2 · 10⁹"
         ],
         "examples": {
           "input": "1234",
@@ -441,18 +464,20 @@
             "input": "1000",
             "output": "1"
           }
-        ]
+        ],
+        "cerinta": "Se citește un număr natural N. Scrie un program care afișează suma cifrelor lui N.",
+        "explicatie": "1 + 2 + 3 + 4 = 10. Pentru N = 0, suma cifrelor este 0."
       },
       "12": {
         "title": "Oglinditul unui număr",
         "category": "3. Prelucrarea cifrelor",
         "difficulty": "medie",
-        "description": "Se citește un număr natural n. Să se determine oglinditul (răsturnatul) său.",
+        "description": "**Oglinditul** unui număr natural se obține scriindu-i cifrele în ordine inversă, de la dreapta la stânga. Zerourile care ajung la început nu se scriu: oglinditul lui 1204 este 4021, iar oglinditul lui 300 este 3.\n\nSe citește un număr natural nenul n. Scrie un program care afișează oglinditul lui n.",
         "input": "Numărul natural n.",
-        "output": "Oglinditul numărului.",
-        "hint": "ogl = ogl * 10 + n % 10 la fiecare pas.",
+        "output": "Oglinditul lui n.",
+        "hint": "Construiește oglinditul cifră cu cifră: ogl = ogl · 10 + n % 10, apoi n = n / 10, cât timp n > 0. Oglinditul poate depăși `int`: folosește `long long`.",
         "constraints": [
-          "1 ≤ n ≤ 2*10⁹"
+          "1 ≤ n ≤ 2 · 10⁹"
         ],
         "examples": {
           "input": "1204",
@@ -483,18 +508,21 @@
             "input": "1000000000",
             "output": "1"
           }
-        ]
+        ],
+        "context": "**Oglinditul** unui număr natural se obține scriindu-i cifrele în ordine inversă, de la dreapta la stânga. Zerourile care ajung la început nu se scriu: oglinditul lui 1204 este 4021, iar oglinditul lui 300 este 3.",
+        "cerinta": "Se citește un număr natural nenul n. Scrie un program care afișează oglinditul lui n.",
+        "explicatie": "Cifrele lui 1204, citite de la dreapta la stânga, sunt 4, 0, 2, 1, deci oglinditul este 4021."
       },
       "13": {
         "title": "Număr palindrom",
         "category": "3. Prelucrarea cifrelor",
         "difficulty": "medie",
-        "description": "Să se verifice dacă un număr natural citit este palindrom.",
+        "description": "Un număr este **palindrom** dacă se citește la fel de la stânga la dreapta și de la dreapta la stânga, adică este egal cu oglinditul său. De exemplu, 12321, 7 și 4554 sunt palindroame, iar 1234 nu este.\n\nSe citește un număr natural nenul n. Scrie un program care afișează `DA` dacă n este palindrom, respectiv `NU` în caz contrar.",
         "input": "Numărul natural n.",
-        "output": "DA dacă este palindrom, altfel NU.",
-        "hint": "Compară numărul inițial cu oglinditul său.",
+        "output": "Mesajul `DA` sau `NU`.",
+        "hint": "Calculează oglinditul lui n într-o copie, ca să nu pierzi valoarea inițială, apoi compară-l cu n.",
         "constraints": [
-          "1 ≤ n ≤ 2*10⁹"
+          "1 ≤ n ≤ 2 · 10⁹"
         ],
         "examples": {
           "input": "12321",
@@ -525,16 +553,19 @@
             "input": "10",
             "output": "NU"
           }
-        ]
+        ],
+        "context": "Un număr este **palindrom** dacă se citește la fel de la stânga la dreapta și de la dreapta la stânga, adică este egal cu oglinditul său. De exemplu, 12321, 7 și 4554 sunt palindroame, iar 1234 nu este.",
+        "cerinta": "Se citește un număr natural nenul n. Scrie un program care afișează `DA` dacă n este palindrom, respectiv `NU` în caz contrar.",
+        "explicatie": "Oglinditul lui 12321 este tot 12321, deci numărul este palindrom."
       },
       "14": {
         "title": "CMMDC (algoritmul lui Euclid)",
         "category": "4. Divizibilitate și numere prime",
         "difficulty": "ușoară",
-        "description": "Se dau două numere naturale. Să se determine cel mai mare divizor comun (CMMDC).",
-        "input": "Două numere naturale a și b.",
-        "output": "Valoarea CMMDC.",
-        "hint": "Poți folosi algoritmul lui Euclid prin împărțiri repetate.",
+        "description": "Se citesc două numere naturale nenule, a și b. Scrie un program care afișează cel mai mare divizor comun al lor, cmmdc(a, b).",
+        "input": "Pe o singură linie, numerele a și b.",
+        "output": "Valoarea cmmdc(a, b).",
+        "hint": "Algoritmul lui Euclid: cât timp b ≠ 0, calculezi r = a % b, apoi a = b și b = r. La final, cmmdc-ul este a.",
         "constraints": [
           "1 ≤ a, b ≤ 10⁹"
         ],
@@ -567,18 +598,20 @@
             "input": "17 51",
             "output": "17"
           }
-        ]
+        ],
+        "cerinta": "Se citesc două numere naturale nenule, a și b. Scrie un program care afișează cel mai mare divizor comun al lor, cmmdc(a, b).",
+        "explicatie": "Divizorii lui 18 sunt 1, 2, 3, 6, 9, 18, iar divizorii lui 24 sunt 1, 2, 3, 4, 6, 8, 12, 24. Cel mai mare divizor comun este 6."
       },
       "15": {
         "title": "Număr prim",
         "category": "4. Divizibilitate și numere prime",
         "difficulty": "medie",
-        "description": "Se dă un număr natural n. Să se afișeze DA dacă n este număr prim și NU în caz contrar.",
-        "input": "Un număr natural n.",
-        "output": "DA sau NU.",
-        "hint": "Verifică divizorii până la radical din n.",
+        "description": "Un număr natural este **prim** dacă are exact doi divizori: 1 și pe el însuși. De exemplu, 2, 3, 5, 7 și 17 sunt prime, iar 1, 4 și 9 nu sunt (1 are un singur divizor).\n\nSe citește un număr natural n. Scrie un program care afișează `DA` dacă n este prim, respectiv `NU` în caz contrar.",
+        "input": "Numărul natural n.",
+        "output": "Mesajul `DA` sau `NU`.",
+        "hint": "Caută un divizor d de la 2 până la √n (cât timp d · d ≤ n). Dacă nu găsești niciunul, iar n ≥ 2, numărul este prim. Cu n până la 2 · 10⁹ faci cel mult aproximativ 45 000 de pași.",
         "constraints": [
-          "1 ≤ n ≤ 2*10⁹"
+          "1 ≤ n ≤ 2 · 10⁹"
         ],
         "examples": {
           "input": "17",
@@ -617,18 +650,21 @@
             "input": "49",
             "output": "NU"
           }
-        ]
+        ],
+        "context": "Un număr natural este **prim** dacă are exact doi divizori: 1 și pe el însuși. De exemplu, 2, 3, 5, 7 și 17 sunt prime, iar 1, 4 și 9 nu sunt (1 are un singur divizor).",
+        "cerinta": "Se citește un număr natural n. Scrie un program care afișează `DA` dacă n este prim, respectiv `NU` în caz contrar.",
+        "explicatie": "17 nu se împarte decât la 1 și la 17, deci este prim."
       },
       "16": {
         "title": "Descompunerea în factori primi",
         "category": "4. Divizibilitate și numere prime",
         "difficulty": "medie",
-        "description": "Se dă un număr natural n. Să se descompună n în factori primi. Pentru fiecare factor prim, în ordine crescătoare, se afișează pe câte o linie factorul și puterea la care apare.",
+        "description": "Se citește un număr natural n, n ≥ 2. Scrie un program care descompune n în factori primi.",
         "input": "Numărul natural n.",
-        "output": "Pe fiecare linie: factorul prim și puterea lui, separate prin spațiu.",
-        "hint": "Împarte repetat la divizorul d începând de la 2.",
+        "output": "Câte o linie pentru fiecare factor prim al lui n, în ordine crescătoare a factorilor. Pe fiecare linie se scriu factorul prim și puterea (exponentul) la care apare în descompunere, separate printr-un spațiu.",
+        "hint": "Pornește cu d = 2. Cât timp n se împarte la d, îl împarți și numeri de câte ori ai făcut-o. Treci apoi la d + 1. Te poți opri când d · d > n: dacă n a rămas mai mare decât 1, el însuși este un factor prim, la puterea 1.",
         "constraints": [
-          "2 ≤ n ≤ 2*10⁹"
+          "2 ≤ n ≤ 2 · 10⁹"
         ],
         "examples": {
           "input": "12",
@@ -663,16 +699,18 @@
             "input": "1999999973",
             "output": "1999999973 1"
           }
-        ]
+        ],
+        "cerinta": "Se citește un număr natural n, n ≥ 2. Scrie un program care descompune n în factori primi.",
+        "explicatie": "12 = 2² · 3¹, deci se afișează linia 2 2 (factorul 2, la puterea 2), apoi linia 3 1 (factorul 3, la puterea 1)."
       },
       "17": {
         "title": "Ciurul lui Eratostene",
         "category": "4. Divizibilitate și numere prime",
         "difficulty": "grea",
-        "description": "Se dă un număr natural n. Să se determine câte numere prime sunt mai mici sau egale cu n.",
-        "input": "Un număr natural n.",
+        "description": "Un număr natural este **prim** dacă are exact doi divizori: 1 și pe el însuși (1 nu este prim).\n\nSe citește un număr natural n. Scrie un program care afișează câte numere prime sunt mai mici sau egale cu n.",
+        "input": "Numărul natural n.",
         "output": "Numărul de numere prime din intervalul [1, n].",
-        "hint": "Marchează multiplii fiecărui număr prim p, începând de la p * p.",
+        "hint": "Ciurul lui Eratostene: un vector în care marchezi multiplii fiecărui număr prim p, începând de la p · p. Numerele de la 2 la n rămase nemarcate sunt prime.",
         "constraints": [
           "1 ≤ n ≤ 10⁶"
         ],
@@ -705,16 +743,19 @@
             "input": "1000000",
             "output": "78498"
           }
-        ]
+        ],
+        "context": "Un număr natural este **prim** dacă are exact doi divizori: 1 și pe el însuși (1 nu este prim).",
+        "cerinta": "Se citește un număr natural n. Scrie un program care afișează câte numere prime sunt mai mici sau egale cu n.",
+        "explicatie": "Numerele prime mai mici sau egale cu 10 sunt 2, 3, 5 și 7, adică 4 numere."
       },
       "18": {
         "title": "Suma elementelor unui vector",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "ușoară",
-        "description": "Se dă un vector cu n elemente întregi. Să se calculeze suma elementelor sale.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente.",
-        "output": "Suma elementelor din vector.",
-        "hint": "Citește elementele pe rând și adună-le.",
+        "description": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care afișează suma celor n elemente.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente, separate prin spații.",
+        "output": "Suma elementelor.",
+        "hint": "Pornește cu suma 0 și adună pe rând fiecare element citit.",
         "constraints": [
           "1 ≤ n ≤ 1000",
           "-10⁴ ≤ elemente ≤ 10⁴"
@@ -744,16 +785,18 @@
             "input": "5\n10000 10000 10000 10000 10000",
             "output": "50000"
           }
-        ]
+        ],
+        "cerinta": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care afișează suma celor n elemente.",
+        "explicatie": "1 + 2 + 3 + 4 = 10."
       },
       "19": {
         "title": "Minimul și maximul dintr-un vector",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "ușoară",
-        "description": "Se dă un vector cu n numere întregi. Să se determine cel mai mic și cel mai mare element.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente.",
-        "output": "Minimul și maximul separate prin spațiu.",
-        "hint": "Inițializează ambele variabile cu primul element.",
+        "description": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care afișează cel mai mic și cel mai mare element al vectorului.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente, separate prin spații.",
+        "output": "Minimul și maximul, în această ordine, separate printr-un spațiu.",
+        "hint": "Pornește cu minimul și maximul egale cu primul element, nu cu 0: elementele pot fi negative.",
         "constraints": [
           "1 ≤ n ≤ 1000",
           "-10⁹ ≤ elemente ≤ 10⁹"
@@ -783,16 +826,18 @@
             "input": "6\n-3 5 0 -9 12 4",
             "output": "-9 12"
           }
-        ]
+        ],
+        "cerinta": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care afișează cel mai mic și cel mai mare element al vectorului.",
+        "explicatie": "Dintre 7, 2, 9, 1 și 5, cel mai mic este 1, iar cel mai mare este 9."
       },
       "20": {
         "title": "Căutare liniară",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "ușoară",
-        "description": "Se dau un vector cu n numere întregi și o valoare x. Să se afișeze prima poziție (numerotată de la 1) pe care apare x în vector sau NU dacă x nu apare.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente, pe a treia linie valoarea x.",
-        "output": "Poziția primei apariții a lui x sau NU.",
-        "hint": "Parcurge vectorul de la stânga la dreapta și oprește-te la prima potrivire.",
+        "description": "Se citesc un vector cu n numere întregi și o valoare x. Scrie un program care afișează prima poziție pe care apare x în vector. Pozițiile se numerotează de la 1. Dacă x nu apare deloc în vector, se afișează `NU`.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente ale vectorului. Pe a treia linie, valoarea x.",
+        "output": "Poziția primei apariții a lui x sau mesajul `NU`.",
+        "hint": "Parcurge vectorul de la stânga la dreapta și oprește-te la primul element egal cu x.",
         "constraints": [
           "1 ≤ n ≤ 1000",
           "-10⁹ ≤ elemente, x ≤ 10⁹"
@@ -822,16 +867,18 @@
             "input": "1\n-4\n-4",
             "output": "1"
           }
-        ]
+        ],
+        "cerinta": "Se citesc un vector cu n numere întregi și o valoare x. Scrie un program care afișează prima poziție pe care apare x în vector. Pozițiile se numerotează de la 1. Dacă x nu apare deloc în vector, se afișează `NU`.",
+        "explicatie": "Valoarea 2 apare în vectorul (3, 8, 2, 9, 4) pe poziția 3."
       },
       "21": {
         "title": "Cea mai frecventă valoare",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "medie",
-        "description": "Se dau n numere naturale mai mici decât 1000. Să se afișeze valoarea care apare de cele mai multe ori. Dacă mai multe valori au același număr maxim de apariții, se afișează cea mai mică dintre ele.",
-        "input": "Pe prima linie n, pe a doua linie cele n numere.",
-        "output": "Valoarea cu număr maxim de apariții.",
-        "hint": "Construiește un vector fr[] unde fr[x] numără aparițiile lui x.",
+        "description": "Se citesc n numere naturale mai mici decât 1000. Scrie un program care afișează valoarea care apare de cele mai multe ori. Dacă mai multe valori apar de același număr maxim de ori, se afișează cea mai mică dintre ele.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n numere.",
+        "output": "Valoarea cu cele mai multe apariții (cea mai mică, la egalitate).",
+        "hint": "Numără aparițiile într-un vector de frecvență fr, unde fr[v] este de câte ori a apărut v. Parcurgând apoi valorile de la 0 la 999, prima valoare cu frecvența maximă este și cea mai mică.",
         "constraints": [
           "1 ≤ n ≤ 10⁵",
           "0 ≤ numere < 1000"
@@ -865,16 +912,18 @@
             "input": "7\n999 1 999 1 2 2 0",
             "output": "1"
           }
-        ]
+        ],
+        "cerinta": "Se citesc n numere naturale mai mici decât 1000. Scrie un program care afișează valoarea care apare de cele mai multe ori. Dacă mai multe valori apar de același număr maxim de ori, se afișează cea mai mică dintre ele.",
+        "explicatie": "4 apare de trei ori, 2 de două ori, iar 3 o singură dată, deci se afișează 4."
       },
       "22": {
         "title": "Sortare prin selecție",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "medie",
-        "description": "Se dă un vector cu n numere întregi. Să se sorteze crescător elementele vectorului și să se afișeze vectorul sortat.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente.",
-        "output": "Elementele vectorului în ordine crescătoare, separate prin spațiu.",
-        "hint": "Pentru fiecare poziție i, adu pe ea cel mai mic element dintre cele rămase (pozițiile i..n-1).",
+        "description": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care ordonează crescător elementele vectorului prin metoda selecției și afișează vectorul ordonat.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente.",
+        "output": "Elementele vectorului în ordine crescătoare, separate prin câte un spațiu.",
+        "hint": "Pentru fiecare poziție i, de la prima la penultima, caută cel mai mic element dintre pozițiile i, i + 1, …, n − 1 și interschimbă-l cu elementul de pe poziția i.",
         "constraints": [
           "1 ≤ n ≤ 1000",
           "-10⁹ ≤ elemente ≤ 10⁹"
@@ -904,16 +953,18 @@
             "input": "1\n8",
             "output": "8"
           }
-        ]
+        ],
+        "cerinta": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care ordonează crescător elementele vectorului prin metoda selecției și afișează vectorul ordonat.",
+        "explicatie": "Elementele 9, 2, 5, 1, ordonate crescător, sunt 1, 2, 5, 9."
       },
       "23": {
         "title": "Căutare binară",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "medie",
-        "description": "Se dă un vector ordonat crescător cu n elemente și o valoare x. Afișați 1 dacă x se află în vector, 0 altfel.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente în ordine crescătoare, pe a treia linie valoarea x.",
-        "output": "1 sau 0.",
-        "hint": "Compară x cu elementul din mijloc și continuă căutarea doar în jumătatea în care x s-ar putea afla.",
+        "description": "Se citesc un vector cu n numere întregi, ordonat crescător, și o valoare x. Scrie un program care afișează 1 dacă x se află în vector, respectiv 0 în caz contrar. Folosește căutarea binară.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente, în ordine crescătoare. Pe a treia linie, valoarea x.",
+        "output": "1 dacă x apare în vector, 0 în caz contrar.",
+        "hint": "Ține capetele st și dr ale zonei în care x s-ar mai putea afla. Compară x cu elementul din mijloc: dacă e mai mare, continui în dreapta mijlocului, dacă e mai mic, în stânga. Te oprești când îl găsești sau când st > dr.",
         "constraints": [
           "1 ≤ n ≤ 10⁵",
           "-10⁹ ≤ elemente, x ≤ 10⁹"
@@ -947,16 +998,18 @@
             "input": "6\n-7 -2 0 3 8 10\n11",
             "output": "0"
           }
-        ]
+        ],
+        "cerinta": "Se citesc un vector cu n numere întregi, ordonat crescător, și o valoare x. Scrie un program care afișează 1 dacă x se află în vector, respectiv 0 în caz contrar. Folosește căutarea binară.",
+        "explicatie": "9 se află în vectorul (1, 4, 7, 9, 12), pe poziția 4."
       },
       "24": {
         "title": "Interclasarea a doi vectori",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "medie",
-        "description": "Se dau doi vectori ordonați crescător, cu n, respectiv m elemente. Să se afișeze vectorul obținut prin interclasarea lor, ordonat crescător.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente ale primului vector, pe a treia linie m, pe a patra linie cele m elemente ale celui de-al doilea vector.",
-        "output": "Cele n + m elemente în ordine crescătoare, separate prin spațiu.",
-        "hint": "Ține câte un indice în fiecare vector și mută de fiecare dată elementul mai mic. La final copiază ce a rămas.",
+        "description": "Se citesc doi vectori ordonați crescător, primul cu n elemente, al doilea cu m elemente. Scrie un program care afișează toate cele n + m elemente, în ordine crescătoare, obținute prin **interclasarea** celor doi vectori.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente ale primului vector. Pe a treia linie, numărul m. Pe a patra linie, cele m elemente ale celui de-al doilea vector.",
+        "output": "Cele n + m elemente, în ordine crescătoare, separate prin câte un spațiu.",
+        "hint": "Nu e nevoie de sortare. Ține un indice în fiecare vector și scrie de fiecare dată elementul mai mic dintre cele două indicate, apoi avansează în vectorul din care l-ai luat. Când un vector se termină, copiază ce a rămas din celălalt.",
         "constraints": [
           "1 ≤ n, m ≤ 10⁵",
           "-10⁹ ≤ elemente ≤ 10⁹"
@@ -986,16 +1039,18 @@
             "input": "1\n5\n1\n-5",
             "output": "-5 5"
           }
-        ]
+        ],
+        "cerinta": "Se citesc doi vectori ordonați crescător, primul cu n elemente, al doilea cu m elemente. Scrie un program care afișează toate cele n + m elemente, în ordine crescătoare, obținute prin **interclasarea** celor doi vectori.",
+        "explicatie": "Din (1, 4, 7) și (2, 5, 6) se iau, pe rând, cele mai mici elemente rămase: 1, 2, 4, 5, 6, 7."
       },
       "25": {
         "title": "Secvența de sumă maximă",
         "category": "5. Tablouri unidimensionale",
         "difficulty": "grea",
-        "description": "Se dă un vector cu n numere întregi. Să se determine suma maximă a unei secvențe nevide de elemente aflate pe poziții consecutive.",
-        "input": "Pe prima linie n, pe a doua linie cele n elemente.",
+        "description": "O **secvență** a unui vector este formată din unul sau mai multe elemente aflate pe poziții consecutive.\n\nSe citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care afișează cea mai mare sumă a elementelor unei secvențe.",
+        "input": "Pe prima linie, numărul n. Pe a doua linie, cele n elemente.",
         "output": "Suma maximă a unei secvențe.",
-        "hint": "Algoritmul lui Kadane: ține suma secvenței curente și reseteaz-o la 0 când devine negativă.",
+        "hint": "Algoritmul lui Kadane: parcurgi vectorul ținând suma celei mai bune secvențe care se termină la elementul curent, adică maximul dintre elementul curent și elementul curent plus suma anterioară. Răspunsul este cea mai mare dintre aceste sume. Sumele pot depăși `int`: folosește `long long`.",
         "constraints": [
           "1 ≤ n ≤ 10⁵",
           "-10⁹ ≤ elemente ≤ 10⁹"
@@ -1025,21 +1080,25 @@
             "input": "7\n3 -4 5 -1 2 -9 6",
             "output": "6"
           }
-        ]
+        ],
+        "context": "O **secvență** a unui vector este formată din unul sau mai multe elemente aflate pe poziții consecutive.",
+        "cerinta": "Se citesc un număr natural n și apoi n numere întregi, elementele unui vector. Scrie un program care afișează cea mai mare sumă a elementelor unei secvențe.",
+        "explicatie": "Secvența 4, −1, 2 are suma 5 și nicio altă secvență nu are o sumă mai mare. Dacă toate elementele sunt negative, răspunsul este cel mai mare dintre ele."
       },
       "91": {
         "title": "Macarie",
         "category": "6. Olimpiadă",
         "difficulty": "grea",
-        "description": "Olimpiada de Informatică, etapa județeană (OJI) 2024, clasa a IX-a. Ca la olimpiadă, datele se citesc din fișierul macarie.in, iar rezultatul se scrie în fișierul macarie.out.\n\nMacarie a primit o nouă temă la informatică: se consideră un șir A de N numere naturale nenule. Fie șirul crescător D format din toți divizorii naturali, nu neapărat distincți, ai elementelor din A. De exemplu, pentru N = 4 și A = (6, 2, 3, 2), avem D = (1, 1, 1, 1, 2, 2, 2, 3, 3, 6).\n\nCunoscându-se un șir Poz de Q numere naturale nenule, reprezentând poziții din șirul D, să se determine, pentru fiecare dintre acestea, elementul corespunzător din șirul D.\n\nExemplu: pentru A = (32, 42, 49, 21), șirul D este (1, 1, 1, 1, 2, 2, 3, 3, 4, 6, 7, 7, 7, 8, 14, 16, 21, 21, 32, 42, 49), iar pozițiile 2 5 9 7 17 corespund valorilor 1 2 4 3 21.",
+        "description": "Macarie a primit o nouă temă la informatică. Se consideră un șir A de N numere naturale nenule. Din el se formează șirul D, care conține, în ordine crescătoare, toți divizorii naturali ai tuturor elementelor lui A. Un divizor comun mai multor elemente apare în D de mai multe ori.\n\nDe exemplu, pentru A = (6, 2, 3, 2): divizorii lui 6 sunt 1, 2, 3, 6, ai lui 2 sunt 1, 2, ai lui 3 sunt 1, 3, iar ai celui de-al doilea 2 sunt 1, 2. Rezultă D = (1, 1, 1, 1, 2, 2, 2, 3, 3, 6).\n\nSe dau șirul A și Q poziții din șirul D (numerotate de la 1). Pentru fiecare poziție, determină elementul aflat pe ea în șirul D.",
         "fisier": "macarie",
-        "input": "Pe prima linie N și Q; pe a doua linie cei N termeni ai lui A; pe a treia linie cele Q poziții.",
-        "output": "Cele Q elemente din D, separate prin câte un spațiu, în ordinea pozițiilor.",
+        "input": "Pe prima linie, numerele N și Q. Pe a doua linie, cele N elemente ale șirului A. Pe a treia linie, cele Q poziții.",
+        "output": "Pe o singură linie, cele Q elemente din D aflate pe pozițiile date, în ordinea în care au fost date pozițiile, separate prin câte un spațiu.",
         "hint": "Nu construi șirul D: poate avea sute de milioane de termeni. Pentru fiecare d de la 1 la 1 000 000 numără câți termeni din A sunt divizibili cu d, adunând frecvențele multiplilor lui d (în total aproximativ V · ln V pași). Cu sume parțiale p[d] = câți termeni din D sunt ≤ d, răspunsul pentru o poziție este cel mai mic d cu p[d] ≥ poziția, găsit prin căutare binară.",
         "constraints": [
-          "1 ≤ N ≤ 1 000 000, 1 ≤ Q ≤ 100 000",
+          "1 ≤ N ≤ 1 000 000",
+          "1 ≤ Q ≤ 100 000",
           "1 ≤ Aᵢ ≤ 1 000 000, nu neapărat distincte",
-          "1 ≤ Pozᵢ ≤ lungimea lui D; numerotarea începe de la 1"
+          "fiecare poziție este cel mult lungimea lui D"
         ],
         "examples": {
           "input": "4 5\n32 42 49 21\n2 5 9 7 17",
@@ -1078,7 +1137,11 @@
             "input": "500 60\n809926 597865 843455 739411 441503 643497 117477 347213 892697 684436 636170 818277 241805 247549 486817 383476 142716 212958 386693 517307 624414 877149 658609 148266 274657 406084 653938 353643 351799 985716 742946 747377 487547 903071 178065 717304 729379 805120 903018 138423 347932 969433 216962 609245 719925 68630 102751 986847 884534 182178 4527 943582 157978 459422 738030 247134 367301 239647 85395 205151 842017 298048 250909 728805 483567 630933 276432 505462 549138 922258 457198 696116 435060 210697 883666 74290 316014 317196 291950 142363 591963 693743 766836 262173 552929 105499 519276 229310 934295 204935 822417 407476 184674 540298 891471 234081 335491 371837 786566 736673 934712 838628 47826 606978 944684 977309 710957 570593 395269 981606 777413 755460 996786 664197 76932 124310 240699 58476 542886 131569 991111 869842 220454 950714 665831 644818 968683 92142 992425 528630 182200 247729 511758 612302 837737 767391 173089 169907 91005 131403 647797 109364 850801 989434 623033 588961 851949 633684 662188 31644 624307 113204 587238 188567 570725 732238 330029 487 128833 294609 30325 191101 64469 108841 666212 898996 655252 706160 649975 769886 220383 607296 217953 675861 199330 483368 195201 495954 328899 285954 768185 475936 665113 460451 875164 750729 844964 864039 227836 419644 614812 908798 470531 905675 438748 623256 737183 140275 925249 219649 168167 326788 417229 206503 789188 188142 374007 477447 719984 15615 125043 351637 707478 3066 810369 233770 788646 531509 439585 690568 39418 224586 638074 487187 581489 520525 573795 844970 52379 452530 348172 11169 534575 356503 579909 943736 983707 921077 268099 698458 768685 165312 236033 633834 112712 866666 834074 887473 451931 70792 925696 139698 183453 26516 903157 354559 322381 993261 960938 264685 519057 169235 380527 872985 488920 971105 454931 990218 515835 643089 342195 167788 39097 807682 127490 125038 381075 446387 667598 189434 529816 739357 99901 57022 691680 456788 936779 27495 849616 955869 933065 985423 286705 242128 123349 333024 569805 911739 594708 144149 222674 597309 612167 113304 452337 107685 989095 627241 740137 732248 278866 455121 586011 167124 800901 242149 985084 58 539298 130467 208476 396197 561374 600991 426720 467330 600675 826823 181194 869954 676022 969873 259319 578828 963501 802338 306010 942577 854697 289844 620179 374185 471774 668423 116793 424095 417475 797853 295345 333686 525713 547437 239268 249602 862647 817443 844299 375448 237926 441634 827136 490113 600863 323595 300219 708207 718589 968543 203299 491104 676424 567248 56427 264465 399069 867403 682777 219674 275629 433647 543176 141142 684085 331685 298706 721599 563969 844470 987631 140737 801315 97659 529761 230954 486072 636975 294899 311093 259413 679357 543681 408334 774784 295571 192749 934378 955388 503077 846621 382505 32599 626637 676027 393329 729087 67190 792454 757821 947167 140244 106287 444089 641991 339505 200074 804522 79834 795222 606744 266615 34395 845472 671163 811961 274176 703469 889662 545830 198584 987376 894795 839408 455226 175909 201908 748611 495231 866283 279105 72698 484410 130230 105104 621936 280958 136660 786105 404036 821133 617858 871029 676318 102638 233491 791811 612370 245818 172344 309812 681486 940834 144389 856765 728035 975181 847261 404040 720069 112983 137168 354972 432399 344552 660311 734919 349779 573576 863521 788450 247294 21066 631833 292308 400541 146149 596999 280322 179301 530526 837742\n2109 1786 4496 1082 5757 3511 6068 4442 1566 1029 6661 1070 5531 5669 1903 2071 205 5227 5052 5554 898 3472 4352 3444 276 3894 1277 2269 5840 2946 3777 2847 2386 3951 5548 4765 3670 4526 5296 258 5580 2324 1534 3137 5334 4060 5225 2960 4122 3984 2980 1296 530 4158 6037 4518 2197 1614 1493 3602",
             "output": "46 24 6903 5 99292 903 201280 6282 15 5 936779 5 59801 83179 30 43 1 30998 22407 62155 3 824 5119 773 1 2010 8 64 116839 277 1572 219 82 2224 61202 12289 1256 7371 35895 1 67416 72 14 417 39309 2817 30779 287 3222 2410 296 8 2 3398 184674 7215 56 17 13 1071"
           }
-        ]
+        ],
+        "sursa": "Olimpiada de Informatică, etapa județeană (OJI) 2024, clasa a IX-a",
+        "context": "Macarie a primit o nouă temă la informatică. Se consideră un șir A de N numere naturale nenule. Din el se formează șirul D, care conține, în ordine crescătoare, toți divizorii naturali ai tuturor elementelor lui A. Un divizor comun mai multor elemente apare în D de mai multe ori.\n\nDe exemplu, pentru A = (6, 2, 3, 2): divizorii lui 6 sunt 1, 2, 3, 6, ai lui 2 sunt 1, 2, ai lui 3 sunt 1, 3, iar ai celui de-al doilea 2 sunt 1, 2. Rezultă D = (1, 1, 1, 1, 2, 2, 2, 3, 3, 6).",
+        "cerinta": "Se dau șirul A și Q poziții din șirul D (numerotate de la 1). Pentru fiecare poziție, determină elementul aflat pe ea în șirul D.",
+        "explicatie": "Pentru A = (32, 42, 49, 21), șirul D este (1, 1, 1, 1, 2, 2, 3, 3, 4, 6, 7, 7, 7, 8, 14, 16, 21, 21, 32, 42, 49). Pe pozițiile 2, 5, 9, 7 și 17 se află 1, 2, 4, 3 și 21."
       }
     },
     "10": {
@@ -4736,7 +4799,8 @@
             "output": "726199157"
           }
         ],
-        "dificultate_motiv": "Reconstruirea numărului cifră cu cifră, uitându-te la cifra vecină din stânga."
+        "dificultate_motiv": "Reconstruirea numărului cifră cu cifră, uitându-te la cifra vecină din stânga.",
+        "imagine_originala": "assets/bac/2026_model_III1.png"
       },
       "102": {
         "title": "Raftul echilibrat",
@@ -5068,7 +5132,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "Construirea numerelor din cifrele pare nenule (unul inversat) și cazul în care nu rămâne nicio cifră."
+        "dificultate_motiv": "Construirea numerelor din cifrele pare nenule (unul inversat) și cazul în care nu rămâne nicio cifră.",
+        "imagine_originala": "assets/bac/2025_model_III1.png"
       },
       "108": {
         "title": "Cel mai mare număr harsad",
@@ -5176,7 +5241,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "Căutarea, de la √n în jos, a primului d cu d² divizor al lui n (sau descompunerea în factori)."
+        "dificultate_motiv": "Căutarea, de la √n în jos, a primului d cu d² divizor al lui n (sau descompunerea în factori).",
+        "imagine_originala": "assets/bac/2025_speciala_III1.png"
       },
       "110": {
         "title": "Suma ascendenților",
@@ -5233,7 +5299,8 @@
             "output": "61722"
           }
         ],
-        "dificultate_motiv": "Parcurgerea intervalului și verificarea cifrelor fiecărui număr față de cifra unităților lui n."
+        "dificultate_motiv": "Parcurgerea intervalului și verificarea cifrelor fiecărui număr față de cifra unităților lui n.",
+        "imagine_originala": "assets/bac/2025_iunie_III1.png"
       },
       "111": {
         "title": "Între două produse consecutive",
@@ -5285,7 +5352,8 @@
             "output": "100"
           }
         ],
-        "dificultate_motiv": "O buclă care crește f până când f · (f + 1) ≥ n."
+        "dificultate_motiv": "O buclă care crește f până când f · (f + 1) ≥ n.",
+        "imagine_originala": "assets/bac/2025_rezerva_III1.png"
       },
       "112": {
         "title": "Împărțirea terenului în parcele",
@@ -5382,7 +5450,8 @@
             "output": "42998169600000000"
           }
         ],
-        "dificultate_motiv": "Un for până la min(a, b) cu două teste de divizibilitate; produsul crește repede, deci long long."
+        "dificultate_motiv": "Un for până la min(a, b) cu două teste de divizibilitate; produsul crește repede, deci long long.",
+        "imagine_originala": "assets/bac/2024_model_III1.png"
       },
       "114": {
         "title": "Cifrele impare dublate",
@@ -5486,7 +5555,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "Parcurgerea cifrelor cu trei verificări: exact 9 cifre, doar 1..4, fiecare tip prezent."
+        "dificultate_motiv": "Parcurgerea cifrelor cu trei verificări: exact 9 cifre, doar 1..4, fiecare tip prezent.",
+        "imagine_originala": "assets/bac/2024_speciala_III1.png"
       },
       "116": {
         "title": "Cel mai mic număr major impar",
@@ -5534,7 +5604,8 @@
             "output": "21"
           }
         ],
-        "dificultate_motiv": "Sume de divizori proprii separate după paritate, pentru fiecare număr din interval."
+        "dificultate_motiv": "Sume de divizori proprii separate după paritate, pentru fiecare număr din interval.",
+        "imagine_originala": "assets/bac/2024_iunie_III1.png"
       },
       "117": {
         "title": "Număr moderat",
@@ -5650,7 +5721,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "O parcurgere a cifrelor; singura capcană e n = 0."
+        "dificultate_motiv": "O parcurgere a cifrelor; singura capcană e n = 0.",
+        "imagine_originala": "assets/bac/2023_model_III1.png"
       },
       "119": {
         "title": "Numere cu trei divizori impari",
@@ -5766,7 +5838,8 @@
             "output": "1425 1"
           }
         ],
-        "dificultate_motiv": "Căutarea celui mai mic x pentru care n e o putere a lui x, prin împărțiri repetate, cu ieșirea x = n, p = 1."
+        "dificultate_motiv": "Căutarea celui mai mic x pentru care n e o putere a lui x, prin împărțiri repetate, cu ieșirea x = n, p = 1.",
+        "imagine_originala": "assets/bac/2023_speciala_III1.png"
       },
       "121": {
         "title": "Număr abundent",
@@ -5830,7 +5903,8 @@
             "output": "0"
           }
         ],
-        "dificultate_motiv": "Sume de divizori pentru toate numerele mai mici și compararea rapoartelor fără erori de rotunjire (S(n)·k > S(k)·n)."
+        "dificultate_motiv": "Sume de divizori pentru toate numerele mai mici și compararea rapoartelor fără erori de rotunjire (S(n)·k > S(k)·n).",
+        "imagine_originala": "assets/bac/2023_iunie_III1.png"
       },
       "122": {
         "title": "Divizorii impari care nu sunt primi",
@@ -6201,7 +6275,8 @@
             "output": "9999973 9999991"
           }
         ],
-        "dificultate_motiv": "Un test de primalitate eficient (până la √x) și o căutare descrescătoare care se oprește după două numere."
+        "dificultate_motiv": "Un test de primalitate eficient (până la √x) și o căutare descrescătoare care se oprește după două numere.",
+        "imagine_originala": "assets/bac/2021_model_III1.png"
       },
       "129": {
         "title": "Primul factor cu puterea minimă",
@@ -6369,7 +6444,8 @@
             "output": "0"
           }
         ],
-        "dificultate_motiv": "Descompunere cu numărarea exponenților și factorul rămas (exponent 1, deci se adună)."
+        "dificultate_motiv": "Descompunere cu numărarea exponenților și factorul rămas (exponent 1, deci se adună).",
+        "imagine_originala": "assets/bac/2021_iunie_III1.png"
       },
       "132": {
         "title": "Primele n cuburi perfecte, descrescător",
@@ -6409,7 +6485,8 @@
             "output": "1000000000 997002999 994011992 991026973 988047936 985074875 982107784 979146657 976191488 973242271 970299000 967361669 964430272 961504803 958585256 955671625 952763904 949862087 946966168 944076141 941192000 938313739 935441352 932574833 929714176 926859375 924010424 921167317 918330048 915498611 912673000 909853209 907039232 904231063 901428696 898632125 895841344 893056347 890277128 887503681 884736000 881974079 879217912 876467493 873722816 870983875 868250664 865523177 862801408 860085351 857375000 854670349 851971392 849278123 846590536 843908625 841232384 838561807 835896888 833237621 830584000 827936019 825293672 822656953 820025856 817400375 814780504 812166237 809557568 806954491 804357000 801765089 799178752 796597983 794022776 791453125 788889024 786330467 783777448 781229961 778688000 776151559 773620632 771095213 768575296 766060875 763551944 761048497 758550528 756058031 753571000 751089429 748613312 746142643 743677416 741217625 738763264 736314327 733870808 731432701 729000000 726572699 724150792 721734273 719323136 716917375 714516984 712121957 709732288 707347971 704969000 702595369 700227072 697864103 695506456 693154125 690807104 688465387 686128968 683797841 681472000 679151439 676836152 674526133 672221376 669921875 667627624 665338617 663054848 660776311 658503000 656234909 653972032 651714363 649461896 647214625 644972544 642735647 640503928 638277381 636056000 633839779 631628712 629422793 627222016 625026375 622835864 620650477 618470208 616295051 614125000 611960049 609800192 607645423 605495736 603351125 601211584 599077107 596947688 594823321 592704000 590589719 588480472 586376253 584277056 582182875 580093704 578009537 575930368 573856191 571787000 569722789 567663552 565609283 563559976 561515625 559476224 557441767 555412248 553387661 551368000 549353259 547343432 545338513 543338496 541343375 539353144 537367797 535387328 533411731 531441000 529475129 527514112 525557943 523606616 521660125 519718464 517781627 515849608 513922401 512000000 510082399 508169592 506261573 504358336 502459875 500566184 498677257 496793088 494913671 493039000 491169069 489303872 487443403 485587656 483736625 481890304 480048687 478211768 476379541 474552000 472729139 470910952 469097433 467288576 465484375 463684824 461889917 460099648 458314011 456533000 454756609 452984832 451217663 449455096 447697125 445943744 444194947 442450728 440711081 438976000 437245479 435519512 433798093 432081216 430368875 428661064 426957777 425259008 423564751 421875000 420189749 418508992 416832723 415160936 413493625 411830784 410172407 408518488 406869021 405224000 403583419 401947272 400315553 398688256 397065375 395446904 393832837 392223168 390617891 389017000 387420489 385828352 384240583 382657176 381078125 379503424 377933067 376367048 374805361 373248000 371694959 370146232 368601813 367061696 365525875 363994344 362467097 360944128 359425431 357911000 356400829 354894912 353393243 351895816 350402625 348913664 347428927 345948408 344472101 343000000 341532099 340068392 338608873 337153536 335702375 334255384 332812557 331373888 329939371 328509000 327082769 325660672 324242703 322828856 321419125 320013504 318611987 317214568 315821241 314432000 313046839 311665752 310288733 308915776 307546875 306182024 304821217 303464448 302111711 300763000 299418309 298077632 296740963 295408296 294079625 292754944 291434247 290117528 288804781 287496000 286191179 284890312 283593393 282300416 281011375 279726264 278445077 277167808 275894451 274625000 273359449 272097792 270840023 269586136 268336125 267089984 265847707 264609288 263374721 262144000 260917119 259694072 258474853 257259456 256047875 254840104 253636137 252435968 251239591 250047000 248858189 247673152 246491883 245314376 244140625 242970624 241804367 240641848 239483061 238328000 237176659 236029032 234885113 233744896 232608375 231475544 230346397 229220928 228099131 226981000 225866529 224755712 223648543 222545016 221445125 220348864 219256227 218167208 217081801 216000000 214921799 213847192 212776173 211708736 210644875 209584584 208527857 207474688 206425071 205379000 204336469 203297472 202262003 201230056 200201625 199176704 198155287 197137368 196122941 195112000 194104539 193100552 192100033 191102976 190109375 189119224 188132517 187149248 186169411 185193000 184220009 183250432 182284263 181321496 180362125 179406144 178453547 177504328 176558481 175616000 174676879 173741112 172808693 171879616 170953875 170031464 169112377 168196608 167284151 166375000 165469149 164566592 163667323 162771336 161878625 160989184 160103007 159220088 158340421 157464000 156590819 155720872 154854153 153990656 153130375 152273304 151419437 150568768 149721291 148877000 148035889 147197952 146363183 145531576 144703125 143877824 143055667 142236648 141420761 140608000 139798359 138991832 138188413 137388096 136590875 135796744 135005697 134217728 133432831 132651000 131872229 131096512 130323843 129554216 128787625 128024064 127263527 126506008 125751501 125000000 124251499 123505992 122763473 122023936 121287375 120553784 119823157 119095488 118370771 117649000 116930169 116214272 115501303 114791256 114084125 113379904 112678587 111980168 111284641 110592000 109902239 109215352 108531333 107850176 107171875 106496424 105823817 105154048 104487111 103823000 103161709 102503232 101847563 101194696 100544625 99897344 99252847 98611128 97972181 97336000 96702579 96071912 95443993 94818816 94196375 93576664 92959677 92345408 91733851 91125000 90518849 89915392 89314623 88716536 88121125 87528384 86938307 86350888 85766121 85184000 84604519 84027672 83453453 82881856 82312875 81746504 81182737 80621568 80062991 79507000 78953589 78402752 77854483 77308776 76765625 76225024 75686967 75151448 74618461 74088000 73560059 73034632 72511713 71991296 71473375 70957944 70444997 69934528 69426531 68921000 68417929 67917312 67419143 66923416 66430125 65939264 65450827 64964808 64481201 64000000 63521199 63044792 62570773 62099136 61629875 61162984 60698457 60236288 59776471 59319000 58863869 58411072 57960603 57512456 57066625 56623104 56181887 55742968 55306341 54872000 54439939 54010152 53582633 53157376 52734375 52313624 51895117 51478848 51064811 50653000 50243409 49836032 49430863 49027896 48627125 48228544 47832147 47437928 47045881 46656000 46268279 45882712 45499293 45118016 44738875 44361864 43986977 43614208 43243551 42875000 42508549 42144192 41781923 41421736 41063625 40707584 40353607 40001688 39651821 39304000 38958219 38614472 38272753 37933056 37595375 37259704 36926037 36594368 36264691 35937000 35611289 35287552 34965783 34645976 34328125 34012224 33698267 33386248 33076161 32768000 32461759 32157432 31855013 31554496 31255875 30959144 30664297 30371328 30080231 29791000 29503629 29218112 28934443 28652616 28372625 28094464 27818127 27543608 27270901 27000000 26730899 26463592 26198073 25934336 25672375 25412184 25153757 24897088 24642171 24389000 24137569 23887872 23639903 23393656 23149125 22906304 22665187 22425768 22188041 21952000 21717639 21484952 21253933 21024576 20796875 20570824 20346417 20123648 19902511 19683000 19465109 19248832 19034163 18821096 18609625 18399744 18191447 17984728 17779581 17576000 17373979 17173512 16974593 16777216 16581375 16387064 16194277 16003008 15813251 15625000 15438249 15252992 15069223 14886936 14706125 14526784 14348907 14172488 13997521 13824000 13651919 13481272 13312053 13144256 12977875 12812904 12649337 12487168 12326391 12167000 12008989 11852352 11697083 11543176 11390625 11239424 11089567 10941048 10793861 10648000 10503459 10360232 10218313 10077696 9938375 9800344 9663597 9528128 9393931 9261000 9129329 8998912 8869743 8741816 8615125 8489664 8365427 8242408 8120601 8000000 7880599 7762392 7645373 7529536 7414875 7301384 7189057 7077888 6967871 6859000 6751269 6644672 6539203 6434856 6331625 6229504 6128487 6028568 5929741 5832000 5735339 5639752 5545233 5451776 5359375 5268024 5177717 5088448 5000211 4913000 4826809 4741632 4657463 4574296 4492125 4410944 4330747 4251528 4173281 4096000 4019679 3944312 3869893 3796416 3723875 3652264 3581577 3511808 3442951 3375000 3307949 3241792 3176523 3112136 3048625 2985984 2924207 2863288 2803221 2744000 2685619 2628072 2571353 2515456 2460375 2406104 2352637 2299968 2248091 2197000 2146689 2097152 2048383 2000376 1953125 1906624 1860867 1815848 1771561 1728000 1685159 1643032 1601613 1560896 1520875 1481544 1442897 1404928 1367631 1331000 1295029 1259712 1225043 1191016 1157625 1124864 1092727 1061208 1030301 1000000 970299 941192 912673 884736 857375 830584 804357 778688 753571 729000 704969 681472 658503 636056 614125 592704 571787 551368 531441 512000 493039 474552 456533 438976 421875 405224 389017 373248 357911 343000 328509 314432 300763 287496 274625 262144 250047 238328 226981 216000 205379 195112 185193 175616 166375 157464 148877 140608 132651 125000 117649 110592 103823 97336 91125 85184 79507 74088 68921 64000 59319 54872 50653 46656 42875 39304 35937 32768 29791 27000 24389 21952 19683 17576 15625 13824 12167 10648 9261 8000 6859 5832 4913 4096 3375 2744 2197 1728 1331 1000 729 512 343 216 125 64 27 8 1"
           }
         ],
-        "dificultate_motiv": "O singură buclă de la n la 1 cu i · i · i."
+        "dificultate_motiv": "O singură buclă de la n la 1 cu i · i · i.",
+        "imagine_originala": "assets/bac/2021_august_III1.png"
       },
       "133": {
         "title": "Primii n multipli ai lui x, descrescător",
@@ -8295,7 +8372,8 @@
             "output": "8"
           }
         ],
-        "dificultate_motiv": "O singură parcurgere a cifrelor, cu un test pentru cifrele 2, 3, 5, 7."
+        "dificultate_motiv": "O singură parcurgere a cifrelor, cu un test pentru cifrele 2, 3, 5, 7.",
+        "imagine_originala": "assets/bac/2019_model_III1.png"
       },
       "169": {
         "title": "Inserarea diferențelor dintre cifre",
@@ -8408,7 +8486,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "O parcurgere a cifrelor, comparând fiecare cifră impară cu prima găsită."
+        "dificultate_motiv": "O parcurgere a cifrelor, comparând fiecare cifră impară cu prima găsită.",
+        "imagine_originala": "assets/bac/2019_speciala_III1.png"
       },
       "171": {
         "title": "Cifrele impare micșorate",
@@ -8461,7 +8540,8 @@
             "output": "864200"
           }
         ],
-        "dificultate_motiv": "Parcurgerea cifrelor și reconstruirea numărului; se poate face și doar scăzând puterea lui 10 pentru fiecare cifră impară."
+        "dificultate_motiv": "Parcurgerea cifrelor și reconstruirea numărului; se poate face și doar scăzând puterea lui 10 pentru fiecare cifră impară.",
+        "imagine_originala": "assets/bac/2019_iunie_III1.png"
       },
       "172": {
         "title": "Produsul divizorilor impari",
@@ -8562,7 +8642,8 @@
             "output": "1 2 \n4 6 \n8 9"
           }
         ],
-        "dificultate_motiv": "Pe linia i se elimină elementul de pe coloana n − 1 − i, iar cele din dreapta lui se mută la stânga."
+        "dificultate_motiv": "Pe linia i se elimină elementul de pe coloana n − 1 − i, iar cele din dreapta lui se mută la stânga.",
+        "imagine_originala": "assets/bac/2026_model_III2.png"
       },
       "174": {
         "title": "Criptarea cu cifru circular",
@@ -8813,7 +8894,8 @@
             "output": "7 6 5 \n15 14 13 \n23 22 21"
           }
         ],
-        "dificultate_motiv": "O formulă directă: a[i][j] = (i + 1)·k − (j − i)."
+        "dificultate_motiv": "O formulă directă: a[i][j] = (i + 1)·k − (j − i).",
+        "imagine_originala": "assets/bac/2025_model_III2.png"
       },
       "180": {
         "title": "Cuvinte asemenea cu ultimul",
@@ -8899,7 +8981,8 @@
             "output": "x - y - z - w"
           }
         ],
-        "dificultate_motiv": "strtok desparte cuvintele chiar și la spații multiple; apoi se construiește textul nou cu „ - ” între ele."
+        "dificultate_motiv": "strtok desparte cuvintele chiar și la spații multiple; apoi se construiește textul nou cu „ - ” între ele.",
+        "imagine_originala": "assets/bac/2025_speciala_III2.png"
       },
       "182": {
         "title": "Cuvinte semioglindite",
@@ -8943,7 +9026,8 @@
             "output": "timpla"
           }
         ],
-        "dificultate_motiv": "Pentru fiecare cuvânt de lungime pară, interschimbarea celor două jumătăți, literă cu literă."
+        "dificultate_motiv": "Pentru fiecare cuvânt de lungime pară, interschimbarea celor două jumătăți, literă cu literă.",
+        "imagine_originala": "assets/bac/2025_iunie_III2.png"
       },
       "183": {
         "title": "Trei locuri libere alăturate",
@@ -8984,7 +9068,8 @@
             "output": "4"
           }
         ],
-        "dificultate_motiv": "Numărarea ferestrelor de câte 3 locuri libere pe prima și pe ultima linie."
+        "dificultate_motiv": "Numărarea ferestrelor de câte 3 locuri libere pe prima și pe ultima linie.",
+        "imagine_originala": "assets/bac/2025_rezerva_III2.png"
       },
       "184": {
         "title": "Coloana minimului înlocuită",
@@ -9070,7 +9155,8 @@
             "output": "nu exista"
           }
         ],
-        "dificultate_motiv": "Două parcurgeri ale cuvintelor; cuvintele cu exact n litere nu apar nicăieri."
+        "dificultate_motiv": "Două parcurgeri ale cuvintelor; cuvintele cu exact n litere nu apar nicăieri.",
+        "imagine_originala": "assets/bac/2024_model_III2.png"
       },
       "186": {
         "title": "Fraza generată dintr-un șablon",
@@ -9156,7 +9242,8 @@
             "output": "11 12 13 14 15 16 17 18 19 101 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 \n12 22 23 24 25 26 27 28 29 102 112 122 132 142 152 162 172 182 192 202 212 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 \n13 23 33 34 35 36 37 38 39 103 113 123 133 143 153 163 173 183 193 203 213 223 233 243 253 263 273 283 293 303 313 323 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 \n14 24 34 44 45 46 47 48 49 104 114 124 134 144 154 164 174 184 194 204 214 224 234 244 254 264 274 284 294 304 314 324 334 344 354 364 374 384 394 404 414 424 434 444 445 446 447 448 449 450 \n15 25 35 45 55 56 57 58 59 105 115 125 135 145 155 165 175 185 195 205 215 225 235 245 255 265 275 285 295 305 315 325 335 345 355 365 375 385 395 405 415 425 435 445 455 465 475 485 495 505 \n16 26 36 46 56 66 67 68 69 106 116 126 136 146 156 166 176 186 196 206 216 226 236 246 256 266 276 286 296 306 316 326 336 346 356 366 376 386 396 406 416 426 436 446 456 466 476 486 496 506 \n17 27 37 47 57 67 77 78 79 107 117 127 137 147 157 167 177 187 197 207 217 227 237 247 257 267 277 287 297 307 317 327 337 347 357 367 377 387 397 407 417 427 437 447 457 467 477 487 497 507 \n18 28 38 48 58 68 78 88 89 108 118 128 138 148 158 168 178 188 198 208 218 228 238 248 258 268 278 288 298 308 318 328 338 348 358 368 378 388 398 408 418 428 438 448 458 468 478 488 498 508 \n19 29 39 49 59 69 79 89 99 109 119 129 139 149 159 169 179 189 199 209 219 229 239 249 259 269 279 289 299 309 319 329 339 349 359 369 379 389 399 409 419 429 439 449 459 469 479 489 499 509 \n101 102 103 104 105 106 107 108 109 1010 1011 1012 1013 1014 1015 1016 1017 1018 1019 1020 1021 1022 1023 1024 1025 1026 1027 1028 1029 1030 1031 1032 1033 1034 1035 1036 1037 1038 1039 1040 1041 1042 1043 1044 1045 1046 1047 1048 1049 1050 \n111 112 113 114 115 116 117 118 119 1011 1111 1112 1113 1114 1115 1116 1117 1118 1119 1120 1121 1122 1123 1124 1125 1126 1127 1128 1129 1130 1131 1132 1133 1134 1135 1136 1137 1138 1139 1140 1141 1142 1143 1144 1145 1146 1147 1148 1149 1150 \n112 122 123 124 125 126 127 128 129 1012 1112 1212 1213 1214 1215 1216 1217 1218 1219 1220 1221 1222 1223 1224 1225 1226 1227 1228 1229 1230 1231 1232 1233 1234 1235 1236 1237 1238 1239 1240 1241 1242 1243 1244 1245 1246 1247 1248 1249 1250 \n113 132 133 134 135 136 137 138 139 1013 1113 1213 1313 1314 1315 1316 1317 1318 1319 1320 1321 1322 1323 1324 1325 1326 1327 1328 1329 1330 1331 1332 1333 1334 1335 1336 1337 1338 1339 1340 1341 1342 1343 1344 1345 1346 1347 1348 1349 1350 \n114 142 143 144 145 146 147 148 149 1014 1114 1214 1314 1414 1415 1416 1417 1418 1419 1420 1421 1422 1423 1424 1425 1426 1427 1428 1429 1430 1431 1432 1433 1434 1435 1436 1437 1438 1439 1440 1441 1442 1443 1444 1445 1446 1447 1448 1449 1450 \n115 152 153 154 155 156 157 158 159 1015 1115 1215 1315 1415 1515 1516 1517 1518 1519 1520 1521 1522 1523 1524 1525 1526 1527 1528 1529 1530 1531 1532 1533 1534 1535 1536 1537 1538 1539 1540 1541 1542 1543 1544 1545 1546 1547 1548 1549 1550 \n116 162 163 164 165 166 167 168 169 1016 1116 1216 1316 1416 1516 1616 1617 1618 1619 1620 1621 1622 1623 1624 1625 1626 1627 1628 1629 1630 1631 1632 1633 1634 1635 1636 1637 1638 1639 1640 1641 1642 1643 1644 1645 1646 1647 1648 1649 1650 \n117 172 173 174 175 176 177 178 179 1017 1117 1217 1317 1417 1517 1617 1717 1718 1719 1720 1721 1722 1723 1724 1725 1726 1727 1728 1729 1730 1731 1732 1733 1734 1735 1736 1737 1738 1739 1740 1741 1742 1743 1744 1745 1746 1747 1748 1749 1750 \n118 182 183 184 185 186 187 188 189 1018 1118 1218 1318 1418 1518 1618 1718 1818 1819 1820 1821 1822 1823 1824 1825 1826 1827 1828 1829 1830 1831 1832 1833 1834 1835 1836 1837 1838 1839 1840 1841 1842 1843 1844 1845 1846 1847 1848 1849 1850 \n119 192 193 194 195 196 197 198 199 1019 1119 1219 1319 1419 1519 1619 1719 1819 1919 1920 1921 1922 1923 1924 1925 1926 1927 1928 1929 1930 1931 1932 1933 1934 1935 1936 1937 1938 1939 1940 1941 1942 1943 1944 1945 1946 1947 1948 1949 1950 \n120 202 203 204 205 206 207 208 209 1020 1120 1220 1320 1420 1520 1620 1720 1820 1920 2020 2021 2022 2023 2024 2025 2026 2027 2028 2029 2030 2031 2032 2033 2034 2035 2036 2037 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 \n121 212 213 214 215 216 217 218 219 1021 1121 1221 1321 1421 1521 1621 1721 1821 1921 2021 2121 2122 2123 2124 2125 2126 2127 2128 2129 2130 2131 2132 2133 2134 2135 2136 2137 2138 2139 2140 2141 2142 2143 2144 2145 2146 2147 2148 2149 2150 \n122 222 223 224 225 226 227 228 229 1022 1122 1222 1322 1422 1522 1622 1722 1822 1922 2022 2122 2222 2223 2224 2225 2226 2227 2228 2229 2230 2231 2232 2233 2234 2235 2236 2237 2238 2239 2240 2241 2242 2243 2244 2245 2246 2247 2248 2249 2250 \n123 223 233 234 235 236 237 238 239 1023 1123 1223 1323 1423 1523 1623 1723 1823 1923 2023 2123 2223 2323 2324 2325 2326 2327 2328 2329 2330 2331 2332 2333 2334 2335 2336 2337 2338 2339 2340 2341 2342 2343 2344 2345 2346 2347 2348 2349 2350 \n124 224 243 244 245 246 247 248 249 1024 1124 1224 1324 1424 1524 1624 1724 1824 1924 2024 2124 2224 2324 2424 2425 2426 2427 2428 2429 2430 2431 2432 2433 2434 2435 2436 2437 2438 2439 2440 2441 2442 2443 2444 2445 2446 2447 2448 2449 2450 \n125 225 253 254 255 256 257 258 259 1025 1125 1225 1325 1425 1525 1625 1725 1825 1925 2025 2125 2225 2325 2425 2525 2526 2527 2528 2529 2530 2531 2532 2533 2534 2535 2536 2537 2538 2539 2540 2541 2542 2543 2544 2545 2546 2547 2548 2549 2550 \n126 226 263 264 265 266 267 268 269 1026 1126 1226 1326 1426 1526 1626 1726 1826 1926 2026 2126 2226 2326 2426 2526 2626 2627 2628 2629 2630 2631 2632 2633 2634 2635 2636 2637 2638 2639 2640 2641 2642 2643 2644 2645 2646 2647 2648 2649 2650 \n127 227 273 274 275 276 277 278 279 1027 1127 1227 1327 1427 1527 1627 1727 1827 1927 2027 2127 2227 2327 2427 2527 2627 2727 2728 2729 2730 2731 2732 2733 2734 2735 2736 2737 2738 2739 2740 2741 2742 2743 2744 2745 2746 2747 2748 2749 2750 \n128 228 283 284 285 286 287 288 289 1028 1128 1228 1328 1428 1528 1628 1728 1828 1928 2028 2128 2228 2328 2428 2528 2628 2728 2828 2829 2830 2831 2832 2833 2834 2835 2836 2837 2838 2839 2840 2841 2842 2843 2844 2845 2846 2847 2848 2849 2850 \n129 229 293 294 295 296 297 298 299 1029 1129 1229 1329 1429 1529 1629 1729 1829 1929 2029 2129 2229 2329 2429 2529 2629 2729 2829 2929 2930 2931 2932 2933 2934 2935 2936 2937 2938 2939 2940 2941 2942 2943 2944 2945 2946 2947 2948 2949 2950 \n130 230 303 304 305 306 307 308 309 1030 1130 1230 1330 1430 1530 1630 1730 1830 1930 2030 2130 2230 2330 2430 2530 2630 2730 2830 2930 3030 3031 3032 3033 3034 3035 3036 3037 3038 3039 3040 3041 3042 3043 3044 3045 3046 3047 3048 3049 3050 \n131 231 313 314 315 316 317 318 319 1031 1131 1231 1331 1431 1531 1631 1731 1831 1931 2031 2131 2231 2331 2431 2531 2631 2731 2831 2931 3031 3131 3132 3133 3134 3135 3136 3137 3138 3139 3140 3141 3142 3143 3144 3145 3146 3147 3148 3149 3150 \n132 232 323 324 325 326 327 328 329 1032 1132 1232 1332 1432 1532 1632 1732 1832 1932 2032 2132 2232 2332 2432 2532 2632 2732 2832 2932 3032 3132 3232 3233 3234 3235 3236 3237 3238 3239 3240 3241 3242 3243 3244 3245 3246 3247 3248 3249 3250 \n133 233 333 334 335 336 337 338 339 1033 1133 1233 1333 1433 1533 1633 1733 1833 1933 2033 2133 2233 2333 2433 2533 2633 2733 2833 2933 3033 3133 3233 3333 3334 3335 3336 3337 3338 3339 3340 3341 3342 3343 3344 3345 3346 3347 3348 3349 3350 \n134 234 334 344 345 346 347 348 349 1034 1134 1234 1334 1434 1534 1634 1734 1834 1934 2034 2134 2234 2334 2434 2534 2634 2734 2834 2934 3034 3134 3234 3334 3434 3435 3436 3437 3438 3439 3440 3441 3442 3443 3444 3445 3446 3447 3448 3449 3450 \n135 235 335 354 355 356 357 358 359 1035 1135 1235 1335 1435 1535 1635 1735 1835 1935 2035 2135 2235 2335 2435 2535 2635 2735 2835 2935 3035 3135 3235 3335 3435 3535 3536 3537 3538 3539 3540 3541 3542 3543 3544 3545 3546 3547 3548 3549 3550 \n136 236 336 364 365 366 367 368 369 1036 1136 1236 1336 1436 1536 1636 1736 1836 1936 2036 2136 2236 2336 2436 2536 2636 2736 2836 2936 3036 3136 3236 3336 3436 3536 3636 3637 3638 3639 3640 3641 3642 3643 3644 3645 3646 3647 3648 3649 3650 \n137 237 337 374 375 376 377 378 379 1037 1137 1237 1337 1437 1537 1637 1737 1837 1937 2037 2137 2237 2337 2437 2537 2637 2737 2837 2937 3037 3137 3237 3337 3437 3537 3637 3737 3738 3739 3740 3741 3742 3743 3744 3745 3746 3747 3748 3749 3750 \n138 238 338 384 385 386 387 388 389 1038 1138 1238 1338 1438 1538 1638 1738 1838 1938 2038 2138 2238 2338 2438 2538 2638 2738 2838 2938 3038 3138 3238 3338 3438 3538 3638 3738 3838 3839 3840 3841 3842 3843 3844 3845 3846 3847 3848 3849 3850 \n139 239 339 394 395 396 397 398 399 1039 1139 1239 1339 1439 1539 1639 1739 1839 1939 2039 2139 2239 2339 2439 2539 2639 2739 2839 2939 3039 3139 3239 3339 3439 3539 3639 3739 3839 3939 3940 3941 3942 3943 3944 3945 3946 3947 3948 3949 3950 \n140 240 340 404 405 406 407 408 409 1040 1140 1240 1340 1440 1540 1640 1740 1840 1940 2040 2140 2240 2340 2440 2540 2640 2740 2840 2940 3040 3140 3240 3340 3440 3540 3640 3740 3840 3940 4040 4041 4042 4043 4044 4045 4046 4047 4048 4049 4050 \n141 241 341 414 415 416 417 418 419 1041 1141 1241 1341 1441 1541 1641 1741 1841 1941 2041 2141 2241 2341 2441 2541 2641 2741 2841 2941 3041 3141 3241 3341 3441 3541 3641 3741 3841 3941 4041 4141 4142 4143 4144 4145 4146 4147 4148 4149 4150 \n142 242 342 424 425 426 427 428 429 1042 1142 1242 1342 1442 1542 1642 1742 1842 1942 2042 2142 2242 2342 2442 2542 2642 2742 2842 2942 3042 3142 3242 3342 3442 3542 3642 3742 3842 3942 4042 4142 4242 4243 4244 4245 4246 4247 4248 4249 4250 \n143 243 343 434 435 436 437 438 439 1043 1143 1243 1343 1443 1543 1643 1743 1843 1943 2043 2143 2243 2343 2443 2543 2643 2743 2843 2943 3043 3143 3243 3343 3443 3543 3643 3743 3843 3943 4043 4143 4243 4343 4344 4345 4346 4347 4348 4349 4350 \n144 244 344 444 445 446 447 448 449 1044 1144 1244 1344 1444 1544 1644 1744 1844 1944 2044 2144 2244 2344 2444 2544 2644 2744 2844 2944 3044 3144 3244 3344 3444 3544 3644 3744 3844 3944 4044 4144 4244 4344 4444 4445 4446 4447 4448 4449 4450 \n145 245 345 445 455 456 457 458 459 1045 1145 1245 1345 1445 1545 1645 1745 1845 1945 2045 2145 2245 2345 2445 2545 2645 2745 2845 2945 3045 3145 3245 3345 3445 3545 3645 3745 3845 3945 4045 4145 4245 4345 4445 4545 4546 4547 4548 4549 4550 \n146 246 346 446 465 466 467 468 469 1046 1146 1246 1346 1446 1546 1646 1746 1846 1946 2046 2146 2246 2346 2446 2546 2646 2746 2846 2946 3046 3146 3246 3346 3446 3546 3646 3746 3846 3946 4046 4146 4246 4346 4446 4546 4646 4647 4648 4649 4650 \n147 247 347 447 475 476 477 478 479 1047 1147 1247 1347 1447 1547 1647 1747 1847 1947 2047 2147 2247 2347 2447 2547 2647 2747 2847 2947 3047 3147 3247 3347 3447 3547 3647 3747 3847 3947 4047 4147 4247 4347 4447 4547 4647 4747 4748 4749 4750 \n148 248 348 448 485 486 487 488 489 1048 1148 1248 1348 1448 1548 1648 1748 1848 1948 2048 2148 2248 2348 2448 2548 2648 2748 2848 2948 3048 3148 3248 3348 3448 3548 3648 3748 3848 3948 4048 4148 4248 4348 4448 4548 4648 4748 4848 4849 4850 \n149 249 349 449 495 496 497 498 499 1049 1149 1249 1349 1449 1549 1649 1749 1849 1949 2049 2149 2249 2349 2449 2549 2649 2749 2849 2949 3049 3149 3249 3349 3449 3549 3649 3749 3849 3949 4049 4149 4249 4349 4449 4549 4649 4749 4849 4949 4950 \n150 250 350 450 505 506 507 508 509 1050 1150 1250 1350 1450 1550 1650 1750 1850 1950 2050 2150 2250 2350 2450 2550 2650 2750 2850 2950 3050 3150 3250 3350 3450 3550 3650 3750 3850 3950 4050 4150 4250 4350 4450 4550 4650 4750 4850 4950 5050"
           }
         ],
-        "dificultate_motiv": "Alipirea a două numere cere puterea lui 10 de lungimea celui din dreapta; apoi minimul celor două alipiri."
+        "dificultate_motiv": "Alipirea a două numere cere puterea lui 10 de lungimea celui din dreapta; apoi minimul celor două alipiri.",
+        "imagine_originala": "assets/bac/2024_speciala_III2.png"
       },
       "188": {
         "title": "Toate cuvintele au aceeași lungime",
@@ -9201,7 +9288,8 @@
             "output": "DA 4"
           }
         ],
-        "dificultate_motiv": "Despărțirea în cuvinte și compararea lungimii fiecăruia cu prima."
+        "dificultate_motiv": "Despărțirea în cuvinte și compararea lungimii fiecăruia cu prima.",
+        "imagine_originala": "assets/bac/2024_iunie_III2.png"
       },
       "189": {
         "title": "Tunderea gazonului",
@@ -9295,7 +9383,8 @@
             "output": "1 4 6 7 8"
           }
         ],
-        "dificultate_motiv": "Pentru fiecare zonă cu cod 3 trebuie verificați vecinii existenți (atenție la margini)."
+        "dificultate_motiv": "Pentru fiecare zonă cu cod 3 trebuie verificați vecinii existenți (atenție la margini).",
+        "imagine_originala": "assets/bac/2023_model_III2.png"
       },
       "191": {
         "title": "Denumirea științifică a unei păsări",
@@ -9380,7 +9469,8 @@
             "output": "99 98 97 96 \n97 95 93 -1 \n92 88 -1 -1 \n80 -1 -1 -1"
           }
         ],
-        "dificultate_motiv": "Completarea tabloului rând cu rând după o regulă cu elementele de pe rândul anterior, plus zona de gazon din dreapta diagonalei secundare."
+        "dificultate_motiv": "Completarea tabloului rând cu rând după o regulă cu elementele de pe rândul anterior, plus zona de gazon din dreapta diagonalei secundare.",
+        "imagine_originala": "assets/bac/2023_speciala_III2.png"
       },
       "193": {
         "title": "Talvegul râului",
@@ -9418,7 +9508,8 @@
             "output": "1:1 2:2"
           }
         ],
-        "dificultate_motiv": "Pentru fiecare linie, poziția primului maxim."
+        "dificultate_motiv": "Pentru fiecare linie, poziția primului maxim.",
+        "imagine_originala": "assets/bac/2023_iunie_III2.png"
       },
       "194": {
         "title": "Pătratul 2 × 2 de valoare maximă",
@@ -9722,7 +9813,8 @@
             "output": "399920004 399840016 399760036 399680064 399600100 399520144 399440196 399360256 399280324 399200400 399120484 399040576 398960676 398880784 398800900 398721024 398641156 398561296 398481444 398401600 398321764 398241936 398162116 398082304 398002500 397922704 397842916 397763136 397683364 397603600 397523844 397444096 397364356 397284624 397204900 397125184 397045476 396965776 396886084 396806400 396726724 396647056 396567396 396487744 396408100 396328464 396248836 396169216 396089604 396010000 395930404 395850816 395771236 395691664 395612100 395532544 395452996 395373456 395293924 395214400 395134884 395055376 394975876 394896384 394816900 394737424 394657956 394578496 394499044 394419600 394340164 394260736 394181316 394101904 394022500 393943104 393863716 393784336 393704964 393625600 393546244 393466896 393387556 393308224 393228900 393149584 393070276 392990976 392911684 392832400 392753124 392673856 392594596 392515344 392436100 392356864 392277636 392198416 392119204 392040000 \n391960804 391881616 391802436 391723264 391644100 391564944 391485796 391406656 391327524 391248400 391169284 391090176 391011076 390931984 390852900 390773824 390694756 390615696 390536644 390457600 390378564 390299536 390220516 390141504 390062500 389983504 389904516 389825536 389746564 389667600 389588644 389509696 389430756 389351824 389272900 389193984 389115076 389036176 388957284 388878400 388799524 388720656 388641796 388562944 388484100 388405264 388326436 388247616 388168804 388090000 388011204 387932416 387853636 387774864 387696100 387617344 387538596 387459856 387381124 387302400 387223684 387144976 387066276 386987584 386908900 386830224 386751556 386672896 386594244 386515600 386436964 386358336 386279716 386201104 386122500 386043904 385965316 385886736 385808164 385729600 385651044 385572496 385493956 385415424 385336900 385258384 385179876 385101376 385022884 384944400 384865924 384787456 384708996 384630544 384552100 384473664 384395236 384316816 384238404 384160000 \n384081604 384003216 383924836 383846464 383768100 383689744 383611396 383533056 383454724 383376400 383298084 383219776 383141476 383063184 382984900 382906624 382828356 382750096 382671844 382593600 382515364 382437136 382358916 382280704 382202500 382124304 382046116 381967936 381889764 381811600 381733444 381655296 381577156 381499024 381420900 381342784 381264676 381186576 381108484 381030400 380952324 380874256 380796196 380718144 380640100 380562064 380484036 380406016 380328004 380250000 380172004 380094016 380016036 379938064 379860100 379782144 379704196 379626256 379548324 379470400 379392484 379314576 379236676 379158784 379080900 379003024 378925156 378847296 378769444 378691600 378613764 378535936 378458116 378380304 378302500 378224704 378146916 378069136 377991364 377913600 377835844 377758096 377680356 377602624 377524900 377447184 377369476 377291776 377214084 377136400 377058724 376981056 376903396 376825744 376748100 376670464 376592836 376515216 376437604 376360000 \n376282404 376204816 376127236 376049664 375972100 375894544 375816996 375739456 375661924 375584400 375506884 375429376 375351876 375274384 375196900 375119424 375041956 374964496 374887044 374809600 374732164 374654736 374577316 374499904 374422500 374345104 374267716 374190336 374112964 374035600 373958244 373880896 373803556 373726224 373648900 373571584 373494276 373416976 373339684 373262400 373185124 373107856 373030596 372953344 372876100 372798864 372721636 372644416 372567204 372490000 372412804 372335616 372258436 372181264 372104100 372026944 371949796 371872656 371795524 371718400 371641284 371564176 371487076 371409984 371332900 371255824 371178756 371101696 371024644 370947600 370870564 370793536 370716516 370639504 370562500 370485504 370408516 370331536 370254564 370177600 370100644 370023696 369946756 369869824 369792900 369715984 369639076 369562176 369485284 369408400 369331524 369254656 369177796 369100944 369024100 368947264 368870436 368793616 368716804 368640000 \n368563204 368486416 368409636 368332864 368256100 368179344 368102596 368025856 367949124 367872400 367795684 367718976 367642276 367565584 367488900 367412224 367335556 367258896 367182244 367105600 367028964 366952336 366875716 366799104 366722500 366645904 366569316 366492736 366416164 366339600 366263044 366186496 366109956 366033424 365956900 365880384 365803876 365727376 365650884 365574400 365497924 365421456 365344996 365268544 365192100 365115664 365039236 364962816 364886404 364810000 364733604 364657216 364580836 364504464 364428100 364351744 364275396 364199056 364122724 364046400 363970084 363893776 363817476 363741184 363664900 363588624 363512356 363436096 363359844 363283600 363207364 363131136 363054916 362978704 362902500 362826304 362750116 362673936 362597764 362521600 362445444 362369296 362293156 362217024 362140900 362064784 361988676 361912576 361836484 361760400 361684324 361608256 361532196 361456144 361380100 361304064 361228036 361152016 361076004 361000000 \n360924004 360848016 360772036 360696064 360620100 360544144 360468196 360392256 360316324 360240400 360164484 360088576 360012676 359936784 359860900 359785024 359709156 359633296 359557444 359481600 359405764 359329936 359254116 359178304 359102500 359026704 358950916 358875136 358799364 358723600 358647844 358572096 358496356 358420624 358344900 358269184 358193476 358117776 358042084 357966400 357890724 357815056 357739396 357663744 357588100 357512464 357436836 357361216 357285604 357210000 357134404 357058816 356983236 356907664 356832100 356756544 356680996 356605456 356529924 356454400 356378884 356303376 356227876 356152384 356076900 356001424 355925956 355850496 355775044 355699600 355624164 355548736 355473316 355397904 355322500 355247104 355171716 355096336 355020964 354945600 354870244 354794896 354719556 354644224 354568900 354493584 354418276 354342976 354267684 354192400 354117124 354041856 353966596 353891344 353816100 353740864 353665636 353590416 353515204 353440000 \n353364804 353289616 353214436 353139264 353064100 352988944 352913796 352838656 352763524 352688400 352613284 352538176 352463076 352387984 352312900 352237824 352162756 352087696 352012644 351937600 351862564 351787536 351712516 351637504 351562500 351487504 351412516 351337536 351262564 351187600 351112644 351037696 350962756 350887824 350812900 350737984 350663076 350588176 350513284 350438400 350363524 350288656 350213796 350138944 350064100 349989264 349914436 349839616 349764804 349690000 349615204 349540416 349465636 349390864 349316100 349241344 349166596 349091856 349017124 348942400 348867684 348792976 348718276 348643584 348568900 348494224 348419556 348344896 348270244 348195600 348120964 348046336 347971716 347897104 347822500 347747904 347673316 347598736 347524164 347449600 347375044 347300496 347225956 347151424 347076900 347002384 346927876 346853376 346778884 346704400 346629924 346555456 346480996 346406544 346332100 346257664 346183236 346108816 346034404 345960000 \n345885604 345811216 345736836 345662464 345588100 345513744 345439396 345365056 345290724 345216400 345142084 345067776 344993476 344919184 344844900 344770624 344696356 344622096 344547844 344473600 344399364 344325136 344250916 344176704 344102500 344028304 343954116 343879936 343805764 343731600 343657444 343583296 343509156 343435024 343360900 343286784 343212676 343138576 343064484 342990400 342916324 342842256 342768196 342694144 342620100 342546064 342472036 342398016 342324004 342250000 342176004 342102016 342028036 341954064 341880100 341806144 341732196 341658256 341584324 341510400 341436484 341362576 341288676 341214784 341140900 341067024 340993156 340919296 340845444 340771600 340697764 340623936 340550116 340476304 340402500 340328704 340254916 340181136 340107364 340033600 339959844 339886096 339812356 339738624 339664900 339591184 339517476 339443776 339370084 339296400 339222724 339149056 339075396 339001744 338928100 338854464 338780836 338707216 338633604 338560000 \n338486404 338412816 338339236 338265664 338192100 338118544 338044996 337971456 337897924 337824400 337750884 337677376 337603876 337530384 337456900 337383424 337309956 337236496 337163044 337089600 337016164 336942736 336869316 336795904 336722500 336649104 336575716 336502336 336428964 336355600 336282244 336208896 336135556 336062224 335988900 335915584 335842276 335768976 335695684 335622400 335549124 335475856 335402596 335329344 335256100 335182864 335109636 335036416 334963204 334890000 334816804 334743616 334670436 334597264 334524100 334450944 334377796 334304656 334231524 334158400 334085284 334012176 333939076 333865984 333792900 333719824 333646756 333573696 333500644 333427600 333354564 333281536 333208516 333135504 333062500 332989504 332916516 332843536 332770564 332697600 332624644 332551696 332478756 332405824 332332900 332259984 332187076 332114176 332041284 331968400 331895524 331822656 331749796 331676944 331604100 331531264 331458436 331385616 331312804 331240000 \n331167204 331094416 331021636 330948864 330876100 330803344 330730596 330657856 330585124 330512400 330439684 330366976 330294276 330221584 330148900 330076224 330003556 329930896 329858244 329785600 329712964 329640336 329567716 329495104 329422500 329349904 329277316 329204736 329132164 329059600 328987044 328914496 328841956 328769424 328696900 328624384 328551876 328479376 328406884 328334400 328261924 328189456 328116996 328044544 327972100 327899664 327827236 327754816 327682404 327610000 327537604 327465216 327392836 327320464 327248100 327175744 327103396 327031056 326958724 326886400 326814084 326741776 326669476 326597184 326524900 326452624 326380356 326308096 326235844 326163600 326091364 326019136 325946916 325874704 325802500 325730304 325658116 325585936 325513764 325441600 325369444 325297296 325225156 325153024 325080900 325008784 324936676 324864576 324792484 324720400 324648324 324576256 324504196 324432144 324360100 324288064 324216036 324144016 324072004 324000000 \n323928004 323856016 323784036 323712064 323640100 323568144 323496196 323424256 323352324 323280400 323208484 323136576 323064676 322992784 322920900 322849024 322777156 322705296 322633444 322561600 322489764 322417936 322346116 322274304 322202500 322130704 322058916 321987136 321915364 321843600 321771844 321700096 321628356 321556624 321484900 321413184 321341476 321269776 321198084 321126400 321054724 320983056 320911396 320839744 320768100 320696464 320624836 320553216 320481604 320410000 320338404 320266816 320195236 320123664 320052100 319980544 319908996 319837456 319765924 319694400 319622884 319551376 319479876 319408384 319336900 319265424 319193956 319122496 319051044 318979600 318908164 318836736 318765316 318693904 318622500 318551104 318479716 318408336 318336964 318265600 318194244 318122896 318051556 317980224 317908900 317837584 317766276 317694976 317623684 317552400 317481124 317409856 317338596 317267344 317196100 317124864 317053636 316982416 316911204 316840000 \n316768804 316697616 316626436 316555264 316484100 316412944 316341796 316270656 316199524 316128400 316057284 315986176 315915076 315843984 315772900 315701824 315630756 315559696 315488644 315417600 315346564 315275536 315204516 315133504 315062500 314991504 314920516 314849536 314778564 314707600 314636644 314565696 314494756 314423824 314352900 314281984 314211076 314140176 314069284 313998400 313927524 313856656 313785796 313714944 313644100 313573264 313502436 313431616 313360804 313290000 313219204 313148416 313077636 313006864 312936100 312865344 312794596 312723856 312653124 312582400 312511684 312440976 312370276 312299584 312228900 312158224 312087556 312016896 311946244 311875600 311804964 311734336 311663716 311593104 311522500 311451904 311381316 311310736 311240164 311169600 311099044 311028496 310957956 310887424 310816900 310746384 310675876 310605376 310534884 310464400 310393924 310323456 310252996 310182544 310112100 310041664 309971236 309900816 309830404 309760000 \n309689604 309619216 309548836 309478464 309408100 309337744 309267396 309197056 309126724 309056400 308986084 308915776 308845476 308775184 308704900 308634624 308564356 308494096 308423844 308353600 308283364 308213136 308142916 308072704 308002500 307932304 307862116 307791936 307721764 307651600 307581444 307511296 307441156 307371024 307300900 307230784 307160676 307090576 307020484 306950400 306880324 306810256 306740196 306670144 306600100 306530064 306460036 306390016 306320004 306250000 306180004 306110016 306040036 305970064 305900100 305830144 305760196 305690256 305620324 305550400 305480484 305410576 305340676 305270784 305200900 305131024 305061156 304991296 304921444 304851600 304781764 304711936 304642116 304572304 304502500 304432704 304362916 304293136 304223364 304153600 304083844 304014096 303944356 303874624 303804900 303735184 303665476 303595776 303526084 303456400 303386724 303317056 303247396 303177744 303108100 303038464 302968836 302899216 302829604 302760000 \n302690404 302620816 302551236 302481664 302412100 302342544 302272996 302203456 302133924 302064400 301994884 301925376 301855876 301786384 301716900 301647424 301577956 301508496 301439044 301369600 301300164 301230736 301161316 301091904 301022500 300953104 300883716 300814336 300744964 300675600 300606244 300536896 300467556 300398224 300328900 300259584 300190276 300120976 300051684 299982400 299913124 299843856 299774596 299705344 299636100 299566864 299497636 299428416 299359204 299290000 299220804 299151616 299082436 299013264 298944100 298874944 298805796 298736656 298667524 298598400 298529284 298460176 298391076 298321984 298252900 298183824 298114756 298045696 297976644 297907600 297838564 297769536 297700516 297631504 297562500 297493504 297424516 297355536 297286564 297217600 297148644 297079696 297010756 296941824 296872900 296803984 296735076 296666176 296597284 296528400 296459524 296390656 296321796 296252944 296184100 296115264 296046436 295977616 295908804 295840000 \n295771204 295702416 295633636 295564864 295496100 295427344 295358596 295289856 295221124 295152400 295083684 295014976 294946276 294877584 294808900 294740224 294671556 294602896 294534244 294465600 294396964 294328336 294259716 294191104 294122500 294053904 293985316 293916736 293848164 293779600 293711044 293642496 293573956 293505424 293436900 293368384 293299876 293231376 293162884 293094400 293025924 292957456 292888996 292820544 292752100 292683664 292615236 292546816 292478404 292410000 292341604 292273216 292204836 292136464 292068100 291999744 291931396 291863056 291794724 291726400 291658084 291589776 291521476 291453184 291384900 291316624 291248356 291180096 291111844 291043600 290975364 290907136 290838916 290770704 290702500 290634304 290566116 290497936 290429764 290361600 290293444 290225296 290157156 290089024 290020900 289952784 289884676 289816576 289748484 289680400 289612324 289544256 289476196 289408144 289340100 289272064 289204036 289136016 289068004 289000000 \n288932004 288864016 288796036 288728064 288660100 288592144 288524196 288456256 288388324 288320400 288252484 288184576 288116676 288048784 287980900 287913024 287845156 287777296 287709444 287641600 287573764 287505936 287438116 287370304 287302500 287234704 287166916 287099136 287031364 286963600 286895844 286828096 286760356 286692624 286624900 286557184 286489476 286421776 286354084 286286400 286218724 286151056 286083396 286015744 285948100 285880464 285812836 285745216 285677604 285610000 285542404 285474816 285407236 285339664 285272100 285204544 285136996 285069456 285001924 284934400 284866884 284799376 284731876 284664384 284596900 284529424 284461956 284394496 284327044 284259600 284192164 284124736 284057316 283989904 283922500 283855104 283787716 283720336 283652964 283585600 283518244 283450896 283383556 283316224 283248900 283181584 283114276 283046976 282979684 282912400 282845124 282777856 282710596 282643344 282576100 282508864 282441636 282374416 282307204 282240000 \n282172804 282105616 282038436 281971264 281904100 281836944 281769796 281702656 281635524 281568400 281501284 281434176 281367076 281299984 281232900 281165824 281098756 281031696 280964644 280897600 280830564 280763536 280696516 280629504 280562500 280495504 280428516 280361536 280294564 280227600 280160644 280093696 280026756 279959824 279892900 279825984 279759076 279692176 279625284 279558400 279491524 279424656 279357796 279290944 279224100 279157264 279090436 279023616 278956804 278890000 278823204 278756416 278689636 278622864 278556100 278489344 278422596 278355856 278289124 278222400 278155684 278088976 278022276 277955584 277888900 277822224 277755556 277688896 277622244 277555600 277488964 277422336 277355716 277289104 277222500 277155904 277089316 277022736 276956164 276889600 276823044 276756496 276689956 276623424 276556900 276490384 276423876 276357376 276290884 276224400 276157924 276091456 276024996 275958544 275892100 275825664 275759236 275692816 275626404 275560000 \n275493604 275427216 275360836 275294464 275228100 275161744 275095396 275029056 274962724 274896400 274830084 274763776 274697476 274631184 274564900 274498624 274432356 274366096 274299844 274233600 274167364 274101136 274034916 273968704 273902500 273836304 273770116 273703936 273637764 273571600 273505444 273439296 273373156 273307024 273240900 273174784 273108676 273042576 272976484 272910400 272844324 272778256 272712196 272646144 272580100 272514064 272448036 272382016 272316004 272250000 272184004 272118016 272052036 271986064 271920100 271854144 271788196 271722256 271656324 271590400 271524484 271458576 271392676 271326784 271260900 271195024 271129156 271063296 270997444 270931600 270865764 270799936 270734116 270668304 270602500 270536704 270470916 270405136 270339364 270273600 270207844 270142096 270076356 270010624 269944900 269879184 269813476 269747776 269682084 269616400 269550724 269485056 269419396 269353744 269288100 269222464 269156836 269091216 269025604 268960000 \n268894404 268828816 268763236 268697664 268632100 268566544 268500996 268435456 268369924 268304400 268238884 268173376 268107876 268042384 267976900 267911424 267845956 267780496 267715044 267649600 267584164 267518736 267453316 267387904 267322500 267257104 267191716 267126336 267060964 266995600 266930244 266864896 266799556 266734224 266668900 266603584 266538276 266472976 266407684 266342400 266277124 266211856 266146596 266081344 266016100 265950864 265885636 265820416 265755204 265690000 265624804 265559616 265494436 265429264 265364100 265298944 265233796 265168656 265103524 265038400 264973284 264908176 264843076 264777984 264712900 264647824 264582756 264517696 264452644 264387600 264322564 264257536 264192516 264127504 264062500 263997504 263932516 263867536 263802564 263737600 263672644 263607696 263542756 263477824 263412900 263347984 263283076 263218176 263153284 263088400 263023524 262958656 262893796 262828944 262764100 262699264 262634436 262569616 262504804 262440000 \n262375204 262310416 262245636 262180864 262116100 262051344 261986596 261921856 261857124 261792400 261727684 261662976 261598276 261533584 261468900 261404224 261339556 261274896 261210244 261145600 261080964 261016336 260951716 260887104 260822500 260757904 260693316 260628736 260564164 260499600 260435044 260370496 260305956 260241424 260176900 260112384 260047876 259983376 259918884 259854400 259789924 259725456 259660996 259596544 259532100 259467664 259403236 259338816 259274404 259210000 259145604 259081216 259016836 258952464 258888100 258823744 258759396 258695056 258630724 258566400 258502084 258437776 258373476 258309184 258244900 258180624 258116356 258052096 257987844 257923600 257859364 257795136 257730916 257666704 257602500 257538304 257474116 257409936 257345764 257281600 257217444 257153296 257089156 257025024 256960900 256896784 256832676 256768576 256704484 256640400 256576324 256512256 256448196 256384144 256320100 256256064 256192036 256128016 256064004 256000000 \n255936004 255872016 255808036 255744064 255680100 255616144 255552196 255488256 255424324 255360400 255296484 255232576 255168676 255104784 255040900 254977024 254913156 254849296 254785444 254721600 254657764 254593936 254530116 254466304 254402500 254338704 254274916 254211136 254147364 254083600 254019844 253956096 253892356 253828624 253764900 253701184 253637476 253573776 253510084 253446400 253382724 253319056 253255396 253191744 253128100 253064464 253000836 252937216 252873604 252810000 252746404 252682816 252619236 252555664 252492100 252428544 252364996 252301456 252237924 252174400 252110884 252047376 251983876 251920384 251856900 251793424 251729956 251666496 251603044 251539600 251476164 251412736 251349316 251285904 251222500 251159104 251095716 251032336 250968964 250905600 250842244 250778896 250715556 250652224 250588900 250525584 250462276 250398976 250335684 250272400 250209124 250145856 250082596 250019344 249956100 249892864 249829636 249766416 249703204 249640000 \n249576804 249513616 249450436 249387264 249324100 249260944 249197796 249134656 249071524 249008400 248945284 248882176 248819076 248755984 248692900 248629824 248566756 248503696 248440644 248377600 248314564 248251536 248188516 248125504 248062500 247999504 247936516 247873536 247810564 247747600 247684644 247621696 247558756 247495824 247432900 247369984 247307076 247244176 247181284 247118400 247055524 246992656 246929796 246866944 246804100 246741264 246678436 246615616 246552804 246490000 246427204 246364416 246301636 246238864 246176100 246113344 246050596 245987856 245925124 245862400 245799684 245736976 245674276 245611584 245548900 245486224 245423556 245360896 245298244 245235600 245172964 245110336 245047716 244985104 244922500 244859904 244797316 244734736 244672164 244609600 244547044 244484496 244421956 244359424 244296900 244234384 244171876 244109376 244046884 243984400 243921924 243859456 243796996 243734544 243672100 243609664 243547236 243484816 243422404 243360000 \n243297604 243235216 243172836 243110464 243048100 242985744 242923396 242861056 242798724 242736400 242674084 242611776 242549476 242487184 242424900 242362624 242300356 242238096 242175844 242113600 242051364 241989136 241926916 241864704 241802500 241740304 241678116 241615936 241553764 241491600 241429444 241367296 241305156 241243024 241180900 241118784 241056676 240994576 240932484 240870400 240808324 240746256 240684196 240622144 240560100 240498064 240436036 240374016 240312004 240250000 240188004 240126016 240064036 240002064 239940100 239878144 239816196 239754256 239692324 239630400 239568484 239506576 239444676 239382784 239320900 239259024 239197156 239135296 239073444 239011600 238949764 238887936 238826116 238764304 238702500 238640704 238578916 238517136 238455364 238393600 238331844 238270096 238208356 238146624 238084900 238023184 237961476 237899776 237838084 237776400 237714724 237653056 237591396 237529744 237468100 237406464 237344836 237283216 237221604 237160000 \n237098404 237036816 236975236 236913664 236852100 236790544 236728996 236667456 236605924 236544400 236482884 236421376 236359876 236298384 236236900 236175424 236113956 236052496 235991044 235929600 235868164 235806736 235745316 235683904 235622500 235561104 235499716 235438336 235376964 235315600 235254244 235192896 235131556 235070224 235008900 234947584 234886276 234824976 234763684 234702400 234641124 234579856 234518596 234457344 234396100 234334864 234273636 234212416 234151204 234090000 234028804 233967616 233906436 233845264 233784100 233722944 233661796 233600656 233539524 233478400 233417284 233356176 233295076 233233984 233172900 233111824 233050756 232989696 232928644 232867600 232806564 232745536 232684516 232623504 232562500 232501504 232440516 232379536 232318564 232257600 232196644 232135696 232074756 232013824 231952900 231891984 231831076 231770176 231709284 231648400 231587524 231526656 231465796 231404944 231344100 231283264 231222436 231161616 231100804 231040000 \n230979204 230918416 230857636 230796864 230736100 230675344 230614596 230553856 230493124 230432400 230371684 230310976 230250276 230189584 230128900 230068224 230007556 229946896 229886244 229825600 229764964 229704336 229643716 229583104 229522500 229461904 229401316 229340736 229280164 229219600 229159044 229098496 229037956 228977424 228916900 228856384 228795876 228735376 228674884 228614400 228553924 228493456 228432996 228372544 228312100 228251664 228191236 228130816 228070404 228010000 227949604 227889216 227828836 227768464 227708100 227647744 227587396 227527056 227466724 227406400 227346084 227285776 227225476 227165184 227104900 227044624 226984356 226924096 226863844 226803600 226743364 226683136 226622916 226562704 226502500 226442304 226382116 226321936 226261764 226201600 226141444 226081296 226021156 225961024 225900900 225840784 225780676 225720576 225660484 225600400 225540324 225480256 225420196 225360144 225300100 225240064 225180036 225120016 225060004 225000000 \n224940004 224880016 224820036 224760064 224700100 224640144 224580196 224520256 224460324 224400400 224340484 224280576 224220676 224160784 224100900 224041024 223981156 223921296 223861444 223801600 223741764 223681936 223622116 223562304 223502500 223442704 223382916 223323136 223263364 223203600 223143844 223084096 223024356 222964624 222904900 222845184 222785476 222725776 222666084 222606400 222546724 222487056 222427396 222367744 222308100 222248464 222188836 222129216 222069604 222010000 221950404 221890816 221831236 221771664 221712100 221652544 221592996 221533456 221473924 221414400 221354884 221295376 221235876 221176384 221116900 221057424 220997956 220938496 220879044 220819600 220760164 220700736 220641316 220581904 220522500 220463104 220403716 220344336 220284964 220225600 220166244 220106896 220047556 219988224 219928900 219869584 219810276 219750976 219691684 219632400 219573124 219513856 219454596 219395344 219336100 219276864 219217636 219158416 219099204 219040000 \n218980804 218921616 218862436 218803264 218744100 218684944 218625796 218566656 218507524 218448400 218389284 218330176 218271076 218211984 218152900 218093824 218034756 217975696 217916644 217857600 217798564 217739536 217680516 217621504 217562500 217503504 217444516 217385536 217326564 217267600 217208644 217149696 217090756 217031824 216972900 216913984 216855076 216796176 216737284 216678400 216619524 216560656 216501796 216442944 216384100 216325264 216266436 216207616 216148804 216090000 216031204 215972416 215913636 215854864 215796100 215737344 215678596 215619856 215561124 215502400 215443684 215384976 215326276 215267584 215208900 215150224 215091556 215032896 214974244 214915600 214856964 214798336 214739716 214681104 214622500 214563904 214505316 214446736 214388164 214329600 214271044 214212496 214153956 214095424 214036900 213978384 213919876 213861376 213802884 213744400 213685924 213627456 213568996 213510544 213452100 213393664 213335236 213276816 213218404 213160000 \n213101604 213043216 212984836 212926464 212868100 212809744 212751396 212693056 212634724 212576400 212518084 212459776 212401476 212343184 212284900 212226624 212168356 212110096 212051844 211993600 211935364 211877136 211818916 211760704 211702500 211644304 211586116 211527936 211469764 211411600 211353444 211295296 211237156 211179024 211120900 211062784 211004676 210946576 210888484 210830400 210772324 210714256 210656196 210598144 210540100 210482064 210424036 210366016 210308004 210250000 210192004 210134016 210076036 210018064 209960100 209902144 209844196 209786256 209728324 209670400 209612484 209554576 209496676 209438784 209380900 209323024 209265156 209207296 209149444 209091600 209033764 208975936 208918116 208860304 208802500 208744704 208686916 208629136 208571364 208513600 208455844 208398096 208340356 208282624 208224900 208167184 208109476 208051776 207994084 207936400 207878724 207821056 207763396 207705744 207648100 207590464 207532836 207475216 207417604 207360000 \n207302404 207244816 207187236 207129664 207072100 207014544 206956996 206899456 206841924 206784400 206726884 206669376 206611876 206554384 206496900 206439424 206381956 206324496 206267044 206209600 206152164 206094736 206037316 205979904 205922500 205865104 205807716 205750336 205692964 205635600 205578244 205520896 205463556 205406224 205348900 205291584 205234276 205176976 205119684 205062400 205005124 204947856 204890596 204833344 204776100 204718864 204661636 204604416 204547204 204490000 204432804 204375616 204318436 204261264 204204100 204146944 204089796 204032656 203975524 203918400 203861284 203804176 203747076 203689984 203632900 203575824 203518756 203461696 203404644 203347600 203290564 203233536 203176516 203119504 203062500 203005504 202948516 202891536 202834564 202777600 202720644 202663696 202606756 202549824 202492900 202435984 202379076 202322176 202265284 202208400 202151524 202094656 202037796 201980944 201924100 201867264 201810436 201753616 201696804 201640000 \n201583204 201526416 201469636 201412864 201356100 201299344 201242596 201185856 201129124 201072400 201015684 200958976 200902276 200845584 200788900 200732224 200675556 200618896 200562244 200505600 200448964 200392336 200335716 200279104 200222500 200165904 200109316 200052736 199996164 199939600 199883044 199826496 199769956 199713424 199656900 199600384 199543876 199487376 199430884 199374400 199317924 199261456 199204996 199148544 199092100 199035664 198979236 198922816 198866404 198810000 198753604 198697216 198640836 198584464 198528100 198471744 198415396 198359056 198302724 198246400 198190084 198133776 198077476 198021184 197964900 197908624 197852356 197796096 197739844 197683600 197627364 197571136 197514916 197458704 197402500 197346304 197290116 197233936 197177764 197121600 197065444 197009296 196953156 196897024 196840900 196784784 196728676 196672576 196616484 196560400 196504324 196448256 196392196 196336144 196280100 196224064 196168036 196112016 196056004 196000000 \n195944004 195888016 195832036 195776064 195720100 195664144 195608196 195552256 195496324 195440400 195384484 195328576 195272676 195216784 195160900 195105024 195049156 194993296 194937444 194881600 194825764 194769936 194714116 194658304 194602500 194546704 194490916 194435136 194379364 194323600 194267844 194212096 194156356 194100624 194044900 193989184 193933476 193877776 193822084 193766400 193710724 193655056 193599396 193543744 193488100 193432464 193376836 193321216 193265604 193210000 193154404 193098816 193043236 192987664 192932100 192876544 192820996 192765456 192709924 192654400 192598884 192543376 192487876 192432384 192376900 192321424 192265956 192210496 192155044 192099600 192044164 191988736 191933316 191877904 191822500 191767104 191711716 191656336 191600964 191545600 191490244 191434896 191379556 191324224 191268900 191213584 191158276 191102976 191047684 190992400 190937124 190881856 190826596 190771344 190716100 190660864 190605636 190550416 190495204 190440000 \n190384804 190329616 190274436 190219264 190164100 190108944 190053796 189998656 189943524 189888400 189833284 189778176 189723076 189667984 189612900 189557824 189502756 189447696 189392644 189337600 189282564 189227536 189172516 189117504 189062500 189007504 188952516 188897536 188842564 188787600 188732644 188677696 188622756 188567824 188512900 188457984 188403076 188348176 188293284 188238400 188183524 188128656 188073796 188018944 187964100 187909264 187854436 187799616 187744804 187690000 187635204 187580416 187525636 187470864 187416100 187361344 187306596 187251856 187197124 187142400 187087684 187032976 186978276 186923584 186868900 186814224 186759556 186704896 186650244 186595600 186540964 186486336 186431716 186377104 186322500 186267904 186213316 186158736 186104164 186049600 185995044 185940496 185885956 185831424 185776900 185722384 185667876 185613376 185558884 185504400 185449924 185395456 185340996 185286544 185232100 185177664 185123236 185068816 185014404 184960000 \n184905604 184851216 184796836 184742464 184688100 184633744 184579396 184525056 184470724 184416400 184362084 184307776 184253476 184199184 184144900 184090624 184036356 183982096 183927844 183873600 183819364 183765136 183710916 183656704 183602500 183548304 183494116 183439936 183385764 183331600 183277444 183223296 183169156 183115024 183060900 183006784 182952676 182898576 182844484 182790400 182736324 182682256 182628196 182574144 182520100 182466064 182412036 182358016 182304004 182250000 182196004 182142016 182088036 182034064 181980100 181926144 181872196 181818256 181764324 181710400 181656484 181602576 181548676 181494784 181440900 181387024 181333156 181279296 181225444 181171600 181117764 181063936 181010116 180956304 180902500 180848704 180794916 180741136 180687364 180633600 180579844 180526096 180472356 180418624 180364900 180311184 180257476 180203776 180150084 180096400 180042724 179989056 179935396 179881744 179828100 179774464 179720836 179667216 179613604 179560000 \n179506404 179452816 179399236 179345664 179292100 179238544 179184996 179131456 179077924 179024400 178970884 178917376 178863876 178810384 178756900 178703424 178649956 178596496 178543044 178489600 178436164 178382736 178329316 178275904 178222500 178169104 178115716 178062336 178008964 177955600 177902244 177848896 177795556 177742224 177688900 177635584 177582276 177528976 177475684 177422400 177369124 177315856 177262596 177209344 177156100 177102864 177049636 176996416 176943204 176890000 176836804 176783616 176730436 176677264 176624100 176570944 176517796 176464656 176411524 176358400 176305284 176252176 176199076 176145984 176092900 176039824 175986756 175933696 175880644 175827600 175774564 175721536 175668516 175615504 175562500 175509504 175456516 175403536 175350564 175297600 175244644 175191696 175138756 175085824 175032900 174979984 174927076 174874176 174821284 174768400 174715524 174662656 174609796 174556944 174504100 174451264 174398436 174345616 174292804 174240000 \n174187204 174134416 174081636 174028864 173976100 173923344 173870596 173817856 173765124 173712400 173659684 173606976 173554276 173501584 173448900 173396224 173343556 173290896 173238244 173185600 173132964 173080336 173027716 172975104 172922500 172869904 172817316 172764736 172712164 172659600 172607044 172554496 172501956 172449424 172396900 172344384 172291876 172239376 172186884 172134400 172081924 172029456 171976996 171924544 171872100 171819664 171767236 171714816 171662404 171610000 171557604 171505216 171452836 171400464 171348100 171295744 171243396 171191056 171138724 171086400 171034084 170981776 170929476 170877184 170824900 170772624 170720356 170668096 170615844 170563600 170511364 170459136 170406916 170354704 170302500 170250304 170198116 170145936 170093764 170041600 169989444 169937296 169885156 169833024 169780900 169728784 169676676 169624576 169572484 169520400 169468324 169416256 169364196 169312144 169260100 169208064 169156036 169104016 169052004 169000000 \n168948004 168896016 168844036 168792064 168740100 168688144 168636196 168584256 168532324 168480400 168428484 168376576 168324676 168272784 168220900 168169024 168117156 168065296 168013444 167961600 167909764 167857936 167806116 167754304 167702500 167650704 167598916 167547136 167495364 167443600 167391844 167340096 167288356 167236624 167184900 167133184 167081476 167029776 166978084 166926400 166874724 166823056 166771396 166719744 166668100 166616464 166564836 166513216 166461604 166410000 166358404 166306816 166255236 166203664 166152100 166100544 166048996 165997456 165945924 165894400 165842884 165791376 165739876 165688384 165636900 165585424 165533956 165482496 165431044 165379600 165328164 165276736 165225316 165173904 165122500 165071104 165019716 164968336 164916964 164865600 164814244 164762896 164711556 164660224 164608900 164557584 164506276 164454976 164403684 164352400 164301124 164249856 164198596 164147344 164096100 164044864 163993636 163942416 163891204 163840000 \n163788804 163737616 163686436 163635264 163584100 163532944 163481796 163430656 163379524 163328400 163277284 163226176 163175076 163123984 163072900 163021824 162970756 162919696 162868644 162817600 162766564 162715536 162664516 162613504 162562500 162511504 162460516 162409536 162358564 162307600 162256644 162205696 162154756 162103824 162052900 162001984 161951076 161900176 161849284 161798400 161747524 161696656 161645796 161594944 161544100 161493264 161442436 161391616 161340804 161290000 161239204 161188416 161137636 161086864 161036100 160985344 160934596 160883856 160833124 160782400 160731684 160680976 160630276 160579584 160528900 160478224 160427556 160376896 160326244 160275600 160224964 160174336 160123716 160073104 160022500 159971904 159921316 159870736 159820164 159769600 159719044 159668496 159617956 159567424 159516900 159466384 159415876 159365376 159314884 159264400 159213924 159163456 159112996 159062544 159012100 158961664 158911236 158860816 158810404 158760000 \n158709604 158659216 158608836 158558464 158508100 158457744 158407396 158357056 158306724 158256400 158206084 158155776 158105476 158055184 158004900 157954624 157904356 157854096 157803844 157753600 157703364 157653136 157602916 157552704 157502500 157452304 157402116 157351936 157301764 157251600 157201444 157151296 157101156 157051024 157000900 156950784 156900676 156850576 156800484 156750400 156700324 156650256 156600196 156550144 156500100 156450064 156400036 156350016 156300004 156250000 156200004 156150016 156100036 156050064 156000100 155950144 155900196 155850256 155800324 155750400 155700484 155650576 155600676 155550784 155500900 155451024 155401156 155351296 155301444 155251600 155201764 155151936 155102116 155052304 155002500 154952704 154902916 154853136 154803364 154753600 154703844 154654096 154604356 154554624 154504900 154455184 154405476 154355776 154306084 154256400 154206724 154157056 154107396 154057744 154008100 153958464 153908836 153859216 153809604 153760000 \n153710404 153660816 153611236 153561664 153512100 153462544 153412996 153363456 153313924 153264400 153214884 153165376 153115876 153066384 153016900 152967424 152917956 152868496 152819044 152769600 152720164 152670736 152621316 152571904 152522500 152473104 152423716 152374336 152324964 152275600 152226244 152176896 152127556 152078224 152028900 151979584 151930276 151880976 151831684 151782400 151733124 151683856 151634596 151585344 151536100 151486864 151437636 151388416 151339204 151290000 151240804 151191616 151142436 151093264 151044100 150994944 150945796 150896656 150847524 150798400 150749284 150700176 150651076 150601984 150552900 150503824 150454756 150405696 150356644 150307600 150258564 150209536 150160516 150111504 150062500 150013504 149964516 149915536 149866564 149817600 149768644 149719696 149670756 149621824 149572900 149523984 149475076 149426176 149377284 149328400 149279524 149230656 149181796 149132944 149084100 149035264 148986436 148937616 148888804 148840000 \n148791204 148742416 148693636 148644864 148596100 148547344 148498596 148449856 148401124 148352400 148303684 148254976 148206276 148157584 148108900 148060224 148011556 147962896 147914244 147865600 147816964 147768336 147719716 147671104 147622500 147573904 147525316 147476736 147428164 147379600 147331044 147282496 147233956 147185424 147136900 147088384 147039876 146991376 146942884 146894400 146845924 146797456 146748996 146700544 146652100 146603664 146555236 146506816 146458404 146410000 146361604 146313216 146264836 146216464 146168100 146119744 146071396 146023056 145974724 145926400 145878084 145829776 145781476 145733184 145684900 145636624 145588356 145540096 145491844 145443600 145395364 145347136 145298916 145250704 145202500 145154304 145106116 145057936 145009764 144961600 144913444 144865296 144817156 144769024 144720900 144672784 144624676 144576576 144528484 144480400 144432324 144384256 144336196 144288144 144240100 144192064 144144036 144096016 144048004 144000000 \n143952004 143904016 143856036 143808064 143760100 143712144 143664196 143616256 143568324 143520400 143472484 143424576 143376676 143328784 143280900 143233024 143185156 143137296 143089444 143041600 142993764 142945936 142898116 142850304 142802500 142754704 142706916 142659136 142611364 142563600 142515844 142468096 142420356 142372624 142324900 142277184 142229476 142181776 142134084 142086400 142038724 141991056 141943396 141895744 141848100 141800464 141752836 141705216 141657604 141610000 141562404 141514816 141467236 141419664 141372100 141324544 141276996 141229456 141181924 141134400 141086884 141039376 140991876 140944384 140896900 140849424 140801956 140754496 140707044 140659600 140612164 140564736 140517316 140469904 140422500 140375104 140327716 140280336 140232964 140185600 140138244 140090896 140043556 139996224 139948900 139901584 139854276 139806976 139759684 139712400 139665124 139617856 139570596 139523344 139476100 139428864 139381636 139334416 139287204 139240000 \n139192804 139145616 139098436 139051264 139004100 138956944 138909796 138862656 138815524 138768400 138721284 138674176 138627076 138579984 138532900 138485824 138438756 138391696 138344644 138297600 138250564 138203536 138156516 138109504 138062500 138015504 137968516 137921536 137874564 137827600 137780644 137733696 137686756 137639824 137592900 137545984 137499076 137452176 137405284 137358400 137311524 137264656 137217796 137170944 137124100 137077264 137030436 136983616 136936804 136890000 136843204 136796416 136749636 136702864 136656100 136609344 136562596 136515856 136469124 136422400 136375684 136328976 136282276 136235584 136188900 136142224 136095556 136048896 136002244 135955600 135908964 135862336 135815716 135769104 135722500 135675904 135629316 135582736 135536164 135489600 135443044 135396496 135349956 135303424 135256900 135210384 135163876 135117376 135070884 135024400 134977924 134931456 134884996 134838544 134792100 134745664 134699236 134652816 134606404 134560000 \n134513604 134467216 134420836 134374464 134328100 134281744 134235396 134189056 134142724 134096400 134050084 134003776 133957476 133911184 133864900 133818624 133772356 133726096 133679844 133633600 133587364 133541136 133494916 133448704 133402500 133356304 133310116 133263936 133217764 133171600 133125444 133079296 133033156 132987024 132940900 132894784 132848676 132802576 132756484 132710400 132664324 132618256 132572196 132526144 132480100 132434064 132388036 132342016 132296004 132250000 132204004 132158016 132112036 132066064 132020100 131974144 131928196 131882256 131836324 131790400 131744484 131698576 131652676 131606784 131560900 131515024 131469156 131423296 131377444 131331600 131285764 131239936 131194116 131148304 131102500 131056704 131010916 130965136 130919364 130873600 130827844 130782096 130736356 130690624 130644900 130599184 130553476 130507776 130462084 130416400 130370724 130325056 130279396 130233744 130188100 130142464 130096836 130051216 130005604 129960000 \n129914404 129868816 129823236 129777664 129732100 129686544 129640996 129595456 129549924 129504400 129458884 129413376 129367876 129322384 129276900 129231424 129185956 129140496 129095044 129049600 129004164 128958736 128913316 128867904 128822500 128777104 128731716 128686336 128640964 128595600 128550244 128504896 128459556 128414224 128368900 128323584 128278276 128232976 128187684 128142400 128097124 128051856 128006596 127961344 127916100 127870864 127825636 127780416 127735204 127690000 127644804 127599616 127554436 127509264 127464100 127418944 127373796 127328656 127283524 127238400 127193284 127148176 127103076 127057984 127012900 126967824 126922756 126877696 126832644 126787600 126742564 126697536 126652516 126607504 126562500 126517504 126472516 126427536 126382564 126337600 126292644 126247696 126202756 126157824 126112900 126067984 126023076 125978176 125933284 125888400 125843524 125798656 125753796 125708944 125664100 125619264 125574436 125529616 125484804 125440000 \n125395204 125350416 125305636 125260864 125216100 125171344 125126596 125081856 125037124 124992400 124947684 124902976 124858276 124813584 124768900 124724224 124679556 124634896 124590244 124545600 124500964 124456336 124411716 124367104 124322500 124277904 124233316 124188736 124144164 124099600 124055044 124010496 123965956 123921424 123876900 123832384 123787876 123743376 123698884 123654400 123609924 123565456 123520996 123476544 123432100 123387664 123343236 123298816 123254404 123210000 123165604 123121216 123076836 123032464 122988100 122943744 122899396 122855056 122810724 122766400 122722084 122677776 122633476 122589184 122544900 122500624 122456356 122412096 122367844 122323600 122279364 122235136 122190916 122146704 122102500 122058304 122014116 121969936 121925764 121881600 121837444 121793296 121749156 121705024 121660900 121616784 121572676 121528576 121484484 121440400 121396324 121352256 121308196 121264144 121220100 121176064 121132036 121088016 121044004 121000000 \n120956004 120912016 120868036 120824064 120780100 120736144 120692196 120648256 120604324 120560400 120516484 120472576 120428676 120384784 120340900 120297024 120253156 120209296 120165444 120121600 120077764 120033936 119990116 119946304 119902500 119858704 119814916 119771136 119727364 119683600 119639844 119596096 119552356 119508624 119464900 119421184 119377476 119333776 119290084 119246400 119202724 119159056 119115396 119071744 119028100 118984464 118940836 118897216 118853604 118810000 118766404 118722816 118679236 118635664 118592100 118548544 118504996 118461456 118417924 118374400 118330884 118287376 118243876 118200384 118156900 118113424 118069956 118026496 117983044 117939600 117896164 117852736 117809316 117765904 117722500 117679104 117635716 117592336 117548964 117505600 117462244 117418896 117375556 117332224 117288900 117245584 117202276 117158976 117115684 117072400 117029124 116985856 116942596 116899344 116856100 116812864 116769636 116726416 116683204 116640000 \n116596804 116553616 116510436 116467264 116424100 116380944 116337796 116294656 116251524 116208400 116165284 116122176 116079076 116035984 115992900 115949824 115906756 115863696 115820644 115777600 115734564 115691536 115648516 115605504 115562500 115519504 115476516 115433536 115390564 115347600 115304644 115261696 115218756 115175824 115132900 115089984 115047076 115004176 114961284 114918400 114875524 114832656 114789796 114746944 114704100 114661264 114618436 114575616 114532804 114490000 114447204 114404416 114361636 114318864 114276100 114233344 114190596 114147856 114105124 114062400 114019684 113976976 113934276 113891584 113848900 113806224 113763556 113720896 113678244 113635600 113592964 113550336 113507716 113465104 113422500 113379904 113337316 113294736 113252164 113209600 113167044 113124496 113081956 113039424 112996900 112954384 112911876 112869376 112826884 112784400 112741924 112699456 112656996 112614544 112572100 112529664 112487236 112444816 112402404 112360000 \n112317604 112275216 112232836 112190464 112148100 112105744 112063396 112021056 111978724 111936400 111894084 111851776 111809476 111767184 111724900 111682624 111640356 111598096 111555844 111513600 111471364 111429136 111386916 111344704 111302500 111260304 111218116 111175936 111133764 111091600 111049444 111007296 110965156 110923024 110880900 110838784 110796676 110754576 110712484 110670400 110628324 110586256 110544196 110502144 110460100 110418064 110376036 110334016 110292004 110250000 110208004 110166016 110124036 110082064 110040100 109998144 109956196 109914256 109872324 109830400 109788484 109746576 109704676 109662784 109620900 109579024 109537156 109495296 109453444 109411600 109369764 109327936 109286116 109244304 109202500 109160704 109118916 109077136 109035364 108993600 108951844 108910096 108868356 108826624 108784900 108743184 108701476 108659776 108618084 108576400 108534724 108493056 108451396 108409744 108368100 108326464 108284836 108243216 108201604 108160000 \n108118404 108076816 108035236 107993664 107952100 107910544 107868996 107827456 107785924 107744400 107702884 107661376 107619876 107578384 107536900 107495424 107453956 107412496 107371044 107329600 107288164 107246736 107205316 107163904 107122500 107081104 107039716 106998336 106956964 106915600 106874244 106832896 106791556 106750224 106708900 106667584 106626276 106584976 106543684 106502400 106461124 106419856 106378596 106337344 106296100 106254864 106213636 106172416 106131204 106090000 106048804 106007616 105966436 105925264 105884100 105842944 105801796 105760656 105719524 105678400 105637284 105596176 105555076 105513984 105472900 105431824 105390756 105349696 105308644 105267600 105226564 105185536 105144516 105103504 105062500 105021504 104980516 104939536 104898564 104857600 104816644 104775696 104734756 104693824 104652900 104611984 104571076 104530176 104489284 104448400 104407524 104366656 104325796 104284944 104244100 104203264 104162436 104121616 104080804 104040000 \n103999204 103958416 103917636 103876864 103836100 103795344 103754596 103713856 103673124 103632400 103591684 103550976 103510276 103469584 103428900 103388224 103347556 103306896 103266244 103225600 103184964 103144336 103103716 103063104 103022500 102981904 102941316 102900736 102860164 102819600 102779044 102738496 102697956 102657424 102616900 102576384 102535876 102495376 102454884 102414400 102373924 102333456 102292996 102252544 102212100 102171664 102131236 102090816 102050404 102010000 101969604 101929216 101888836 101848464 101808100 101767744 101727396 101687056 101646724 101606400 101566084 101525776 101485476 101445184 101404900 101364624 101324356 101284096 101243844 101203600 101163364 101123136 101082916 101042704 101002500 100962304 100922116 100881936 100841764 100801600 100761444 100721296 100681156 100641024 100600900 100560784 100520676 100480576 100440484 100400400 100360324 100320256 100280196 100240144 100200100 100160064 100120036 100080016 100040004 100000000 \n99960004 99920016 99880036 99840064 99800100 99760144 99720196 99680256 99640324 99600400 99560484 99520576 99480676 99440784 99400900 99361024 99321156 99281296 99241444 99201600 99161764 99121936 99082116 99042304 99002500 98962704 98922916 98883136 98843364 98803600 98763844 98724096 98684356 98644624 98604900 98565184 98525476 98485776 98446084 98406400 98366724 98327056 98287396 98247744 98208100 98168464 98128836 98089216 98049604 98010000 97970404 97930816 97891236 97851664 97812100 97772544 97732996 97693456 97653924 97614400 97574884 97535376 97495876 97456384 97416900 97377424 97337956 97298496 97259044 97219600 97180164 97140736 97101316 97061904 97022500 96983104 96943716 96904336 96864964 96825600 96786244 96746896 96707556 96668224 96628900 96589584 96550276 96510976 96471684 96432400 96393124 96353856 96314596 96275344 96236100 96196864 96157636 96118416 96079204 96040000 \n96000804 95961616 95922436 95883264 95844100 95804944 95765796 95726656 95687524 95648400 95609284 95570176 95531076 95491984 95452900 95413824 95374756 95335696 95296644 95257600 95218564 95179536 95140516 95101504 95062500 95023504 94984516 94945536 94906564 94867600 94828644 94789696 94750756 94711824 94672900 94633984 94595076 94556176 94517284 94478400 94439524 94400656 94361796 94322944 94284100 94245264 94206436 94167616 94128804 94090000 94051204 94012416 93973636 93934864 93896100 93857344 93818596 93779856 93741124 93702400 93663684 93624976 93586276 93547584 93508900 93470224 93431556 93392896 93354244 93315600 93276964 93238336 93199716 93161104 93122500 93083904 93045316 93006736 92968164 92929600 92891044 92852496 92813956 92775424 92736900 92698384 92659876 92621376 92582884 92544400 92505924 92467456 92428996 92390544 92352100 92313664 92275236 92236816 92198404 92160000 \n92121604 92083216 92044836 92006464 91968100 91929744 91891396 91853056 91814724 91776400 91738084 91699776 91661476 91623184 91584900 91546624 91508356 91470096 91431844 91393600 91355364 91317136 91278916 91240704 91202500 91164304 91126116 91087936 91049764 91011600 90973444 90935296 90897156 90859024 90820900 90782784 90744676 90706576 90668484 90630400 90592324 90554256 90516196 90478144 90440100 90402064 90364036 90326016 90288004 90250000 90212004 90174016 90136036 90098064 90060100 90022144 89984196 89946256 89908324 89870400 89832484 89794576 89756676 89718784 89680900 89643024 89605156 89567296 89529444 89491600 89453764 89415936 89378116 89340304 89302500 89264704 89226916 89189136 89151364 89113600 89075844 89038096 89000356 88962624 88924900 88887184 88849476 88811776 88774084 88736400 88698724 88661056 88623396 88585744 88548100 88510464 88472836 88435216 88397604 88360000 \n88322404 88284816 88247236 88209664 88172100 88134544 88096996 88059456 88021924 87984400 87946884 87909376 87871876 87834384 87796900 87759424 87721956 87684496 87647044 87609600 87572164 87534736 87497316 87459904 87422500 87385104 87347716 87310336 87272964 87235600 87198244 87160896 87123556 87086224 87048900 87011584 86974276 86936976 86899684 86862400 86825124 86787856 86750596 86713344 86676100 86638864 86601636 86564416 86527204 86490000 86452804 86415616 86378436 86341264 86304100 86266944 86229796 86192656 86155524 86118400 86081284 86044176 86007076 85969984 85932900 85895824 85858756 85821696 85784644 85747600 85710564 85673536 85636516 85599504 85562500 85525504 85488516 85451536 85414564 85377600 85340644 85303696 85266756 85229824 85192900 85155984 85119076 85082176 85045284 85008400 84971524 84934656 84897796 84860944 84824100 84787264 84750436 84713616 84676804 84640000 \n84603204 84566416 84529636 84492864 84456100 84419344 84382596 84345856 84309124 84272400 84235684 84198976 84162276 84125584 84088900 84052224 84015556 83978896 83942244 83905600 83868964 83832336 83795716 83759104 83722500 83685904 83649316 83612736 83576164 83539600 83503044 83466496 83429956 83393424 83356900 83320384 83283876 83247376 83210884 83174400 83137924 83101456 83064996 83028544 82992100 82955664 82919236 82882816 82846404 82810000 82773604 82737216 82700836 82664464 82628100 82591744 82555396 82519056 82482724 82446400 82410084 82373776 82337476 82301184 82264900 82228624 82192356 82156096 82119844 82083600 82047364 82011136 81974916 81938704 81902500 81866304 81830116 81793936 81757764 81721600 81685444 81649296 81613156 81577024 81540900 81504784 81468676 81432576 81396484 81360400 81324324 81288256 81252196 81216144 81180100 81144064 81108036 81072016 81036004 81000000 \n80964004 80928016 80892036 80856064 80820100 80784144 80748196 80712256 80676324 80640400 80604484 80568576 80532676 80496784 80460900 80425024 80389156 80353296 80317444 80281600 80245764 80209936 80174116 80138304 80102500 80066704 80030916 79995136 79959364 79923600 79887844 79852096 79816356 79780624 79744900 79709184 79673476 79637776 79602084 79566400 79530724 79495056 79459396 79423744 79388100 79352464 79316836 79281216 79245604 79210000 79174404 79138816 79103236 79067664 79032100 78996544 78960996 78925456 78889924 78854400 78818884 78783376 78747876 78712384 78676900 78641424 78605956 78570496 78535044 78499600 78464164 78428736 78393316 78357904 78322500 78287104 78251716 78216336 78180964 78145600 78110244 78074896 78039556 78004224 77968900 77933584 77898276 77862976 77827684 77792400 77757124 77721856 77686596 77651344 77616100 77580864 77545636 77510416 77475204 77440000 \n77404804 77369616 77334436 77299264 77264100 77228944 77193796 77158656 77123524 77088400 77053284 77018176 76983076 76947984 76912900 76877824 76842756 76807696 76772644 76737600 76702564 76667536 76632516 76597504 76562500 76527504 76492516 76457536 76422564 76387600 76352644 76317696 76282756 76247824 76212900 76177984 76143076 76108176 76073284 76038400 76003524 75968656 75933796 75898944 75864100 75829264 75794436 75759616 75724804 75690000 75655204 75620416 75585636 75550864 75516100 75481344 75446596 75411856 75377124 75342400 75307684 75272976 75238276 75203584 75168900 75134224 75099556 75064896 75030244 74995600 74960964 74926336 74891716 74857104 74822500 74787904 74753316 74718736 74684164 74649600 74615044 74580496 74545956 74511424 74476900 74442384 74407876 74373376 74338884 74304400 74269924 74235456 74200996 74166544 74132100 74097664 74063236 74028816 73994404 73960000 \n73925604 73891216 73856836 73822464 73788100 73753744 73719396 73685056 73650724 73616400 73582084 73547776 73513476 73479184 73444900 73410624 73376356 73342096 73307844 73273600 73239364 73205136 73170916 73136704 73102500 73068304 73034116 72999936 72965764 72931600 72897444 72863296 72829156 72795024 72760900 72726784 72692676 72658576 72624484 72590400 72556324 72522256 72488196 72454144 72420100 72386064 72352036 72318016 72284004 72250000 72216004 72182016 72148036 72114064 72080100 72046144 72012196 71978256 71944324 71910400 71876484 71842576 71808676 71774784 71740900 71707024 71673156 71639296 71605444 71571600 71537764 71503936 71470116 71436304 71402500 71368704 71334916 71301136 71267364 71233600 71199844 71166096 71132356 71098624 71064900 71031184 70997476 70963776 70930084 70896400 70862724 70829056 70795396 70761744 70728100 70694464 70660836 70627216 70593604 70560000 \n70526404 70492816 70459236 70425664 70392100 70358544 70324996 70291456 70257924 70224400 70190884 70157376 70123876 70090384 70056900 70023424 69989956 69956496 69923044 69889600 69856164 69822736 69789316 69755904 69722500 69689104 69655716 69622336 69588964 69555600 69522244 69488896 69455556 69422224 69388900 69355584 69322276 69288976 69255684 69222400 69189124 69155856 69122596 69089344 69056100 69022864 68989636 68956416 68923204 68890000 68856804 68823616 68790436 68757264 68724100 68690944 68657796 68624656 68591524 68558400 68525284 68492176 68459076 68425984 68392900 68359824 68326756 68293696 68260644 68227600 68194564 68161536 68128516 68095504 68062500 68029504 67996516 67963536 67930564 67897600 67864644 67831696 67798756 67765824 67732900 67699984 67667076 67634176 67601284 67568400 67535524 67502656 67469796 67436944 67404100 67371264 67338436 67305616 67272804 67240000 \n67207204 67174416 67141636 67108864 67076100 67043344 67010596 66977856 66945124 66912400 66879684 66846976 66814276 66781584 66748900 66716224 66683556 66650896 66618244 66585600 66552964 66520336 66487716 66455104 66422500 66389904 66357316 66324736 66292164 66259600 66227044 66194496 66161956 66129424 66096900 66064384 66031876 65999376 65966884 65934400 65901924 65869456 65836996 65804544 65772100 65739664 65707236 65674816 65642404 65610000 65577604 65545216 65512836 65480464 65448100 65415744 65383396 65351056 65318724 65286400 65254084 65221776 65189476 65157184 65124900 65092624 65060356 65028096 64995844 64963600 64931364 64899136 64866916 64834704 64802500 64770304 64738116 64705936 64673764 64641600 64609444 64577296 64545156 64513024 64480900 64448784 64416676 64384576 64352484 64320400 64288324 64256256 64224196 64192144 64160100 64128064 64096036 64064016 64032004 64000000 \n63968004 63936016 63904036 63872064 63840100 63808144 63776196 63744256 63712324 63680400 63648484 63616576 63584676 63552784 63520900 63489024 63457156 63425296 63393444 63361600 63329764 63297936 63266116 63234304 63202500 63170704 63138916 63107136 63075364 63043600 63011844 62980096 62948356 62916624 62884900 62853184 62821476 62789776 62758084 62726400 62694724 62663056 62631396 62599744 62568100 62536464 62504836 62473216 62441604 62410000 62378404 62346816 62315236 62283664 62252100 62220544 62188996 62157456 62125924 62094400 62062884 62031376 61999876 61968384 61936900 61905424 61873956 61842496 61811044 61779600 61748164 61716736 61685316 61653904 61622500 61591104 61559716 61528336 61496964 61465600 61434244 61402896 61371556 61340224 61308900 61277584 61246276 61214976 61183684 61152400 61121124 61089856 61058596 61027344 60996100 60964864 60933636 60902416 60871204 60840000 \n60808804 60777616 60746436 60715264 60684100 60652944 60621796 60590656 60559524 60528400 60497284 60466176 60435076 60403984 60372900 60341824 60310756 60279696 60248644 60217600 60186564 60155536 60124516 60093504 60062500 60031504 60000516 59969536 59938564 59907600 59876644 59845696 59814756 59783824 59752900 59721984 59691076 59660176 59629284 59598400 59567524 59536656 59505796 59474944 59444100 59413264 59382436 59351616 59320804 59290000 59259204 59228416 59197636 59166864 59136100 59105344 59074596 59043856 59013124 58982400 58951684 58920976 58890276 58859584 58828900 58798224 58767556 58736896 58706244 58675600 58644964 58614336 58583716 58553104 58522500 58491904 58461316 58430736 58400164 58369600 58339044 58308496 58277956 58247424 58216900 58186384 58155876 58125376 58094884 58064400 58033924 58003456 57972996 57942544 57912100 57881664 57851236 57820816 57790404 57760000 \n57729604 57699216 57668836 57638464 57608100 57577744 57547396 57517056 57486724 57456400 57426084 57395776 57365476 57335184 57304900 57274624 57244356 57214096 57183844 57153600 57123364 57093136 57062916 57032704 57002500 56972304 56942116 56911936 56881764 56851600 56821444 56791296 56761156 56731024 56700900 56670784 56640676 56610576 56580484 56550400 56520324 56490256 56460196 56430144 56400100 56370064 56340036 56310016 56280004 56250000 56220004 56190016 56160036 56130064 56100100 56070144 56040196 56010256 55980324 55950400 55920484 55890576 55860676 55830784 55800900 55771024 55741156 55711296 55681444 55651600 55621764 55591936 55562116 55532304 55502500 55472704 55442916 55413136 55383364 55353600 55323844 55294096 55264356 55234624 55204900 55175184 55145476 55115776 55086084 55056400 55026724 54997056 54967396 54937744 54908100 54878464 54848836 54819216 54789604 54760000 \n54730404 54700816 54671236 54641664 54612100 54582544 54552996 54523456 54493924 54464400 54434884 54405376 54375876 54346384 54316900 54287424 54257956 54228496 54199044 54169600 54140164 54110736 54081316 54051904 54022500 53993104 53963716 53934336 53904964 53875600 53846244 53816896 53787556 53758224 53728900 53699584 53670276 53640976 53611684 53582400 53553124 53523856 53494596 53465344 53436100 53406864 53377636 53348416 53319204 53290000 53260804 53231616 53202436 53173264 53144100 53114944 53085796 53056656 53027524 52998400 52969284 52940176 52911076 52881984 52852900 52823824 52794756 52765696 52736644 52707600 52678564 52649536 52620516 52591504 52562500 52533504 52504516 52475536 52446564 52417600 52388644 52359696 52330756 52301824 52272900 52243984 52215076 52186176 52157284 52128400 52099524 52070656 52041796 52012944 51984100 51955264 51926436 51897616 51868804 51840000 \n51811204 51782416 51753636 51724864 51696100 51667344 51638596 51609856 51581124 51552400 51523684 51494976 51466276 51437584 51408900 51380224 51351556 51322896 51294244 51265600 51236964 51208336 51179716 51151104 51122500 51093904 51065316 51036736 51008164 50979600 50951044 50922496 50893956 50865424 50836900 50808384 50779876 50751376 50722884 50694400 50665924 50637456 50608996 50580544 50552100 50523664 50495236 50466816 50438404 50410000 50381604 50353216 50324836 50296464 50268100 50239744 50211396 50183056 50154724 50126400 50098084 50069776 50041476 50013184 49984900 49956624 49928356 49900096 49871844 49843600 49815364 49787136 49758916 49730704 49702500 49674304 49646116 49617936 49589764 49561600 49533444 49505296 49477156 49449024 49420900 49392784 49364676 49336576 49308484 49280400 49252324 49224256 49196196 49168144 49140100 49112064 49084036 49056016 49028004 49000000 \n48972004 48944016 48916036 48888064 48860100 48832144 48804196 48776256 48748324 48720400 48692484 48664576 48636676 48608784 48580900 48553024 48525156 48497296 48469444 48441600 48413764 48385936 48358116 48330304 48302500 48274704 48246916 48219136 48191364 48163600 48135844 48108096 48080356 48052624 48024900 47997184 47969476 47941776 47914084 47886400 47858724 47831056 47803396 47775744 47748100 47720464 47692836 47665216 47637604 47610000 47582404 47554816 47527236 47499664 47472100 47444544 47416996 47389456 47361924 47334400 47306884 47279376 47251876 47224384 47196900 47169424 47141956 47114496 47087044 47059600 47032164 47004736 46977316 46949904 46922500 46895104 46867716 46840336 46812964 46785600 46758244 46730896 46703556 46676224 46648900 46621584 46594276 46566976 46539684 46512400 46485124 46457856 46430596 46403344 46376100 46348864 46321636 46294416 46267204 46240000 \n46212804 46185616 46158436 46131264 46104100 46076944 46049796 46022656 45995524 45968400 45941284 45914176 45887076 45859984 45832900 45805824 45778756 45751696 45724644 45697600 45670564 45643536 45616516 45589504 45562500 45535504 45508516 45481536 45454564 45427600 45400644 45373696 45346756 45319824 45292900 45265984 45239076 45212176 45185284 45158400 45131524 45104656 45077796 45050944 45024100 44997264 44970436 44943616 44916804 44890000 44863204 44836416 44809636 44782864 44756100 44729344 44702596 44675856 44649124 44622400 44595684 44568976 44542276 44515584 44488900 44462224 44435556 44408896 44382244 44355600 44328964 44302336 44275716 44249104 44222500 44195904 44169316 44142736 44116164 44089600 44063044 44036496 44009956 43983424 43956900 43930384 43903876 43877376 43850884 43824400 43797924 43771456 43744996 43718544 43692100 43665664 43639236 43612816 43586404 43560000 \n43533604 43507216 43480836 43454464 43428100 43401744 43375396 43349056 43322724 43296400 43270084 43243776 43217476 43191184 43164900 43138624 43112356 43086096 43059844 43033600 43007364 42981136 42954916 42928704 42902500 42876304 42850116 42823936 42797764 42771600 42745444 42719296 42693156 42667024 42640900 42614784 42588676 42562576 42536484 42510400 42484324 42458256 42432196 42406144 42380100 42354064 42328036 42302016 42276004 42250000 42224004 42198016 42172036 42146064 42120100 42094144 42068196 42042256 42016324 41990400 41964484 41938576 41912676 41886784 41860900 41835024 41809156 41783296 41757444 41731600 41705764 41679936 41654116 41628304 41602500 41576704 41550916 41525136 41499364 41473600 41447844 41422096 41396356 41370624 41344900 41319184 41293476 41267776 41242084 41216400 41190724 41165056 41139396 41113744 41088100 41062464 41036836 41011216 40985604 40960000 \n40934404 40908816 40883236 40857664 40832100 40806544 40780996 40755456 40729924 40704400 40678884 40653376 40627876 40602384 40576900 40551424 40525956 40500496 40475044 40449600 40424164 40398736 40373316 40347904 40322500 40297104 40271716 40246336 40220964 40195600 40170244 40144896 40119556 40094224 40068900 40043584 40018276 39992976 39967684 39942400 39917124 39891856 39866596 39841344 39816100 39790864 39765636 39740416 39715204 39690000 39664804 39639616 39614436 39589264 39564100 39538944 39513796 39488656 39463524 39438400 39413284 39388176 39363076 39337984 39312900 39287824 39262756 39237696 39212644 39187600 39162564 39137536 39112516 39087504 39062500 39037504 39012516 38987536 38962564 38937600 38912644 38887696 38862756 38837824 38812900 38787984 38763076 38738176 38713284 38688400 38663524 38638656 38613796 38588944 38564100 38539264 38514436 38489616 38464804 38440000 \n38415204 38390416 38365636 38340864 38316100 38291344 38266596 38241856 38217124 38192400 38167684 38142976 38118276 38093584 38068900 38044224 38019556 37994896 37970244 37945600 37920964 37896336 37871716 37847104 37822500 37797904 37773316 37748736 37724164 37699600 37675044 37650496 37625956 37601424 37576900 37552384 37527876 37503376 37478884 37454400 37429924 37405456 37380996 37356544 37332100 37307664 37283236 37258816 37234404 37210000 37185604 37161216 37136836 37112464 37088100 37063744 37039396 37015056 36990724 36966400 36942084 36917776 36893476 36869184 36844900 36820624 36796356 36772096 36747844 36723600 36699364 36675136 36650916 36626704 36602500 36578304 36554116 36529936 36505764 36481600 36457444 36433296 36409156 36385024 36360900 36336784 36312676 36288576 36264484 36240400 36216324 36192256 36168196 36144144 36120100 36096064 36072036 36048016 36024004 36000000 \n35976004 35952016 35928036 35904064 35880100 35856144 35832196 35808256 35784324 35760400 35736484 35712576 35688676 35664784 35640900 35617024 35593156 35569296 35545444 35521600 35497764 35473936 35450116 35426304 35402500 35378704 35354916 35331136 35307364 35283600 35259844 35236096 35212356 35188624 35164900 35141184 35117476 35093776 35070084 35046400 35022724 34999056 34975396 34951744 34928100 34904464 34880836 34857216 34833604 34810000 34786404 34762816 34739236 34715664 34692100 34668544 34644996 34621456 34597924 34574400 34550884 34527376 34503876 34480384 34456900 34433424 34409956 34386496 34363044 34339600 34316164 34292736 34269316 34245904 34222500 34199104 34175716 34152336 34128964 34105600 34082244 34058896 34035556 34012224 33988900 33965584 33942276 33918976 33895684 33872400 33849124 33825856 33802596 33779344 33756100 33732864 33709636 33686416 33663204 33640000 \n33616804 33593616 33570436 33547264 33524100 33500944 33477796 33454656 33431524 33408400 33385284 33362176 33339076 33315984 33292900 33269824 33246756 33223696 33200644 33177600 33154564 33131536 33108516 33085504 33062500 33039504 33016516 32993536 32970564 32947600 32924644 32901696 32878756 32855824 32832900 32809984 32787076 32764176 32741284 32718400 32695524 32672656 32649796 32626944 32604100 32581264 32558436 32535616 32512804 32490000 32467204 32444416 32421636 32398864 32376100 32353344 32330596 32307856 32285124 32262400 32239684 32216976 32194276 32171584 32148900 32126224 32103556 32080896 32058244 32035600 32012964 31990336 31967716 31945104 31922500 31899904 31877316 31854736 31832164 31809600 31787044 31764496 31741956 31719424 31696900 31674384 31651876 31629376 31606884 31584400 31561924 31539456 31516996 31494544 31472100 31449664 31427236 31404816 31382404 31360000 \n31337604 31315216 31292836 31270464 31248100 31225744 31203396 31181056 31158724 31136400 31114084 31091776 31069476 31047184 31024900 31002624 30980356 30958096 30935844 30913600 30891364 30869136 30846916 30824704 30802500 30780304 30758116 30735936 30713764 30691600 30669444 30647296 30625156 30603024 30580900 30558784 30536676 30514576 30492484 30470400 30448324 30426256 30404196 30382144 30360100 30338064 30316036 30294016 30272004 30250000 30228004 30206016 30184036 30162064 30140100 30118144 30096196 30074256 30052324 30030400 30008484 29986576 29964676 29942784 29920900 29899024 29877156 29855296 29833444 29811600 29789764 29767936 29746116 29724304 29702500 29680704 29658916 29637136 29615364 29593600 29571844 29550096 29528356 29506624 29484900 29463184 29441476 29419776 29398084 29376400 29354724 29333056 29311396 29289744 29268100 29246464 29224836 29203216 29181604 29160000 \n29138404 29116816 29095236 29073664 29052100 29030544 29008996 28987456 28965924 28944400 28922884 28901376 28879876 28858384 28836900 28815424 28793956 28772496 28751044 28729600 28708164 28686736 28665316 28643904 28622500 28601104 28579716 28558336 28536964 28515600 28494244 28472896 28451556 28430224 28408900 28387584 28366276 28344976 28323684 28302400 28281124 28259856 28238596 28217344 28196100 28174864 28153636 28132416 28111204 28090000 28068804 28047616 28026436 28005264 27984100 27962944 27941796 27920656 27899524 27878400 27857284 27836176 27815076 27793984 27772900 27751824 27730756 27709696 27688644 27667600 27646564 27625536 27604516 27583504 27562500 27541504 27520516 27499536 27478564 27457600 27436644 27415696 27394756 27373824 27352900 27331984 27311076 27290176 27269284 27248400 27227524 27206656 27185796 27164944 27144100 27123264 27102436 27081616 27060804 27040000 \n27019204 26998416 26977636 26956864 26936100 26915344 26894596 26873856 26853124 26832400 26811684 26790976 26770276 26749584 26728900 26708224 26687556 26666896 26646244 26625600 26604964 26584336 26563716 26543104 26522500 26501904 26481316 26460736 26440164 26419600 26399044 26378496 26357956 26337424 26316900 26296384 26275876 26255376 26234884 26214400 26193924 26173456 26152996 26132544 26112100 26091664 26071236 26050816 26030404 26010000 25989604 25969216 25948836 25928464 25908100 25887744 25867396 25847056 25826724 25806400 25786084 25765776 25745476 25725184 25704900 25684624 25664356 25644096 25623844 25603600 25583364 25563136 25542916 25522704 25502500 25482304 25462116 25441936 25421764 25401600 25381444 25361296 25341156 25321024 25300900 25280784 25260676 25240576 25220484 25200400 25180324 25160256 25140196 25120144 25100100 25080064 25060036 25040016 25020004 25000000 \n24980004 24960016 24940036 24920064 24900100 24880144 24860196 24840256 24820324 24800400 24780484 24760576 24740676 24720784 24700900 24681024 24661156 24641296 24621444 24601600 24581764 24561936 24542116 24522304 24502500 24482704 24462916 24443136 24423364 24403600 24383844 24364096 24344356 24324624 24304900 24285184 24265476 24245776 24226084 24206400 24186724 24167056 24147396 24127744 24108100 24088464 24068836 24049216 24029604 24010000 23990404 23970816 23951236 23931664 23912100 23892544 23872996 23853456 23833924 23814400 23794884 23775376 23755876 23736384 23716900 23697424 23677956 23658496 23639044 23619600 23600164 23580736 23561316 23541904 23522500 23503104 23483716 23464336 23444964 23425600 23406244 23386896 23367556 23348224 23328900 23309584 23290276 23270976 23251684 23232400 23213124 23193856 23174596 23155344 23136100 23116864 23097636 23078416 23059204 23040000 \n23020804 23001616 22982436 22963264 22944100 22924944 22905796 22886656 22867524 22848400 22829284 22810176 22791076 22771984 22752900 22733824 22714756 22695696 22676644 22657600 22638564 22619536 22600516 22581504 22562500 22543504 22524516 22505536 22486564 22467600 22448644 22429696 22410756 22391824 22372900 22353984 22335076 22316176 22297284 22278400 22259524 22240656 22221796 22202944 22184100 22165264 22146436 22127616 22108804 22090000 22071204 22052416 22033636 22014864 21996100 21977344 21958596 21939856 21921124 21902400 21883684 21864976 21846276 21827584 21808900 21790224 21771556 21752896 21734244 21715600 21696964 21678336 21659716 21641104 21622500 21603904 21585316 21566736 21548164 21529600 21511044 21492496 21473956 21455424 21436900 21418384 21399876 21381376 21362884 21344400 21325924 21307456 21288996 21270544 21252100 21233664 21215236 21196816 21178404 21160000 \n21141604 21123216 21104836 21086464 21068100 21049744 21031396 21013056 20994724 20976400 20958084 20939776 20921476 20903184 20884900 20866624 20848356 20830096 20811844 20793600 20775364 20757136 20738916 20720704 20702500 20684304 20666116 20647936 20629764 20611600 20593444 20575296 20557156 20539024 20520900 20502784 20484676 20466576 20448484 20430400 20412324 20394256 20376196 20358144 20340100 20322064 20304036 20286016 20268004 20250000 20232004 20214016 20196036 20178064 20160100 20142144 20124196 20106256 20088324 20070400 20052484 20034576 20016676 19998784 19980900 19963024 19945156 19927296 19909444 19891600 19873764 19855936 19838116 19820304 19802500 19784704 19766916 19749136 19731364 19713600 19695844 19678096 19660356 19642624 19624900 19607184 19589476 19571776 19554084 19536400 19518724 19501056 19483396 19465744 19448100 19430464 19412836 19395216 19377604 19360000 \n19342404 19324816 19307236 19289664 19272100 19254544 19236996 19219456 19201924 19184400 19166884 19149376 19131876 19114384 19096900 19079424 19061956 19044496 19027044 19009600 18992164 18974736 18957316 18939904 18922500 18905104 18887716 18870336 18852964 18835600 18818244 18800896 18783556 18766224 18748900 18731584 18714276 18696976 18679684 18662400 18645124 18627856 18610596 18593344 18576100 18558864 18541636 18524416 18507204 18490000 18472804 18455616 18438436 18421264 18404100 18386944 18369796 18352656 18335524 18318400 18301284 18284176 18267076 18249984 18232900 18215824 18198756 18181696 18164644 18147600 18130564 18113536 18096516 18079504 18062500 18045504 18028516 18011536 17994564 17977600 17960644 17943696 17926756 17909824 17892900 17875984 17859076 17842176 17825284 17808400 17791524 17774656 17757796 17740944 17724100 17707264 17690436 17673616 17656804 17640000 \n17623204 17606416 17589636 17572864 17556100 17539344 17522596 17505856 17489124 17472400 17455684 17438976 17422276 17405584 17388900 17372224 17355556 17338896 17322244 17305600 17288964 17272336 17255716 17239104 17222500 17205904 17189316 17172736 17156164 17139600 17123044 17106496 17089956 17073424 17056900 17040384 17023876 17007376 16990884 16974400 16957924 16941456 16924996 16908544 16892100 16875664 16859236 16842816 16826404 16810000 16793604 16777216 16760836 16744464 16728100 16711744 16695396 16679056 16662724 16646400 16630084 16613776 16597476 16581184 16564900 16548624 16532356 16516096 16499844 16483600 16467364 16451136 16434916 16418704 16402500 16386304 16370116 16353936 16337764 16321600 16305444 16289296 16273156 16257024 16240900 16224784 16208676 16192576 16176484 16160400 16144324 16128256 16112196 16096144 16080100 16064064 16048036 16032016 16016004 16000000 \n15984004 15968016 15952036 15936064 15920100 15904144 15888196 15872256 15856324 15840400 15824484 15808576 15792676 15776784 15760900 15745024 15729156 15713296 15697444 15681600 15665764 15649936 15634116 15618304 15602500 15586704 15570916 15555136 15539364 15523600 15507844 15492096 15476356 15460624 15444900 15429184 15413476 15397776 15382084 15366400 15350724 15335056 15319396 15303744 15288100 15272464 15256836 15241216 15225604 15210000 15194404 15178816 15163236 15147664 15132100 15116544 15100996 15085456 15069924 15054400 15038884 15023376 15007876 14992384 14976900 14961424 14945956 14930496 14915044 14899600 14884164 14868736 14853316 14837904 14822500 14807104 14791716 14776336 14760964 14745600 14730244 14714896 14699556 14684224 14668900 14653584 14638276 14622976 14607684 14592400 14577124 14561856 14546596 14531344 14516100 14500864 14485636 14470416 14455204 14440000 \n14424804 14409616 14394436 14379264 14364100 14348944 14333796 14318656 14303524 14288400 14273284 14258176 14243076 14227984 14212900 14197824 14182756 14167696 14152644 14137600 14122564 14107536 14092516 14077504 14062500 14047504 14032516 14017536 14002564 13987600 13972644 13957696 13942756 13927824 13912900 13897984 13883076 13868176 13853284 13838400 13823524 13808656 13793796 13778944 13764100 13749264 13734436 13719616 13704804 13690000 13675204 13660416 13645636 13630864 13616100 13601344 13586596 13571856 13557124 13542400 13527684 13512976 13498276 13483584 13468900 13454224 13439556 13424896 13410244 13395600 13380964 13366336 13351716 13337104 13322500 13307904 13293316 13278736 13264164 13249600 13235044 13220496 13205956 13191424 13176900 13162384 13147876 13133376 13118884 13104400 13089924 13075456 13060996 13046544 13032100 13017664 13003236 12988816 12974404 12960000 \n12945604 12931216 12916836 12902464 12888100 12873744 12859396 12845056 12830724 12816400 12802084 12787776 12773476 12759184 12744900 12730624 12716356 12702096 12687844 12673600 12659364 12645136 12630916 12616704 12602500 12588304 12574116 12559936 12545764 12531600 12517444 12503296 12489156 12475024 12460900 12446784 12432676 12418576 12404484 12390400 12376324 12362256 12348196 12334144 12320100 12306064 12292036 12278016 12264004 12250000 12236004 12222016 12208036 12194064 12180100 12166144 12152196 12138256 12124324 12110400 12096484 12082576 12068676 12054784 12040900 12027024 12013156 11999296 11985444 11971600 11957764 11943936 11930116 11916304 11902500 11888704 11874916 11861136 11847364 11833600 11819844 11806096 11792356 11778624 11764900 11751184 11737476 11723776 11710084 11696400 11682724 11669056 11655396 11641744 11628100 11614464 11600836 11587216 11573604 11560000 \n11546404 11532816 11519236 11505664 11492100 11478544 11464996 11451456 11437924 11424400 11410884 11397376 11383876 11370384 11356900 11343424 11329956 11316496 11303044 11289600 11276164 11262736 11249316 11235904 11222500 11209104 11195716 11182336 11168964 11155600 11142244 11128896 11115556 11102224 11088900 11075584 11062276 11048976 11035684 11022400 11009124 10995856 10982596 10969344 10956100 10942864 10929636 10916416 10903204 10890000 10876804 10863616 10850436 10837264 10824100 10810944 10797796 10784656 10771524 10758400 10745284 10732176 10719076 10705984 10692900 10679824 10666756 10653696 10640644 10627600 10614564 10601536 10588516 10575504 10562500 10549504 10536516 10523536 10510564 10497600 10484644 10471696 10458756 10445824 10432900 10419984 10407076 10394176 10381284 10368400 10355524 10342656 10329796 10316944 10304100 10291264 10278436 10265616 10252804 10240000 \n10227204 10214416 10201636 10188864 10176100 10163344 10150596 10137856 10125124 10112400 10099684 10086976 10074276 10061584 10048900 10036224 10023556 10010896 9998244 9985600 9972964 9960336 9947716 9935104 9922500 9909904 9897316 9884736 9872164 9859600 9847044 9834496 9821956 9809424 9796900 9784384 9771876 9759376 9746884 9734400 9721924 9709456 9696996 9684544 9672100 9659664 9647236 9634816 9622404 9610000 9597604 9585216 9572836 9560464 9548100 9535744 9523396 9511056 9498724 9486400 9474084 9461776 9449476 9437184 9424900 9412624 9400356 9388096 9375844 9363600 9351364 9339136 9326916 9314704 9302500 9290304 9278116 9265936 9253764 9241600 9229444 9217296 9205156 9193024 9180900 9168784 9156676 9144576 9132484 9120400 9108324 9096256 9084196 9072144 9060100 9048064 9036036 9024016 9012004 9000000 \n8988004 8976016 8964036 8952064 8940100 8928144 8916196 8904256 8892324 8880400 8868484 8856576 8844676 8832784 8820900 8809024 8797156 8785296 8773444 8761600 8749764 8737936 8726116 8714304 8702500 8690704 8678916 8667136 8655364 8643600 8631844 8620096 8608356 8596624 8584900 8573184 8561476 8549776 8538084 8526400 8514724 8503056 8491396 8479744 8468100 8456464 8444836 8433216 8421604 8410000 8398404 8386816 8375236 8363664 8352100 8340544 8328996 8317456 8305924 8294400 8282884 8271376 8259876 8248384 8236900 8225424 8213956 8202496 8191044 8179600 8168164 8156736 8145316 8133904 8122500 8111104 8099716 8088336 8076964 8065600 8054244 8042896 8031556 8020224 8008900 7997584 7986276 7974976 7963684 7952400 7941124 7929856 7918596 7907344 7896100 7884864 7873636 7862416 7851204 7840000 \n7828804 7817616 7806436 7795264 7784100 7772944 7761796 7750656 7739524 7728400 7717284 7706176 7695076 7683984 7672900 7661824 7650756 7639696 7628644 7617600 7606564 7595536 7584516 7573504 7562500 7551504 7540516 7529536 7518564 7507600 7496644 7485696 7474756 7463824 7452900 7441984 7431076 7420176 7409284 7398400 7387524 7376656 7365796 7354944 7344100 7333264 7322436 7311616 7300804 7290000 7279204 7268416 7257636 7246864 7236100 7225344 7214596 7203856 7193124 7182400 7171684 7160976 7150276 7139584 7128900 7118224 7107556 7096896 7086244 7075600 7064964 7054336 7043716 7033104 7022500 7011904 7001316 6990736 6980164 6969600 6959044 6948496 6937956 6927424 6916900 6906384 6895876 6885376 6874884 6864400 6853924 6843456 6832996 6822544 6812100 6801664 6791236 6780816 6770404 6760000 \n6749604 6739216 6728836 6718464 6708100 6697744 6687396 6677056 6666724 6656400 6646084 6635776 6625476 6615184 6604900 6594624 6584356 6574096 6563844 6553600 6543364 6533136 6522916 6512704 6502500 6492304 6482116 6471936 6461764 6451600 6441444 6431296 6421156 6411024 6400900 6390784 6380676 6370576 6360484 6350400 6340324 6330256 6320196 6310144 6300100 6290064 6280036 6270016 6260004 6250000 6240004 6230016 6220036 6210064 6200100 6190144 6180196 6170256 6160324 6150400 6140484 6130576 6120676 6110784 6100900 6091024 6081156 6071296 6061444 6051600 6041764 6031936 6022116 6012304 6002500 5992704 5982916 5973136 5963364 5953600 5943844 5934096 5924356 5914624 5904900 5895184 5885476 5875776 5866084 5856400 5846724 5837056 5827396 5817744 5808100 5798464 5788836 5779216 5769604 5760000 \n5750404 5740816 5731236 5721664 5712100 5702544 5692996 5683456 5673924 5664400 5654884 5645376 5635876 5626384 5616900 5607424 5597956 5588496 5579044 5569600 5560164 5550736 5541316 5531904 5522500 5513104 5503716 5494336 5484964 5475600 5466244 5456896 5447556 5438224 5428900 5419584 5410276 5400976 5391684 5382400 5373124 5363856 5354596 5345344 5336100 5326864 5317636 5308416 5299204 5290000 5280804 5271616 5262436 5253264 5244100 5234944 5225796 5216656 5207524 5198400 5189284 5180176 5171076 5161984 5152900 5143824 5134756 5125696 5116644 5107600 5098564 5089536 5080516 5071504 5062500 5053504 5044516 5035536 5026564 5017600 5008644 4999696 4990756 4981824 4972900 4963984 4955076 4946176 4937284 4928400 4919524 4910656 4901796 4892944 4884100 4875264 4866436 4857616 4848804 4840000 \n4831204 4822416 4813636 4804864 4796100 4787344 4778596 4769856 4761124 4752400 4743684 4734976 4726276 4717584 4708900 4700224 4691556 4682896 4674244 4665600 4656964 4648336 4639716 4631104 4622500 4613904 4605316 4596736 4588164 4579600 4571044 4562496 4553956 4545424 4536900 4528384 4519876 4511376 4502884 4494400 4485924 4477456 4468996 4460544 4452100 4443664 4435236 4426816 4418404 4410000 4401604 4393216 4384836 4376464 4368100 4359744 4351396 4343056 4334724 4326400 4318084 4309776 4301476 4293184 4284900 4276624 4268356 4260096 4251844 4243600 4235364 4227136 4218916 4210704 4202500 4194304 4186116 4177936 4169764 4161600 4153444 4145296 4137156 4129024 4120900 4112784 4104676 4096576 4088484 4080400 4072324 4064256 4056196 4048144 4040100 4032064 4024036 4016016 4008004 4000000 \n3992004 3984016 3976036 3968064 3960100 3952144 3944196 3936256 3928324 3920400 3912484 3904576 3896676 3888784 3880900 3873024 3865156 3857296 3849444 3841600 3833764 3825936 3818116 3810304 3802500 3794704 3786916 3779136 3771364 3763600 3755844 3748096 3740356 3732624 3724900 3717184 3709476 3701776 3694084 3686400 3678724 3671056 3663396 3655744 3648100 3640464 3632836 3625216 3617604 3610000 3602404 3594816 3587236 3579664 3572100 3564544 3556996 3549456 3541924 3534400 3526884 3519376 3511876 3504384 3496900 3489424 3481956 3474496 3467044 3459600 3452164 3444736 3437316 3429904 3422500 3415104 3407716 3400336 3392964 3385600 3378244 3370896 3363556 3356224 3348900 3341584 3334276 3326976 3319684 3312400 3305124 3297856 3290596 3283344 3276100 3268864 3261636 3254416 3247204 3240000 \n3232804 3225616 3218436 3211264 3204100 3196944 3189796 3182656 3175524 3168400 3161284 3154176 3147076 3139984 3132900 3125824 3118756 3111696 3104644 3097600 3090564 3083536 3076516 3069504 3062500 3055504 3048516 3041536 3034564 3027600 3020644 3013696 3006756 2999824 2992900 2985984 2979076 2972176 2965284 2958400 2951524 2944656 2937796 2930944 2924100 2917264 2910436 2903616 2896804 2890000 2883204 2876416 2869636 2862864 2856100 2849344 2842596 2835856 2829124 2822400 2815684 2808976 2802276 2795584 2788900 2782224 2775556 2768896 2762244 2755600 2748964 2742336 2735716 2729104 2722500 2715904 2709316 2702736 2696164 2689600 2683044 2676496 2669956 2663424 2656900 2650384 2643876 2637376 2630884 2624400 2617924 2611456 2604996 2598544 2592100 2585664 2579236 2572816 2566404 2560000 \n2553604 2547216 2540836 2534464 2528100 2521744 2515396 2509056 2502724 2496400 2490084 2483776 2477476 2471184 2464900 2458624 2452356 2446096 2439844 2433600 2427364 2421136 2414916 2408704 2402500 2396304 2390116 2383936 2377764 2371600 2365444 2359296 2353156 2347024 2340900 2334784 2328676 2322576 2316484 2310400 2304324 2298256 2292196 2286144 2280100 2274064 2268036 2262016 2256004 2250000 2244004 2238016 2232036 2226064 2220100 2214144 2208196 2202256 2196324 2190400 2184484 2178576 2172676 2166784 2160900 2155024 2149156 2143296 2137444 2131600 2125764 2119936 2114116 2108304 2102500 2096704 2090916 2085136 2079364 2073600 2067844 2062096 2056356 2050624 2044900 2039184 2033476 2027776 2022084 2016400 2010724 2005056 1999396 1993744 1988100 1982464 1976836 1971216 1965604 1960000 \n1954404 1948816 1943236 1937664 1932100 1926544 1920996 1915456 1909924 1904400 1898884 1893376 1887876 1882384 1876900 1871424 1865956 1860496 1855044 1849600 1844164 1838736 1833316 1827904 1822500 1817104 1811716 1806336 1800964 1795600 1790244 1784896 1779556 1774224 1768900 1763584 1758276 1752976 1747684 1742400 1737124 1731856 1726596 1721344 1716100 1710864 1705636 1700416 1695204 1690000 1684804 1679616 1674436 1669264 1664100 1658944 1653796 1648656 1643524 1638400 1633284 1628176 1623076 1617984 1612900 1607824 1602756 1597696 1592644 1587600 1582564 1577536 1572516 1567504 1562500 1557504 1552516 1547536 1542564 1537600 1532644 1527696 1522756 1517824 1512900 1507984 1503076 1498176 1493284 1488400 1483524 1478656 1473796 1468944 1464100 1459264 1454436 1449616 1444804 1440000 \n1435204 1430416 1425636 1420864 1416100 1411344 1406596 1401856 1397124 1392400 1387684 1382976 1378276 1373584 1368900 1364224 1359556 1354896 1350244 1345600 1340964 1336336 1331716 1327104 1322500 1317904 1313316 1308736 1304164 1299600 1295044 1290496 1285956 1281424 1276900 1272384 1267876 1263376 1258884 1254400 1249924 1245456 1240996 1236544 1232100 1227664 1223236 1218816 1214404 1210000 1205604 1201216 1196836 1192464 1188100 1183744 1179396 1175056 1170724 1166400 1162084 1157776 1153476 1149184 1144900 1140624 1136356 1132096 1127844 1123600 1119364 1115136 1110916 1106704 1102500 1098304 1094116 1089936 1085764 1081600 1077444 1073296 1069156 1065024 1060900 1056784 1052676 1048576 1044484 1040400 1036324 1032256 1028196 1024144 1020100 1016064 1012036 1008016 1004004 1000000 \n996004 992016 988036 984064 980100 976144 972196 968256 964324 960400 956484 952576 948676 944784 940900 937024 933156 929296 925444 921600 917764 913936 910116 906304 902500 898704 894916 891136 887364 883600 879844 876096 872356 868624 864900 861184 857476 853776 850084 846400 842724 839056 835396 831744 828100 824464 820836 817216 813604 810000 806404 802816 799236 795664 792100 788544 784996 781456 777924 774400 770884 767376 763876 760384 756900 753424 749956 746496 743044 739600 736164 732736 729316 725904 722500 719104 715716 712336 708964 705600 702244 698896 695556 692224 688900 685584 682276 678976 675684 672400 669124 665856 662596 659344 656100 652864 649636 646416 643204 640000 \n636804 633616 630436 627264 624100 620944 617796 614656 611524 608400 605284 602176 599076 595984 592900 589824 586756 583696 580644 577600 574564 571536 568516 565504 562500 559504 556516 553536 550564 547600 544644 541696 538756 535824 532900 529984 527076 524176 521284 518400 515524 512656 509796 506944 504100 501264 498436 495616 492804 490000 487204 484416 481636 478864 476100 473344 470596 467856 465124 462400 459684 456976 454276 451584 448900 446224 443556 440896 438244 435600 432964 430336 427716 425104 422500 419904 417316 414736 412164 409600 407044 404496 401956 399424 396900 394384 391876 389376 386884 384400 381924 379456 376996 374544 372100 369664 367236 364816 362404 360000 \n357604 355216 352836 350464 348100 345744 343396 341056 338724 336400 334084 331776 329476 327184 324900 322624 320356 318096 315844 313600 311364 309136 306916 304704 302500 300304 298116 295936 293764 291600 289444 287296 285156 283024 280900 278784 276676 274576 272484 270400 268324 266256 264196 262144 260100 258064 256036 254016 252004 250000 248004 246016 244036 242064 240100 238144 236196 234256 232324 230400 228484 226576 224676 222784 220900 219024 217156 215296 213444 211600 209764 207936 206116 204304 202500 200704 198916 197136 195364 193600 191844 190096 188356 186624 184900 183184 181476 179776 178084 176400 174724 173056 171396 169744 168100 166464 164836 163216 161604 160000 \n158404 156816 155236 153664 152100 150544 148996 147456 145924 144400 142884 141376 139876 138384 136900 135424 133956 132496 131044 129600 128164 126736 125316 123904 122500 121104 119716 118336 116964 115600 114244 112896 111556 110224 108900 107584 106276 104976 103684 102400 101124 99856 98596 97344 96100 94864 93636 92416 91204 90000 88804 87616 86436 85264 84100 82944 81796 80656 79524 78400 77284 76176 75076 73984 72900 71824 70756 69696 68644 67600 66564 65536 64516 63504 62500 61504 60516 59536 58564 57600 56644 55696 54756 53824 52900 51984 51076 50176 49284 48400 47524 46656 45796 44944 44100 43264 42436 41616 40804 40000 \n39204 38416 37636 36864 36100 35344 34596 33856 33124 32400 31684 30976 30276 29584 28900 28224 27556 26896 26244 25600 24964 24336 23716 23104 22500 21904 21316 20736 20164 19600 19044 18496 17956 17424 16900 16384 15876 15376 14884 14400 13924 13456 12996 12544 12100 11664 11236 10816 10404 10000 9604 9216 8836 8464 8100 7744 7396 7056 6724 6400 6084 5776 5476 5184 4900 4624 4356 4096 3844 3600 3364 3136 2916 2704 2500 2304 2116 1936 1764 1600 1444 1296 1156 1024 900 784 676 576 484 400 324 256 196 144 100 64 36 16 4 0"
           }
         ],
-        "dificultate_motiv": "Formula pătratului par de rang k și completarea tabloului linie cu linie."
+        "dificultate_motiv": "Formula pătratului par de rang k și completarea tabloului linie cu linie.",
+        "imagine_originala": "assets/bac/2021_model_III2.png"
       },
       "201": {
         "title": "Deplasare circulară spre dreapta pe linia k",
@@ -9847,7 +9939,8 @@
             "output": "a"
           }
         ],
-        "dificultate_motiv": "Citirea cuvintelor și o numărătoare; mesajul se afișează singur, deci trebuie verificat înainte de afișare."
+        "dificultate_motiv": "Citirea cuvintelor și o numărătoare; mesajul se afișează singur, deci trebuie verificat înainte de afișare.",
+        "imagine_originala": "assets/bac/2021_iunie_III2.png"
       },
       "204": {
         "title": "Diagonala cu multipli de k",
@@ -9887,7 +9980,8 @@
             "output": "2 3 4 5 6 \n3 4 5 6 7 \n4 5 6 7 8 \n5 6 7 8 9 \n6 7 8 9 10"
           }
         ],
-        "dificultate_motiv": "O formulă directă: pe linia i elementul de pe diagonală e (i + 1)·k, iar vecinii diferă cu câte 1."
+        "dificultate_motiv": "O formulă directă: pe linia i elementul de pe diagonală e (i + 1)·k, iar vecinii diferă cu câte 1.",
+        "imagine_originala": "assets/bac/2021_august_III2.png"
       },
       "205": {
         "title": "Primul pătrat concentric, invers acelor de ceasornic",
@@ -11369,7 +11463,8 @@
             "output": "nu exista"
           }
         ],
-        "dificultate_motiv": "Despărțirea în cuvinte (strtok rezolvă și spațiile multiple) și trei căutări simple."
+        "dificultate_motiv": "Despărțirea în cuvinte (strtok rezolvă și spațiile multiple) și trei căutări simple.",
+        "imagine_originala": "assets/bac/2019_model_III2.png"
       },
       "241": {
         "title": "Numele instituției fără prescurtări",
@@ -11462,7 +11557,8 @@
             "output": "Bacalaureat"
           }
         ],
-        "dificultate_motiv": "Despărțirea textului în cuvinte și o comparație de lungime."
+        "dificultate_motiv": "Despărțirea textului în cuvinte și o comparație de lungime.",
+        "imagine_originala": "assets/bac/2019_speciala_III2.png"
       },
       "243": {
         "title": "Tablou simetric față de coloana din mijloc",
@@ -11508,7 +11604,8 @@
             "output": "DA"
           }
         ],
-        "dificultate_motiv": "Compararea perechilor a[i][j] și a[i][n−1−j] pe fiecare linie."
+        "dificultate_motiv": "Compararea perechilor a[i][j] și a[i][n−1−j] pe fiecare linie.",
+        "imagine_originala": "assets/bac/2019_iunie_III2.png"
       },
       "244": {
         "title": "Cel mai mare pătrat cu elemente egale",
@@ -11617,7 +11714,8 @@
             "output": "376"
           }
         ],
-        "dificultate_motiv": "Cere formula lui Legendre și observația că 26 = 2 · 13, iar factorii 2 sunt mereu mai mulți, deci contează doar 13."
+        "dificultate_motiv": "Cere formula lui Legendre și observația că 26 = 2 · 13, iar factorii 2 sunt mereu mai mulți, deci contează doar 13.",
+        "imagine_originala": "assets/bac/2026_model_III3.png"
       },
       "246": {
         "title": "Valori pare distincte dintr-un interval",
@@ -11929,7 +12027,8 @@
             "output": "nu exista"
           }
         ],
-        "dificultate_motiv": "Despărțirea codului (an = cod % 10000, colecționar = cod / 10000) și reținerea ultimei perechi alăturate."
+        "dificultate_motiv": "Despărțirea codului (an = cod % 10000, colecționar = cod / 10000) și reținerea ultimei perechi alăturate.",
+        "imagine_originala": "assets/bac/2025_model_III3.png"
       },
       "252": {
         "title": "Seturi de bijuterii potrivite",
@@ -12030,7 +12129,8 @@
             "output": "2"
           }
         ],
-        "dificultate_motiv": "Pentru fiecare triplet, cea mai mare latură e ipotenuza; un vector de frecvență pe lungimi (1..100)."
+        "dificultate_motiv": "Pentru fiecare triplet, cea mai mare latură e ipotenuza; un vector de frecvență pe lungimi (1..100).",
+        "imagine_originala": "assets/bac/2025_speciala_III3.png"
       },
       "254": {
         "title": "Muzeele convenabile",
@@ -12072,7 +12172,8 @@
             "output": "1 1"
           }
         ],
-        "dificultate_motiv": "Intersecția a două intervale: min(capete drepte) − max(capete stângi) ≥ 1, verificată pentru fiecare muzeu."
+        "dificultate_motiv": "Intersecția a două intervale: min(capete drepte) − max(capete stângi) ≥ 1, verificată pentru fiecare muzeu.",
+        "imagine_originala": "assets/bac/2025_iunie_III3.png"
       },
       "255": {
         "title": "Extragerea de la loterie",
@@ -12120,7 +12221,8 @@
             "output": "1018 7165 3193"
           }
         ],
-        "dificultate_motiv": "Inversarea cifrelor, un vector de marcaj pentru valorile distincte (cel mult 9999) și alegerea celor trei numere în ordinea cerută."
+        "dificultate_motiv": "Inversarea cifrelor, un vector de marcaj pentru valorile distincte (cel mult 9999) și alegerea celor trei numere în ordinea cerută.",
+        "imagine_originala": "assets/bac/2025_rezerva_III3.png"
       },
       "256": {
         "title": "Perioadele de producție validate",
@@ -12225,7 +12327,8 @@
             "output": "16 15 13"
           }
         ],
-        "dificultate_motiv": "Un vector de frecvență pentru prețuri și trei căutări de sus în jos, fiecare pornind de sub prețul ales anterior."
+        "dificultate_motiv": "Un vector de frecvență pentru prețuri și trei căutări de sus în jos, fiecare pornind de sub prețul ales anterior.",
+        "imagine_originala": "assets/bac/2024_model_III3.png"
       },
       "258": {
         "title": "Șir de tip api",
@@ -12337,7 +12440,8 @@
             "output": "nu exista"
           }
         ],
-        "dificultate_motiv": "O parcurgere cu cifra maximă de până atunci, care se resetează când apare o cifră mai mare; plus cazul în care e o singură apariție."
+        "dificultate_motiv": "O parcurgere cu cifra maximă de până atunci, care se resetează când apare o cifră mai mare; plus cazul în care e o singură apariție.",
+        "imagine_originala": "assets/bac/2024_speciala_III3.png"
       },
       "260": {
         "title": "Cea mai lungă scară pe traseu",
@@ -12393,7 +12497,8 @@
             "output": "13 14 15"
           }
         ],
-        "dificultate_motiv": "O parcurgere cu lungimea scării curente (fiecare cotă e cu 1 mai mare decât cea dinainte) și reconstruirea cotelor scării maxime din ultima ei cotă și lungime."
+        "dificultate_motiv": "O parcurgere cu lungimea scării curente (fiecare cotă e cu 1 mai mare decât cea dinainte) și reconstruirea cotelor scării maxime din ultima ei cotă și lungime.",
+        "imagine_originala": "assets/bac/2024_iunie_III3.png"
       },
       "261": {
         "title": "Termenii șirului cu trei termeni, invers",
@@ -12495,7 +12600,8 @@
             "output": "DA"
           }
         ],
-        "dificultate_motiv": "Condiția pentru toate perechile se reduce la două comparații de extreme (minimul parilor din prima jumătate față de maximul imparilor din a doua și invers), cu atenție la cazurile fără numere de o paritate."
+        "dificultate_motiv": "Condiția pentru toate perechile se reduce la două comparații de extreme (minimul parilor din prima jumătate față de maximul imparilor din a doua și invers), cu atenție la cazurile fără numere de o paritate.",
+        "imagine_originala": "assets/bac/2023_model_III3.png"
       },
       "263": {
         "title": "Pașii reprezentativi",
@@ -12603,7 +12709,8 @@
             "output": "3 11"
           }
         ],
-        "dificultate_motiv": "Trebuie observat că p-intervalul e [minim, maxim] al primilor p termeni și că rămâne același exact când termenul p e între minimul și maximul celor de dinainte."
+        "dificultate_motiv": "Trebuie observat că p-intervalul e [minim, maxim] al primilor p termeni și că rămâne același exact când termenul p e între minimul și maximul celor de dinainte.",
+        "imagine_originala": "assets/bac/2023_speciala_III3.png"
       },
       "265": {
         "title": "Valori de două cifre: tot atâtea prefixe cât sufixe",
@@ -12655,7 +12762,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "Trebuie înțelese bine prefixul și sufixul (cel puțin o cifră eliminată, valoarea de două cifre), apoi două vectori de frecvență."
+        "dificultate_motiv": "Trebuie înțelese bine prefixul și sufixul (cel puțin o cifră eliminată, valoarea de două cifre), apoi două vectori de frecvență.",
+        "imagine_originala": "assets/bac/2023_iunie_III3.png"
       },
       "266": {
         "title": "Perechi de poziții cu valori egale",
@@ -13008,7 +13116,8 @@
             "output": "84 1"
           }
         ],
-        "dificultate_motiv": "Un vector de sume pe tipuri (1..100) și apoi maximul cu numărul de apariții; capcana e depășirea lui int."
+        "dificultate_motiv": "Un vector de sume pe tipuri (1..100) și apoi maximul cu numărul de apariții; capcana e depășirea lui int.",
+        "imagine_originala": "assets/bac/2021_model_III3.png"
       },
       "273": {
         "title": "Costul elementelor grafice",
@@ -13158,7 +13267,8 @@
             "output": "825127 240127"
           }
         ],
-        "dificultate_motiv": "O parcurgere în care se reține termenul anterior și dacă avea sufixul; pentru x de trei cifre, sufixul e restul la 1000."
+        "dificultate_motiv": "O parcurgere în care se reține termenul anterior și dacă avea sufixul; pentru x de trei cifre, sufixul e restul la 1000.",
+        "imagine_originala": "assets/bac/2021_iunie_III3.png"
       },
       "276": {
         "title": "Perechi asemenea",
@@ -13207,7 +13317,8 @@
             "output": "0"
           }
         ],
-        "dificultate_motiv": "Cheia e să normalizezi ultimele două cifre (ordonate) și să numeri pe chei; produsul frecvențelor dă perechile fără să compari fiecare cu fiecare."
+        "dificultate_motiv": "Cheia e să normalizezi ultimele două cifre (ordonate) și să numeri pe chei; produsul frecvențelor dă perechile fără să compari fiecare cu fiecare.",
+        "imagine_originala": "assets/bac/2021_august_III3.png"
       },
       "277": {
         "title": "Numere cu două cifre distincte care lipsesc",
@@ -14970,7 +15081,8 @@
             "output": "1"
           }
         ],
-        "dificultate_motiv": "Vector de frecvență, apoi căutarea secvențelor de valori consecutive prezente; trebuie observat că intervalul optim e o astfel de secvență maximală."
+        "dificultate_motiv": "Vector de frecvență, apoi căutarea secvențelor de valori consecutive prezente; trebuie observat că intervalul optim e o astfel de secvență maximală.",
+        "imagine_originala": "assets/bac/2019_model_III3.png"
       },
       "313": {
         "title": "Șir paritar",
@@ -15085,7 +15197,8 @@
             "output": "573 573 545 545 517 517 489 489 461 461 433 433 405 405 377 377 349 349 321 321 293 293 265 265 237 237 209 209 181 181 153 153 125 125 97 97 69"
           }
         ],
-        "dificultate_motiv": "Cere observația că recurența se poate rula și înapoi (f[i−3] = f[i−1] + f[i−2] − f[i]), ca să nu păstrezi termenii; ușor de pierdut cazurile n < 3."
+        "dificultate_motiv": "Cere observația că recurența se poate rula și înapoi (f[i−3] = f[i−1] + f[i−2] − f[i]), ca să nu păstrezi termenii; ușor de pierdut cazurile n < 3.",
+        "imagine_originala": "assets/bac/2019_speciala_III3.png"
       },
       "315": {
         "title": "Vârfurile locale ale unui șir",
@@ -15142,7 +15255,8 @@
             "output": "2"
           }
         ],
-        "dificultate_motiv": "O parcurgere cu maximul de până atunci și cu starea termenului anterior; definiția recursivă pentru valorile egale cere atenție."
+        "dificultate_motiv": "O parcurgere cu maximul de până atunci și cu starea termenului anterior; definiția recursivă pentru valorile egale cere atenție.",
+        "imagine_originala": "assets/bac/2019_iunie_III3.png"
       },
       "316": {
         "title": "Întâi imparii, apoi parii, crescător",
@@ -16921,47 +17035,51 @@
         "title": "Determinant de ordin 2",
         "category": "1. Matrice și determinanți",
         "difficulty": "ușoară",
-        "description": "Calculează determinantul matricei A cu liniile (3, 2) și (1, 4).",
+        "description": "Calculează determinantul matricei $$A = \\begin{pmatrix} 3 & 2 \\\\ 1 & 4 \\end{pmatrix}.$$",
         "tip_exercitiu": "text",
-        "raspuns_corect": "10",
-        "hint": "Pentru liniile (a, b) și (c, d), determinantul este ad − bc.",
-        "solutie": "det A = 3 · 4 − 2 · 1 = 12 − 2 = 10."
+        "raspuns_corect": "$\\det A = 10$",
+        "hint": "Pentru o matrice de ordinul 2: $\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc$.",
+        "solutie": "$$\\det A = \\begin{vmatrix} 3 & 2 \\\\ 1 & 4 \\end{vmatrix} = 3 \\cdot 4 - 2 \\cdot 1 = 12 - 2 = 10.$$",
+        "cerinta": "Calculează determinantul matricei $$A = \\begin{pmatrix} 3 & 2 \\\\ 1 & 4 \\end{pmatrix}.$$"
       },
       "33": {
         "title": "Determinant de ordin 3",
         "category": "1. Matrice și determinanți",
         "difficulty": "medie",
-        "description": "Calculează determinantul matricei cu liniile (1, 2, 3), (0, 1, 4) și (5, 6, 0).",
+        "description": "Calculează determinantul $$\\Delta = \\begin{vmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 4 \\\\ 5 & 6 & 0 \\end{vmatrix}.$$",
         "tip_exercitiu": "text",
-        "raspuns_corect": "1",
-        "hint": "Dezvoltă după prima coloană: are un zero.",
-        "solutie": "După prima coloană: 1 · (1 · 0 − 4 · 6) + 5 · (2 · 4 − 3 · 1) = −24 + 25 = 1."
+        "raspuns_corect": "$\\Delta = 1$",
+        "hint": "Dezvoltă determinantul după prima coloană: are un zero, deci doar doi termeni.",
+        "solutie": "Dezvoltând după prima coloană:$$\\Delta = 1 \\cdot \\begin{vmatrix} 1 & 4 \\\\ 6 & 0 \\end{vmatrix} + 5 \\cdot \\begin{vmatrix} 2 & 3 \\\\ 1 & 4 \\end{vmatrix} = 1 \\cdot (0 - 24) + 5 \\cdot (8 - 3) = -24 + 25 = 1.$$",
+        "cerinta": "Calculează determinantul $$\\Delta = \\begin{vmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 4 \\\\ 5 & 6 & 0 \\end{vmatrix}.$$"
       },
       "34": {
         "title": "Pătratul unei matrice",
         "category": "1. Matrice și determinanți",
         "difficulty": "medie",
-        "description": "Fie matricea A cu liniile (1, 2) și (3, 4). Calculează suma elementelor matricei A².",
+        "description": "Se consideră matricea $$A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}.$$ Calculează suma elementelor matricei $A^2$.",
         "tip_exercitiu": "text",
         "raspuns_corect": "54",
-        "hint": "A² = A · A: linie înmulțită cu coloană.",
-        "solutie": "A² are liniile (7, 10) și (15, 22). Suma elementelor este 7 + 10 + 15 + 22 = 54."
+        "hint": "$A^2 = A \\cdot A$: elementul de pe linia $i$ și coloana $j$ se obține înmulțind linia $i$ a lui $A$ cu coloana $j$ a lui $A$.",
+        "solutie": "$$A^2 = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} \\cdot \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} = \\begin{pmatrix} 1 + 6 & 2 + 8 \\\\ 3 + 12 & 6 + 16 \\end{pmatrix} = \\begin{pmatrix} 7 & 10 \\\\ 15 & 22 \\end{pmatrix}.$$Suma elementelor este $7 + 10 + 15 + 22 = 54$.",
+        "cerinta": "Se consideră matricea $$A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}.$$ Calculează suma elementelor matricei $A^2$."
       },
       "35": {
         "title": "Matrice neinversabilă",
         "category": "1. Matrice și determinanți",
         "difficulty": "medie",
-        "description": "Matricea A cu liniile (2, m) și (4, 6) nu este inversabilă pentru:",
+        "description": "Se consideră matricea $$A = \\begin{pmatrix} 2 & m \\\\ 4 & 6 \\end{pmatrix}, \\quad m \\in \\mathbb{R}.$$ Matricea $A$ **nu** este inversabilă pentru:",
         "tip_exercitiu": "grila",
         "variante": [
-          "m = −3",
-          "m = 2",
-          "m = 12",
-          "m = 3"
+          "$m = -3$",
+          "$m = 2$",
+          "$m = 12$",
+          "$m = 3$"
         ],
-        "raspuns_corect": "m = 3",
-        "hint": "O matrice nu este inversabilă exact când determinantul ei este 0.",
-        "solutie": "det A = 2 · 6 − 4m = 12 − 4m. Din 12 − 4m = 0 rezultă m = 3."
+        "raspuns_corect": "$m = 3$",
+        "hint": "O matrice pătratică este inversabilă dacă și numai dacă determinantul ei este nenul.",
+        "solutie": "$\\det A = 2 \\cdot 6 - 4m = 12 - 4m$. Matricea nu este inversabilă exact când $12 - 4m = 0$, adică $m = 3$.",
+        "cerinta": "Se consideră matricea $$A = \\begin{pmatrix} 2 & m \\\\ 4 & 6 \\end{pmatrix}, \\quad m \\in \\mathbb{R}.$$ Matricea $A$ **nu** este inversabilă pentru:"
       },
       "36": {
         "title": "Sistem cu două necunoscute",
@@ -17099,61 +17217,67 @@
         "title": "Operații cu matrice",
         "category": "1. Matrice și determinanți",
         "difficulty": "ușoară",
-        "description": "Fie matricele A cu liniile (1, 2) și (3, 4) și B cu liniile (0, −1) și (2, 1). Calculează suma elementelor matricei A + 2B.",
+        "description": "Se consideră matricele $$A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} \\quad \\text{și} \\quad B = \\begin{pmatrix} 0 & -1 \\\\ 2 & 1 \\end{pmatrix}.$$ Calculează suma elementelor matricei $A + 2B$.",
         "tip_exercitiu": "text",
         "raspuns_corect": "14",
-        "hint": "Înmulțirea cu un număr și adunarea se fac element cu element.",
-        "solutie": "2B are liniile (0, −2) și (4, 2), deci A + 2B are liniile (1, 0) și (7, 6). Suma elementelor este 1 + 0 + 7 + 6 = 14."
+        "hint": "Înmulțirea unei matrice cu un număr și adunarea a două matrice se fac element cu element.",
+        "solutie": "$$2B = \\begin{pmatrix} 0 & -2 \\\\ 4 & 2 \\end{pmatrix}, \\qquad A + 2B = \\begin{pmatrix} 1 & 0 \\\\ 7 & 6 \\end{pmatrix}.$$Suma elementelor este $1 + 0 + 7 + 6 = 14$.",
+        "cerinta": "Se consideră matricele $$A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} \\quad \\text{și} \\quad B = \\begin{pmatrix} 0 & -1 \\\\ 2 & 1 \\end{pmatrix}.$$ Calculează suma elementelor matricei $A + 2B$."
       },
       "196": {
         "title": "Relația Cayley–Hamilton",
         "category": "1. Matrice și determinanți",
         "difficulty": "medie",
-        "description": "Fie matricea A cu liniile (2, 1) și (1, 3). Determină numerele reale a și b pentru care A² = aA + bI₂.",
+        "description": "Se consideră matricea $$A = \\begin{pmatrix} 2 & 1 \\\\ 1 & 3 \\end{pmatrix}.$$ Determină numerele reale $a$ și $b$ pentru care $A^2 = aA + bI_2$.",
         "tip_exercitiu": "text",
-        "raspuns_corect": "a = 5, b = −5",
-        "hint": "Pentru o matrice 2 × 2: A² − (tr A)A + (det A)I₂ = O₂.",
-        "solutie": "tr A = 2 + 3 = 5 și det A = 6 − 1 = 5, deci A² = 5A − 5I₂. Verificare: A² are liniile (5, 5) și (5, 10), iar 5A − 5I₂ are liniile (10 − 5, 5) și (5, 15 − 5)."
+        "raspuns_corect": "$a = 5$, $b = -5$",
+        "hint": "Relația Cayley–Hamilton: pentru orice matrice de ordinul 2, $A^2 - (\\operatorname{tr} A)\\,A + (\\det A)\\,I_2 = O_2$.",
+        "solutie": "$\\operatorname{tr} A = 2 + 3 = 5$ și $\\det A = 6 - 1 = 5$, deci $A^2 = 5A - 5I_2$, adică $a = 5$ și $b = -5$.\n\nVerificare:$$A^2 = \\begin{pmatrix} 5 & 5 \\\\ 5 & 10 \\end{pmatrix}, \\qquad 5A - 5I_2 = \\begin{pmatrix} 10 - 5 & 5 \\\\ 5 & 15 - 5 \\end{pmatrix} = \\begin{pmatrix} 5 & 5 \\\\ 5 & 10 \\end{pmatrix}.$$",
+        "cerinta": "Se consideră matricea $$A = \\begin{pmatrix} 2 & 1 \\\\ 1 & 3 \\end{pmatrix}.$$ Determină numerele reale $a$ și $b$ pentru care $A^2 = aA + bI_2$."
       },
       "197": {
         "title": "Inversa unei matrice de ordinul 2",
         "category": "1. Matrice și determinanți",
         "difficulty": "medie",
-        "description": "Determină inversa matricei A cu liniile (2, 1) și (5, 3).",
+        "description": "Determină inversa matricei $$A = \\begin{pmatrix} 2 & 1 \\\\ 5 & 3 \\end{pmatrix}.$$",
         "tip_exercitiu": "text",
-        "raspuns_corect": "A⁻¹ are liniile (3, −1) și (−5, 2)",
-        "hint": "Pentru A cu liniile (a, b) și (c, d), A⁻¹ = 1/det A · matricea cu liniile (d, −b) și (−c, a).",
-        "solutie": "det A = 6 − 5 = 1 ≠ 0, deci A este inversabilă, iar A⁻¹ are liniile (3, −1) și (−5, 2). Verificare: A · A⁻¹ = I₂."
+        "raspuns_corect": "$A^{-1} = \\begin{pmatrix} 3 & -1 \\\\ -5 & 2 \\end{pmatrix}$",
+        "hint": "Pentru $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$ cu $\\det A \\neq 0$: $A^{-1} = \\dfrac{1}{\\det A} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$.",
+        "solutie": "$\\det A = 2 \\cdot 3 - 1 \\cdot 5 = 1 \\neq 0$, deci $A$ este inversabilă și$$A^{-1} = \\frac{1}{1} \\begin{pmatrix} 3 & -1 \\\\ -5 & 2 \\end{pmatrix} = \\begin{pmatrix} 3 & -1 \\\\ -5 & 2 \\end{pmatrix}.$$Verificare: $A \\cdot A^{-1} = \\begin{pmatrix} 6 - 5 & -2 + 2 \\\\ 15 - 15 & -5 + 6 \\end{pmatrix} = I_2$.",
+        "cerinta": "Determină inversa matricei $$A = \\begin{pmatrix} 2 & 1 \\\\ 5 & 3 \\end{pmatrix}.$$"
       },
       "198": {
         "title": "Determinantul Vandermonde",
         "category": "1. Matrice și determinanți",
         "difficulty": "grea",
-        "description": "Calculează determinantul de ordinul 3 cu liniile (1, 1, 1), (1, 2, 4) și (1, 4, 16).",
+        "description": "Calculează determinantul $$\\Delta = \\begin{vmatrix} 1 & 1 & 1 \\\\ 1 & 2 & 4 \\\\ 1 & 4 & 16 \\end{vmatrix}.$$",
         "tip_exercitiu": "text",
-        "raspuns_corect": "6",
-        "hint": "Pentru liniile (1, 1, 1), (a, b, c), (a², b², c²), determinantul este (b − a)(c − a)(c − b).",
-        "solutie": "Este un determinant Vandermonde cu a = 1, b = 2, c = 4: (2 − 1)(4 − 1)(4 − 2) = 1 · 3 · 2 = 6."
+        "raspuns_corect": "$\\Delta = 6$",
+        "hint": "Determinantul Vandermonde: $\\begin{vmatrix} 1 & 1 & 1 \\\\ a & b & c \\\\ a^2 & b^2 & c^2 \\end{vmatrix} = (b - a)(c - a)(c - b)$. Determinantul unei matrice este egal cu al transpusei ei.",
+        "solutie": "Transpusa are liniile $(1, 1, 1)$, $(1, 2, 4)$ și $(1, 4, 16) = (1^2, 2^2, 4^2)$, deci este un determinant Vandermonde cu $a = 1$, $b = 2$, $c = 4$:$$\\Delta = (2 - 1)(4 - 1)(4 - 2) = 1 \\cdot 3 \\cdot 2 = 6.$$",
+        "cerinta": "Calculează determinantul $$\\Delta = \\begin{vmatrix} 1 & 1 & 1 \\\\ 1 & 2 & 4 \\\\ 1 & 4 & 16 \\end{vmatrix}.$$"
       },
       "199": {
         "title": "Ecuație cu un determinant",
         "category": "1. Matrice și determinanți",
         "difficulty": "medie",
-        "description": "Rezolvă în ℝ ecuația det = 10, unde determinantul are liniile (x, 2) și (3, x).",
+        "description": "Rezolvă în mulțimea numerelor reale ecuația $$\\begin{vmatrix} x & 2 \\\\ 3 & x \\end{vmatrix} = 10.$$",
         "tip_exercitiu": "text",
-        "raspuns_corect": "x ∈ {−4, 4}",
-        "hint": "Un determinant de ordinul 2 este ad − bc.",
-        "solutie": "x · x − 2 · 3 = 10 ⇔ x² = 16 ⇔ x = ±4."
+        "raspuns_corect": "$x \\in \\{-4, 4\\}$",
+        "hint": "Calculează întâi determinantul: $\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc$.",
+        "solutie": "$x \\cdot x - 2 \\cdot 3 = 10 \\iff x^2 = 16 \\iff x = -4$ sau $x = 4$.",
+        "cerinta": "Rezolvă în mulțimea numerelor reale ecuația $$\\begin{vmatrix} x & 2 \\\\ 3 & x \\end{vmatrix} = 10.$$"
       },
       "200": {
         "title": "O putere mare a unei matrice",
         "category": "1. Matrice și determinanți",
         "difficulty": "grea",
-        "description": "Fie A matricea cu liniile (1, 1) și (0, 1). Determină elementul de pe linia 1, coloana 2 al matricei A²⁰²⁶.",
+        "description": "Se consideră matricea $$A = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}.$$ Determină elementul situat pe linia 1 și coloana 2 a matricei $A^{2026}$.",
         "tip_exercitiu": "text",
         "raspuns_corect": "2026",
-        "hint": "Calculează A², A³ și ghicește Aⁿ, apoi demonstrează prin inducție.",
-        "solutie": "A² are liniile (1, 2) și (0, 1), A³ are liniile (1, 3) și (0, 1). Prin inducție, Aⁿ are liniile (1, n) și (0, 1): Aⁿ⁺¹ = Aⁿ · A are liniile (1, n + 1) și (0, 1). Deci elementul cerut este 2026."
+        "hint": "Calculează $A^2$ și $A^3$, ghicește forma lui $A^n$, apoi demonstreaz-o prin inducție matematică.",
+        "solutie": "$$A^2 = \\begin{pmatrix} 1 & 2 \\\\ 0 & 1 \\end{pmatrix}, \\qquad A^3 = \\begin{pmatrix} 1 & 3 \\\\ 0 & 1 \\end{pmatrix}.$$Presupunem $A^n = \\begin{pmatrix} 1 & n \\\\ 0 & 1 \\end{pmatrix}$. Atunci$$A^{n+1} = A^n \\cdot A = \\begin{pmatrix} 1 & n \\\\ 0 & 1 \\end{pmatrix} \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix} = \\begin{pmatrix} 1 & n + 1 \\\\ 0 & 1 \\end{pmatrix},$$deci formula e adevărată pentru orice $n \\geq 1$. Elementul cerut este $2026$.",
+        "cerinta": "Se consideră matricea $$A = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}.$$ Determină elementul situat pe linia 1 și coloana 2 a matricei $A^{2026}$."
       },
       "201": {
         "title": "Regula lui Cramer",
