@@ -85,7 +85,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return f == null || f.isEmpty ? null : f;
   }
 
-  String get _boilerplate => _file == null
+  /// A subprogram problem (BAC Subiectul III.1): the student writes only the
+  /// subprogram; its 'main_verificare' reads the input, calls it and prints,
+  /// and is added after the student's code when it runs.
+  String? get _harness => _str(['main_verificare']);
+  String? get _header => _str(['antet']);
+
+  /// What runs: the student's code, with the hidden main after it, unless they wrote a main themselves.
+  String _program(String code) =>
+      _harness == null || RegExp(r'\bint\s+main\s*\(').hasMatch(code) ? code : '$code\n\n// ---- funcția main, scrisă deja ----\n${_harness!}\n';
+
+  String get _boilerplate => _header != null && _harness != null
+      ? '#include <iostream>\nusing namespace std;\n\n$_header {\n    // TODO: scrie aici subprogramul\n    \n}\n'
+      : _file == null
       ? defaultCppBoilerplate
       : '#include <fstream>\nusing namespace std;\n\nifstream fin("$_file.in");\nofstream fout("$_file.out");\n\nint main() {\n    // Citește cu fin >> ..., scrie cu fout << ...\n    \n    return 0;\n}';
 
@@ -239,7 +251,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   /// A problem with files starts from a program that opens them, unless something's written already.
   void _fileTemplate() {
-    if (_file != null && _codeController.text.trim() == defaultCppBoilerplate.trim()) _codeController.text = _boilerplate;
+    if ((_file != null || _harness != null) && _codeController.text.trim() == defaultCppBoilerplate.trim()) _codeController.text = _boilerplate;
   }
 
   int _getCurrentLine() {
@@ -549,7 +561,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final inputData = tests[i]["input"] ?? "";
         final expectedOutput = tests[i]["output"] ?? "";
 
-        final result = await Judge0.run(code: code, stdin: inputData.toString(), file: _file);
+        final result = await Judge0.run(code: _program(code), stdin: inputData.toString(), file: _file);
         final got = normOutput(result.stdout);
         final normExpected = normOutput(expectedOutput.toString());
         final ok = got == normExpected;
@@ -1731,7 +1743,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Text('Ln ${_getCurrentLine()}, Col ${_getCurrentCol()}', style: TextStyle(color: Pb.muted, fontSize: 12.5)),
+            child: Text(
+              'Ln ${_getCurrentLine()}, Col ${_getCurrentCol()}${_harness != null ? '  ·  scrii doar subprogramul, main e scrisă deja' : ''}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Pb.muted, fontSize: 12.5),
+            ),
           ),
           PbButton(
             text: 'Rulează',
@@ -2261,7 +2278,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     var all = true;
     try {
       for (var i = 0; i < tests.length; i++) {
-        final r = await Judge0.run(code: code, stdin: tests[i]['input'] ?? '', file: _file);
+        final r = await Judge0.run(code: _program(code), stdin: tests[i]['input'] ?? '', file: _file);
         final got = normOutput(r.stdout);
         final err = r.error.replaceAll('\r', '').trim();
         final exp = normOutput(tests[i]['output']!);
