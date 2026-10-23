@@ -717,6 +717,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   int _cSelTest = 0;
   bool _cLastWasRun = false;
   bool _cHintOpen = false;
+  bool _whyOpen = false; // why the problem is at its level: it gives the idea away, so it waits for a tap
   bool _cShowSol = false;
   final List<Map<String, dynamic>> _cSubmissions = [];
   int _cCheer = 0; // bump -> the army cheers, dragons breathe fire
@@ -1161,7 +1162,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         chips,
-        line(Icons.insights_outlined, 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why'),
+        _whyOpen
+            ? line(Icons.insights_outlined, 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why')
+            : Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: PbLink(
+                  text: 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}? (dă un indiciu)',
+                  fontSize: 13,
+                  onTap: () => setState(() => _whyOpen = true),
+                ),
+              ),
       ],
     );
   }
@@ -1187,6 +1197,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (source != null || pictures.isNotEmpty) ...[_cOrigin(source, pictures), const SizedBox(height: 16)],
+          if (_str(['nota_examen']) != null) ...[_cExamNote(_str(['nota_examen'])!), const SizedBox(height: 16)],
           if (_file != null) ...[
             PbAlert(
               type: PbAlertType.info,
@@ -1310,6 +1321,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ),
           ),
         ),
+      );
+
+  /// What was different at the exam (a file instead of the keyboard, the
+  /// algorithm described in words), so the task above it can say only what to do here.
+  Widget _cExamNote(String note) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(padding: const EdgeInsets.only(top: 2), child: Icon(Icons.info_outline, size: 16, color: Pb.muted)),
+          const SizedBox(width: 8),
+          Expanded(child: StatementText(note, fontSize: 13.5, height: 1.5, color: Pb.muted)),
+        ],
       );
 
   /// The story and the definitions: what the words of the task mean.
@@ -2697,8 +2719,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ],
         if (_str(['dificultate_motiv']) != null) ...[
           const SizedBox(height: 8),
-          Text('${(_str(['dificultate', 'difficulty']) ?? 'Nivel').toUpperCase()}: ${_str(['dificultate_motiv'])}',
-              style: TextStyle(fontSize: isMobile ? 12.5 : 14, color: AppColors.textMuted, fontWeight: FontWeight.w700, height: 1.4)),
+          GestureDetector(
+            onTap: () => setState(() => _whyOpen = !_whyOpen),
+            child: Text(
+                _whyOpen
+                    ? '${(_str(['dificultate', 'difficulty']) ?? 'Nivel').toUpperCase()}: ${_str(['dificultate_motiv'])}'
+                    : 'DE CE E ${(_str(['dificultate', 'difficulty']) ?? 'LA ACEST NIVEL').toUpperCase()}? APASĂ PENTRU INDICIU',
+                style: TextStyle(
+                    fontSize: isMobile ? 12.5 : 14,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w700,
+                    height: 1.4,
+                    decoration: _whyOpen ? null : TextDecoration.underline)),
+          ),
         ],
         SizedBox(height: isMobile ? 14 : 24),
         Container(

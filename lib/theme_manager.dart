@@ -13,6 +13,9 @@ class ThemeManager {
   // A page showing only its work (the editor's focus mode): the floating
   // buttons step aside.
   static final ValueNotifier<bool> focusNotifier = ValueNotifier(false);
+  // The theme / style / motion buttons out on the screen, or tucked away
+  // behind the tab on the left edge (the default).
+  static final ValueNotifier<bool> deckNotifier = ValueNotifier(false);
   static bool _motionChosen = false;
 
   static bool get isDark => themeNotifier.value == ThemeMode.dark;
@@ -33,6 +36,15 @@ class ThemeManager {
     final motion = prefs.getString('ambient_motion'); // 'on', 'off', 'auto_off' or unset
     motionNotifier.value = motion != 'off' && motion != 'auto_off';
     _motionChosen = motion == 'on' || motion == 'off';
+
+    deckNotifier.value = prefs.getBool('deck_open') ?? false;
+  }
+
+  // Show / tuck away the theme, style and motion buttons
+  static Future<void> toggleDeck() async {
+    deckNotifier.value = !deckNotifier.value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('deck_open', deckNotifier.value);
   }
 
   // Toggle Light / Dark mode

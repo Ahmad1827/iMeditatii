@@ -140,7 +140,8 @@
         {
           "id": "91",
           "title": "Macarie",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada de Informatică, etapa județeană (OJI) 2024, clasa a IX-a"
         }
       ]
     },
@@ -303,7 +304,8 @@
         {
           "id": "92",
           "title": "Aprogressive",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada de Informatică, etapa județeană (OJI) 2024, clasa a X-a"
         }
       ]
     },
@@ -405,7 +407,8 @@
         {
           "id": "93",
           "title": "Birocrație",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada de Informatică, etapa județeană (OJI) 2024, clasele XI–XII"
         }
       ]
     },
@@ -1717,7 +1720,7 @@
           "id": "94",
           "title": "Nestemate",
           "difficulty": "grea",
-          "sursa": "OJI 2024 · clasele XI–XII"
+          "sursa": "Olimpiada de Informatică, etapa județeană (OJI) 2024, clasele XI–XII"
         }
       ],
       "5. Exerciții suplimentare · în stilul Subiectului III": [
@@ -2326,7 +2329,8 @@
         {
           "id": "62",
           "title": "Pătrat perfect",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada Națională de Matematică, etapa județeană 2026, clasa a IX-a, problema 3"
         }
       ]
     },
@@ -2751,7 +2755,8 @@
         {
           "id": "63",
           "title": "Ecuație exponențială",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada Națională de Matematică, etapa județeană 2026, clasa a X-a, problema 3"
         }
       ]
     },
@@ -3124,7 +3129,8 @@
         {
           "id": "64",
           "title": "Un șir și un produs",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada Națională de Matematică, etapa județeană 2026, clasa a XI-a, problema 2 (Gazeta Matematică)"
         }
       ]
     },
@@ -3497,7 +3503,8 @@
         {
           "id": "65",
           "title": "Iteratele unei funcții",
-          "difficulty": "grea"
+          "difficulty": "grea",
+          "sursa": "Olimpiada Națională de Matematică, etapa județeană 2026, clasa a XII-a, problema 4"
         }
       ]
     }

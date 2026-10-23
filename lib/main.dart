@@ -275,7 +275,7 @@ class IMeditatiiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier, ThemeManager.motionNotifier, ThemeManager.focusNotifier]),
+      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.styleNotifier, ThemeManager.motionNotifier, ThemeManager.focusNotifier, ThemeManager.deckNotifier]),
       builder: (context, _) {
         final currentMode = ThemeManager.themeNotifier.value;
         final currentStyle = ThemeManager.styleNotifier.value;
@@ -330,6 +330,7 @@ class IMeditatiiApp extends StatelessWidget {
             final isMobile = MediaQuery.of(context).size.width < 750;
             final motion = ThemeManager.motionNotifier.value;
             final focus = ThemeManager.focusNotifier.value;
+            final deck = ThemeManager.deckNotifier.value;
 
             return Stack(
               children: [
@@ -339,10 +340,59 @@ class IMeditatiiApp extends StatelessWidget {
                 if (!focus)
                 Positioned(
                   bottom: isMobile ? 14 : 20,
-                  left: isMobile ? 14 : 20,
+                  left: 0,
                   child: Material(
                     color: Colors.transparent,
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // the tab on the left edge: shows the buttons, or tucks them away
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => ThemeManager.toggleDeck(),
+                            child: Semantics(
+                              button: true,
+                              label: deck ? 'Ascunde butoanele de temă' : 'Arată butoanele de temă',
+                              child: Container(
+                                width: 22,
+                                height: isMobile ? 40 : 36,
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF1B242B) : Colors.white,
+                                  borderRadius: isRetro ? BorderRadius.zero : const BorderRadius.horizontal(right: Radius.circular(10)),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                    width: isRetro ? 2.5 : 1.2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: isDark ? Colors.black87 : const Color(0xFF2C363F).withOpacity(isRetro ? 1.0 : 0.1),
+                                      offset: const Offset(2.5, 2.5),
+                                      blurRadius: isRetro ? 0 : 6,
+                                    ),
+                                  ],
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  deck ? Icons.chevron_left : Icons.tune,
+                                  size: deck ? 18 : 14,
+                                  color: isDark ? const Color(0xFF55EFC4) : const Color(0xFF2C363F),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        ClipRect(
+                          child: AnimatedSize(
+                            duration: const Duration(milliseconds: 260),
+                            curve: Curves.easeOutCubic,
+                            alignment: Alignment.centerLeft,
+                            child: !deck
+                                ? const SizedBox(height: 46)
+                                : Padding(
+                                    // room for the buttons' shadows
+                                    padding: EdgeInsets.fromLTRB(isMobile ? 8 : 10, 4, 6, 6),
+                                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // 1. Theme Button (Dark/Light)
@@ -514,6 +564,11 @@ class IMeditatiiApp extends StatelessWidget {
                                       ),
                               ),
                             ),
+                          ),
+                        ),
+                      ],
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
