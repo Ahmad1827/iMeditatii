@@ -11,6 +11,7 @@ import 'app_colors.dart';
 import 'theme_manager.dart';
 import 'classes_models.dart' show Classes, HwProblem, Solution;
 import 'browser_run.dart';
+import 'code_keys.dart';
 import 'judge0.dart';
 import 'math_sheet.dart';
 import 'problem_quiz.dart';
@@ -269,7 +270,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   KeyEventResult _handleEditorKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent) {
+    if (event is! KeyUpEvent) { // held down keys repeat, as in any editor
       final isControlOrCmd = HardwareKeyboard.instance.isControlPressed || HardwareKeyboard.instance.isMetaPressed;
       final isShift = HardwareKeyboard.instance.isShiftPressed;
 
@@ -283,40 +284,27 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         return KeyEventResult.handled;
       }
 
-      if (event.logicalKey == LogicalKeyboardKey.tab) {
-        final text = _codeController.text;
-        final selection = _codeController.selection;
-        final start = selection.start < 0 ? text.length : selection.start;
-        final end = selection.end < 0 ? text.length : selection.end;
-        const tabSpaces = "    ";
-        _codeController.value = TextEditingValue(
-          text: text.replaceRange(start, end, tabSpaces),
-          selection: TextSelection.collapsed(offset: start + tabSpaces.length),
-        );
+      final next = CodeKeys.apply(
+        _codeController.value,
+        key: event.logicalKey,
+        character: event.character,
+        ctrl: isControlOrCmd,
+        shift: isShift,
+        alt: HardwareKeyboard.instance.isAltPressed,
+      );
+      if (next != null) {
+        _codeController.value = next;
         return KeyEventResult.handled;
-      }
-
-      if (event.logicalKey == LogicalKeyboardKey.enter) {
-        final text = _codeController.text;
-        final selection = _codeController.selection;
-        if (selection.isCollapsed && selection.baseOffset >= 0) {
-          final pos = selection.baseOffset;
-          final lastNewline = text.lastIndexOf('\n', pos > 0 ? pos - 1 : 0);
-          final lineStart = lastNewline == -1 ? 0 : lastNewline + 1;
-          final currentLine = text.substring(lineStart, pos);
-          final match = RegExp(r'^[ ]*').firstMatch(currentLine);
-          String indent = match != null ? match.group(0)! : "";
-          if (currentLine.trimRight().endsWith('{')) indent += "    ";
-          final insertion = "\n$indent";
-          _codeController.value = TextEditingValue(
-            text: text.replaceRange(pos, pos, insertion),
-            selection: TextSelection.collapsed(offset: pos + insertion.length),
-          );
-          return KeyEventResult.handled;
-        }
       }
     }
     return KeyEventResult.ignored;
+  }
+
+  /// Aligns the whole program (Shift+Alt+F), keeping the caret on its token.
+  void _formatCode() {
+    final next = CodeKeys.formatValue(_codeController.value);
+    if (next.text != _codeController.text) _codeController.value = next;
+    _editorFocusNode.requestFocus();
   }
 
   void _insertSnippet(String prefix, String suffix, [int cursorOffset = 0]) {
@@ -1777,6 +1765,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 PopupMenuItem(value: 'tab', child: Text('Tab (4 spații)', style: TextStyle(fontSize: 13, color: Pb.text))),
               ],
             ),
+            iconBtn(Icons.format_align_left, 'Aliniază codul (Shift+Alt+F)', _formatCode),
             iconBtn(Icons.fullscreen, 'Mod focus', _cEnterFocus),
             iconBtn(Icons.undo, 'Anulează (Ctrl+Z)', _performUndo),
             iconBtn(Icons.redo, 'Refă (Ctrl+Y)', _performRedo),

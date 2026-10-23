@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'browser_run.dart';
+import 'code_keys.dart';
 import 'judge0.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, CodeHighlighter;
 
@@ -79,8 +80,6 @@ class CodeEditor extends StatefulWidget {
 class _CodeEditorState extends State<CodeEditor> {
   static const double _lineH = 1.55;
   static const double _padV = 12;
-  static const String _tab = '    ';
-  static const Map<String, String> _pairs = {'(': ')', '[': ']', '{': '}', '"': '"', "'": "'"};
 
   final ScrollController _v = ScrollController();
   final ScrollController _h = ScrollController();
@@ -124,13 +123,6 @@ class _CodeEditorState extends State<CodeEditor> {
 
   int get _currentLine => _caret < 0 ? 0 : '\n'.allMatches(_c.text.substring(0, _caret)).length + 1;
 
-  int _lineStart(int pos) => pos <= 0 ? 0 : _c.text.lastIndexOf('\n', pos - 1) + 1;
-
-  int _lineEnd(int pos) {
-    final i = _c.text.indexOf('\n', pos);
-    return i < 0 ? _c.text.length : i;
-  }
-
   // ---------------------------------------------------------------- keys
   KeyEventResult _onKey(FocusNode node, KeyEvent e) {
     if (e is KeyUpEvent) return KeyEventResult.ignored;
@@ -145,157 +137,10 @@ class _CodeEditorState extends State<CodeEditor> {
     }
     if (widget.readOnly) return KeyEventResult.ignored;
 
-    final sel = _c.selection;
-    if (!sel.isValid) return KeyEventResult.ignored;
-    final text = _c.text;
-
-    if (ctrl && key == LogicalKeyboardKey.slash) {
-      _toggleComment();
-      return KeyEventResult.handled;
-    }
-    if (ctrl || kb.isAltPressed) return KeyEventResult.ignored;
-
-    if (key == LogicalKeyboardKey.tab) {
-      if (sel.isCollapsed && !shift) {
-        _c.replace(sel.start, sel.end, _tab);
-      } else {
-        _indentLines(outdent: shift);
-      }
-      return KeyEventResult.handled;
-    }
-
-    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
-      final pos = sel.start;
-      final line = text.substring(_lineStart(pos), pos);
-      final base = RegExp(r'^[ \t]*').stringMatch(line) ?? '';
-      final trimmed = line.trimRight();
-      final opens = trimmed.endsWith('{') || trimmed.endsWith('(') || trimmed.endsWith('[') || (_c.lang == 'python' && trimmed.endsWith(':'));
-      final next = sel.end < text.length ? text[sel.end] : '';
-      if (opens && (next == '}' || next == ')' || next == ']')) {
-        // "{|}" -> body on its own indented line, closer back on the base indent.
-        _c.replace(pos, sel.end, '\n$base$_tab\n$base', caret: pos + 1 + base.length + _tab.length);
-      } else {
-        _c.replace(pos, sel.end, '\n$base${opens ? _tab : ''}');
-      }
-      return KeyEventResult.handled;
-    }
-
-    if (key == LogicalKeyboardKey.backspace && sel.isCollapsed && sel.start > 0) {
-      final pos = sel.start;
-      final prev = text[pos - 1];
-      final next = pos < text.length ? text[pos] : '';
-      if (_pairs[prev] == next && next.isNotEmpty) {
-        _c.replace(pos - 1, pos + 1, '');
-        return KeyEventResult.handled;
-      }
-      final before = text.substring(_lineStart(pos), pos);
-      if (before.isNotEmpty && before.trim().isEmpty && before.length % _tab.length == 0 && !before.contains('\t')) {
-        _c.replace(pos - _tab.length, pos, '');
-        return KeyEventResult.handled;
-      }
-      return KeyEventResult.ignored;
-    }
-
-    final ch = e.character;
-    if (ch != null && ch.length == 1) {
-      final next = sel.end < text.length ? text[sel.end] : '';
-      // Typing a closer that is already there just steps over it.
-      if (sel.isCollapsed && next == ch && _pairs.containsValue(ch)) {
-        final isQuote = ch == '"' || ch == "'";
-        if (!isQuote || (sel.start > 0 && text[sel.start - 1] != '\\')) {
-          _c.selection = TextSelection.collapsed(offset: sel.start + 1);
-          return KeyEventResult.handled;
-        }
-      }
-      final close = _pairs[ch];
-      if (close != null) {
-        if (!sel.isCollapsed) {
-          final inner = text.substring(sel.start, sel.end);
-          _c.replace(sel.start, sel.end, '$ch$inner$close', caret: sel.start + 1, selectTo: sel.end + 1);
-          return KeyEventResult.handled;
-        }
-        final isQuote = ch == '"' || ch == "'";
-        final prev = sel.start > 0 ? text[sel.start - 1] : '';
-        final roomAfter = next.isEmpty || RegExp(r'[\s)\]};,]').hasMatch(next);
-        final wordBefore = RegExp(r'[A-Za-z0-9_\\]').hasMatch(prev);
-        if (roomAfter && !(isQuote && wordBefore)) {
-          _c.replace(sel.start, sel.end, '$ch$close', caret: sel.start + 1);
-          return KeyEventResult.handled;
-        }
-      }
-    }
-    return KeyEventResult.ignored;
-  }
-
-  void _indentLines({required bool outdent}) {
-    final sel = _c.selection;
-    final text = _c.text;
-    final from = _lineStart(sel.start);
-    // A selection that ends at column 0 does not include that last line.
-    final lastPos = !sel.isCollapsed && sel.end > sel.start && text[sel.end - 1] == '\n' ? sel.end - 1 : sel.end;
-    final to = _lineEnd(lastPos);
-    final lines = text.substring(from, to).split('\n');
-    var firstDelta = 0;
-    var total = 0;
-    for (var i = 0; i < lines.length; i++) {
-      var d = 0;
-      if (outdent) {
-        final lead = RegExp(r'^ {1,4}|^\t').stringMatch(lines[i]) ?? '';
-        lines[i] = lines[i].substring(lead.length);
-        d = -lead.length;
-      } else if (lines[i].isNotEmpty) {
-        lines[i] = '$_tab${lines[i]}';
-        d = _tab.length;
-      }
-      if (i == 0) firstDelta = d;
-      total += d;
-    }
-    final out = lines.join('\n');
-    _c.value = TextEditingValue(
-      text: text.replaceRange(from, to, out),
-      selection: TextSelection(
-        baseOffset: math.max(from, sel.start + firstDelta),
-        extentOffset: math.max(from, sel.end + total),
-      ),
-    );
-  }
-
-  void _toggleComment() {
-    final mark = _c.lang == 'python' ? '#' : '//';
-    final sel = _c.selection;
-    final text = _c.text;
-    final from = _lineStart(sel.start);
-    final lastPos = !sel.isCollapsed && sel.end > sel.start && text[sel.end - 1] == '\n' ? sel.end - 1 : sel.end;
-    final to = _lineEnd(lastPos);
-    final lines = text.substring(from, to).split('\n');
-    final live = lines.where((l) => l.trim().isNotEmpty);
-    final allCommented = live.isNotEmpty && live.every((l) => l.trimLeft().startsWith(mark));
-    var firstDelta = 0;
-    var total = 0;
-    for (var i = 0; i < lines.length; i++) {
-      final l = lines[i];
-      if (l.trim().isEmpty) continue;
-      final lead = l.length - l.trimLeft().length;
-      String next;
-      if (allCommented) {
-        var rest = l.substring(lead + mark.length);
-        if (rest.startsWith(' ')) rest = rest.substring(1);
-        next = l.substring(0, lead) + rest;
-      } else {
-        next = '${l.substring(0, lead)}$mark ${l.substring(lead)}';
-      }
-      final d = next.length - l.length;
-      if (i == 0) firstDelta = d;
-      total += d;
-      lines[i] = next;
-    }
-    _c.value = TextEditingValue(
-      text: text.replaceRange(from, to, lines.join('\n')),
-      selection: TextSelection(
-        baseOffset: math.max(from, sel.start + firstDelta),
-        extentOffset: math.max(from, sel.end + total),
-      ),
-    );
+    final next = CodeKeys.apply(_c.value, key: key, character: e.character, ctrl: ctrl, shift: shift, alt: kb.isAltPressed, lang: _c.lang);
+    if (next == null) return KeyEventResult.ignored;
+    _c.value = next;
+    return KeyEventResult.handled;
   }
 
   // ---------------------------------------------------------------- build
