@@ -14,6 +14,7 @@ import 'browser_run.dart';
 import 'judge0.dart';
 import 'math_sheet.dart';
 import 'problem_quiz.dart';
+import 'progress.dart';
 import 'statement.dart';
 import 'statement_text.dart';
 import 'workspace_screen.dart' show wsAgo;
@@ -383,6 +384,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     Future<void> _markExerciseAsDone() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_progressKey, true);
+    solvedChanged.value++;
     if (mounted) setState(() => _alreadyDone = true);
 
     // Clasament: fiecare problemă se numără o singură dată pe cont.

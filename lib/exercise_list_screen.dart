@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'app_colors.dart';
 import 'classes_models.dart' show Classes, Solution;
 import 'custom_navbar.dart' show CustomNavbar;
+import 'progress.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'sticky_footer.dart';
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
@@ -69,6 +70,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     selectedGrade = widget.grade ?? "9";
     selectedCategory = widget.category ?? "Toate";
     _loadAllExercises();
+    solvedChanged.addListener(_updateCategoriesAndFilter);
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       _sentSub = Classes.mySolutions(uid).listen((m) {
@@ -87,6 +89,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
   @override
   void dispose() {
+    solvedChanged.removeListener(_updateCategoriesAndFilter);
     _sentSub?.cancel();
     _scrollController.dispose();
     _cScroll.dispose();
