@@ -558,7 +558,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         if (!ok) allPassed = false;
         final note = ok ? '' : _fileNote(result);
 
-        testResults.add({"index": i + 1, "passed": ok, "expected": normExpected, "got": note.isEmpty ? got : '$got  [$note]'});
+        testResults.add({"index": i + 1, "passed": ok, "input": inputData.toString(), "expected": normExpected, "got": note.isEmpty ? got : '$got  [$note]'});
         if (mounted) setState(() {});
       }
 
@@ -2185,7 +2185,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     final sel = _cSelTest >= total ? 0 : _cSelTest;
     final t = testResults[sel];
-    final visible = t['sample'] == true;
+    // As on LeetCode, the first test that fails is shown in full, even a hidden one.
+    final firstFail = testResults.indexWhere((t) => t['passed'] != true);
+    final revealed = t['sample'] != true && sel == firstFail;
+    final visible = t['sample'] == true || revealed;
 
     Widget detailBox(String label, String v) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -2203,9 +2206,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (visible) ...[
-          detailBox('Intrare', '${t['input'] ?? ''}'),
-          detailBox('Ieșire așteptată', '${t['expected']}'),
-          detailBox('Ieșirea ta', '${t['got']}'),
+          if (revealed)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text('Primul test greșit. Îl vezi întreg ca să găsești greșeala; celelalte teste ascunse rămân ascunse.',
+                  style: TextStyle(fontSize: 13, color: Pb.muted, height: 1.4)),
+            ),
+          detailBox('Intrare', _cClip('${t['input'] ?? ''}')),
+          detailBox('Ieșire așteptată', _cClip('${t['expected']}')),
+          detailBox('Ieșirea ta', _cClip('${t['got']}')),
         ] else
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -2226,7 +2235,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     final list = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [for (var i = 0; i < total; i++) _cTestTile(i, testResults[i], i == sel)],
+      children: [for (var i = 0; i < total; i++) _cTestTile(i, testResults[i], i == sel, revealed: i == firstFail)],
     );
 
     return Column(
@@ -2250,7 +2259,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _cTestTile(int i, Map<String, dynamic> t, bool sel) {
+  /// Hidden tests can be large; show only the start of their data.
+  static String _cClip(String v) {
+    const max = 3000;
+    return v.length <= max ? v : '${v.substring(0, max)}\n… (încă ${v.length - max} caractere)';
+  }
+
+  Widget _cTestTile(int i, Map<String, dynamic> t, bool sel, {bool revealed = false}) {
     final ok = t['passed'] == true;
     final sample = t['sample'] == true;
     return MouseRegion(
@@ -2272,7 +2287,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               Expanded(
                 child: Text(sample ? 'Exemplu ${i + 1}' : 'Test ${i + 1}', style: TextStyle(fontSize: 13.5, color: Pb.text)),
               ),
-              if (!sample) Icon(Icons.lock_outline, size: 13, color: Pb.muted),
+              if (!sample && !revealed) Icon(Icons.lock_outline, size: 13, color: Pb.muted),
             ],
           ),
         ),
@@ -2343,9 +2358,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     if (!mounted) return;
     final passed = testResults.where((t) => t['passed'] == true).length;
     final score = (passed * 100 / testResults.length).round();
+    final firstFail = testResults.indexWhere((t) => t['passed'] != true);
 
     setState(() {
       isRunningCode = false;
+      if (firstFail >= 0) _cSelTest = firstFail;
       solutionChecked = true;
       solutionOk = all;
       _cSubmissions.insert(0, {
@@ -3102,6 +3119,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           const SizedBox(height: 8),
           ...testResults.map((t) {
             final passed = t["passed"] == true;
+            final firstFail = identical(t, testResults.firstWhere((r) => r["passed"] != true, orElse: () => const {}));
             final c = passed ? AppColors.forest : AppColors.sunset;
             return Container(
               margin: const EdgeInsets.only(bottom: 6),
@@ -3120,6 +3138,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ),
                   if (!passed) ...[
                     const SizedBox(height: 4),
+                    if (firstFail && '${t['input'] ?? ''}'.isNotEmpty)
+                      Text("INPUT:    ${_cClip('${t['input']}')}", style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
                     Text("EXPECTED: ${t['expected']}", style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
                     Text("OUTPUT:   ${t['got']}", style: TextStyle(color: AppColors.sunset, fontSize: 11, fontFamily: 'monospace')),
                   ],
