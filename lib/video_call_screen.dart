@@ -1,70 +1,76 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'peer_call.dart';
 import 'theme_manager.dart';
 import 'app_colors.dart';
-import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, showPbModal;
+import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, showPbModal;
 
-class DrawingPoint {
-  final double x;
-  final double y;
-  final int colorValue;
-  final double strokeWidth;
-  final bool isEndOfStroke;
+/// One whiteboard line. Points are fractions of the board, so both screens agree.
+class Stroke {
+  Stroke({required this.id, required this.color, required this.width, required this.mine, List<Offset>? points})
+      : points = points ?? [];
 
-  DrawingPoint({
-    required this.x,
-    required this.y,
-    required this.colorValue,
-    required this.strokeWidth,
-    this.isEndOfStroke = false,
-  });
+  final String id;
+  final int color;
+  final double width;
+  final bool mine;
+  final List<Offset> points;
+
+  static double r(double v) => (v * 10000).round() / 10000;
 
   Map<String, dynamic> toMap() => {
-        'x': x,
-        'y': y,
-        'c': colorValue,
-        'w': strokeWidth,
-        'e': isEndOfStroke,
+        'id': id,
+        'c': color,
+        'w': width,
+        'p': [for (final o in points) ...[r(o.dx), r(o.dy)]],
       };
 
-  factory DrawingPoint.fromMap(Map<String, dynamic> map) => DrawingPoint(
-        x: (map['x'] as num).toDouble(),
-        y: (map['y'] as num).toDouble(),
-        colorValue: map['c'] as int,
-        strokeWidth: (map['w'] as num).toDouble(),
-        isEndOfStroke: map['e'] as bool? ?? false,
-      );
+  factory Stroke.fromMap(Map<String, dynamic> m) {
+    final p = (m['p'] as List? ?? const []).cast<num>();
+    return Stroke(
+      id: m['id'] as String,
+      color: m['c'] as int,
+      width: (m['w'] as num).toDouble(),
+      mine: false,
+      points: [for (var i = 0; i + 1 < p.length; i += 2) Offset(p[i].toDouble(), p[i + 1].toDouble())],
+    );
+  }
 }
 
 class WhiteboardPainter extends CustomPainter {
-  final List<DrawingPoint> points;
-  WhiteboardPainter({required this.points});
+  final List<Stroke> strokes;
+  WhiteboardPainter({required this.strokes});
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (int i = 0; i < points.length - 1; i++) {
-      if (points[i].isEndOfStroke) continue;
-      if (points[i + 1].isEndOfStroke) continue;
-
+    for (final s in strokes) {
+      if (s.points.isEmpty) continue;
       final paint = Paint()
-        ..color = Color(points[i].colorValue)
-        ..strokeWidth = points[i].strokeWidth
+        ..color = Color(s.color)
+        ..strokeWidth = s.width
         ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round;
-
-      final p1 = Offset(points[i].x * size.width, points[i].y * size.height);
-      final p2 = Offset(points[i + 1].x * size.width, points[i + 1].y * size.height);
-
-      canvas.drawLine(p1, p2, paint);
+        ..strokeJoin = StrokeJoin.round
+        ..style = PaintingStyle.stroke;
+      Offset at(Offset o) => Offset(o.dx * size.width, o.dy * size.height);
+      if (s.points.length == 1) {
+        canvas.drawCircle(at(s.points.first), s.width / 2, paint..style = PaintingStyle.fill);
+        continue;
+      }
+      final path = Path()..moveTo(at(s.points.first).dx, at(s.points.first).dy);
+      for (final o in s.points.skip(1)) {
+        final q = at(o);
+        path.lineTo(q.dx, q.dy);
+      }
+      canvas.drawPath(path, paint);
     }
   }
 
@@ -224,6 +230,7 @@ class _RetroIconButtonState extends State<RetroIconButton> {
   }
 }
 
+
 class VideoCallScreen extends StatefulWidget {
   final String roomId;
   const VideoCallScreen({super.key, required this.roomId});
@@ -233,16 +240,11 @@ class VideoCallScreen extends StatefulWidget {
 }
 
 class _VideoCallScreenState extends State<VideoCallScreen> {
-  late RtcEngine _engine;
-  bool _localUserJoined = false;
-  int? _remoteUid;
-  bool _isScreenShared = false;
+  PeerCall? _call;
   bool _isWhiteboardOpen = false;
 
-  bool _hasCamera = true;
-  final String appId = dotenv.env['AGORA_APP_ID'] ?? '';
-
-  List<DrawingPoint> _whiteboardPoints = [];
+  final List<Stroke> _strokes = [];
+  Stroke? _drawing;
   Color _selectedDrawColor = const Color(0xFF55EFC4);
   double _strokeWidth = 3.5;
 
@@ -250,19 +252,22 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   bool _isTeacher = false;
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-  // listeners + call timer (cancelled in dispose)
+  // listener + call timer (cancelled in dispose)
   StreamSubscription? _sessionSub;
-  StreamSubscription? _boardSub;
   Timer? _clock;
   DateTime? _joinedAt;
-  bool _micOff = false;
-  bool _camOff = false;
+
+  bool get _localUserJoined => _call != null && _call!.link != CallLink.starting;
+  bool get _peerHere => _call?.peerHere ?? false;
+  bool get _hasCamera => _call?.hasCamera ?? false;
+  bool get _micOff => _call?.micOff ?? false;
+  bool get _camOff => _call?.camOff ?? false;
+  bool get _isScreenShared => _call?.sharing ?? false;
 
   @override
   void initState() {
     super.initState();
     _verifyAccessAndInit();
-    _listenToWhiteboard();
     _listenToSessionStatus();
   }
 
@@ -310,50 +315,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
     if (!mounted) return;
     setState(() => _isAuthorized = true);
-    initAgora();
-  }
-
-  void _listenToWhiteboard() {
-    _boardSub = FirebaseFirestore.instance
-        .collection('chats')
-        .doc(widget.roomId)
-        .collection('whiteboard')
-        .doc('live')
-        .snapshots()
-        .listen((doc) {
-      if (doc.exists && doc.data() != null) {
-        final list = doc.data()!['points'] as List<dynamic>?;
-        if (list != null && mounted) {
-          setState(() {
-            _whiteboardPoints = list.map((item) => DrawingPoint.fromMap(item as Map<String, dynamic>)).toList();
-          });
-        }
-      }
-    });
-  }
-
-  Future<void> _pushWhiteboardStroke(List<DrawingPoint> newPoints) async {
-    final ref = FirebaseFirestore.instance.collection('chats').doc(widget.roomId).collection('whiteboard').doc('live');
-
-    final mapped = newPoints.map((p) => p.toMap()).toList();
-    await ref.set({'points': mapped}, SetOptions(merge: true));
-  }
-
-  Future<void> _clearWhiteboard() async {
-    setState(() => _whiteboardPoints.clear());
-    await FirebaseFirestore.instance.collection('chats').doc(widget.roomId).collection('whiteboard').doc('live').set({'points': []});
-  }
-
-  /// Removes the last stroke.
-  void _undoStroke() {
-    if (_whiteboardPoints.isEmpty) return;
-    var i = _whiteboardPoints.length - 1;
-    if (_whiteboardPoints[i].isEndOfStroke) i--;
-    while (i >= 0 && !_whiteboardPoints[i].isEndOfStroke) {
-      i--;
-    }
-    setState(() => _whiteboardPoints = _whiteboardPoints.sublist(0, i + 1));
-    _pushWhiteboardStroke(_whiteboardPoints);
+    _startCall();
   }
 
   void _startClock() {
@@ -363,63 +325,39 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     });
   }
 
-  Future<void> initAgora() async {
+  void _onCall() {
+    if (!mounted) return;
+    if (_localUserJoined) _startClock();
+    setState(() {});
+  }
+
+  void _snack(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text), behavior: SnackBarBehavior.floating));
+  }
+
+  Future<void> _startCall() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final name = user?.displayName?.trim() ?? '';
+    final call = PeerCall(
+      roomId: widget.roomId,
+      isOfferer: _isTeacher,
+      myName: name.isNotEmpty ? name : (_isTeacher ? 'Profesorul' : 'Elevul'),
+      onMessage: _onBoardMessage,
+      onChannelOpen: _sendBoard,
+    );
+    call.addListener(_onCall);
+    setState(() => _call = call);
     try {
       if (!kIsWeb) {
         await [Permission.microphone, Permission.camera].request();
       }
-
-      _engine = createAgoraRtcEngine();
-
-      await _engine.initialize(RtcEngineContext(
-        appId: appId,
-        channelProfile: ChannelProfileType.channelProfileCommunication,
-      ));
-
-      _engine.registerEventHandler(
-        RtcEngineEventHandler(
-          onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-            if (!mounted) return;
-            setState(() => _localUserJoined = true);
-            _startClock();
-          },
-          onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-            if (mounted) setState(() => _remoteUid = remoteUid);
-          },
-          onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
-            if (mounted) setState(() => _remoteUid = null);
-          },
-          onLeaveChannel: (RtcConnection connection, RtcStats stats) {
-            if (!mounted) return;
-            setState(() {
-              _localUserJoined = false;
-              _remoteUid = null;
-            });
-          },
-        ),
-      );
-
-      await _engine.enableAudio();
-
-      try {
-        await _engine.enableVideo();
-        await _engine.startPreview(sourceType: VideoSourceType.videoSourceCamera);
-        _hasCamera = true;
-      } catch (e) {
-        _hasCamera = false;
+      await call.start();
+      if (!call.hasMic) {
+        _snack(AppStyle.current.isClean
+            ? 'Nu avem acces la microfon. Permite microfonul și camera din browser, apoi reintră.'
+            : 'NO MICROPHONE ACCESS. ALLOW IT IN THE BROWSER AND REJOIN.');
       }
-
-      await _engine.joinChannel(
-        token: '',
-        channelId: widget.roomId,
-        uid: 0,
-        options: ChannelMediaOptions(
-          channelProfile: ChannelProfileType.channelProfileCommunication,
-          clientRoleType: ClientRoleType.clientRoleBroadcaster,
-          publishCameraTrack: _hasCamera,
-          publishMicrophoneTrack: true,
-        ),
-      );
     } catch (e) {
       if (!mounted) return;
       if (AppStyle.current.isClean) {
@@ -451,45 +389,107 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // whiteboard: lines travel over the call's own data channel, point by point
+  // ---------------------------------------------------------------------------
+  String _newStrokeId() => '${currentUserId ?? 'x'}-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 20)}';
+
+  Stroke? _strokeById(Object? id) {
+    for (final s in _strokes.reversed) {
+      if (s.id == id) return s;
+    }
+    return null;
+  }
+
+  void _onBoardMessage(Map<String, dynamic> m) {
+    switch (m['t']) {
+      case 's':
+        if (_strokeById(m['id']) == null) _strokes.add(Stroke.fromMap(m));
+        _isWhiteboardOpen = true; // the other one draws: show it
+        break;
+      case 'p':
+        _strokeById(m['id'])?.points.add(Offset((m['x'] as num).toDouble(), (m['y'] as num).toDouble()));
+        break;
+      case 'u':
+        _strokes.removeWhere((s) => s.id == m['id']);
+        break;
+      case 'clr':
+        _strokes.clear();
+        _drawing = null;
+        break;
+      case 'board':
+        for (final raw in (m['strokes'] as List? ?? const [])) {
+          final s = Stroke.fromMap(raw as Map<String, dynamic>);
+          if (_strokeById(s.id) == null) _strokes.add(s);
+        }
+        break;
+      default:
+        return;
+    }
+    if (mounted) setState(() {});
+  }
+
+  /// On (re)connect both sides send what they have; strokes merge by id.
+  void _sendBoard() {
+    for (var i = 0; i < _strokes.length; i += 40) {
+      _call?.send({
+        't': 'board',
+        'strokes': [for (final s in _strokes.skip(i).take(40)) s.toMap()],
+      });
+    }
+  }
+
+  void _boardPoint(Offset p, BoxConstraints c, {bool end = false}) {
+    if (end) {
+      _drawing = null;
+      return;
+    }
+    final o = Offset((p.dx / c.maxWidth).clamp(0.0, 1.0), (p.dy / c.maxHeight).clamp(0.0, 1.0));
+    final d = _drawing;
+    if (d == null) {
+      final s = Stroke(id: _newStrokeId(), color: _selectedDrawColor.value, width: _strokeWidth, mine: true, points: [o]);
+      _drawing = s;
+      _strokes.add(s);
+      _call?.send({'t': 's', ...s.toMap()});
+    } else {
+      d.points.add(o);
+      _call?.send({'t': 'p', 'id': d.id, 'x': Stroke.r(o.dx), 'y': Stroke.r(o.dy)});
+    }
+    setState(() {});
+  }
+
+  void _clearWhiteboard() {
+    setState(() {
+      _strokes.clear();
+      _drawing = null;
+    });
+    _call?.send({'t': 'clr'});
+  }
+
+  /// Removes my last line.
+  void _undoStroke() {
+    for (final s in _strokes.reversed) {
+      if (!s.mine) continue;
+      setState(() => _strokes.remove(s));
+      _call?.send({'t': 'u', 'id': s.id});
+      return;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // controls
+  // ---------------------------------------------------------------------------
   Future<void> _toggleScreenShare() async {
-    try {
-      if (_isScreenShared) {
-        await _engine.stopScreenCapture();
-        await _engine.updateChannelMediaOptions(ChannelMediaOptions(publishScreenTrack: false, publishCameraTrack: _hasCamera));
-        await _engine.stopPreview(sourceType: VideoSourceType.videoSourceScreen);
-        if (_hasCamera) await _engine.startPreview(sourceType: VideoSourceType.videoSourceCamera);
-      } else {
-        await _engine.startScreenCapture(const ScreenCaptureParameters2(captureAudio: true, captureVideo: true));
-        await _engine.updateChannelMediaOptions(const ChannelMediaOptions(publishCameraTrack: false, publishScreenTrack: true));
-        if (_hasCamera) await _engine.stopPreview(sourceType: VideoSourceType.videoSourceCamera);
-        await _engine.startPreview(sourceType: VideoSourceType.videoSourceScreen);
-      }
-      setState(() => _isScreenShared = !_isScreenShared);
-    } catch (e) {
-      debugPrint("Screen share error: $e");
-    }
+    final msg = await _call?.toggleShare();
+    if (msg != null) _snack(msg);
   }
 
-  Future<void> _toggleMic() async {
-    if (!_localUserJoined) return;
-    final next = !_micOff;
-    try {
-      await _engine.muteLocalAudioStream(next);
-      setState(() => _micOff = next);
-    } catch (e) {
-      debugPrint('Mic toggle: $e');
-    }
+  void _toggleMic() {
+    if (_localUserJoined) _call!.toggleMic();
   }
 
-  Future<void> _toggleCam() async {
-    if (!_localUserJoined || !_hasCamera) return;
-    final next = !_camOff;
-    try {
-      await _engine.muteLocalVideoStream(next);
-      setState(() => _camOff = next);
-    } catch (e) {
-      debugPrint('Camera toggle: $e');
-    }
+  void _toggleCam() {
+    if (_localUserJoined && _hasCamera) _call!.toggleCam();
   }
 
   Future<void> _handleHangup() async {
@@ -553,30 +553,76 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void dispose() {
     _sessionSub?.cancel();
-    _boardSub?.cancel();
     _clock?.cancel();
-    if (_isAuthorized) {
-      _engine.leaveChannel();
-      _engine.release();
-    }
+    _call?.removeListener(_onCall);
+    _call?.leave();
     super.dispose();
   }
 
-  // whiteboard gestures shared by both styles
-  void _boardPoint(Offset p, BoxConstraints c, {bool end = false}) {
-    if (end) {
-      _whiteboardPoints.add(DrawingPoint(x: 0, y: 0, colorValue: 0, strokeWidth: 0, isEndOfStroke: true));
-    } else {
-      _whiteboardPoints.add(DrawingPoint(
-        x: p.dx / c.maxWidth,
-        y: p.dy / c.maxHeight,
-        colorValue: _selectedDrawColor.value,
-        strokeWidth: _strokeWidth,
-      ));
-    }
-    setState(() {});
-    _pushWhiteboardStroke(_whiteboardPoints);
+  // ---------------------------------------------------------------------------
+  // what the other side shows, shared by both styles
+  // ---------------------------------------------------------------------------
+  Widget _remoteStage() {
+    final c = _call!;
+    final name = c.remoteName ?? (_isTeacher ? 'Elevul' : 'Profesorul');
+    final showVideo = c.remoteSharing || !c.remoteCamOff;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (showVideo)
+          RTCVideoView(
+            c.remoteView,
+            // a shared screen is never cropped: the code must be all there
+            objectFit: c.remoteSharing ? RTCVideoViewObjectFit.RTCVideoViewObjectFitContain : RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            filterQuality: FilterQuality.medium,
+          )
+        else
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 44,
+                  backgroundColor: const Color(0xFF2A2E33),
+                  child: Text(name.characters.first.toUpperCase(),
+                      style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(height: 12),
+                Text(name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                const Text('Camera e oprită', style: TextStyle(color: Colors.white54, fontSize: 13)),
+              ],
+            ),
+          ),
+        Positioned(
+          top: 72,
+          left: 16,
+          child: SafeArea(
+            bottom: false,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(999)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (c.remoteMicOff) ...[const Icon(Icons.mic_off, size: 14, color: Color(0xFFE5484D)), const SizedBox(width: 5)],
+                  Text(c.remoteSharing ? '$name · ecran' : name, style: const TextStyle(color: Colors.white, fontSize: 12.5)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
+
+  Widget _selfVideo() => RTCVideoView(
+        _call!.localView,
+        key: ValueKey(_isScreenShared),
+        mirror: !_isScreenShared,
+        objectFit: _isScreenShared ? RTCVideoViewObjectFit.RTCVideoViewObjectFitContain : RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+      );
+
 
   @override
   Widget build(BuildContext context) {
@@ -631,15 +677,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         children: [
           // remote video / waiting room
           Positioned.fill(
-            child: _remoteUid != null
-                ? AgoraVideoView(
-                    controller: VideoViewController.remote(
-                      rtcEngine: _engine,
-                      canvas: VideoCanvas(uid: _remoteUid),
-                      connection: RtcConnection(channelId: widget.roomId),
-                    ),
-                  )
-                : const _WaitingRoom(),
+            child: _peerHere ? _remoteStage() : _WaitingRoom(failed: _call?.link == CallLink.failed, onRetry: () => _call?.retry()),
           ),
 
           // whiteboard
@@ -654,7 +692,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         onPanStart: (d) => _boardPoint(d.localPosition, c),
                         onPanUpdate: (d) => _boardPoint(d.localPosition, c),
                         onPanEnd: (_) => _boardPoint(Offset.zero, c, end: true),
-                        child: CustomPaint(painter: WhiteboardPainter(points: _whiteboardPoints), size: Size(c.maxWidth, c.maxHeight)),
+                        child: CustomPaint(painter: WhiteboardPainter(strokes: _strokes), size: Size(c.maxWidth, c.maxHeight)),
                       ),
                     ),
                     Positioned(top: isMobile ? 64 : 76, left: 0, right: 0, child: Center(child: _cBoardTools())),
@@ -678,10 +716,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       Container(
                         width: 8,
                         height: 8,
-                        decoration: BoxDecoration(color: _localUserJoined ? _vRed : Colors.white38, shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                            color: _call?.link == CallLink.reconnecting ? const Color(0xFFF59E0B) : (_localUserJoined ? _vRed : Colors.white38),
+                            shape: BoxShape.circle),
                       ),
                       const SizedBox(width: 8),
-                      Text(_localUserJoined ? 'Live' : 'Se conectează',
+                      Text(_call?.link == CallLink.reconnecting ? 'Se reconectează' : (_localUserJoined ? 'Live' : 'Se conectează'),
                           style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
                       const SizedBox(width: 10),
                       Text(_elapsed, style: const TextStyle(color: Colors.white70, fontSize: 13, fontFeatures: [FontFeature.tabularFigures()])),
@@ -691,9 +731,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   _pill(Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(_remoteUid != null ? Icons.people_alt_outlined : Icons.person_outline, size: 16, color: Colors.white70),
+                      Icon(_peerHere ? Icons.people_alt_outlined : Icons.person_outline, size: 16, color: Colors.white70),
                       const SizedBox(width: 6),
-                      Text(_remoteUid != null ? '2 în apel' : 'Doar tu', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                      Text(_peerHere ? '2 în apel' : 'Doar tu', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                      if (_peerHere && _call?.signal != null) ...[
+                        const SizedBox(width: 10),
+                        _signalIcon(_call!.signal!),
+                      ],
                     ],
                   )),
                 ],
@@ -721,16 +765,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   fit: StackFit.expand,
                   children: [
                     if ((_isScreenShared || _hasCamera) && !(_camOff && !_isScreenShared))
-                      AgoraVideoView(
-                        key: ValueKey(_isScreenShared),
-                        controller: VideoViewController(
-                          rtcEngine: _engine,
-                          canvas: VideoCanvas(
-                            uid: 0,
-                            sourceType: _isScreenShared ? VideoSourceType.videoSourceScreen : VideoSourceType.videoSourceCamera,
-                          ),
-                        ),
-                      )
+                      _selfVideo()
                     else
                       const Center(child: Icon(Icons.videocam_off_outlined, color: Colors.white38, size: 34)),
                     Positioned(
@@ -808,6 +843,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ],
       ),
     );
+  }
+
+  Widget _signalIcon(CallSignal s) {
+    final (color, text) = switch (s) {
+      CallSignal.good => (_vGreen, 'Conexiune bună'),
+      CallSignal.weak => (const Color(0xFFF59E0B), 'Conexiune slabă'),
+      CallSignal.bad => (_vRed, 'Conexiune foarte slabă'),
+    };
+    return Tooltip(message: text, child: Icon(Icons.signal_cellular_alt, size: 16, color: color));
   }
 
   Widget _cBoardTools() {
@@ -909,21 +953,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           body: Stack(
             children: [
               Center(
-                child: _remoteUid != null
-                    ? AgoraVideoView(
-                        controller: VideoViewController.remote(
-                          rtcEngine: _engine,
-                          canvas: VideoCanvas(uid: _remoteUid),
-                          connection: RtcConnection(channelId: widget.roomId),
-                        ),
-                      )
+                child: _peerHere
+                    ? _remoteStage()
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.satellite_alt, size: 64, color: AppColors.sky),
+                          Icon(_call?.link == CallLink.failed ? Icons.link_off : Icons.satellite_alt, size: 64, color: AppColors.sky),
                           const SizedBox(height: 24),
                           Text(
-                            'AWAITING REMOTE CONNECTION...',
+                            _call?.link == CallLink.failed ? 'DIRECT LINK FAILED. TRY ANOTHER WI-FI OR A HOTSPOT.' : 'AWAITING REMOTE CONNECTION...',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: AppColors.cloud,
@@ -948,7 +986,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                               onPanUpdate: (details) => _boardPoint(details.localPosition, constraints),
                               onPanEnd: (_) => _boardPoint(Offset.zero, constraints, end: true),
                               child: CustomPaint(
-                                painter: WhiteboardPainter(points: _whiteboardPoints),
+                                painter: WhiteboardPainter(strokes: _strokes),
                                 size: Size(constraints.maxWidth, constraints.maxHeight),
                               ),
                             );
@@ -1004,17 +1042,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       border: Border.all(color: AppColors.sky, width: 4),
                       boxShadow: [BoxShadow(color: AppColors.shadow, offset: const Offset(6, 6))],
                     ),
-                    child: (_isScreenShared || _hasCamera)
-                        ? AgoraVideoView(
-                            key: ValueKey(_isScreenShared),
-                            controller: VideoViewController(
-                              rtcEngine: _engine,
-                              canvas: VideoCanvas(
-                                uid: 0,
-                                sourceType: _isScreenShared ? VideoSourceType.videoSourceScreen : VideoSourceType.videoSourceCamera,
-                              ),
-                            ),
-                          )
+                    child: (_isScreenShared || (_hasCamera && !_camOff))
+                        ? _selfVideo()
                         : Center(child: Icon(Icons.videocam_off, color: AppColors.sunset, size: 48)),
                   ),
                 ),
@@ -1141,7 +1170,9 @@ class _DockButtonState extends State<_DockButton> {
 }
 
 class _WaitingRoom extends StatefulWidget {
-  const _WaitingRoom();
+  const _WaitingRoom({this.failed = false, this.onRetry});
+  final bool failed;
+  final VoidCallback? onRetry;
 
   @override
   State<_WaitingRoom> createState() => _WaitingRoomState();
@@ -1158,6 +1189,33 @@ class _WaitingRoomState extends State<_WaitingRoom> with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) {
+    if (widget.failed) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.link_off, color: Colors.white70, size: 44),
+              const SizedBox(height: 16),
+              const Text('Nu ne putem conecta direct',
+                  textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Text(
+                  'Rețeaua unuia dintre voi blochează apelurile directe (se întâmplă pe unele rețele mobile sau Wi-Fi de școală). Încercați alt Wi-Fi sau un hotspot.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white54, fontSize: 13.5),
+                ),
+              ),
+              const SizedBox(height: 18),
+              PbButton(text: 'Încearcă din nou', size: PbSize.sm, onPressed: widget.onRetry),
+            ],
+          ),
+        ),
+      );
+    }
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
