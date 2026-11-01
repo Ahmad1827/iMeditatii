@@ -2,14 +2,17 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show RenderEditable;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'browser_run.dart';
+import 'code_assistant.dart';
+import 'code_complete.dart';
 import 'code_keys.dart';
 import 'code_style.dart';
 import 'judge0.dart';
-import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, CodeHighlighter;
+import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, CodeHighlighter, showPbModal;
 
 // =============================================================================
 // CODE EDITOR — line numbers, syntax colours, no soft wrap, IDE-style keys.
@@ -65,6 +68,7 @@ class CodeEditor extends StatefulWidget {
   final double fontSize;
   final VoidCallback? onRun; // Ctrl/Cmd + Enter
   final List<StyleIssue> issues; // drawn as squiggles, explained on hover
+  final CodeAssistant? assistant; // the grey suggestion after the caret
 
   const CodeEditor({
     super.key,
@@ -75,6 +79,7 @@ class CodeEditor extends StatefulWidget {
     this.fontSize = 14.5,
     this.onRun,
     this.issues = const [],
+    this.assistant,
   });
 
   static Color colorOf(IssueLevel l) => switch (l) {
@@ -99,6 +104,8 @@ class _CodeEditorState extends State<CodeEditor> {
 
   CodeController get _c => widget.controller;
   StyleIssue? _hover;
+  final GlobalKey _fieldKey = GlobalKey();
+  double _textTop = _padV; // where the field really draws its first line
 
   @override
   void initState() {
@@ -149,10 +156,118 @@ class _CodeEditorState extends State<CodeEditor> {
     }
     if (widget.readOnly) return KeyEventResult.ignored;
 
+    final ai = widget.assistant;
+    if (ai != null) {
+      if (ctrl && key == LogicalKeyboardKey.space) {
+        ai.requestNow();
+        return KeyEventResult.handled;
+      }
+      final g = _ghost;
+      if (g != null && key == LogicalKeyboardKey.tab && !shift && !ctrl) {
+        _c.value = CodeComplete.apply(g, _c.value);
+        return KeyEventResult.handled;
+      }
+      if (g != null && key == LogicalKeyboardKey.escape) {
+        ai.dismiss();
+        return KeyEventResult.handled;
+      }
+    }
+
     final next = CodeKeys.apply(_c.value, key: key, character: e.character, ctrl: ctrl, shift: shift, alt: kb.isAltPressed, lang: _c.lang);
     if (next == null) return KeyEventResult.ignored;
     _c.value = next;
     return KeyEventResult.handled;
+  }
+
+  /// The suggestion to show now; one made for older text is not shown.
+  Ghost? get _ghost {
+    final g = widget.assistant?.ghost;
+    return g != null && g.matches(_c.value) ? g : null;
+  }
+
+  /// Reads where the field draws its text, so the suggestion sits exactly on it.
+  void _measureText(TextStyle style, StrutStyle strut, double rowH) {
+    if (!mounted) return;
+    final first = _c.text.indexOf(RegExp(r'\S'));
+    if (first < 0) return;
+    final field = _fieldKey.currentContext?.findRenderObject();
+    if (field is! RenderBox) return;
+    RenderEditable? editable;
+    void look(RenderObject o) {
+      if (o is RenderEditable) {
+        editable = o;
+      } else if (editable == null) {
+        o.visitChildren(look);
+      }
+    }
+
+    look(field);
+    final e = editable;
+    if (e == null || !e.hasSize) return;
+    final boxes = e.getBoxesForSelection(TextSelection(baseOffset: first, extentOffset: first + 1));
+    if (boxes.isEmpty) return;
+    // the same character alone, as the suggestion draws it: the difference is
+    // where the suggestion's first line has to start
+    final probe = TextPainter(text: TextSpan(text: _c.text[first], style: style), strutStyle: strut, textDirection: TextDirection.ltr)..layout();
+    final own = probe.getBoxesForSelection(const TextSelection(baseOffset: 0, extentOffset: 1));
+    probe.dispose();
+    if (own.isEmpty) return;
+    final line = '\n'.allMatches(_c.text.substring(0, first)).length;
+    final top = e.localToGlobal(Offset(0, boxes.first.top), ancestor: field).dy - own.first.top - line * rowH;
+    if ((top - _textTop).abs() > 0.5) setState(() => _textTop = top);
+  }
+
+  /// The suggestion over the code: its first line continues the caret's line
+  /// (what followed the caret moves after it), the others cover the lines below.
+  List<Widget> _ghostLayers(Ghost g, TextStyle style, StrutStyle strut, double rowH, double charW) {
+    final parts = g.text.split('\n');
+    final before = _c.text.substring(0, g.at);
+    final lineStart = before.lastIndexOf('\n') + 1;
+    final col = g.at - lineStart;
+    final line = '\n'.allMatches(before).length;
+    final nl = _c.text.indexOf('\n', g.at);
+    final rest = _c.text.substring(g.at + g.consume, nl < 0 ? _c.text.length : nl);
+    final grey = style.copyWith(color: Pb.muted);
+    final lineBg = Color.alphaBlend(Pb.editorActiveLine.withOpacity(0.35), Pb.editorBg);
+    final top = _textTop + line * rowH;
+    final hides = g.consume > 0 || rest.isNotEmpty; // what followed the caret moves
+    return [
+      Positioned(
+        left: _padH + col * charW,
+        top: top,
+        height: rowH,
+        child: IgnorePointer(
+          child: ColoredBox(
+            color: hides ? lineBg : Colors.transparent,
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: parts.first, style: grey),
+                if (parts.length == 1) TextSpan(text: rest, style: style),
+              ]),
+              maxLines: 1,
+              softWrap: false,
+              strutStyle: strut,
+            ),
+          ),
+        ),
+      ),
+      if (parts.length > 1)
+        Positioned(
+          left: 0,
+          right: 0,
+          top: top + rowH,
+          height: (parts.length - 1) * rowH,
+          child: IgnorePointer(
+            child: ColoredBox(
+              color: Pb.editorBg,
+              child: Padding(
+                padding: const EdgeInsets.only(left: _padH),
+                child: Text(parts.skip(1).join('\n'), style: grey, strutStyle: strut, softWrap: false),
+              ),
+            ),
+          ),
+        ),
+    ];
   }
 
   /// The issue under the mouse at [p] (in the text's coordinates).
@@ -211,7 +326,9 @@ class _CodeEditorState extends State<CodeEditor> {
   @override
   Widget build(BuildContext context) {
     final fs = widget.fontSize;
-    final style = Pb.mono(fs, height: _lineH);
+    // spelled out: a TextField otherwise takes 0.5 from the theme, and then charW
+    // below would not be the real width of a character
+    final style = Pb.mono(fs, height: _lineH).copyWith(letterSpacing: 0.5);
     final strut = StrutStyle.fromTextStyle(style, forceStrutHeight: true);
     final rowH = fs * _lineH;
 
@@ -225,13 +342,18 @@ class _CodeEditorState extends State<CodeEditor> {
     probe.dispose();
     final gutterW = (digits * charW + 22).ceilToDouble();
     final cur = _currentLine;
+    final ghost = _ghost;
+    if (ghost != null) WidgetsBinding.instance.addPostFrameCallback((_) => _measureText(style, strut, rowH));
+    final ghostParts = ghost?.text.split('\n') ?? const <String>[];
+    final ghostLong = ghostParts.fold<int>(0, (m, l) => math.max(m, l.length));
+    final ghostCol = ghost == null ? 0 : ghost.at - (_c.text.lastIndexOf('\n', math.max(0, ghost.at - 1)) + 1);
 
     return LayoutBuilder(
       builder: (context, box) {
         final viewH = box.maxHeight.isFinite ? box.maxHeight : 420.0;
         final viewW = box.maxWidth.isFinite ? box.maxWidth : 600.0;
-        final textW = math.max(viewW - gutterW, longest * charW + 60);
-        final contentH = math.max(viewH, lineCount * rowH + _padV * 2 + viewH * 0.35);
+        final textW = math.max(viewW - gutterW, (longest + ghostCol + ghostLong) * charW + 60);
+        final contentH = math.max(viewH, (lineCount + ghostParts.length) * rowH + _padV * 2 + viewH * 0.35);
 
         final field = Theme(
           data: Theme.of(context).copyWith(
@@ -246,6 +368,7 @@ class _CodeEditorState extends State<CodeEditor> {
             skipTraversal: true,
             onKeyEvent: _onKey,
             child: TextField(
+              key: _fieldKey,
               controller: _c,
               focusNode: _focus,
               undoController: widget.undoController,
@@ -352,6 +475,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                         ),
                                       ),
                                     ),
+                                  if (ghost != null) ..._ghostLayers(ghost, style, strut, rowH, charW),
                                   if (_hover != null && widget.issues.contains(_hover))
                                     Positioned(
                                       left: math.max(0, math.min(_padH + _hover!.col * charW, textW - 340)),
@@ -502,6 +626,7 @@ class CodeWorkbench extends StatefulWidget {
   final List<Widget> actions; // extra buttons before "Rulează"
   final bool styleCheck; // the Stil tab: the coding style, drawn in the code
   final bool sideConsole; // on a wide screen, input and output beside the code
+  final bool autocomplete; // the grey suggestions, built in or from Claude Code
 
   const CodeWorkbench({
     super.key,
@@ -516,6 +641,7 @@ class CodeWorkbench extends StatefulWidget {
     this.actions = const [],
     this.styleCheck = false,
     this.sideConsole = false,
+    this.autocomplete = false,
   });
 
   @override
@@ -566,12 +692,16 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
   List<StyleIssue> _style = const [];
   List<StyleIssue> _compile = const []; // the last run's errors, until the code changes
   Timer? _lint;
+  CodeAssistant? _ai;
 
   @override
   void initState() {
     super.initState();
     _lastText = _code.text;
     _code.addListener(_onCode);
+    if (widget.autocomplete && !widget.readOnly) {
+      _ai = CodeAssistant(_code)..addListener(_onAi);
+    }
     _relint();
     BrowserRun.warm(_code.lang);
     SharedPreferences.getInstance().then((p) {
@@ -583,12 +713,17 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
   @override
   void dispose() {
     _lint?.cancel();
+    _ai?.dispose();
     _code.removeListener(_onCode);
     _code.dispose();
     _stdin.dispose();
     _undo.dispose();
     _focus.dispose();
     super.dispose();
+  }
+
+  void _onAi() {
+    if (mounted) setState(() {});
   }
 
   void _onCode() {
@@ -1083,6 +1218,123 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
     );
   }
 
+  // ---------------------------------------------------------------- autocomplete
+  static String _aiLabel(CodeAssistant ai) {
+    if (!ai.enabled) return 'Completare oprită';
+    return switch (ai.link) {
+      ClaudeLink.off => 'Completare',
+      ClaudeLink.connecting => 'Caut Claude Code...',
+      ClaudeLink.ready => ai.thinking ? 'Claude scrie...' : 'Claude',
+      ClaudeLink.unreachable => 'Claude Code oprit',
+    };
+  }
+
+  static Color _aiColor(CodeAssistant ai) {
+    if (!ai.enabled) return Pb.muted;
+    return switch (ai.link) {
+      ClaudeLink.ready => ai.problem != null ? _amber : Pb.primary,
+      ClaudeLink.unreachable => _amber,
+      _ => Pb.muted,
+    };
+  }
+
+  Widget _aiChip(CodeAssistant ai) {
+    final c = _aiColor(ai);
+    return Tooltip(
+      message: 'Sugestii în cod: Tab acceptă, Esc renunță',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => _aiDialog(ai),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, size: 13, color: c),
+              const SizedBox(width: 5),
+              Text(_aiLabel(ai), style: TextStyle(fontSize: 12, color: c, fontWeight: ai.link == ClaudeLink.ready ? FontWeight.w600 : FontWeight.w400)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _aiDialog(CodeAssistant ai) {
+    showPbModal<void>(
+      context,
+      title: 'Completare automată',
+      actions: (ctx) => [PbButton(text: 'Gata', size: PbSize.sm, onPressed: () => Navigator.of(ctx).pop())],
+      body: ListenableBuilder(
+        listenable: ai,
+        builder: (_, __) {
+          final muted = TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.4);
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: Text('Sugestii în timp ce scrii', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text))),
+                  Switch(value: ai.enabled, activeColor: Pb.primary, onChanged: ai.setEnabled),
+                ],
+              ),
+              Text('Tab acceptă sugestia, Esc renunță, Ctrl+Space cere una acum. Merge din prima, fără cont și fără internet.', style: muted),
+              const SizedBox(height: 16),
+              Container(height: 1, color: Pb.border),
+              const SizedBox(height: 14),
+              Text('Mai inteligent, cu Claude Code', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Pb.text)),
+              const SizedBox(height: 4),
+              if (ai.link == ClaudeLink.off) ...[
+                Text('Dacă ai Claude Code pe calculator, el poate scrie sugestiile, folosind contul tău. Codul din IDE ajunge atunci la Claude.', style: muted),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: PbButton(text: 'Conectează', icon: Icons.link, size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => ai.connect()),
+                ),
+              ] else ...[
+                if (ai.link == ClaudeLink.ready)
+                  Text('Conectat. Sugestiile vin de la Claude la aproximativ 2 secunde după ce te oprești din scris.', style: muted)
+                else if (ai.link == ClaudeLink.connecting)
+                  Text('Caut Claude Code pe calculatorul tău...', style: muted)
+                else ...[
+                  Text('Nu l-am găsit. Rulează asta într-un terminal și lasă-l deschis (îți trebuie Node și Claude Code):', style: muted),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(10, 4, 4, 4),
+                    decoration: BoxDecoration(color: Pb.editorBg, borderRadius: BorderRadius.circular(6), border: Border.all(color: Pb.border)),
+                    child: Row(
+                      children: [
+                        Expanded(child: SelectableText(CodeAssistant.setupCommand, style: Pb.mono(12, color: Pb.text))),
+                        _icon(Icons.copy_all_outlined, 'Copiază comanda', () => _copy(CodeAssistant.setupCommand, 'Comanda a fost')),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text('Dacă browserul întreabă de acces la rețeaua locală, permite. Safari nu lasă paginile să ajungă la calculatorul tău: folosește Chrome, Edge sau Firefox.', style: muted),
+                ],
+                if (ai.problem != null) ...[
+                  const SizedBox(height: 8),
+                  Text(ai.problem!, style: TextStyle(fontSize: 13, color: _amber, height: 1.35)),
+                ],
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    if (ai.link != ClaudeLink.ready) ...[
+                      PbButton(text: 'Verifică din nou', size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: () => ai.connect()),
+                      const SizedBox(width: 8),
+                    ],
+                    PbButton(text: 'Deconectează', size: PbSize.sm, variant: PbVariant.outlineSecondary, onPressed: ai.disconnect),
+                  ],
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final (ln, col) = _lnCol;
@@ -1097,6 +1349,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
       fontSize: widget.compact ? math.min(_font, 13.5) : _font,
       onRun: _run,
       issues: _issues,
+      assistant: _ai,
     );
 
     final status = Container(
@@ -1108,6 +1361,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
           const SizedBox(width: 14),
           Text('$lines ${lines == 1 ? 'linie' : 'linii'}', style: TextStyle(fontSize: 12, color: Pb.muted)),
           const SizedBox(width: 14),
+          if (_ai != null) ...[_aiChip(_ai!), const SizedBox(width: 14)],
           // the issue on the caret's line, so it is read without the mouse (on a phone too)
           Expanded(
             child: here.isEmpty

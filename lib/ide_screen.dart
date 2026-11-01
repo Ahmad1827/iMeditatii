@@ -174,6 +174,9 @@ class _IdeScreenState extends State<IdeScreen> {
   void _keys() {
     const rows = [
       ('Ctrl+Enter', 'rulează programul'),
+      ('Tab', 'acceptă sugestia gri'),
+      ('Esc', 'renunță la sugestie'),
+      ('Ctrl+Space', 'cere o sugestie acum'),
       ('Shift+Alt+F', 'aliniază tot codul'),
       ('Ctrl+/', 'comentează liniile'),
       ('Tab / Shift+Tab', 'indentează / scoate indentarea'),
@@ -294,6 +297,7 @@ class _IdeScreenState extends State<IdeScreen> {
                       compact: narrow,
                       styleCheck: true,
                       sideConsole: true,
+                      autocomplete: !narrow, // accepted with Tab, which a phone does not have
                       onCodeChanged: _onCode,
                       onLangChanged: _onLang,
                       onStdinChanged: _onInput,
