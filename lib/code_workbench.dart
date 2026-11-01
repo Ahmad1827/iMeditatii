@@ -106,6 +106,11 @@ class _CodeEditorState extends State<CodeEditor> {
   StyleIssue? _hover;
   final GlobalKey _fieldKey = GlobalKey();
   double _textTop = _padV; // where the field really draws its first line
+  // what the field really lays out, read from it: browsers round the line height,
+  // so fontSize * _lineH drifts further from the code on every line
+  double? _rowH;
+  double? _rowHFor; // the font size _rowH was read at
+  double? _baseline; // from the top of a row to the code's baseline
 
   @override
   void initState() {
@@ -213,8 +218,27 @@ class _CodeEditorState extends State<CodeEditor> {
     probe.dispose();
     if (own.isEmpty) return;
     final line = '\n'.allMatches(_c.text.substring(0, first)).length;
-    final top = e.localToGlobal(Offset(0, boxes.first.top), ancestor: field).dy - own.first.top - line * rowH;
-    if ((top - _textTop).abs() > 0.5) setState(() => _textTop = top);
+    var row = rowH;
+    final lastAt = _c.text.lastIndexOf(RegExp(r'\S'));
+    final lastLine = '\n'.allMatches(_c.text.substring(0, lastAt)).length;
+    if (lastLine > line) {
+      final lastBoxes = e.getBoxesForSelection(TextSelection(baseOffset: lastAt, extentOffset: lastAt + 1));
+      if (lastBoxes.isNotEmpty) row = (lastBoxes.first.top - boxes.first.top) / (lastLine - line);
+    }
+    final top = e.localToGlobal(Offset(0, boxes.first.top), ancestor: field).dy - own.first.top - line * row;
+    // getDistanceToBaseline may only be called by a parent during layout; here layout is over
+    // ignore: invalid_use_of_protected_member
+    final fromTop = e.computeDistanceToActualBaseline(TextBaseline.alphabetic);
+    final base = e.localToGlobal(Offset(0, fromTop), ancestor: field).dy - top;
+    final fs = widget.fontSize;
+    if ((top - _textTop).abs() > 0.1 || (row - rowH).abs() > 0.001 || _rowHFor != fs || (base - (_baseline ?? -1)).abs() > 0.1) {
+      setState(() {
+        _textTop = top;
+        _rowH = row;
+        _rowHFor = fs;
+        _baseline = base;
+      });
+    }
   }
 
   /// The suggestion over the code: its first line continues the caret's line
@@ -330,7 +354,7 @@ class _CodeEditorState extends State<CodeEditor> {
     // below would not be the real width of a character
     final style = Pb.mono(fs, height: _lineH).copyWith(letterSpacing: 0.5);
     final strut = StrutStyle.fromTextStyle(style, forceStrutHeight: true);
-    final rowH = fs * _lineH;
+    final rowH = _rowHFor == fs && _rowH != null ? _rowH! : fs * _lineH;
 
     final lines = _c.text.split('\n');
     final lineCount = lines.length;
@@ -344,9 +368,9 @@ class _CodeEditorState extends State<CodeEditor> {
     final cur = _currentLine;
     final ghost = _ghost;
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureText(style, strut, rowH));
-    // from the top of a row to the code's baseline: the numbers sit on it too
+    // the numbers sit on the code's baseline; until the field is read, a guess
     final rowProbe = TextPainter(text: TextSpan(text: '0', style: style), strutStyle: strut, textDirection: TextDirection.ltr)..layout();
-    final baseline = rowProbe.computeDistanceToActualBaseline(TextBaseline.alphabetic);
+    final baseline = _baseline ?? rowProbe.computeDistanceToActualBaseline(TextBaseline.alphabetic);
     rowProbe.dispose();
     final ghostParts = ghost?.text.split('\n') ?? const <String>[];
     final ghostLong = ghostParts.fold<int>(0, (m, l) => math.max(m, l.length));
