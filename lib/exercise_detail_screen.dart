@@ -11,9 +11,12 @@ import 'app_colors.dart';
 import 'theme_manager.dart';
 import 'classes_models.dart' show Classes, HwProblem, Solution;
 import 'browser_run.dart';
+import 'package:flutter/rendering.dart' show RenderEditable;
+
 import 'code_keys.dart';
 import 'judge0.dart';
 import 'math_sheet.dart';
+import 'pane_split.dart';
 import 'problem_quiz.dart';
 import 'progress.dart';
 import 'statement.dart';
@@ -124,6 +127,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     _recordHistorySnapshot(_codeController.value);
     _codeController.addListener(_onCodeChanged);
     _loadExerciseDetails();
+    SharedPreferences.getInstance().then((p) {
+      if (!mounted) return;
+      setState(() {
+        _splitX = p.getDouble(_kSplitX) ?? _splitX;
+        _splitY = p.getDouble(_kSplitY) ?? _splitY;
+      });
+    }).catchError((_) {});
     _isExerciseDone().then((done) {
       if (mounted && done) setState(() => _alreadyDone = true);
     });
@@ -580,6 +590,29 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   // ===========================================================================
   // SHARED EDITOR (colors per style)
   // ===========================================================================
+  double _editorTextTop = 12; // where the field really draws its first line
+
+  /// A field draws its text above its padding; the numbers beside it follow.
+  void _readEditorTextTop(BuildContext fieldContext) {
+    if (!mounted || !fieldContext.mounted) return;
+    final field = fieldContext.findRenderObject();
+    if (field is! RenderBox || !field.hasSize) return;
+    RenderEditable? editable;
+    void look(RenderObject o) {
+      if (o is RenderEditable) {
+        editable = o;
+      } else if (editable == null) {
+        o.visitChildren(look);
+      }
+    }
+
+    look(field);
+    final e = editable;
+    if (e == null || !e.hasSize) return;
+    final top = e.localToGlobal(Offset.zero, ancestor: field).dy;
+    if ((top - _editorTextTop).abs() > 0.1) setState(() => _editorTextTop = top);
+  }
+
   Widget _buildEditor({required bool clean, required bool isMobile}) {
     final lineCount = '\n'.allMatches(_codeController.text).length + 1;
     final currentLine = _getCurrentLine();
@@ -592,6 +625,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ? Pb.mono(fontSz, height: lineH)
         : TextStyle(fontFamily: 'monospace', fontSize: fontSz, height: lineH, fontWeight: FontWeight.w600);
     final strut = StrutStyle.fromTextStyle(codeStyle, forceStrutHeight: true);
+    // the real row height (browsers round it) and the highlighted row, centred on the letters
+    final rowProbe = TextPainter(text: TextSpan(text: '0\n0', style: codeStyle), strutStyle: strut, textDirection: TextDirection.ltr)..layout();
+    final rowH = rowProbe.height / 2;
+    final rowTop = _editorTextTop + rowProbe.computeDistanceToActualBaseline(TextBaseline.alphabetic) - rowH / 2 - fontSz * 0.33;
+    rowProbe.dispose();
 
     final bg = clean ? Pb.editorBg : const Color(0xFF1B242B);
     final gutterBg = clean ? Pb.editorGutter : const Color(0xFF131A1F);
@@ -627,33 +665,44 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   children: [
                     SizedBox(
                       width: gutterW,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: List.generate(lineCount, (i) {
-                            final n = i + 1;
-                            final isCurrent = n == currentLine;
-                            return Container(
-                              height: fontSz * lineH,
-                              color: isCurrent ? activeLine : Colors.transparent,
-                              padding: const EdgeInsets.only(right: 6),
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                !clean && isCurrent ? "▶$n" : "$n",
-                                strutStyle: strut,
-                                style: clean
-                                    ? Pb.mono(isMobile ? 11 : 12.5, color: isCurrent ? activeNum : numColor)
-                                    : TextStyle(
-                                        fontFamily: 'monospace',
-                                        color: isCurrent ? activeNum : numColor,
-                                        fontSize: isMobile ? 10.5 : 12,
-                                        fontWeight: isCurrent ? FontWeight.w900 : FontWeight.w600,
-                                      ),
+                      child: Stack(
+                        fit: StackFit.passthrough,
+                        children: [
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            top: rowTop + (currentLine - 1) * rowH,
+                            height: rowH,
+                            child: ColoredBox(color: activeLine),
+                          ),
+                          // one text with the code's strut: the browser lays the
+                          // numbers out exactly as it lays out the code's lines
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, _editorTextTop, 6, 12),
+                            child: Text.rich(
+                              TextSpan(
+                                children: List.generate(lineCount, (i) {
+                                  final n = i + 1;
+                                  final isCurrent = n == currentLine;
+                                  return TextSpan(
+                                    text: "${!clean && isCurrent ? '▶$n' : '$n'}${n < lineCount ? '\n' : ''}",
+                                    style: clean
+                                        ? Pb.mono(isMobile ? 11 : 12.5, color: isCurrent ? activeNum : numColor)
+                                        : TextStyle(
+                                            fontFamily: 'monospace',
+                                            color: isCurrent ? activeNum : numColor,
+                                            fontSize: isMobile ? 10.5 : 12,
+                                            fontWeight: isCurrent ? FontWeight.w900 : FontWeight.w600,
+                                          ),
+                                  );
+                                }),
                               ),
-                            );
-                          }),
-                        ),
+                              strutStyle: strut,
+                              textAlign: TextAlign.right,
+                              softWrap: false,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Expanded(
@@ -670,7 +719,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                 selectionHandleColor: clean ? Pb.primary : const Color(0xFF74B9FF),
                               ),
                             ),
-                            child: TextField(
+                            child: Builder(builder: (fieldContext) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) => _readEditorTextTop(fieldContext));
+                              return TextField(
                               controller: _codeController,
                               maxLines: null,
                               keyboardType: TextInputType.multiline,
@@ -683,7 +734,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                               ),
-                            ),
+                            );
+                            }),
                           ),
                         ),
                       ),
@@ -729,6 +781,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   bool _fTerminal = false; // focus: the terminal open under the code
   double _fStatementW = 420;
   double _fTerminalH = 240;
+  // the dividers, kept between problems and visits
+  static const _kSplitX = 'problem_split_x';
+  static const _kSplitY = 'problem_split_y';
+  static const _kSplitXDefault = 5 / 11;
+  static const _kSplitYDefault = 0.6;
+  double _splitX = _kSplitXDefault; // the statement's share of the width
+  double _splitY = _kSplitYDefault; // the editor's share of the height
   final GlobalKey _cHeadKey = GlobalKey();
   final GlobalKey _cLeftKey = GlobalKey();
   final GlobalKey _cRightKey = GlobalKey();
@@ -896,46 +955,39 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           header,
           const SizedBox(height: 14),
           Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: slide(
-                    -1.4,
-                    KeyedSubtree(
-                      key: _cLeftKey,
-                      child: _cCard(
-                        fill: true,
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
-                          child: tabContent,
-                        ),
-                      ),
+            child: _sideBySide(
+              first: slide(
+                -1.4,
+                KeyedSubtree(
+                  key: _cLeftKey,
+                  child: _cCard(
+                    fill: true,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
+                      child: tabContent,
                     ),
                   ),
                 ),
-                const SizedBox(width: 14),
-                Expanded(
-                  flex: 6,
-                  child: slide(
-                    1.4,
-                    KeyedSubtree(
-                      key: _cRightKey,
-                      child: isCode
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(flex: 3, child: _cEditor()),
-                                const SizedBox(height: 14),
-                                Expanded(flex: 2, child: _cConsole(fill: true)),
-                              ],
-                            )
-                          : (_isSheet ? _sheet(fill: true) : SingleChildScrollView(child: _cAnswerPanel())),
-                    ),
-                  ),
+              ),
+              second: slide(
+                1.4,
+                KeyedSubtree(
+                  key: _cRightKey,
+                  child: isCode
+                      ? PaneSplit(
+                          axis: Axis.vertical,
+                          ratio: _splitY,
+                          defaultRatio: _kSplitYDefault,
+                          minFirst: 220,
+                          minSecond: 130,
+                          onChanged: (r) => setState(() => _splitY = r),
+                          onChangeEnd: _saveSplits,
+                          first: _cEditor(),
+                          second: _cConsole(fill: true),
+                        )
+                      : (_isSheet ? _sheet(fill: true) : SingleChildScrollView(child: _cAnswerPanel())),
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -943,7 +995,27 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     ));
   }
 
-  // ---------------------------------------------------------------- building blocks
+  /// The statement and the work beside it, with a divider to drag between them.
+  Widget _sideBySide({required Widget first, required Widget second, double gap = 14}) => PaneSplit(
+        axis: Axis.horizontal,
+        ratio: _splitX,
+        defaultRatio: _kSplitXDefault,
+        minFirst: 280,
+        minSecond: 380,
+        gap: gap,
+        onChanged: (r) => setState(() => _splitX = r),
+        onChangeEnd: _saveSplits,
+        first: first,
+        second: second,
+      );
+
+  void _saveSplits() {
+    SharedPreferences.getInstance().then((p) {
+      p.setDouble(_kSplitX, _splitX);
+      p.setDouble(_kSplitY, _splitY);
+    }).catchError((_) {});
+  }
+
   Widget _cCard({Widget? header, required Widget child, bool fill = false}) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -2528,13 +2600,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               child: Padding(
                 padding: EdgeInsets.all(isMobile ? 14.0 : 22.0),
                 child: !isMobile
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 5, child: SingleChildScrollView(child: _retroContentPanel(isMobile))),
-                          const SizedBox(width: 24),
-                          Expanded(flex: 6, child: SingleChildScrollView(child: _retroInteractionPanel(isMobile))),
-                        ],
+                    ? _sideBySide(
+                        gap: 24,
+                        first: SingleChildScrollView(child: _retroContentPanel(isMobile)),
+                        second: SingleChildScrollView(child: _retroInteractionPanel(isMobile)),
                       )
                     : SingleChildScrollView(
                         child: Column(children: [

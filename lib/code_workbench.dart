@@ -294,9 +294,17 @@ class _CodeEditorState extends State<CodeEditor> {
     ];
   }
 
+  /// The top of the first row as the eye sees it: centred on the letters. The
+  /// field's own line box has its extra space below them, so a band drawn from
+  /// it looks shifted up.
+  double _rowTop(double rowH) {
+    final base = _baseline;
+    return base == null ? _textTop : _textTop + base - rowH / 2 - widget.fontSize * 0.33;
+  }
+
   /// The issue under the mouse at [p] (in the text's coordinates).
   StyleIssue? _issueAt(Offset p, double rowH, double charW, List<String> lines) {
-    final line = ((p.dy - _textTop) / rowH).floor() + 1;
+    final line = ((p.dy - _rowTop(rowH)) / rowH).floor() + 1;
     final col = ((p.dx - _padH) / charW).floor();
     StyleIssue? best;
     for (final i in widget.issues) {
@@ -372,6 +380,7 @@ class _CodeEditorState extends State<CodeEditor> {
     final rowProbe = TextPainter(text: TextSpan(text: '0', style: style), strutStyle: strut, textDirection: TextDirection.ltr)..layout();
     final baseline = _baseline ?? rowProbe.computeDistanceToActualBaseline(TextBaseline.alphabetic);
     rowProbe.dispose();
+    final rowTop = _rowTop(rowH);
     final ghostParts = ghost?.text.split('\n') ?? const <String>[];
     final ghostLong = ghostParts.fold<int>(0, (m, l) => math.max(m, l.length));
     final ghostCol = ghost == null ? 0 : ghost.at - (_c.text.lastIndexOf('\n', math.max(0, ghost.at - 1)) + 1);
@@ -456,8 +465,8 @@ class _CodeEditorState extends State<CodeEditor> {
                               lineCount: lineCount,
                               current: cur,
                               rowH: rowH,
-                              padV: _textTop,
-                              baseline: baseline,
+                              padV: rowTop,
+                              baseline: _baseline == null ? baseline : _textTop + _baseline! - rowTop,
                               style: Pb.mono(fs - 2, color: Pb.muted, height: _lineH),
                               activeStyle: Pb.mono(fs - 2, color: Pb.text, height: _lineH),
                               activeBg: Pb.editorActiveLine,
@@ -477,7 +486,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                     Positioned(
                                       left: 0,
                                       right: 0,
-                                      top: _textTop + (cur - 1) * rowH,
+                                      top: rowTop + (cur - 1) * rowH,
                                       height: rowH,
                                       child: ColoredBox(color: Pb.editorActiveLine.withOpacity(0.35)),
                                     ),
@@ -500,7 +509,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                     Positioned.fill(
                                       child: IgnorePointer(
                                         child: CustomPaint(
-                                          painter: _SquigglePainter(widget.issues, lines, rowH: rowH, charW: charW, padV: _textTop, padH: _padH),
+                                          painter: _SquigglePainter(widget.issues, lines, rowH: rowH, charW: charW, padV: rowTop, padH: _padH),
                                         ),
                                       ),
                                     ),
@@ -508,7 +517,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                   if (_hover != null && widget.issues.contains(_hover))
                                     Positioned(
                                       left: math.max(0, math.min(_padH + _hover!.col * charW, textW - 340)),
-                                      top: _textTop + _hover!.line * rowH + 2,
+                                      top: rowTop + _hover!.line * rowH + 2,
                                       child: IgnorePointer(child: _bubble(_hover!)),
                                     ),
                                 ],
