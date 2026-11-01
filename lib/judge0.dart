@@ -30,6 +30,26 @@ class RunResult {
 
   bool get ok => !failed && status == 'Accepted';
 
+  /// It was stopped for running too long; whatever it printed doesn't count.
+  bool get timedOut => status.startsWith('Time Limit');
+
+  /// What went wrong with the run itself, in words; null if it ran to the end.
+  String? get problem {
+    if (failed) return 'Nu s-a putut rula';
+    if (timedOut) return 'Timp depășit';
+    if (status == 'Compilation Error') return 'Eroare de compilare';
+    if (status.startsWith('Runtime Error')) return 'Eroare la rulare';
+    return null;
+  }
+
+  /// [problem], explained, for a test that failed because of it.
+  String get timeNote {
+    if (!timedOut) return '';
+    final s = seconds;
+    final after = s == null ? '' : ' după ${s.toStringAsFixed(s == s.roundToDouble() ? 0 : 1)} secunde';
+    return 'Programul a rulat prea mult și a fost oprit$after. Caută o buclă care nu se termină sau un algoritm mai rapid.';
+  }
+
   RunResult copyWith({String? stdout, String? console, bool? noFile}) => RunResult(
         stdout: stdout ?? this.stdout,
         console: console ?? this.console,

@@ -554,11 +554,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final result = await Judge0.run(code: _program(code), stdin: inputData.toString(), file: _file);
         final got = normOutput(result.stdout);
         final normExpected = normOutput(expectedOutput.toString());
-        final ok = got == normExpected;
+        final ok = got == normExpected && !result.timedOut;
         if (!ok) allPassed = false;
         final note = ok ? '' : _fileNote(result);
 
-        testResults.add({"index": i + 1, "passed": ok, "input": inputData.toString(), "expected": normExpected, "got": note.isEmpty ? got : '$got  [$note]'});
+        testResults.add({"index": i + 1, "passed": ok, "timedOut": result.timedOut, "input": inputData.toString(), "expected": normExpected, "got": note.isEmpty ? got : '$got  [$note]'});
         if (mounted) setState(() {});
       }
 
@@ -1692,7 +1692,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             Text(
               s['ok'] == true
                   ? (s['submit'] == true ? 'Acceptat' : 'Exemple corecte')
-                  : (s['submit'] == true ? 'Respins' : 'Exemple greșite'),
+                  : ('${s['verdict'] ?? ''}'.isNotEmpty ? '${s['verdict']}' : (s['submit'] == true ? 'Respins' : 'Exemple greșite')),
               style: TextStyle(fontWeight: FontWeight.w600, color: s['ok'] == true ? Pb.success : Pb.danger),
             ),
             Text('${s['passed']}/${s['total']}'),
@@ -2019,7 +2019,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                       else if (testResults.isNotEmpty) ...[
                         Icon(solutionOk ? Icons.check_circle : Icons.cancel, size: 15, color: solutionOk ? Pb.success : Pb.danger),
                         const SizedBox(width: 5),
-                        Text('$passed/${testResults.length} teste', style: TextStyle(fontSize: 13, color: Pb.muted)),
+                        Text('$passed/${testResults.length} teste${_cFailVerdict.isEmpty ? '' : ' · $_cFailVerdict'}', style: TextStyle(fontSize: 13, color: Pb.muted)),
                       ],
                     ],
                   ),
@@ -2167,8 +2167,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   children: [
                     Text(
                       _cLastWasRun
-                          ? (solutionOk ? 'Exemplele trec' : 'Exemplele nu trec')
-                          : (solutionOk ? 'Acceptat. Felicitări!' : 'Respins'),
+                          ? (solutionOk ? 'Exemplele trec' : (_cFailVerdict.isNotEmpty ? _cFailVerdict : 'Exemplele nu trec'))
+                          : (solutionOk ? 'Acceptat. Felicitări!' : (_cFailVerdict.isNotEmpty ? _cFailVerdict : 'Respins')),
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: solutionOk ? Pb.success : Pb.danger),
                     ),
                     Text(
@@ -2259,6 +2259,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
+  /// Why the first failed test failed, when the run itself went wrong (too long,
+  /// a crash, no compile); empty when it only printed something else.
+  String get _cFailVerdict {
+    for (final t in testResults) {
+      if (t['passed'] != true) return '${t['verdict'] ?? ''}';
+    }
+    return '';
+  }
+
   /// Hidden tests can be large; show only the start of their data.
   static String _cClip(String v) {
     const max = 3000;
@@ -2285,7 +2294,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               Icon(ok ? Icons.check_circle : Icons.cancel, size: 16, color: ok ? Pb.success : Pb.danger),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(sample ? 'Exemplu ${i + 1}' : 'Test ${i + 1}', style: TextStyle(fontSize: 13.5, color: Pb.text)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(sample ? 'Exemplu ${i + 1}' : 'Test ${i + 1}', style: TextStyle(fontSize: 13.5, color: Pb.text)),
+                    if ('${t['verdict'] ?? ''}'.isNotEmpty) Text('${t['verdict']}', style: TextStyle(fontSize: 11.5, color: Pb.danger)),
+                  ],
+                ),
               ),
               if (!sample && !revealed) Icon(Icons.lock_outline, size: 13, color: Pb.muted),
             ],
@@ -2334,8 +2349,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         final got = normOutput(r.stdout);
         final err = r.error.replaceAll('\r', '').trim();
         final exp = normOutput(tests[i]['output']!);
-        final ok = got == exp;
-        final note = ok ? '' : _fileNote(r);
+        final ok = got == exp && !r.timedOut;
+        final note = ok ? '' : [r.timeNote, _fileNote(r)].where((n) => n.isNotEmpty).join('\n');
         if (!ok) all = false;
 
         testResults.add({
@@ -2347,6 +2362,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           'got': got,
           'error': err,
           'note': note,
+          'verdict': ok ? '' : (r.problem ?? ''),
         });
         if (mounted) setState(() {});
       }
@@ -2369,6 +2385,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         'time': TimeOfDay.now().format(context),
         'submit': submit,
         'ok': all,
+        'verdict': _cFailVerdict,
         'score': score,
         'passed': passed,
         'total': testResults.length,
@@ -3132,7 +3149,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     children: [
                       Icon(passed ? Icons.check_circle : Icons.cancel, size: 14, color: c),
                       const SizedBox(width: 6),
-                      Text("TEST ${t['index']}: ${passed ? 'PASSED (OK)' : 'FAILED'}",
+                      Text("TEST ${t['index']}: ${passed ? 'PASSED (OK)' : (t['timedOut'] == true ? 'TIME LIMIT EXCEEDED' : 'FAILED')}",
                           style: TextStyle(color: c, fontWeight: FontWeight.w900, fontSize: 11)),
                     ],
                   ),
@@ -3169,7 +3186,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              solutionOk ? "QUEST CLEARED! +50 EXP EARNED." : "TESTS FAILED. INSPECT CONSOLE.",
+              solutionOk
+                  ? "QUEST CLEARED! +50 EXP EARNED."
+                  : (testResults.any((t) => t['timedOut'] == true) ? "TIME LIMIT EXCEEDED. INSPECT CONSOLE." : "TESTS FAILED. INSPECT CONSOLE."),
               style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 0.8),
             ),
           ),

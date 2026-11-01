@@ -272,7 +272,7 @@ class _CodeEditorState extends State<CodeEditor> {
 
   /// The issue under the mouse at [p] (in the text's coordinates).
   StyleIssue? _issueAt(Offset p, double rowH, double charW, List<String> lines) {
-    final line = ((p.dy - _padV) / rowH).floor() + 1;
+    final line = ((p.dy - _textTop) / rowH).floor() + 1;
     final col = ((p.dx - _padH) / charW).floor();
     StyleIssue? best;
     for (final i in widget.issues) {
@@ -343,7 +343,11 @@ class _CodeEditorState extends State<CodeEditor> {
     final gutterW = (digits * charW + 22).ceilToDouble();
     final cur = _currentLine;
     final ghost = _ghost;
-    if (ghost != null) WidgetsBinding.instance.addPostFrameCallback((_) => _measureText(style, strut, rowH));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureText(style, strut, rowH));
+    // from the top of a row to the code's baseline: the numbers sit on it too
+    final rowProbe = TextPainter(text: TextSpan(text: '0', style: style), strutStyle: strut, textDirection: TextDirection.ltr)..layout();
+    final baseline = rowProbe.computeDistanceToActualBaseline(TextBaseline.alphabetic);
+    rowProbe.dispose();
     final ghostParts = ghost?.text.split('\n') ?? const <String>[];
     final ghostLong = ghostParts.fold<int>(0, (m, l) => math.max(m, l.length));
     final ghostCol = ghost == null ? 0 : ghost.at - (_c.text.lastIndexOf('\n', math.max(0, ghost.at - 1)) + 1);
@@ -428,7 +432,8 @@ class _CodeEditorState extends State<CodeEditor> {
                               lineCount: lineCount,
                               current: cur,
                               rowH: rowH,
-                              padV: _padV,
+                              padV: _textTop,
+                              baseline: baseline,
                               style: Pb.mono(fs - 2, color: Pb.muted, height: _lineH),
                               activeStyle: Pb.mono(fs - 2, color: Pb.text, height: _lineH),
                               activeBg: Pb.editorActiveLine,
@@ -448,7 +453,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                     Positioned(
                                       left: 0,
                                       right: 0,
-                                      top: _padV + (cur - 1) * rowH,
+                                      top: _textTop + (cur - 1) * rowH,
                                       height: rowH,
                                       child: ColoredBox(color: Pb.editorActiveLine.withOpacity(0.35)),
                                     ),
@@ -471,7 +476,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                     Positioned.fill(
                                       child: IgnorePointer(
                                         child: CustomPaint(
-                                          painter: _SquigglePainter(widget.issues, lines, rowH: rowH, charW: charW, padV: _padV, padH: _padH),
+                                          painter: _SquigglePainter(widget.issues, lines, rowH: rowH, charW: charW, padV: _textTop, padH: _padH),
                                         ),
                                       ),
                                     ),
@@ -479,7 +484,7 @@ class _CodeEditorState extends State<CodeEditor> {
                                   if (_hover != null && widget.issues.contains(_hover))
                                     Positioned(
                                       left: math.max(0, math.min(_padH + _hover!.col * charW, textW - 340)),
-                                      top: _padV + _hover!.line * rowH + 2,
+                                      top: _textTop + _hover!.line * rowH + 2,
                                       child: IgnorePointer(child: _bubble(_hover!)),
                                     ),
                                 ],
@@ -507,6 +512,7 @@ class _GutterPainter extends CustomPainter {
   final int current;
   final double rowH;
   final double padV;
+  final double baseline; // from the top of a row to the code's baseline
   final TextStyle style;
   final TextStyle activeStyle;
   final Color activeBg;
@@ -519,6 +525,7 @@ class _GutterPainter extends CustomPainter {
     required this.current,
     required this.rowH,
     required this.padV,
+    required this.baseline,
     required this.style,
     required this.activeStyle,
     required this.activeBg,
@@ -538,7 +545,7 @@ class _GutterPainter extends CustomPainter {
         text: TextSpan(text: '${i + 1}', style: active ? activeStyle : style),
         textDirection: TextDirection.ltr,
       )..layout();
-      tp.paint(canvas, Offset(size.width - 10 - tp.width, top + (rowH - tp.height) / 2));
+      tp.paint(canvas, Offset(size.width - 10 - tp.width, top + baseline - tp.computeDistanceToActualBaseline(TextBaseline.alphabetic)));
       tp.dispose();
       final m = marks[i + 1];
       if (m != null) canvas.drawCircle(Offset(5, top + rowH / 2), 3, Paint()..color = m);
@@ -550,6 +557,8 @@ class _GutterPainter extends CustomPainter {
       old.lineCount != lineCount ||
       old.current != current ||
       old.rowH != rowH ||
+      old.padV != padV ||
+      old.baseline != baseline ||
       old.viewH != viewH ||
       old.style != style ||
       old.activeBg != activeBg ||
@@ -967,12 +976,10 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
   }
 
   (String, Color) _statusOf(RunResult r) {
-    if (r.failed) return ('Nu s-a putut rula', _red);
+    final problem = r.problem;
+    if (problem != null) return (problem, r.timedOut ? _amber : _red);
     final s = r.status;
     if (s == 'Accepted') return ('Rulat cu succes', _green);
-    if (s == 'Compilation Error') return ('Eroare de compilare', _red);
-    if (s.startsWith('Time Limit')) return ('Timp depășit', _amber);
-    if (s.startsWith('Runtime Error')) return ('Eroare la rulare', _red);
     return (s.isEmpty ? 'Terminat' : s, _amber);
   }
 
