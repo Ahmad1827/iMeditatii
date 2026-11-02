@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _hFactTimer?.cancel();
+    _hAuthSub?.cancel();
     solvedChanged.removeListener(_loadPlayerStats);
     _scrollController.dispose();
     super.dispose();
@@ -104,6 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>>? _hPosts;
   List<Map<String, dynamic>>? _hLeaders;
   bool _hLeadersError = false;
+  StreamSubscription<User?>? _hAuthSub;
+  bool _hAuthSeen = false;
+  String? _hAuthUid;
+  int _hLeadersRequest = 0;
   bool _hCardsHidden = false;
   int _hFactIdx = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
   Timer? _hFactTimer;
@@ -122,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!_hStarted) {
       _hStarted = true;
       Future.microtask(_hLoadAll);
+      _hAuthSub = FirebaseAuth.instance.authStateChanges().listen(_hOnAuth);
     }
 
     final catalog = _HReveal(
@@ -208,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   // ---------------------------------------------------------------- data
   Future<void> _hLoadAll() async {
-    await Future.wait([_hLoadExercises(), _hLoadPosts(), _hLoadLeaders()]);
+    await Future.wait([_hLoadExercises(), _hLoadPosts()]);
   }
 
   Future<void> _hLoadExercises() async {
@@ -325,7 +331,23 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() => _hPosts = posts);
   }
 
+  /// The rules let only signed-in users read `users`, and a home page stays open
+  /// through a login or logout, so the leaderboard follows the account.
+  void _hOnAuth(User? user) {
+    if (_hAuthSeen && user?.uid == _hAuthUid) return;
+    _hAuthSeen = true;
+    _hAuthUid = user?.uid;
+    _hLeadersRequest++;
+    if (!mounted) return;
+    setState(() {
+      _hLeaders = user == null ? const [] : null;
+      _hLeadersError = false;
+    });
+    if (user != null) _hLoadLeaders();
+  }
+
   Future<void> _hLoadLeaders() async {
+    final request = _hLeadersRequest;
     try {
       final snap = await FirebaseFirestore.instance
           .collection('users')
@@ -341,15 +363,15 @@ class _HomeScreenState extends State<HomeScreen> {
         list.add({
           'uid': d.id,
           'name': (m['name'] ?? m['fullName'] ?? m['displayName'] ?? m['nume'] ?? 'Elev').toString(),
-          'photo': (m['photoUrl'] ?? m['avatarUrl'] ?? m['photo'] ?? '').toString(),
+          'photo': (m['image'] ?? m['photoUrl'] ?? m['avatarUrl'] ?? m['photo'] ?? '').toString(),
           'count': count,
         });
         if (list.length == 10) break;
       }
-      if (mounted) setState(() => _hLeaders = list);
+      if (mounted && request == _hLeadersRequest) setState(() => _hLeaders = list);
     } catch (e) {
       debugPrint('Leaderboard: $e');
-      if (mounted) {
+      if (mounted && request == _hLeadersRequest) {
         setState(() {
           _hLeaders = [];
           _hLeadersError = true;
@@ -914,7 +936,26 @@ class _HomeScreenState extends State<HomeScreen> {
     final me = FirebaseAuth.instance.currentUser?.uid;
 
     Widget body;
-    if (leaders == null) {
+    if (me == null) {
+      body = Container(
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
+        padding: const EdgeInsets.all(20),
+        child: Wrap(
+          spacing: 14,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text('Intră în cont ca să vezi clasamentul.', style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.5)),
+            AppLink(to: '/login', child: PbButton(
+              text: 'Intră în cont',
+              variant: PbVariant.outlinePrimary,
+              size: PbSize.sm,
+              onPressed: () => context.go('/login'),
+            )),
+          ],
+        ),
+      );
+    } else if (leaders == null) {
       body = _hLoading('Se încarcă clasamentul...');
     } else if (leaders.isEmpty) {
       body = Container(
