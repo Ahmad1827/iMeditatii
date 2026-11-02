@@ -30,3 +30,40 @@ Future<Set<String>> solvedKeys() async {
   }
   return keys;
 }
+
+/// What this device solved that the account doesn't have yet. Maths stays out:
+/// a person checks it and can take it back, and the account's list is the verdict.
+Set<String> keysToSync(Iterable<String> local, Iterable<String> account) {
+  final have = account.toSet();
+  return {
+    for (final k in local)
+      // a ':' is another kind of flag, like lectie_citita:<id> for a lesson read
+      if (progressKey.hasMatch(k) && !k.contains(':') && !k.toLowerCase().startsWith('mate') && !have.contains(k)) k,
+  };
+}
+
+/// The leaderboard reads the account, but a problem solved while logged out, or
+/// while the connection dropped, was saved only on this device and a problem already
+/// marked here is never sent again. Called when an account is seen on this device.
+Future<void> syncSolvedToAccount() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+  final prefs = await SharedPreferences.getInstance();
+  final local = prefs.getKeys().where((k) => prefs.get(k) == true);
+  final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
+  await FirebaseFirestore.instance.runTransaction((tx) async {
+    final data = (await tx.get(ref)).data();
+    final account = List<String>.from((data?['solvedIds'] as List?) ?? const []);
+    final fresh = keysToSync(local, account);
+    final uncounted = data?['solvedCount'] == null && account.isNotEmpty;
+    if (fresh.isEmpty && !uncounted) return;
+    tx.set(
+      ref,
+      {
+        'solvedIds': FieldValue.arrayUnion(fresh.toList()),
+        'solvedCount': account.length + fresh.length,
+      },
+      SetOptions(merge: true),
+    );
+  });
+}

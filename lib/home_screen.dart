@@ -333,17 +333,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// The rules let only signed-in users read `users`, and a home page stays open
   /// through a login or logout, so the leaderboard follows the account.
-  void _hOnAuth(User? user) {
+  Future<void> _hOnAuth(User? user) async {
     if (_hAuthSeen && user?.uid == _hAuthUid) return;
     _hAuthSeen = true;
     _hAuthUid = user?.uid;
-    _hLeadersRequest++;
+    final request = ++_hLeadersRequest;
     if (!mounted) return;
     setState(() {
       _hLeaders = user == null ? const [] : null;
       _hLeadersError = false;
     });
-    if (user != null) _hLoadLeaders();
+    if (user == null) return;
+    try {
+      await syncSolvedToAccount().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      debugPrint('Solved sync: $e');
+    }
+    if (mounted && request == _hLeadersRequest) _hLoadLeaders();
   }
 
   Future<void> _hLoadLeaders() async {
