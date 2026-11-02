@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'bac_progress.dart';
 import 'workspace_cards.dart';
@@ -368,10 +369,10 @@ class _UserDashboardState extends State<UserDashboard> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              PbButton(text: 'Exersează', icon: Icons.play_arrow, onPressed: () => context.go('/exercitii')),
-              PbButton(text: 'Temele mele', icon: Icons.assignment_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/clase')),
-              PbButton(text: 'Găsește profesori', icon: Icons.school_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/materii')),
-              PbButton(text: 'Profilul meu', icon: Icons.person_outline, variant: PbVariant.outlineSecondary, onPressed: () => context.go('/elev/$_uid')),
+              AppLink(to: '/exercitii', child: PbButton(text: 'Exersează', icon: Icons.play_arrow, onPressed: () => context.go('/exercitii'))),
+              AppLink(to: '/clase', child: PbButton(text: 'Temele mele', icon: Icons.assignment_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/clase'))),
+              AppLink(to: '/materii', child: PbButton(text: 'Găsește profesori', icon: Icons.school_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/materii'))),
+              AppLink(to: '/elev/$_uid', child: PbButton(text: 'Profilul meu', icon: Icons.person_outline, variant: PbVariant.outlineSecondary, onPressed: () => context.go('/elev/$_uid'))),
             ],
           ),
         ],
@@ -476,7 +477,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 ),
               ),
           const SizedBox(height: 4),
-          PbButton(text: 'Continuă să exersezi', icon: Icons.arrow_forward, size: PbSize.sm, fullWidth: true, onPressed: () => context.go('/exercitii')),
+          AppLink(to: '/exercitii', child: PbButton(text: 'Continuă să exersezi', icon: Icons.arrow_forward, size: PbSize.sm, fullWidth: true, onPressed: () => context.go('/exercitii'))),
         ],
       ),
     );
@@ -545,18 +546,18 @@ class _UserDashboardState extends State<UserDashboard> {
                       textAlign: TextAlign.center, style: TextStyle(fontSize: 13.5, color: Pb.muted)),
                   if (docs.isEmpty) ...[
                     const SizedBox(height: 14),
-                    PbButton(text: 'Găsește un profesor', icon: Icons.school_outlined, size: PbSize.sm, onPressed: () => context.go('/materii')),
+                    AppLink(to: '/materii', child: PbButton(text: 'Găsește un profesor', icon: Icons.school_outlined, size: PbSize.sm, onPressed: () => context.go('/materii'))),
                   ],
                 ],
               ),
             )
           else
             for (final d in list)
-              _UdChatRow(
+              AppLink(to: '/chat/${d.id}', child: _UdChatRow(
                 data: d.data() as Map<String, dynamic>,
                 when: _when((d.data() as Map<String, dynamic>)['updatedAt'] as Timestamp?),
                 onOpen: (name) => context.go('/chat/${d.id}', extra: name),
-              ),
+              )),
         ],
       ),
     );
@@ -658,14 +659,14 @@ class _UserDashboardState extends State<UserDashboard> {
               style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            RetroButton(
+            AppLink(to: '/elev/$userId', child: RetroButton(
               text: "PROFILE",
               icon: Icons.person,
               isFullWidth: true,
               bgColor: AppColors.cardBg,
               textColor: AppColors.ink,
               onPressed: () => context.go('/elev/$userId'),
-            ),
+            )),
           ],
         ),
       );
@@ -708,13 +709,13 @@ class _UserDashboardState extends State<UserDashboard> {
             ),
           ),
           const SizedBox(width: 24),
-          RetroButton(
+          AppLink(to: '/elev/$userId', child: RetroButton(
             text: "PROFILE",
             icon: Icons.person,
             bgColor: AppColors.cardBg,
             textColor: AppColors.ink,
             onPressed: () => context.go('/elev/$userId'),
-          ),
+          )),
         ],
       ),
     );
@@ -757,7 +758,7 @@ class _UserDashboardState extends State<UserDashboard> {
                 final teacherName = teacherData['name'] ?? 'UNKNOWN MASTER';
                 final teacherAvatar = teacherData['image'] as String? ?? '';
 
-                return _RetroChatCard(
+                return AppLink(to: '/chat/$chatId', child: _RetroChatCard(
                   name: teacherName,
                   avatarUrl: teacherAvatar,
                   lastMessage: lastMsg,
@@ -765,7 +766,7 @@ class _UserDashboardState extends State<UserDashboard> {
                   isMobile: isMobile,
                   initials: _getInitials(teacherName),
                   onTap: () => context.go('/chat/$chatId', extra: teacherName),
-                );
+                ));
               },
             );
           }).toList(),
@@ -827,12 +828,12 @@ class _UserDashboardState extends State<UserDashboard> {
               style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.textMuted, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
-            RetroButton(
+            AppLink(to: '/materii', child: RetroButton(
               text: "SEARCH MASTERS",
               bgColor: AppColors.forest,
               textColor: Colors.white,
               onPressed: () => context.go('/materii'),
-            ),
+            )),
           ],
         ),
       ),

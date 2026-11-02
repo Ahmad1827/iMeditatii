@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'home_ambient.dart' show HomeSky;
@@ -372,7 +373,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
               for (final d in list)
                 SizedBox(
                   width: w,
-                  child: _SpSubjectCard(
+                  child: AppLink(to: '/materii/${Uri.encodeComponent(d['name'] as String)}', child: _SpSubjectCard(
                     icon: d['icon'] as IconData,
                     title: d['name'] as String,
                     tag: d['tag'] as String,
@@ -381,7 +382,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
                     teachers: _teachersFor(teachers, d['name'] as String),
                     loading: loading,
                     onTap: () => context.go('/materii/${Uri.encodeComponent(d['name'] as String)}', extra: d),
-                  ),
+                  )),
                 ),
             ],
           );
@@ -392,8 +393,8 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
 
   Widget _cFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
     return Container(
@@ -537,7 +538,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
                   children: list.map((d) {
                     final name = d['name'] as String;
                     final count = subjects.where((s) => s.contains(name.toLowerCase())).length;
-                    return RetroSubjectCard(
+                    return AppLink(to: '/materii/${Uri.encodeComponent(name)}', child: RetroSubjectCard(
                       icon: d['icon'] as IconData,
                       color: d['color'] as Color,
                       title: name,
@@ -547,7 +548,7 @@ class _SpecializationScreenState extends State<SpecializationScreen> {
                       cta: 'Vezi mentorii',
                       isMobile: m,
                       onTap: () => context.go('/materii/${Uri.encodeComponent(name)}', extra: d),
-                    );
+                    ));
                   }).toList(),
                 );
               },

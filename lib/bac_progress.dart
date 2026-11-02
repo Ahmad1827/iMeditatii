@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_link.dart';
 import 'classes_models.dart' show Classes;
 import 'clean_kit.dart';
 import 'exercise_list_screen.dart' show ExerciseListScreen;
@@ -192,13 +193,13 @@ class _BacProgressCardState extends State<BacProgressCard> {
                     style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
               )
             else
-              PbButton(
+              AppLink(to: next.path, child: PbButton(
                 text: 'Următorul: ${next.name}',
                 icon: Icons.arrow_forward,
                 size: PbSize.sm,
                 fullWidth: true,
                 onPressed: () => context.go(next.path),
-              ),
+              )),
           ],
         ],
       ),
@@ -233,7 +234,7 @@ class _BacProgressCardState extends State<BacProgressCard> {
     };
     return Tooltip(
       message: '$n din ${t.ids.length} probleme rezolvate',
-      child: CkHover(
+      child: AppLink(to: t.path, child: CkHover(
         onTap: () => context.go(t.path),
         builder: (hover) => Container(
           padding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
@@ -254,7 +255,7 @@ class _BacProgressCardState extends State<BacProgressCard> {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 }

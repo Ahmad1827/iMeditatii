@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'app_link.dart';
 import 'classes_models.dart';
 
 import 'app_colors.dart';
@@ -669,7 +670,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(before, style: TextStyle(fontSize: 14, color: Pb.text)),
-                  PbLink(text: link, fontSize: 14, onTap: () => context.go(route)),
+                  AppLink(to: route, child: PbLink(text: link, fontSize: 14, onTap: () => context.go(route))),
                 ],
               ),
             ),
@@ -693,7 +694,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text('Ai deja cont? ', style: TextStyle(fontSize: 14, color: Pb.muted)),
-                PbLink(text: 'Intră în cont', fontSize: 14, onTap: () => context.go('/login')),
+                AppLink(to: '/login', child: PbLink(text: 'Intră în cont', fontSize: 14, onTap: () => context.go('/login'))),
               ],
             ),
             if (widget.googleUser) ...[
@@ -1007,10 +1008,10 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
           preferredSize: const Size.fromHeight(3),
           child: Container(color: AppColors.border, height: 3),
         ),
-        leading: IconButton(
+        leading: AppLink(to: '/login', child: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 26 : 32),
           onPressed: () => context.go('/login'),
-        ),
+        )),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -1221,7 +1222,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                       onPressed: _signup,
                     ),
                     SizedBox(height: isMobile ? 20 : 32),
-                    GestureDetector(
+                    AppLink(to: '/login', child: GestureDetector(
                       onTap: () => context.go('/login'),
                       child: Text(
                         "ALREADY REGISTERED? LOG IN.",
@@ -1234,7 +1235,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                           decorationThickness: 2,
                         ),
                       ),
-                    ),
+                    )),
                   ],
                 ),
               ),

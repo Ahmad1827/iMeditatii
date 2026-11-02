@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'brand_mark.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'ui_components.dart' show StyleBuilder, Pb, PbButton, PbVariant;
@@ -343,8 +344,8 @@ class _LegalPageState extends State<_LegalPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          tab('Termeni', Icons.description_outlined, terms, _termsDoc.accent, () => context.go(_termsDoc.route)),
-          tab('Confidențialitate', Icons.shield_outlined, !terms, _privacyDoc.accent, () => context.go(_privacyDoc.route)),
+          AppLink(to: _termsDoc.route, child: tab('Termeni', Icons.description_outlined, terms, _termsDoc.accent, () => context.go(_termsDoc.route))),
+          AppLink(to: _privacyDoc.route, child: tab('Confidențialitate', Icons.shield_outlined, !terms, _privacyDoc.accent, () => context.go(_privacyDoc.route))),
         ],
       ),
     );
@@ -654,12 +655,12 @@ class _LegalPageState extends State<_LegalPage> {
   Widget _cEnd(bool isMobile) {
     final buttons = [
       PbButton(text: 'Am înțeles', icon: Icons.check, onPressed: _goBack),
-      PbButton(
+      AppLink(to: doc.otherRoute, child: PbButton(
         text: doc.otherTitle,
         icon: Icons.arrow_forward,
         variant: PbVariant.outlineSecondary,
         onPressed: () => context.go(doc.otherRoute),
-      ),
+      )),
     ];
 
     return Container(
@@ -889,10 +890,10 @@ class _LegalPageState extends State<_LegalPage> {
       appBar: AppBar(
         backgroundColor: AppColors.bg,
         elevation: 0,
-        leading: IconButton(
+        leading: AppLink(to: '/inregistrare', child: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink, size: 32),
           onPressed: () => context.go('/inregistrare'),
-        ),
+        )),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
           child: Container(color: AppColors.ink, height: 3),
@@ -937,13 +938,13 @@ class _LegalPageState extends State<_LegalPage> {
                   const SizedBox(height: 32),
                   Container(height: 3, color: AppColors.ink),
                   const SizedBox(height: 32),
-                  _LRetroButton(
+                  AppLink(to: '/inregistrare', child: _LRetroButton(
                     text: 'ACKNOWLEDGE & RETURN',
                     isFullWidth: true,
                     bgColor: AppColors.sky,
                     textColor: AppColors.ink,
                     onPressed: () => context.go('/inregistrare'),
-                  ),
+                  )),
                 ],
               ),
             ),

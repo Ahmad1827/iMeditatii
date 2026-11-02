@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
+import 'ide_statement.dart' show ProblemRef;
 import 'app_colors.dart';
 import 'classes_models.dart' show Classes, Solution;
 import 'custom_navbar.dart' show CustomNavbar;
@@ -220,15 +222,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   }
 
   /// Lowercase and without diacritics, so "sesiunea speciala" finds "Sesiunea specială".
-  static String _fold(String s) {
-    const from = 'ăâîșşțţ', to = 'aaissstt';
-    final b = StringBuffer();
-    for (final ch in s.toLowerCase().split('')) {
-      final k = from.indexOf(ch);
-      b.write(k < 0 ? ch : to[k]);
-    }
-    return b.toString();
-  }
+  static String _fold(String s) => ProblemRef.fold(s);
 
   Future<bool> _isExerciseDone(String id) async {
     final prefs = await SharedPreferences.getInstance();
@@ -868,7 +862,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     final cc = _catColor(cat);
     final sursa = '${e['sursa'] ?? ''}';
 
-    return _LHover(
+    return AppLink(to: '/exercitiu/${e['id']}?materie=${Uri.encodeComponent(widget.subject)}&clasa=${Uri.encodeComponent(selectedGrade)}', child: _LHover(
       onTap: () => _openExercise(e),
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 140),
@@ -953,13 +947,13 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _cFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
 
@@ -1037,7 +1031,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                       children: [
                         MouseRegion(
                           cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
+                          child: AppLink(to: '/', child: GestureDetector(
                             onTap: () => context.go('/'),
                             child: Container(
                               padding: const EdgeInsets.all(8),
@@ -1048,7 +1042,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                               ),
                               child: Icon(Icons.arrow_back, color: AppColors.ink, size: 18),
                             ),
-                          ),
+                          )),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -1099,7 +1093,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   children: [
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
+                      child: AppLink(to: '/', child: GestureDetector(
                         onTap: () => context.go('/'),
                         child: Container(
                           padding: const EdgeInsets.all(10),
@@ -1110,7 +1104,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                           ),
                           child: Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
                         ),
-                      ),
+                      )),
                     ),
                     const SizedBox(width: 20),
                     Column(
@@ -1426,13 +1420,13 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 future: _isExerciseDone(ex["id"]),
                 builder: (context, snapshot) {
                   final isDone = snapshot.data ?? false;
-                  return SingleColumnQuestCard(
+                  return AppLink(to: '/exercitiu/${ex['id']}?materie=${Uri.encodeComponent(widget.subject)}&clasa=${Uri.encodeComponent(selectedGrade)}', child: SingleColumnQuestCard(
                     index: index,
                     exercise: ex,
                     isDone: isDone,
                     isMobile: isMobile,
                     onTap: () => _openExercise(ex),
-                  );
+                  ));
                 },
               );
             },

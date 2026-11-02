@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart';
@@ -207,7 +208,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                           children: [
                             const PbAlert(type: PbAlertType.danger, text: 'Lecția nu a fost găsită.'),
                             const SizedBox(height: 12),
-                            PbLink(text: 'Înapoi la lecții', underline: true, onTap: () => context.go('/resurse')),
+                            AppLink(to: '/resurse', child: PbLink(text: 'Înapoi la lecții', underline: true, onTap: () => context.go('/resurse'))),
                           ],
                         ),
                       ),
@@ -467,7 +468,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    PbLink(text: 'Lecții', fontSize: 13, onTap: () => context.go('/resurse')),
+                    AppLink(to: '/resurse', child: PbLink(text: 'Lecții', fontSize: 13, onTap: () => context.go('/resurse'))),
                     sep,
                     Text(_subjName(subj), style: TextStyle(fontSize: 13, color: Pb.muted)),
                     if (grade.isNotEmpty) ...[
@@ -602,13 +603,13 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
           const SizedBox(height: 6),
           Text('Probleme de $materie, evaluate automat.', style: TextStyle(fontSize: 13.5, color: Pb.muted, height: 1.45)),
           const SizedBox(height: 12),
-          PbButton(
+          AppLink(to: '/lista-exercitii?materie=${Uri.encodeComponent(materie)}', child: PbButton(
             text: 'Deschide problemele',
             icon: Icons.arrow_forward,
             size: PbSize.sm,
             fullWidth: true,
             onPressed: () => context.go('/lista-exercitii?materie=${Uri.encodeComponent(materie)}'),
-          ),
+          )),
         ],
       ),
     );
@@ -781,13 +782,13 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     if (meta == null) {
       return Align(
         alignment: Alignment.centerLeft,
-        child: PbButton(
+        child: AppLink(to: '/resurse', child: PbButton(
           text: 'Înapoi la lecții',
           icon: Icons.arrow_back,
           variant: PbVariant.outlineSecondary,
           size: PbSize.sm,
           onPressed: () => context.go('/resurse'),
-        ),
+        )),
       );
     }
     final list = ResourcesData.allArticles.where((a) => '${a['grade']}' == '${meta['grade']}').toList();
@@ -797,7 +798,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
 
     Widget card(Map<String, dynamic>? a, bool isNext) {
       if (a == null) return const SizedBox.shrink();
-      return _DHover(
+      return AppLink(to: '/resurse/${a['id']}', child: _DHover(
         onTap: () => context.go('/resurse/${a['id']}'),
         builder: (h) => AnimatedContainer(
           duration: const Duration(milliseconds: 150),
@@ -829,7 +830,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             ],
           ),
         ),
-      );
+      ));
     }
 
     if (isMobile) {
@@ -854,8 +855,8 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
 
   Widget _cFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
 
@@ -895,10 +896,10 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(preferredSize: const Size.fromHeight(2.5), child: Container(color: AppColors.border, height: 2.5)),
-        leading: IconButton(
+        leading: AppLink(to: '/resurse', child: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 22 : 28),
           onPressed: () => context.go('/resurse'),
-        ),
+        )),
       ),
       body: Center(
         child: ConstrainedBox(
@@ -1089,14 +1090,14 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
               Text("Fixează-ți conceptele teoretice rezolvând exercițiile interactive din arena de antrenament.",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: bannerInk)),
               const SizedBox(height: 16),
-              RetroButton(
+              AppLink(to: '/exercitii', child: RetroButton(
                 text: "DESCHIDE ARENA DE EXERCIȚII",
                 icon: Icons.play_arrow,
                 bgColor: AppColors.ink,
                 textColor: AppColors.isDark ? const Color(0xFF10161A) : Colors.white,
                 fontSize: 13,
                 onPressed: () => context.go('/exercitii'),
-              ),
+              )),
             ],
           ),
         ),

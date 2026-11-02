@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'app_link.dart';
 import 'classes_models.dart';
 import 'ink_page.dart';
 import 'statement_text.dart';
@@ -330,7 +331,7 @@ class _MathSheetPanelState extends State<MathSheetPanel> {
             const SizedBox(height: 6),
             Text('Intră în cont ca să scrii rezolvarea pe foaie și s-o trimiți la verificare.', style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.4)),
             const SizedBox(height: 14),
-            PbButton(text: 'Autentificare', onPressed: () => context.go('/login')),
+            AppLink(to: '/login', child: PbButton(text: 'Autentificare', onPressed: () => context.go('/login'))),
           ],
         ),
       );

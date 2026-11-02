@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'app_link.dart';
 import 'clean_kit.dart';
 import 'classes_models.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize;
@@ -266,7 +267,7 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             if (!done && next != null)
-              PbButton(text: started ? 'Continuă' : 'Începe tema', icon: Icons.play_arrow_rounded, size: PbSize.sm, onPressed: () => _go(next.path))
+              AppLink(to: next.path, child: PbButton(text: started ? 'Continuă' : 'Începe tema', icon: Icons.play_arrow_rounded, size: PbSize.sm, onPressed: () => _go(next.path)))
             else if (!done && h.problems.isEmpty && h.material != null)
               PbButton(text: 'Începe tema', icon: Icons.play_arrow_rounded, size: PbSize.sm, onPressed: _opening ? null : _openMaterial),
             done
@@ -352,7 +353,7 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
 
   Widget _problemStep(int n, HwProblem p, bool ok) {
     final c = ckSubjectColor(p.subject);
-    return _step(
+    return AppLink(to: p.path, child: _step(
       n: n,
       ok: ok,
       color: c,
@@ -360,7 +361,7 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
       sub: [p.subject, if (p.grade.isNotEmpty) 'clasa a ${p.grade}-a'].join(' · '),
       trailing: ok ? hwPill('Rezolvată', hwGreen, icon: Icons.check) : _go2('Rezolvă', c),
       onTap: () => _go(p.path),
-    );
+    ));
   }
 
   Widget _materialStep(int n) {

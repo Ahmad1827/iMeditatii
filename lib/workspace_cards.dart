@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'clean_kit.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, PbLink;
 import 'workspace_models.dart';
@@ -88,7 +89,7 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                         ckCardTitle(
                           Icons.auto_stories_outlined,
                           'Atelier',
-                          trailing: PbLink(text: 'Deschide atelierul', fontSize: 13.5, onTap: () => context.go('/atelier')),
+                          trailing: AppLink(to: '/atelier', child: PbLink(text: 'Deschide atelierul', fontSize: 13.5, onTap: () => context.go('/atelier'))),
                         ),
                         Text(
                           'Un caiet pe care scrii de mână și un editor de cod care rulează pe loc. Ce faci aici poți trimite direct elevilor.',
@@ -100,21 +101,21 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                           runSpacing: 8,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            PbButton(text: 'Caiet de matematică', icon: Icons.draw_outlined, size: PbSize.sm, onPressed: () => context.go('/atelier?nou=ink')),
-                            PbButton(
+                            AppLink(to: '/atelier?nou=ink', child: PbButton(text: 'Caiet de matematică', icon: Icons.draw_outlined, size: PbSize.sm, onPressed: () => context.go('/atelier?nou=ink'))),
+                            AppLink(to: '/atelier?nou=cpp', child: PbButton(
                               text: 'Fișier C++',
                               icon: Icons.code,
                               size: PbSize.sm,
                               variant: PbVariant.outlinePrimary,
                               onPressed: () => context.go('/atelier?nou=cpp'),
-                            ),
-                            PbButton(
+                            )),
+                            AppLink(to: '/atelier?nou=python', child: PbButton(
                               text: 'Fișier Python',
                               icon: Icons.code,
                               size: PbSize.sm,
                               variant: PbVariant.outlineSecondary,
                               onPressed: () => context.go('/atelier?nou=python'),
-                            ),
+                            )),
                             if (sent.isNotEmpty) ...[
                               _pill('${sent.length} trimise', _blue, icon: Icons.send),
                               if (unseen > 0) _pill('$unseen nedeschise', _amber, icon: Icons.schedule),
@@ -129,7 +130,7 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                     const Padding(padding: EdgeInsets.all(18), child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary))))
                   else
                     for (final d in docs.take(4))
-                      CkHover(
+                      AppLink(to: '/atelier?doc=${d.id}', child: CkHover(
                         onTap: () => context.go('/atelier?doc=${d.id}'),
                         builder: (h) {
                           final c = wsDocColor(d.type, d.lang);
@@ -179,12 +180,12 @@ class _TeacherWorkspaceCardState extends State<TeacherWorkspaceCard> {
                             ),
                           );
                         },
-                      ),
+                      )),
                   if (!loading && docs.length > 4)
                     Container(
                       decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
                       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                      child: PbLink(text: 'Vezi toate cele ${docs.length} documente', fontSize: 13.5, onTap: () => context.go('/atelier')),
+                      child: AppLink(to: '/atelier', child: PbLink(text: 'Vezi toate cele ${docs.length} documente', fontSize: 13.5, onTap: () => context.go('/atelier'))),
                     ),
                 ],
               );
@@ -281,7 +282,7 @@ class _ReceivedMaterialsCardState extends State<ReceivedMaterialsCard> {
   Widget _row(BuildContext context, WsShare s) {
     final c = wsDocColor(s.type, s.lang);
     final preview = s.isCode ? _codeSummary(s.content, s.langLabel) : (s.isInk ? 'Pagină scrisă de mână' : NoteContent.preview(s.content, max: 90));
-    return CkHover(
+    return AppLink(to: '/material/${s.id}', child: CkHover(
       onTap: () => context.push('/material/${s.id}'),
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 140),
@@ -334,6 +335,6 @@ class _ReceivedMaterialsCardState extends State<ReceivedMaterialsCard> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

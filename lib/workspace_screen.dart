@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'app_link.dart';
 import 'clean_kit.dart';
 import 'code_workbench.dart';
 import 'custom_navbar.dart' show CustomNavbar;
@@ -465,7 +466,7 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
       body = _centerMessage(
         Icons.lock_outline,
         'Intră în cont ca să-ți deschizi atelierul.',
-        action: PbButton(text: 'Autentificare', onPressed: () => context.go('/login')),
+        action: AppLink(to: '/login', child: PbButton(text: 'Autentificare', onPressed: () => context.go('/login'))),
       );
     } else if (isMobile) {
       body = _mobileList || _active == null ? _sidebarPanel(isMobile: true) : _main(isMobile: true);
@@ -631,13 +632,13 @@ class _WorkspaceBodyState extends State<WorkspaceBody> {
             padding: const EdgeInsets.fromLTRB(14, 14, 12, 10),
             child: Row(
               children: [
-                IconButton(
+                AppLink(to: '/panou-profesor', child: IconButton(
                   tooltip: 'Înapoi la panou',
                   icon: Icon(Icons.arrow_back, size: 19, color: Pb.muted),
                   splashRadius: 18,
                   visualDensity: VisualDensity.compact,
                   onPressed: () => context.go('/panou-profesor'),
-                ),
+                )),
                 const SizedBox(width: 2),
                 Expanded(child: Text('Atelier', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Pb.text, letterSpacing: -0.3))),
                 PopupMenuButton<WsTemplate>(
@@ -1558,12 +1559,12 @@ class _SentDialog extends StatelessWidget {
                             ],
                           ),
                         ),
-                        IconButton(
+                        AppLink(to: '/material/${s.id}', child: IconButton(
                           tooltip: s.studentEdited ? 'Vezi ce a lucrat elevul' : 'Vezi ce are elevul',
                           icon: Icon(Icons.open_in_new, size: 18, color: Pb.muted),
                           splashRadius: 17,
                           onPressed: () => onOpen(s),
-                        ),
+                        )),
                         IconButton(
                           tooltip: 'Retrage de la acest elev',
                           icon: const Icon(Icons.undo, size: 18, color: _red),

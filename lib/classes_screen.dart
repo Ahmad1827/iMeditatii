@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'classroom_kit.dart';
 import 'clean_kit.dart';
@@ -131,7 +132,7 @@ class ClassesBody extends StatelessWidget {
             Icons.lock_outline,
             'Intră în cont',
             'Clasele și temele sunt legate de contul tău.',
-            action: PbButton(text: 'Autentificare', onPressed: () => context.go('/login')),
+            action: AppLink(to: '/login', child: PbButton(text: 'Autentificare', onPressed: () => context.go('/login'))),
           ),
         ),
       );
@@ -361,7 +362,7 @@ class _ClassBodyState extends State<ClassBody> {
             Icons.link_off,
             'Clasa nu mai există',
             'Linkul e greșit sau profesorul a șters clasa. Cere-i un link nou.',
-            action: PbButton(text: 'Înapoi la clase', onPressed: () => context.go('/clase')),
+            action: AppLink(to: '/clase', child: PbButton(text: 'Înapoi la clase', onPressed: () => context.go('/clase'))),
           ),
         ),
       );
@@ -440,9 +441,9 @@ class _ClassBodyState extends State<ClassBody> {
                       style: TextStyle(fontSize: 15, color: Pb.text, height: 1.5),
                     ),
                     const SizedBox(height: 22),
-                    PbButton(text: 'Creează cont', icon: Icons.person_add_alt, fullWidth: true, onPressed: () => context.go('/inregistrare')),
+                    AppLink(to: '/inregistrare', child: PbButton(text: 'Creează cont', icon: Icons.person_add_alt, fullWidth: true, onPressed: () => context.go('/inregistrare'))),
                     const SizedBox(height: 10),
-                    PbButton(text: 'Am deja cont', icon: Icons.login, fullWidth: true, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/login')),
+                    AppLink(to: '/login', child: PbButton(text: 'Am deja cont', icon: Icons.login, fullWidth: true, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/login'))),
                     const SizedBox(height: 14),
                     Text('Codul clasei: $_code', style: TextStyle(fontSize: 12.5, color: Pb.muted, letterSpacing: 0.5)),
                   ],

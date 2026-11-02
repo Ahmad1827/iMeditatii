@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky;
@@ -434,7 +435,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  PbLink(text: 'Profesori', fontSize: 13, onTap: () => context.go('/materii')),
+                  AppLink(to: '/materii', child: PbLink(text: 'Profesori', fontSize: 13, onTap: () => context.go('/materii'))),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted)),
@@ -547,8 +548,8 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: [
-                if (!searching) PbButton(text: 'Devino profesor', icon: Icons.school_outlined, size: PbSize.sm, onPressed: () => context.go('/inregistrare')),
-                PbButton(text: 'Alte materii', variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: () => context.go('/materii')),
+                if (!searching) AppLink(to: '/inregistrare', child: PbButton(text: 'Devino profesor', icon: Icons.school_outlined, size: PbSize.sm, onPressed: () => context.go('/inregistrare'))),
+                AppLink(to: '/materii', child: PbButton(text: 'Alte materii', variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: () => context.go('/materii'))),
               ],
             ),
           ],
@@ -567,14 +568,14 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
           for (var i = 0; i < list.length; i++)
             SizedBox(
               width: w,
-              child: _TlTeacherCard(
+              child: AppLink(to: '/profesor/${list[i].id}', child: _TlTeacherCard(
                 data: list[i].data() as Map<String, dynamic>,
                 color: _subjectColor,
                 highlight: _sort == 'pret' && i == 0 ? 'Cel mai accesibil' : (_sort == 'experienta' && i == 0 ? 'Cel mai experimentat' : null),
                 busy: _opening,
                 onProfile: () => context.push('/profesor/${list[i].id}'),
                 onMessage: () => _message(list[i].id, list[i].data() as Map<String, dynamic>),
-              ),
+              )),
             ),
         ],
       );
@@ -583,8 +584,8 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
 
   Widget _cFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
     return Container(
@@ -664,7 +665,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                   children: [
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
+                      child: AppLink(to: '/materii', child: GestureDetector(
                         onTap: () => context.go('/materii'),
                         child: Container(
                           width: 44,
@@ -679,7 +680,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                           alignment: Alignment.center,
                           child: Icon(Icons.arrow_back, color: AppColors.ink, size: 22),
                         ),
-                      ),
+                      )),
                     ),
                     const SizedBox(width: 12),
                     Container(
@@ -796,7 +797,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
               alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
               children: teachers.map((doc) {
                 final data = doc.data() as Map<String, dynamic>;
-                return _TeacherCard(
+                return AppLink(to: '/profesor/${doc.id}', child: _TeacherCard(
                   id: doc.id,
                   data: data,
                   isMobile: isMobile,
@@ -804,7 +805,7 @@ class _TeacherListScreenState extends State<TeacherListScreen> {
                   onViewProfile: () {
                     context.push('/profesor/${doc.id}');
                   },
-                );
+                ));
               }).toList(),
             );
           },

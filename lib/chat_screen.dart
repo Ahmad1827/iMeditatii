@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'theme_manager.dart';
 import 'app_colors.dart';
 import 'clean_kit.dart';
@@ -558,15 +559,22 @@ class _ChatScreenState extends State<ChatScreen> {
     await chatRef.set({'lastMessage': text, 'updatedAt': Timestamp.now()}, SetOptions(merge: true));
   }
 
+  String? get _otherProfilePath {
+    if (currentUser == null) return null;
+    final amITeacher = currentUser!.uid == teacherId && teacherId.isNotEmpty;
+    final targetId = amITeacher ? studentId : teacherId;
+    if (targetId.isEmpty) return null;
+    return amITeacher ? '/elev/$targetId' : '/profesor/$targetId';
+  }
+
   void _openOtherProfile() {
     if (currentUser == null) return;
-    final amITeacher = currentUser!.uid == teacherId && teacherId.isNotEmpty;
-    final targetId = amITeacher ? (studentId.isNotEmpty ? studentId : null) : (teacherId.isNotEmpty ? teacherId : null);
-    if (targetId == null) {
+    final path = _otherProfilePath;
+    if (path == null) {
       _toast('PROFILE NOT FOUND.', clean: 'Nu am găsit profilul.', error: true);
       return;
     }
-    context.go(amITeacher ? '/elev/$targetId' : '/profesor/$targetId');
+    context.go(path);
   }
 
   void _goBack() {
@@ -681,7 +689,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           IconButton(tooltip: 'Înapoi', icon: Icon(Icons.arrow_back, color: Pb.muted), onPressed: _goBack),
           Expanded(
-            child: CkHover(
+            child: AppLink(to: _otherProfilePath, child: CkHover(
               onTap: _openOtherProfile,
               builder: (h) => Row(
                 children: [
@@ -712,7 +720,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-            ),
+            )),
           ),
           if (isOwner && !isSessionPaid)
             IconButton(
@@ -1078,7 +1086,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-            title: GestureDetector(
+            title: AppLink(to: _otherProfilePath, child: GestureDetector(
               onTap: _openOtherProfile,
               child: Row(
                 children: [
@@ -1132,7 +1140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-            ),
+            )),
             actions: [
               if (isTeacher || isOwner)
                 IconButton(

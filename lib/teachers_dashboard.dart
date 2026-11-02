@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'workspace_cards.dart';
 import 'clean_kit.dart';
@@ -440,27 +441,27 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              PbButton(text: 'Atelier', icon: Icons.auto_stories_outlined, onPressed: () => context.go('/atelier')),
-              PbButton(text: 'Clase și teme', icon: Icons.assignment_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/clase')),
-              PbButton(
+              AppLink(to: '/atelier', child: PbButton(text: 'Atelier', icon: Icons.auto_stories_outlined, onPressed: () => context.go('/atelier'))),
+              AppLink(to: '/clase', child: PbButton(text: 'Clase și teme', icon: Icons.assignment_outlined, variant: PbVariant.outlinePrimary, onPressed: () => context.go('/clase'))),
+              AppLink(to: '/adauga-exercitiu', child: PbButton(
                 text: 'Problemă nouă',
                 icon: Icons.add_task,
                 variant: PbVariant.outlinePrimary,
                 onPressed: () => context.go('/adauga-exercitiu'),
-              ),
-              PbButton(
+              )),
+              AppLink(to: '/adauga-articol', child: PbButton(
                 text: 'Lecție nouă',
                 icon: Icons.menu_book_outlined,
                 variant: PbVariant.outlinePrimary,
                 onPressed: () => context.go('/adauga-articol'),
-              ),
+              )),
               if (_uid.isNotEmpty)
-                PbButton(
+                AppLink(to: '/profesor/$_uid', child: PbButton(
                   text: 'Profilul meu',
                   icon: Icons.person_outline,
                   variant: PbVariant.outlineSecondary,
                   onPressed: () => context.go('/profesor/$_uid'),
-                ),
+                )),
             ],
           ),
         ],
@@ -542,7 +543,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
               separatorBuilder: (_, __) => const SizedBox(width: 14),
               itemBuilder: (context, i) {
                 final e = entries[i];
-                return CkHover(
+                return AppLink(to: '/chat/${chatIds[e.key]}', child: CkHover(
                   onTap: () => context.go('/chat/${chatIds[e.key]}', extra: e.value),
                   builder: (h) => SizedBox(
                     width: 64,
@@ -567,7 +568,7 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                       ],
                     ),
                   ),
-                );
+                ));
               },
             ),
           ),
@@ -647,11 +648,11 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             )
           else
             for (final d in list)
-              _TdChatRow(
+              AppLink(to: '/chat/${d.id}', child: _TdChatRow(
                 data: d.data() as Map<String, dynamic>,
                 when: _when((d.data() as Map<String, dynamic>)['updatedAt'] as Timestamp?),
                 onOpen: (name) => context.go('/chat/${d.id}', extra: name),
-              ),
+              )),
         ],
       ),
     );
@@ -900,21 +901,21 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
             ),
           ),
           const SizedBox(width: 8),
-          RetroButton(
+          AppLink(to: '/adauga-exercitiu', child: RetroButton(
             text: "+ QUEST",
             icon: Icons.add_task,
             bgColor: AppColors.forest,
             textColor: Colors.white,
             onPressed: () => context.go('/adauga-exercitiu'),
-          ),
+          )),
           const SizedBox(width: 8),
-          RetroButton(
+          AppLink(to: '/adauga-articol', child: RetroButton(
             text: "+ ARTICLE",
             icon: Icons.menu_book,
             bgColor: AppColors.sky,
             textColor: Colors.white,
             onPressed: () => context.go('/adauga-articol'),
-          ),
+          )),
         ],
       ),
     );
@@ -1258,14 +1259,14 @@ class _TeachersDashboardState extends State<TeachersDashboard> {
                 final userName = userData['name'] ?? 'UNKNOWN PLAYER';
                 final userAvatar = userData['image'] as String? ?? '';
 
-                return _chatCard(
+                return AppLink(to: '/chat/$chatId', child: _chatCard(
                   name: userName,
                   avatarUrl: userAvatar,
                   lastMessage: lastMsg,
                   timestamp: timestamp,
                   isMobile: isMobile,
                   onTap: () => context.go('/chat/$chatId', extra: userName),
-                );
+                ));
               },
             );
           }).toList(),

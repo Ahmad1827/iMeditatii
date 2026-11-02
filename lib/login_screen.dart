@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'app_link.dart';
 import 'classes_models.dart';
 
 import 'app_colors.dart';
@@ -616,7 +617,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text('Nu ai cont? ', style: TextStyle(fontSize: 14, color: Pb.muted)),
-              PbLink(text: 'Creează unul gratuit', fontSize: 14, onTap: () => context.go('/inregistrare')),
+              AppLink(to: '/inregistrare', child: PbLink(text: 'Creează unul gratuit', fontSize: 14, onTap: () => context.go('/inregistrare'))),
             ],
           ),
           const SizedBox(height: 22),
@@ -697,9 +698,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text('Continuând, ești de acord cu ', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-              PbLink(text: 'termenii', fontSize: 12.5, onTap: () => context.go('/termeni-si-conditii')),
+              AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'termenii', fontSize: 12.5, onTap: () => context.go('/termeni-si-conditii'))),
               Text(' și ', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-              PbLink(text: 'politica de confidențialitate', fontSize: 12.5, onTap: () => context.go('/politica-confidentialitate')),
+              AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'politica de confidențialitate', fontSize: 12.5, onTap: () => context.go('/politica-confidentialitate'))),
               Text('.', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
             ],
           ),
@@ -773,10 +774,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           preferredSize: const Size.fromHeight(3),
           child: Container(color: AppColors.border, height: 3),
         ),
-        leading: IconButton(
+        leading: AppLink(to: '/', child: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.ink, size: isMobile ? 26 : 32),
           onPressed: () => context.go('/'),
-        ),
+        )),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -876,7 +877,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ? Center(child: CircularProgressIndicator(color: AppColors.sky))
                       : GoogleRetroButton(onPressed: _signInWithGoogle, isMobile: isMobile),
                   SizedBox(height: isMobile ? 20 : 32),
-                  GestureDetector(
+                  AppLink(to: '/inregistrare', child: GestureDetector(
                     onTap: () => context.go('/inregistrare'),
                     child: Text(
                       "NO ACCOUNT? INITIATE REGISTRATION",
@@ -889,7 +890,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         decorationThickness: 2,
                       ),
                     ),
-                  ),
+                  )),
                 ],
               ),
             ),

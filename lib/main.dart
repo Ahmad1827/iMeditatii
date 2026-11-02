@@ -9,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
+import 'app_link.dart' show rootNavigatorKey;
 import 'theme_manager.dart';
 import 'design_system.dart' show AppStyleScope;
 import 'app_colors.dart';
@@ -90,6 +91,7 @@ void main() async {
 }
 
 final GoRouter _router = GoRouter(
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/',
   routes: [
     GoRoute(
@@ -146,6 +148,7 @@ final GoRouter _router = GoRouter(
         code: state.uri.queryParameters['cod'],
         lang: state.uri.queryParameters['limbaj'],
         input: state.uri.queryParameters['in'],
+        problem: state.uri.queryParameters['problema'],
       ),
     ),
     GoRoute(

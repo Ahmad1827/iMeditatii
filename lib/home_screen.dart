@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart';
@@ -61,12 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _startDailyQuest() {
-    const exerciseId = '1';
-    final encodedMaterie = Uri.encodeComponent('Informatică');
-    final encodedClasa = Uri.encodeComponent('9');
-    context.go('/exercitiu/$exerciseId?materie=$encodedMaterie&clasa=$encodedClasa');
-  }
+  String get _dailyQuestPath => '/exercitiu/1?materie=${Uri.encodeComponent('Informatică')}&clasa=9';
+
+  void _startDailyQuest() => context.go(_dailyQuestPath);
 
   void _openSubject(String route) {
     context.go('/lista-exercitii?materie=${Uri.encodeComponent(route)}');
@@ -575,8 +573,8 @@ class _HomeScreenState extends State<HomeScreen> {
           runSpacing: 8,
           alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
           children: [
-            PbButton(text: 'Problema zilei', icon: Icons.play_arrow, onPressed: _startDailyQuest),
-            PbButton(text: 'Toate lecțiile', variant: PbVariant.outlineSecondary, onPressed: () => context.go('/resurse')),
+            AppLink(to: _dailyQuestPath, child: PbButton(text: 'Problema zilei', icon: Icons.play_arrow, onPressed: _startDailyQuest)),
+            AppLink(to: '/resurse', child: PbButton(text: 'Toate lecțiile', variant: PbVariant.outlineSecondary, onPressed: () => context.go('/resurse'))),
           ],
         ),
       ],
@@ -836,12 +834,12 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_hShowLessons) {
       rows = [
         for (var i = 0; i < shown; i++)
-          _HLessonRow(
+          AppLink(to: '/resurse/${lessonRows[i]['id']}', child: _HLessonRow(
             index: i + 1,
             data: lessonRows[i],
             isMobile: isMobile,
             onTap: () => context.go('/resurse/${lessonRows[i]['id']}'),
-          ),
+          )),
       ];
     } else {
       rows = [for (var i = 0; i < shown; i++) _hExerciseRow(exRows[i], isMobile, compact)];
@@ -896,13 +894,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(fontSize: 13, color: Pb.muted),
                     ),
                   ),
-                  PbButton(
+                  AppLink(to: _hShowLessons ? '/resurse' : '/exercitii', child: PbButton(
                     text: _hShowLessons ? 'Toate lecțiile' : 'Toate problemele',
                     icon: Icons.arrow_forward,
                     variant: PbVariant.outlinePrimary,
                     size: PbSize.sm,
                     onPressed: () => context.go(_hShowLessons ? '/resurse' : '/exercitii'),
-                  ),
+                  )),
                 ],
               ),
             ),
@@ -964,7 +962,7 @@ class _HomeScreenState extends State<HomeScreen> {
     void open() => context.go(
         '/exercitiu/${e['id']}?materie=${Uri.encodeComponent('${e['subject']}')}&clasa=${Uri.encodeComponent(grade)}');
 
-    return _HHover(
+    return AppLink(to: '/exercitiu/${e['id']}?materie=${Uri.encodeComponent('${e['subject']}')}&clasa=${Uri.encodeComponent(grade)}', child: _HHover(
       onTap: open,
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 140),
@@ -1051,7 +1049,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   // ---------------------------------------------------------------- posts
@@ -1137,7 +1135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   if (open && link != null && link.isNotEmpty) ...[
                     const SizedBox(height: 10),
-                    PbLink(text: 'Deschide', fontSize: 14, onTap: () => context.go(link)),
+                    AppLink(to: link, child: PbLink(text: 'Deschide', fontSize: 14, onTap: () => context.go(link))),
                   ],
                 ],
               ),
@@ -1212,7 +1210,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ? '?'
         : name.split(RegExp(r'\s+')).take(2).map((w) => w[0].toUpperCase()).join();
 
-    return _HHover(
+    return AppLink(to: '/elev/${u['uid']}', child: _HHover(
       onTap: () => context.go('/elev/${u['uid']}'),
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 150),
@@ -1284,12 +1282,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
   Widget _hFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
 
@@ -1407,7 +1405,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                RetroButton(
+                AppLink(to: '/materii', child: RetroButton(
                   text: "FIND A MASTER",
                   icon: Icons.search,
                   fontSize: 14,
@@ -1415,9 +1413,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   bgColor: AppColors.forest,
                   isFullWidth: true,
                   onPressed: () => context.go('/materii'),
-                ),
+                )),
                 const SizedBox(height: 10),
-                RetroButton(
+                AppLink(to: '/exercitii', child: RetroButton(
                   text: "DAILY QUESTS",
                   icon: Icons.track_changes,
                   fontSize: 14,
@@ -1426,21 +1424,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   textColor: AppColors.ink,
                   isFullWidth: true,
                   onPressed: () => context.go('/exercitii'),
-                ),
+                )),
               ],
             )
           else
             Row(
               children: [
-                RetroButton(text: "FIND A MASTER", icon: Icons.search, bgColor: AppColors.forest, onPressed: () => context.go('/materii')),
+                AppLink(to: '/materii', child: RetroButton(text: "FIND A MASTER", icon: Icons.search, bgColor: AppColors.forest, onPressed: () => context.go('/materii'))),
                 const SizedBox(width: 16),
-                RetroButton(
+                AppLink(to: '/exercitii', child: RetroButton(
                   text: "DAILY QUESTS",
                   icon: Icons.track_changes,
                   bgColor: AppColors.cardBg,
                   textColor: AppColors.ink,
                   onPressed: () => context.go('/exercitii'),
-                ),
+                )),
               ],
             ),
         ],
@@ -1517,7 +1515,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           SizedBox(height: isMobile ? 16 : 24),
-          RetroButton(
+          AppLink(to: _dailyQuestPath, child: RetroButton(
             text: "ACCEPT BOUNTY",
             icon: Icons.play_arrow,
             bgColor: AppColors.sunset,
@@ -1525,7 +1523,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 14,
             padding: const EdgeInsets.symmetric(vertical: 10),
             onPressed: _startDailyQuest,
-          ),
+          )),
         ],
       ),
     );
@@ -1560,7 +1558,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bottom: isMobile && path != paths.last ? 12 : 0,
           right: !isMobile && path != paths.last ? 20 : 0,
         ),
-        child: GestureDetector(
+        child: AppLink(to: '/lista-exercitii?materie=${Uri.encodeComponent(path["route"] as String)}', child: GestureDetector(
           onTap: () => _openSubject(path["route"] as String),
           child: RetroBlock(
             bgColor: AppColors.cardBg,
@@ -1586,7 +1584,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-        ),
+        )),
       );
     }).toList();
 
@@ -1626,7 +1624,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Text("Mentori verificați gata să te ghideze 1-la-1 cu tablă interactivă live și conexiune securizată.",
             style: TextStyle(fontSize: isMobile ? 13 : 16, color: AppColors.ink, fontWeight: FontWeight.bold, height: 1.45)),
         SizedBox(height: isMobile ? 16 : 22),
-        RetroButton(
+        AppLink(to: '/materii', child: RetroButton(
           text: "EXPLOREAZĂ PROFESORII",
           icon: Icons.groups,
           bgColor: AppColors.sunset,
@@ -1634,7 +1632,7 @@ class _HomeScreenState extends State<HomeScreen> {
           fontSize: 14,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           onPressed: () => context.go('/materii'),
-        ),
+        )),
       ],
     );
 

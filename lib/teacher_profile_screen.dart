@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky;
@@ -478,12 +479,12 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           const SizedBox(height: 10),
                           Text('Profilul nu a fost găsit.', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Pb.text)),
                           const SizedBox(height: 16),
-                          PbButton(
+                          AppLink(to: '/materii', child: PbButton(
                             text: 'Înapoi la profesori',
                             variant: PbVariant.outlineSecondary,
                             size: PbSize.sm,
                             onPressed: () => context.go('/materii'),
-                          ),
+                          )),
                         ],
                       ),
                     );
@@ -1006,7 +1007,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 Icons.reviews_outlined,
                 'Recenzii',
                 trailing: docs.length > 3
-                    ? PbLink(text: 'Toate (${docs.length})', fontSize: 13.5, onTap: () => context.push('/toate-recenziile/${widget.teacherId}'))
+                    ? AppLink(to: '/toate-recenziile/${widget.teacherId}', child: PbLink(text: 'Toate (${docs.length})', fontSize: 13.5, onTap: () => context.push('/toate-recenziile/${widget.teacherId}')))
                     : null,
               ),
               if (!snap.hasData)
@@ -1256,8 +1257,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
 
   Widget _cFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
     return Container(
@@ -1925,11 +1926,11 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               if (docs.length > 3)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: TextButton(
+                  child: AppLink(to: '/toate-recenziile/$teacherId', child: TextButton(
                     onPressed: () => context.push('/toate-recenziile/$teacherId'),
                     child: Text("ACCESS ALL REVIEWS (${docs.length}) →",
                         style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.sky)),
-                  ),
+                  )),
                 ),
             ],
           ),

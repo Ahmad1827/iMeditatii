@@ -348,13 +348,13 @@ class _ClassroomViewState extends State<ClassroomView> with SingleTickerProvider
       ),
     );
     if (c == null) return board;
-    final catedra = _Catedra(
+    final catedra = AppLink(to: widget.teacher ? null : '/profesor/${c.teacherId}', child: _Catedra(
       key: _key('catedra'),
       name: c.teacherName,
       teacher: widget.teacher,
       papers: widget.teacher ? hw.where((h) => h.classIds.contains(c.id)).length : 0,
       onTap: widget.teacher ? () => _open(const _Focus('catedra', null)) : () => context.go('/profesor/${c.teacherId}'),
-    );
+    ));
     if (narrow) {
       // smaller on a phone, so the benches aren't far down
       return Column(

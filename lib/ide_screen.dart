@@ -5,8 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_link.dart';
 import 'brand_mark.dart' show BrandLogo, BrandMark;
 import 'code_workbench.dart';
+import 'ide_statement.dart';
+import 'pane_split.dart';
 import 'theme_manager.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, showPbModal;
 
@@ -14,18 +17,20 @@ import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize, showPbModal;
 // IDE — the editor alone, on the whole screen, at /ide. A link can carry a
 // program (/ide?limbaj=cpp&cod=…&in=…): "Distribuie" copies one with the code
 // as it is, so a teacher sends a program and the student opens it ready to run.
-// Without a link, the last program written here comes back.
+// Without a link, the last program written here comes back. On the right, the
+// statement of the problem being solved (ide_statement.dart); the link carries it too.
 // =============================================================================
 class IdeScreen extends StatefulWidget {
   final String? code; // from the link, base64url
   final String? lang;
   final String? input; // base64url
+  final String? problem; // ProblemRef.key
 
-  const IdeScreen({super.key, this.code, this.lang, this.input});
+  const IdeScreen({super.key, this.code, this.lang, this.input, this.problem});
 
   /// The link that opens [code] here.
-  static String linkFor(String code, String lang, String input) {
-    final q = {'limbaj': lang, 'cod': _enc(code), if (input.trim().isNotEmpty) 'in': _enc(input)};
+  static String linkFor(String code, String lang, String input, {String? problem}) {
+    final q = {'limbaj': lang, 'cod': _enc(code), if (input.trim().isNotEmpty) 'in': _enc(input), if (problem != null) 'problema': problem};
     return '${Uri.base.origin}${Uri(path: '/ide', queryParameters: q)}';
   }
 
@@ -48,6 +53,11 @@ class _IdeScreenState extends State<IdeScreen> {
   static const _kCode = 'ide_code';
   static const _kLang = 'ide_lang';
   static const _kInput = 'ide_input';
+  static const _kProblem = 'ide_problem';
+  static const _kPanel = 'ide_panel_open';
+  static const _kSplit = 'ide_panel_split';
+  static const _splitDefault = 0.68;
+  static const _panelBeside = 1000.0; // narrower than this, the statement opens over the code
 
   static const Map<String, String> _starters = {
     'cpp': '#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    cout << n * 2 << "\\n";\n    return 0;\n}\n',
@@ -58,7 +68,10 @@ class _IdeScreenState extends State<IdeScreen> {
   String _lang = 'cpp';
   String _input = '5';
   bool _fromLink = false;
-  int _gen = 0; // a new workbench (a new program) when it changes
+  GlobalKey _workbench = GlobalKey(); // a new one for a new program; it keeps the workbench when the panel opens or closes
+  final ValueNotifier<ProblemRef?> _problem = ValueNotifier(null);
+  bool _panelOpen = true;
+  double _split = _splitDefault;
 
   @override
   void initState() {
@@ -66,11 +79,13 @@ class _IdeScreenState extends State<IdeScreen> {
     // the theme deck and the homework dock stay away from a full-screen editor
     Future.microtask(() => ThemeManager.focusNotifier.value = true);
     _load();
+    _loadPanel();
   }
 
   @override
   void dispose() {
     Future.microtask(() => ThemeManager.focusNotifier.value = false);
+    _problem.dispose();
     super.dispose();
   }
 
@@ -103,6 +118,58 @@ class _IdeScreenState extends State<IdeScreen> {
     });
   }
 
+  /// The panel as it was left, and the problem from the link or the one read last.
+  Future<void> _loadPanel() async {
+    String? key = widget.problem;
+    try {
+      final p = await SharedPreferences.getInstance();
+      key ??= p.getString(_kProblem);
+      if (!mounted) return;
+      setState(() {
+        _panelOpen = p.getBool(_kPanel) ?? true;
+        _split = p.getDouble(_kSplit) ?? _splitDefault;
+      });
+    } catch (_) {}
+    if (key == null) return;
+    final all = await ProblemIndex.load();
+    if (!mounted) return;
+    for (final p in all) {
+      if (p.key == key) _problem.value = p;
+    }
+  }
+
+  void _pick(ProblemRef p) {
+    _problem.value = p;
+    _save(_kProblem, p.key);
+  }
+
+  void _setPanel(bool open) {
+    setState(() => _panelOpen = open);
+    SharedPreferences.getInstance().then((p) => p.setBool(_kPanel, open)).catchError((_) => false);
+  }
+
+  void _togglePanel() {
+    if (MediaQuery.of(context).size.width >= _panelBeside) {
+      _setPanel(!_panelOpen);
+      return;
+    }
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => FractionallySizedBox(
+        heightFactor: 0.9,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: Material(
+            color: Pb.surface,
+            child: IdeStatementPanel(picked: _problem, onPick: _pick, onClose: () => Navigator.of(ctx).pop()),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _save(String key, String value) {
     SharedPreferences.getInstance().then((p) => p.setString(key, value)).catchError((_) => false);
   }
@@ -120,7 +187,7 @@ class _IdeScreenState extends State<IdeScreen> {
     if (untouched) {
       setState(() {
         _code = _starters[l]!;
-        _gen++;
+        _workbench = GlobalKey();
       });
       _save(_kCode, _code!);
     }
@@ -138,7 +205,7 @@ class _IdeScreenState extends State<IdeScreen> {
   }
 
   void _share() {
-    final link = IdeScreen.linkFor(_code ?? '', _lang, _input);
+    final link = IdeScreen.linkFor(_code ?? '', _lang, _input, problem: _problem.value?.key);
     Clipboard.setData(ClipboardData(text: link));
     _toast(link.length > 6000
         ? 'Linkul a fost copiat (e lung, pentru că are tot programul în el).'
@@ -163,7 +230,7 @@ class _IdeScreenState extends State<IdeScreen> {
       _code = _starters[lang]!;
       _input = '5';
       _fromLink = false;
-      _gen++;
+      _workbench = GlobalKey();
     });
     _save(_kLang, lang);
     _save(_kCode, _code!);
@@ -231,14 +298,14 @@ class _IdeScreenState extends State<IdeScreen> {
         children: [
           Tooltip(
             message: 'Pagina principală',
-            child: InkWell(
+            child: AppLink(to: '/', child: InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () => context.go('/'),
               child: Padding(
                 padding: const EdgeInsets.all(4),
                 child: narrow ? const BrandMark(size: 26) : BrandLogo(color: Pb.text, accent: Pb.link, markSize: 26, fontSize: 16),
               ),
-            ),
+            )),
           ),
           if (!narrow) ...[
             const SizedBox(width: 12),
@@ -257,6 +324,10 @@ class _IdeScreenState extends State<IdeScreen> {
             ),
           ],
           const Spacer(),
+          narrow
+              ? _iconBtn(Icons.description_outlined, 'Cerință', _togglePanel)
+              : PbButton(text: 'Cerință', icon: Icons.description_outlined, variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: _togglePanel),
+          const SizedBox(width: 6),
           _iconBtn(Icons.note_add_outlined, 'Program nou', _newProgram),
           _iconBtn(Icons.keyboard_outlined, 'Scurtături', _keys),
           ValueListenableBuilder<ThemeMode>(
@@ -278,7 +349,23 @@ class _IdeScreenState extends State<IdeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final narrow = MediaQuery.of(context).size.width < 700;
+    final width = MediaQuery.of(context).size.width;
+    final narrow = width < 700;
+    final Widget workbench = _code == null
+        ? const Center(child: CircularProgressIndicator(color: Pb.primary))
+        : CodeWorkbench(
+            key: _workbench,
+            initialCode: _code!,
+            initialLang: _lang,
+            initialStdin: _input,
+            compact: narrow,
+            styleCheck: true,
+            sideConsole: true,
+            autocomplete: !narrow, // accepted with Tab, which a phone does not have
+            onCodeChanged: _onCode,
+            onLangChanged: _onLang,
+            onStdinChanged: _onInput,
+          );
     return Scaffold(
       backgroundColor: Pb.editorBg,
       body: SafeArea(
@@ -287,21 +374,20 @@ class _IdeScreenState extends State<IdeScreen> {
           children: [
             _bar(narrow),
             Expanded(
-              child: _code == null
-                  ? const Center(child: CircularProgressIndicator(color: Pb.primary))
-                  : CodeWorkbench(
-                      key: ValueKey(_gen),
-                      initialCode: _code!,
-                      initialLang: _lang,
-                      initialStdin: _input,
-                      compact: narrow,
-                      styleCheck: true,
-                      sideConsole: true,
-                      autocomplete: !narrow, // accepted with Tab, which a phone does not have
-                      onCodeChanged: _onCode,
-                      onLangChanged: _onLang,
-                      onStdinChanged: _onInput,
-                    ),
+              child: _panelOpen && width >= _panelBeside
+                  ? PaneSplit(
+                      axis: Axis.horizontal,
+                      ratio: _split,
+                      defaultRatio: _splitDefault,
+                      minFirst: 480,
+                      minSecond: 300,
+                      gap: 10,
+                      onChanged: (r) => setState(() => _split = r),
+                      onChangeEnd: () => SharedPreferences.getInstance().then((p) => p.setDouble(_kSplit, _split)).catchError((_) => false),
+                      first: workbench,
+                      second: IdeStatementPanel(picked: _problem, onPick: _pick, onClose: () => _setPanel(false)),
+                    )
+                  : workbench,
             ),
           ],
         ),

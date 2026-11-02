@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'brand_mark.dart';
 import 'ui_components.dart';
@@ -355,7 +356,7 @@ class CustomNavbar extends StatelessWidget {
   Widget _buildClean(BuildContext context, User? user, bool isDesktop) {
     final path = _currentPath(context);
 
-    final brand = _NavHover(
+    final brand = AppLink(to: '/', child: _NavHover(
       onTap: () => context.go('/'),
       builder: (h) => Row(
         mainAxisSize: MainAxisSize.min,
@@ -375,15 +376,15 @@ class CustomNavbar extends StatelessWidget {
           BrandWordmark(color: Pb.text, accent: Pb.link, fontSize: 18),
         ],
       ),
-    );
+    ));
 
     final right = user == null
         ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _NavGhost(label: 'Autentificare', onTap: () => context.go('/login')),
+              AppLink(to: '/login', child: _NavGhost(label: 'Autentificare', onTap: () => context.go('/login'))),
               const SizedBox(width: 8),
-              _NavCta(label: 'Creează cont', onTap: () => context.go('/inregistrare')),
+              AppLink(to: '/inregistrare', child: _NavCta(label: 'Creează cont', onTap: () => context.go('/inregistrare'))),
             ],
           )
         : _cleanUserMenu(context, user, showName: true);
@@ -435,37 +436,37 @@ class CustomNavbar extends StatelessWidget {
                       const SizedBox(width: 18),
                       Container(width: 1, height: 22, color: Pb.border),
                       const SizedBox(width: 14),
-                      _PbNavLink(
+                      AppLink(to: '/exercitii', child: _PbNavLink(
                         label: 'Probleme',
                         icon: Icons.code,
                         active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii'),
                         onTap: () => context.go('/exercitii'),
-                      ),
-                      _PbNavLink(
+                      )),
+                      AppLink(to: '/resurse', child: _PbNavLink(
                         label: 'Lecții',
                         icon: Icons.menu_book_outlined,
                         active: path.startsWith('/resurse'),
                         onTap: () => context.go('/resurse'),
-                      ),
-                      _PbNavLink(
+                      )),
+                      AppLink(to: '/ide', child: _PbNavLink(
                         label: 'IDE',
                         icon: Icons.terminal,
                         active: path.startsWith('/ide'),
                         onTap: () => context.go('/ide'),
-                      ),
-                      _PbNavLink(
+                      )),
+                      AppLink(to: '/materii', child: _PbNavLink(
                         label: 'Profesori',
                         icon: Icons.school_outlined,
                         active: path.startsWith('/materii') || path.startsWith('/profesor'),
                         onTap: () => context.go('/materii'),
-                      ),
+                      )),
                       if (user != null)
-                        _PbNavLink(
+                        AppLink(to: '/clase', child: _PbNavLink(
                           label: 'Clase',
                           icon: Icons.assignment_outlined,
                           active: path.startsWith('/clase') || path.startsWith('/clasa'),
                           onTap: () => context.go('/clase'),
-                        ),
+                        )),
                       const Spacer(),
                       right,
                     ] else ...[
@@ -710,19 +711,19 @@ class CustomNavbar extends StatelessWidget {
                   ),
                 ),
                 section('NAVIGARE'),
-                item(Icons.code, 'Probleme', Pb.link, () => context.go('/exercitii'),
-                    active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii')),
-                item(Icons.menu_book_outlined, 'Lecții', blue, () => context.go('/resurse'),
-                    active: path.startsWith('/resurse')),
-                item(Icons.terminal, 'IDE', const Color(0xFF10B981), () => context.go('/ide'), active: path.startsWith('/ide')),
-                item(Icons.school_outlined, 'Profesori', violet, () => context.go('/materii'),
-                    active: path.startsWith('/materii') || path.startsWith('/profesor')),
+                AppLink(to: '/exercitii', child: item(Icons.code, 'Probleme', Pb.link, () => context.go('/exercitii'),
+                    active: path.startsWith('/exercit') || path.startsWith('/lista-exercitii'))),
+                AppLink(to: '/resurse', child: item(Icons.menu_book_outlined, 'Lecții', blue, () => context.go('/resurse'),
+                    active: path.startsWith('/resurse'))),
+                AppLink(to: '/ide', child: item(Icons.terminal, 'IDE', const Color(0xFF10B981), () => context.go('/ide'), active: path.startsWith('/ide'))),
+                AppLink(to: '/materii', child: item(Icons.school_outlined, 'Profesori', violet, () => context.go('/materii'),
+                    active: path.startsWith('/materii') || path.startsWith('/profesor'))),
                 if (user != null)
-                  item(Icons.assignment_outlined, 'Clase și teme', const Color(0xFFF59E0B), () => context.go('/clase'),
-                      active: path.startsWith('/clase') || path.startsWith('/clasa')),
+                  AppLink(to: '/clase', child: item(Icons.assignment_outlined, 'Clase și teme', const Color(0xFFF59E0B), () => context.go('/clase'),
+                      active: path.startsWith('/clase') || path.startsWith('/clasa'))),
                 section('CONT'),
                 if (user == null) ...[
-                  item(Icons.login, 'Autentificare', Pb.link, () => context.go('/login')),
+                  AppLink(to: '/login', child: item(Icons.login, 'Autentificare', Pb.link, () => context.go('/login'))),
                   const SizedBox(height: 8),
                   _NavCta(label: 'Creează cont', fullWidth: true, onTap: () => go(() => context.go('/inregistrare'))),
                 ] else ...[
@@ -763,22 +764,22 @@ class CustomNavbar extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              NavTextLink(text: 'Teachers', isMobile: true, onTap: () { context.pop(); context.go('/materii'); }),
+              AppLink(to: '/materii', child: NavTextLink(text: 'Teachers', isMobile: true, onTap: () { context.pop(); context.go('/materii'); })),
               const SizedBox(height: 8),
-              NavTextLink(text: 'Exercises', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); }),
+              AppLink(to: '/exercitii', child: NavTextLink(text: 'Exercises', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); })),
               const SizedBox(height: 8),
-              NavTextLink(text: 'Resources', isMobile: true, onTap: () { context.pop(); context.go('/resurse'); }),
+              AppLink(to: '/resurse', child: NavTextLink(text: 'Resources', isMobile: true, onTap: () { context.pop(); context.go('/resurse'); })),
               if (user != null) ...[
                 const SizedBox(height: 8),
-                NavTextLink(text: 'Classes', isMobile: true, onTap: () { context.pop(); context.go('/clase'); }),
+                AppLink(to: '/clase', child: NavTextLink(text: 'Classes', isMobile: true, onTap: () { context.pop(); context.go('/clase'); })),
               ],
               const SizedBox(height: 24),
               Container(height: 3, color: AppColors.border),
               const SizedBox(height: 24),
               if (user == null) ...[
-                NavRetroButton(text: 'Log In', isFullWidth: true, bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () { context.pop(); context.go('/login'); }),
+                AppLink(to: '/login', child: NavRetroButton(text: 'Log In', isFullWidth: true, bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () { context.pop(); context.go('/login'); })),
                 const SizedBox(height: 16),
-                NavRetroButton(text: 'Start Playing', isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: () { context.pop(); context.go('/inregistrare'); }),
+                AppLink(to: '/inregistrare', child: NavRetroButton(text: 'Start Playing', isFullWidth: true, bgColor: AppColors.sky, textColor: Colors.white, onPressed: () { context.pop(); context.go('/inregistrare'); })),
               ] else ...[
                 NavRetroButton(text: 'Terminal', icon: Icons.dashboard, isFullWidth: true, bgColor: AppColors.mustard, textColor: AppColors.ink, onPressed: () { context.pop(); _handleDashboardRouting(context, user); }),
                 const SizedBox(height: 16),
@@ -822,7 +823,7 @@ class CustomNavbar extends StatelessWidget {
               children: [
                 MouseRegion(
                   cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
+                  child: AppLink(to: '/', child: GestureDetector(
                     onTap: () => context.go('/'),
                     child: Row(
                       children: [
@@ -846,28 +847,28 @@ class CustomNavbar extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
+                  )),
                 ),
                 if (isDesktop) ...[
                   Row(
                     children: [
-                      NavTextLink(text: 'Teachers', onTap: () => context.go('/materii')),
+                      AppLink(to: '/materii', child: NavTextLink(text: 'Teachers', onTap: () => context.go('/materii'))),
                       const SizedBox(width: 16),
-                      NavTextLink(text: 'Exercises', onTap: () => context.go('/exercitii')),
+                      AppLink(to: '/exercitii', child: NavTextLink(text: 'Exercises', onTap: () => context.go('/exercitii'))),
                       const SizedBox(width: 14),
-                      NavTextLink(text: 'Resources', onTap: () => context.go('/resurse')),
+                      AppLink(to: '/resurse', child: NavTextLink(text: 'Resources', onTap: () => context.go('/resurse'))),
                       if (user != null) ...[
                         const SizedBox(width: 14),
-                        NavTextLink(text: 'Classes', onTap: () => context.go('/clase')),
+                        AppLink(to: '/clase', child: NavTextLink(text: 'Classes', onTap: () => context.go('/clase'))),
                       ],
                     ],
                   ),
                   Row(
                     children: [
                       if (user == null) ...[
-                        NavRetroButton(text: 'Log In', bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () => context.go('/login')),
+                        AppLink(to: '/login', child: NavRetroButton(text: 'Log In', bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () => context.go('/login'))),
                         const SizedBox(width: 16),
-                        NavRetroButton(text: 'Start Playing', bgColor: AppColors.sky, textColor: Colors.white, onPressed: () => context.go('/inregistrare')),
+                        AppLink(to: '/inregistrare', child: NavRetroButton(text: 'Start Playing', bgColor: AppColors.sky, textColor: Colors.white, onPressed: () => context.go('/inregistrare'))),
                       ] else ...[
                         IconButton(icon: Icon(Icons.dashboard, color: AppColors.ink, size: 28), onPressed: () => _handleDashboardRouting(context, user)),
                         const SizedBox(width: 8),

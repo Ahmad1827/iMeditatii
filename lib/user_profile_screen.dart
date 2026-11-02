@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'clean_kit.dart';
 import 'custom_navbar.dart';
@@ -525,7 +526,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ckCardTitle(
             Icons.trending_up,
             'Progres pe materii',
-            trailing: isMe ? GestureDetector(onTap: () => context.go('/exercitii'), child: Text('Exersează', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.link))) : null,
+            trailing: isMe ? AppLink(to: '/exercitii', child: GestureDetector(onTap: () => context.go('/exercitii'), child: Text('Exersează', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.link)))) : null,
           ),
           if (entries.isEmpty)
             Container(
@@ -1188,13 +1189,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 "SKILL & QUEST PROGRESSION",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AppColors.ink),
               ),
-              GestureDetector(
+              AppLink(to: '/exercitii', child: GestureDetector(
                 onTap: () => context.go('/exercitii'),
                 child: Text(
                   "ENTER ARENA >",
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.sunset, decoration: TextDecoration.underline),
                 ),
-              ),
+              )),
             ],
           ),
           const SizedBox(height: 14),

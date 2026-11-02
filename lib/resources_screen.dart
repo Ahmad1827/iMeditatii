@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
 import 'home_ambient.dart';
@@ -937,8 +938,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
   Widget _cFooter(bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
 
@@ -1408,7 +1409,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     final String date = '${article['date'] ?? ResourcesData.defaultDate}';
     final String readTime = '${article['readTime'] ?? "5 MIN"}';
 
-    return GestureDetector(
+    return AppLink(to: '/resurse/${article['id']}', child: GestureDetector(
       onTap: () => context.go('/resurse/${article['id']}'),
       child: Container(
         width: double.infinity,
@@ -1515,7 +1516,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildEmptyState(bool isMobile) {

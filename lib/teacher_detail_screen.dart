@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart' show CustomNavbar;
 import 'home_ambient.dart' show HomeSky;
@@ -274,7 +275,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
           const SizedBox(height: 4),
           Text('Poate a fost șters sau nu e încă aprobat.', style: TextStyle(fontSize: 14, color: Pb.muted)),
           const SizedBox(height: 16),
-          PbButton(text: 'Înapoi la profesori', variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: () => context.go('/materii')),
+          AppLink(to: '/materii', child: PbButton(text: 'Înapoi la profesori', variant: PbVariant.outlineSecondary, size: PbSize.sm, onPressed: () => context.go('/materii'))),
         ],
       ),
     );
@@ -456,13 +457,13 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
                     if (isMobile) ...[
                       _cContactButton(context, name, email, contact),
                       const SizedBox(height: 10),
-                      PbButton(
+                      AppLink(to: '/profesor/$teacherId/recenzii', child: PbButton(
                         text: 'Vezi recenziile',
                         icon: Icons.rate_review_outlined,
                         variant: PbVariant.outlineSecondary,
                         fullWidth: true,
                         onPressed: () => context.push('/profesor/$teacherId/recenzii'),
-                      ),
+                      )),
                     ] else
                       Row(
                         children: [
@@ -470,13 +471,13 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             flex: 2,
-                            child: PbButton(
+                            child: AppLink(to: '/profesor/$teacherId/recenzii', child: PbButton(
                               text: 'Vezi recenziile',
                               icon: Icons.rate_review_outlined,
                               variant: PbVariant.outlineSecondary,
                               fullWidth: true,
                               onPressed: () => context.push('/profesor/$teacherId/recenzii'),
-                            ),
+                            )),
                           ),
                         ],
                       ),
@@ -545,8 +546,8 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
 
   Widget _cFooter(BuildContext context, bool isMobile) {
     final links = [
-      PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii')),
-      PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate')),
+      AppLink(to: '/termeni-si-conditii', child: PbLink(text: 'Termeni și condiții', fontSize: 14, onTap: () => context.go('/termeni-si-conditii'))),
+      AppLink(to: '/politica-confidentialitate', child: PbLink(text: 'Politica de confidențialitate', fontSize: 14, onTap: () => context.go('/politica-confidentialitate'))),
     ];
     final copy = Text('© 2026 iMeditații', style: TextStyle(color: Pb.muted, fontSize: 14));
     return Container(
