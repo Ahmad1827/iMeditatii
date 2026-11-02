@@ -21,6 +21,31 @@
           "id": "4",
           "title": "Interschimbarea a două valori",
           "difficulty": "ușoară"
+        },
+        {
+          "id": "1001",
+          "title": "Timp în ore și minute",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1002",
+          "title": "Ultimele două cifre",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1003",
+          "title": "Bomboane împărțite",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1004",
+          "title": "Suma numerelor de la 1 la n",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1005",
+          "title": "Numărul de pagini",
+          "difficulty": "medie"
         }
       ],
       "2. Structuri alternative": [
@@ -48,6 +73,36 @@
           "id": "9",
           "title": "Laturile unui triunghi",
           "difficulty": "medie"
+        },
+        {
+          "id": "1006",
+          "title": "Maximul a trei numere",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1007",
+          "title": "Zile într-o lună",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1008",
+          "title": "Punctul în cadran",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1009",
+          "title": "Ecuația de gradul I",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1010",
+          "title": "Tip de triunghi",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1011",
+          "title": "Notă în calificativ",
+          "difficulty": "ușoară"
         }
       ],
       "3. Prelucrarea cifrelor": [
@@ -70,6 +125,41 @@
           "id": "13",
           "title": "Număr palindrom",
           "difficulty": "medie"
+        },
+        {
+          "id": "1012",
+          "title": "Numărul de cifre",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1013",
+          "title": "Cifra maximă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1014",
+          "title": "Cifre pare și impare",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1015",
+          "title": "Eliminarea cifrei",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1016",
+          "title": "Număr cu cifre crescătoare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1017",
+          "title": "Rădăcina digitală",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1018",
+          "title": "Palindrom după o singură cifră eliminată",
+          "difficulty": "grea"
         }
       ],
       "4. Divizibilitate și numere prime": [
@@ -91,6 +181,36 @@
         {
           "id": "17",
           "title": "Ciurul lui Eratostene",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1019",
+          "title": "Divizorii unui număr",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1020",
+          "title": "CMMMC a două numere",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1021",
+          "title": "Numere prime între ele",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1022",
+          "title": "Numere perfecte",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1023",
+          "title": "Câte numere prime până la n",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1024",
+          "title": "Divizori ai produsului",
           "difficulty": "grea"
         }
       ],
@@ -134,9 +254,108 @@
           "id": "25",
           "title": "Secvența de sumă maximă",
           "difficulty": "grea"
+        },
+        {
+          "id": "1025",
+          "title": "Elemente pare din vector",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1026",
+          "title": "Inversarea unui vector",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1027",
+          "title": "Rotire la stânga",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1028",
+          "title": "Elementele distincte în ordine",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1029",
+          "title": "Doi vecini egali",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1030",
+          "title": "Secvența crescătoare maximă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1031",
+          "title": "Numărul majoritar",
+          "difficulty": "grea"
         }
       ],
-      "6. Olimpiadă": [
+      "6. Sortare și căutare binară": [
+        {
+          "id": "1032",
+          "title": "Sortare prin metoda bulelor",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1033",
+          "title": "Sortare după paritate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1034",
+          "title": "Prima și ultima apariție",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1035",
+          "title": "Rădăcina pătrată întreagă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1036",
+          "title": "Perechea cu suma dată (sortat)",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1037",
+          "title": "Câte elemente sunt mai mici",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1038",
+          "title": "Tăierea buștenilor",
+          "difficulty": "grea"
+        }
+      ],
+      "7. Sume parțiale și doi indici": [
+        {
+          "id": "1039",
+          "title": "Sume pe interval",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1040",
+          "title": "Interval cu suma k",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1041",
+          "title": "Secvențe cu suma divizibilă",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1042",
+          "title": "Elementele care apar în ambii vectori",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1043",
+          "title": "Cele două sume egale",
+          "difficulty": "medie"
+        }
+      ],
+      "8. Olimpiadă": [
         {
           "id": "91",
           "title": "Macarie",
@@ -171,6 +390,41 @@
           "id": "30",
           "title": "Parcurgere în spirală",
           "difficulty": "grea"
+        },
+        {
+          "id": "1201",
+          "title": "Suma pe linii și coloane",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1202",
+          "title": "Linia cu suma maximă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1203",
+          "title": "Matrice triunghiulară",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1204",
+          "title": "Rotirea matricei cu 90°",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1205",
+          "title": "Puncte șa",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1206",
+          "title": "Suma pe submatrice",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1207",
+          "title": "Insule de unu",
+          "difficulty": "grea"
         }
       ],
       "2. Șiruri de caractere": [
@@ -198,6 +452,56 @@
           "id": "35",
           "title": "Anagrame",
           "difficulty": "medie"
+        },
+        {
+          "id": "1208",
+          "title": "Numărul de cuvinte",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1209",
+          "title": "Frecvența literelor",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1210",
+          "title": "Cifrul lui Cezar",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1211",
+          "title": "Comprimarea unui șir",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1212",
+          "title": "Cuvântul cel mai lung",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1213",
+          "title": "Subșir într-un șir",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1214",
+          "title": "Cel mai lung prefix comun",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1215",
+          "title": "Parola sigură",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1216",
+          "title": "Cuvinte în ordine inversă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1217",
+          "title": "Cea mai lungă secvență fără repetiții",
+          "difficulty": "grea"
         }
       ],
       "3. Recursivitate": [
@@ -274,6 +578,31 @@
           "title": "Evaluarea unei expresii",
           "difficulty": "grea",
           "sursa": "N. Wirth, «Algorithms + Data Structures = Programs» (1976), cap. 5 · analiza recursivă descendentă"
+        },
+        {
+          "id": "1218",
+          "title": "Suma cifrelor, recursiv",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1219",
+          "title": "Puterea, recursiv",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1220",
+          "title": "Combinări cu triunghiul lui Pascal",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1221",
+          "title": "Afișarea în baza 2",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1222",
+          "title": "Scara cu pași de 1 sau 2",
+          "difficulty": "medie"
         }
       ],
       "4. Divide et Impera": [
@@ -285,6 +614,26 @@
         {
           "id": "41",
           "title": "Sortare prin interclasare (MergeSort)",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1223",
+          "title": "Maximul prin divide et impera",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1224",
+          "title": "Sortare rapidă (QuickSort)",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1225",
+          "title": "Numărul de inversiuni",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1226",
+          "title": "Al k-lea element",
           "difficulty": "grea"
         }
       ],
@@ -298,9 +647,78 @@
           "id": "43",
           "title": "Paranteze corecte",
           "difficulty": "medie"
+        },
+        {
+          "id": "1227",
+          "title": "Elementul următor mai mare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1228",
+          "title": "Editor cu Undo",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1229",
+          "title": "Două numere cu suma dată",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1230",
+          "title": "Anagrame grupate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1231",
+          "title": "Valori distincte în fereastră",
+          "difficulty": "grea"
         }
       ],
-      "6. Olimpiadă": [
+      "6. Subprograme": [
+        {
+          "id": "1232",
+          "title": "Funcție: este prim",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1233",
+          "title": "Funcție cu parametri prin referință",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1234",
+          "title": "Funcție: simplificarea unei fracții",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1235",
+          "title": "Funcție: număr rotund",
+          "difficulty": "medie"
+        }
+      ],
+      "7. Greedy": [
+        {
+          "id": "1236",
+          "title": "Spectacole",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1237",
+          "title": "Rest cu bancnote",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1238",
+          "title": "Elevi și cărți",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1239",
+          "title": "Salturi până la capăt",
+          "difficulty": "grea"
+        }
+      ],
+      "8. Olimpiadă": [
         {
           "id": "92",
           "title": "Aprogressive",
@@ -335,6 +753,41 @@
           "id": "48",
           "title": "Problema damelor",
           "difficulty": "grea"
+        },
+        {
+          "id": "1401",
+          "title": "Submulțimi",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1402",
+          "title": "Șiruri binare fără doi de 1 vecini",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1403",
+          "title": "Suma din submulțime",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1404",
+          "title": "Paranteze echilibrate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1405",
+          "title": "Colorarea hărții",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1406",
+          "title": "Ieșirea din labirint",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1407",
+          "title": "Numere cu cifre distincte",
+          "difficulty": "grea"
         }
       ],
       "2. Grafuri neorientate": [
@@ -362,6 +815,36 @@
           "id": "53",
           "title": "Componente conexe",
           "difficulty": "medie"
+        },
+        {
+          "id": "1408",
+          "title": "Lista de adiacență",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1409",
+          "title": "Graf bipartit",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1410",
+          "title": "Cel mai scurt drum, fără costuri",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1411",
+          "title": "Numărul de triunghiuri",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1412",
+          "title": "Reunirea orașelor (DSU)",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1413",
+          "title": "Noduri izolate și frunze",
+          "difficulty": "ușoară"
         }
       ],
       "3. Grafuri ponderate": [
@@ -373,6 +856,26 @@
         {
           "id": "55",
           "title": "Arbore parțial de cost minim (Kruskal)",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1414",
+          "title": "Floyd–Warshall",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1415",
+          "title": "Prim: arbore de cost minim",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1416",
+          "title": "Dijkstra cu reconstrucție",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1417",
+          "title": "Bellman–Ford cu costuri negative",
           "difficulty": "grea"
         }
       ],
@@ -401,9 +904,108 @@
           "id": "60",
           "title": "Subșirul comun maximal (LCS)",
           "difficulty": "grea"
+        },
+        {
+          "id": "1418",
+          "title": "Drumuri în grilă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1419",
+          "title": "Hoțul pe stradă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1420",
+          "title": "Numărul de moduri cu monede",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1421",
+          "title": "Distanța de editare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1422",
+          "title": "Împărțirea în două grupe egale",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1423",
+          "title": "Palindromul cel mai lung",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1424",
+          "title": "Tăierea unei bare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1425",
+          "title": "Numărul de subșiruri",
+          "difficulty": "grea"
+        },
+        {
+          "id": "1426",
+          "title": "Înmulțirea matricelor",
+          "difficulty": "grea"
         }
       ],
-      "5. Olimpiadă": [
+      "5. Arbori": [
+        {
+          "id": "1427",
+          "title": "Înălțimea unui arbore",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1428",
+          "title": "Frunzele arborelui",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1429",
+          "title": "Parcurgerile unui arbore binar",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1430",
+          "title": "Diametrul unui arbore",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1431",
+          "title": "Mărimea subarborilor",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1432",
+          "title": "Arbore binar de căutare",
+          "difficulty": "grea"
+        }
+      ],
+      "6. Grafuri orientate": [
+        {
+          "id": "1433",
+          "title": "Sortare topologică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1434",
+          "title": "Accesibilitate din sursă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "1435",
+          "title": "Circuit în graf orientat",
+          "difficulty": "medie"
+        },
+        {
+          "id": "1436",
+          "title": "Componente tare conexe",
+          "difficulty": "grea"
+        }
+      ],
+      "7. Olimpiadă": [
         {
           "id": "93",
           "title": "Birocrație",

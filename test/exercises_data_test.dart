@@ -75,6 +75,41 @@ void main() {
     });
   });
 
+  test('informatics IX–XI: every official solution passes all its tests, and every chapter ends with the olympiad', () async {
+    String norm(String s) => s.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+    final tmp = Directory.systemTemp.createTempSync('info');
+    addTearDown(() => tmp.deleteSync(recursive: true));
+    final failures = <String>[];
+    for (final grade in ['9', '10', '11']) {
+      expect((list['Informatică'][grade] as Map<String, dynamic>).keys.last, endsWith('Olimpiadă'), reason: grade);
+      final problems = {
+        for (final e in (details['Informatică'][grade] as Map<String, dynamic>).entries)
+          if (e.value['fisier'] == null) e.key: e.value as Map<String, dynamic>,
+      };
+      final ids = problems.keys.toList();
+      for (var i = 0; i < ids.length; i += 8) {
+        await Future.wait([
+          for (final id in ids.skip(i).take(8))
+            () async {
+              final dir = Directory('${tmp.path}/${grade}_$id')..createSync();
+              File('${dir.path}/main.cpp').writeAsStringSync(problems[id]!['official_solution']['code']);
+              final c = await Process.run('g++', ['-std=c++17', '-O2', 'main.cpp', '-o', 'main'], workingDirectory: dir.path);
+              if (c.exitCode != 0) return failures.add('$grade/$id: compile error');
+              for (final t in problems[id]!['tests'] as List) {
+                final p = await Process.start('${dir.path}/main', [], workingDirectory: dir.path);
+                p.stdin.write(t['input']);
+                await p.stdin.close();
+                final out = await p.stdout.transform(const SystemEncoding().decoder).join();
+                await p.exitCode;
+                if (norm(out) != norm('${t['output']}')) failures.add('$grade/$id: ${'${t['input']}'.split('\n').first}');
+              }
+            }(),
+        ]);
+      }
+    }
+    expect(failures, isEmpty);
+  }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 10)));
+
   group('grade 12 informatics: Subiectul III from every BAC paper, 2019 to 2026', () {
     final g12 = (details['Informatică']['12'] as Map<String, dynamic>);
     final bac = {for (final e in g12.entries) if ('${e.value['sursa'] ?? ''}'.startsWith('BAC ')) e.key: e.value as Map<String, dynamic>};
