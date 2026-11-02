@@ -363,7 +363,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final list = <Map<String, dynamic>>[];
       for (final d in snap.docs) {
         final m = d.data();
-        if (m['role'] == 'teacher') continue;
         final count = (m['solvedCount'] as num?)?.toInt() ?? 0;
         if (count <= 0) continue;
         list.add({
@@ -371,6 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'name': (m['name'] ?? m['fullName'] ?? m['displayName'] ?? m['nume'] ?? 'Elev').toString(),
           'photo': (m['image'] ?? m['photoUrl'] ?? m['avatarUrl'] ?? m['photo'] ?? '').toString(),
           'count': count,
+          'teacher': m['role'] == 'teacher',
         });
         if (list.length == 10) break;
       }
@@ -1257,8 +1257,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ? '?'
         : name.split(RegExp(r'\s+')).take(2).map((w) => w[0].toUpperCase()).join();
 
-    return AppLink(to: '/elev/${u['uid']}', child: _HHover(
-      onTap: () => context.go('/elev/${u['uid']}'),
+    final profile = '${u['teacher'] == true ? '/profesor' : '/elev'}/${u['uid']}';
+
+    return AppLink(to: profile, child: _HHover(
+      onTap: () => context.go(profile),
       builder: (h) => AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
