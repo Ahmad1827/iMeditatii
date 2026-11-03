@@ -137,6 +137,90 @@ void main() {
     expect(failures, isEmpty);
   }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 30)));
 
+  group('AcadNet: Interoperabilitate software, a program with bugs to fix', () {
+    final chapters = list['Informatică']['AcadNet'] as Map<String, dynamic>;
+    final problems = details['Informatică']['AcadNet'] as Map<String, dynamic>;
+
+    test('a chapter per year, newest first; each problem with its source, the program to fix, a hint and what was wrong', () {
+      final names = chapters.keys.toList();
+      final years = [for (final n in names) int.parse(RegExp(r'^\d+\. AcadNet (\d{4})$').firstMatch(n)!.group(1)!)];
+      for (var i = 0; i < names.length; i++) {
+        expect(names[i], startsWith('${i + 1}. '));
+        if (i > 0) expect(years[i], lessThan(years[i - 1]));
+      }
+      final titles = <String>{};
+      for (final MapEntry(key: chapter, value: items) in chapters.entries) {
+        for (final item in items as List) {
+          final d = problems[item['id']] as Map<String, dynamic>;
+          final why = '${item['id']} ${d['title']}';
+          expect(titles.add('${d['title']}'.toLowerCase()), true, reason: '$why twice');
+          expect(d['sursa'], matches(RegExp(r'^AcadNet (\d{4}) · Etapa (locală|județeană|națională) · clasele (9–10|11–12)$')), reason: why);
+          expect(chapter, endsWith('${d['sursa']}'.substring(8, 12)), reason: why);
+          expect(item['sursa'], d['sursa'], reason: why);
+          expect(['ușoară', 'medie', 'grea'], contains(d['difficulty']), reason: why);
+          expect('${d['hint'] ?? ''}'.trim(), isNotEmpty, reason: why);
+          expect('${d['solutie'] ?? ''}', contains('- '), reason: why);
+          expect('${d['cod_initial'] ?? ''}'.trim(), isNotEmpty, reason: why);
+          expect(d['cod_initial'], isNot(d['official_solution']['code']), reason: why);
+          expect((d['tests'] as List), isNotEmpty, reason: why);
+          for (final f in (d['imagine_originala'] as List?) ?? const []) {
+            expect(File('$f').existsSync(), true, reason: '$why: $f');
+          }
+        }
+      }
+      expect(titles.length, problems.length);
+      expect(titles.length, greaterThanOrEqualTo(60));
+    });
+
+    test('the official program passes every test; the program given fails one, or does not compile', () async {
+      final tmp = Directory.systemTemp.createTempSync('acadnet');
+      addTearDown(() => tmp.deleteSync(recursive: true));
+      final failures = <String>[];
+      Future<String?> build(String dir, String code) async {
+        File('$dir/main.cpp').writeAsStringSync(code);
+        final c = await Process.run('g++', ['-std=c++17', '-O2', '-w', 'main.cpp', '-o', 'main'], workingDirectory: dir);
+        return c.exitCode == 0 ? '$dir/main' : null;
+      }
+
+      Future<String> runOn(String exe, String input) async {
+        final p = await Process.start(exe, []);
+        final reading = p.stdout.transform(const SystemEncoding().decoder).join();
+        p.stdin.write(input);
+        await p.stdin.close();
+        final out = await reading.timeout(const Duration(seconds: 20), onTimeout: () {
+          p.kill();
+          return '<timeout>';
+        });
+        await p.exitCode;
+        return out;
+      }
+
+      final ids = problems.keys.toList();
+      final batch = Platform.numberOfProcessors.clamp(8, 32);
+      for (var i = 0; i < ids.length; i += batch) {
+        await Future.wait([
+          for (final id in ids.skip(i).take(batch))
+            () async {
+              final d = problems[id] as Map<String, dynamic>;
+              final good = Directory('${tmp.path}/${id}_good')..createSync();
+              final bad = Directory('${tmp.path}/${id}_bad')..createSync();
+              final g = await build(good.path, d['official_solution']['code']);
+              if (g == null) return failures.add('$id: the official program does not compile');
+              final b = await build(bad.path, d['cod_initial']);
+              var badFails = b == null;
+              for (final t in d['tests'] as List) {
+                final want = ExerciseDetailScreen.normOutput('${t['output']}');
+                if (ExerciseDetailScreen.normOutput(await runOn(g, '${t['input']}')) != want) failures.add('$id: ${'${t['input']}'.split('\n').first}');
+                if (!badFails && ExerciseDetailScreen.normOutput(await runOn(b!, '${t['input']}')) != want) badFails = true;
+              }
+              if (!badFails) failures.add('$id: the program given already passes every test');
+            }(),
+        ]);
+      }
+      expect(failures, isEmpty);
+    }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 20)));
+  });
+
   group('grade 12 informatics: Subiectul III from every BAC paper, 2019 to 2026', () {
     final g12 = (details['Informatică']['12'] as Map<String, dynamic>);
     final bac = {for (final e in g12.entries) if ('${e.value['sursa'] ?? ''}'.startsWith('BAC ')) e.key: e.value as Map<String, dynamic>};

@@ -27,6 +27,7 @@ import 'workspace_screen.dart' show wsAgo;
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
+import 'grade_label.dart';
 
 // ----------------------------------------------------
 // SYNTAX-HIGHLIGHTED EDITOR CONTROLLER
@@ -48,6 +49,7 @@ class ExerciseDetailScreen extends StatefulWidget {
 
   /// Whether a typed short answer counts as the expected one.
   static bool answersMatch(String given, String expected) => _ExerciseDetailScreenState.answersMatch(given, expected);
+  static String normOutput(String s) => _ExerciseDetailScreenState.normOutput(s);
 
   const ExerciseDetailScreen({super.key, required this.subject, required this.grade, required this.id});
 
@@ -102,7 +104,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   String _program(String code) =>
       _harness == null || RegExp(r'\bint\s+main\s*\(').hasMatch(code) ? code : '$code\n\n// ---- funcția main, scrisă deja ----\n${_harness!}\n';
 
-  String get _boilerplate => _header != null && _harness != null
+  /// A program to fix (AcadNet, Interoperabilitate software): the editor opens on it, bugs and all.
+  String? get _given => _str(['cod_initial']);
+
+  String get _boilerplate => _given != null
+      ? _given!
+      : _header != null && _harness != null
       ? '#include <iostream>\nusing namespace std;\n\n$_header {\n    // TODO: scrie aici subprogramul\n    \n}\n'
       : _file == null
       ? defaultCppBoilerplate
@@ -265,7 +272,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   /// A problem with files starts from a program that opens them, unless something's written already.
   void _fileTemplate() {
-    if ((_file != null || _harness != null) && _codeController.text.trim() == defaultCppBoilerplate.trim()) _codeController.text = _boilerplate;
+    if ((_file != null || _harness != null || _given != null) && _codeController.text.trim() == defaultCppBoilerplate.trim()) _codeController.text = _boilerplate;
   }
 
   int _getCurrentLine() {
@@ -1112,7 +1119,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               sep,
               AppLink(to: listRoute, child: PbLink(text: widget.subject, fontSize: 13, onTap: () => context.go(listRoute))),
               sep,
-              Text('Clasa a ${widget.grade}-a', style: TextStyle(fontSize: 13, color: Pb.muted)),
+              Text(isSchoolGrade(widget.grade) ? 'Clasa a ${widget.grade}-a' : widget.grade, style: TextStyle(fontSize: 13, color: Pb.muted)),
             ],
           ),
           const SizedBox(height: 8),
@@ -1261,7 +1268,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
         chip(kind, icon: _kind == 'cod' ? Icons.code : (_isSheet ? Icons.draw_outlined : Icons.quiz_outlined)),
         if (_file != null) chip('$_file.in / $_file.out', icon: Icons.description_outlined),
-        chip('Clasa a ${widget.grade}-a', icon: Icons.school_outlined),
+        chip(isSchoolGrade(widget.grade) ? 'Clasa a ${widget.grade}-a' : widget.grade, icon: isSchoolGrade(widget.grade) ? Icons.school_outlined : Icons.emoji_events_outlined),
         if (time != null) chip(time, icon: Icons.timer_outlined),
         if (mem != null) chip(mem, icon: Icons.memory),
         for (final t in tags) chip(t, icon: Icons.sell_outlined),
@@ -1360,6 +1367,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               child: StatementText('**Răspuns:** $answer', fontSize: 15, height: 1.5, color: Pb.successText),
             ),
           ],
+        ],
+      );
+    }
+    // what was wrong in the program given (AcadNet), then the corrected one
+    if (worked != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SelectionArea(child: StatementText(worked, fontSize: 15, height: 1.65)),
+          const SizedBox(height: 16),
+          PbCodeBox(code, lang: 'cpp', fontSize: 14),
         ],
       );
     }

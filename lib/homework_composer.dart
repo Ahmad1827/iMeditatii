@@ -9,6 +9,7 @@ import 'homework_dock.dart' show hwDueLabel;
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize;
 import 'workspace_models.dart';
 import 'workspace_screen.dart' show wsDialogShell, wsDocColor, wsDocIcon;
+import 'grade_label.dart';
 
 // =============================================================================
 // HOMEWORK COMPOSER — one dialog: who gets it, what to do, until when, and
@@ -400,7 +401,7 @@ class _ComposerState extends State<_Composer> {
             icon: ckSubjectIcon(p.subject),
             color: ckSubjectColor(p.subject),
             title: p.title,
-            sub: '${p.subject}, clasa a ${p.grade}-a',
+            sub: '${p.subject}, ${gradeInline(p.grade)}',
             onRemove: () => setState(() => _problems.remove(p)),
           ),
         if (_material != null)
@@ -589,11 +590,15 @@ class _ProblemPickerState extends State<_ProblemPicker> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
-            child: Row(
+            // the grades wrap onto a line of their own when there are many (IX–XII and AcadNet)
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                for (final g in grades.keys) Padding(padding: const EdgeInsets.only(right: 6), child: _seg('a $g-a', g == _grade, () => setState(() => _grade = g))),
-                const SizedBox(width: 6),
-                Expanded(
+                for (final g in grades.keys) _seg(isSchoolGrade(g) ? 'a $g-a' : g, g == _grade, () => setState(() => _grade = g)),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 160, maxWidth: 260),
                   child: TextField(
                     onChanged: (v) => setState(() => _q = v),
                     style: TextStyle(fontSize: 14, color: Pb.text),

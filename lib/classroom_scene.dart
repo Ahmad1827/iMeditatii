@@ -1086,7 +1086,7 @@ class _Notebook extends StatelessWidget {
     final ok = !teacher && solved.contains(p.progressKey);
     final c = ckSubjectColor(p.subject);
     final sol = sent?[p.progressKey];
-    final subject = '${p.subject}${p.grade.isEmpty ? '' : ', a ${p.grade}-a'}';
+    final subject = '${p.subject}${p.grade.isEmpty ? '' : ', ${isSchoolGrade(p.grade) ? 'a ${p.grade}-a' : p.grade}'}';
     final titleStyle = TextStyle(
       fontSize: isMobile ? 17 : 22,
       fontWeight: FontWeight.w600,

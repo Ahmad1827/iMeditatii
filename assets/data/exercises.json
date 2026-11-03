@@ -4577,6 +4577,410 @@
           "sursa": "Exercițiu de antrenament (nu e dintr-o variantă BAC)"
         }
       ]
+    },
+    "AcadNet": {
+      "1. AcadNet 2026": [
+        {
+          "id": "2001",
+          "title": "Fuel Wars",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2002",
+          "title": "Quick Maths",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2003",
+          "title": "Sum Up",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2004",
+          "title": "The Amazing Machine of Gumball",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2005",
+          "title": "Bank",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2006",
+          "title": "Collatz",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2007",
+          "title": "DoubleTrouble",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2008",
+          "title": "No Strings Attached",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2009",
+          "title": "Cowsay Bonanza",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2010",
+          "title": "Friend In Need",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2011",
+          "title": "Pixelator",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2012",
+          "title": "Pole Position",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2013",
+          "title": "Headline Hunter",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2014",
+          "title": "No More 67",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2015",
+          "title": "Stack",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2016",
+          "title": "Votefellas",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2017",
+          "title": "Banca Castorilor",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2018",
+          "title": "Enigma",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2019",
+          "title": "In search of maximum",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2020",
+          "title": "KNN",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2021",
+          "title": "Padding Struct Optimizer",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2022",
+          "title": "AcadBank",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2023",
+          "title": "Dosarele Huffman",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2024",
+          "title": "In search of minimum",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2025",
+          "title": "Matrix Overload",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2026 · Etapa națională · clasele 11–12"
+        }
+      ],
+      "2. AcadNet 2025": [
+        {
+          "id": "2026",
+          "title": "Airport Check",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2027",
+          "title": "Frog Leap",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2028",
+          "title": "Medie liceu",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2029",
+          "title": "Save Acadnesti",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2030",
+          "title": "Digit Chief",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2031",
+          "title": "Loterie",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2032",
+          "title": "Matrice Sum",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2033",
+          "title": "Num_Product",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2034",
+          "title": "Eratostene",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2035",
+          "title": "Key Access",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2036",
+          "title": "Luhn",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2037",
+          "title": "A2D2",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2038",
+          "title": "Bit Key",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2039",
+          "title": "Fast Expo",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2040",
+          "title": "Hamming Code",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2025 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2041",
+          "title": "Code Hammer",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2025 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2042",
+          "title": "Health Tree",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2025 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2043",
+          "title": "Power Chess",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2025 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2044",
+          "title": "Beautiful Diamond",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2025 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2045",
+          "title": "Expression evaluator",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2025 · Etapa națională · clasele 11–12"
+        }
+      ],
+      "3. AcadNet 2024": [
+        {
+          "id": "2046",
+          "title": "Concat count",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2047",
+          "title": "Matsum",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2048",
+          "title": "PRIMES",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2049",
+          "title": "Sumvect",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 9–10"
+        },
+        {
+          "id": "2050",
+          "title": "Medii",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2051",
+          "title": "Num_Sum",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2052",
+          "title": "Teren",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2053",
+          "title": "WrongData",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa locală · clasele 11–12"
+        },
+        {
+          "id": "2054",
+          "title": "Interclasare",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2024 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2055",
+          "title": "Trader",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2056",
+          "title": "Volei",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2024 · Etapa județeană · clasele 9–10"
+        },
+        {
+          "id": "2057",
+          "title": "Alan Wake",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2058",
+          "title": "Kernel",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2024 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2059",
+          "title": "YzziD",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa județeană · clasele 11–12"
+        },
+        {
+          "id": "2060",
+          "title": "Bomboane",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2061",
+          "title": "Interval sortat",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2062",
+          "title": "Markdown parser",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2063",
+          "title": "Ransomware Task Force",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2064",
+          "title": "Dicționar de intervale",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2065",
+          "title": "Longest increasing sequence",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2066",
+          "title": "Stolechain",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2024 · Etapa națională · clasele 11–12"
+        }
+      ]
     }
   },
   "Matematică": {

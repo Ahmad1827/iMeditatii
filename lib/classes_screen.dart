@@ -20,6 +20,7 @@ import 'workspace_models.dart';
 import 'workspace_screen.dart' show wsDialogShell;
 import 'home_ambient.dart' show HomeSky;
 import 'math_sheet.dart' show SheetReviewCard;
+import 'grade_label.dart';
 
 part 'classroom_scene.dart';
 

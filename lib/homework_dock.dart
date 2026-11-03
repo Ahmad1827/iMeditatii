@@ -10,6 +10,7 @@ import 'clean_kit.dart';
 import 'classes_models.dart';
 import 'ui_components.dart' show Pb, PbButton, PbVariant, PbSize;
 import 'workspace_screen.dart' show wsDocColor, wsDialogShell;
+import 'grade_label.dart';
 
 // =============================================================================
 // HOMEWORK — what a student sees.
@@ -358,7 +359,7 @@ class _HomeworkDetailsState extends State<HomeworkDetails> {
       ok: ok,
       color: c,
       title: p.title.isEmpty ? p.id : p.title,
-      sub: [p.subject, if (p.grade.isNotEmpty) 'clasa a ${p.grade}-a'].join(' · '),
+      sub: [p.subject, if (p.grade.isNotEmpty) gradeInline(p.grade)].join(' · '),
       trailing: ok ? hwPill('Rezolvată', hwGreen, icon: Icons.check) : _go2('Rezolvă', c),
       onTap: () => _go(p.path),
     ));

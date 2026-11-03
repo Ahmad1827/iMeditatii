@@ -7,6 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'app_link.dart';
 import 'problem_statement.dart';
 import 'ui_components.dart';
+import 'grade_label.dart';
 
 // =============================================================================
 // THE STATEMENT BESIDE THE CODE, IN THE IDE
@@ -153,7 +154,7 @@ class _IdeStatementPanelState extends State<IdeStatementPanel> {
         ),
       );
 
-  String _where(ProblemRef p) => [p.subject, if (p.grade.isNotEmpty) 'clasa a ${p.grade}-a', if ('${p.data['category'] ?? ''}'.isNotEmpty) '${p.data['category']}'].join(' · ');
+  String _where(ProblemRef p) => [p.subject, if (p.grade.isNotEmpty) gradeInline(p.grade), if ('${p.data['category'] ?? ''}'.isNotEmpty) '${p.data['category']}'].join(' · ');
 
   Widget _resultsList() {
     final results = _results;

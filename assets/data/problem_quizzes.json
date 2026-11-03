@@ -22051,6 +22051,1460 @@
      "e": "0 este număr par și poate apărea în șir."
     }
    ]
+  },
+  "AcadNet": {
+   "2001": [
+    {
+     "q": "Ce structură de date folosește algoritmul Lee ca să găsească drumul cel mai scurt într-o grilă?",
+     "o": [
+      "O coadă",
+      "O stivă",
+      "Un vector sortat"
+     ],
+     "a": 0,
+     "e": "Celulele se scot în ordinea în care au fost descoperite, deci în ordinea distanței."
+    },
+    {
+     "q": "Când se afișează `Not enough fuel!`?",
+     "o": [
+      "Există drum, dar e mai lung decât combustibilul",
+      "Nu există niciun drum",
+      "Startul e blocat"
+     ],
+     "a": 0,
+     "e": "Dacă drumul există, se compară lungimea lui cu f."
+    }
+   ],
+   "2002": [
+    {
+     "q": "Pentru a = 5 și b = 3, ce trebuie să afișeze linia „Difference is”?",
+     "o": [
+      "2",
+      "8",
+      "15"
+     ],
+     "a": 0,
+     "e": "Diferența este a - b = 2."
+    },
+    {
+     "q": "Pentru a = -2 și b = 4, cât este produsul?",
+     "o": [
+      "-8",
+      "2",
+      "-6"
+     ],
+     "a": 0,
+     "e": "(-2) · 4 = -8."
+    }
+   ],
+   "2003": [
+    {
+     "q": "Care expresie verifică corect că x este par?",
+     "o": [
+      "x % 2 == 0",
+      "x / 2 == 0",
+      "x % 2 == 1"
+     ],
+     "a": 0,
+     "e": "Un număr e par când restul împărțirii la 2 este 0."
+    },
+    {
+     "q": "Pentru numerele `4 -6 3 8`, cât e suma numerelor pozitive pare?",
+     "o": [
+      "12",
+      "6",
+      "9"
+     ],
+     "a": 0,
+     "e": "Se iau doar 4 și 8; -6 nu este pozitiv."
+    }
+   ],
+   "2004": [
+    {
+     "q": "Ce comandă înseamnă „s-a introdus o monedă”?",
+     "o": [
+      "1",
+      "2",
+      "orice altă comandă"
+     ],
+     "a": 0,
+     "e": "După manual: 1 = monedă, 2 = cerere de gumă, altceva = oprire."
+    },
+    {
+     "q": "Ce se întâmplă cu monedele după ce aparatul dă o gumă?",
+     "o": [
+      "Scad cu 2",
+      "Cresc cu 1",
+      "Rămân la fel"
+     ],
+     "a": 0,
+     "e": "O gumă costă două monede."
+    }
+   ],
+   "2005": [
+    {
+     "q": "De ce nu se schimbă soldurile din `main` dacă `transfer` are antetul `void transfer(Account from, Account to, double amount)`?",
+     "o": [
+      "Funcția lucrează pe copii ale conturilor",
+      "Tipul double nu poate fi scăzut",
+      "Structurile nu pot fi parametri"
+     ],
+     "a": 0,
+     "e": "Fără `&`, parametrii sunt copii; modificările lor dispar la ieșirea din funcție."
+    },
+    {
+     "q": "Ce trebuie să facă `withdraw` dacă soldul este mai mic decât suma cerută?",
+     "o": [
+      "Nu schimbă soldul și întoarce 0",
+      "Lasă soldul negativ",
+      "Pune soldul pe 0"
+     ],
+     "a": 0,
+     "e": "Transferul se face doar dacă prima persoană are destui bani; altfel nu se întâmplă nimic."
+    }
+   ],
+   "2006": [
+    {
+     "q": "Care este secvența Collatz pentru n = 6?",
+     "o": [
+      "6 3 10 5 16 8 4 2 1",
+      "6 3 9 27 ...",
+      "6 12 6 12 ..."
+     ],
+     "a": 0,
+     "e": "6 e par → 3; 3 e impar → 10; 10 → 5 → 16 → 8 → 4 → 2 → 1."
+    },
+    {
+     "q": "De ce nu se compilează un program care apelează în `main` o funcție scrisă abia după `main`?",
+     "o": [
+      "Compilatorul nu știe încă de funcție în locul apelului",
+      "Funcțiile trebuie să fie de tip int",
+      "main trebuie să fie ultima funcție"
+     ],
+     "a": 0,
+     "e": "În C++ un nume trebuie declarat înainte de a fi folosit; ajunge un prototip deasupra lui `main`."
+    }
+   ],
+   "2007": [
+    {
+     "q": "Ce se întâmplă cu `for (j = 1; j <= m; i++)`?",
+     "o": [
+      "j nu se schimbă niciodată, deci bucla poate să nu se mai termine",
+      "Bucla merge de m ori",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "Condiția depinde de j, dar se mărește i, așa că j <= m rămâne adevărat."
+    },
+    {
+     "q": "Ce afișează programul corect pentru matricea 1 × 3 cu elementele `1 2 3`?",
+     "o": [
+      "2 4 6",
+      "1 2 3",
+      "3 4 5"
+     ],
+     "a": 0,
+     "e": "Fiecare element se înmulțește cu 2."
+    }
+   ],
+   "2008": [
+    {
+     "q": "Ce întoarce `strlen(\"abc\")`?",
+     "o": [
+      "3",
+      "4",
+      "2"
+     ],
+     "a": 0,
+     "e": "Se numără caracterele până la terminatorul `\\0`, fără el."
+    },
+    {
+     "q": "Care este ordinea parametrilor la `strcpy` din biblioteca standard?",
+     "o": [
+      "strcpy(destinatie, sursa)",
+      "strcpy(sursa, destinatie)",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Ca la o atribuire: destinația e prima, `dest = src`."
+    }
+   ],
+   "2009": [
+    {
+     "q": "Câte caractere ocupă numărul -45 la afișare?",
+     "o": [
+      "3",
+      "2",
+      "4"
+     ],
+     "a": 0,
+     "e": "Semnul minus și cele două cifre."
+    },
+    {
+     "q": "Câte cifre are 0, după cum se numără cu `while (num != 0) { num /= 10; digits++; }`?",
+     "o": [
+      "0, de aceea trebuie tratat separat",
+      "1",
+      "2"
+     ],
+     "a": 0,
+     "e": "Bucla nu se execută deloc pentru 0, așa că programul trebuie să adauge singur cifra."
+    }
+   ],
+   "2010": [
+    {
+     "q": "Cât este F(7)?",
+     "o": [
+      "13",
+      "8",
+      "21"
+     ],
+     "a": 0,
+     "e": "0, 1, 1, 2, 3, 5, 8, 13: F(7) = 13."
+    },
+    {
+     "q": "Dacă la fiecare pas c = a + b, ce valori trebuie să primească a și b?",
+     "o": [
+      "a = b, apoi b = c",
+      "b = a, apoi a = c",
+      "a = c, apoi b = c"
+     ],
+     "a": 0,
+     "e": "Fereastra de două numere se mută cu o poziție la dreapta."
+    }
+   ],
+   "2011": [
+    {
+     "q": "Câte linii are submatricea de la linia 2 până la linia 5 inclusiv?",
+     "o": [
+      "4",
+      "3",
+      "5"
+     ],
+     "a": 0,
+     "e": "5 - 2 + 1 = 4."
+    },
+    {
+     "q": "De ce `BLUR` trebuie să scrie rezultatul într-o matrice separată?",
+     "o": [
+      "Ca vecinii să fie citiți cu valorile vechi",
+      "Ca să fie mai rapid",
+      "Ca să nu se rotunjească"
+     ],
+     "a": 0,
+     "e": "Dacă suprascrii pe loc, pixelii de după folosesc valori deja modificate."
+    }
+   ],
+   "2012": [
+    {
+     "q": "Câte puncte primește pilotul de pe locul 3?",
+     "o": [
+      "15",
+      "18",
+      "12"
+     ],
+     "a": 0,
+     "e": "Punctajele sunt 25, 18, 15, 12, 10, 8, 6, 4, 2, 1."
+    },
+    {
+     "q": "Ce se întâmplă cu `a = b; b = a;` fără o variabilă auxiliară?",
+     "o": [
+      "Ambele ajung egale cu b",
+      "Se interschimbă corect",
+      "Ambele ajung egale cu a"
+     ],
+     "a": 0,
+     "e": "După prima atribuire valoarea veche a lui a s-a pierdut."
+    }
+   ],
+   "2013": [
+    {
+     "q": "Ce întoarce `strcmp(\"ana\", \"ana\")`?",
+     "o": [
+      "0",
+      "1",
+      "-1"
+     ],
+     "a": 0,
+     "e": "Pentru șiruri egale `strcmp` întoarce 0."
+    },
+    {
+     "q": "Ce primește `strtok` ca prim argument la al doilea apel și la următoarele?",
+     "o": [
+      "NULL",
+      "Același șir",
+      "Cuvântul găsit anterior"
+     ],
+     "a": 0,
+     "e": "Cu NULL, strtok continuă din locul în care a rămas."
+    }
+   ],
+   "2014": [
+    {
+     "q": "Ce se întâmplă cu o funcție recursivă fără condiție de oprire?",
+     "o": [
+      "Se apelează până se umple stiva",
+      "Se oprește singură la 0",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "Fiecare apel ocupă loc pe stivă; în final programul se oprește cu eroare."
+    },
+    {
+     "q": "De câte ori afișează mesajul `recursive_print(3)` în varianta corectă?",
+     "o": [
+      "3",
+      "4",
+      "2"
+     ],
+     "a": 0,
+     "e": "Pentru 3, 2, 1 afișează; la 0 se oprește."
+    }
+   ],
+   "2015": [
+    {
+     "q": "Într-o stivă făcută cu listă simplu înlănțuită, unde se face `push`?",
+     "o": [
+      "La început (vârful e primul nod)",
+      "La sfârșitul listei",
+      "La mijloc"
+     ],
+     "a": 0,
+     "e": "Inserarea la început e O(1), iar vârful stivei e primul nod."
+    },
+    {
+     "q": "Ce trebuie să întoarcă `isEmpty()` când `top == NULL`?",
+     "o": [
+      "true",
+      "false",
+      "numărul de noduri"
+     ],
+     "a": 0,
+     "e": "Fără niciun nod, stiva e goală."
+    }
+   ],
+   "2016": [
+    {
+     "q": "La votul preferențial (IRV), cine este eliminat la sfârșitul unei runde fără câștigător?",
+     "o": [
+      "Candidatul cu cele mai puține voturi",
+      "Candidatul cu cele mai multe voturi",
+      "Un candidat la întâmplare"
+     ],
+     "a": 0,
+     "e": "Cel mai slab candidat iese, iar voturile lui merg la următoarea preferință."
+    },
+    {
+     "q": "Câte voturi înseamnă majoritate absolută din 9 voturi valide?",
+     "o": [
+      "5",
+      "4",
+      "6"
+     ],
+     "a": 0,
+     "e": "9 / 2 + 1 = 4 + 1 = 5."
+    }
+   ],
+   "2017": [
+    {
+     "q": "De ce se păstrează cifrele în ordine inversă (unitățile pe poziția 0)?",
+     "o": [
+      "Ca adunarea să înceapă de la indicele 0",
+      "Ca să ocupe mai puțină memorie",
+      "Pentru că așa se citesc"
+     ],
+     "a": 0,
+     "e": "Adunarea se face de la unități spre stânga, deci de la poziția 0 în sus."
+    },
+    {
+     "q": "Cât face 999 + 1 și câte cifre are rezultatul?",
+     "o": [
+      "1000, 4 cifre",
+      "1000, 3 cifre",
+      "999, 3 cifre"
+     ],
+     "a": 0,
+     "e": "Transportul final adaugă o cifră nouă; de aceea bucla trebuie să continue cât timp carry > 0."
+    }
+   ],
+   "2018": [
+    {
+     "q": "Cât este `-3 % 26` în C++?",
+     "o": [
+      "-3",
+      "23",
+      "3"
+     ],
+     "a": 0,
+     "e": "În C++ restul are semnul deîmpărțitului; de aceea se adună 26 înainte."
+    },
+    {
+     "q": "Ce proprietate are mașina Enigma, după enunț?",
+     "o": [
+      "Criptarea aplicată de două ori dă textul inițial",
+      "Fiecare literă trece în ea însăși",
+      "Textul criptat e mai lung"
+     ],
+     "a": 0,
+     "e": "Același set de instrucțiuni criptează și decriptează."
+    }
+   ],
+   "2019": [
+    {
+     "q": "Ce afișează programul greșit pentru șirul `-5 -2 -9`?",
+     "o": [
+      "0",
+      "-2",
+      "-9"
+     ],
+     "a": 0,
+     "e": "Niciun element nu e mai mare decât 0, deci maximul rămâne 0."
+    },
+    {
+     "q": "Care e maximul corect pentru `-5 -2 -9`?",
+     "o": [
+      "-2",
+      "-5",
+      "0"
+     ],
+     "a": 0,
+     "e": "-2 este cel mai mare dintre cele trei."
+    }
+   ],
+   "2020": [
+    {
+     "q": "Care e distanța euclidiană între (0, 0) și (3, 4)?",
+     "o": [
+      "5",
+      "7",
+      "1"
+     ],
+     "a": 0,
+     "e": "sqrt(3² + 4²) = sqrt(25) = 5."
+    },
+    {
+     "q": "Ce se întâmplă cu `int best = 0; if (...) { int best = i; }`?",
+     "o": [
+      "Se schimbă o altă variabilă, care dispare după if",
+      "best primește i",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "A doua declarație ascunde prima în interiorul blocului."
+    }
+   ],
+   "2021": [
+    {
+     "q": "Ce dimensiune are `struct { char a; int b; }` cu alinierea obișnuită (int pe 4 octeți)?",
+     "o": [
+      "8",
+      "5",
+      "4"
+     ],
+     "a": 0,
+     "e": "După char urmează 3 octeți de padding, ca int să înceapă la o adresă multiplu de 4."
+    },
+    {
+     "q": "De ce reduce dimensiunea o structură sortarea membrilor descrescător după aliniere?",
+     "o": [
+      "Apar mai puțini octeți de padding",
+      "Membrii devin mai mici",
+      "Compilatorul ignoră membrii mici"
+     ],
+     "a": 0,
+     "e": "Membrii mari, puși primii, lasă mai puține goluri între ei."
+    }
+   ],
+   "2022": [
+    {
+     "q": "În Python, `d = {}` creează un dicționar. Ce structură îi corespunde în C++?",
+     "o": [
+      "std::map",
+      "std::vector",
+      "std::stack"
+     ],
+     "a": 0,
+     "e": "map asociază unei chei (numele) o valoare (contul)."
+    },
+    {
+     "q": "Ce se întâmplă, după script, cu un cont care încearcă un transfer fără destui bani?",
+     "o": [
+      "Devine suspect",
+      "Soldul devine negativ",
+      "Este șters"
+     ],
+     "a": 0,
+     "e": "Scriptul marchează trimițătorul ca suspect și nu mută banii."
+    }
+   ],
+   "2023": [
+    {
+     "q": "La Huffman, ce două noduri se unesc la fiecare pas?",
+     "o": [
+      "Cele cu frecvențele cele mai mici",
+      "Cele cu frecvențele cele mai mari",
+      "Primele două citite"
+     ],
+     "a": 0,
+     "e": "Caracterele rare ajung mai jos în arbore, deci primesc coduri mai lungi."
+    },
+    {
+     "q": "Ce cod primește un caracter care apare foarte des, față de unul rar?",
+     "o": [
+      "Unul mai scurt",
+      "Unul mai lung",
+      "La fel de lung"
+     ],
+     "a": 0,
+     "e": "Asta e ideea compresiei: codurile scurte merg la caracterele frecvente."
+    }
+   ],
+   "2024": [
+    {
+     "q": "Cu ce e cel mai sigur să inițializezi minimul unei matrice?",
+     "o": [
+      "Cu primul ei element",
+      "Cu 100",
+      "Cu 0"
+     ],
+     "a": 0,
+     "e": "Orice constantă poate fi depășită de date; primul element e mereu un candidat valid."
+    },
+    {
+     "q": "Ce face `&` în `void read_input(int &n)`?",
+     "o": [
+      "Transmite n prin referință",
+      "Ia adresa lui n ca număr",
+      "Face n constant"
+     ],
+     "a": 0,
+     "e": "Modificările lui n din funcție se văd și în `main`."
+    }
+   ],
+   "2025": [
+    {
+     "q": "Când se pot înmulți matricele A (m × n) și B (p × q)?",
+     "o": [
+      "Când n = p",
+      "Când m = p",
+      "Când m = q"
+     ],
+     "a": 0,
+     "e": "Numărul de coloane al lui A trebuie să fie egal cu numărul de linii al lui B."
+    },
+    {
+     "q": "Ce dimensiune are produsul unei matrice 2 × 3 cu una 3 × 4?",
+     "o": [
+      "2 × 4",
+      "3 × 3",
+      "2 × 3"
+     ],
+     "a": 0,
+     "e": "Rezultatul are liniile lui A și coloanele lui B."
+    }
+   ],
+   "2026": [
+    {
+     "q": "Ce rezultă din interclasarea șirurilor `1 4 9` și `2 3 10 11`?",
+     "o": [
+      "1 2 3 4 9 10 11",
+      "1 4 9 2 3 10 11",
+      "1 2 3 4 9"
+     ],
+     "a": 0,
+     "e": "Se ia mereu cel mai mic dintre cele două elemente curente, apoi ce a rămas."
+    },
+    {
+     "q": "Ce complexitate are interclasarea a două șiruri sortate de lungimi n și m?",
+     "o": [
+      "O(n + m)",
+      "O(n · m)",
+      "O((n + m) log(n + m))"
+     ],
+     "a": 0,
+     "e": "Fiecare element e mutat o singură dată."
+    }
+   ],
+   "2027": [
+    {
+     "q": "Ce face instrucțiunea `i + 1;`?",
+     "o": [
+      "Calculează i + 1 și aruncă rezultatul",
+      "Mărește i cu 1",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "Fără atribuire, valoarea lui i nu se schimbă."
+    },
+    {
+     "q": "Câte numere afișează programul corect (de la 0 la 100, din 2 în 2)?",
+     "o": [
+      "51",
+      "50",
+      "100"
+     ],
+     "a": 0,
+     "e": "0, 2, ..., 100: 100 / 2 + 1 = 51 de valori."
+    }
+   ],
+   "2028": [
+    {
+     "q": "Ce medie de admitere are un elev cu media 10 în gimnaziu, 9 la română și 8 la matematică?",
+     "o": [
+      "8.80",
+      "9.00",
+      "8.60"
+     ],
+     "a": 0,
+     "e": "0.2 · 10 + 0.4 · 9 + 0.4 · 8 = 2 + 3.6 + 3.2 = 8.8."
+    },
+    {
+     "q": "Cât trebuie să dea suma ponderilor 0.20 + 0.40 + 0.40?",
+     "o": [
+      "1",
+      "0.8",
+      "100"
+     ],
+     "a": 0,
+     "e": "O medie ponderată are ponderile cu suma 1 (100%)."
+    }
+   ],
+   "2029": [
+    {
+     "q": "Care sunt casele afișate pentru numerele `3 8 10 7 2`?",
+     "o": [
+      "8 10 2",
+      "3 7",
+      "8 10"
+     ],
+     "a": 0,
+     "e": "Se afișează doar cele pare, în ordinea citirii."
+    },
+    {
+     "q": "Ce dă `-7 % 2` în C++?",
+     "o": [
+      "-1",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Restul are semnul deîmpărțitului, de aceea „impar” se testează mai sigur cu `x % 2 != 0`."
+    }
+   ],
+   "2030": [
+    {
+     "q": "Care este cifra de control a lui 9875?",
+     "o": [
+      "2",
+      "29",
+      "11"
+     ],
+     "a": 0,
+     "e": "9 + 8 + 7 + 5 = 29, 2 + 9 = 11, 1 + 1 = 2."
+    },
+    {
+     "q": "Ce formulă dă direct cifra de control a unui n > 0?",
+     "o": [
+      "1 + (n - 1) % 9",
+      "n % 10",
+      "n % 9"
+     ],
+     "a": 0,
+     "e": "Suma repetată a cifrelor este restul la 9, cu 9 în loc de 0."
+    }
+   ],
+   "2031": [
+    {
+     "q": "Care sunt numerele prime din intervalul [10; 20]?",
+     "o": [
+      "11 13 17 19",
+      "11 13 15 17 19",
+      "10 11 13 17 19"
+     ],
+     "a": 0,
+     "e": "15 = 3 · 5, deci nu e prim."
+    },
+    {
+     "q": "Până unde e suficient să cauți divizori ai lui n?",
+     "o": [
+      "Până la √n",
+      "Până la n - 1",
+      "Până la n / 2 + 10"
+     ],
+     "a": 0,
+     "e": "Dacă n = a · b cu a ≤ b, atunci a ≤ √n."
+    }
+   ],
+   "2032": [
+    {
+     "q": "Câte elemente are o matrice 3 × 4?",
+     "o": [
+      "12",
+      "7",
+      "9"
+     ],
+     "a": 0,
+     "e": "n · m = 3 · 4."
+    },
+    {
+     "q": "Ce adună `x[i][i]` dacă i merge de la 1 la n?",
+     "o": [
+      "Doar diagonala principală",
+      "Toată matricea",
+      "Prima linie"
+     ],
+     "a": 0,
+     "e": "Linia și coloana sunt egale doar pe diagonala principală."
+    }
+   ],
+   "2033": [
+    {
+     "q": "Ce este `int produs(int a, int b, int c);` scris deasupra lui `main`?",
+     "o": [
+      "Un prototip (declarație)",
+      "O definiție completă",
+      "Un apel"
+     ],
+     "a": 0,
+     "e": "Anunță compilatorului antetul funcției; corpul poate veni mai jos."
+    },
+    {
+     "q": "Cât e produsul numerelor 2, -3 și 4?",
+     "o": [
+      "-24",
+      "24",
+      "3"
+     ],
+     "a": 0,
+     "e": "2 · (-3) · 4 = -24."
+    }
+   ],
+   "2034": [
+    {
+     "q": "Câți divizori are 12?",
+     "o": [
+      "6",
+      "4",
+      "5"
+     ],
+     "a": 0,
+     "e": "1, 2, 3, 4, 6, 12."
+    },
+    {
+     "q": "Ce complexitate are numărarea divizorilor pentru toate numerele până la n cu metoda multiplilor?",
+     "o": [
+      "O(n log n)",
+      "O(n²)",
+      "O(n)"
+     ],
+     "a": 0,
+     "e": "Pentru fiecare i sunt n / i multipli, iar n/1 + n/2 + ... ≈ n · ln n."
+    }
+   ],
+   "2035": [
+    {
+     "q": "Cum se scrie 13 în baza 2?",
+     "o": [
+      "1101",
+      "1011",
+      "1110"
+     ],
+     "a": 0,
+     "e": "13 = 8 + 4 + 1."
+    },
+    {
+     "q": "Ce cifre obții, în ordine, împărțind repetat 6 la 2 și păstrând resturile?",
+     "o": [
+      "0 1 1",
+      "1 1 0",
+      "1 0 1"
+     ],
+     "a": 0,
+     "e": "Resturile ies de la ultima cifră spre prima: 6 = 110₂, deci 0, 1, 1."
+    }
+   ],
+   "2036": [
+    {
+     "q": "În algoritmul Luhn, ce se face cu o cifră dublată care trece de 9?",
+     "o": [
+      "Se scade 9",
+      "Se împarte la 2",
+      "Se lasă așa"
+     ],
+     "a": 0,
+     "e": "De exemplu 7 · 2 = 14 → 14 - 9 = 5 (adică 1 + 4)."
+    },
+    {
+     "q": "Când este valid un număr de card după Luhn?",
+     "o": [
+      "Când suma finală se divide cu 10",
+      "Când are 16 cifre",
+      "Când începe cu 4"
+     ],
+     "a": 0,
+     "e": "Suma calculată trebuie să fie multiplu de 10."
+    }
+   ],
+   "2037": [
+    {
+     "q": "În algoritmul Lee, cu cât e mai mare valoarea unei celule față de celula din care a fost descoperită?",
+     "o": [
+      "Cu 1",
+      "Cu 2",
+      "Cu numărul de vecini"
+     ],
+     "a": 0,
+     "e": "Fiecare pas adaugă 1 la distanță."
+    },
+    {
+     "q": "Cum se reconstituie drumul minim după Lee?",
+     "o": [
+      "De la destinație înapoi, mergând mereu la un vecin cu valoarea cu 1 mai mică",
+      "De la start, mergând la orice vecin liber",
+      "Se sortează celulele"
+     ],
+     "a": 0,
+     "e": "Valorile scad cu câte 1 până la start."
+    }
+   ],
+   "2038": [
+    {
+     "q": "Ce face `x | (1 << 3)`?",
+     "o": [
+      "Pune bitul 3 pe 1",
+      "Șterge bitul 3",
+      "Inversează toți biții"
+     ],
+     "a": 0,
+     "e": "SAU cu o mască pune bitul pe 1, indiferent ce era înainte."
+    },
+    {
+     "q": "Cum verifici că bitul n al lui x e 1?",
+     "o": [
+      "(x & (1 << n)) != 0",
+      "(x | (1 << n)) != 0",
+      "x >> n == 0"
+     ],
+     "a": 0,
+     "e": "ȘI cu masca păstrează doar bitul n."
+    }
+   ],
+   "2039": [
+    {
+     "q": "Câte înmulțiri face, aproximativ, ridicarea rapidă la putere pentru p = 1024?",
+     "o": [
+      "În jur de 10",
+      "1024",
+      "512"
+     ],
+     "a": 0,
+     "e": "Exponentul se înjumătățește la fiecare pas: log₂(1024) = 10."
+    },
+    {
+     "q": "Cât este A⁰?",
+     "o": [
+      "1",
+      "0",
+      "A"
+     ],
+     "a": 0,
+     "e": "Orice număr nenul la puterea 0 este 1."
+    }
+   ],
+   "2040": [
+    {
+     "q": "Ce înseamnă un bit de paritate pe o linie?",
+     "o": [
+      "Un bit ales astfel încât suma liniei să fie pară",
+      "Primul bit al liniei",
+      "Numărul de linii"
+     ],
+     "a": 0,
+     "e": "Dacă suma liniei iese impară, pe linia aceea s-a schimbat un bit."
+    },
+    {
+     "q": "Cu verificarea pe linii și pe coloane, ce poți afla despre o singură eroare?",
+     "o": [
+      "Linia și coloana ei, deci o poți corecta",
+      "Doar că există",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Linia și coloana cu paritate greșită se intersectează în bitul schimbat."
+    }
+   ],
+   "2041": [
+    {
+     "q": "Cât este `0 << 5`?",
+     "o": [
+      "0",
+      "32",
+      "5"
+     ],
+     "a": 0,
+     "e": "Deplasarea lui 0 dă tot 0; masca pentru bitul 5 e `1 << 5` = 32."
+    },
+    {
+     "q": "Câți biți de date transportă un cod Hamming(8, 4)?",
+     "o": [
+      "4",
+      "8",
+      "3"
+     ],
+     "a": 0,
+     "e": "Din cei 8 biți, 4 sunt date, iar ceilalți sunt de control."
+    }
+   ],
+   "2042": [
+    {
+     "q": "Ce se întâmplă cu `while (!st.empty()) { x = st.back(); ... }` dacă nu scoți niciodată elementul?",
+     "o": [
+      "Bucla nu se mai termină",
+      "Se parcurge corect",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "Stiva nu se golește niciodată."
+    },
+    {
+     "q": "Ce structură reține fiecare nod o singură dată, ca să nu fie vizitat de două ori?",
+     "o": [
+      "set<string> visited",
+      "vector<string> stack",
+      "map<string, string> description"
+     ],
+     "a": 0,
+     "e": "Un set are fiecare element o singură dată și căutare rapidă."
+    }
+   ],
+   "2043": [
+    {
+     "q": "Cum se compară corect două poziții la egalitate?",
+     "o": [
+      "lin == other.lin && col == other.col",
+      "lin == other.lin || col == other.col",
+      "lin + col == other.lin + other.col"
+     ],
+     "a": 0,
+     "e": "Două poziții sunt egale doar dacă au și aceeași linie, și aceeași coloană."
+    },
+    {
+     "q": "Ce valoare are `(char)16777216`?",
+     "o": [
+      "0",
+      "16777216",
+      "-1"
+     ],
+     "a": 0,
+     "e": "16777216 = 2²⁴; ultimii 8 biți sunt toți 0."
+    }
+   ],
+   "2044": [
+    {
+     "q": "Ce rezolvă moștenirea virtuală (`class B : virtual public A`)?",
+     "o": [
+      "Clasa de bază A apare o singură dată în D",
+      "Face metodele virtuale",
+      "Interzice moștenirea"
+     ],
+     "a": 0,
+     "e": "Fără virtual, D ar avea câte un A prin B și unul prin C."
+    },
+    {
+     "q": "Cine construiește baza virtuală A într-un obiect D?",
+     "o": [
+      "Constructorul lui D",
+      "Constructorul lui B",
+      "Constructorul lui C"
+     ],
+     "a": 0,
+     "e": "La moștenirea virtuală, clasa cea mai derivată apelează direct constructorul bazei."
+    }
+   ],
+   "2045": [
+    {
+     "q": "Cât valorează expresia prefixată `(+ 2 (* 3 4))`?",
+     "o": [
+      "14",
+      "20",
+      "24"
+     ],
+     "a": 0,
+     "e": "3 · 4 = 12, 2 + 12 = 14."
+    },
+    {
+     "q": "Într-un arbore de expresie, ce se află în frunze?",
+     "o": [
+      "Numerele",
+      "Operatorii",
+      "Parantezele"
+     ],
+     "a": 0,
+     "e": "Operatorii sunt noduri interne cu doi fii, numerele sunt frunze."
+    }
+   ],
+   "2046": [
+    {
+     "q": "Ce cifră are indicele 4 în șirul 100101102...?",
+     "o": [
+      "0",
+      "1",
+      "2"
+     ],
+     "a": 0,
+     "e": "4 / 3 = 1 → numărul 101, 4 % 3 = 1 → a doua cifră, 0."
+    },
+    {
+     "q": "Câte cifre are șirul format din numerele de la 100 la 999?",
+     "o": [
+      "2700",
+      "2697",
+      "900"
+     ],
+     "a": 0,
+     "e": "Sunt 900 de numere a câte 3 cifre."
+    }
+   ],
+   "2047": [
+    {
+     "q": "Ce bibliotecă definește `cin` și `cout`?",
+     "o": [
+      "iostream",
+      "cmath",
+      "cstring"
+     ],
+     "a": 0,
+     "e": "iostream conține fluxurile de intrare și ieșire."
+    },
+    {
+     "q": "Când apare eroarea pentru un `#include` greșit?",
+     "o": [
+      "La compilare",
+      "La rulare",
+      "Doar la unele teste"
+     ],
+     "a": 0,
+     "e": "Preprocesorul nu găsește fișierul, deci programul nu se compilează."
+    }
+   ],
+   "2048": [
+    {
+     "q": "Ce valoare are o variabilă locală `int x;` înainte de prima atribuire?",
+     "o": [
+      "Una oarecare, nedefinită",
+      "Mereu 0",
+      "Mereu -1"
+     ],
+     "a": 0,
+     "e": "Variabilele locale nu se inițializează singure; doar cele globale pornesc de la 0."
+    },
+    {
+     "q": "Care dintre numerele 1, 2, 9 și 11 sunt prime?",
+     "o": [
+      "2 și 11",
+      "1, 2 și 11",
+      "2, 9 și 11"
+     ],
+     "a": 0,
+     "e": "1 nu e prim, 9 = 3 · 3."
+    }
+   ],
+   "2049": [
+    {
+     "q": "Cât e suma profiturilor `5 10 15`?",
+     "o": [
+      "30",
+      "25",
+      "15"
+     ],
+     "a": 0,
+     "e": "5 + 10 + 15 = 30."
+    },
+    {
+     "q": "Pentru un vector indexat de la 0 cu n elemente, care e ultimul indice?",
+     "o": [
+      "n - 1",
+      "n",
+      "n + 1"
+     ],
+     "a": 0,
+     "e": "Indicii sunt 0, 1, ..., n - 1."
+    }
+   ],
+   "2050": [
+    {
+     "q": "Cât este `7 / 2` în C++ dacă ambele numere sunt int?",
+     "o": [
+      "3",
+      "3.5",
+      "4"
+     ],
+     "a": 0,
+     "e": "Împărțirea întreagă taie partea zecimală."
+    },
+    {
+     "q": "Cum obții 3.5 din 7 și 2 întregi?",
+     "o": [
+      "(double)7 / 2",
+      "(double)(7 / 2)",
+      "7 / 2 * 1.0"
+     ],
+     "a": 0,
+     "e": "Conversia trebuie făcută înainte de împărțire."
+    }
+   ],
+   "2051": [
+    {
+     "q": "Ce face `using namespace std;`?",
+     "o": [
+      "Permite `cout` în loc de `std::cout`",
+      "Include iostream",
+      "Declară funcția main"
+     ],
+     "a": 0,
+     "e": "Numele din biblioteca standard pot fi scrise fără prefixul std::."
+    },
+    {
+     "q": "Unde trebuie pus prototipul unei funcții scrise după `main`?",
+     "o": [
+      "Înainte de main",
+      "În interiorul lui main, după apel",
+      "La sfârșitul fișierului"
+     ],
+     "a": 0,
+     "e": "Compilatorul trebuie să o cunoască în locul în care e apelată."
+    }
+   ],
+   "2052": [
+    {
+     "q": "O mașină cu P = 3 pe parcela 5 (fără ziduri în apropiere): câte semințe pune pe parcela 7?",
+     "o": [
+      "1",
+      "2",
+      "0"
+     ],
+     "a": 0,
+     "e": "d = 2, deci P - d = 1."
+    },
+    {
+     "q": "De ce se pun santinele (`-1`) la pozițiile 0 și L + 1?",
+     "o": [
+      "Ca bucla să se oprească la margine ca la un zid",
+      "Ca să numere parcelele",
+      "Pentru afișare"
+     ],
+     "a": 0,
+     "e": "Marginea se comportă ca un zid, fără verificări separate de indice."
+    }
+   ],
+   "2053": [
+    {
+     "q": "Ce dimensiune are transpusa unei matrice 2 × 5?",
+     "o": [
+      "5 × 2",
+      "2 × 5",
+      "5 × 5"
+     ],
+     "a": 0,
+     "e": "Liniile devin coloane: t[j][i] = a[i][j]."
+    },
+    {
+     "q": "Ce element ajunge pe poziția (3, 1) în transpusă?",
+     "o": [
+      "a[1][3]",
+      "a[3][1]",
+      "a[1][1]"
+     ],
+     "a": 0,
+     "e": "Transpusa schimbă indicii între ei."
+    }
+   ],
+   "2054": [
+    {
+     "q": "Ce dă interclasarea șirurilor `1 3 3` și `3 4`?",
+     "o": [
+      "1 3 3 3 4",
+      "1 3 4",
+      "1 3 3 4"
+     ],
+     "a": 0,
+     "e": "Se păstrează toate elementele, inclusiv cele egale."
+    },
+    {
+     "q": "Câte elemente are rezultatul interclasării a două șiruri cu n și m elemente?",
+     "o": [
+      "n + m",
+      "max(n, m)",
+      "n · m"
+     ],
+     "a": 0,
+     "e": "Fiecare element apare o singură dată în rezultat."
+    }
+   ],
+   "2055": [
+    {
+     "q": "Ce înseamnă că negustorul a intrat într-un loop?",
+     "o": [
+      "Revine în aceeași poziție cu aceeași direcție",
+      "Trece de două ori prin aceeași celulă, în orice direcție",
+      "Iese din matrice"
+     ],
+     "a": 0,
+     "e": "Starea care se repetă e perechea (poziție, direcție); două drumuri se pot încrucișa fără să fie un loop."
+    },
+    {
+     "q": "Unde poate negustorul să-și schimbe direcția?",
+     "o": [
+      "Doar într-o piață",
+      "În orice celulă",
+      "Doar la marginea matricei"
+     ],
+     "a": 0,
+     "e": "Altfel merge drept."
+    }
+   ],
+   "2056": [
+    {
+     "q": "De ce trebuie să marchezi un jucător ca vizitat înainte de a continua fill-ul din el?",
+     "o": [
+      "Ca să nu-l vizitezi la infinit",
+      "Ca să fie numărat de două ori",
+      "Ca să sorteze jucătorii"
+     ],
+     "a": 0,
+     "e": "Fără marcaj, A → B → A → B ... nu se mai termină."
+    },
+    {
+     "q": "Un jucător pe poziția 4 cu puterea 3 aruncă la dreapta. Pe ce poziții poate cădea mingea, în ordine?",
+     "o": [
+      "7, 10, 13, ...",
+      "5, 6, 7, ...",
+      "7, 8, 9, ..."
+     ],
+     "a": 0,
+     "e": "Mingea sare din k în k: 4 + 3, 4 + 6, 4 + 9, ... până atinge un jucător."
+    }
+   ],
+   "2057": [
+    {
+     "q": "De ce se folosește BFS pentru drumul cel mai scurt în labirint?",
+     "o": [
+      "Găsește întâi celulele aflate la distanță mai mică",
+      "E mai scurt de scris decât DFS",
+      "Nu folosește memorie"
+     ],
+     "a": 0,
+     "e": "BFS vizitează celulele în ordinea distanței față de start."
+    },
+    {
+     "q": "Ce afișează programul dacă startul coincide cu ieșirea?",
+     "o": [
+      "0",
+      "-1",
+      "1"
+     ],
+     "a": 0,
+     "e": "Nu e nevoie de niciun pas."
+    }
+   ],
+   "2058": [
+    {
+     "q": "Ce face un kernel 3 × 3 aplicat unui pixel?",
+     "o": [
+      "Calculează o sumă ponderată a pixelului și a celor 8 vecini",
+      "Copiază pixelul",
+      "Sortează vecinii"
+     ],
+     "a": 0,
+     "e": "Kernelul se centrează pe pixel și fiecare vecin se înmulțește cu valoarea din kernel."
+    },
+    {
+     "q": "Ce valoare primește un pixel a cărui sumă iese -7, dacă intervalul permis e [0, max]?",
+     "o": [
+      "0",
+      "-7",
+      "max"
+     ],
+     "a": 0,
+     "e": "Valorile negative se taie la 0."
+    }
+   ],
+   "2059": [
+    {
+     "q": "De ce verificarea cu un vector aleator v e mai rapidă decât să înmulțești A cu B?",
+     "o": [
+      "Fiecare produs matrice × vector e O(n²), nu O(n³)",
+      "Nu citește matricele",
+      "Folosește mai puține numere"
+     ],
+     "a": 0,
+     "e": "Se calculează B × v, apoi A × (B × v), apoi C × v, fiecare în O(n²)."
+    },
+    {
+     "q": "Dacă A × B = C, ce dă mereu verificarea?",
+     "o": [
+      "1",
+      "Uneori 0",
+      "Depinde de v"
+     ],
+     "a": 0,
+     "e": "Egalitatea A × B × v = C × v e adevărată pentru orice v."
+    }
+   ],
+   "2060": [
+    {
+     "q": "Ce face `ms.erase(5)` pe un `multiset` cu valorile 5, 5, 7?",
+     "o": [
+      "Șterge ambele valori 5",
+      "Șterge un singur 5",
+      "Șterge 7"
+     ],
+     "a": 0,
+     "e": "erase cu o valoare șterge toate aparițiile; erase cu un iterator șterge doar elementul acela."
+    },
+    {
+     "q": "Pentru pungile `1 3 5 7` și target = 8, ce pungi rămân necombinate?",
+     "o": [
+      "Niciuna",
+      "1 7",
+      "3 5"
+     ],
+     "a": 0,
+     "e": "1 + 7 = 8 și 3 + 5 = 8."
+    }
+   ],
+   "2061": [
+    {
+     "q": "Cum afli de câte ori apare x într-un șir sortat?",
+     "o": [
+      "Prima poziție după x minus prima poziție a lui x",
+      "Ultima poziție a lui x",
+      "Poziția lui x plus 1"
+     ],
+     "a": 0,
+     "e": "Aparițiile lui x formează o secvență continuă."
+    },
+    {
+     "q": "Ce complexitate are căutarea binară într-un șir de n elemente?",
+     "o": [
+      "O(log n)",
+      "O(n)",
+      "O(n log n)"
+     ],
+     "a": 0,
+     "e": "Intervalul se înjumătățește la fiecare pas."
+    }
+   ],
+   "2062": [
+    {
+     "q": "Ce nivel are titlul `### Exemple` în Markdown?",
+     "o": [
+      "3",
+      "1",
+      "6"
+     ],
+     "a": 0,
+     "e": "Nivelul este numărul de caractere #."
+    },
+    {
+     "q": "După `auto x = v.back(); x.a = 5;`, se schimbă `v.back().a`?",
+     "o": [
+      "Nu, x este o copie",
+      "Da",
+      "Doar dacă v are un element"
+     ],
+     "a": 0,
+     "e": "Ca să modifici elementul din vector, folosește `auto &x = v.back();` sau `v.back().a = 5;`."
+    }
+   ],
+   "2063": [
+    {
+     "q": "Cum se decriptează o literă cifrată cu deplasarea k la Vigenère?",
+     "o": [
+      "(c - k + 26) % 26",
+      "(c + k) % 26",
+      "c * k % 26"
+     ],
+     "a": 0,
+     "e": "Criptarea adună deplasarea, decriptarea o scade (cu +26 ca să nu iasă negativ)."
+    },
+    {
+     "q": "De ce ajută să știi că mesajul începe cu „ACADNET”?",
+     "o": [
+      "Poți verifica rapid dacă o cheie încercată e cea bună",
+      "Scurtează mesajul",
+      "Nu ajută"
+     ],
+     "a": 0,
+     "e": "Acesta e un atac cu text clar cunoscut: cheia bună dă exact acest început."
+    }
+   ],
+   "2064": [
+    {
+     "q": "Ce întoarce `m.lower_bound(k)` pentru un `std::map`?",
+     "o": [
+      "Primul element cu cheia ≥ k",
+      "Primul element cu cheia > k",
+      "Ultimul element cu cheia < k"
+     ],
+     "a": 0,
+     "e": "upper_bound e cel cu cheia strict mai mare."
+    },
+    {
+     "q": "După `assign(2, 5, 'x')`, ce valoare are cheia 5?",
+     "o": [
+      "Valoarea de dinainte",
+      "'x'",
+      "Nu are"
+     ],
+     "a": 0,
+     "e": "Intervalul este [2, 5), deci 5 nu e inclus."
+    }
+   ],
+   "2065": [
+    {
+     "q": "Care e cea mai lungă secvență crescătoare din `5 1 2 3 0 4`?",
+     "o": [
+      "1 2 3",
+      "0 4",
+      "1 2 3 4"
+     ],
+     "a": 0,
+     "e": "Secvența trebuie să fie din elemente consecutive; 1 2 3 are lungimea 3."
+    },
+    {
+     "q": "Care e cea mai lungă secvență crescătoare din `3 1 2 3 4`?",
+     "o": [
+      "1 2 3 4",
+      "3",
+      "1 2"
+     ],
+     "a": 0,
+     "e": "Se termină pe ultimul element; acesta e cazul pe care programul greșit îl pierdea."
+    }
+   ],
+   "2066": [
+    {
+     "q": "La ce folosește cheia privată într-un sistem cu semnături digitale?",
+     "o": [
+      "La semnarea tranzacțiilor",
+      "La verificarea semnăturilor de către oricine",
+      "La afișarea soldului"
+     ],
+     "a": 0,
+     "e": "Cu cheia publică oricine poate verifica, dar doar proprietarul cheii private poate semna."
+    },
+    {
+     "q": "Câte din cele 10 calculatoare ale rețelei trebuie să confirme o tranzacție ca să fie acceptată?",
+     "o": [
+      "Cel puțin 6",
+      "Cel puțin 5",
+      "Unul"
+     ],
+     "a": 0,
+     "e": "E nevoie de mai mult de jumătate: peste 10 / 2 = 5."
+    }
+   ]
   }
  },
  "Matematică": {

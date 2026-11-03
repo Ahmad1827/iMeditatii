@@ -147,8 +147,12 @@ class Markup {
         continue;
       }
       if (t.startsWith('```')) {
+        // as in Markdown: a box opened with n backticks is closed by a line of
+        // at least n, so a box can show ``` (a statement about Markdown does)
+        final n = RegExp(r'^`+').firstMatch(t)![0]!.length;
+        final close = RegExp('^`{$n,}\\s*\$');
         final box = <String>[];
-        while (++i < lines.length && !lines[i].trim().startsWith('```')) {
+        while (++i < lines.length && !close.hasMatch(lines[i].trim())) {
           box.add(lines[i]);
         }
         out.add(StatementBlock(BlockKind.code, [box.join('\n')]));

@@ -139,7 +139,7 @@ class _ProblemStatementState extends State<ProblemStatement> {
             if (pictures.isNotEmpty) ...[
               const SizedBox(width: 8),
               PbButton(
-                text: 'Subiectul original',
+                text: source != null && source.startsWith('AcadNet') ? 'Figurile' : 'Subiectul original',
                 icon: Icons.image_outlined,
                 variant: PbVariant.outlineSecondary,
                 size: PbSize.sm,

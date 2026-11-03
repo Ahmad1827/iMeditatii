@@ -131,8 +131,11 @@ void pictureTests() {
           final p = e['imagine_originala'];
           if (p == null) continue;
           n++;
-          expect(File('$p').existsSync(), isTrue, reason: '${e['title']}: $p');
-          expect('${e['sursa']}', startsWith('BAC'), reason: '${e['title']}');
+          // one page of a BAC paper, or the figures of an AcadNet statement
+          for (final f in p is List ? p : [p]) {
+            expect(File('$f').existsSync(), isTrue, reason: '${e['title']}: $f');
+          }
+          expect('${e['sursa']}', anyOf(startsWith('BAC'), startsWith('AcadNet')), reason: '${e['title']}');
         }
       }
     }

@@ -15,6 +15,7 @@ import 'math_sheet.dart' show isMathSubject;
 import 'progress.dart';
 import 'resources_data.dart';
 import 'ui_components.dart';
+import 'grade_label.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -121,7 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  static const Map<String, String> _hRoman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
 
   Widget _buildClean(bool isMobile) {
     if (!_hStarted) {
@@ -816,8 +816,8 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         _hChip('Toate clasele', _hGrade == 'toate', () => setState(() => _hGrade = 'toate')),
-        for (final g in const ['9', '10', '11', '12'])
-          _hChip('a ${_hRoman[g]}-a', _hGrade == g, () => setState(() => _hGrade = g)),
+        for (final g in const ['9', '10', '11', '12', 'AcadNet'])
+          _hChip(gradeShort(g), _hGrade == g, () => setState(() => _hGrade = g)),
         Container(width: 1, height: 20, margin: const EdgeInsets.symmetric(horizontal: 6), color: Pb.border),
         _hChip('Toate materiile', _hSubject == 'toate', () => setState(() => _hSubject = 'toate')),
         for (final s in subjects)
@@ -1046,8 +1046,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 2),
                   Text(
                     isMobile
-                        ? '${e['subject']}, clasa a $grade-a${diff.isEmpty ? '' : ', ${AppStyle.sentence(diff)}'}'
-                        : 'Clasa a ${_hRoman[grade] ?? grade}-a',
+                        ? '${e['subject']}, ${gradeInline('$grade')}${diff.isEmpty ? '' : ', ${AppStyle.sentence(diff)}'}'
+                        : gradeTitle('$grade'),
                     style: TextStyle(fontSize: 12.5, color: Pb.muted),
                   ),
                 ],

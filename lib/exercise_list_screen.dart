@@ -16,6 +16,7 @@ import 'progress.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'sticky_footer.dart';
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
+import 'grade_label.dart';
 
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
@@ -262,7 +263,6 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   static const Color _cRose = Color(0xFFE5484D);
   static const Color _cBlue = Color(0xFF3B82F6);
   static const List<Color> _catColors = [Pb.primary, _cBlue, _cAmber, _cRose, Color(0xFF8B5CF6), Color(0xFF14B8A6)];
-  static const Map<String, String> _roman = {'9': 'IX', '10': 'X', '11': 'XI', '12': 'XII'};
 
   Color get _subjectColor => _colorOf(widget.subject);
 
@@ -277,7 +277,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     return Pb.primary;
   }
 
-  String _gradeLabel(String g) => 'a ${_roman[g] ?? g}-a';
+  String _gradeLabel(String g) => gradeShort(g);
 
   Color _catColor(String cat) {
     final i = availableCategories.indexOf(cat);
@@ -587,8 +587,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
         const SizedBox(height: 12),
         Text(
           total == 0
-              ? 'Nu sunt încă probleme pentru clasa ${_gradeLabel(selectedGrade)}.'
-              : 'Clasa ${_gradeLabel(selectedGrade)}: $total probleme în ${availableCategories.length} capitole. '
+              ? 'Nu sunt încă probleme pentru ${isSchoolGrade(selectedGrade) ? 'clasa ${_gradeLabel(selectedGrade)}' : selectedGrade}.'
+              : '${isSchoolGrade(selectedGrade) ? 'Clasa ${_gradeLabel(selectedGrade)}' : selectedGrade}: $total probleme în ${availableCategories.length} capitole. '
                   '${completedCount == total && total > 0 ? 'Le-ai rezolvat pe toate!' : 'Mai ai ${total - completedCount} de rezolvat.'}',
           style: TextStyle(fontSize: 14.5, color: Pb.muted, height: 1.5),
         ),

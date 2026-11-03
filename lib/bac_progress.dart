@@ -11,6 +11,7 @@ import 'classes_models.dart' show Classes;
 import 'clean_kit.dart';
 import 'exercise_list_screen.dart' show ExerciseListScreen;
 import 'ui_components.dart' show Pb, PbButton, PbSize;
+import 'grade_label.dart';
 
 // =============================================================================
 // Pregătirea pentru BAC: every chapter the exam covers, and how far the student
@@ -62,7 +63,7 @@ class Bac {
     return [
       for (final g in keys)
         for (final e in (grades[g] as Map<String, dynamic>).entries)
-          if (_counts(e.key) && (e.value as List).isNotEmpty)
+          if (isSchoolGrade(g) && _counts(e.key) && (e.value as List).isNotEmpty)
             BacTopic(subject: subject, grade: g, chapter: e.key, ids: [for (final p in e.value as List) '${p['id']}']),
     ];
   }
