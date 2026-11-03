@@ -3087,6 +3087,12 @@
     "12": {
       "1. Subiectul III.1 · Subprograme": [
         {
+          "id": "2101",
+          "title": "Parcele pătrate pe un teren dreptunghiular",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2027 · Model · Subiectul III.1"
+        },
+        {
           "id": "101",
           "title": "Fiecare 25 devine 26",
           "difficulty": "medie",
@@ -3521,6 +3527,12 @@
       ],
       "2. Subiectul III.2 · Șiruri și matrice": [
         {
+          "id": "2102",
+          "title": "Cuvinte cu tot atâtea paranteze câte litere",
+          "difficulty": "ușoară",
+          "sursa": "BAC 2027 · Model · Subiectul III.2"
+        },
+        {
           "id": "173",
           "title": "Fără jucăriile de pe diagonala secundară",
           "difficulty": "ușoară",
@@ -3954,6 +3966,12 @@
         }
       ],
       "3. Subiectul III.3 · Fișiere și algoritmi eficienți": [
+        {
+          "id": "2103",
+          "title": "Prima echipă din clasamentul concursului",
+          "difficulty": "medie",
+          "sursa": "BAC 2027 · Model · Subiectul III.3"
+        },
         {
           "id": "245",
           "title": "Cea mai mare putere a lui 26 care divide n!",

@@ -22050,6 +22050,72 @@
      "a": 0,
      "e": "0 este număr par și poate apărea în șir."
     }
+   ],
+   "2101": [
+    {
+     "q": "Ce afișează parcele(6, 4)?",
+     "o": [
+      "24 cu latura 1;6 cu latura 2;",
+      "24 cu latura 1;",
+      "24 cu latura 1;6 cu latura 2;2 cu latura 4;"
+     ],
+     "a": 0,
+     "e": "Divizorii comuni ai lui 6 și 4 sunt 1 și 2: 6 · 4 = 24 de parcele cu latura 1, 3 · 2 = 6 cu latura 2."
+    },
+    {
+     "q": "Care este cea mai mare latură posibilă a unei parcele pentru x și y date?",
+     "o": [
+      "cmmdc(x, y)",
+      "cmmmc(x, y)",
+      "min(x, y)"
+     ],
+     "a": 0,
+     "e": "Latura trebuie să dividă ambele numere, iar cel mai mare divizor comun este cmmdc."
+    }
+   ],
+   "2102": [
+    {
+     "q": "Se numără cuvântul (x)?",
+     "o": [
+      "Nu: are o literă și două paranteze",
+      "Da: are și litere, și paranteze",
+      "Da: parantezele sunt închise corect"
+     ],
+     "a": 0,
+     "e": "Cerința e ca numărul de litere să fie egal cu numărul de paranteze."
+    },
+    {
+     "q": "Se numără cuvântul 27?",
+     "o": [
+      "Nu: nu are nici litere, nici paranteze",
+      "Da: 0 litere și 0 paranteze sunt egale",
+      "Doar dacă e ultimul"
+     ],
+     "a": 0,
+     "e": "Cuvântul trebuie să conțină atât paranteze, cât și litere, deci ambele contoare trebuie să fie nenule."
+    }
+   ],
+   "2103": [
+    {
+     "q": "Ce înseamnă numărul 3010?",
+     "o": [
+      "Echipa 10 a primit 0 puncte la problema 3",
+      "Echipa 30 a primit 10 puncte la problema 1",
+      "Echipa 10 a primit 30 de puncte"
+     ],
+     "a": 0,
+     "e": "Ultimele două cifre sunt indicativul (10), prima e problema (3), iar la mijloc e punctajul (0)."
+    },
+    {
+     "q": "Două echipe au același total și câte o problemă de 99. Care e prima?",
+     "o": [
+      "Cea cu indicativul mai mic",
+      "Cea cu indicativul mai mare",
+      "Cea care apare prima în fișier"
+     ],
+     "a": 0,
+     "e": "Indicativele se dau în ordinea înscrierii, deci indicativul mai mic înseamnă înscriere mai devreme."
+    }
    ]
   },
   "AcadNet": {

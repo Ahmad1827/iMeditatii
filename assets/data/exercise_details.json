@@ -38915,6 +38915,190 @@
         "cerinta": "Se dă un șir de cel puțin două și cel mult 10⁶ numere naturale din intervalul [0, 10³]. Șirul are cel puțin un termen par și cel puțin un termen impar. Numerele se citesc până la sfârșitul datelor.\n\nSe cere să se afișeze pe ecran termenii șirului, separați prin câte un spațiu, astfel încât toți cei impari să apară înaintea tuturor celor pari, și atât subșirul format din cei impari, cât și subșirul format din cei pari, să fie în ordine crescătoare, ca în exemplu. Proiectează un algoritm eficient din punctul de vedere al timpului de executare.",
         "explicatie": "Pentru șirul 12 2 3 1 2 5 se afișează pe ecran: 1 3 5 2 2 12",
         "nota_examen": "La examen datele sunt în fișierul bac.txt; aici le citești de la tastatură. La examen se cere și descrierea în limbaj natural a algoritmului, cu justificarea eficienței (2p.), apoi programul (8p.)."
+      },
+      "2101": {
+        "title": "Parcele pătrate pe un teren dreptunghiular",
+        "category": "1. Subiectul III.1 · Subprograme",
+        "difficulty": "ușoară",
+        "sursa": "BAC 2027 · Model · Subiectul III.1",
+        "description": "Un grădinar are un teren dreptunghiular pe care îl împarte în parcele pătrate, toate de latură egală, număr natural. Subprogramul parcele are doi parametri, x și y, prin care primește câte un număr natural din intervalul [1, 10⁴], reprezentând lățimea, respectiv lungimea terenului, măsurate în metri. Subprogramul afișează pe ecran, pentru fiecare variantă de împărțire a terenului, o pereche formată din numărul de parcele obținute și latura unei astfel de parcele, în această ordine. Valorile din pereche sunt separate prin expresia `cu latura`, iar fiecare pereche este urmată de simbolul punct și virgulă (;), ca în exemplu.\n\nScrie definiția completă a subprogramului:\nvoid parcele(int x, int y)\n\nFuncția `main`, care citește datele de intrare, apelează subprogramul și afișează rezultatul, este scrisă deja: tu scrii doar subprogramul.",
+        "input": "Numerele x și y.",
+        "output": "Perechile, fără spații între ele, în ordinea crescătoare a laturii.",
+        "hint": "O latură l e bună dacă divide atât x, cât și y. Atunci pe lățime încap x / l parcele, iar pe lungime y / l, deci în total (x / l) · (y / l).",
+        "constraints": [
+          "1 ≤ x, y ≤ 10⁴"
+        ],
+        "examples": {
+          "input": "18 24",
+          "output": "432 cu latura 1;108 cu latura 2;48 cu latura 3;12 cu latura 6;"
+        },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\nvoid parcele(int x, int y) {\n    for (int l = 1; l <= x && l <= y; l++)\n        if (x % l == 0 && y % l == 0)\n            cout << (x / l) * (y / l) << \" cu latura \" << l << \";\";\n}\nint main() {\n    int x, y;\n    cin >> x >> y;\n    parcele(x, y);\n    return 0;\n}"
+        },
+        "tests": [
+          {
+            "input": "18 24",
+            "output": "432 cu latura 1;108 cu latura 2;48 cu latura 3;12 cu latura 6;"
+          },
+          {
+            "input": "7 5",
+            "output": "35 cu latura 1;"
+          },
+          {
+            "input": "1 1",
+            "output": "1 cu latura 1;"
+          },
+          {
+            "input": "10000 10000",
+            "output": "100000000 cu latura 1;25000000 cu latura 2;6250000 cu latura 4;4000000 cu latura 5;1562500 cu latura 8;1000000 cu latura 10;390625 cu latura 16;250000 cu latura 20;160000 cu latura 25;62500 cu latura 40;40000 cu latura 50;15625 cu latura 80;10000 cu latura 100;6400 cu latura 125;2500 cu latura 200;1600 cu latura 250;625 cu latura 400;400 cu latura 500;256 cu latura 625;100 cu latura 1000;64 cu latura 1250;25 cu latura 2000;16 cu latura 2500;4 cu latura 5000;1 cu latura 10000;"
+          },
+          {
+            "input": "9973 10000",
+            "output": "99730000 cu latura 1;"
+          },
+          {
+            "input": "5040 7560",
+            "output": "38102400 cu latura 1;9525600 cu latura 2;4233600 cu latura 3;2381400 cu latura 4;1524096 cu latura 5;1058400 cu latura 6;777600 cu latura 7;595350 cu latura 8;470400 cu latura 9;381024 cu latura 10;264600 cu latura 12;194400 cu latura 14;169344 cu latura 15;117600 cu latura 18;95256 cu latura 20;86400 cu latura 21;66150 cu latura 24;48600 cu latura 28;42336 cu latura 30;31104 cu latura 35;29400 cu latura 36;23814 cu latura 40;21600 cu latura 42;18816 cu latura 45;12150 cu latura 56;10584 cu latura 60;9600 cu latura 63;7776 cu latura 70;7350 cu latura 72;5400 cu latura 84;4704 cu latura 90;3456 cu latura 105;2646 cu latura 120;2400 cu latura 126;1944 cu latura 140;1350 cu latura 168;1176 cu latura 180;864 cu latura 210;600 cu latura 252;486 cu latura 280;384 cu latura 315;294 cu latura 360;216 cu latura 420;150 cu latura 504;96 cu latura 630;54 cu latura 840;24 cu latura 1260;6 cu latura 2520;"
+          },
+          {
+            "input": "1 10000",
+            "output": "10000 cu latura 1;"
+          },
+          {
+            "input": "360 840",
+            "output": "302400 cu latura 1;75600 cu latura 2;33600 cu latura 3;18900 cu latura 4;12096 cu latura 5;8400 cu latura 6;4725 cu latura 8;3024 cu latura 10;2100 cu latura 12;1344 cu latura 15;756 cu latura 20;525 cu latura 24;336 cu latura 30;189 cu latura 40;84 cu latura 60;21 cu latura 120;"
+          }
+        ],
+        "dificultate_motiv": "Latura unei parcele trebuie să dividă și lățimea, și lungimea: se parcurg divizorii comuni, iar numărul de parcele este (x / l) · (y / l).",
+        "imagine_originala": "assets/bac/2027_model_III1.png",
+        "cerinta": "Un grădinar are un teren dreptunghiular pe care îl împarte în parcele pătrate, toate de latură egală, număr natural. Subprogramul parcele are doi parametri, x și y, prin care primește câte un număr natural din intervalul [1, 10⁴], reprezentând lățimea, respectiv lungimea terenului, măsurate în metri. Subprogramul afișează pe ecran, pentru fiecare variantă de împărțire a terenului, o pereche formată din numărul de parcele obținute și latura unei astfel de parcele, în această ordine. Valorile din pereche sunt separate prin expresia `cu latura`, iar fiecare pereche este urmată de simbolul punct și virgulă (;), ca în exemplu.\n\nScrie definiția completă a subprogramului:\nvoid parcele(int x, int y)\n\nFuncția `main`, care citește datele de intrare, apelează subprogramul și afișează rezultatul, este scrisă deja: tu scrii doar subprogramul.",
+        "explicatie": "Pentru x = 18 și y = 24, laturile posibile sunt divizorii comuni 1, 2, 3 și 6: 18 · 24 = 432 de parcele cu latura 1, 9 · 12 = 108 cu latura 2, 6 · 8 = 48 cu latura 3 și 3 · 4 = 12 cu latura 6.",
+        "antet": "void parcele(int x, int y)",
+        "main_verificare": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x, y;\n    cin >> x >> y;\n    parcele(x, y);\n    return 0;\n}",
+        "nota_examen": "La examen perechile pot fi afișate în orice ordine; aici testele le așteaptă în ordinea crescătoare a laturii, ca în exemplu."
+      },
+      "2102": {
+        "title": "Cuvinte cu tot atâtea paranteze câte litere",
+        "category": "2. Subiectul III.2 · Șiruri și matrice",
+        "difficulty": "ușoară",
+        "sursa": "BAC 2027 · Model · Subiectul III.2",
+        "description": "Într-un text de cel mult 200 de caractere, cuvintele sunt separate prin câte un spațiu și sunt formate din litere mici ale alfabetului englez, cifre și simboluri din mulțimea parantezelor: (, ), [, ], {, }.\n\nScrie un program care citește de la tastatură un text de tipul precizat și afișează pe ecran numărul cuvintelor care conțin atât paranteze, cât și litere, în număr egal.",
+        "input": "Textul, pe o singură linie.",
+        "output": "Numărul de cuvinte cerut.",
+        "hint": "Numără literele și parantezele cuvântului curent; la fiecare spațiu (și la sfârșitul textului) verifici dacă sunt egale și nenule, apoi pornești de la zero.",
+        "constraints": [
+          "textul are cel mult 200 de caractere",
+          "cuvintele sunt separate prin câte un spațiu"
+        ],
+        "examples": {
+          "input": "a(b5) xyz [x1]y2 (x) {a6bc} 27 pq {ba}a)",
+          "output": "3"
+        },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\n#include <cstring>\nusing namespace std;\nint main() {\n    char s[201];\n    cin.getline(s, 201);\n    int nr = 0, litere = 0, paranteze = 0;\n    for (int i = 0; ; i++) {\n        if (s[i] == ' ' || s[i] == '\\0') {\n            if (litere > 0 && litere == paranteze) nr++;\n            litere = paranteze = 0;\n            if (s[i] == '\\0') break;\n        } else if (s[i] >= 'a' && s[i] <= 'z') litere++;\n        else if (strchr(\"()[]{}\", s[i])) paranteze++;\n    }\n    cout << nr;\n    return 0;\n}"
+        },
+        "tests": [
+          {
+            "input": "a(b5) xyz [x1]y2 (x) {a6bc} 27 pq {ba}a)",
+            "output": "3"
+          },
+          {
+            "input": "abc",
+            "output": "0"
+          },
+          {
+            "input": "(a)",
+            "output": "0"
+          },
+          {
+            "input": "()",
+            "output": "0"
+          },
+          {
+            "input": "a) (b ]c[ {}{}ab",
+            "output": "2"
+          },
+          {
+            "input": "x1y2 [] 12 (5) a{b}c [a]",
+            "output": "0"
+          },
+          {
+            "input": "{c ( z[z)z29 (9 22 1z()1[{ z{)(x0b }2x2][ z2 c] }1 bx9c x ({a aa( 9[}{0[ z}21a}2y )1xc }]y2{ 2]2 1]a0{y zy[90 )0[29 0xx12 ca{bya[ 92[x ]2 0[ 0ycz(] ybza{(0 9x0 01c(0xz} y}c 1b{yz{} c09c 0{az 9{b0[z0",
+            "output": "7"
+          },
+          {
+            "input": "2]}9y yab z y2 z})0(z9{ bc)2{{ b(z]0{]) {2)(xcbc {{ 0} acz92[99 c)])[[2 y )c)a]yax yz }x}x a[a}z) )y}0}z]x { 0[[[}[(( b z[0 b[}} [xa}0aa[ x9 (y2 1{9 1) b(9a [))[9(] ]([ a}{y[ z99 y)1 9 xby1 xb{cby",
+            "output": "5"
+          },
+          {
+            "input": "(a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a)b) (a",
+            "output": "1"
+          }
+        ],
+        "dificultate_motiv": "O parcurgere a textului, cuvânt cu cuvânt, cu două contoare care se compară la fiecare spațiu și la sfârșit.",
+        "imagine_originala": "assets/bac/2027_model_III2.png",
+        "cerinta": "Într-un text de cel mult 200 de caractere, cuvintele sunt separate prin câte un spațiu și sunt formate din litere mici ale alfabetului englez, cifre și simboluri din mulțimea parantezelor: (, ), [, ], {, }.\n\nScrie un program care citește de la tastatură un text de tipul precizat și afișează pe ecran numărul cuvintelor care conțin atât paranteze, cât și litere, în număr egal.",
+        "explicatie": "Pentru textul a(b5) xyz [x1]y2 (x) {a6bc} 27 pq {ba}a) se afișează 3: a(b5) are 2 litere și 2 paranteze, [x1]y2 are 2 și 2, iar {ba}a) are 3 și 3. Cuvântul (x) are o literă și două paranteze."
+      },
+      "2103": {
+        "title": "Prima echipă din clasamentul concursului",
+        "category": "3. Subiectul III.3 · Fișiere și algoritmi eficienți",
+        "difficulty": "medie",
+        "sursa": "BAC 2027 · Model · Subiectul III.3",
+        "description": "La un concurs, fiecare echipă are câte un indicativ, număr natural din intervalul [10, 99]; indicativele sunt acordate la rând, în ordinea înscrierii. Fiecare echipă are de rezolvat câte trei probleme și fiecare problemă este evaluată cel mult o dată și notată cu un punctaj, număr natural din intervalul [0, 99]. Rezultatul pentru fiecare problemă trimisă spre evaluare este înregistrat sub forma unui număr natural, format prin concatenarea, în această ordine, a numărului problemei (1, 2 sau 3), a punctajului obținut și a indicativului echipei. Problemele pentru care nu se trimit rezolvări spre evaluare sunt notate implicit cu câte 0 puncte. Clasamentul se face în funcție de punctajul total obținut, în ordine descrescătoare, la punctaj egal departajarea fiind în funcție de numărul de probleme cu punctaj 99, iar în caz de egalitate în funcție de ordinea înscrierii.\n\nSe citesc cel mult 10⁶ numere naturale din intervalul [10³, 10⁵), reprezentând rezultatele obținute la problemele evaluate, separate prin câte un spațiu. Se cere să se afișeze pe ecran indicativul primei echipe din clasament. Proiectează un algoritm eficient din punctul de vedere al timpului de executare.",
+        "input": "Rezultatele, numere naturale separate prin spații, până la sfârșitul datelor.",
+        "output": "Indicativul primei echipe din clasament.",
+        "hint": "Ultimele două cifre sunt indicativul, prima cifră e problema, iar ce rămâne la mijloc e punctajul: două cifre dacă numărul are 5 cifre, una dacă are 4. Ține în doi vectori de 100 de elemente punctajul total și numărul de 99 ale fiecărei echipe, apoi parcurge indicativele crescător, adică în ordinea înscrierii.",
+        "constraints": [
+          "cel mult 10⁶ numere",
+          "fiecare număr este din [10³, 10⁵)",
+          "indicativele sunt din [10, 99], punctajele din [0, 99]"
+        ],
+        "examples": {
+          "input": "19912 19910 28012\n38012 29011 3010 19015\n38011 37015 22030\n29915 29910 18911",
+          "output": "12"
+        },
+        "official_solution": {
+          "language": "C++",
+          "code": "#include <iostream>\nusing namespace std;\n// total[e] = punctajul echipei e, maxim[e] = câte probleme are cu 99 de puncte\nint total[100], maxim[100];\nbool inscrisa[100];\nint main() {\n    int x;\n    while (cin >> x) {\n        int echipa = x % 100, punctaj;\n        if (x >= 10000) punctaj = x / 100 % 100;   // punctaj din două cifre\n        else punctaj = x / 100 % 10;               // punctaj dintr-o cifră\n        total[echipa] += punctaj;\n        if (punctaj == 99) maxim[echipa]++;\n        inscrisa[echipa] = true;\n    }\n    int prima = 0;\n    for (int e = 10; e <= 99; e++)   // în ordinea înscrierii\n        if (inscrisa[e] && (prima == 0 || total[e] > total[prima] ||\n            (total[e] == total[prima] && maxim[e] > maxim[prima])))\n            prima = e;\n    cout << prima;\n    return 0;\n}"
+        },
+        "tests": [
+          {
+            "input": "19912 19910 28012\n38012 29011 3010 19015\n38011 37015 22030\n29915 29910 18911",
+            "output": "12"
+          },
+          {
+            "input": "1010",
+            "output": "10"
+          },
+          {
+            "input": "19999 29999 39999 19998 29998 39998",
+            "output": "98"
+          },
+          {
+            "input": "18915 28915 32015 19920 29920 3020 19930 28030 31930 19940 29940 3040",
+            "output": "20"
+          },
+          {
+            "input": "12682 24175 33821 24081 14492 14038 34373 2571 17030 14072 28229 17151 11073 29963 27211 11887 19940 14323 22457 34112 29018 25134 38178 24828 16088 28476 34217 32393 16214 37151 31590 15097 35222 38233 17212 14261 29027 37276 35761 16550 11115 31344 15047 27238 27067 39457 33824 3456 34867 23180 27094 21089 29535 35042 29425 23241 31555 16080 22047 13548 18032 13978 35846 16319 25313 22316 12283 2596 37759 25569 1366 26430 32471 14770 28849 38854 13811 34418 36626 16857 14355 16989 23764 35870 28115 14863 16917 34120 14776 36930 24224 23970 2831 23191 23946 23690 17437 1458 3380 28188 23450 35174 25987 17434 25851 3689 29459 1068 17828 23354 29862 15493 12456 14326 26755 14691 39999 18994 25237 28822 12369 16665 2474 18824 35195 33869 19846 18520 24882 17477 25656 36749 37160 28568 27992 34387 1345 33945 16490 33463 3496 31837 3681 17344 29545 18999 15759 21877 36565 2686 36928 32239 29260 33434 21758 38435 21966 38686 18343 28585 37243 26079 3648 26684 38331 34198 27748 14118 37513 18871 22072 36472 23026 11686 25597 35485 14064 11196 16598 13684 29239 2978 3916 15162 25042 3188 31425 28244 17013 36827 23221 13727 3782 15035 15925 35162 11042 1433 37492 37629 15229 37968 13610 31797 39510 12375 38094 33450 24643 18031 14941 38877 17822 28293 33384 27940 3314 12054 33052 22161 37232 24299 24983 26010 29232 2052 29773 12639 32315 34553 39358 19936",
+            "output": "32"
+          },
+          {
+            "input": "3768 2099 19984 39999 25879 19927 21424 19969 31179 19962 29926 26578 19937 36637 2295 29951 39984 29912 19978 29998 16990 19912 39926 31258 39947 18963 39663 39912 27284 28769 28546 17786 36759 19979 17246 29927 37374 19936 39982 19958 39932 29919 37286 39962 39936 29986 29982 15419 19998 19959 36378 35390 19974 11951 19982 18326 29947 19999 29758 39951 29963 17414 39969 19966 24974 29966 29936 39914 26137 19922 35546 27768 27422 21059",
+            "output": "12"
+          },
+          {
+            "input": "19957 29944 26727 19938 19918 13775 19910 29976 26767 39959 26161 19056 11842 26592 29225 29931 39963 29917 19931 31025 11162 39573 29942 32626 25855 29978 38334 29951 39982 17114 38812 29922 26916 2430 39538 11121 28213 16877 28841 29958 39952 39988 39958 38570 26746 29921 19990 12988 17220 29991 19986 13891 19130 19935 19944 16726 17627 31010 1999 19934 16179 29923 36366 29924 19976 28577 39987 19959 19922 36428 39956 32785 26666 19995 3372 29935 13198 29970 23553 19948 28765 19978 16425 39942 29950 39989 35348 16039 36291 1370 19973 22815 28439 18367 19084 1119 29673 39916 16297 27872 39980 26187 19949 19960 39994 28371 19955 16013 29420 17074 19394 29262 19982 17823 23657 29919 39292 39968 32471 26980 12340 21411 37836 27668 19983 19993 19950 39914 37733 36497 29954 29960 16754 19965 29914 17343 29969 37565 19728 39981 36524 29963 39943 23810 26890 16858 39984 39983 26386 29949 37351 29943 28775 39920 39941 19947 15824 37040 19972 37578 22582 39927 38023 39993 29940 29952 19981 39976 19916 29985 29974 39937 39949 22093 26396 39950 29984 27388 38098 39299 39139 39921 26294 19951 29998 29926 31518 19992 11253 39960 37464 38245 38319 19933 19929 29936 28547 19946 36813 29938 39969 19964 21328 2199 18032 29948 29918 3179 19963 29197 39996 19680 29932 31917 19996 19911 29964 14866 11045 19052 39911 19969 34675 17285 29945 36722 29912 17667 16724 39918 39810 19990 24726 29950 16484 16382 16271 39915 31443 39923 39972 39765 16758 19972 39171 29967 39983 31147 39922 18295 39940 39967 39935 11556 28693 39925 18691 27115 39994 19932 19989 26324 38273 36462 15476 27712 1523 29913 18457 19946 39493 17193 27027 39976 19974 39914 39916 39661 17363 37498 29946 19945 29995 25799 37244 29975 38249 26520 26329 35648 29671 29256 16077 19955 19994 29989 39992 17892 19968 19933 29892 23248 1748 39951 37541 15878 29740 19961 19959 19999 31931 19929 22778 39766 23028 29980 28297 29976 39959 39912 39979 19096 29335 19920 39996 26251 3938 27577 19916 27319 32881 19940 11741 28694 28154 2145 23283 17362 12181 19925 36182 14442 29982 29987 29961 19969 39977 19917 39933 26217 19922 39984 29933 27636 19910 19934 29910 39950 17515 29930 37557 38678 28870 28565 19627 33230 19939 37899 15437 17183 27698 39970 29986 29996 39953 17512 19926 29966 16980 29925 29981 29885 19973 24257 29939 37858 39913 33432 29611 29916 39519 19935 16979 29984 29914 23958 38117 18636 19952 29923 26791 29960 39924 26274 19930 25822 29053 39985 29962 29938 39963 23521 16728 39046 35826 19987 38680 29942 1051 38355 37386 21263 39911 29968 19953 39995 39939 19986 39469 19960 29969 36527 29673 39989 28255 11913 29979 37074 19965 29937 29964 19998 13021 19938 39356 33920 29944 21649 19964 22259 37991 16685 19970 19919 15611 39962 19612 27966 39919 29971 14648 27380 39922 29935 24297 26370 25786 29965 19931 29982 11645 19875 39951 29748 28169 29911 16138 19932 39974 39953 21057 19193 39944 36691 39969 19843 29910 31676 29945 19964 28922 19944 19953 19974 22793 19930 39964 19910 29938 16552 29916 29973 21817 39955 29931 38660 13554 1256 29988 37541 39666 39940 29918 29944 19920 19992 3165 19957 13942 37972 39913 19934 11140 29437 19961 19971 16776 3758 17822 38447 26761 29949 36277 28290 28941 39990 19941 22999 19973 19925 37756 39931 29995 26240 29953 19972 19918 27483 27315 39952 29889 29913 37882 39946 19947 39970 19980 29946 29920 26214 16321 28667 19091 29963 33694 11797 39998 39928 29964 39942 39767 29985 19923 29958 39218 27925 19929 39996 36671 36379 27198 39110 18368 39950 39917 39932 16777 29943 19998 29981 28172 39695 33793 19981 19939 39957 19951 37911 35445 29921 19989 39321 18613 39973 39937 19978 16833 29928 39989 39943 29950 19969 18615 19962 16083 27855 31880 19979 27942 29960 37848 29912 29956 1584 33633 39926 18890 19928 39930 3539 39985 29978 23296 29923 28034 19949 39968 27927 39924 36727 17237 39984 32438 36414 34459 39920 19970 31412 39987 29268 37581 18917 16955 39961 19927 29954 18360 17350 17116 18694 39936 17763 29936 28577 19995 29487 37729 39925 26251 28132 1459 19999 37123 17366 38688 29979 29976 13435 39916 19958 39935 39949 27630 12067 29062 39999",
+            "output": "69"
+          }
+        ],
+        "dificultate_motiv": "Fiecare număr se desface în problemă, punctaj și indicativ; cu doi vectori indexați după indicativ (punctaj total și număr de 99) se face o singură trecere prin fișier.",
+        "imagine_originala": "assets/bac/2027_model_III3.png",
+        "cerinta": "La un concurs, fiecare echipă are câte un indicativ, număr natural din intervalul [10, 99]; indicativele sunt acordate la rând, în ordinea înscrierii. Fiecare echipă are de rezolvat câte trei probleme și fiecare problemă este evaluată cel mult o dată și notată cu un punctaj, număr natural din intervalul [0, 99]. Rezultatul pentru fiecare problemă trimisă spre evaluare este înregistrat sub forma unui număr natural, format prin concatenarea, în această ordine, a numărului problemei (1, 2 sau 3), a punctajului obținut și a indicativului echipei. Problemele pentru care nu se trimit rezolvări spre evaluare sunt notate implicit cu câte 0 puncte. Clasamentul se face în funcție de punctajul total obținut, în ordine descrescătoare, la punctaj egal departajarea fiind în funcție de numărul de probleme cu punctaj 99, iar în caz de egalitate în funcție de ordinea înscrierii.\n\nSe citesc cel mult 10⁶ numere naturale din intervalul [10³, 10⁵), reprezentând rezultatele obținute la problemele evaluate, separate prin câte un spațiu. Se cere să se afișeze pe ecran indicativul primei echipe din clasament. Proiectează un algoritm eficient din punctul de vedere al timpului de executare.",
+        "explicatie": "Pentru exemplu se afișează 12: primele cinci echipe din clasament sunt, în această ordine, 12, 15, 11, 10, 30. Primele trei au câte 259 de puncte, primele două au câte o problemă cu 99 de puncte, iar echipa 12 s-a înscris înaintea echipei 15.",
+        "nota_examen": "La examen datele sunt în fișierul bac.txt; aici le citești de la tastatură. La examen se cere și descrierea în limbaj natural a algoritmului, cu justificarea eficienței (2p.), apoi programul (8p.)."
       }
     },
     "AcadNet": {

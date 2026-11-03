@@ -221,19 +221,19 @@ void main() {
     }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 20)));
   });
 
-  group('grade 12 informatics: Subiectul III from every BAC paper, 2019 to 2026', () {
+  group('grade 12 informatics: Subiectul III from every BAC paper, 2019 to 2027', () {
     final g12 = (details['Informatică']['12'] as Map<String, dynamic>);
     final bac = {for (final e in g12.entries) if ('${e.value['sursa'] ?? ''}'.startsWith('BAC ')) e.key: e.value as Map<String, dynamic>};
 
     test('each paper with its three problems, each problem with its source, difficulty and why', () {
-      expect(bac.length, 216);
+      expect(bac.length, 219);
       final papers = <String, Set<String>>{};
       for (final e in bac.entries) {
         final p = e.value;
         final m = RegExp(r'^BAC (20\d\d) · (.+) · Subiectul III\.([123])').firstMatch('${p['sursa']}');
         expect(m, isNotNull, reason: '${e.key}: ${p['sursa']}');
         final year = int.parse(m!.group(1)!);
-        expect(year, inInclusiveRange(2019, 2026));
+        expect(year, inInclusiveRange(2019, 2027));
         papers.putIfAbsent('$year ${m.group(2)}', () => {}).add(m.group(3)!);
         expect(p['category'], startsWith('${m.group(3)}. Subiectul III.${m.group(3)}'), reason: e.key);
         expect(['ușoară', 'medie', 'grea'], contains(p['difficulty']), reason: e.key);
@@ -242,8 +242,10 @@ void main() {
         expect(p['examples']['output'], (p['tests'] as List).first['output'], reason: '${e.key}: the example is the first test');
       }
       // 2019–2026: models, simulations, special, June–July, reserve and August sessions,
-      // plus the 2020 and 2021 training tests (test 11 of 2021 is the 2021 special session again)
-      expect(papers.length, 72);
+      // plus the 2020 and 2021 training tests (test 11 of 2021 is the 2021 special session again),
+      // and the 2027 model
+      expect(papers.length, 73);
+      expect(papers.containsKey('2027 Model'), true);
       for (final e in papers.entries) {
         expect(e.value, {'1', '2', '3'}, reason: e.key);
       }
