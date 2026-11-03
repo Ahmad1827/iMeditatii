@@ -75,6 +75,29 @@ void main() {
     });
   });
 
+  test('informatics IX–XI: at least 200 problems per grade, chapters numbered in order, each problem with tests and a hint', () {
+    for (final grade in ['9', '10', '11']) {
+      final chapters = list['Informatică'][grade] as Map<String, dynamic>;
+      final names = chapters.keys.toList();
+      for (var i = 0; i < names.length; i++) {
+        expect(names[i], startsWith('${i + 1}. '), reason: '$grade: ${names[i]}');
+      }
+      var count = 0;
+      final titles = <String>{};
+      for (final items in chapters.values) {
+        for (final item in items as List) {
+          count++;
+          expect(titles.add('${item['title']}'.toLowerCase()), true, reason: '$grade: ${item['title']} twice');
+          final d = details['Informatică'][grade][item['id']] as Map<String, dynamic>;
+          expect(['ușoară', 'medie', 'grea'], contains(d['difficulty']), reason: '$grade/${item['id']}');
+          expect('${d['hint'] ?? ''}'.trim(), isNotEmpty, reason: '$grade/${item['id']}');
+          if (d['fisier'] == null) expect((d['tests'] as List).length, greaterThanOrEqualTo(3), reason: '$grade/${item['id']}');
+        }
+      }
+      expect(count, greaterThanOrEqualTo(200), reason: grade);
+    }
+  });
+
   test('informatics IX–XI: every official solution passes all its tests, and every chapter ends with the olympiad', () async {
     String norm(String s) => s.replaceAll(RegExp(r'\s+'), '').toLowerCase();
     final tmp = Directory.systemTemp.createTempSync('info');
@@ -87,9 +110,10 @@ void main() {
           if (e.value['fisier'] == null) e.key: e.value as Map<String, dynamic>,
       };
       final ids = problems.keys.toList();
-      for (var i = 0; i < ids.length; i += 8) {
+      final batch = Platform.numberOfProcessors.clamp(8, 32);
+      for (var i = 0; i < ids.length; i += batch) {
         await Future.wait([
-          for (final id in ids.skip(i).take(8))
+          for (final id in ids.skip(i).take(batch))
             () async {
               final dir = Directory('${tmp.path}/${grade}_$id')..createSync();
               File('${dir.path}/main.cpp').writeAsStringSync(problems[id]!['official_solution']['code']);
@@ -97,9 +121,12 @@ void main() {
               if (c.exitCode != 0) return failures.add('$grade/$id: compile error');
               for (final t in problems[id]!['tests'] as List) {
                 final p = await Process.start('${dir.path}/main', [], workingDirectory: dir.path);
+                // read while writing: a program that prints as it reads would
+                // otherwise fill the pipe and wait for us forever
+                final reading = p.stdout.transform(const SystemEncoding().decoder).join();
                 p.stdin.write(t['input']);
                 await p.stdin.close();
-                final out = await p.stdout.transform(const SystemEncoding().decoder).join();
+                final out = await reading;
                 await p.exitCode;
                 if (norm(out) != norm('${t['output']}')) failures.add('$grade/$id: ${'${t['input']}'.split('\n').first}');
               }
@@ -108,7 +135,7 @@ void main() {
       }
     }
     expect(failures, isEmpty);
-  }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 10)));
+  }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 30)));
 
   group('grade 12 informatics: Subiectul III from every BAC paper, 2019 to 2026', () {
     final g12 = (details['Informatică']['12'] as Map<String, dynamic>);
@@ -168,9 +195,10 @@ void main() {
       addTearDown(() => tmp.deleteSync(recursive: true));
       final failures = <String>[];
       final ids = bac.keys.toList();
-      for (var i = 0; i < ids.length; i += 8) {
+      final batch = Platform.numberOfProcessors.clamp(8, 32);
+      for (var i = 0; i < ids.length; i += batch) {
         await Future.wait([
-          for (final id in ids.skip(i).take(8))
+          for (final id in ids.skip(i).take(batch))
             () async {
               final dir = Directory('${tmp.path}/$id')..createSync();
               File('${dir.path}/main.cpp').writeAsStringSync(bac[id]!['official_solution']['code']);
@@ -178,9 +206,12 @@ void main() {
               if (c.exitCode != 0) return failures.add('$id: compile error');
               for (final t in bac[id]!['tests'] as List) {
                 final p = await Process.start('${dir.path}/main', [], workingDirectory: dir.path);
+                // read while writing: a program that prints as it reads would
+                // otherwise fill the pipe and wait for us forever
+                final reading = p.stdout.transform(const SystemEncoding().decoder).join();
                 p.stdin.write(t['input']);
                 await p.stdin.close();
-                final out = await p.stdout.transform(const SystemEncoding().decoder).join();
+                final out = await reading;
                 await p.exitCode;
                 if (norm(out) != norm('${t['output']}')) failures.add('$id: ${'${t['input']}'.split('\n').first}');
               }
