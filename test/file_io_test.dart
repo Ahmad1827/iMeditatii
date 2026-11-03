@@ -1,7 +1,7 @@
 // Problems with files (like at the olympiad): the program reads name.in and
 // writes name.out. For the server judge, which only has the keyboard and the
 // screen, FileIo.wrap adds a prelude; these compile it with this machine's g++.
-import 'dart:convert';
+import 'details_io.dart';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -72,7 +72,7 @@ void main() {
   });
 
   test('the problems with files pass every test with their official solution, through the server judge', () async {
-    final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+    final details = readAllDetails();
     String norm(String s) => s.replaceAll('\r', '').split('\n').map((l) => l.trimRight()).join('\n').trim();
     var problems = 0;
     for (final grade in (details['Informatică'] as Map<String, dynamic>).values) {

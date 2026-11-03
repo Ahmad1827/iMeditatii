@@ -1,5 +1,5 @@
 // A statement in sections: the text as written, only placed better.
-import 'dart:convert';
+import 'details_io.dart';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -43,7 +43,7 @@ void main() {
   });
 
   test('no text is lost: every paragraph of every problem lands somewhere', () {
-    final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+    final details = readAllDetails();
     for (final subject in details.values) {
       for (final grade in (subject as Map<String, dynamic>).values) {
         for (final e in (grade as Map<String, dynamic>).values) {
@@ -106,7 +106,7 @@ void markupTests() {
   });
 
   test('every statement field of every problem has its markup closed', () {
-    final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+    final details = readAllDetails();
     for (final subject in details.values) {
       for (final grade in (subject as Map<String, dynamic>).values) {
         for (final e in (grade as Map<String, dynamic>).values) {
@@ -123,7 +123,7 @@ void markupTests() {
 
 void pictureTests() {
   test('every original picture a problem links to comes with the app', () {
-    final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+    final details = readAllDetails();
     var n = 0;
     for (final subject in details.values) {
       for (final grade in (subject as Map<String, dynamic>).values) {

@@ -17,17 +17,24 @@ const REFRESHED = ['fonts.googleapis.com'];
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE).then((cache) =>
-      Promise.all(
-        [
+    caches.open(CACHE).then(async (cache) => {
+      const put = (path) => {
+        const url = new URL(path, self.registration.scope).href;
+        return fetch(url, { cache: 'no-cache' }).then((res) => (res.ok ? cache.put(url, res.clone()).then(() => res) : null)).catch(() => null);
+      };
+      // every problem, so any of them opens offline, not only those seen: one file per grade, listed in index.json
+      const details = put('assets/assets/data/details/index.json')
+        .then((res) => (res ? res.json() : {}))
+        .then((index) => Promise.all(Object.values(index).flatMap((grades) => Object.values(grades).flat()).map((f) => put(`assets/assets/data/details/${f}`))))
+        .catch(() => null);
+      await Promise.all([
+        ...[
           SHELL, 'flutter_bootstrap.js', 'main.dart.js', 'manifest.json', 'favicon.png', 'icons/Icon-192.png', 'py_runner.js', 'cpp_runner.js',
-          // every problem, so any of them opens offline, not only those seen
-          'assets/assets/data/exercises.json', 'assets/assets/data/exercise_details.json', 'assets/assets/data/problem_quizzes.json',
-        ]
-          .map((path) => new URL(path, self.registration.scope).href)
-          .map((url) => fetch(url, { cache: 'no-cache' }).then((res) => (res.ok ? cache.put(url, res) : null)).catch(() => null))
-      )
-    )
+          'assets/assets/data/exercises.json', 'assets/assets/data/problem_quizzes.json',
+        ].map(put),
+        details,
+      ]);
+    })
   );
 });
 

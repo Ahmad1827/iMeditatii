@@ -1,5 +1,6 @@
 // Questions before a problem: a few multiple-choice questions that lead into
 // it, each explained once answered; "Sari peste" goes straight to the problem.
+import 'details_io.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -21,7 +22,7 @@ void main() {
   });
 
   test('every problem in the app has its questions, each with one right answer', () {
-    final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+    final details = readAllDetails();
     final bank = jsonDecode(File('assets/data/problem_quizzes.json').readAsStringSync()) as Map<String, dynamic>;
     var problems = 0;
     for (final subject in details.keys) {
@@ -41,7 +42,7 @@ void main() {
         }
       }
     }
-    expect(problems, 1220);
+    expect(problems, 1277);
     // and nothing for a problem that doesn't exist
     for (final subject in bank.keys) {
       for (final grade in (bank[subject] as Map<String, dynamic>).keys) {

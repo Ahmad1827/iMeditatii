@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'exercise_details.dart';
 import 'app_link.dart';
 import 'classes_models.dart';
 import 'ink_page.dart';
@@ -131,8 +130,7 @@ Future<Map<String, dynamic>?> Function(String subject, String grade, String id) 
 /// A problem by subject, grade and id: those that come with the app, then Firestore.
 Future<Map<String, dynamic>?> loadExercise(String subject, String grade, String id) async {
   try {
-    final data = json.decode(await rootBundle.loadString('assets/data/exercise_details.json'));
-    final e = data[subject]?[grade]?[id];
+    final e = (await loadGradeDetails(subject, grade))[id];
     if (e is Map) return Map<String, dynamic>.from(e);
   } catch (_) {}
   try {

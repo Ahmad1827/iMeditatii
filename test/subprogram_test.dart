@@ -1,12 +1,12 @@
 // Subprogram problems: the student writes only the subprogram, and the main
 // that reads the input, calls it and prints (main_verificare) is added after it.
-import 'dart:convert';
+import 'details_io.dart';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+  final details = readAllDetails();
   final subs = <String, Map<String, dynamic>>{
     for (final s in details.entries)
       for (final g in (s.value as Map<String, dynamic>).entries)

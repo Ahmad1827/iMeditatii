@@ -23570,6 +23570,1260 @@
      "a": 0,
      "e": "E nevoie de mai mult de jumătate: peste 10 / 2 = 5."
     }
+   ],
+   "2067": [
+    {
+     "q": "Câte apeluri face Fibonacci recursiv fără cache pentru n = 30?",
+     "o": [
+      "Peste un milion",
+      "Aproximativ 30",
+      "Aproximativ 900"
+     ],
+     "a": 0,
+     "e": "Numărul de apeluri crește exponențial, ca însuși șirul."
+    },
+    {
+     "q": "Ce dă 999 + 1 dacă uiți transportul de la ultima cifră?",
+     "o": [
+      "000",
+      "1000",
+      "100"
+     ],
+     "a": 0,
+     "e": "Cifra 1 de la început vine doar din transport."
+    }
+   ],
+   "2068": [
+    {
+     "q": "Care e următorul termen Collatz după 7?",
+     "o": [
+      "22",
+      "3",
+      "14"
+     ],
+     "a": 0,
+     "e": "7 e impar: 3 · 7 + 1 = 22."
+    },
+    {
+     "q": "Pentru ce numere se poate face (x − 1) / 3 ca număr natural?",
+     "o": [
+      "Pentru x de forma 3k + 1",
+      "Pentru x par",
+      "Pentru orice x"
+     ],
+     "a": 0,
+     "e": "Altfel x − 1 nu se împarte exact la 3."
+    }
+   ],
+   "2069": [
+    {
+     "q": "De ce se alege pivotul cel mai mare în modul?",
+     "o": [
+      "Ca să se evite împărțirea la 0 și erorile de rotunjire mari",
+      "Ca soluția să fie pozitivă",
+      "Ca să fie mai puține ecuații"
+     ],
+     "a": 0,
+     "e": "Împărțirea la un număr mic amplifică erorile."
+    },
+    {
+     "q": "Ce se întâmplă dacă o variabilă locală are același nume ca una globală?",
+     "o": [
+      "Cea locală o ascunde pe cea globală în acel bloc",
+      "Eroare de compilare",
+      "Sunt aceeași variabilă"
+     ],
+     "a": 0,
+     "e": "Funcțiile care folosesc numele global văd însă tot variabila globală."
+    }
+   ],
+   "2070": [
+    {
+     "q": "Se poate scrie 5 ca a² + p, cu a ≥ 1 și p prim?",
+     "o": [
+      "Nu: 5 − 1 = 4 și 5 − 4 = 1 nu sunt prime",
+      "Da, 0² + 5",
+      "Da, 1² + 4"
+     ],
+     "a": 0,
+     "e": "Cu a nenul, singurele variante sunt a = 1 și a = 2."
+    },
+    {
+     "q": "Care este cel mai mic număr prim?",
+     "o": [
+      "2",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "1 nu e prim: are un singur divizor."
+    }
+   ],
+   "2071": [
+    {
+     "q": "Ce face `v.erase(std::remove_if(v.begin(), v.end(), f), v.end())`?",
+     "o": [
+      "Șterge efectiv elementele pentru care f e adevărat",
+      "Nimic",
+      "Sortează vectorul"
+     ],
+     "a": 0,
+     "e": "E idiomul „erase–remove”."
+    },
+    {
+     "q": "Unde ajunge `cd ../..` din `/a`?",
+     "o": [
+      "La /",
+      "Rămâne în /a",
+      "Eroare"
+     ],
+     "a": 0,
+     "e": "Se poate urca doar un nivel, așa că se urcă unul."
+    }
+   ],
+   "2072": [
+    {
+     "q": "Ce declară `int *a, b;`?",
+     "o": [
+      "Un pointer a și un int b",
+      "Două pointere",
+      "Eroare"
+     ],
+     "a": 0,
+     "e": "Steluța ține de fiecare nume separat."
+    },
+    {
+     "q": "De ce nu poate apărea `01` în șirurile generate?",
+     "o": [
+      "Toți 1 sunt generați înaintea tuturor 0",
+      "Pentru că 0 nu e permis",
+      "Din întâmplare"
+     ],
+     "a": 0,
+     "e": "A pune 1 la stânga, apoi B pune doar 0 la dreapta."
+    }
+   ],
+   "2073": [
+    {
+     "q": "Ce se întâmplă cu un iterator după ce ștergi elementul la care arată din vector?",
+     "o": [
+      "Devine invalid; `erase` întoarce iteratorul următor",
+      "Arată la elementul următor",
+      "Nu se schimbă"
+     ],
+     "a": 0,
+     "e": "De aceea se scrie `it = v.erase(it)`."
+    },
+    {
+     "q": "Ce înseamnă „object slicing” la `Car c; c = Sedan(1);`?",
+     "o": [
+      "Se copiază doar partea de Car a obiectului",
+      "Eroare de compilare",
+      "c devine Sedan"
+     ],
+     "a": 0,
+     "e": "Un obiect de tipul bazei nu poate ține partea derivată."
+    }
+   ],
+   "2074": [
+    {
+     "q": "Câți biți sunt necesari pentru orice număr mai mic decât 2³²?",
+     "o": [
+      "32",
+      "16",
+      "64"
+     ],
+     "a": 0,
+     "e": "De aceea ajung cele aproximativ 58 de cicluri rămase."
+    },
+    {
+     "q": "Cum află penultimul client bitul ultimului, dacă acesta are registrul 499 sau 500?",
+     "o": [
+      "Din răspunsul lui send(1): ERR dacă registrul e 500",
+      "Citind registrul vecinului",
+      "Nu poate"
+     ],
+     "a": 0,
+     "e": "499 + 1 încape, 500 + 1 depășește MAX_SIZE."
+    }
+   ],
+   "2075": [
+    {
+     "q": "Ce dimensiuni are produsul unei matrice 2 × 3 cu una 3 × 4?",
+     "o": [
+      "2 × 4",
+      "3 × 3",
+      "2 × 3"
+     ],
+     "a": 0,
+     "e": "Liniile primei și coloanele celei de-a doua."
+    },
+    {
+     "q": "Câte înmulțiri face algoritmul clasic pentru două matrice n × n?",
+     "o": [
+      "n³",
+      "n²",
+      "2n"
+     ],
+     "a": 0,
+     "e": "n² elemente, fiecare cu câte n înmulțiri."
+    }
+   ],
+   "2076": [
+    {
+     "q": "Ce întoarce `string(\"0773663346\").substr(4, 3)`?",
+     "o": [
+      "\"663\"",
+      "\"366\"",
+      "\"3663\""
+     ],
+     "a": 0,
+     "e": "Începe de la poziția 4 (numărând de la 0) și ia 3 caractere."
+    },
+    {
+     "q": "Câte caractere are `+40720062916`?",
+     "o": [
+      "12",
+      "13",
+      "11"
+     ],
+     "a": 0,
+     "e": "`+4` și cele 10 cifre ale numărului."
+    }
+   ],
+   "2077": [
+    {
+     "q": "Cât este 1 + 2 + … + 100?",
+     "o": [
+      "5050",
+      "5000",
+      "10100"
+     ],
+     "a": 0,
+     "e": "100 · 101 / 2 = 5050."
+    },
+    {
+     "q": "Ce valoare inițială are o variabilă în care se calculează un produs?",
+     "o": [
+      "1",
+      "0",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Pornind de la 0, produsul rămâne 0."
+    }
+   ],
+   "2078": [
+    {
+     "q": "Care operator se aplică primul în `a & b > 0`?",
+     "o": [
+      ">",
+      "&",
+      "Depinde"
+     ],
+     "a": 0,
+     "e": "Comparațiile au prioritate mai mare decât operatorii pe biți."
+    },
+    {
+     "q": "De ce ciurul poate porni marcarea multiplilor lui d de la d · d?",
+     "o": [
+      "Multiplii mai mici au fost marcați de divizori mai mici",
+      "Pentru că d · d e prim",
+      "Din greșeală"
+     ],
+     "a": 0,
+     "e": "Orice k · d cu k < d are un factor prim mai mic decât d."
+    }
+   ],
+   "2079": [
+    {
+     "q": "Ce structură de date folosește algoritmul lui Lee?",
+     "o": [
+      "O coadă",
+      "O stivă",
+      "Un arbore"
+     ],
+     "a": 0,
+     "e": "Celulele se vizitează în ordinea distanței față de start."
+    },
+    {
+     "q": "Câți vecini are o celulă din interior, cu 8 direcții?",
+     "o": [
+      "8",
+      "4",
+      "6"
+     ],
+     "a": 0,
+     "e": "4 pe linie și coloană plus 4 pe diagonale."
+    }
+   ],
+   "2080": [
+    {
+     "q": "Cât este `0 + 3 >> 1`?",
+     "o": [
+      "1",
+      "0",
+      "3"
+     ],
+     "a": 0,
+     "e": "Adunarea are prioritate mai mare: (0 + 3) >> 1 = 1."
+    },
+    {
+     "q": "Ce adâncime are recursivitatea Divide et Impera pe n elemente?",
+     "o": [
+      "Aproximativ log₂ n",
+      "n",
+      "n²"
+     ],
+     "a": 0,
+     "e": "Intervalul se înjumătățește la fiecare nivel."
+    }
+   ],
+   "2081": [
+    {
+     "q": "Când este `h & (c - 1)` egal cu `h % c`?",
+     "o": [
+      "Când c e o putere a lui 2",
+      "Mereu",
+      "Când c e prim"
+     ],
+     "a": 0,
+     "e": "Pentru c = 2ᵏ, ultimii k biți sunt chiar restul împărțirii la c."
+    },
+    {
+     "q": "Ce face „linear probing” la o coliziune?",
+     "o": [
+      "Încearcă poziția următoare din tabelă",
+      "Dublează tabela",
+      "Aruncă cheia"
+     ],
+     "a": 0,
+     "e": "Merge la dreapta, reluând de la început la capăt."
+    }
+   ],
+   "2082": [
+    {
+     "q": "Câte insule are harta `101 / 010 / 101` cu legături pe diagonală?",
+     "o": [
+      "1",
+      "5",
+      "4"
+     ],
+     "a": 0,
+     "e": "Celula din mijloc atinge pe diagonală toate cele 4 colțuri."
+    },
+    {
+     "q": "De ce se transformă uscatul vizitat în 0?",
+     "o": [
+      "Ca aceeași insulă să nu fie numărată din nou",
+      "Ca să economisească memorie",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "E marcajul „vizitat” al parcurgerii."
+    }
+   ],
+   "2083": [
+    {
+     "q": "Câți operanzi de 4 biți încap într-un `unsigned short`?",
+     "o": [
+      "4",
+      "2",
+      "16"
+     ],
+     "a": 0,
+     "e": "16 biți / 4 = 4 operanzi."
+    },
+    {
+     "q": "Ce dă `x >> (32 - n)` pentru un `unsigned int` x?",
+     "o": [
+      "Cei mai semnificativi n biți ai lui x",
+      "Ultimii n biți",
+      "x · 2ⁿ"
+     ],
+     "a": 0,
+     "e": "Mutarea la dreapta aruncă ultimii 32 − n biți."
+    }
+   ],
+   "2084": [
+    {
+     "q": "Ce se întâmplă cu o variabilă transmisă prin referință și modificată în funcție?",
+     "o": [
+      "Se modifică și variabila de la apel",
+      "Nu se schimbă",
+      "Eroare de compilare"
+     ],
+     "a": 0,
+     "e": "Referința e un alt nume pentru aceeași variabilă."
+    },
+    {
+     "q": "Cum se citește `n**factors.crbegin()`?",
+     "o": [
+      "n înmulțit cu ultimul element din factors",
+      "n la puterea …",
+      "Eroare"
+     ],
+     "a": 0,
+     "e": "C++ nu are `**`: e `n * (*factors.crbegin())`."
+    }
+   ],
+   "2085": [
+    {
+     "q": "Câte rânduri afișează `for (i = 0; i < 3; i++) cin >> x; cout << x;`?",
+     "o": [
+      "1",
+      "3",
+      "0"
+     ],
+     "a": 0,
+     "e": "Fără acolade, în buclă e doar `cin >> x`."
+    },
+    {
+     "q": "Cât este aria unei elipse cu a = b = r?",
+     "o": [
+      "π · r², aria cercului",
+      "2πr",
+      "π · r"
+     ],
+     "a": 0,
+     "e": "Un cerc e o elipsă cu semi-axele egale."
+    }
+   ],
+   "2086": [
+    {
+     "q": "Cum se numește ambiguitatea în care `T x();` e citit ca declarație de funcție?",
+     "o": [
+      "Most vexing parse",
+      "Dangling else",
+      "Slicing"
+     ],
+     "a": 0,
+     "e": "De aici și titlul problemei."
+    },
+    {
+     "q": "Care inițializare de membru e permisă direct în clasă?",
+     "o": [
+      "std::vector<int> v{1, 2};",
+      "std::vector<int> v(1, 2);",
+      "Niciuna"
+     ],
+     "a": 0,
+     "e": "În clasă se pot folosi `=` sau acolade, nu paranteze rotunde."
+    }
+   ],
+   "2087": [
+    {
+     "q": "Când e `a * b > M` echivalent cu `a > M / b` (împărțire întreagă, b > 0)?",
+     "o": [
+      "Mereu, pentru numere naturale",
+      "Doar dacă b e par",
+      "Niciodată"
+     ],
+     "a": 0,
+     "e": "a · b ≤ M dacă și numai dacă a ≤ ⌊M / b⌋."
+    },
+    {
+     "q": "Cât este ULLONG_MAX?",
+     "o": [
+      "2⁶⁴ − 1",
+      "2⁶³ − 1",
+      "10¹⁸"
+     ],
+     "a": 0,
+     "e": "Cel mai mare `unsigned long long`."
+    }
+   ],
+   "2088": [
+    {
+     "q": "Câte elemente are `vector<int> v{5, 0}`?",
+     "o": [
+      "2",
+      "5",
+      "0"
+     ],
+     "a": 0,
+     "e": "Acoladele dau lista de elemente: 5 și 0."
+    },
+    {
+     "q": "Cât este `7 - 1 / 2` în C++?",
+     "o": [
+      "7",
+      "3",
+      "6"
+     ],
+     "a": 0,
+     "e": "`1 / 2` e 0 (împărțire întreagă) și se face înaintea scăderii."
+    }
+   ],
+   "2089": [
+    {
+     "q": "Cât este i · i?",
+     "o": [
+      "-1",
+      "1",
+      "i"
+     ],
+     "a": 0,
+     "e": "Prin definiție, i² = −1."
+    },
+    {
+     "q": "Cât este (2 + 3i)(2 − 3i)?",
+     "o": [
+      "13",
+      "4 − 9i",
+      "-5"
+     ],
+     "a": 0,
+     "e": "4 − 6i + 6i − 9i² = 4 + 9 = 13."
+    }
+   ],
+   "2090": [
+    {
+     "q": "Cât devine -1 convertit la `unsigned int`?",
+     "o": [
+      "4294967295",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "Se ia modulo 2³²."
+    },
+    {
+     "q": "Ce tip are `x` în `auto x = -1;`?",
+     "o": [
+      "int",
+      "unsigned int",
+      "long long"
+     ],
+     "a": 0,
+     "e": "`auto` ia tipul inițializatorului, iar `-1` e `int`."
+    }
+   ],
+   "2091": [
+    {
+     "q": "Câte pointere ajută la întoarcerea unei liste simplu înlănțuite pe loc?",
+     "o": [
+      "Trei: anterior, curent, următor",
+      "Unul",
+      "Niciunul"
+     ],
+     "a": 0,
+     "e": "Următorul trebuie salvat înainte să schimbi legătura curentului."
+    },
+    {
+     "q": "Ce valoare are expresia `a, b` în C++?",
+     "o": [
+      "Valoarea lui b",
+      "Valoarea lui a",
+      "a && b"
+     ],
+     "a": 0,
+     "e": "Operatorul virgulă evaluează ambele părți și întoarce a doua."
+    }
+   ],
+   "2092": [
+    {
+     "q": "Ce face un `\\` la sfârșitul unei linii de cod C++?",
+     "o": [
+      "Unește linia cu următoarea, chiar și într-un comentariu //",
+      "Nimic",
+      "Pune un caracter nou"
+     ],
+     "a": 0,
+     "e": "Lipirea liniilor se face înaintea eliminării comentariilor, deci și comentariul continuă pe linia următoare."
+    },
+    {
+     "q": "Ce rămâne după ce `if (...)` e „înghițit” de comentariu?",
+     "o": [
+      "Un bloc { } care se execută mereu",
+      "O eroare de compilare",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Acoladele singure formează un bloc obișnuit."
+    }
+   ],
+   "2093": [
+    {
+     "q": "Ce garantează backtracking-ul în problema asta?",
+     "o": [
+      "Că încearcă toate drumurile posibile",
+      "Că găsește primul drumul cel mai lung",
+      "Că trece prin toate zonele"
+     ],
+     "a": 0,
+     "e": "De aceea poate compara toate drumurile și îl păstrează pe cel mai lung."
+    },
+    {
+     "q": "De ce se pune `a[l][c] = 0` după apelul recursiv?",
+     "o": [
+      "Ca zona să fie din nou liberă pentru alte drumuri",
+      "Ca să se afișeze 0",
+      "Nu e nevoie"
+     ],
+     "a": 0,
+     "e": "Este pasul de „întoarcere” din backtracking."
+    }
+   ],
+   "2094": [
+    {
+     "q": "De câte ori rulează `for (int i = 3; i >= 0; i--)`?",
+     "o": [
+      "4",
+      "3",
+      "La infinit"
+     ],
+     "a": 0,
+     "e": "Pentru i = 3, 2, 1, 0."
+    },
+    {
+     "q": "Ce se întâmplă când un `unsigned int` depășește 4294967295?",
+     "o": [
+      "Reia de la 0 (se calculează modulo 2³²)",
+      "Programul se oprește",
+      "Devine negativ"
+     ],
+     "a": 0,
+     "e": "Aritmetica fără semn e definită modulo 2ⁿ."
+    }
+   ],
+   "2095": [
+    {
+     "q": "De ce se poate lua restul după fiecare adunare, nu doar la final?",
+     "o": [
+      "(a + b) mod m = ((a mod m) + (b mod m)) mod m",
+      "Pentru că rezultatul e mic",
+      "Nu se poate"
+     ],
+     "a": 0,
+     "e": "Restul se păstrează la adunare, așa că valorile intermediare rămân mici."
+    },
+    {
+     "q": "Cât de mare poate fi un `int` pe 32 de biți?",
+     "o": [
+      "2 147 483 647",
+      "4 294 967 295",
+      "10¹²"
+     ],
+     "a": 0,
+     "e": "2³¹ − 1; peste el apare overflow."
+    }
+   ],
+   "2096": [
+    {
+     "q": "Ce moștenire e implicită la `class B : A`?",
+     "o": [
+      "Privată",
+      "Publică",
+      "Protejată"
+     ],
+     "a": 0,
+     "e": "La `struct` e publică implicit, la `class` e privată."
+    },
+    {
+     "q": "De ce trebuie destructorul clasei de bază să fie virtual?",
+     "o": [
+      "Ca `delete` printr-un pointer la bază să apeleze și destructorul derivatei",
+      "Ca să se compileze",
+      "Ca să fie mai rapid"
+     ],
+     "a": 0,
+     "e": "Fără `virtual`, se alege destructorul după tipul pointerului, nu al obiectului."
+    }
+   ],
+   "2097": [
+    {
+     "q": "Când se construiește o variabilă locală `static`?",
+     "o": [
+      "La primul apel al funcției, o singură dată",
+      "La fiecare apel",
+      "Înainte de main"
+     ],
+     "a": 0,
+     "e": "De la C++11, această inițializare e garantată și pentru mai multe fire de execuție."
+    },
+    {
+     "q": "De ce poate `getUniqueGigel` crea un obiect cu constructor privat?",
+     "o": [
+      "E o metodă a clasei, deci are acces la membrii privați",
+      "Pentru că e statică",
+      "Nu poate"
+     ],
+     "a": 0,
+     "e": "Funcțiile membre (inclusiv cele statice) văd tot ce e privat."
+    }
+   ],
+   "2098": [
+    {
+     "q": "Ce întoarce `getchar()` la sfârșitul intrării?",
+     "o": [
+      "EOF, adică -1, ca int",
+      "'\\0'",
+      "0xFF"
+     ],
+     "a": 0,
+     "e": "De aceea rezultatul se ține într-un `int`, nu într-un `char`."
+    },
+    {
+     "q": "Cât este `20 & 0x0F`?",
+     "o": [
+      "4",
+      "20",
+      "0"
+     ],
+     "a": 0,
+     "e": "20 = 0b10100; ultimii 4 biți sunt 0100, adică 4 (restul împărțirii la 16)."
+    }
+   ],
+   "2099": [
+    {
+     "q": "Cât este (x + y + |x − y|) / 2?",
+     "o": [
+      "max(x, y)",
+      "min(x, y)",
+      "x + y"
+     ],
+     "a": 0,
+     "e": "Dacă x ≥ y, dă (x + y + x − y) / 2 = x."
+    },
+    {
+     "q": "Ce dă `x >> 31` pentru un `int` negativ (pe 32 de biți)?",
+     "o": [
+      "-1 (toți biții 1)",
+      "1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Mutarea la dreapta a unui număr cu semn copiază bitul de semn."
+    }
+   ],
+   "2100": [
+    {
+     "q": "Care este ordinea argumentelor lui `memset`?",
+     "o": [
+      "memset(adresă, valoare, număr de octeți)",
+      "memset(adresă, număr de octeți, valoare)",
+      "memset(valoare, adresă, număr)"
+     ],
+     "a": 0,
+     "e": "Cu argumentele inversate, `memset(p, 16, 0)` nu scrie nimic."
+    },
+    {
+     "q": "De ce ridicarea la putere prin înjumătățirea exponentului e rapidă?",
+     "o": [
+      "Face doar O(log n) înmulțiri",
+      "Folosește goto",
+      "Matricea e mică"
+     ],
+     "a": 0,
+     "e": "La fiecare pas exponentul se înjumătățește."
+    }
+   ],
+   "2101": [
+    {
+     "q": "Ce afișează `i[s]` pentru `int s[] = {2, 3, 4}` și i = 1?",
+     "o": [
+      "3",
+      "1",
+      "Eroare"
+     ],
+     "a": 0,
+     "e": "`i[s]` înseamnă `*(i + s)`, la fel ca `s[i]`."
+    },
+    {
+     "q": "De ce `a->print1()` merge chiar dacă `a` e nul?",
+     "o": [
+      "print1 e statică și nu folosește obiectul",
+      "Pointerii nuli sunt valizi",
+      "Din întâmplare"
+     ],
+     "a": 0,
+     "e": "O metodă statică nu are `this`, deci nu citește nimic din obiect."
+    }
+   ],
+   "2102": [
+    {
+     "q": "Câte iterații face `while (--q)` pentru q = 3?",
+     "o": [
+      "2",
+      "3",
+      "4"
+     ],
+     "a": 0,
+     "e": "Se decrementează înainte de test: 2 (adevărat), 1 (adevărat), 0 (fals)."
+    },
+    {
+     "q": "Ce valoare are `logN` după `for (logN = 1; logN <= 10; logN <<= 1);`?",
+     "o": [
+      "16",
+      "8",
+      "10"
+     ],
+     "a": 0,
+     "e": "Se dublează până trece de 10: 1, 2, 4, 8, 16."
+    }
+   ],
+   "2103": [
+    {
+     "q": "Ce se întâmplă dacă folosești un vector după `delete[]`?",
+     "o": [
+      "Comportament nedefinit: poate merge, poate da valori greșite sau poate crăpa",
+      "Vectorul se realocă",
+      "Eroare de compilare"
+     ],
+     "a": 0,
+     "e": "Memoria poate fi refolosită oricând de program, așa că rezultatul nu e garantat."
+    },
+    {
+     "q": "În ce se transformă 4?",
+     "o": [
+      "9",
+      "11",
+      "8"
+     ],
+     "a": 0,
+     "e": "4 e par: 2 · 4 + 1 = 9."
+    }
+   ],
+   "2104": [
+    {
+     "q": "De ce `ball(x)` din interiorul macro-ului `#define ball(x) {...; ball(x); }` nu se expandează din nou?",
+     "o": [
+      "Un macro nu se expandează recursiv în propria definiție",
+      "Pentru că e în acolade",
+      "Se expandează și dă eroare"
+     ],
+     "a": 0,
+     "e": "Preprocesorul nu reînlocuiește numele unui macro în timpul expandării lui."
+    },
+    {
+     "q": "De ce macro-ul trebuie definit după funcția `ball`, nu înainte?",
+     "o": [
+      "Altfel ar înlocui și numele din definiția funcției",
+      "Altfel nu se compilează main",
+      "Nu contează"
+     ],
+     "a": 0,
+     "e": "Un macro definit înainte ar transforma și antetul `void ball(int diameter)`."
+    }
+   ],
+   "2105": [
+    {
+     "q": "De ce un `case` poate fi în interiorul unui `while` din același `switch`?",
+     "o": [
+      "Etichetele case sunt doar puncte de salt în blocul switch",
+      "Nu poate, e o eroare",
+      "Pentru că while e în case 0"
+     ],
+     "a": 0,
+     "e": "E trucul cunoscut ca „Duff’s device”: `switch` sare la eticheta potrivită oriunde s-ar afla în blocul lui."
+    },
+    {
+     "q": "Ce păstrează o variabilă locală `static` între apeluri?",
+     "o": [
+      "Valoarea de la apelul anterior",
+      "Nimic, pornește de la 0",
+      "Adresa funcției"
+     ],
+     "a": 0,
+     "e": "O variabilă statică e inițializată o singură dată și trăiește cât programul."
+    }
+   ],
+   "2106": [
+    {
+     "q": "Cum se scrie 5 pe 8 biți?",
+     "o": [
+      "00000101",
+      "10100000",
+      "101"
+     ],
+     "a": 0,
+     "e": "5 = 4 + 1, adică biții 2 și 0."
+    },
+    {
+     "q": "Ce afișa programul greșit pentru octetul 1?",
+     "o": [
+      "10000000",
+      "00000001",
+      "00000000"
+     ],
+     "a": 0,
+     "e": "Șirul corect `00000001` era întors pe dos."
+    }
+   ],
+   "2107": [
+    {
+     "q": "Cât dă `MULTIPLY(1 + 2, 1 + 2)` cu `#define MULTIPLY(a, b) a * b`?",
+     "o": [
+      "5",
+      "9",
+      "6"
+     ],
+     "a": 0,
+     "e": "Textul devine `1 + 2 * 1 + 2` = 1 + 2 + 2 = 5."
+    },
+    {
+     "q": "Ce face `IIF(1)(0, 1)`, adică `IIF_1(0, 1)`?",
+     "o": [
+      "Alege primul argument, 0",
+      "Alege al doilea, 1",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "`IIF_ ## cond` lipește numele: `IIF_1(t, f)` dă t."
+    }
+   ],
+   "2108": [
+    {
+     "q": "Cât devine un `unsigned int` egal cu 0 după `n--`?",
+     "o": [
+      "4294967295",
+      "-1",
+      "0"
+     ],
+     "a": 0,
+     "e": "Numerele fără semn „dau peste cap”: 0 − 1 = 2³² − 1."
+    },
+    {
+     "q": "Pentru ce valori ale lui `n` (de tip unsigned) este `n >= 0` fals?",
+     "o": [
+      "Pentru niciuna",
+      "Pentru n = 0",
+      "Pentru numerele mari"
+     ],
+     "a": 0,
+     "e": "De aceea compilatorul avertizează că, la un tip fără semn, condiția e mereu adevărată."
+    }
+   ],
+   "2109": [
+    {
+     "q": "Ce scrie `ss << (5) << 2` în stringstream?",
+     "o": [
+      "52",
+      "20",
+      "10"
+     ],
+     "a": 0,
+     "e": "Fiecare `<<` scrie în flux: întâi 5, apoi 2."
+    },
+    {
+     "q": "Cât este `5 << 1`?",
+     "o": [
+      "10",
+      "6",
+      "2"
+     ],
+     "a": 0,
+     "e": "O mutare la stânga cu o poziție înseamnă înmulțire cu 2."
+    }
+   ],
+   "2110": [
+    {
+     "q": "Cutiile au 1, 2, 3 și 5 jucării. Se pot egaliza?",
+     "o": [
+      "Nu, 11 nu se împarte la 4",
+      "Da, câte 3",
+      "Da, câte 2"
+     ],
+     "a": 0,
+     "e": "Suma 11 nu e multiplu de 4, deci rezultatul e -1."
+    },
+    {
+     "q": "Câte mutări sunt necesare cel mult pentru n cutii?",
+     "o": [
+      "Cel mult n − 1",
+      "Cel mult n²",
+      "Exact n"
+     ],
+     "a": 0,
+     "e": "Fiecare mutare aduce o cutie la medie, iar când n − 1 cutii sunt la medie, e și ultima."
+    }
+   ],
+   "2111": [
+    {
+     "q": "Ce face `for (i = 0; i < 3; i++); { x++; }`?",
+     "o": [
+      "Bucla nu face nimic, iar x crește o singură dată",
+      "x crește de 3 ori",
+      "Nu se compilează"
+     ],
+     "a": 0,
+     "e": "`;` este corpul (gol) al buclei; acoladele sunt un bloc separat."
+    },
+    {
+     "q": "Cât este `19 / 2` în C++ pentru numere întregi?",
+     "o": [
+      "9",
+      "9.5",
+      "10"
+     ],
+     "a": 0,
+     "e": "Împărțirea întreagă taie zecimalele, adică rotunjește în jos pentru numere pozitive."
+    }
+   ],
+   "2112": [
+    {
+     "q": "În ce spațiu de nume se află `cin` și `cout`?",
+     "o": [
+      "std",
+      "io",
+      "global"
+     ],
+     "a": 0,
+     "e": "De aceea se scrie `std::cout` sau `using namespace std;`."
+    },
+    {
+     "q": "Care este al 6-lea termen al șirului 1, 2, 3, 5, 8, …?",
+     "o": [
+      "13",
+      "8",
+      "21"
+     ],
+     "a": 0,
+     "e": "5 + 8 = 13."
+    }
+   ],
+   "2113": [
+    {
+     "q": "Ce valoare are x după `x = 1, 2, 3;`?",
+     "o": [
+      "1",
+      "3",
+      "6"
+     ],
+     "a": 0,
+     "e": "Atribuirea se face prima (`x = 1`), apoi `2` și `3` sunt evaluate și ignorate."
+    },
+    {
+     "q": "Ce valoare are y după `y = (1, 2, 3);`?",
+     "o": [
+      "3",
+      "1",
+      "6"
+     ],
+     "a": 0,
+     "e": "Cu paranteze, operatorul virgulă se evaluează întâi și întoarce ultima expresie."
+    }
+   ],
+   "2114": [
+    {
+     "q": "Cu ce este egal 1 − cos x?",
+     "o": [
+      "2 sin²(x/2)",
+      "sin²x",
+      "2 cos²(x/2)"
+     ],
+     "a": 0,
+     "e": "Din formula unghiului dublu: cos x = 1 − 2 sin²(x/2)."
+    },
+    {
+     "q": "De ce dă `1 - cos(1e-9)` exact 0 în `double`?",
+     "o": [
+      "cos(1e-9) se rotunjește la 1",
+      "cos nu merge pentru numere mici",
+      "Din cauza împărțirii la x²"
+     ],
+     "a": 0,
+     "e": "cos(1e-9) ≈ 1 − 5·10⁻¹⁹, dar un double are doar ~16 cifre exacte, deci se rotunjește la 1."
+    }
+   ],
+   "2115": [
+    {
+     "q": "Ce instrucțiuni țin de `if` în `if (c) a++; b++;`?",
+     "o": [
+      "Doar a++",
+      "a++ și b++",
+      "Niciuna"
+     ],
+     "a": 0,
+     "e": "Fără acolade, `if` ia doar prima instrucțiune, oricum ar fi indentată a doua."
+    },
+    {
+     "q": "Ce valoare are o variabilă locală neinițializată?",
+     "o": [
+      "Una oarecare, nedefinită",
+      "0",
+      "-1"
+     ],
+     "a": 0,
+     "e": "Doar variabilele globale și statice pornesc de la 0."
+    }
+   ],
+   "2116": [
+    {
+     "q": "Ce face `fscanf(fin, \"%*[^\\n]\\n\")`?",
+     "o": [
+      "Citește și aruncă tot rândul curent",
+      "Citește un număr",
+      "Închide fișierul"
+     ],
+     "a": 0,
+     "e": "`%*[^\\n]` potrivește tot până la sfârșitul rândului, dar steluța spune să nu se păstreze nimic."
+    },
+    {
+     "q": "De ce `atoi(\"Nota\")` strică media?",
+     "o": [
+      "Întoarce 0, care intră în medie ca o notă în plus",
+      "Programul se oprește",
+      "Întoarce 10"
+     ],
+     "a": 0,
+     "e": "Un șir care nu începe cu cifre dă 0 la `atoi`, iar 0 se adună la note și mărește numărul lor."
+    }
+   ],
+   "2117": [
+    {
+     "q": "Ce minim calculează programul greșit pentru lista `4 9 7`?",
+     "o": [
+      "0",
+      "4",
+      "7"
+     ],
+     "a": 0,
+     "e": "Elementul de pe poziția 0 nu se citește și rămâne 0 (vectorul e creat cu `resize(n, 0)`), iar 0 e mai mic decât toate."
+    },
+    {
+     "q": "Pentru minimul 5, se numără și valoarea 15?",
+     "o": [
+      "Nu, se numără doar valorile mai mici strict decât 15",
+      "Da",
+      "Doar dacă apare o singură dată"
+     ],
+     "a": 0,
+     "e": "Condiția este `3 * min > v[i]`, adică v[i] < 15."
+    }
+   ],
+   "2118": [
+    {
+     "q": "Ce înseamnă `virtual void do_work() = 0;`?",
+     "o": [
+      "Metodă virtuală pură: clasele derivate trebuie s-o implementeze",
+      "Metoda întoarce 0",
+      "Metoda nu se poate apela"
+     ],
+     "a": 0,
+     "e": "O clasă cu o metodă virtuală pură neimplementată e abstractă și nu poate avea obiecte."
+    },
+    {
+     "q": "Cum accesezi câmpul `m_name` printr-un pointer `p`?",
+     "o": [
+      "p->m_name",
+      "p.m_name",
+      "*p->m_name"
+     ],
+     "a": 0,
+     "e": "`p->m_name` este prescurtarea pentru `(*p).m_name`."
+    }
+   ],
+   "2119": [
+    {
+     "q": "Cât este `'a' - ' '` în C++?",
+     "o": [
+      "'A'",
+      "'a'",
+      "0"
+     ],
+     "a": 0,
+     "e": "Codul lui `a` este 97, al spațiului 32, iar 97 − 32 = 65, adică `A`."
+    },
+    {
+     "q": "De ce `for (char c = 0; c <= 127; c++)` nu se oprește?",
+     "o": [
+      "Un char nu poate depăși 127, deci condiția rămâne adevărată",
+      "Pentru că 127 nu e literă",
+      "Se oprește după 128 de pași"
+     ],
+     "a": 0,
+     "e": "După 127, `c++` dă −128 (pe un char cu semn), care e tot ≤ 127."
+    }
+   ],
+   "2120": [
+    {
+     "q": "În ce se transformă `SQR(1 + 2)` cu `#define SQR(x) x*x`?",
+     "o": [
+      "1 + 2*1 + 2, adică 5",
+      "(1 + 2)*(1 + 2), adică 9",
+      "1 + 2, adică 3"
+     ],
+     "a": 0,
+     "e": "Preprocesorul înlocuiește x cu textul `1 + 2`, fără paranteze, iar înmulțirea se face înaintea adunării."
+    },
+    {
+     "q": "De ce se pune și o pereche de paranteze în jurul întregului macro?",
+     "o": [
+      "Ca expresii ca `2 / SQR(x)` să se calculeze corect",
+      "E obligatoriu sintactic",
+      "Ca să fie mai rapid"
+     ],
+     "a": 0,
+     "e": "Fără parantezele exterioare, `2 / SQR(x)` devine `2 / (x) * (x)`."
+    }
+   ],
+   "2121": [
+    {
+     "q": "De ce `car.fill_with_gas(10)` nu se compilează dacă parametrul e `int &`?",
+     "o": [
+      "O referință neconstantă nu se poate lega de o constantă",
+      "Pentru că 10 e prea mic",
+      "Pentru că metoda e privată"
+     ],
+     "a": 0,
+     "e": "O constantă nu are o variabilă în spate pe care funcția s-o poată modifica."
+    },
+    {
+     "q": "Ce lipsește la sfârșitul `class Car { … }`?",
+     "o": [
+      "Punct și virgulă",
+      "return 0",
+      "Nimic"
+     ],
+     "a": 0,
+     "e": "Definiția unei clase (ca și a unui struct) se termină cu `;`."
+    }
+   ],
+   "2122": [
+    {
+     "q": "Cât este `-13 % 26` în C++?",
+     "o": [
+      "-13",
+      "13",
+      "0"
+     ],
+     "a": 0,
+     "e": "Restul are semnul deîmpărțitului; de aceea se adună 26 înainte."
+    },
+    {
+     "q": "În ce se decriptează `N` cu ROT13?",
+     "o": [
+      "A",
+      "M",
+      "Z"
+     ],
+     "a": 0,
+     "e": "N este a 14-a literă; 13 poziții înapoi ajungem la A."
+    }
+   ],
+   "2123": [
+    {
+     "q": "Câte elemente are conturul unei matrice 3 × 4?",
+     "o": [
+      "10",
+      "14",
+      "12"
+     ],
+     "a": 0,
+     "e": "2 · (3 + 4) − 4 = 10: colțurile se numără o singură dată."
+    },
+    {
+     "q": "Cu ce matrice rămâne spirala după ce afișează conturul unei matrice 5 × 5?",
+     "o": [
+      "3 × 3",
+      "4 × 4",
+      "5 × 3"
+     ],
+     "a": 0,
+     "e": "Se elimină prima și ultima linie, prima și ultima coloană."
+    }
    ]
   }
  },

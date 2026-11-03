@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'exercise_details.dart';
 import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
@@ -235,18 +235,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     try {
-      final raw = json.decode(await rootBundle.loadString('assets/data/exercise_details.json'));
-      if (raw is Map) {
-        raw.forEach((subject, grades) {
-          if (grades is! Map) return;
-          grades.forEach((grade, items) {
-            if (items is! Map) return;
-            items.forEach((id, ex) {
-              if (ex is Map) add('$subject', '$grade', '$id', ex);
-            });
+      (await loadAllDetails()).forEach((subject, grades) {
+        if (grades is! Map) return;
+        grades.forEach((grade, items) {
+          if (items is! Map) return;
+          items.forEach((id, ex) {
+            if (ex is Map) add(subject, '$grade', '$id', ex);
           });
         });
-      }
+      });
     } catch (e) {
       debugPrint('Exercises (json): $e');
     }

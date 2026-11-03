@@ -1,6 +1,5 @@
 // Every formula in every problem is TeX the app can typeset.
-import 'dart:convert';
-import 'dart:io';
+import 'details_io.dart';
 
 import 'package:flutter_math_fork/tex.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +8,7 @@ import 'package:iMeditatii/statement.dart';
 
 void main() {
   test('every formula in the problems parses', () {
-    final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+    final details = readAllDetails();
     final bad = <String>[];
     var n = 0;
     void check(String where, String text) {

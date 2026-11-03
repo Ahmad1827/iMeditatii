@@ -1,3 +1,4 @@
+import 'details_io.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,7 +8,7 @@ import 'package:iMeditatii/exercise_detail_screen.dart';
 
 void main() {
   final list = jsonDecode(File('assets/data/exercises.json').readAsStringSync()) as Map<String, dynamic>;
-  final details = jsonDecode(File('assets/data/exercise_details.json').readAsStringSync()) as Map<String, dynamic>;
+  final details = readAllDetails();
 
   test('short answers accept the usual ways of writing a number', () {
     bool ok(String given, String expected) => ExerciseDetailScreen.answersMatch(given, expected);
@@ -154,7 +155,7 @@ void main() {
           final d = problems[item['id']] as Map<String, dynamic>;
           final why = '${item['id']} ${d['title']}';
           expect(titles.add('${d['title']}'.toLowerCase()), true, reason: '$why twice');
-          expect(d['sursa'], matches(RegExp(r'^AcadNet (\d{4}) · Etapa (locală|județeană|națională) · clasele (9–10|11–12)$')), reason: why);
+          expect(d['sursa'], matches(RegExp(r'^AcadNet (\d{4}) · Etapa (locală|județeană|interjudețeană|națională) · clasele (9–10|11–12|9–12)$')), reason: why);
           expect(chapter, endsWith('${d['sursa']}'.substring(8, 12)), reason: why);
           expect(item['sursa'], d['sursa'], reason: why);
           expect(['ușoară', 'medie', 'grea'], contains(d['difficulty']), reason: why);
@@ -169,7 +170,7 @@ void main() {
         }
       }
       expect(titles.length, problems.length);
-      expect(titles.length, greaterThanOrEqualTo(60));
+      expect(titles.length, greaterThanOrEqualTo(120)); // 2017–2026
     });
 
     test('the official program passes every test; the program given fails one, or does not compile', () async {

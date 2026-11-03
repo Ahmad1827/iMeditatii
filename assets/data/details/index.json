@@ -1,0 +1,33 @@
+{
+  "Informatică": {
+    "9": [
+      "informatica_9.json"
+    ],
+    "10": [
+      "informatica_10.json"
+    ],
+    "11": [
+      "informatica_11.json"
+    ],
+    "12": [
+      "informatica_12.json"
+    ],
+    "AcadNet": [
+      "informatica_acadnet.json"
+    ]
+  },
+  "Matematică": {
+    "9": [
+      "matematica_9.json"
+    ],
+    "10": [
+      "matematica_10.json"
+    ],
+    "11": [
+      "matematica_11.json"
+    ],
+    "12": [
+      "matematica_12.json"
+    ]
+  }
+}

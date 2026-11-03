@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
+import 'exercise_details.dart';
 import 'app_link.dart';
 import 'app_colors.dart';
 import 'theme_manager.dart';
@@ -355,13 +355,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   Future<void> _loadExerciseDetails() async {
     try {
-      final String response = await rootBundle.loadString('assets/data/exercise_details.json');
-      final data = json.decode(response);
-      if (data[widget.subject] != null &&
-          data[widget.subject][widget.grade] != null &&
-          data[widget.subject][widget.grade][widget.id] != null) {
+      final grade = await loadGradeDetails(widget.subject, widget.grade);
+      if (grade[widget.id] != null) {
         if (!mounted) return;
-        setState(() => exerciseData = data[widget.subject][widget.grade][widget.id]);
+        setState(() => exerciseData = grade[widget.id]);
         _fileTemplate();
         _offerQuiz();
         return;

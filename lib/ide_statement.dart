@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
+import 'exercise_details.dart';
 import 'app_link.dart';
 import 'problem_statement.dart';
 import 'ui_components.dart';
@@ -52,7 +50,7 @@ class ProblemIndex {
   static Future<List<ProblemRef>> _load() async {
     final out = <ProblemRef>[];
     try {
-      out.addAll(fromDetails(json.decode(await rootBundle.loadString('assets/data/exercise_details.json')) as Map));
+      out.addAll(fromDetails(await loadAllDetails()));
     } catch (e) {
       debugPrint('Problems file: $e');
     }

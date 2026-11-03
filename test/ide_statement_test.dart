@@ -1,6 +1,5 @@
 // Looking a problem up in the IDE, by number or by name, and the statement it shows.
-import 'dart:convert';
-import 'dart:io';
+import 'details_io.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +8,7 @@ import 'package:iMeditatii/ide_statement.dart';
 import 'package:iMeditatii/problem_statement.dart';
 
 void main() {
-  final all = ProblemIndex.fromDetails(json.decode(File('assets/data/exercise_details.json').readAsStringSync()) as Map);
+  final all = ProblemIndex.fromDetails(readAllDetails());
 
   test('a number finds that problem first, in Informatică before Matematică', () {
     final r = ProblemIndex.search(all, '12');

@@ -4998,6 +4998,362 @@
           "difficulty": "grea",
           "sursa": "AcadNet 2024 · Etapa națională · clasele 11–12"
         }
+      ],
+      "4. AcadNet 2023": [
+        {
+          "id": "2067",
+          "title": "Cached Fibonacci",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2068",
+          "title": "Collatz Halves",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2069",
+          "title": "Gauss is coming",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2070",
+          "title": "Square Prime",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 9–10"
+        },
+        {
+          "id": "2071",
+          "title": "File System",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2072",
+          "title": "Lazy Evaluation",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2073",
+          "title": "Reprezentanță Mașini",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 11–12"
+        },
+        {
+          "id": "2074",
+          "title": "Wire without phone",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2023 · Etapa națională · clasele 11–12"
+        }
+      ],
+      "5. AcadNet 2022": [
+        {
+          "id": "2075",
+          "title": "Matrice",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2022 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2076",
+          "title": "Numere de telefon",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2022 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2077",
+          "title": "Sumă",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2022 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2078",
+          "title": "Ciur",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2022 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2079",
+          "title": "Labirint",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2022 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2080",
+          "title": "Sumă clasică",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2022 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2081",
+          "title": "Departments",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2022 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2082",
+          "title": "Lost at Sea",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2022 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2083",
+          "title": "Processor",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2022 · Etapa națională · clasele 9–12"
+        }
+      ],
+      "6. AcadNet 2021": [
+        {
+          "id": "2084",
+          "title": "Back to Basics",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2021 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2085",
+          "title": "Easy as Pi",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2021 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2086",
+          "title": "Most Vexing Indeed",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2021 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2087",
+          "title": "Bogdan și artefactul",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2021 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2088",
+          "title": "Decebal la internship",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2021 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2089",
+          "title": "Matematică POO",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2021 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2090",
+          "title": "TraianUB",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2021 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2091",
+          "title": "Link it Up",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2021 · Etapa națională · clasele 9–12"
+        }
+      ],
+      "7. AcadNet 2020": [
+        {
+          "id": "2092",
+          "title": "Make It Run",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2020 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2093",
+          "title": "Mouse",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2020 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2094",
+          "title": "Optimize",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2020 · Etapa locală · clasele 9–12"
+        },
+        {
+          "id": "2095",
+          "title": "Gigel și COVID-19",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2020 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2096",
+          "title": "Inheritance Demo",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2020 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2097",
+          "title": "Gigel Absolut",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2020 · Etapa națională · clasele 9–12"
+        }
+      ],
+      "8. AcadNet 2019": [
+        {
+          "id": "2098",
+          "title": "Asamblică",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2019 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2099",
+          "title": "Minmax",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2019 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2100",
+          "title": "No loops",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2019 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2101",
+          "title": "Easy Peasy",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2019 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2102",
+          "title": "Elevator",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2019 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2103",
+          "title": "Gigelina",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2019 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2104",
+          "title": "Magic C++",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2019 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2105",
+          "title": "Word Wrap",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2019 · Etapa națională · clasele 9–12"
+        }
+      ],
+      "9. AcadNet 2018": [
+        {
+          "id": "2106",
+          "title": "Convertorul IPv4",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2018 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2107",
+          "title": "Special macro",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2018 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2108",
+          "title": "Squares",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2018 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2109",
+          "title": "CLI Calculator",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2018 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2110",
+          "title": "Fabrica de jucării",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2018 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2111",
+          "title": "Statistica mediilor",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2018 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2112",
+          "title": "Problema lui Gigel",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2018 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2113",
+          "title": "Gigel vs Gigelinho",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2018 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2114",
+          "title": "Limits",
+          "difficulty": "grea",
+          "sursa": "AcadNet 2018 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2115",
+          "title": "Numere prime",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2018 · Etapa națională · clasele 9–12"
+        }
+      ],
+      "10. AcadNet 2017": [
+        {
+          "id": "2116",
+          "title": "Grades Magic",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2017 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2117",
+          "title": "Trei-Minim",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2017 · Etapa județeană · clasele 9–12"
+        },
+        {
+          "id": "2118",
+          "title": "Jedi",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2017 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2119",
+          "title": "WordStat",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2017 · Etapa interjudețeană · clasele 9–12"
+        },
+        {
+          "id": "2120",
+          "title": "Calc",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2017 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2121",
+          "title": "Car",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2017 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2122",
+          "title": "Decrypt",
+          "difficulty": "ușoară",
+          "sursa": "AcadNet 2017 · Etapa națională · clasele 9–12"
+        },
+        {
+          "id": "2123",
+          "title": "Loretto",
+          "difficulty": "medie",
+          "sursa": "AcadNet 2017 · Etapa națională · clasele 9–12"
+        }
       ]
     }
   },

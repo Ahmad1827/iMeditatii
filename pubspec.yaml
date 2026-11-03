@@ -114,7 +114,7 @@ flutter:
   # see https://flutter.dev/to/font-from-package
   assets:
     - assets/data/exercises.json
-    - assets/data/exercise_details.json
+    - assets/data/details/
     - assets/data/problem_quizzes.json
     - assets/icons/
     - .env
