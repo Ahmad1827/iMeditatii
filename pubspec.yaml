@@ -121,3 +121,10 @@ flutter:
     - assets/images/
     - assets/bac/
     - assets/acadnet/
+  fonts:
+    # Iosevka (SIL OFL 1.1), cut down to Latin, Romanian and box drawing: the ACS section
+    - family: Iosevka
+      fonts:
+        - asset: assets/fonts/Iosevka-Regular.ttf
+        - asset: assets/fonts/Iosevka-Bold.ttf
+          weight: 700

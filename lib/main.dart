@@ -37,6 +37,7 @@ import 'review_screen.dart';
 import 'all_reviews_screen.dart';
 
 import 'exercise_list_screen.dart';
+import 'acs_screen.dart';
 import 'exercise_detail_screen.dart';
 import 'ide_screen.dart';
 import 'add_exercise_screen.dart';
@@ -214,6 +215,10 @@ final GoRouter _router = GoRouter(
         final materie = prefs.getString(ExerciseListScreen.lastSubjectKey) ?? 'Informatică';
         return '/lista-exercitii?materie=${Uri.encodeComponent(materie)}';
       },
+    ),
+    GoRoute(
+      path: '/acs',
+      builder: (context, state) => const AcsScreen(),
     ),
     GoRoute(
       path: '/lista-exercitii',

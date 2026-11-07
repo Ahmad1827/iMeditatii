@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum AppStyleMode { retro, clean }
 
+/// How the ACS section looks: a terminal, or a notebook page.
+enum AcsStyle { terminal, notebook }
+
 class ThemeManager {
   // Global notifiers for Theme (Light/Dark) and Style (Retro/Clean)
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -16,6 +19,8 @@ class ThemeManager {
   // The theme / style / motion buttons out on the screen, or tucked away
   // behind the tab on the left edge (the default).
   static final ValueNotifier<bool> deckNotifier = ValueNotifier(false);
+  // The ACS section's own look (its light / dark follows themeNotifier).
+  static final ValueNotifier<AcsStyle> acsStyleNotifier = ValueNotifier(AcsStyle.terminal);
   static bool _motionChosen = false;
 
   static bool get isDark => themeNotifier.value == ThemeMode.dark;
@@ -38,6 +43,15 @@ class ThemeManager {
     _motionChosen = motion == 'on' || motion == 'off';
 
     deckNotifier.value = prefs.getBool('deck_open') ?? false;
+
+    acsStyleNotifier.value = prefs.getString('acs_style') == 'notebook' ? AcsStyle.notebook : AcsStyle.terminal;
+  }
+
+  // Terminal / Notebook in the ACS section
+  static Future<void> setAcsStyle(AcsStyle style) async {
+    acsStyleNotifier.value = style;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('acs_style', style.name);
   }
 
   // Show / tuck away the theme, style and motion buttons

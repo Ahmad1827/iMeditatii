@@ -7,6 +7,7 @@ import 'app_link.dart';
 import 'app_colors.dart';
 import 'brand_mark.dart';
 import 'ui_components.dart';
+import 'theme_manager.dart';
 
 // =============================================================================
 // RETRO PIECES (original)
@@ -291,6 +292,48 @@ class _NavCta extends StatelessWidget {
 // =============================================================================
 // NAVBAR
 // =============================================================================
+/// Light / dark, top right of the bar.
+class _NavThemeButton extends StatelessWidget {
+  final bool retro;
+  const _NavThemeButton({this.retro = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = ThemeManager.isDark;
+    final label = dark ? 'Temă luminoasă' : 'Temă întunecată';
+    final icon = dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined;
+    if (retro) {
+      return IconButton(
+        tooltip: label,
+        icon: Icon(icon, color: AppColors.ink, size: 26),
+        onPressed: ThemeManager.toggleTheme,
+      );
+    }
+    return Tooltip(
+      message: label,
+      child: Semantics(
+        button: true,
+        label: label,
+        child: _NavHover(
+          onTap: ThemeManager.toggleTheme,
+          builder: (h) => AnimatedContainer(
+            duration: const Duration(milliseconds: 170),
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: h ? Pb.hoverBg : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Pb.border),
+            ),
+            child: Icon(icon, size: 19, color: h ? Pb.link : Pb.text),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class CustomNavbar extends StatelessWidget {
   const CustomNavbar({super.key});
 
@@ -468,9 +511,13 @@ class CustomNavbar extends StatelessWidget {
                           onTap: () => context.go('/clase'),
                         )),
                       const Spacer(),
+                      const _NavThemeButton(),
+                      const SizedBox(width: 10),
                       right,
                     ] else ...[
                       const Spacer(),
+                      const _NavThemeButton(),
+                      const SizedBox(width: 8),
                       if (user != null) ...[
                         _cleanUserMenu(context, user, showName: false),
                         const SizedBox(width: 8),
@@ -865,6 +912,8 @@ class CustomNavbar extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                      const _NavThemeButton(retro: true),
+                      const SizedBox(width: 8),
                       if (user == null) ...[
                         AppLink(to: '/login', child: NavRetroButton(text: 'Log In', bgColor: AppColors.cardBg, textColor: AppColors.ink, onPressed: () => context.go('/login'))),
                         const SizedBox(width: 16),
@@ -885,10 +934,13 @@ class CustomNavbar extends StatelessWidget {
                     ],
                   ),
                 ] else ...[
-                  IconButton(
-                    icon: Icon(Icons.menu, color: AppColors.ink, size: 32),
-                    onPressed: () => _showRetroMenu(context, user),
-                  ),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    const _NavThemeButton(retro: true),
+                    IconButton(
+                      icon: Icon(Icons.menu, color: AppColors.ink, size: 32),
+                      onPressed: () => _showRetroMenu(context, user),
+                    ),
+                  ]),
                 ],
               ],
             ),

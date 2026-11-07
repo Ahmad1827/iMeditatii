@@ -473,7 +473,33 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     final toggle = Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(12)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [for (final g in availableGrades) seg(g)]),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        for (final g in availableGrades) seg(g),
+        // the university section: a page of its own, with its own look
+        Container(width: 1, height: 18, margin: const EdgeInsets.symmetric(horizontal: 4), color: Pb.border),
+        AppLink(
+          to: '/acs',
+          child: _LHover(
+            onTap: () => context.go('/acs'),
+            builder: (h) => AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
+              decoration: BoxDecoration(
+                color: h ? Pb.surface.withOpacity(0.5) : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('ACS', style: TextStyle(fontFamily: 'Iosevka', fontSize: 14.5, fontWeight: FontWeight.w700, color: h ? Pb.text : Pb.muted)),
+                  const SizedBox(width: 4),
+                  Icon(Icons.arrow_outward, size: 13, color: Pb.muted),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ]),
     );
 
     Widget subjectTile(IconData icon, String name, String tagline) {
