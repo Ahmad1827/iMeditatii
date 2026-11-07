@@ -28,6 +28,7 @@ import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
 import 'grade_label.dart';
+import 'problem_author.dart';
 
 // ----------------------------------------------------
 // SYNTAX-HIGHLIGHTED EDITOR CONTROLLER
@@ -59,6 +60,7 @@ class ExerciseDetailScreen extends StatefulWidget {
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Map<String, dynamic>? exerciseData;
+  bool _fromSiteFiles = false; // from the app's files, not sent in by a visitor
   String selectedTab = "enunt";
   int _consoleTab = 0;
   final CppSyntaxController _codeController = CppSyntaxController();
@@ -358,7 +360,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       final grade = await loadGradeDetails(widget.subject, widget.grade);
       if (grade[widget.id] != null) {
         if (!mounted) return;
-        setState(() => exerciseData = grade[widget.id]);
+        setState(() {
+          exerciseData = grade[widget.id];
+          _fromSiteFiles = true;
+        });
         _fileTemplate();
         _offerQuiz();
         return;
@@ -1090,10 +1095,34 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted)),
     );
-    final title = Text(
+    final heading = Text(
       '${widget.id}. $_title',
       style: TextStyle(fontSize: isMobile ? 22 : 26, fontWeight: FontWeight.w700, color: Pb.text, height: 1.2),
     );
+    final credit = exerciseData == null ? null : problemCredit(exerciseData!, fromSiteFiles: _fromSiteFiles, grade: widget.grade);
+    final title = credit == null
+        ? heading
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              heading,
+              const SizedBox(height: 6),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.person_outline, size: 16, color: Pb.muted),
+                  const SizedBox(width: 5),
+                  Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: '${credit.$1} '),
+                      TextSpan(text: credit.$2, style: TextStyle(fontWeight: FontWeight.w700, color: Pb.text)),
+                    ]),
+                    style: TextStyle(fontSize: 13.5, color: Pb.muted),
+                  ),
+                ],
+              ),
+            ],
+          );
 
     return Container(
       clipBehavior: Clip.antiAlias,
