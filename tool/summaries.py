@@ -15,7 +15,8 @@ from details import merge  # noqa: E402
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'data', 'summaries.json')
 STATEMENT = 170  # characters of the statement
-EXAMPLE = 32  # characters of the example's input and of its output
+EXAMPLE = 16  # characters on a line of the example
+EXAMPLE_LINES = 4  # lines of the example's input, and of its output
 
 # the TeX of the maths statements, as plain text for one line
 TEX = {
@@ -88,13 +89,21 @@ def statement(d, maths):
 
 
 def example(d):
+    """The first example as lines (at most EXAMPLE_LINES, each cut at EXAMPLE),
+    so a matrix still reads as a matrix in the list."""
     ex = d.get('examples')
     if isinstance(ex, list):
         ex = ex[0] if ex else None
     if not isinstance(ex, dict) or 'input' not in ex or 'output' not in ex:
         return None
-    flat = lambda s: one_line(' / '.join(l.strip() for l in str(s).strip().splitlines() if l.strip()), EXAMPLE)
-    i, o = flat(ex['input']), flat(ex['output'])
+
+    def lines(s):
+        ls = [l.rstrip() for l in str(s).strip().splitlines() if l.strip()]
+        if len(ls) > EXAMPLE_LINES:
+            ls = ls[:EXAMPLE_LINES - 1] + ['…']
+        return '\n'.join(l if len(l) <= EXAMPLE else l[:EXAMPLE - 1] + '…' for l in ls)
+
+    i, o = lines(ex['input']), lines(ex['output'])
     return [i, o] if i and o else None
 
 

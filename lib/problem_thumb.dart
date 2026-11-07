@@ -74,8 +74,9 @@ class ProblemThumb extends StatelessWidget {
   final String chapter;
   final Color color;
   final double width;
+  final double? height; // 0.6 of the width unless given (a square for a chapter's header)
   final bool dark;
-  const ProblemThumb({super.key, required this.chapter, required this.color, this.width = 72, this.dark = false});
+  const ProblemThumb({super.key, required this.chapter, required this.color, this.width = 72, this.height, this.dark = false});
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +84,10 @@ class ProblemThumb extends StatelessWidget {
     final number = RegExp(r'^\d+').stringMatch(chapter.trim()) ?? '';
     return Container(
       width: width,
-      height: width * 0.6,
+      height: height ?? width * 0.6,
       decoration: BoxDecoration(
         color: color.withOpacity(dark ? 0.16 : 0.11),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(width >= 80 ? 14 : 10),
       ),
       child: CustomPaint(painter: _ThumbPainter(kind, color, number)),
     );
@@ -104,9 +105,11 @@ class _ThumbPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // drawn in a 100 x 60 box, scaled to the tile
+    // drawn in a 100 x 60 box, scaled evenly into the middle of the tile
+    final k = math.min(size.width / 100, size.height / 60) * 0.92;
     canvas.save();
-    canvas.scale(size.width / 100, size.height / 60);
+    canvas.translate((size.width - 100 * k) / 2, (size.height - 60 * k) / 2);
+    canvas.scale(k);
     _draw(canvas);
     canvas.restore();
   }
@@ -114,7 +117,7 @@ class _ThumbPainter extends CustomPainter {
   Paint get _line => Paint()
     ..color = c
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 2.6
+    ..strokeWidth = 3.4
     ..strokeCap = StrokeCap.round
     ..strokeJoin = StrokeJoin.round;
   Paint _fill([double o = 1]) => Paint()..color = c.withOpacity(o);
@@ -122,7 +125,7 @@ class _ThumbPainter extends CustomPainter {
   void _box(Canvas k, double x, double y, double w, double h, {double fill = 0}) {
     final r = RRect.fromRectAndRadius(Rect.fromLTWH(x, y, w, h), const Radius.circular(2.5));
     if (fill > 0) k.drawRRect(r, _fill(fill));
-    k.drawRRect(r, _line..strokeWidth = 2);
+    k.drawRRect(r, _line..strokeWidth = 2.8);
   }
 
   void _arrow(Canvas k, Offset a, Offset b) {
@@ -243,17 +246,17 @@ class _ThumbPainter extends CustomPainter {
         }
         star.close();
         k.drawPath(star, _fill(0.35));
-        k.drawPath(star, _line..strokeWidth = 2);
+        k.drawPath(star, _line..strokeWidth = 2.8);
       case ThumbKind.matrix:
       case ThumbKind.dp:
       case ThumbKind.lee:
         for (var r = 0; r < 3; r++) {
-          for (var col = 0; col < 4; col++) {
+          for (var col = 0; col < 3; col++) {
             double f = 0;
-            if (kind == ThumbKind.matrix && r == col) f = 0.45;
-            if (kind == ThumbKind.dp) f = 0.12 + (r + col) * 0.12;
-            if (kind == ThumbKind.lee && (r == 0 && col < 3 || col == 2 && r > 0)) f = 0.5;
-            _box(k, 25 + col * 13.0, 11 + r * 13.0, 11, 11, fill: f);
+            if (kind == ThumbKind.matrix && r == col) f = 1;
+            if (kind == ThumbKind.dp) f = 0.15 + (r + col) * 0.2;
+            if (kind == ThumbKind.lee && (r == 0 || col == 2)) f = 0.75;
+            _box(k, 30 + col * 14.0, 9 + r * 14.0, 11, 11, fill: f);
           }
         }
       case ThumbKind.text:
@@ -292,17 +295,17 @@ class _ThumbPainter extends CustomPainter {
       case ThumbKind.backtracking:
         const n = [Offset(50, 11), Offset(32, 30), Offset(68, 30), Offset(22, 49), Offset(42, 49), Offset(60, 49), Offset(78, 49)];
         for (final e in const [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]]) {
-          k.drawLine(n[e[0]], n[e[1]], _line..strokeWidth = 2);
+          k.drawLine(n[e[0]], n[e[1]], _line..strokeWidth = 2.8);
         }
         _dots(k, n, r: 4.5);
         if (kind == ThumbKind.backtracking) {
           _dots(k, [n[6]], r: 6.5, o: 0.35);
-          k.drawLine(const Offset(71, 54), const Offset(85, 44), _line..strokeWidth = 2);
+          k.drawLine(const Offset(71, 54), const Offset(85, 44), _line..strokeWidth = 2.8);
         }
       case ThumbKind.graph:
         const n = [Offset(22, 18), Offset(52, 10), Offset(80, 26), Offset(34, 48), Offset(66, 50)];
         for (final e in const [[0, 1], [1, 2], [0, 3], [3, 4], [1, 4], [2, 4]]) {
-          k.drawLine(n[e[0]], n[e[1]], _line..strokeWidth = 2);
+          k.drawLine(n[e[0]], n[e[1]], _line..strokeWidth = 2.8);
         }
         _dots(k, n, r: 5);
       case ThumbKind.linked:
@@ -326,15 +329,15 @@ class _ThumbPainter extends CustomPainter {
           ..lineTo(68, 54)
           ..lineTo(34, 54)
           ..close();
-        k.drawPath(p, _line..strokeWidth = 2);
+        k.drawPath(p, _line..strokeWidth = 2.8);
         for (var i = 0; i < 3; i++) {
           k.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(40, 24 + i * 9.0, 22 - i * 5.0, 4), const Radius.circular(2)), _fill(0.6));
         }
       case ThumbKind.sets:
         k.drawCircle(const Offset(40, 30), 17, _fill(0.25));
         k.drawCircle(const Offset(60, 30), 17, _fill(0.25));
-        k.drawCircle(const Offset(40, 30), 17, _line..strokeWidth = 2);
-        k.drawCircle(const Offset(60, 30), 17, _line..strokeWidth = 2);
+        k.drawCircle(const Offset(40, 30), 17, _line..strokeWidth = 2.8);
+        k.drawCircle(const Offset(60, 30), 17, _line..strokeWidth = 2.8);
       case ThumbKind.progression:
         _dots(k, [for (var i = 0; i < 6; i++) Offset(18 + i * 13.0, 48 - i * 7.0)], r: 4);
       case ThumbKind.induction:
@@ -369,10 +372,10 @@ class _ThumbPainter extends CustomPainter {
         _arrow(k, const Offset(24, 48), const Offset(74, 40));
         _arrow(k, const Offset(24, 48), const Offset(44, 12));
       case ThumbKind.trig:
-        k.drawCircle(const Offset(50, 30), 21, _line..strokeWidth = 2);
+        k.drawCircle(const Offset(50, 30), 21, _line..strokeWidth = 2.8);
         final p = Offset(50 + 21 * math.cos(-0.8), 30 + 21 * math.sin(-0.8));
         k.drawLine(const Offset(50, 30), p, _line);
-        k.drawLine(const Offset(50, 30), const Offset(71, 30), _line..strokeWidth = 1.6);
+        k.drawLine(const Offset(50, 30), const Offset(71, 30), _line..strokeWidth = 2.2);
         k.drawArc(const Rect.fromLTWH(41, 21, 18, 18), -0.8, 0.8, true, _fill(0.4));
       case ThumbKind.analytic:
         _axes(k);
@@ -380,7 +383,7 @@ class _ThumbPainter extends CustomPainter {
         _dots(k, const [Offset(54, 30)], r: 4.5);
       case ThumbKind.complex:
         _axes(k);
-        k.drawLine(const Offset(20, 50), const Offset(64, 18), _line..strokeWidth = 1.8);
+        k.drawLine(const Offset(20, 50), const Offset(64, 18), _line..strokeWidth = 2.4);
         _dots(k, const [Offset(64, 18)], r: 5);
         k.drawLine(const Offset(64, 18), const Offset(64, 50), _line..strokeWidth = 1);
       case ThumbKind.composition:

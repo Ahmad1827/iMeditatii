@@ -832,9 +832,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: LayoutBuilder(
                 builder: (context, b) => Row(children: [
-                  const SizedBox(width: 36 + 72 + 14),
+                  const SizedBox(width: 40),
                   Expanded(child: Text('Problema', style: headStyle)),
-                  if (b.maxWidth >= _cExampleMin && _hasExamples) SizedBox(width: 170, child: Text('Exemplu', style: headStyle)),
+                  if (b.maxWidth >= _cExampleMin && _hasExamples) SizedBox(width: _cExampleWidth + 20, child: Text('Exemplu', style: headStyle)),
                   SizedBox(width: 96, child: Text('Dificultate', style: headStyle)),
                 ]),
               ),
@@ -868,7 +868,10 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               ),
             )
           else
-            for (var i = 0; i < shown; i++) _cRow(rows[i], isMobile),
+            for (var i = 0; i < shown; i++) ...[
+              if (i == 0 || rows[i]['category'] != rows[i - 1]['category']) _cChapterHead('${rows[i]['category'] ?? ''}', isMobile, first: i == 0),
+              _cRow(rows[i], isMobile),
+            ],
           if (rows.isNotEmpty)
             Container(
               decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
@@ -892,10 +895,87 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   }
 
   /// Below this width a row has no room for the example column.
-  static const double _cExampleMin = 760;
+  static const double _cExampleMin = 720;
+  static const double _cExampleWidth = 190;
 
   /// Informatică shows each problem's example; in maths the example is the answer.
   bool get _hasExamples => !widget.subject.toLowerCase().startsWith('mat');
+
+  /// Where a chapter starts in the list: its picture, once and big, with how
+  /// far the student got in it. The rows under it carry no picture of their own.
+  Widget _cChapterHead(String cat, bool isMobile, {bool first = false}) {
+    final cc = _catColor(cat);
+    final inChapter = allExercises.where((e) => e['grade'] == selectedGrade && e['category'] == cat).toList();
+    final done = inChapter.where(_isSolved).length;
+    final total = inChapter.length;
+    return Container(
+      padding: EdgeInsets.fromLTRB(isMobile ? 14 : 20, isMobile ? 14 : 18, 20, isMobile ? 14 : 18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [cc.withOpacity(AppColors.isDark ? 0.13 : 0.08), cc.withOpacity(0)], stops: const [0, 0.7]),
+        border: Border(top: BorderSide(color: Pb.border, width: first ? 1 : 1.5)),
+      ),
+      child: Row(
+        children: [
+          ProblemThumb(chapter: cat, color: cc, width: isMobile ? 56 : 76, height: isMobile ? 56 : 76, dark: AppColors.isDark),
+          SizedBox(width: isMobile ? 14 : 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppStyle.sentence(cat),
+                    maxLines: 2, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: isMobile ? 16 : 18, fontWeight: FontWeight.w700, color: Pb.text, height: 1.25)),
+                const SizedBox(height: 3),
+                Text('$total probleme · $done rezolvate', style: TextStyle(fontSize: 13, color: Pb.muted)),
+                const SizedBox(height: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 280),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(99),
+                    child: LinearProgressIndicator(
+                      value: total == 0 ? 0 : done / total,
+                      minHeight: 6,
+                      backgroundColor: Pb.border,
+                      color: cc,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The example as it is written: its lines stacked, the output set apart.
+  Widget _cExample(List example, Color cc, {bool compact = false}) {
+    const mono = TextStyle(fontFamily: 'Iosevka', fontFamilyFallback: ['monospace'], fontSize: 13.5, height: 1.35);
+    Widget box(String text, bool output) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+          decoration: BoxDecoration(
+            color: output ? cc.withOpacity(AppColors.isDark ? 0.14 : 0.09) : Pb.hoverBg,
+            borderRadius: BorderRadius.circular(7),
+            border: Border.all(color: output ? cc.withOpacity(0.4) : Pb.border),
+          ),
+          child: Text(text,
+              maxLines: 4,
+              overflow: TextOverflow.clip,
+              softWrap: false,
+              style: mono.copyWith(color: output ? cc : Pb.muted, fontWeight: output ? FontWeight.w700 : FontWeight.w500)),
+        );
+    final input = Flexible(child: box('${example[0]}', false));
+    final output = Flexible(child: box('${example[1]}', true));
+    return Row(
+      mainAxisSize: compact ? MainAxisSize.min : MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        input,
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text('→', style: TextStyle(color: Pb.muted, fontSize: 14))),
+        output,
+      ],
+    );
+  }
 
   Widget _cRow(Map<String, dynamic> e, bool isMobile) {
     final solved = _isSolved(e);
@@ -914,43 +994,26 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             message: review.rejected ? 'Respinsă: corectează și trimite din nou' : 'La verificare',
             child: Icon(
               review.rejected ? Icons.cancel : Icons.hourglass_top_rounded,
-              size: 18,
+              size: 22,
               color: review.rejected ? Pb.danger : const Color(0xFFB45309),
             ),
           )
         : Icon(
             solved ? Icons.check_circle : Icons.radio_button_unchecked,
-            size: 18,
-            color: solved ? _cGreen : Pb.border,
+            size: 22,
+            color: solved ? _cGreen : Pb.inputBorder,
           );
 
     final diffPill = diff.isEmpty
         ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
         : Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-            decoration: BoxDecoration(color: dc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
-            child: Text(AppStyle.sentence(diff), style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: dc)),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(color: dc.withOpacity(0.15), borderRadius: BorderRadius.circular(999)),
+            child: Text(AppStyle.sentence(diff), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: dc)),
           );
-
-    // the chapter's picture; its name shows on hover, and under the title when the
-    // list holds every chapter
-    final thumb = Tooltip(
-      message: AppStyle.sentence(cat),
-      child: ProblemThumb(chapter: cat, color: cc, width: isMobile ? 60 : 72, dark: AppColors.isDark),
-    );
 
     // "BAC 2024 iunie · " before the statement, when the problem has a source
     final second = [if (sursa.isNotEmpty) sursa, if (statement.isNotEmpty) statement].join(' · ');
-
-    Widget exampleText(Color strong) => Text.rich(
-          TextSpan(children: [
-            TextSpan(text: '${example![0]}  →  ', style: TextStyle(color: Pb.muted)),
-            TextSpan(text: '${example[1]}', style: TextStyle(color: strong, fontWeight: FontWeight.w600)),
-          ]),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 13, fontFamily: 'Iosevka', fontFamilyFallback: ['monospace'], height: 1.35),
-        );
 
     return AppLink(to: '/exercitiu/${e['id']}?materie=${Uri.encodeComponent(widget.subject)}&clasa=${Uri.encodeComponent(selectedGrade)}', child: _LHover(
       onTap: () => _openExercise(e),
@@ -963,42 +1026,44 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             left: BorderSide(color: h ? cc : Colors.transparent, width: 3),
           ),
         ),
-        padding: EdgeInsets.fromLTRB(13, isMobile ? 12 : 10, 16, isMobile ? 12 : 10),
+        padding: EdgeInsets.fromLTRB(isMobile ? 11 : 17, isMobile ? 14 : 18, isMobile ? 14 : 20, isMobile ? 14 : 18),
         child: LayoutBuilder(
           builder: (context, b) {
             final showExample = !isMobile && example != null && b.maxWidth >= _cExampleMin;
             final title = Text.rich(
               TextSpan(children: [
-                TextSpan(text: '${e['id']}  ', style: TextStyle(fontSize: 13, color: Pb.muted, fontFamily: 'Iosevka', fontFamilyFallback: const ['monospace'], fontWeight: FontWeight.w400)),
+                TextSpan(
+                    text: '${e['id']}  ',
+                    style: TextStyle(fontSize: 13.5, color: Pb.muted, fontFamily: 'Iosevka', fontFamilyFallback: const ['monospace'], fontWeight: FontWeight.w400)),
                 TextSpan(text: '${e['title']}'),
               ]),
-              maxLines: isMobile ? 2 : 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: h ? cc : Pb.text),
+              style: TextStyle(fontSize: isMobile ? 15.5 : 16, fontWeight: FontWeight.w600, color: h ? cc : Pb.text, height: 1.3),
             );
             final line = second.isEmpty
                 ? null
-                : Text(second, maxLines: isMobile ? 2 : 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: Pb.muted, height: 1.35));
+                : Text(second, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.45));
+            final text = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [title, if (line != null) ...[const SizedBox(height: 4), line]],
+            );
 
             if (isMobile) {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(clipBehavior: Clip.none, children: [
-                    thumb,
-                    Positioned(right: -6, top: -6, child: Container(decoration: BoxDecoration(color: Pb.surface, shape: BoxShape.circle), child: status)),
-                  ]),
+                  Padding(padding: const EdgeInsets.only(top: 1), child: status),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        title,
-                        if (line != null) ...[const SizedBox(height: 2), line],
-                        const SizedBox(height: 6),
-                        Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                        text,
+                        const SizedBox(height: 10),
+                        Row(children: [
                           diffPill,
-                          if (example != null) exampleText(Pb.text),
+                          if (example != null) ...[const SizedBox(width: 12), Flexible(child: _cExample(example, cc, compact: true))],
                         ]),
                       ],
                     ),
@@ -1008,22 +1073,15 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             }
             return Row(
               children: [
-                SizedBox(width: 36, child: status),
-                thumb,
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [title, if (line != null) ...[const SizedBox(height: 2), line]],
-                  ),
-                ),
+                SizedBox(width: 40, child: Align(alignment: Alignment.centerLeft, child: status)),
+                Expanded(child: text),
                 if (showExample) ...[
-                  const SizedBox(width: 14),
-                  SizedBox(width: 144, child: exampleText(cc)),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 20),
+                  SizedBox(width: _cExampleWidth, child: _cExample(example, cc)),
                 ] else if (b.maxWidth >= _cExampleMin && _hasExamples)
-                  const SizedBox(width: 170),
-                SizedBox(width: 96, child: Align(alignment: Alignment.centerLeft, child: diffPill)),
+                  const SizedBox(width: _cExampleWidth + 20),
+                const SizedBox(width: 16),
+                SizedBox(width: 80, child: Align(alignment: Alignment.centerLeft, child: diffPill)),
               ],
             );
           },
