@@ -17,6 +17,7 @@ import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'sticky_footer.dart';
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
 import 'grade_label.dart';
+import 'problem_thumb.dart';
 
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
@@ -24,6 +25,14 @@ class ExerciseListScreen extends StatefulWidget {
   final String? category; // a chapter to open on, as in exercises.json
 
   const ExerciseListScreen({super.key, required this.subject, this.grade, this.category});
+
+  /// A line about every problem (the start of its statement, the first example),
+  /// from tool/summaries.py: read once, shared by every visit to the list.
+  static Future<Map<String, dynamic>>? _summaries;
+  static Future<Map<String, dynamic>> summaries() => _summaries ??= rootBundle
+      .loadString('assets/data/summaries.json')
+      .then((s) => json.decode(s) as Map<String, dynamic>)
+      .catchError((_) => <String, dynamic>{});
 
   /// Last subject opened, so /exercitii lands back on it.
   static const String lastSubjectKey = 'exercises_last_subject';
@@ -109,6 +118,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     try {
       final String response = await rootBundle.loadString('assets/data/exercises.json');
       final data = json.decode(response);
+      final about = (await ExerciseListScreen.summaries())[widget.subject] as Map<String, dynamic>? ?? const {};
 
       final subjectData = data[widget.subject];
       if (subjectData != null) {
@@ -124,6 +134,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 'difficulty': ex['difficulty'] ?? "ușoară",
                 'sursa': ex['sursa'] ?? '',
                 'source': 'json',
+                'about': (about[gradeKey] as Map<String, dynamic>?)?['${ex['id']}'],
               });
             }
           });
@@ -819,13 +830,14 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             Container(
               color: Pb.hoverBg,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(children: [
-                const SizedBox(width: 36),
-                SizedBox(width: 52, child: Text('#', style: headStyle)),
-                Expanded(child: Text('Titlu', style: headStyle)),
-                SizedBox(width: 170, child: Text('Capitol', style: headStyle)),
-                SizedBox(width: 96, child: Text('Dificultate', style: headStyle)),
-              ]),
+              child: LayoutBuilder(
+                builder: (context, b) => Row(children: [
+                  const SizedBox(width: 36 + 72 + 14),
+                  Expanded(child: Text('Problema', style: headStyle)),
+                  if (b.maxWidth >= _cExampleMin && _hasExamples) SizedBox(width: 170, child: Text('Exemplu', style: headStyle)),
+                  SizedBox(width: 96, child: Text('Dificultate', style: headStyle)),
+                ]),
+              ),
             ),
           if (rows.isEmpty)
             Container(
@@ -879,6 +891,12 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     );
   }
 
+  /// Below this width a row has no room for the example column.
+  static const double _cExampleMin = 760;
+
+  /// Informatică shows each problem's example; in maths the example is the answer.
+  bool get _hasExamples => !widget.subject.toLowerCase().startsWith('mat');
+
   Widget _cRow(Map<String, dynamic> e, bool isMobile) {
     final solved = _isSolved(e);
     final review = solved ? null : _review(e);
@@ -887,6 +905,52 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     final cat = '${e['category'] ?? ''}';
     final cc = _catColor(cat);
     final sursa = '${e['sursa'] ?? ''}';
+    final about = e['about'] as Map<String, dynamic>?;
+    final statement = '${about?['s'] ?? ''}';
+    final example = about?['e'] as List?;
+
+    final status = review != null
+        ? Tooltip(
+            message: review.rejected ? 'Respinsă: corectează și trimite din nou' : 'La verificare',
+            child: Icon(
+              review.rejected ? Icons.cancel : Icons.hourglass_top_rounded,
+              size: 18,
+              color: review.rejected ? Pb.danger : const Color(0xFFB45309),
+            ),
+          )
+        : Icon(
+            solved ? Icons.check_circle : Icons.radio_button_unchecked,
+            size: 18,
+            color: solved ? _cGreen : Pb.border,
+          );
+
+    final diffPill = diff.isEmpty
+        ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
+        : Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            decoration: BoxDecoration(color: dc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
+            child: Text(AppStyle.sentence(diff), style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: dc)),
+          );
+
+    // the chapter's picture; its name shows on hover, and under the title when the
+    // list holds every chapter
+    final thumb = Tooltip(
+      message: AppStyle.sentence(cat),
+      child: ProblemThumb(chapter: cat, color: cc, width: isMobile ? 60 : 72, dark: AppColors.isDark),
+    );
+
+    // "BAC 2024 iunie · " before the statement, when the problem has a source
+    final second = [if (sursa.isNotEmpty) sursa, if (statement.isNotEmpty) statement].join(' · ');
+
+    Widget exampleText(Color strong) => Text.rich(
+          TextSpan(children: [
+            TextSpan(text: '${example![0]}  →  ', style: TextStyle(color: Pb.muted)),
+            TextSpan(text: '${example[1]}', style: TextStyle(color: strong, fontWeight: FontWeight.w600)),
+          ]),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 13, fontFamily: 'Iosevka', fontFamilyFallback: ['monospace'], height: 1.35),
+        );
 
     return AppLink(to: '/exercitiu/${e['id']}?materie=${Uri.encodeComponent(widget.subject)}&clasa=${Uri.encodeComponent(selectedGrade)}', child: _LHover(
       onTap: () => _openExercise(e),
@@ -899,78 +963,70 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             left: BorderSide(color: h ? cc : Colors.transparent, width: 3),
           ),
         ),
-        padding: const EdgeInsets.fromLTRB(13, 12, 16, 12),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 36,
-              child: review != null
-                  ? Tooltip(
-                      message: review.rejected ? 'Respinsă: corectează și trimite din nou' : 'La verificare',
-                      child: Icon(
-                        review.rejected ? Icons.cancel : Icons.hourglass_top_rounded,
-                        size: 18,
-                        color: review.rejected ? Pb.danger : const Color(0xFFB45309),
-                      ),
-                    )
-                  : Icon(
-                      solved ? Icons.check_circle : Icons.radio_button_unchecked,
-                      size: 18,
-                      color: solved ? _cGreen : Pb.border,
-                    ),
-            ),
-            if (!isMobile) SizedBox(width: 52, child: Text('${e['id']}', style: TextStyle(fontSize: 13.5, color: Pb.muted))),
-            Expanded(
-              child: Column(
+        padding: EdgeInsets.fromLTRB(13, isMobile ? 12 : 10, 16, isMobile ? 12 : 10),
+        child: LayoutBuilder(
+          builder: (context, b) {
+            final showExample = !isMobile && example != null && b.maxWidth >= _cExampleMin;
+            final title = Text.rich(
+              TextSpan(children: [
+                TextSpan(text: '${e['id']}  ', style: TextStyle(fontSize: 13, color: Pb.muted, fontFamily: 'Iosevka', fontFamilyFallback: const ['monospace'], fontWeight: FontWeight.w400)),
+                TextSpan(text: '${e['title']}'),
+              ]),
+              maxLines: isMobile ? 2 : 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: h ? cc : Pb.text),
+            );
+            final line = second.isEmpty
+                ? null
+                : Text(second, maxLines: isMobile ? 2 : 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: Pb.muted, height: 1.35));
+
+            if (isMobile) {
+              return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${e['title']}',
-                    maxLines: isMobile ? 2 : 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: h ? cc : Pb.text),
-                  ),
-                  if (isMobile) ...[
-                    const SizedBox(height: 2),
-                    Text('#${e['id']}, ${sursa.isNotEmpty ? sursa : AppStyle.sentence(cat)}, ${AppStyle.sentence(diff)}',
-                        style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-                  ] else if (sursa.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(sursa, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-                  ],
-                ],
-              ),
-            ),
-            if (!isMobile) ...[
-              SizedBox(
-                width: 170,
-                child: Row(
-                  children: [
-                    Container(width: 7, height: 7, decoration: BoxDecoration(color: cc, shape: BoxShape.circle)),
-                    const SizedBox(width: 7),
-                    Expanded(
-                      child: Text(AppStyle.sentence(cat),
-                          overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Pb.text)),
+                  Stack(clipBehavior: Clip.none, children: [
+                    thumb,
+                    Positioned(right: -6, top: -6, child: Container(decoration: BoxDecoration(color: Pb.surface, shape: BoxShape.circle), child: status)),
+                  ]),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        title,
+                        if (line != null) ...[const SizedBox(height: 2), line],
+                        const SizedBox(height: 6),
+                        Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                          diffPill,
+                          if (example != null) exampleText(Pb.text),
+                        ]),
+                      ],
                     ),
-                  ],
+                  ),
+                ],
+              );
+            }
+            return Row(
+              children: [
+                SizedBox(width: 36, child: status),
+                thumb,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [title, if (line != null) ...[const SizedBox(height: 2), line]],
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 96,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: diff.isEmpty
-                      ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
-                      : Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                          decoration: BoxDecoration(color: dc.withOpacity(0.14), borderRadius: BorderRadius.circular(999)),
-                          child: Text(AppStyle.sentence(diff),
-                              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: dc)),
-                        ),
-                ),
-              ),
-            ],
-          ],
+                if (showExample) ...[
+                  const SizedBox(width: 14),
+                  SizedBox(width: 144, child: exampleText(cc)),
+                  const SizedBox(width: 12),
+                ] else if (b.maxWidth >= _cExampleMin && _hasExamples)
+                  const SizedBox(width: 170),
+                SizedBox(width: 96, child: Align(alignment: Alignment.centerLeft, child: diffPill)),
+              ],
+            );
+          },
         ),
       ),
     ));

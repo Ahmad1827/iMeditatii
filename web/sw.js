@@ -30,7 +30,7 @@ self.addEventListener('install', (event) => {
       await Promise.all([
         ...[
           SHELL, 'flutter_bootstrap.js', 'main.dart.js', 'manifest.json', 'favicon.png', 'icons/Icon-192.png', 'py_runner.js', 'cpp_runner.js',
-          'assets/assets/data/exercises.json', 'assets/assets/data/problem_quizzes.json',
+          'assets/assets/data/exercises.json', 'assets/assets/data/summaries.json', 'assets/assets/data/problem_quizzes.json',
         ].map(put),
         details,
       ]);
