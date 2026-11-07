@@ -16,6 +16,7 @@ import 'progress.dart';
 import 'resources_data.dart';
 import 'ui_components.dart';
 import 'grade_label.dart';
+import 'sticky_footer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -169,11 +170,12 @@ class _HomeScreenState extends State<HomeScreen> {
               blockers: [_hTopKey, if (!_hCardsHidden) _hMainKey, _hFootKey],
               cardsHidden: _hCardsHidden,
               onToggleCards: () => setState(() => _hCardsHidden = !_hCardsHidden),
-              child: Scrollbar(
+              // the footer sits at the bottom of the screen while the cards are
+              // short (still loading), and right after them once they're long
+              child: StickyFooterScroll(
                 controller: _scrollController,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
+                footer: KeyedSubtree(key: _hFootKey, child: _hFooter(isMobile)),
+                body: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: isMobile ? 24 : 44),
@@ -200,11 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 56),
-                      KeyedSubtree(key: _hFootKey, child: _hFooter(isMobile)),
                     ],
                   ),
-                ),
               ),
             ),
           ),
@@ -1362,21 +1361,17 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const CustomNavbar(),
           Expanded(
-            child: Scrollbar(
+            child: StickyFooterScroll(
               controller: _scrollController,
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const ClampingScrollPhysics(),
-                child: Column(
-                  children: [
-                    _retroHero(isMobile),
-                    _retroPaths(isMobile),
-                    _retroMasters(isMobile),
-                    SizedBox(height: isMobile ? 14 : 28),
-                    _retroFooter(isMobile),
-                  ],
-                ),
+              gap: isMobile ? 14 : 28,
+              body: Column(
+                children: [
+                  _retroHero(isMobile),
+                  _retroPaths(isMobile),
+                  _retroMasters(isMobile),
+                ],
               ),
+              footer: _retroFooter(isMobile),
             ),
           ),
         ],

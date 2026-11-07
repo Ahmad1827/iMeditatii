@@ -503,6 +503,12 @@ class CustomNavbar extends StatelessWidget {
                         active: path.startsWith('/materii') || path.startsWith('/profesor'),
                         onTap: () => context.go('/materii'),
                       )),
+                      AppLink(to: '/acs', child: _PbNavLink(
+                        label: 'ACS',
+                        icon: Icons.memory,
+                        active: path.startsWith('/acs'),
+                        onTap: () => context.go('/acs'),
+                      )),
                       if (user != null)
                         AppLink(to: '/clase', child: _PbNavLink(
                           label: 'Clase',
@@ -765,6 +771,8 @@ class CustomNavbar extends StatelessWidget {
                 AppLink(to: '/ide', child: item(Icons.terminal, 'IDE', const Color(0xFF10B981), () => context.go('/ide'), active: path.startsWith('/ide'))),
                 AppLink(to: '/materii', child: item(Icons.school_outlined, 'Profesori', violet, () => context.go('/materii'),
                     active: path.startsWith('/materii') || path.startsWith('/profesor'))),
+                AppLink(to: '/acs', child: item(Icons.memory, 'ACS (Automatică și Calculatoare)', const Color(0xFF64748B), () => context.go('/acs'),
+                    active: path.startsWith('/acs'))),
                 if (user != null)
                   AppLink(to: '/clase', child: item(Icons.assignment_outlined, 'Clase și teme', const Color(0xFFF59E0B), () => context.go('/clase'),
                       active: path.startsWith('/clase') || path.startsWith('/clasa'))),
@@ -816,6 +824,8 @@ class CustomNavbar extends StatelessWidget {
               AppLink(to: '/exercitii', child: NavTextLink(text: 'Exercises', isMobile: true, onTap: () { context.pop(); context.go('/exercitii'); })),
               const SizedBox(height: 8),
               AppLink(to: '/resurse', child: NavTextLink(text: 'Resources', isMobile: true, onTap: () { context.pop(); context.go('/resurse'); })),
+              const SizedBox(height: 8),
+              AppLink(to: '/acs', child: NavTextLink(text: 'ACS', isMobile: true, onTap: () { context.pop(); context.go('/acs'); })),
               if (user != null) ...[
                 const SizedBox(height: 8),
                 AppLink(to: '/clase', child: NavTextLink(text: 'Classes', isMobile: true, onTap: () { context.pop(); context.go('/clase'); })),
@@ -904,6 +914,8 @@ class CustomNavbar extends StatelessWidget {
                       AppLink(to: '/exercitii', child: NavTextLink(text: 'Exercises', onTap: () => context.go('/exercitii'))),
                       const SizedBox(width: 14),
                       AppLink(to: '/resurse', child: NavTextLink(text: 'Resources', onTap: () => context.go('/resurse'))),
+                      const SizedBox(width: 14),
+                      AppLink(to: '/acs', child: NavTextLink(text: 'ACS', onTap: () => context.go('/acs'))),
                       if (user != null) ...[
                         const SizedBox(width: 14),
                         AppLink(to: '/clase', child: NavTextLink(text: 'Classes', onTap: () => context.go('/clase'))),
