@@ -18,6 +18,9 @@ import 'sticky_footer.dart';
 import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
 import 'grade_label.dart';
 import 'problem_thumb.dart';
+import 'problem_author.dart';
+import 'row_glow.dart';
+import 'theme_manager.dart';
 
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
@@ -46,7 +49,7 @@ class ExerciseListScreen extends StatefulWidget {
   State<ExerciseListScreen> createState() => _ExerciseListScreenState();
 }
 
-class _ExerciseListScreenState extends State<ExerciseListScreen> {
+class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
 
   List<Map<String, dynamic>> allExercises = [];
@@ -66,6 +69,22 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   final ScrollController _cScroll = ScrollController();
   final TextEditingController _cSearch = TextEditingController();
   Set<String> _solved = {};
+  Set<String> _tried = {}; // progress keys tried and not solved (yet)
+
+  // one clock for every solved / tried row's glow
+  late final AnimationController _glow = AnimationController(vsync: this, duration: const Duration(milliseconds: 5200));
+  bool get _glowMoves => ThemeManager.motionNotifier.value && !(MediaQuery.maybeOf(context)?.disableAnimations ?? false);
+  bool _isTried(Map<String, dynamic> e) => _tried.contains("${widget.subject}_${selectedGrade}_${e['id']}") || (_review(e)?.rejected ?? false);
+
+  /// Runs the clock only while motion is on and some problem shown glows:
+  /// a list with nothing solved or tried draws no frames for it.
+  void _syncGlow() {
+    if (!mounted) return;
+    final run = _glowMoves && displayedExercises.any((e) => _isSolved(e) || _isTried(e));
+    if (run == _glow.isAnimating) return;
+    run ? _glow.repeat() : _glow.stop();
+    setState(() {});
+  }
   Map<String, Solution> _sent = {}; // maths sent to be checked, by progress key: waiting or turned down
   StreamSubscription? _sentSub;
   String _cDiff = 'toate';
@@ -83,6 +102,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     selectedCategory = widget.category ?? "Toate";
     _loadAllExercises();
     solvedChanged.addListener(_updateCategoriesAndFilter);
+    ThemeManager.motionNotifier.addListener(_syncGlow);
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       _sentSub = Classes.mySolutions(uid).listen((m) {
@@ -94,6 +114,12 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncGlow());
+  }
+
   void _switchSubject(String materie) {
     if (materie == widget.subject) return;
     context.go('/lista-exercitii?materie=${Uri.encodeComponent(materie)}');
@@ -102,6 +128,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   @override
   void dispose() {
     solvedChanged.removeListener(_updateCategoriesAndFilter);
+    ThemeManager.motionNotifier.removeListener(_syncGlow);
+    _glow.dispose();
     _sentSub?.cancel();
     _scrollController.dispose();
     _cScroll.dispose();
@@ -163,6 +191,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           'difficulty': data['difficulty'] ?? "ușoară",
           'sursa': data['sursa'] ?? '',
           'source': 'firebase',
+          'autor': data['autor'],
         });
         tempGrades.add(gradeStr);
       }
@@ -206,8 +235,13 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     }
 
     if (!mounted) return;
+    final tried = {
+      for (final k in prefs.getKeys())
+        if (k.startsWith(triedPrefix)) k.substring(triedPrefix.length),
+    };
     setState(() {
       _solved = solved;
+      _tried = tried;
       completedCount = done;
       availableCategories = tempCategories.toList()..sort();
 
@@ -231,6 +265,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
       displayedExercises = filtered;
     });
+    _syncGlow();
   }
 
   /// Lowercase and without diacritics, so "sesiunea speciala" finds "Sesiunea specială".
@@ -870,7 +905,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           else
             for (var i = 0; i < shown; i++) ...[
               if (i == 0 || rows[i]['category'] != rows[i - 1]['category']) _cChapterHead('${rows[i]['category'] ?? ''}', isMobile, first: i == 0),
-              _cRow(rows[i], isMobile),
+              _cRow(rows[i], isMobile, index: i),
             ],
           if (rows.isNotEmpty)
             Container(
@@ -977,9 +1012,12 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     );
   }
 
-  Widget _cRow(Map<String, dynamic> e, bool isMobile) {
+  Widget _cRow(Map<String, dynamic> e, bool isMobile, {int index = 0}) {
     final solved = _isSolved(e);
     final review = solved ? null : _review(e);
+    // tried: a wrong answer or a failed submission here, or maths turned down
+    final tried = !solved && _isTried(e);
+    final glow = solved ? RowGlow.solved : (tried ? RowGlow.tried : null);
     final diff = '${e['difficulty'] ?? ''}';
     final dc = _diffColor(diff);
     final cat = '${e['category'] ?? ''}';
@@ -998,11 +1036,13 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
               color: review.rejected ? Pb.danger : const Color(0xFFB45309),
             ),
           )
-        : Icon(
-            solved ? Icons.check_circle : Icons.radio_button_unchecked,
-            size: 22,
-            color: solved ? _cGreen : Pb.inputBorder,
-          );
+        : tried
+            ? Tooltip(message: 'Încercată, nerezolvată încă', child: Icon(Icons.adjust, size: 22, color: _cAmber))
+            : Icon(
+                solved ? Icons.check_circle : Icons.radio_button_unchecked,
+                size: 22,
+                color: solved ? _cGreen : Pb.inputBorder,
+              );
 
     final diffPill = diff.isEmpty
         ? Text('–', style: TextStyle(fontSize: 13.5, color: Pb.muted))
@@ -1012,12 +1052,41 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             child: Text(AppStyle.sentence(diff), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: dc)),
           );
 
+    // who made it: the name, and "Creată de Ahmad" in full on hover
+    final credit = problemCredit(e, fromSiteFiles: e['source'] == 'json', grade: selectedGrade);
+    final by = credit == null
+        ? null
+        : Tooltip(
+            message: '${credit.$1} ${credit.$2}',
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.person_outline, size: 14, color: Pb.muted),
+                const SizedBox(width: 3),
+                Flexible(
+                  child: Text(credit.$2,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: Pb.muted, fontWeight: FontWeight.w500)),
+                ),
+              ],
+            ),
+          );
+
     // "BAC 2024 iunie · " before the statement, when the problem has a source
     final second = [if (sursa.isNotEmpty) sursa, if (statement.isNotEmpty) statement].join(' · ');
 
     return AppLink(to: '/exercitiu/${e['id']}?materie=${Uri.encodeComponent(widget.subject)}&clasa=${Uri.encodeComponent(selectedGrade)}', child: _LHover(
       onTap: () => _openExercise(e),
-      builder: (h) => AnimatedContainer(
+      builder: (h) => CustomPaint(
+        painter: glow == null
+            ? null
+            : RowGlowPainter(
+                kind: glow,
+                color: glow == RowGlow.solved ? _cGreen : _cAmber,
+                clock: _glow.isAnimating ? _glow : null,
+                phase: (index * 0.137) % 1.0,
+                dark: AppColors.isDark,
+              ),
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 140),
         decoration: BoxDecoration(
           color: h ? cc.withOpacity(0.06) : Colors.transparent,
@@ -1062,7 +1131,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                         text,
                         const SizedBox(height: 10),
                         Row(children: [
-                          diffPill,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [diffPill, if (by != null) ...[const SizedBox(height: 6), by]],
+                          ),
                           if (example != null) ...[const SizedBox(width: 12), Flexible(child: _cExample(example, cc, compact: true))],
                         ]),
                       ],
@@ -1081,11 +1154,19 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                 ] else if (b.maxWidth >= _cExampleMin && _hasExamples)
                   const SizedBox(width: _cExampleWidth + 20),
                 const SizedBox(width: 16),
-                SizedBox(width: 80, child: Align(alignment: Alignment.centerLeft, child: diffPill)),
+                SizedBox(
+                  width: 80,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [diffPill, if (by != null) ...[const SizedBox(height: 6), by]],
+                  ),
+                ),
               ],
             );
           },
         ),
+      ),
       ),
     ));
   }

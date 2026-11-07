@@ -530,6 +530,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionOk = ok;
     });
     _saveSolution(raspunsElev, null, ok);
+    if (!ok && !_alreadyDone) markTried(_progressKey);
     if (solutionOk) {
       setState(() => _cCheer++);
       await _markExerciseAsDone();
@@ -2130,6 +2131,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     });
 
     if (submit) _saveSolution(code, 'cpp', all);
+    if (submit && !all && !_alreadyDone) markTried(_progressKey);
     if (submit && all) {
       setState(() => _cCheer++);
       await _markExerciseAsDone();

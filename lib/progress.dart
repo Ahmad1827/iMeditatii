@@ -8,6 +8,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// leaves the problem (back, the breadcrumb, a link).
 final ValueNotifier<int> solvedChanged = ValueNotifier(0);
 
+/// A problem tried and not solved (yet): "incercata:<progress key>" -> when, as
+/// text. Never a bool, so it never counts as solved (solvedKeys reads the trues).
+const String triedPrefix = 'incercata:';
+
+Future<void> markTried(String key) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('$triedPrefix$key', DateTime.now().toIso8601String());
+    solvedChanged.value++;
+  } catch (_) {}
+}
+
 /// Progress keys look like "<materie>_<clasa>_<id>" (see ExerciseDetailScreen).
 final RegExp progressKey = RegExp(r'^(.+?)_(\d+)_(.+)$');
 
