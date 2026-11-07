@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
 import 'theme_manager.dart';
@@ -144,6 +145,19 @@ class AddExerciseScreen extends StatefulWidget {
 }
 
 class _AddExerciseScreenState extends State<AddExerciseScreen> {
+  /// The sender's name, as on their profile (or their account), and their id.
+  Future<(String, String)?> _senderName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    var name = '';
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      name = '${doc.data()?['name'] ?? ''}'.trim();
+    } catch (_) {}
+    if (name.isEmpty) name = (user.displayName ?? '').trim();
+    return name.isEmpty ? null : (name, user.uid);
+  }
+
   final _formKey = GlobalKey<FormState>();
 
   String _selectedSubject = 'Matematică';
@@ -334,7 +348,20 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
 
       if (quiz.isNotEmpty) exerciseData['intrebari'] = [for (final q in quiz) q.toJson()];
 
-      await FirebaseFirestore.instance.collection('exercises').add(exerciseData);
+      // who sent it, so the problem page says "Trimisă de ..."
+      final sender = await _senderName();
+      final col = FirebaseFirestore.instance.collection('exercises');
+      if (sender == null) {
+        await col.add(exerciseData);
+      } else {
+        try {
+          await col.add({...exerciseData, 'autor': sender.$1, 'autorId': sender.$2});
+        } on FirebaseException catch (e) {
+          // the database's rules may not know the field yet: the problem goes in without it
+          if (e.code != 'permission-denied') rethrow;
+          await col.add(exerciseData);
+        }
+      }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
