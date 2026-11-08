@@ -1,0 +1,1085 @@
+{
+ "code": "mn",
+ "chapters": [
+  "1. Sisteme liniare: metode directe",
+  "2. Sisteme liniare: metode iterative",
+  "3. Interpolare",
+  "4. Ecuații neliniare",
+  "5. Integrare și ecuații diferențiale",
+  "6. Valori proprii și ortogonalizare"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Substituția înapoi",
+   "chapter": "1. Sisteme liniare: metode directe",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie funcția `x = subst_inv(U, b)`, care rezolvă sistemul `U x = b`, unde `U` e **superior triunghiulară** (n × n, cu diagonala nenulă) și `b` e un vector coloană. `x` trebuie să fie tot coloană.\n\n$$x_i = \\frac{1}{u_{ii}}\\left(b_i - \\sum_{j=i+1}^{n} u_{ij} x_j\\right), \\quad i = n, n-1, \\ldots, 1$$\n\nNu ai voie să folosești `\\` sau `inv`. Încearcă funcția în consola de sub editor.",
+   "hint": "Pornește de la ultima ecuație, care are o singură necunoscută. `U(i, i+1:n) * x(i+1:n)` face suma dintr-o singură operație.",
+   "solution": "Ultima ecuație dă direct `x(n)`; fiecare ecuație de deasupra are o singură necunoscută nouă. Complexitatea e O(n²).\n\n```matlab\nfunction x = subst_inv(U, b)\n    n = length(b);\n    x = zeros(n, 1);\n    for i = n:-1:1\n        x(i) = (b(i) - U(i, i+1:n) * x(i+1:n)) / U(i, i);\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "subst_inv",
+    "signature": "function x = subst_inv(U, b)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[2.0 1.0 -1.0; 0.0 3.0 2.0; 0.0 0.0 4.0]",
+       "[1.0; 2.0; 8.0]"
+      ],
+      "expect": [
+       "[1.8333333333333333; -0.6666666666666666; 2.0]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 2.0 3.0 4.0; 0.0 5.0 6.0 7.0; 0.0 0.0 8.0 9.0; 0.0 0.0 0.0 10.0]",
+       "[10.0; 18.0; 17.0; 10.0]"
+      ],
+      "expect": [
+       "[1.0; 1.0; 1.0; 1.0]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[7.0]",
+       "[14.0]"
+      ],
+      "expect": [
+       "[2.0]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[-1.0 2.0; 0.0 0.5]",
+       "[3.0; 1.0]"
+      ],
+      "expect": [
+       "[1.0; 2.0]"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "\\",
+     "inv"
+    ],
+    "starter": "function x = subst_inv(U, b)\n    % scrie codul aici\n\nend\n",
+    "reference": "function x = subst_inv(U, b)\n    n = length(b);\n    x = zeros(n, 1);\n    for i = n:-1:1\n        x(i) = (b(i) - U(i, i+1:n) * x(i+1:n)) / U(i, i);\n    end\nend"
+   }
+  },
+  {
+   "id": "2",
+   "title": "Substituția înainte",
+   "chapter": "1. Sisteme liniare: metode directe",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie `x = subst_dir(L, b)`, care rezolvă `L x = b` pentru `L` **inferior triunghiulară**: de data asta pornești de la prima ecuație.",
+   "hint": "Pentru i = 1, `1:i-1` e un interval gol, iar produsul cu un vector gol dă 0.",
+   "solution": "Simetric cu substituția înapoi: `x(i)` depinde doar de `x(1)`, ..., `x(i-1)`.\n\n```matlab\nfunction x = subst_dir(L, b)\n    n = length(b);\n    x = zeros(n, 1);\n    for i = 1:n\n        x(i) = (b(i) - L(i, 1:i-1) * x(1:i-1)) / L(i, i);\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "subst_dir",
+    "signature": "function x = subst_dir(L, b)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[2.0 0.0 0.0; 1.0 3.0 0.0; -1.0 2.0 4.0]",
+       "[2.0; 5.0; 11.0]"
+      ],
+      "expect": [
+       "[1.0; 1.3333333333333333; 2.3333333333333335]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 0.0; 0.5 2.0]",
+       "[1.0; 3.0]"
+      ],
+      "expect": [
+       "[1.0; 1.25]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[3.0 0.0 0.0 0.0; 1.0 1.0 0.0 0.0; 2.0 -1.0 5.0 0.0; 0.0 4.0 1.0 2.0]",
+       "[3.0; 2.0; 9.0; 7.0]"
+      ],
+      "expect": [
+       "[1.0; 0.9999999999999999; 1.6; 0.7000000000000001]"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "\\",
+     "inv"
+    ],
+    "starter": "function x = subst_dir(L, b)\n    % scrie codul aici\n\nend\n",
+    "reference": "function x = subst_dir(L, b)\n    n = length(b);\n    x = zeros(n, 1);\n    for i = 1:n\n        x(i) = (b(i) - L(i, 1:i-1) * x(1:i-1)) / L(i, i);\n    end\nend"
+   }
+  },
+  {
+   "id": "3",
+   "title": "Eliminarea Gauss cu pivotare parțială",
+   "chapter": "1. Sisteme liniare: metode directe",
+   "difficulty": "medie",
+   "source": "Tema MN · eliminare gaussiană",
+   "statement": "Scrie `x = gauss_pp(A, b)`, care rezolvă `A x = b` (A pătratică, nesingulară) prin **eliminare gaussiană cu pivotare parțială**: la pasul `k` alegi ca pivot elementul cu cea mai mare valoare absolută din coloana `k`, de pe liniile `k..n`, și schimbi liniile; apoi elimini sub pivot și rezolvi sistemul triunghiular rămas.\n\nUnul dintre teste are un pivot `0`, altul un pivot de `1e-12`: fără pivotare dau rezultate greșite. Nu ai voie la `\\`, `inv` sau `lu`.",
+   "hint": "`[~, p] = max(abs(A(k:n, k)))` dă poziția pivotului în subvector; adună `k - 1` ca să ai linia din A. `A([k p], :) = A([p k], :)` schimbă două linii.",
+   "solution": "Pivotarea parțială ține multiplicatorii sub 1 în modul, deci erorile de rotunjire nu cresc. Fără ea, un pivot mic (1e-12) amplifică erorile cu 1e12.\n\n```matlab\nfunction x = gauss_pp(A, b)\n    n = length(b);\n    for k = 1:n-1\n        [~, p] = max(abs(A(k:n, k)));\n        p = p + k - 1;\n        A([k p], :) = A([p k], :);\n        b([k p]) = b([p k]);\n        for i = k+1:n\n            m = A(i, k) / A(k, k);\n            A(i, k:n) = A(i, k:n) - m * A(k, k:n);\n            b(i) = b(i) - m * b(k);\n        end\n    end\n    x = zeros(n, 1);\n    for i = n:-1:1\n        x(i) = (b(i) - A(i, i+1:n) * x(i+1:n)) / A(i, i);\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "gauss_pp",
+    "signature": "function x = gauss_pp(A, b)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[2.0 1.0 -1.0; -3.0 -1.0 2.0; -2.0 1.0 2.0]",
+       "[8.0; -11.0; -3.0]"
+      ],
+      "expect": [
+       "[2.0000000000000004; 2.9999999999999996; -0.9999999999999994]"
+      ],
+      "tol": 1e-08
+     },
+     {
+      "args": [
+       "[0.0 2.0 1.0; 1.0 1.0 1.0; 2.0 1.0 0.0]",
+       "[3.0; 6.0; 1.0]"
+      ],
+      "expect": [
+       "[1.3333333333333333; -1.6666666666666665; 6.333333333333333]"
+      ],
+      "tol": 1e-08
+     },
+     {
+      "args": [
+       "[1e-12 1.0; 1.0 1.0]",
+       "[1.0; 2.0]"
+      ],
+      "expect": [
+       "[1.000000000001; 0.999999999999]"
+      ],
+      "tol": 1e-08
+     },
+     {
+      "args": [
+       "[4.0 -2.0 1.0 3.0; 3.0 6.0 -4.0 2.0; 2.0 1.0 8.0 -5.0; 1.0 3.0 -2.0 7.0]",
+       "[5.0; 8.0; 12.0; 9.0]"
+      ],
+      "expect": [
+       "[0.9712230215827338; 1.6264988009592325; 1.6252997601918466; 0.9142685851318944]"
+      ],
+      "tol": 1e-08
+     }
+    ],
+    "forbid": [
+     "\\",
+     "inv",
+     "lu"
+    ],
+    "starter": "function x = gauss_pp(A, b)\n    % scrie codul aici\n\nend\n",
+    "reference": "function x = gauss_pp(A, b)\n    n = length(b);\n    for k = 1:n-1\n        [~, p] = max(abs(A(k:n, k)));\n        p = p + k - 1;\n        A([k p], :) = A([p k], :);\n        b([k p]) = b([p k]);\n        for i = k+1:n\n            m = A(i, k) / A(k, k);\n            A(i, k:n) = A(i, k:n) - m * A(k, k:n);\n            b(i) = b(i) - m * b(k);\n        end\n    end\n    x = zeros(n, 1);\n    for i = n:-1:1\n        x(i) = (b(i) - A(i, i+1:n) * x(i+1:n)) / A(i, i);\n    end\nend"
+   }
+  },
+  {
+   "id": "4",
+   "title": "Factorizarea LU (Doolittle)",
+   "chapter": "1. Sisteme liniare: metode directe",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Scrie `[L, U] = doolittle(A)`, care descompune `A = L U` cu `L` **inferior triunghiulară cu 1 pe diagonală** și `U` superior triunghiulară (fără pivotare; testele au toți pivoții nenuli):\n\n$$u_{ij} = a_{ij} - \\sum_{k<i} l_{ik} u_{kj} \\; (j \\ge i), \\qquad l_{ji} = \\frac{1}{u_{ii}}\\left(a_{ji} - \\sum_{k<i} l_{jk} u_{ki}\\right) \\; (j > i)$$\n\nFără `lu`.",
+   "hint": "Calculează alternativ: linia `i` din U, apoi coloana `i` din L.",
+   "solution": "O dată ce ai L și U, orice sistem `A x = b` cere doar două substituții (înainte, apoi înapoi): O(n²) în loc de O(n³).\n\n```matlab\nfunction [L, U] = doolittle(A)\n    n = rows(A);\n    L = eye(n);\n    U = zeros(n);\n    for i = 1:n\n        for j = i:n\n            U(i, j) = A(i, j) - L(i, 1:i-1) * U(1:i-1, j);\n        end\n        for j = i+1:n\n            L(j, i) = (A(j, i) - L(j, 1:i-1) * U(1:i-1, i)) / U(i, i);\n        end\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "doolittle",
+    "signature": "function [L, U] = doolittle(A)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "[2.0 -1.0 -2.0; -4.0 6.0 3.0; -4.0 -2.0 8.0]"
+      ],
+      "expect": [
+       "[1.0 0.0 0.0; -2.0 1.0 0.0; -2.0 -1.0 1.0]",
+       "[2.0 -1.0 -2.0; 0.0 4.0 -1.0; 0.0 0.0 3.0]"
+      ],
+      "check": [
+       "norm(o1*o2 - a1) < 1e-9",
+       "isequal(o2, triu(o2))",
+       "all(diag(o1) == 1)"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 2.0; 3.0 4.0]"
+      ],
+      "expect": [
+       "[1.0 0.0; 3.0 1.0]",
+       "[1.0 2.0; 0.0 -2.0]"
+      ],
+      "check": [
+       "norm(o1*o2 - a1) < 1e-9",
+       "isequal(o2, triu(o2))",
+       "all(diag(o1) == 1)"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[4.0 3.0 2.0 1.0; 3.0 4.0 3.0 2.0; 2.0 3.0 4.0 3.0; 1.0 2.0 3.0 4.0]"
+      ],
+      "expect": [
+       "[1.0 0.0 0.0 0.0; 0.75 1.0 0.0 0.0; 0.5 0.8571428571428571 1.0 0.0; 0.25 0.7142857142857143 0.8333333333333333 1.0]",
+       "[4.0 3.0 2.0 1.0; 0.0 1.75 1.5 1.25; 0.0 0.0 1.7142857142857144 1.4285714285714286; 0.0 0.0 0.0 1.666666666666667]"
+      ],
+      "check": [
+       "norm(o1*o2 - a1) < 1e-9",
+       "isequal(o2, triu(o2))",
+       "all(diag(o1) == 1)"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "lu",
+     "\\",
+     "inv"
+    ],
+    "starter": "function [L, U] = doolittle(A)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [L, U] = doolittle(A)\n    n = rows(A);\n    L = eye(n);\n    U = zeros(n);\n    for i = 1:n\n        for j = i:n\n            U(i, j) = A(i, j) - L(i, 1:i-1) * U(1:i-1, j);\n        end\n        for j = i+1:n\n            L(j, i) = (A(j, i) - L(j, 1:i-1) * U(1:i-1, i)) / U(i, i);\n        end\n    end\nend"
+   }
+  },
+  {
+   "id": "5",
+   "title": "Factorizarea Cholesky",
+   "chapter": "1. Sisteme liniare: metode directe",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Pentru o matrice **simetrică și pozitiv definită**, scrie `L = cholesky(A)` cu `L` inferior triunghiulară, cu diagonala pozitivă, astfel încât `A = L L'`:\n\n$$l_{jj} = \\sqrt{a_{jj} - \\sum_{k<j} l_{jk}^2}, \\qquad l_{ij} = \\frac{1}{l_{jj}}\\left(a_{ij} - \\sum_{k<j} l_{ik} l_{jk}\\right) \\; (i > j)$$\n\nFără `chol`.",
+   "hint": "Mergi pe coloane: întâi elementul de pe diagonală, apoi cele de sub el.",
+   "solution": "Cholesky face jumătate din operațiile lui LU și nu are nevoie de pivotare pentru matrice pozitiv definite.\n\n```matlab\nfunction L = cholesky(A)\n    n = rows(A);\n    L = zeros(n);\n    for j = 1:n\n        L(j, j) = sqrt(A(j, j) - L(j, 1:j-1) * L(j, 1:j-1)');\n        for i = j+1:n\n            L(i, j) = (A(i, j) - L(i, 1:j-1) * L(j, 1:j-1)') / L(j, j);\n        end\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "cholesky",
+    "signature": "function L = cholesky(A)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[4.0 12.0 -16.0; 12.0 37.0 -43.0; -16.0 -43.0 98.0]"
+      ],
+      "expect": [
+       "[2.0 0.0 0.0; 6.0 1.0 0.0; -8.0 5.0 3.0]"
+      ],
+      "check": [
+       "norm(o1*o1' - a1) < 1e-9",
+       "isequal(o1, tril(o1))"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[2.0 -1.0 0.0; -1.0 2.0 -1.0; 0.0 -1.0 2.0]"
+      ],
+      "expect": [
+       "[1.4142135623730951 0.0 0.0; -0.7071067811865475 1.224744871391589 0.0; 0.0 -0.8164965809277261 1.1547005383792515]"
+      ],
+      "check": [
+       "norm(o1*o1' - a1) < 1e-9",
+       "isequal(o1, tril(o1))"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[25.0 15.0 -5.0; 15.0 18.0 0.0; -5.0 0.0 11.0]"
+      ],
+      "expect": [
+       "[5.0 0.0 0.0; 3.0 3.0 0.0; -1.0 1.0 3.0]"
+      ],
+      "check": [
+       "norm(o1*o1' - a1) < 1e-9",
+       "isequal(o1, tril(o1))"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[9.0]"
+      ],
+      "expect": [
+       "[3.0]"
+      ],
+      "check": [
+       "norm(o1*o1' - a1) < 1e-9",
+       "isequal(o1, tril(o1))"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "chol",
+     "\\",
+     "inv"
+    ],
+    "starter": "function L = cholesky(A)\n    % scrie codul aici\n\nend\n",
+    "reference": "function L = cholesky(A)\n    n = rows(A);\n    L = zeros(n);\n    for j = 1:n\n        L(j, j) = sqrt(A(j, j) - L(j, 1:j-1) * L(j, 1:j-1)');\n        for i = j+1:n\n            L(i, j) = (A(i, j) - L(i, 1:j-1) * L(j, 1:j-1)') / L(j, j);\n        end\n    end\nend"
+   }
+  },
+  {
+   "id": "6",
+   "title": "Metoda Jacobi",
+   "chapter": "2. Sisteme liniare: metode iterative",
+   "difficulty": "medie",
+   "source": "Tema MN · metode iterative",
+   "statement": "Scrie `[x, k] = jacobi(A, b, x0, tol, maxit)`, care rezolvă `A x = b` iterativ, pornind din `x0`. Fiecare componentă nouă se calculează **doar din iterația veche** `x`:\n\n$$x^{(k+1)}_i = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j \\ne i} a_{ij} x^{(k)}_j\\right)$$\n\n**Oprirea**: după fiecare iterație `k` (numărate de la 1), dacă `norm(x_nou - x_vechi, Inf) < tol`, întorci `x_nou` și `k`. Dacă ajungi la `maxit` iterații fără să te oprești, întorci ultima iterație și `k = maxit`. Testele verifică și `k`, deci respectă exact regula.",
+   "hint": "Ține două vectori: iterația veche și cea nouă. `norm(v, Inf)` e cel mai mare element în modul.",
+   "solution": "Matricele din teste sunt diagonal dominante, deci metoda converge.\n\n```matlab\nfunction [x, k] = jacobi(A, b, x0, tol, maxit)\n    n = length(b);\n    x = x0;\n    for k = 1:maxit\n        xn = x;\n        for i = 1:n\n            s = 0;\n            for j = 1:n\n                if j ~= i\n                    s = s + A(i, j) * x(j);\n                end\n            end\n            xn(i) = (b(i) - s) / A(i, i);\n        end\n        if norm(xn - x, Inf) < tol\n            x = xn;\n            return;\n        end\n        x = xn;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "jacobi",
+    "signature": "function [x, k] = jacobi(A, b, x0, tol, maxit)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "[10.0 -1.0 2.0 0.0; -1.0 11.0 -1.0 3.0; 2.0 -1.0 10.0 -1.0; 0.0 3.0 -1.0 8.0]",
+       "[6.0; 25.0; -11.0; 15.0]",
+       "[0.0; 0.0; 0.0; 0.0]",
+       "1e-8",
+       "500"
+      ],
+      "expect": [
+       "[1.0000000008366592; 1.9999999985888712; -0.9999999989100756; 0.9999999984529894]",
+       "24"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[4.0 1.0; 2.0 5.0]",
+       "[1.0; 2.0]",
+       "[0.0; 0.0]",
+       "1e-8",
+       "500"
+      ],
+      "expect": [
+       "[0.166666665; 0.33333333]",
+       "16"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[5.0 -1.0 1.0; 2.0 8.0 -1.0; -1.0 1.0 4.0]",
+       "[10.0; 11.0; 3.0]",
+       "[0.0; 0.0; 0.0]",
+       "1e-8",
+       "500"
+      ],
+      "expect": [
+       "[1.9999999996267868; 0.9999999987249255; 1.0000000018707167]",
+       "20"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "\\",
+     "inv"
+    ],
+    "starter": "function [x, k] = jacobi(A, b, x0, tol, maxit)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [x, k] = jacobi(A, b, x0, tol, maxit)\n    n = length(b);\n    x = x0;\n    for k = 1:maxit\n        xn = x;\n        for i = 1:n\n            s = 0;\n            for j = 1:n\n                if j ~= i\n                    s = s + A(i, j) * x(j);\n                end\n            end\n            xn(i) = (b(i) - s) / A(i, i);\n        end\n        if norm(xn - x, Inf) < tol\n            x = xn;\n            return;\n        end\n        x = xn;\n    end\nend"
+   }
+  },
+  {
+   "id": "7",
+   "title": "Metoda Gauss-Seidel",
+   "chapter": "2. Sisteme liniare: metode iterative",
+   "difficulty": "medie",
+   "source": "Tema MN · metode iterative",
+   "statement": "Scrie `[x, k] = gauss_seidel(A, b, x0, tol, maxit)`, care rezolvă `A x = b` iterativ, pornind din `x0`. Spre deosebire de Jacobi, folosești **imediat** componentele deja calculate în iterația curentă:\n\n$$x^{(k+1)}_i = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j<i} a_{ij} x^{(k+1)}_j - \\sum_{j>i} a_{ij} x^{(k)}_j\\right)$$\n\n**Oprirea**: după fiecare iterație `k` (numărate de la 1), dacă `norm(x_nou - x_vechi, Inf) < tol`, întorci `x_nou` și `k`. Dacă ajungi la `maxit` iterații fără să te oprești, întorci ultima iterație și `k = maxit`. Testele verifică și `k`, deci respectă exact regula.",
+   "hint": "Ține două vectori: iterația veche și cea nouă. `norm(v, Inf)` e cel mai mare element în modul.",
+   "solution": "Gauss-Seidel folosește informația nouă mai devreme, deci de obicei are nevoie de mai puține iterații decât Jacobi (compară `k` pe aceleași teste).\n\n```matlab\nfunction [x, k] = gauss_seidel(A, b, x0, tol, maxit)\n    n = length(b);\n    x = x0;\n    for k = 1:maxit\n        xn = x;\n        for i = 1:n\n            s = 0;\n            for j = 1:n\n                if j ~= i\n                    s = s + A(i, j) * xn(j);\n                end\n            end\n            xn(i) = (b(i) - s) / A(i, i);\n        end\n        if norm(xn - x, Inf) < tol\n            x = xn;\n            return;\n        end\n        x = xn;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "gauss_seidel",
+    "signature": "function [x, k] = gauss_seidel(A, b, x0, tol, maxit)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "[10.0 -1.0 2.0 0.0; -1.0 11.0 -1.0 3.0; 2.0 -1.0 10.0 -1.0; 0.0 3.0 -1.0 8.0]",
+       "[6.0; 25.0; -11.0; 15.0]",
+       "[0.0; 0.0; 0.0; 0.0]",
+       "1e-8",
+       "500"
+      ],
+      "expect": [
+       "[0.9999999999868117; 1.9999999998595697; -0.9999999999763907; 1.0000000000556126]",
+       "10"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[4.0 1.0; 2.0 5.0]",
+       "[1.0; 2.0]",
+       "[0.0; 0.0]",
+       "1e-8",
+       "500"
+      ],
+      "expect": [
+       "[0.1666666675; 0.333333333]",
+       "9"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[5.0 -1.0 1.0; 2.0 8.0 -1.0; -1.0 1.0 4.0]",
+       "[10.0; 11.0; 3.0]",
+       "[0.0; 0.0; 0.0]",
+       "1e-8",
+       "500"
+      ],
+      "expect": [
+       "[1.9999999991310642; 1.0000000004474003; 0.9999999996709159]",
+       "12"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "\\",
+     "inv"
+    ],
+    "starter": "function [x, k] = gauss_seidel(A, b, x0, tol, maxit)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [x, k] = gauss_seidel(A, b, x0, tol, maxit)\n    n = length(b);\n    x = x0;\n    for k = 1:maxit\n        xn = x;\n        for i = 1:n\n            s = 0;\n            for j = 1:n\n                if j ~= i\n                    s = s + A(i, j) * xn(j);\n                end\n            end\n            xn(i) = (b(i) - s) / A(i, i);\n        end\n        if norm(xn - x, Inf) < tol\n            x = xn;\n            return;\n        end\n        x = xn;\n    end\nend"
+   }
+  },
+  {
+   "id": "8",
+   "title": "Interpolarea Lagrange",
+   "chapter": "3. Interpolare",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Scrie `y = lagrange(xs, ys, x)`: valorile polinomului de interpolare Lagrange prin punctele `(xs(i), ys(i))`, calculate în fiecare punct al vectorului **linie** `x`. `y` are aceeași formă ca `x`.\n\n$$P(t) = \\sum_{i=1}^{n} y_i \\prod_{j \\ne i} \\frac{t - x_j}{x_i - x_j}$$",
+   "hint": "Calculează polinoamele de bază `L_i` direct pe tot vectorul `x`, cu operații element cu element (`.*`).",
+   "solution": "Fiecare `L_i` e 1 în `xs(i)` și 0 în celelalte noduri, deci suma trece prin toate punctele.\n\n```matlab\nfunction y = lagrange(xs, ys, x)\n    n = length(xs);\n    y = zeros(size(x));\n    for i = 1:n\n        L = ones(size(x));\n        for j = 1:n\n            if j ~= i\n                L = L .* (x - xs(j)) / (xs(i) - xs(j));\n            end\n        end\n        y = y + ys(i) * L;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "lagrange",
+    "signature": "function y = lagrange(xs, ys, x)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[0.0 1.0 2.0]",
+       "[1.0 3.0 7.0]",
+       "[0.5 1.5 3.0]"
+      ],
+      "expect": [
+       "[1.75 4.75 13.0]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[-1.0 0.0 1.0 2.0]",
+       "[2.0 1.0 0.0 5.0]",
+       "[0.0 0.25 -0.5]"
+      ],
+      "expect": [
+       "[1.0 0.515625 1.875]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 2.0 4.0 5.0 7.0]",
+       "[0.0 1.0 3.0 2.0 8.0]",
+       "[3.0 6.0]"
+      ],
+      "expect": [
+       "[2.711111111111111 2.1111111111111107]"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [],
+    "starter": "function y = lagrange(xs, ys, x)\n    % scrie codul aici\n\nend\n",
+    "reference": "function y = lagrange(xs, ys, x)\n    n = length(xs);\n    y = zeros(size(x));\n    for i = 1:n\n        L = ones(size(x));\n        for j = 1:n\n            if j ~= i\n                L = L .* (x - xs(j)) / (xs(i) - xs(j));\n            end\n        end\n        y = y + ys(i) * L;\n    end\nend"
+   }
+  },
+  {
+   "id": "9",
+   "title": "Diferențele divizate ale lui Newton",
+   "chapter": "3. Interpolare",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Scrie `c = dif_div(xs, ys)`, care întoarce (ca vector **linie**) coeficienții formei Newton a polinomului de interpolare:\n\n$$P(t) = c_1 + c_2 (t - x_1) + c_3 (t - x_1)(t - x_2) + \\ldots$$\n\nadică `c(k) = f[x_1, ..., x_k]`, diferențele divizate de pe diagonala tabelului.",
+   "hint": "Poți calcula tabelul pe loc, într-un singur vector: la pasul `j` actualizezi de la coadă spre `j`, ca să nu strici valorile de care mai ai nevoie.",
+   "solution": "Avantajul formei Newton: un punct nou adaugă doar un termen, fără să recalculezi tot.\n\n```matlab\nfunction c = dif_div(xs, ys)\n    n = length(xs);\n    c = ys;\n    for j = 2:n\n        for i = n:-1:j\n            c(i) = (c(i) - c(i-1)) / (xs(i) - xs(i-j+1));\n        end\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "dif_div",
+    "signature": "function c = dif_div(xs, ys)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[0.0 1.0 2.0]",
+       "[1.0 3.0 7.0]"
+      ],
+      "expect": [
+       "[1.0 2.0 1.0]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[-1.0 0.0 1.0 2.0]",
+       "[2.0 1.0 0.0 5.0]"
+      ],
+      "expect": [
+       "[2.0 -1.0 0.0 1.0]"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 2.0 4.0 5.0 7.0]",
+       "[0.0 1.0 3.0 2.0 8.0]"
+      ],
+      "expect": [
+       "[0.0 1.0 0.0 -0.16666666666666666 0.09444444444444444]"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [],
+    "starter": "function c = dif_div(xs, ys)\n    % scrie codul aici\n\nend\n",
+    "reference": "function c = dif_div(xs, ys)\n    n = length(xs);\n    c = ys;\n    for j = 2:n\n        for i = n:-1:j\n            c(i) = (c(i) - c(i-1)) / (xs(i) - xs(i-j+1));\n        end\n    end\nend"
+   }
+  },
+  {
+   "id": "10",
+   "title": "Metoda lui Newton",
+   "chapter": "4. Ecuații neliniare",
+   "difficulty": "medie",
+   "source": "Laborator MN · ecuații neliniare",
+   "statement": "Scrie `[r, k] = newton(f, df, x0, tol, maxit)`: rădăcina lui `f` prin metoda tangentei, pornind din `x0`. `f` și `df` (derivata) sunt funcții, de exemplu `@(x) x.^2 - 2`; le apelezi ca `f(x)`.\n\n$$x_{k+1} = x_k - \\frac{f(x_k)}{f^{\\prime}(x_k)}$$\n\n**Oprirea**: după iterația `k` (de la 1), dacă `abs(x_nou - x_vechi) < tol` întorci `x_nou` și `k`; după `maxit` iterații întorci ce ai.",
+   "hint": "O funcție primită ca argument se apelează ca oricare alta: `f(x)`.",
+   "solution": "Aproape de rădăcină, Newton converge pătratic: numărul de cifre corecte se dublează la fiecare pas (vezi cât de mic e `k`).\n\n```matlab\nfunction [r, k] = newton(f, df, x0, tol, maxit)\n    x = x0;\n    for k = 1:maxit\n        r = x - f(x) / df(x);\n        if abs(r - x) < tol\n            return;\n        end\n        x = r;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "newton",
+    "signature": "function [r, k] = newton(f, df, x0, tol, maxit)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "@(x) x.^3 - 2*x - 5",
+       "@(x) 3*x.^2 - 2",
+       "2",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "2.0945514815423265",
+       "5"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "@(x) cos(x) - x",
+       "@(x) -sin(x) - 1",
+       "1",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "0.7390851332151607",
+       "5"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "@(x) x.^2 - 2",
+       "@(x) 2*x",
+       "1",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "1.414213562373095",
+       "6"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "@(x) exp(x) - 3",
+       "@(x) exp(x)",
+       "0",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "1.0986122886681098",
+       "7"
+      ],
+      "tol": 1e-09
+     }
+    ],
+    "forbid": [],
+    "starter": "function [r, k] = newton(f, df, x0, tol, maxit)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [r, k] = newton(f, df, x0, tol, maxit)\n    x = x0;\n    for k = 1:maxit\n        r = x - f(x) / df(x);\n        if abs(r - x) < tol\n            return;\n        end\n        x = r;\n    end\nend"
+   }
+  },
+  {
+   "id": "11",
+   "title": "Metoda bisecției",
+   "chapter": "4. Ecuații neliniare",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie `r = bisectie(f, a, b, tol)`, unde `f(a)` și `f(b)` au semne opuse. Cât timp `(b - a) / 2 > tol`: iei mijlocul `c`; dacă `f(a) * f(c) <= 0` rădăcina e în `[a, c]` (deci `b = c`), altfel în `[c, b]` (`a = c`). La sfârșit întorci mijlocul intervalului rămas.",
+   "hint": "Un `while` cu condiția din enunț; nu uita că la sfârșit întorci mijlocul, nu `a` sau `b`.",
+   "solution": "Fiecare pas înjumătățește intervalul: pentru o precizie `tol` trebuie aproximativ log₂((b - a) / tol) pași.\n\n```matlab\nfunction r = bisectie(f, a, b, tol)\n    while (b - a) / 2 > tol\n        c = (a + b) / 2;\n        if f(a) * f(c) <= 0\n            b = c;\n        else\n            a = c;\n        end\n    end\n    r = (a + b) / 2;\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "bisectie",
+    "signature": "function r = bisectie(f, a, b, tol)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "@(x) x.^3 - x - 2",
+       "1",
+       "2",
+       "1e-10"
+      ],
+      "expect": [
+       "1.5213797068572603"
+      ],
+      "tol": 1e-12
+     },
+     {
+      "args": [
+       "@(x) cos(x) - x",
+       "0",
+       "1",
+       "1e-10"
+      ],
+      "expect": [
+       "0.7390851332456805"
+      ],
+      "tol": 1e-12
+     },
+     {
+      "args": [
+       "@(x) x.^2 - 5",
+       "0",
+       "5",
+       "1e-10"
+      ],
+      "expect": [
+       "2.23606797742832"
+      ],
+      "tol": 1e-12
+     }
+    ],
+    "forbid": [],
+    "starter": "function r = bisectie(f, a, b, tol)\n    % scrie codul aici\n\nend\n",
+    "reference": "function r = bisectie(f, a, b, tol)\n    while (b - a) / 2 > tol\n        c = (a + b) / 2;\n        if f(a) * f(c) <= 0\n            b = c;\n        else\n            a = c;\n        end\n    end\n    r = (a + b) / 2;\nend"
+   }
+  },
+  {
+   "id": "12",
+   "title": "Formula trapezelor",
+   "chapter": "5. Integrare și ecuații diferențiale",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie `I = trapez(f, a, b, n)`: aproximarea integralei lui `f` pe `[a, b]` cu formula **trapezelor compusă**, pe `n` subintervale egale de lungime `h = (b - a) / n`:\n\n$$I \\approx h\\left(\\frac{f(x_0)}{2} + f(x_1) + \\ldots + f(x_{n-1}) + \\frac{f(x_n)}{2}\\right)$$\n\n`f` acceptă vectori (scrisă cu `.^`, `./`).",
+   "hint": "`x = a + (0:n) * h` dă toate nodurile deodată.",
+   "solution": "Eroarea scade ca h²: dublând n, eroarea scade de aproximativ 4 ori.\n\n```matlab\nfunction I = trapez(f, a, b, n)\n    h = (b - a) / n;\n    x = a + (0:n) * h;\n    y = f(x);\n    I = h * (y(1) / 2 + sum(y(2:n)) + y(n+1) / 2);\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "trapez",
+    "signature": "function I = trapez(f, a, b, n)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "@(x) x.^2",
+       "0",
+       "1",
+       "10"
+      ],
+      "expect": [
+       "0.3350000000000001"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) sin(x)",
+       "0",
+       "3.141592653589793",
+       "10"
+      ],
+      "expect": [
+       "1.9835235375094546"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) exp(-x.^2)",
+       "0",
+       "2",
+       "10"
+      ],
+      "expect": [
+       "0.8818388107987754"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) 1 ./ (1 + x.^2)",
+       "0",
+       "1",
+       "10"
+      ],
+      "expect": [
+       "0.7849814972267897"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) x.^2",
+       "0",
+       "1",
+       "1"
+      ],
+      "expect": [
+       "0.5"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [],
+    "starter": "function I = trapez(f, a, b, n)\n    % scrie codul aici\n\nend\n",
+    "reference": "function I = trapez(f, a, b, n)\n    h = (b - a) / n;\n    x = a + (0:n) * h;\n    y = f(x);\n    I = h * (y(1) / 2 + sum(y(2:n)) + y(n+1) / 2);\nend"
+   }
+  },
+  {
+   "id": "13",
+   "title": "Formula lui Simpson",
+   "chapter": "5. Integrare și ecuații diferențiale",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Scrie `I = simpson(f, a, b, n)` cu formula lui **Simpson compusă**, `n` par:\n\n$$I \\approx \\frac{h}{3}\\left(f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + \\ldots + 4f(x_{n-1}) + f(x_n)\\right)$$",
+   "hint": "În Octave indicii pornesc de la 1: nodurile impare ale formulei (x₁, x₃, ...) sunt `y(2:2:n)`.",
+   "solution": "Simpson e exactă pentru polinoame de grad cel mult 3 (testul cu x³ dă exact 4), iar eroarea scade ca h⁴.\n\n```matlab\nfunction I = simpson(f, a, b, n)\n    h = (b - a) / n;\n    x = a + (0:n) * h;\n    y = f(x);\n    I = h / 3 * (y(1) + 4 * sum(y(2:2:n)) + 2 * sum(y(3:2:n-1)) + y(n+1));\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "simpson",
+    "signature": "function I = simpson(f, a, b, n)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "@(x) x.^2",
+       "0",
+       "1",
+       "10"
+      ],
+      "expect": [
+       "0.3333333333333333"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) sin(x)",
+       "0",
+       "3.141592653589793",
+       "10"
+      ],
+      "expect": [
+       "2.0001095173150043"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) exp(-x.^2)",
+       "0",
+       "2",
+       "10"
+      ],
+      "expect": [
+       "0.882074876854494"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) 1 ./ (1 + x.^2)",
+       "0",
+       "1",
+       "10"
+      ],
+      "expect": [
+       "0.7853981534848038"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(x) x.^3",
+       "0",
+       "2",
+       "2"
+      ],
+      "expect": [
+       "4"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [],
+    "starter": "function I = simpson(f, a, b, n)\n    % scrie codul aici\n\nend\n",
+    "reference": "function I = simpson(f, a, b, n)\n    h = (b - a) / n;\n    x = a + (0:n) * h;\n    y = f(x);\n    I = h / 3 * (y(1) + 4 * sum(y(2:2:n)) + 2 * sum(y(3:2:n-1)) + y(n+1));\nend"
+   }
+  },
+  {
+   "id": "14",
+   "title": "Metoda lui Euler",
+   "chapter": "5. Integrare și ecuații diferențiale",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie `y = euler(f, t0, y0, h, n)` pentru problema Cauchy `y' = f(t, y)`, `y(t0) = y0`: faci `n` pași de lungime `h` și întorci **vectorul linie** cu cele `n + 1` valori `y_0, y_1, ..., y_n`.\n\n$$y_{k+1} = y_k + h\\, f(t_k, y_k), \\qquad t_{k+1} = t_k + h$$",
+   "hint": "Indicele `k` din vector e cu 1 mai mare decât cel din formulă.",
+   "solution": "Primul test aproximează e¹ ≈ 2.71828 cu 2.59374: Euler are eroare O(h).\n\n```matlab\nfunction y = euler(f, t0, y0, h, n)\n    y = zeros(1, n + 1);\n    y(1) = y0;\n    t = t0;\n    for k = 1:n\n        y(k+1) = y(k) + h * f(t, y(k));\n        t = t + h;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "euler",
+    "signature": "function y = euler(f, t0, y0, h, n)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "@(t, y) y",
+       "0",
+       "1",
+       "0.1",
+       "10"
+      ],
+      "expect": [
+       "[1.0 1.1 1.2100000000000002 1.3310000000000002 1.4641000000000002 1.61051 1.7715610000000002 1.9487171 2.1435888100000002 2.357947691 2.5937424601]"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(t, y) -2 * t * y",
+       "0",
+       "1",
+       "0.05",
+       "20"
+      ],
+      "expect": [
+       "[1.0 1.0 0.995 0.98505 0.97027425 0.9508687650000001 0.9270970458750001 0.8992841344987501 0.8678091897912938 0.8330968221996421 0.7956074652006582 0.7558270919406253 0.7142566018838908 0.6714012057708574 0.6277601273957516 0.583816918478049 0.5400306495921953 0.4968281976248196 0.4545978008267099 0.413683998752306 0.3743840188708369]"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(t, y) t - y",
+       "0",
+       "2",
+       "0.5",
+       "4"
+      ],
+      "expect": [
+       "[2.0 1.0 0.75 0.875 1.1875]"
+      ],
+      "tol": 1e-10
+     }
+    ],
+    "forbid": [],
+    "starter": "function y = euler(f, t0, y0, h, n)\n    % scrie codul aici\n\nend\n",
+    "reference": "function y = euler(f, t0, y0, h, n)\n    y = zeros(1, n + 1);\n    y(1) = y0;\n    t = t0;\n    for k = 1:n\n        y(k+1) = y(k) + h * f(t, y(k));\n        t = t + h;\n    end\nend"
+   }
+  },
+  {
+   "id": "15",
+   "title": "Metoda puterii",
+   "chapter": "6. Valori proprii și ortogonalizare",
+   "difficulty": "medie",
+   "source": "Laborator MN · valori proprii",
+   "statement": "Scrie `[lambda, v] = putere(A, x0, tol, maxit)`, care găsește valoarea proprie de **modul maxim** a lui `A` și un vector propriu, prin metoda puterii: repeți `y = A x`, `x = y / norm(y)`, iar estimarea valorii proprii e `x' A x` (câtul Rayleigh). Te oprești când estimarea se schimbă cu mai puțin de `tol` sau după `maxit` pași.\n\nTestele verifică valoarea proprie și că `A v ≈ λ v` (orice normare a lui `v` e acceptată).",
+   "hint": "Normează vectorul la fiecare pas, altfel crește (sau scade) exponențial.",
+   "solution": "Viteza depinde de raportul |λ₂ / λ₁|: cu cât e mai aproape de 1, cu atât converge mai încet.\n\n```matlab\nfunction [lambda, v] = putere(A, x0, tol, maxit)\n    v = x0 / norm(x0);\n    lambda = v' * A * v;\n    for k = 1:maxit\n        y = A * v;\n        v = y / norm(y);\n        nou = v' * A * v;\n        if abs(nou - lambda) < tol\n            lambda = nou;\n            return;\n        end\n        lambda = nou;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "putere",
+    "signature": "function [lambda, v] = putere(A, x0, tol, maxit)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "[2.0 1.0; 1.0 3.0]",
+       "[1.0; 1.0]",
+       "1e-12",
+       "1000"
+      ],
+      "expect": [
+       "3.618033988749895"
+      ],
+      "check": [
+       "norm(a1*o2 - o1*o2) < 1e-5 * norm(o2)",
+       "norm(o2) > 0"
+      ],
+      "tol": 1e-07
+     },
+     {
+      "args": [
+       "[4.0 1.0 0.0; 1.0 3.0 1.0; 0.0 1.0 2.0]",
+       "[1.0; 1.0; 1.0]",
+       "1e-12",
+       "1000"
+      ],
+      "expect": [
+       "4.732050807568877"
+      ],
+      "check": [
+       "norm(a1*o2 - o1*o2) < 1e-5 * norm(o2)",
+       "norm(o2) > 0"
+      ],
+      "tol": 1e-07
+     },
+     {
+      "args": [
+       "[4.0 -2.0 1.0; -2.0 4.0 -2.0; 1.0 -2.0 4.0]",
+       "[1.0; 1.0; 1.0]",
+       "1e-12",
+       "1000"
+      ],
+      "expect": [
+       "7.372281323269014"
+      ],
+      "check": [
+       "norm(a1*o2 - o1*o2) < 1e-5 * norm(o2)",
+       "norm(o2) > 0"
+      ],
+      "tol": 1e-07
+     },
+     {
+      "args": [
+       "[6.0 2.0 1.0; 2.0 3.0 1.0; 1.0 1.0 1.0]",
+       "[1.0; 1.0; 1.0]",
+       "1e-12",
+       "1000"
+      ],
+      "expect": [
+       "7.287992138960423"
+      ],
+      "check": [
+       "norm(a1*o2 - o1*o2) < 1e-5 * norm(o2)",
+       "norm(o2) > 0"
+      ],
+      "tol": 1e-07
+     }
+    ],
+    "forbid": [
+     "eig"
+    ],
+    "starter": "function [lambda, v] = putere(A, x0, tol, maxit)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [lambda, v] = putere(A, x0, tol, maxit)\n    v = x0 / norm(x0);\n    lambda = v' * A * v;\n    for k = 1:maxit\n        y = A * v;\n        v = y / norm(y);\n        nou = v' * A * v;\n        if abs(nou - lambda) < tol\n            lambda = nou;\n            return;\n        end\n        lambda = nou;\n    end\nend"
+   }
+  },
+  {
+   "id": "16",
+   "title": "Gram-Schmidt: factorizarea QR",
+   "chapter": "6. Valori proprii și ortogonalizare",
+   "difficulty": "grea",
+   "source": "Laborator MN",
+   "statement": "Scrie `[Q, R] = gram_schmidt(A)` pentru o matrice `A` (m × n, m ≥ n) cu coloanele liniar independente: `Q` (m × n) are coloanele **ortonormate**, `R` (n × n) e superior triunghiulară cu diagonala pozitivă, iar `A = Q R`.\n\nColoana `j` din Q se obține din coloana `j` din A scăzând proiecțiile pe coloanele deja găsite și normând rezultatul.",
+   "hint": "`R(i, j) = Q(:, i)' * A(:, j)` e proiecția; după ce le-ai scăzut pe toate, `norm(v)` e `R(j, j)`.",
+   "solution": "Așa se rezolvă și problemele de cele mai mici pătrate: `A x ≈ b` devine `R x = Q' b`.\n\n```matlab\nfunction [Q, R] = gram_schmidt(A)\n    [m, n] = size(A);\n    Q = zeros(m, n);\n    R = zeros(n);\n    for j = 1:n\n        v = A(:, j);\n        for i = 1:j-1\n            R(i, j) = Q(:, i)' * A(:, j);\n            v = v - R(i, j) * Q(:, i);\n        end\n        R(j, j) = norm(v);\n        Q(:, j) = v / R(j, j);\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "gram_schmidt",
+    "signature": "function [Q, R] = gram_schmidt(A)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "[1.0 1.0 0.0; 1.0 0.0 1.0; 0.0 1.0 1.0]"
+      ],
+      "check": [
+       "norm(o1*o2 - a1) < 1e-9",
+       "norm(o1'*o1 - eye(columns(a1))) < 1e-9",
+       "isequal(o2, triu(o2))",
+       "all(diag(o2) > 0)",
+       "isequal(size(o1), size(a1))"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[3.0 1.0; 4.0 2.0]"
+      ],
+      "check": [
+       "norm(o1*o2 - a1) < 1e-9",
+       "norm(o1'*o1 - eye(columns(a1))) < 1e-9",
+       "isequal(o2, triu(o2))",
+       "all(diag(o2) > 0)",
+       "isequal(size(o1), size(a1))"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 2.0 0.0; 0.0 1.0 1.0; 1.0 0.0 1.0; 1.0 1.0 1.0]"
+      ],
+      "check": [
+       "norm(o1*o2 - a1) < 1e-9",
+       "norm(o1'*o1 - eye(columns(a1))) < 1e-9",
+       "isequal(o2, triu(o2))",
+       "all(diag(o2) > 0)",
+       "isequal(size(o1), size(a1))"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "qr"
+    ],
+    "starter": "function [Q, R] = gram_schmidt(A)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [Q, R] = gram_schmidt(A)\n    [m, n] = size(A);\n    Q = zeros(m, n);\n    R = zeros(n);\n    for j = 1:n\n        v = A(:, j);\n        for i = 1:j-1\n            R(i, j) = Q(:, i)' * A(:, j);\n            v = v - R(i, j) * Q(:, i);\n        end\n        R(j, j) = norm(v);\n        Q(:, j) = v / R(j, j);\n    end\nend"
+   }
+  }
+ ]
+}

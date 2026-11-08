@@ -6,7 +6,7 @@ import 'judge0.dart' show RunResult;
 extension type _Runner._(JSObject _) implements JSObject {
   external void warm();
   external JSBoolean isReady();
-  external JSPromise<_Result> run(JSString code, JSString stdin, JSNumber timeoutMs, JSString? file);
+  external JSPromise<_Result> run(JSString code, JSString stdin, JSNumber timeoutMs, JSString? file, JSString lang);
 }
 
 extension type _Result._(JSObject _) implements JSObject {
@@ -27,11 +27,11 @@ void warm(String runner) => _get(runner)?.warm();
 
 bool ready(String runner) => _get(runner)?.isReady().toDart ?? false;
 
-Future<RunResult?> run(String runner, String code, String stdin, Duration limit, String? file) async {
+Future<RunResult?> run(String runner, String code, String stdin, Duration limit, String? file, [String lang = 'cpp']) async {
   final r0 = _get(runner);
   if (r0 == null) return null;
   try {
-    final r = await r0.run(code.toJS, stdin.toJS, limit.inMilliseconds.toJS, file?.toJS).toDart;
+    final r = await r0.run(code.toJS, stdin.toJS, limit.inMilliseconds.toJS, file?.toJS, lang.toJS).toDart;
     if ((r.failed?.toDart ?? false) || (r.notReady?.toDart ?? false)) return null; // let the server run it
     return RunResult(
       stdout: r.stdout?.toDart ?? '',

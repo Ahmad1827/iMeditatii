@@ -126,8 +126,9 @@ class Judge0 {
 
   static const int cpp = 52;
   static const int python = 71;
+  static const int c = 50; // C (GCC 9.2)
 
-  static int languageId(String lang) => lang == 'python' ? python : cpp;
+  static int languageId(String lang) => lang == 'python' ? python : lang == 'c' ? c : cpp;
 
   /// Public Judge0 CE instance: no key, used when the RapidAPI plan refuses us.
   static const String _publicHost = 'ce.judge0.com';

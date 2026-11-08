@@ -1295,7 +1295,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
         chip(kind, icon: _kind == 'cod' ? Icons.code : (_isSheet ? Icons.draw_outlined : Icons.quiz_outlined)),
         if (_file != null) chip('$_file.in / $_file.out', icon: Icons.description_outlined),
-        chip(isSchoolGrade(widget.grade) ? 'Clasa a ${widget.grade}-a' : widget.grade, icon: isSchoolGrade(widget.grade) ? Icons.school_outlined : (widget.subject == 'ACS' ? Icons.memory : Icons.emoji_events_outlined)),
+        chip(isSchoolGrade(widget.grade) ? 'Clasa a ${widget.grade}-a' : widget.grade, icon: isSchoolGrade(widget.grade) ? Icons.school_outlined : Icons.emoji_events_outlined),
         if (time != null) chip(time, icon: Icons.timer_outlined),
         if (mem != null) chip(mem, icon: Icons.memory),
         for (final t in tags) chip(t, icon: Icons.sell_outlined),
@@ -2250,7 +2250,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       backgroundColor: AppColors.bg,
       appBar: AppBar(
         title: Text(
-          "${widget.subject.toUpperCase()} • ${isSchoolGrade(widget.grade) ? 'C${widget.grade}' : widget.grade} • #${widget.id}",
+          "${widget.subject.toUpperCase()} • C${widget.grade} • #${widget.id}",
           style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: isMobile ? 14 : 16),
         ),
         backgroundColor: AppColors.bg,

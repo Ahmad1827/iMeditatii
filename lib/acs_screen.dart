@@ -1,111 +1,70 @@
 // =============================================================================
 // ACS: problems for the Faculty of Automatic Control and Computers (UPB)
 //   A section of its own, with its own look: a terminal, or a notebook page,
-//   each in light and dark, all set in Iosevka. The switches sit top right;
-//   light / dark is the app's own theme, Terminal / Notebook is remembered apart.
+//   each in light and dark, all set in Iosevka (acs/acs_kit.dart). Each
+//   course opens its own list (/acs/<code>) and each problem its workspace:
+//   a shell, an x86 emulator, a C editor, a circuit... (acs/).
 // =============================================================================
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'acs/acs_data.dart';
+import 'acs/acs_kit.dart';
 import 'app_link.dart';
-import 'theme_manager.dart';
 
-/// A course of the section. Its problems are in assets/data/exercises.json under
-/// "ACS", in the section named [section] (shown and solved like any other problem);
-/// a course with no section yet shows as coming soon.
+/// A course of the section; its problems are in assets/data/acs/<code>.json.
+/// A course with no semester is still to come.
 class AcsSubject {
-  final String code; // the folder name in the terminal: "pclp"
-  final String section; // its key under "ACS" in exercises.json; '' while it has no problems
+  final String code; // the folder name in the terminal, and the file's name: "pclp"
+  final String short; // "PCLP"
   final String name;
   final String about;
   final int semester; // 1 or 2 of the first year; 0: coming later
-  const AcsSubject(this.code, this.section, this.name, this.about, {this.semester = 0});
+  const AcsSubject(this.code, this.short, this.name, this.about, {this.semester = 0});
 
-  bool get ready => section.isNotEmpty;
-  String get route => '/lista-exercitii?materie=ACS&clasa=${Uri.encodeComponent(section)}';
+  bool get ready => semester != 0;
+  String get route => '/acs/$code';
 }
 
 /// The first year of the CD series; the electives (history, philosophy...) have no problems here.
 const List<AcsSubject> acsSubjects = [
-  AcsSubject('am', 'AM', 'Analiză Matematică', 'Serii, derivate parțiale, extreme, integrale multiple', semester: 1),
-  AcsSubject('algaed', 'ALGAED', 'Algebră, Geometrie și Ecuații Diferențiale', 'Matrice, valori proprii, DVS, geometrie, ecuații diferențiale', semester: 1),
-  AcsSubject('pclp', 'PCLP', 'Programarea Calculatoarelor', 'C: pointeri, șiruri, biți, structuri, alocare dinamică', semester: 1),
-  AcsSubject('uso', 'USO', 'Utilizarea Sistemelor de Operare', 'Fișiere, permisiuni, filtre de text, scripturi, rețea', semester: 1),
-  AcsSubject('pl', 'PL', 'Proiectare Logică', 'Numerație, Karnaugh, multiplexoare, bistabili, automate', semester: 1),
-  AcsSubject('ms', 'MS', 'Matematici Speciale', 'Funcții complexe, Laplace și Z, probabilități, statistică', semester: 2),
-  AcsSubject('elth', 'ELTH', 'Electrotehnică', 'Circuite de c.c. și c.a., regim tranzitoriu, câmp', semester: 2),
-  AcsSubject('fizica', 'Fizică', 'Fizică (Mecanică)', 'Cinematică, dinamică, energie, rotație, oscilații', semester: 2),
-  AcsSubject('mn', 'MN', 'Metode Numerice', 'LU, Cholesky, iterații, interpolare, Newton, Euler', semester: 2),
-  AcsSubject('iocla', 'IOCLA', 'Calculatoare și Limbaje de Asamblare', 'Biți, registre x86, stiva, apeluri, buffere', semester: 2),
-  AcsSubject('sd', 'SD', 'Structuri de Date', 'Liste, stive, arbori, heap, dispersie, grafuri', semester: 2),
-  AcsSubject('admitere', '', 'Admitere ACS', 'Subiectele de matematică și informatică de la admitere'),
-  AcsSubject('poo', '', 'Programare Orientată pe Obiecte', 'Anul II: clase, moștenire, polimorfism'),
-  AcsSubject('pa', '', 'Proiectarea Algoritmilor', 'Anul II: divide et impera, programare dinamică, greedy'),
+  AcsSubject('am', 'AM', 'Analiză Matematică', 'Serii Taylor, derivate parțiale, extreme, integrale — cu grafice', semester: 1),
+  AcsSubject('algaed', 'ALGAED', 'Algebră, Geometrie și Ecuații Diferențiale', 'Operații pe linii, valori proprii, ecuații diferențiale', semester: 1),
+  AcsSubject('pclp', 'PCLP', 'Programarea Calculatoarelor', 'C cu teste: pointeri, șiruri, biți, structuri, alocare dinamică', semester: 1),
+  AcsSubject('uso', 'USO', 'Utilizarea Sistemelor de Operare', 'Un shell adevărat: fișiere, permisiuni, filtre, scripturi', semester: 1),
+  AcsSubject('pl', 'PL', 'Proiectare Logică', 'Expresii booleene, Karnaugh, multiplexoare, automate', semester: 1),
+  AcsSubject('ms', 'MS', 'Matematici Speciale', 'Laplace și Z, serii Fourier, probabilități — cu grafice', semester: 2),
+  AcsSubject('elth', 'ELTH', 'Electrotehnică', 'Circuite de c.c. și c.a. rezolvate pe schemă, simulate', semester: 2),
+  AcsSubject('fizica', 'Fizică', 'Fizică (Mecanică)', 'Simulări: aruncări, plan înclinat, ciocniri, oscilații', semester: 2),
+  AcsSubject('mn', 'MN', 'Metode Numerice', 'Un Octave în browser: LU, iterații, interpolare, Newton', semester: 2),
+  AcsSubject('iocla', 'IOCLA', 'Calculatoare și Limbaje de Asamblare', 'Asamblare x86 pe un emulator: registre, stivă, apeluri', semester: 2),
+  AcsSubject('sd', 'SD', 'Structuri de Date', 'C cu teste și structuri construite pas cu pas', semester: 2),
+  AcsSubject('admitere', 'ADM', 'Admitere ACS', 'Subiectele de matematică și informatică de la admitere'),
+  AcsSubject('poo', 'POO', 'Programare Orientată pe Obiecte', 'Anul II: clase, moștenire, polimorfism'),
+  AcsSubject('pa', 'PA', 'Proiectarea Algoritmilor', 'Anul II: divide et impera, programare dinamică, greedy'),
 ];
+
+AcsSubject? acsSubject(String code) {
+  for (final s in acsSubjects) {
+    if (s.code == code) return s;
+  }
+  return null;
+}
 
 /// How many problems a course has, and how many of them are solved on this device.
 typedef AcsCount = ({int problems, int solved});
 
-/// Every course's count, from exercises.json and the solved marks (`ACS_<section>_<id>`).
+/// Every ready course's count, by its code.
 Future<Map<String, AcsCount>> loadAcsCounts() async {
-  final data = json.decode(await rootBundle.loadString('assets/data/exercises.json')) as Map<String, dynamic>;
-  final acs = data['ACS'] as Map<String, dynamic>? ?? const {};
-  final prefs = await SharedPreferences.getInstance();
-  return {
-    for (final MapEntry(key: section, value: chapters) in acs.entries)
-      section: () {
-        var n = 0, done = 0;
-        for (final items in (chapters as Map<String, dynamic>).values) {
-          for (final item in items as List) {
-            n++;
-            if (prefs.get('ACS_${section}_${item['id']}') == true) done++;
-          }
-        }
-        return (problems: n, solved: done);
-      }(),
-  };
-}
-
-const String _font = 'Iosevka';
-const List<String> _fallback = ['monospace'];
-
-/// The colours of one look in one theme.
-class _Ink {
-  final Color bg, fg, strong, accent, muted, dim, line, hover;
-  const _Ink({
-    required this.bg,
-    required this.fg,
-    required this.strong,
-    required this.accent,
-    required this.muted,
-    required this.dim,
-    required this.line,
-    required this.hover,
-  });
-
-  static _Ink of(AcsStyle style, bool dark) {
-    if (style == AcsStyle.terminal) {
-      return dark
-          ? const _Ink(
-              bg: Color(0xFF121513), fg: Color(0xFFCFD6C9), strong: Color(0xFFE9EFE2), accent: Color(0xFF9FCF8F),
-              muted: Color(0xFF7D887A), dim: Color(0xFF4B544A), line: Color(0xFF2A302A), hover: Color(0xFF1A1F1B))
-          : const _Ink(
-              bg: Color(0xFFF2F4EF), fg: Color(0xFF243025), strong: Color(0xFF111A12), accent: Color(0xFF2F7A3A),
-              muted: Color(0xFF5D6B5C), dim: Color(0xFFA3AD9F), line: Color(0xFFD3D9CF), hover: Color(0xFFE6EAE2));
-    }
-    return dark
-        ? const _Ink(
-            bg: Color(0xFF1B1C1E), fg: Color(0xFFDADAD6), strong: Color(0xFFF0F0EC), accent: Color(0xFF8AB4F0),
-            muted: Color(0xFF9A9A96), dim: Color(0xFF6A6B6E), line: Color(0xFF4A4B4E), hover: Color(0xFF252629))
-        : const _Ink(
-            bg: Color(0xFFFBFBF9), fg: Color(0xFF2B2B2B), strong: Color(0xFF222222), accent: Color(0xFF1F5FA8),
-            muted: Color(0xFF666666), dim: Color(0xFF8A8A8A), line: Color(0xFFB9B9B9), hover: Color(0xFFF0F0EC));
+  final out = <String, AcsCount>{};
+  for (final s in acsSubjects.where((s) => s.ready)) {
+    final data = await loadAcsCourse(s.code);
+    if (data == null) continue;
+    final done = await AcsProgress.solvedIds(s.code);
+    out[s.code] = (problems: data.problems.length, solved: data.problems.where((p) => done.contains(p.id)).length);
   }
+  return out;
 }
 
 class AcsScreen extends StatefulWidget {
@@ -134,164 +93,10 @@ class _AcsScreenState extends State<AcsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([ThemeManager.themeNotifier, ThemeManager.acsStyleNotifier]),
-      builder: (context, _) {
-        final style = ThemeManager.acsStyleNotifier.value;
-        final dark = ThemeManager.isDark;
-        final ink = _Ink.of(style, dark);
-        final width = MediaQuery.of(context).size.width;
-        final narrow = width < 600;
-
-        final base = TextStyle(fontFamily: _font, fontFamilyFallback: _fallback, color: ink.fg, fontSize: 15, height: 1.45);
-
-        return Scaffold(
-          backgroundColor: ink.bg,
-          body: DefaultTextStyle(
-            style: base,
-            child: SafeArea(
-              child: SingleChildScrollView(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 900),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(narrow ? 16 : 32, 18, narrow ? 16 : 32, 64),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Align(alignment: Alignment.centerRight, child: _Switches(ink: ink, style: style, dark: dark)),
-                          const SizedBox(height: 14),
-                          style == AcsStyle.terminal
-                              ? _Terminal(ink: ink, narrow: narrow, counts: _counts)
-                              : _Notebook(ink: ink, narrow: narrow, counts: _counts),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// ---------------------------------------------------------------- switches
-class _Switches extends StatelessWidget {
-  final _Ink ink;
-  final AcsStyle style;
-  final bool dark;
-  const _Switches({required this.ink, required this.style, required this.dark});
-
-  @override
-  Widget build(BuildContext context) {
-    Widget seg(String label, AcsStyle s) {
-      final on = style == s;
-      return _Tap(
-        label: 'Aspect $label',
-        onTap: () => ThemeManager.setAcsStyle(s),
-        builder: (h) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          color: on ? ink.accent : (h ? ink.hover : Colors.transparent),
-          child: Text(label,
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: on ? ink.bg : ink.muted)),
-        ),
+  Widget build(BuildContext context) => AcsPage(
+        builder: (context, ink, narrow) =>
+            ink.terminal ? _Terminal(ink: ink, narrow: narrow, counts: _counts) : _Notebook(ink: ink, narrow: narrow, counts: _counts),
       );
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          decoration: BoxDecoration(border: Border.all(color: ink.line)),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [seg('terminal', AcsStyle.terminal), seg('notebook', AcsStyle.notebook)]),
-        ),
-        const SizedBox(width: 8),
-        _Tap(
-          label: dark ? 'Temă luminoasă' : 'Temă întunecată',
-          onTap: ThemeManager.toggleTheme,
-          builder: (h) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-            decoration: BoxDecoration(border: Border.all(color: ink.line), color: h ? ink.hover : Colors.transparent),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 15, color: ink.fg),
-                const SizedBox(width: 6),
-                Text(dark ? 'light' : 'dark', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: ink.fg)),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// A clickable bit of text: hand cursor, hover state, read out as a button.
-class _Tap extends StatefulWidget {
-  final String label;
-  final VoidCallback onTap;
-  final Widget Function(bool hover) builder;
-  const _Tap({required this.label, required this.onTap, required this.builder});
-
-  @override
-  State<_Tap> createState() => _TapState();
-}
-
-class _TapState extends State<_Tap> {
-  bool _h = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: widget.label,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _h = true),
-        onExit: (_) => setState(() => _h = false),
-        child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: widget.onTap, child: widget.builder(_h)),
-      ),
-    );
-  }
-}
-
-/// "materii | ← iMeditatii": the section's links, split by pipes.
-class _Nav extends StatelessWidget {
-  final _Ink ink;
-  final double size;
-  const _Nav({required this.ink, this.size = 15});
-
-  @override
-  Widget build(BuildContext context) {
-    Widget link(String t, String to, {bool on = false}) => AppLink(
-          to: to,
-          child: _Tap(
-            label: t,
-            onTap: () => context.go(to),
-            builder: (h) => Text(t,
-                style: TextStyle(
-                    fontSize: size,
-                    fontWeight: FontWeight.w700,
-                    color: on ? ink.accent : ink.strong,
-                    decoration: h ? TextDecoration.underline : null,
-                    decorationColor: on ? ink.accent : ink.strong)),
-          ),
-        );
-    Widget pipe() => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text('|', style: TextStyle(fontSize: size, color: ink.dim)),
-        );
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.center,
-      runSpacing: 4,
-      children: [link('materii', '/acs', on: true), pipe(), link('← iMeditatii', '/exercitii')],
-    );
-  }
 }
 
 /// "██████░░░░ 61%", or "în curând" while a course has no problems.
@@ -317,13 +122,13 @@ Widget _courseLink(BuildContext context, AcsSubject s, Widget Function(bool hove
   if (!s.ready) return builder(false);
   return AppLink(
     to: s.route,
-    child: _Tap(label: s.name, onTap: () => context.go(s.route), builder: builder),
+    child: AcsTap(label: s.name, onTap: () => context.go(s.route), builder: builder),
   );
 }
 
 // ---------------------------------------------------------------- terminal
 class _Terminal extends StatelessWidget {
-  final _Ink ink;
+  final AcsInk ink;
   final bool narrow;
   final Map<String, AcsCount> counts;
   const _Terminal({required this.ink, required this.narrow, required this.counts});
@@ -344,7 +149,7 @@ class _Terminal extends StatelessWidget {
     final cells = TextStyle(fontSize: narrow ? 13 : 14, color: ink.fg);
     // one line per course: the folder opens its problems
     Widget row(AcsSubject s) {
-      final c = counts[s.section] ?? _none;
+      final c = counts[s.code] ?? _none;
       return _courseLink(
         context,
         s,
@@ -410,14 +215,15 @@ class _Terminal extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        _Nav(ink: ink),
+        AcsNav(ink: ink),
         for (final (dir, _, sem) in _groups) ...[
           prompt('ls -l $dir/'),
           for (final s in acsSubjects.where((s) => s.ready ? s.semester == sem : sem == 0)) row(s),
         ],
         prompt('cat README'),
-        Text('Seria CD, anul I: probleme din examenele, testele și laboratoarele fiecărei materii.\nDeschide un director ca să vezi problemele. Materiile opționale nu sunt incluse.',
+        Text('Seria CD, anul I: probleme din examenele, testele și laboratoarele fiecărei materii, rezolvate\nîn unealta materiei: un shell la USO, un emulator x86 la IOCLA, Octave la MN, circuite la ELTH...\nMateriile opționale nu sunt incluse.',
             style: TextStyle(color: ink.muted, fontSize: 14)),
+
         const SizedBox(height: 18),
         Row(children: [
           Text.rich(TextSpan(children: [
@@ -425,7 +231,7 @@ class _Terminal extends StatelessWidget {
             TextSpan(text: ':~', style: TextStyle(color: ink.muted)),
             TextSpan(text: '\$ ', style: TextStyle(color: ink.accent)),
           ])),
-          _Cursor(color: ink.accent),
+          AcsCursor(color: ink.accent),
         ]),
       ],
     );
@@ -433,50 +239,9 @@ class _Terminal extends StatelessWidget {
 
 }
 
-/// The blinking block at the prompt; still when the system asks for less motion.
-class _Cursor extends StatefulWidget {
-  final Color color;
-  const _Cursor({required this.color});
-
-  @override
-  State<_Cursor> createState() => _CursorState();
-}
-
-class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100));
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.of(context).disableAnimations) {
-      _c.stop();
-      _c.value = 0;
-    } else if (!_c.isAnimating) {
-      _c.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (_, __) => Opacity(
-        opacity: _c.value < 0.5 ? 1 : 0,
-        child: Container(width: 9, height: 18, color: widget.color),
-      ),
-    );
-  }
-}
-
 // ---------------------------------------------------------------- notebook
 class _Notebook extends StatelessWidget {
-  final _Ink ink;
+  final AcsInk ink;
   final bool narrow;
   final Map<String, AcsCount> counts;
   const _Notebook({required this.ink, required this.narrow, required this.counts});
@@ -498,7 +263,7 @@ class _Notebook extends StatelessWidget {
         Container(
           padding: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: ink.line, width: 2))),
-          child: _Nav(ink: ink, size: narrow ? 15 : 17),
+          child: AcsNav(ink: ink, size: narrow ? 15 : 17),
         ),
         const SizedBox(height: 26),
         Text('Materii, anul I',
@@ -516,7 +281,7 @@ class _Notebook extends StatelessWidget {
           Text(title, style: TextStyle(fontSize: narrow ? 18 : 21, fontWeight: FontWeight.w700, color: ink.strong)),
           const SizedBox(height: 14),
           for (final s in acsSubjects.where((s) => s.ready ? s.semester == sem : sem == 0)) ...[
-            _NotebookRow(ink: ink, s: s, c: counts[s.section] ?? _none, narrow: narrow),
+            _NotebookRow(ink: ink, s: s, c: counts[s.code] ?? _none, narrow: narrow),
             const SizedBox(height: 18),
           ],
         ],
@@ -526,7 +291,7 @@ class _Notebook extends StatelessWidget {
 }
 
 class _NotebookRow extends StatelessWidget {
-  final _Ink ink;
+  final AcsInk ink;
   final AcsSubject s;
   final AcsCount c;
   final bool narrow;

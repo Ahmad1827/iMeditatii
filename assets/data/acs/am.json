@@ -1,0 +1,679 @@
+{
+ "code": "am",
+ "chapters": [
+  "1. Formula lui Taylor",
+  "2. Derivate și primitive",
+  "3. Funcții de mai multe variabile",
+  "4. Serii și integrale"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Polinomul Taylor al lui eˣ sin x",
+   "chapter": "1. Formula lui Taylor",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Scrie polinomul Taylor de **grad 3** al funcției $f(x) = e^x \\sin x$ în jurul lui $x_0 = 0$.\n\nGraficul arată funcția (gri) și polinomul tău (colorat): lângă 0 trebuie să se suprapună.",
+   "hint": "Înmulțește dezvoltările: $e^x = 1 + x + x^2/2 + \\ldots$, $\\sin x = x - x^3/6 + \\ldots$, și păstrează termenii până la $x^3$.",
+   "solution": "$(1 + x + \\frac{x^2}{2})(x - \\frac{x^3}{6}) = x + x^2 + \\frac{x^3}{2} - \\frac{x^3}{6} + \\ldots = x + x^2 + \\frac{x^3}{3}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "T₃(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(P([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), (@(x) x + x.^2 + x.^3/3)([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), 1e-7)",
+      "msg": "e polinomul Taylor de grad 3 în 0"
+     },
+     {
+      "expr": "abs(P(0)) < 1e-12",
+      "msg": "T₃(0) = f(0) = 0"
+     }
+    ],
+    "reference": {
+     "P": "x + x^2 + x^3/3"
+    },
+    "wrong": {
+     "P": "x + x^2"
+    },
+    "plot": {
+     "field": "P",
+     "range": [
+      -2.5,
+      2.5
+     ],
+     "ref": "@(x) exp(x).*sin(x)",
+     "refLabel": "f(x) = eˣ sin x",
+     "label": "T₃(x)"
+    }
+   }
+  },
+  {
+   "id": "2",
+   "title": "Taylor pentru ln(1 + x)",
+   "chapter": "1. Formula lui Taylor",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie polinomul Taylor de **grad 4** al lui $f(x) = \\ln(1 + x)$ în $x_0 = 0$. Uită-te pe grafic cum se depărtează de funcție după $x = 1$ (raza de convergență a seriei e 1).",
+   "hint": "$f^{(n)}(0) = (-1)^{n-1}(n-1)!$, deci coeficientul lui $x^n$ e $(-1)^{n-1}/n$.",
+   "solution": "$T_4(x) = x - \\frac{x^2}{2} + \\frac{x^3}{3} - \\frac{x^4}{4}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "T₄(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(P([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), (@(x) x - x.^2/2 + x.^3/3 - x.^4/4)([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), 1e-7)",
+      "msg": "e polinomul Taylor de grad 4 în 0"
+     }
+    ],
+    "reference": {
+     "P": "x - x^2/2 + x^3/3 - x^4/4"
+    },
+    "wrong": {
+     "P": "x - x^2/2 + x^3/3"
+    },
+    "plot": {
+     "field": "P",
+     "range": [
+      -0.95,
+      2.5
+     ],
+     "ref": "@(x) log(1 + x)",
+     "refLabel": "ln(1 + x)",
+     "label": "T₄(x)",
+     "yrange": [
+      -3,
+      2
+     ]
+    }
+   }
+  },
+  {
+   "id": "3",
+   "title": "Aproximarea lui cos x",
+   "chapter": "1. Formula lui Taylor",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie polinomul Taylor de **grad 6** al lui $\\cos x$ în 0. Cât de departe de 0 rămâne bun?",
+   "hint": "Doar puterile pare apar: $\\cos x = \\sum (-1)^k x^{2k}/(2k)!$.",
+   "solution": "$T_6(x) = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "T₆(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(P([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), (@(x) 1 - x.^2/2 + x.^4/24 - x.^6/720)([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), 1e-7)",
+      "msg": "e polinomul Taylor de grad 6 în 0"
+     }
+    ],
+    "reference": {
+     "P": "1 - x^2/2 + x^4/24 - x^6/720"
+    },
+    "wrong": {
+     "P": "1 - x^2/2 + x^4/24"
+    },
+    "plot": {
+     "field": "P",
+     "range": [
+      -6,
+      6
+     ],
+     "ref": "@(x) cos(x)",
+     "refLabel": "cos x",
+     "label": "T₆(x)",
+     "yrange": [
+      -2,
+      2
+     ]
+    }
+   }
+  },
+  {
+   "id": "4",
+   "title": "Derivata unui produs",
+   "chapter": "2. Derivate și primitive",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează derivata funcției $f(x) = x^2 \\ln x$, $x > 0$.",
+   "hint": "$(uv)' = u'v + uv'$.",
+   "solution": "$f'(x) = 2x \\ln x + x^2 \\cdot \\frac{1}{x} = 2x\\ln x + x$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "d",
+      "label": "f'(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(d([0.3 0.7 1 1.5 2.4 3.1]), deriv(@(x) x.^2.*log(x), [0.3 0.7 1 1.5 2.4 3.1]), 1e-6)",
+      "msg": "e derivata lui x² ln x"
+     }
+    ],
+    "reference": {
+     "d": "2x ln x + x"
+    },
+    "wrong": {
+     "d": "2x ln x"
+    },
+    "plot": {
+     "field": "d",
+     "range": [
+      0.05,
+      3
+     ],
+     "ref": "@(x) 2*x.*log(x) + x",
+     "refLabel": "f'(x)",
+     "label": "derivata ta"
+    }
+   }
+  },
+  {
+   "id": "5",
+   "title": "O primitivă prin părți",
+   "chapter": "2. Derivate și primitive",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Găsește o primitivă $F$ a funcției $f(x) = x e^x$. Orice primitivă e bună (constanta nu contează): se verifică $F' = f$.",
+   "hint": "Integrare prin părți: $\\int u\\,dv = uv - \\int v\\,du$ cu $u = x$, $dv = e^x dx$.",
+   "solution": "$\\int x e^x dx = x e^x - \\int e^x dx = (x - 1)e^x + C$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "F",
+      "label": "F(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv(F, [-2 -1 0 0.5 1 2]), [-2 -1 0 0.5 1 2] .* exp([-2 -1 0 0.5 1 2]), 1e-6)",
+      "msg": "F'(x) = x eˣ"
+     }
+    ],
+    "reference": {
+     "F": "x e^x - e^x + 7"
+    },
+    "wrong": {
+     "F": "x e^x"
+    },
+    "plot": {
+     "field": "F",
+     "range": [
+      -3,
+      2
+     ],
+     "ref": "@(x) (x - 1).*exp(x)",
+     "refLabel": "(x - 1)eˣ",
+     "label": "F(x) (poate fi deplasată în sus sau jos)"
+    }
+   }
+  },
+  {
+   "id": "6",
+   "title": "Primitiva cu arctangentă",
+   "chapter": "2. Derivate și primitive",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Găsește o primitivă a funcției $f(x) = \\dfrac{1}{x^2 + 4}$.",
+   "hint": "$\\int \\frac{dx}{x^2 + a^2} = \\frac{1}{a}\\arctan\\frac{x}{a} + C$.",
+   "solution": "$F(x) = \\frac{1}{2}\\arctan\\frac{x}{2} + C$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "F",
+      "label": "F(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv(F, [-3 -1 0 0.5 2 4]), 1 ./ ([-3 -1 0 0.5 2 4].^2 + 4), 1e-6)",
+      "msg": "F'(x) = 1/(x² + 4)"
+     }
+    ],
+    "reference": {
+     "F": "1/2 arctg(x/2)"
+    },
+    "wrong": {
+     "F": "arctg(x/2)"
+    },
+    "plot": {
+     "field": "F",
+     "range": [
+      -6,
+      6
+     ],
+     "ref": "@(x) atan(x/2)/2",
+     "refLabel": "½ arctg(x/2)",
+     "label": "F(x)"
+    }
+   }
+  },
+  {
+   "id": "7",
+   "title": "Derivatele parțiale",
+   "chapter": "3. Funcții de mai multe variabile",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Pentru $f(x, y) = x^2 y + \\sin(xy)$ calculează derivatele parțiale $\\dfrac{\\partial f}{\\partial x}$ și $\\dfrac{\\partial f}{\\partial y}$.",
+   "hint": "Derivând după x, y e o constantă (și invers).",
+   "solution": "$f_x = 2xy + y\\cos(xy)$, $f_y = x^2 + x\\cos(xy)$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "fx",
+      "label": "∂f/∂x =",
+      "type": "expr",
+      "vars": [
+       "x",
+       "y"
+      ],
+      "hint": ""
+     },
+     {
+      "name": "fy",
+      "label": "∂f/∂y =",
+      "type": "expr",
+      "vars": [
+       "x",
+       "y"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(fx([0.3 -1 2 0.7], [1 0.5 -0.4 2]), dx(@(x, y) x.^2.*y + sin(x.*y), [0.3 -1 2 0.7], [1 0.5 -0.4 2]), 1e-5)",
+      "msg": "∂f/∂x e corectă"
+     },
+     {
+      "expr": "close(fy([0.3 -1 2 0.7], [1 0.5 -0.4 2]), dy(@(x, y) x.^2.*y + sin(x.*y), [0.3 -1 2 0.7], [1 0.5 -0.4 2]), 1e-5)",
+      "msg": "∂f/∂y e corectă"
+     }
+    ],
+    "reference": {
+     "fx": "2xy + y cos(xy)",
+     "fy": "x^2 + x cos(xy)"
+    },
+    "wrong": {
+     "fx": "2xy",
+     "fy": "x^2"
+    }
+   }
+  },
+  {
+   "id": "8",
+   "title": "Punctele critice ale lui x³ + y³ - 3xy",
+   "chapter": "3. Funcții de mai multe variabile",
+   "difficulty": "medie",
+   "source": "Examen AM · seria CD · februarie 2022",
+   "statement": "Găsește **toate** punctele critice ale funcției $f(x, y) = x^3 + y^3 - 3xy$ și spune pentru fiecare dacă e minim local, maxim local sau punct șa.\n\nHarta de culori arată funcția; pune-ți punctele pe ea.",
+   "hint": "$f_x = 3x^2 - 3y = 0$ și $f_y = 3y^2 - 3x = 0$ dau $y = x^2$ și $x = y^2$. Apoi hessiana: $f_{xx} = 6x$, $f_{yy} = 6y$, $f_{xy} = -3$.",
+   "solution": "Din $y = x^2$, $x = x^4$: $x = 0$ sau $x = 1$, deci $(0, 0)$ și $(1, 1)$. În $(0,0)$: $\\det H = 0 \\cdot 0 - 9 < 0$, punct șa. În $(1,1)$: $\\det H = 36 - 9 > 0$ și $f_{xx} = 6 > 0$, minim local ($f = -1$).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "Punctele critice:",
+      "type": "points",
+      "kinds": true
+     }
+    ],
+    "checks": [
+     {
+      "expr": "same_points(P, P_tip, [0 0 0; 1 1 1])",
+      "msg": "punctele critice sunt exact acestea"
+     },
+     {
+      "expr": "same_points(P, P_tip, [0 0 0; 1 1 1], 1)",
+      "msg": "tipul fiecărui punct e corect"
+     }
+    ],
+    "reference": {
+     "P": [
+      [
+       "0",
+       "0",
+       "șa"
+      ],
+      [
+       "1",
+       "1",
+       "min"
+      ]
+     ]
+    },
+    "wrong": {
+     "P": [
+      [
+       "1",
+       "1",
+       "min"
+      ]
+     ]
+    },
+    "heat": {
+     "field": "P",
+     "fn": "@(x, y) x.^3 + y.^3 - 3*x.*y",
+     "xr": [
+      -1.5,
+      2
+     ],
+     "yr": [
+      -1.5,
+      2
+     ],
+     "label": "f(x, y) = x³ + y³ - 3xy"
+    }
+   }
+  },
+  {
+   "id": "9",
+   "title": "Un singur extrem",
+   "chapter": "3. Funcții de mai multe variabile",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Găsește punctele critice ale funcției $f(x, y) = x^2 + xy + y^2 - 3x$ și natura lor.",
+   "hint": "Un sistem liniar: $2x + y - 3 = 0$, $x + 2y = 0$.",
+   "solution": "$(2, -1)$; hessiana $\\begin{pmatrix}2 & 1\\\\1 & 2\\end{pmatrix}$ e pozitiv definită, deci minim ($f = -3$).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "Punctele critice:",
+      "type": "points",
+      "kinds": true
+     }
+    ],
+    "checks": [
+     {
+      "expr": "same_points(P, P_tip, [2 -1 1])",
+      "msg": "punctele critice sunt exact acestea"
+     },
+     {
+      "expr": "same_points(P, P_tip, [2 -1 1], 1)",
+      "msg": "tipul e corect"
+     }
+    ],
+    "reference": {
+     "P": [
+      [
+       "2",
+       "-1",
+       "min"
+      ]
+     ]
+    },
+    "wrong": {
+     "P": [
+      [
+       "2",
+       "-1",
+       "max"
+      ]
+     ]
+    },
+    "heat": {
+     "field": "P",
+     "fn": "@(x, y) x.^2 + x.*y + y.^2 - 3*x",
+     "xr": [
+      -1,
+      4
+     ],
+     "yr": [
+      -3,
+      2
+     ],
+     "label": "f(x, y)"
+    }
+   }
+  },
+  {
+   "id": "10",
+   "title": "Extreme cu legături",
+   "chapter": "3. Funcții de mai multe variabile",
+   "difficulty": "grea",
+   "source": "Examen AM · seria CD · februarie 2022",
+   "statement": "Găsește punctele de extrem ale funcției $f(x, y) = xy$ pe cercul $x^2 + y^2 = 2$ (metoda multiplicatorilor lui Lagrange) și spune care sunt de maxim și care de minim.",
+   "hint": "$L = xy - \\lambda(x^2 + y^2 - 2)$: $y = 2\\lambda x$, $x = 2\\lambda y$. Rezultă $x^2 = y^2$.",
+   "solution": "Din $x^2 = y^2$ și $x^2 + y^2 = 2$: $x, y = \\pm 1$. $f = 1$ în $(1,1)$, $(-1,-1)$ (maxime) și $f = -1$ în $(1,-1)$, $(-1,1)$ (minime).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "Punctele de extrem:",
+      "type": "points",
+      "kinds": true
+     }
+    ],
+    "checks": [
+     {
+      "expr": "same_points(P, P_tip, [1 1 -1; -1 -1 -1; 1 -1 1; -1 1 1])",
+      "msg": "punctele de extrem sunt exact acestea"
+     },
+     {
+      "expr": "same_points(P, P_tip, [1 1 -1; -1 -1 -1; 1 -1 1; -1 1 1], 1)",
+      "msg": "tipul fiecăruia e corect"
+     },
+     {
+      "expr": "all(abs(P(:, 1).^2 + P(:, 2).^2 - 2) < 1e-9)",
+      "msg": "toate sunt pe cerc"
+     }
+    ],
+    "reference": {
+     "P": [
+      [
+       "1",
+       "1",
+       "max"
+      ],
+      [
+       "-1",
+       "-1",
+       "max"
+      ],
+      [
+       "1",
+       "-1",
+       "min"
+      ],
+      [
+       "-1",
+       "1",
+       "min"
+      ]
+     ]
+    },
+    "wrong": {
+     "P": [
+      [
+       "1",
+       "1",
+       "max"
+      ],
+      [
+       "-1",
+       "-1",
+       "max"
+      ]
+     ]
+    },
+    "heat": {
+     "field": "P",
+     "fn": "@(x, y) x.*y - 3*(abs(sqrt(x.^2 + y.^2) - sqrt(2)) < 0.04)",
+     "xr": [
+      -2,
+      2
+     ],
+     "yr": [
+      -2,
+      2
+     ],
+     "label": "f(x, y) = xy, cu cercul x² + y² = 2"
+    }
+   }
+  },
+  {
+   "id": "11",
+   "title": "Suma unei serii de puteri",
+   "chapter": "4. Serii și integrale",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Găsește suma seriei $\\displaystyle S(x) = \\sum_{n=1}^{\\infty} \\frac{x^n}{n}$ pentru $|x| < 1$, ca formulă închisă.",
+   "hint": "Derivează termen cu termen: $S'(x) = \\sum x^{n-1} = \\frac{1}{1-x}$, apoi integrează, cu $S(0) = 0$.",
+   "solution": "$S(x) = -\\ln(1 - x)$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "S",
+      "label": "S(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(S([-0.9 -0.5 0 0.3 0.6 0.85]), -log(1 - [-0.9 -0.5 0 0.3 0.6 0.85]), 1e-7)",
+      "msg": "e suma seriei pe (-1, 1)"
+     }
+    ],
+    "reference": {
+     "S": "-ln(1 - x)"
+    },
+    "wrong": {
+     "S": "1/(1 - x)"
+    },
+    "plot": {
+     "field": "S",
+     "range": [
+      -0.99,
+      0.95
+     ],
+     "ref": "@(x) -log(1 - x)",
+     "refLabel": "-ln(1 - x)",
+     "label": "S(x)"
+    }
+   }
+  },
+  {
+   "id": "12",
+   "title": "O integrală definită",
+   "chapter": "4. Serii și integrale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează exact $\\displaystyle \\int_0^1 x^2 e^x \\, dx$ (poți scrie rezultatul cu `e`).",
+   "hint": "De două ori prin părți: $\\int x^2 e^x = (x^2 - 2x + 2)e^x$.",
+   "solution": "$[(x^2 - 2x + 2)e^x]_0^1 = e - 2$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "I",
+      "label": "I =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(I - (e - 2)) < 1e-9",
+      "msg": "valoarea integralei e corectă"
+     }
+    ],
+    "reference": {
+     "I": "e - 2"
+    },
+    "wrong": {
+     "I": "e"
+    }
+   }
+  },
+  {
+   "id": "13",
+   "title": "Integrală dublă pe un triunghi",
+   "chapter": "4. Serii și integrale",
+   "difficulty": "medie",
+   "source": "Examen AM · seria CD · februarie 2022",
+   "statement": "Calculează $\\displaystyle \\iint_D xy \\, dx\\, dy$, unde $D$ e triunghiul $x \\ge 0$, $y \\ge 0$, $x + y \\le 1$.",
+   "hint": "Integrează întâi după $y$ de la 0 la $1 - x$, apoi după $x$ de la 0 la 1.",
+   "solution": "$\\int_0^1 x \\frac{(1-x)^2}{2} dx = \\frac{1}{2}\\left(\\frac{1}{2} - \\frac{2}{3} + \\frac{1}{4}\\right) = \\frac{1}{24}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "I",
+      "label": "I =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(I - 1/24) < 1e-12",
+      "msg": "valoarea integralei e corectă"
+     }
+    ],
+    "reference": {
+     "I": "1/24"
+    },
+    "wrong": {
+     "I": "1/12"
+    }
+   }
+  }
+ ]
+}

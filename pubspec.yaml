@@ -116,6 +116,7 @@ flutter:
     - assets/data/exercises.json
     - assets/data/summaries.json
     - assets/data/details/
+    - assets/data/acs/
     - assets/data/problem_quizzes.json
     - assets/icons/
     - .env

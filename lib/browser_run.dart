@@ -3,7 +3,7 @@ import 'judge0.dart' show RunResult;
 
 /// Code run in the student's own browser: Python with Pyodide
 /// (web/py_runner.js), C++ with Clang built for WebAssembly
-/// (web/cpp_runner.js). Free and without limits. When it can't run there
+/// (web/cpp_runner.js), and C with the same Clang (lang 'c'). Free and without limits. When it can't run there
 /// (off the web, still loading, didn't load), [run] gives null and the
 /// caller runs the code on the server instead.
 class BrowserRun {
@@ -18,7 +18,7 @@ class BrowserRun {
   /// With [file] (C++ only), [stdin] goes in `file.in` and the result's
   /// stdout is `file.out`; see [Judge0.run].
   static Future<RunResult?> run(String lang, String code, String stdin, {String? file}) =>
-      impl.run(_runner(lang), code, stdin, timeLimit, lang == 'python' ? null : file);
+      impl.run(_runner(lang), code, stdin, timeLimit, lang == 'python' ? null : file, lang == 'c' ? 'c' : 'cpp');
 
   static String _runner(String lang) => lang == 'python' ? 'imPython' : 'imCpp';
 }

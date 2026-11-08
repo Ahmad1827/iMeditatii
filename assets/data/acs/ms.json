@@ -1,0 +1,497 @@
+{
+ "code": "ms",
+ "chapters": [
+  "1. Transformata Laplace",
+  "2. Transformata Z",
+  "3. Serii Fourier",
+  "4. Probabilități și reziduuri"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Laplace pentru t e²ᵗ",
+   "chapter": "1. Transformata Laplace",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează transformata Laplace $F(s) = \\mathcal{L}\\{t e^{2t}\\}(s)$, pentru $s > 2$.",
+   "hint": "$\\mathcal{L}\\{t\\} = 1/s^2$, iar înmulțirea cu $e^{at}$ deplasează: $s \\to s - a$.",
+   "solution": "$F(s) = \\frac{1}{(s-2)^2}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "F",
+      "label": "F(s) =",
+      "type": "expr",
+      "vars": [
+       "s"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(F([3 3.5 4.2 5 6.5 8]), 1 ./ ([3 3.5 4.2 5 6.5 8] - 2).^2, 1e-9)",
+      "msg": "e transformata lui t e²ᵗ"
+     }
+    ],
+    "reference": {
+     "F": "1/(s - 2)^2"
+    },
+    "wrong": {
+     "F": "1/(s - 2)"
+    },
+    "plot": {
+     "field": "F",
+     "range": [
+      2.3,
+      8
+     ],
+     "ref": "@(s) 1 ./ (s - 2).^2",
+     "refLabel": "F(s)",
+     "label": "F(s) a ta",
+     "yrange": [
+      0,
+      6
+     ]
+    }
+   }
+  },
+  {
+   "id": "2",
+   "title": "Laplace pentru e⁻ᵗ cos 2t",
+   "chapter": "1. Transformata Laplace",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează $\\mathcal{L}\\{e^{-t}\\cos 2t\\}(s)$.",
+   "hint": "$\\mathcal{L}\\{\\cos \\omega t\\} = \\frac{s}{s^2 + \\omega^2}$; apoi $s \\to s + 1$.",
+   "solution": "$F(s) = \\frac{s + 1}{(s+1)^2 + 4}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "F",
+      "label": "F(s) =",
+      "type": "expr",
+      "vars": [
+       "s"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(F([3 3.5 4.2 5 6.5 8]), ([3 3.5 4.2 5 6.5 8] + 1) ./ (([3 3.5 4.2 5 6.5 8] + 1).^2 + 4), 1e-9)",
+      "msg": "e transformata lui e⁻ᵗ cos 2t"
+     }
+    ],
+    "reference": {
+     "F": "(s + 1)/((s + 1)^2 + 4)"
+    },
+    "wrong": {
+     "F": "s/(s^2 + 4)"
+    }
+   }
+  },
+  {
+   "id": "3",
+   "title": "Original din fracții simple",
+   "chapter": "1. Transformata Laplace",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Găsește originalul $f(t)$ al lui $F(s) = \\dfrac{s + 3}{s^2 + 3s + 2}$.",
+   "hint": "$s^2 + 3s + 2 = (s+1)(s+2)$; descompune în fracții simple.",
+   "solution": "$F = \\frac{2}{s+1} - \\frac{1}{s+2}$, deci $f(t) = 2e^{-t} - e^{-2t}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "f",
+      "label": "f(t) =",
+      "type": "expr",
+      "vars": [
+       "t"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(f([0 0.3 0.8 1.5 2.5 4]), 2*exp(-[0 0.3 0.8 1.5 2.5 4]) - exp(-2*[0 0.3 0.8 1.5 2.5 4]), 1e-9)",
+      "msg": "e originalul lui F"
+     }
+    ],
+    "reference": {
+     "f": "2e^(-t) - e^(-2t)"
+    },
+    "wrong": {
+     "f": "e^(-t) - e^(-2t)"
+    },
+    "plot": {
+     "field": "f",
+     "range": [
+      0,
+      5
+     ],
+     "ref": "@(t) 2*exp(-t) - exp(-2*t)",
+     "refLabel": "originalul",
+     "label": "f(t)"
+    }
+   }
+  },
+  {
+   "id": "4",
+   "title": "O ecuație diferențială rezolvată cu Laplace",
+   "chapter": "1. Transformata Laplace",
+   "difficulty": "medie",
+   "source": "Examen MS · seria CD · iunie 2022",
+   "statement": "Rezolvă cu transformata Laplace problema $y' + 2y = e^{-t}$, $y(0) = 0$.\n\nSe verifică direct că funcția ta satisface ecuația și condiția inițială.",
+   "hint": "$sY + 2Y = \\frac{1}{s+1}$, deci $Y = \\frac{1}{(s+1)(s+2)}$.",
+   "solution": "$Y = \\frac{1}{s+1} - \\frac{1}{s+2}$, $y(t) = e^{-t} - e^{-2t}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "y",
+      "label": "y(t) =",
+      "type": "expr",
+      "vars": [
+       "t"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv(y, [0 0.3 0.8 1.5 2.5 4]) + 2*y([0 0.3 0.8 1.5 2.5 4]), exp(-[0 0.3 0.8 1.5 2.5 4]), 1e-5)",
+      "msg": "y' + 2y = e⁻ᵗ"
+     },
+     {
+      "expr": "abs(y(0)) < 1e-9",
+      "msg": "y(0) = 0"
+     }
+    ],
+    "reference": {
+     "y": "e^(-t) - e^(-2t)"
+    },
+    "wrong": {
+     "y": "e^(-t)"
+    },
+    "plot": {
+     "field": "y",
+     "range": [
+      0,
+      5
+     ],
+     "ref": "@(t) exp(-t) - exp(-2*t)",
+     "refLabel": "soluția",
+     "label": "y(t)"
+    }
+   }
+  },
+  {
+   "id": "5",
+   "title": "Transformata Z a unui șir geometric",
+   "chapter": "2. Transformata Z",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează transformata Z a șirului $x_n = \\left(\\frac{1}{2}\\right)^n$, $n \\ge 0$: $X(z) = \\sum_{n\\ge 0} x_n z^{-n}$, pentru $|z| > \\frac{1}{2}$.",
+   "hint": "E o serie geometrică de rație $\\frac{1}{2z}$.",
+   "solution": "$X(z) = \\frac{1}{1 - \\frac{1}{2z}} = \\frac{z}{z - 1/2}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "X",
+      "label": "X(z) =",
+      "type": "expr",
+      "vars": [
+       "z"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(X([1.5 2 2.7 3.5 5]), [1.5 2 2.7 3.5 5] ./ ([1.5 2 2.7 3.5 5] - 0.5), 1e-9)",
+      "msg": "e transformata Z a lui (1/2)ⁿ"
+     }
+    ],
+    "reference": {
+     "X": "z/(z - 1/2)"
+    },
+    "wrong": {
+     "X": "1/(z - 1/2)"
+    }
+   }
+  },
+  {
+   "id": "6",
+   "title": "Transformata Z a lui n",
+   "chapter": "2. Transformata Z",
+   "difficulty": "medie",
+   "source": "Examen MS · seria CD · iunie 2022",
+   "statement": "Calculează $\\mathcal{Z}\\{n\\}(z)$, $|z| > 1$.",
+   "hint": "Derivează $\\sum z^{-n} = \\frac{z}{z-1}$ după $z$ și înmulțește cu $-z$.",
+   "solution": "$\\mathcal{Z}\\{n\\} = \\frac{z}{(z-1)^2}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "X",
+      "label": "X(z) =",
+      "type": "expr",
+      "vars": [
+       "z"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(X([1.5 2 2.7 3.5 5]), [1.5 2 2.7 3.5 5] ./ ([1.5 2 2.7 3.5 5] - 1).^2, 1e-9)",
+      "msg": "e transformata Z a lui n"
+     }
+    ],
+    "reference": {
+     "X": "z/(z - 1)^2"
+    },
+    "wrong": {
+     "X": "z/(z - 1)"
+    }
+   }
+  },
+  {
+   "id": "7",
+   "title": "Seria Fourier a lui f(x) = x",
+   "chapter": "3. Serii Fourier",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Funcția $f(x) = x$ pe $(-\\pi, \\pi)$, prelungită prin periodicitate, e impară, deci seria ei Fourier are doar sinusuri:\n\n$$f(x) \\sim \\sum_{n \\ge 1} b_n \\sin nx.$$\n\nScrie coeficientul $b_n$ ca formulă în $n$. Graficul arată suma primilor 15 termeni cu coeficienții tăi (fenomenul Gibbs se vede la capete).",
+   "hint": "$b_n = \\frac{1}{\\pi}\\int_{-\\pi}^{\\pi} x \\sin nx\\, dx$; integrează prin părți.",
+   "solution": "$b_n = \\frac{2(-1)^{n+1}}{n}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "b",
+      "label": "bₙ =",
+      "type": "expr",
+      "vars": [
+       "n"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(b([1 2 3 4 5 6 7 10]), 2*(-1).^([1 2 3 4 5 6 7 10]+1) ./ [1 2 3 4 5 6 7 10], 1e-9)",
+      "msg": "coeficienții bₙ sunt corecți"
+     }
+    ],
+    "reference": {
+     "b": "2(-1)^(n+1)/n"
+    },
+    "wrong": {
+     "b": "2/n"
+    },
+    "plot": {
+     "field": "b",
+     "fourier": "sin",
+     "N": 15,
+     "range": [
+      -3.6,
+      3.6
+     ],
+     "ref": "@(x) x - 2*pi*round(x/(2*pi))",
+     "refLabel": "f(x) = x (periodică)",
+     "label": "suma Fourier, 15 termeni"
+    }
+   }
+  },
+  {
+   "id": "8",
+   "title": "Seria Fourier a lui |x|",
+   "chapter": "3. Serii Fourier",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Funcția $f(x) = |x|$ pe $(-\\pi, \\pi)$ e pară, deci are doar cosinusuri:\n\n$$f(x) \\sim \\frac{a_0}{2} + \\sum_{n \\ge 1} a_n \\cos nx.$$\n\nScrie $a_0$ și $a_n$.",
+   "hint": "$a_0 = \\frac{2}{\\pi}\\int_0^\\pi x\\,dx$, $a_n = \\frac{2}{\\pi}\\int_0^\\pi x \\cos nx\\,dx$.",
+   "solution": "$a_0 = \\pi$, $a_n = \\frac{2((-1)^n - 1)}{\\pi n^2}$: zero pentru $n$ par, $-\\frac{4}{\\pi n^2}$ pentru $n$ impar.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "a0",
+      "label": "a₀ =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "a",
+      "label": "aₙ =",
+      "type": "expr",
+      "vars": [
+       "n"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(a0 - pi) < 1e-9",
+      "msg": "a₀ e corect"
+     },
+     {
+      "expr": "close(a([1 2 3 4 5 6 7 10]), 2*((-1).^[1 2 3 4 5 6 7 10] - 1) ./ (pi*[1 2 3 4 5 6 7 10].^2), 1e-9)",
+      "msg": "aₙ e corect"
+     }
+    ],
+    "reference": {
+     "a0": "pi",
+     "a": "2((-1)^n - 1)/(pi n^2)"
+    },
+    "wrong": {
+     "a0": "pi",
+     "a": "-4/(pi n^2)"
+    },
+    "plot": {
+     "field": "a",
+     "a0": "a0",
+     "fourier": "cos",
+     "N": 15,
+     "range": [
+      -3.6,
+      3.6
+     ],
+     "ref": "@(x) abs(x - 2*pi*round(x/(2*pi)))",
+     "refLabel": "|x| (periodică)",
+     "label": "suma Fourier, 15 termeni"
+    }
+   }
+  },
+  {
+   "id": "9",
+   "title": "Repartiția binomială",
+   "chapter": "4. Probabilități și reziduuri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un test grilă are 5 întrebări; la fiecare, un student care ghicește răspunde corect cu probabilitatea 0,3, independent. Care e probabilitatea să răspundă corect la **cel puțin 2** întrebări?",
+   "hint": "$X \\sim \\text{Bin}(5;\\,0{,}3)$; complementul e $X \\in \\{0, 1\\}$.",
+   "solution": "$1 - 0{,}7^5 - 5 \\cdot 0{,}3 \\cdot 0{,}7^4 = 0{,}47178$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "p",
+      "label": "P(X ≥ 2) =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(p - (1 - 0.7^5 - 5*0.3*0.7^4)) < 1e-6",
+      "msg": "probabilitatea e corectă"
+     }
+    ],
+    "reference": {
+     "p": "1 - 0.7^5 - 5*0.3*0.7^4"
+    },
+    "wrong": {
+     "p": "0.3^2"
+    }
+   }
+  },
+  {
+   "id": "10",
+   "title": "O densitate de probabilitate",
+   "chapter": "4. Probabilități și reziduuri",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "$X$ are densitatea $f(x) = c\\,x(1 - x)$ pe $[0, 1]$ (și 0 în rest). Află constanta $c$, media $E[X]$ și dispersia $D^2[X]$.",
+   "hint": "$\\int_0^1 f = 1$ dă $c$. $D^2[X] = E[X^2] - E[X]^2$.",
+   "solution": "$c \\int_0^1 (x - x^2) = c/6 = 1$, $c = 6$; $E[X] = 1/2$ (simetrie); $E[X^2] = 6(1/4 - 1/5) = 3/10$, $D^2 = 3/10 - 1/4 = 1/20$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "c",
+      "label": "c =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "m",
+      "label": "E[X] =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "v",
+      "label": "D²[X] =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(c - 6) < 1e-9",
+      "msg": "c e corect"
+     },
+     {
+      "expr": "abs(m - 1/2) < 1e-9",
+      "msg": "media e corectă"
+     },
+     {
+      "expr": "abs(v - 1/20) < 1e-9",
+      "msg": "dispersia e corectă"
+     }
+    ],
+    "reference": {
+     "c": "6",
+     "m": "1/2",
+     "v": "1/20"
+    },
+    "wrong": {
+     "c": "6",
+     "m": "1/2",
+     "v": "1/4"
+    }
+   }
+  },
+  {
+   "id": "11",
+   "title": "O integrală reală prin reziduuri",
+   "chapter": "4. Probabilități și reziduuri",
+   "difficulty": "grea",
+   "source": "Examen MS · seria CD · iunie 2022",
+   "statement": "Calculează $\\displaystyle \\int_{-\\infty}^{\\infty} \\frac{dx}{(x^2 + 1)^2}$ cu teorema reziduurilor.",
+   "hint": "Singurul pol din semiplanul superior e $z = i$, de ordin 2. $I = 2\\pi i \\, \\text{Rez}(f, i)$.",
+   "solution": "$\\text{Rez}\\left(\\frac{1}{(z+i)^2(z-i)^2}, i\\right) = \\frac{d}{dz}(z+i)^{-2}\\Big|_{z=i} = \\frac{-2}{(2i)^3} = \\frac{1}{4i}$, deci $I = 2\\pi i \\cdot \\frac{1}{4i} = \\frac{\\pi}{2}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "I",
+      "label": "I =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(I - pi/2) < 1e-9",
+      "msg": "valoarea e corectă"
+     }
+    ],
+    "reference": {
+     "I": "pi/2"
+    },
+    "wrong": {
+     "I": "pi"
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,1431 @@
+{
+ "code": "elth",
+ "chapters": [
+  "1. Circuite de curent continuu",
+  "2. Teoreme și proiectare",
+  "3. Regim sinusoidal"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Divizorul de tensiune",
+   "chapter": "1. Circuite de curent continuu",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Sursa $E = 12\\,\\text{V}$ alimentează rezistențele $R_1 = 4\\,\\Omega$ și $R_2 = 2\\,\\Omega$ legate în serie. Calculează curentul prin $R_1$ și tensiunea la bornele lui $R_2$, în sensurile săgeților de pe schemă.",
+   "hint": "În serie curentul e același: $I = E / (R_1 + R_2)$.",
+   "solution": "$I = 12/6 = 2\\,\\text{A}$, $U_2 = R_2 I = 4\\,\\text{V}$ — divizorul dă $E \\cdot R_2/(R_1 + R_2)$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       3
+      ],
+      "v": 12,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ],
+      "v": 4
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       5,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       5,
+       0
+      ],
+      "b": [
+       5,
+       3
+      ],
+      "v": 2
+     },
+     {
+      "t": "W",
+      "a": [
+       5,
+       3
+      ],
+      "b": [
+       0,
+       3
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       3
+      ]
+     }
+    ],
+    "grid": [
+     6,
+     4
+    ],
+    "omega": 0.0,
+    "ask": [
+     {
+      "q": "I.R1",
+      "label": "I (prin R1)",
+      "unit": "A"
+     },
+     {
+      "q": "U.R2",
+      "label": "U (pe R2)",
+      "unit": "V"
+     }
+    ],
+    "expect": {
+     "I.R1": 2.0,
+     "U.R2": 4.0
+    }
+   }
+  },
+  {
+   "id": "2",
+   "title": "Serie și paralel",
+   "chapter": "1. Circuite de curent continuu",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "$E = 10\\,\\text{V}$, $R_1 = 2\\,\\Omega$, $R_2 = 6\\,\\Omega$, $R_3 = 3\\,\\Omega$. Calculează curentul prin $R_1$ și curentul prin $R_3$.",
+   "hint": "$R_2 \\parallel R_3 = \\frac{R_2 R_3}{R_2 + R_3}$, apoi divizorul de curent.",
+   "solution": "$R_e = 2 + 2 = 4\\,\\Omega$, $I_1 = 2{,}5\\,\\text{A}$; tensiunea pe grupul paralel e 5 V, deci $I_3 = 5/3 \\approx 1,67\\,\\text{A}$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       4
+      ],
+      "v": 10,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       1,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       1,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ],
+      "v": 2
+     },
+     {
+      "t": "W",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       6,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       4
+      ],
+      "v": 6
+     },
+     {
+      "t": "R",
+      "n": "R3",
+      "a": [
+       6,
+       0
+      ],
+      "b": [
+       6,
+       4
+      ],
+      "v": 3
+     },
+     {
+      "t": "W",
+      "a": [
+       6,
+       4
+      ],
+      "b": [
+       4,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       4
+      ],
+      "b": [
+       0,
+       4
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       4
+      ]
+     }
+    ],
+    "grid": [
+     7,
+     5
+    ],
+    "omega": 0.0,
+    "ask": [
+     {
+      "q": "I.R1",
+      "label": "I1",
+      "unit": "A"
+     },
+     {
+      "q": "I.R3",
+      "label": "I3",
+      "unit": "A"
+     }
+    ],
+    "expect": {
+     "I.R1": 2.5,
+     "I.R3": 1.6666666666666665
+    }
+   }
+  },
+  {
+   "id": "3",
+   "title": "Teoremele lui Kirchhoff",
+   "chapter": "1. Circuite de curent continuu",
+   "difficulty": "medie",
+   "source": "Examen ELTH · seria CD · 2022",
+   "statement": "Două surse, $E_1 = 12\\,\\text{V}$ și $E_2 = 6\\,\\text{V}$, alimentează împreună rezistența $R_3 = 6\\,\\Omega$ prin $R_1 = 2\\,\\Omega$ și $R_2 = 4\\,\\Omega$. Calculează curenții prin $R_1$, $R_2$ și $R_3$, în sensurile săgeților (un curent negativ înseamnă sens opus).",
+   "hint": "Un singur nod independent (sus, la R3): scrie potențialul lui cu metoda potențialelor nodurilor.",
+   "solution": "Cu $V$ potențialul nodului din mijloc: $\\frac{12 - V}{2} + \\frac{6 - V}{4} = \\frac{V}{6}$, deci $V = 8,182\\,\\text{V}$; $I_1 = 1,91$, $I_2 = 0,545$, $I_3 = 1,36\\,\\text{A}$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E1",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       4
+      ],
+      "v": 12,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       1,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       1,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ],
+      "v": 2
+     },
+     {
+      "t": "W",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R3",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       4
+      ],
+      "v": 6
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       5,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       5,
+       0
+      ],
+      "b": [
+       7,
+       0
+      ],
+      "v": 4
+     },
+     {
+      "t": "W",
+      "a": [
+       7,
+       0
+      ],
+      "b": [
+       8,
+       0
+      ]
+     },
+     {
+      "t": "V",
+      "n": "E2",
+      "a": [
+       8,
+       0
+      ],
+      "b": [
+       8,
+       4
+      ],
+      "v": 6,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       8,
+       4
+      ],
+      "b": [
+       4,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       4
+      ],
+      "b": [
+       0,
+       4
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       4
+      ]
+     }
+    ],
+    "grid": [
+     9,
+     5
+    ],
+    "omega": 0.0,
+    "ask": [
+     {
+      "q": "I.R1",
+      "label": "I1",
+      "unit": "A"
+     },
+     {
+      "q": "I.R2",
+      "label": "I2",
+      "unit": "A"
+     },
+     {
+      "q": "I.R3",
+      "label": "I3",
+      "unit": "A"
+     }
+    ],
+    "expect": {
+     "I.R1": 1.9090909090909083,
+     "I.R2": 0.5454545454545459,
+     "I.R3": 1.3636363636363638
+    }
+   }
+  },
+  {
+   "id": "4",
+   "title": "Cu o sursă de curent",
+   "chapter": "1. Circuite de curent continuu",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Sursa de curent $J = 2\\,\\text{A}$ și sursa de tensiune $E = 4\\,\\text{V}$ lucrează în același circuit, cu $R_1 = 5\\,\\Omega$ și $R_2 = 3\\,\\Omega$. Calculează curentul prin $R_1$ și tensiunea pe $R_2$.",
+   "hint": "Nodul de sus din stânga primește J; scrie Kirchhoff I acolo.",
+   "solution": "Potențialul nodului: $2 = \\frac{V}{5} + \\frac{V - 4}{3}$, $V = 6,25\\,\\text{V}$; $I_1 = 1,25\\,\\text{A}$, $U_2 = 2,25\\,\\text{V}$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "I",
+      "n": "J",
+      "a": [
+       0,
+       4
+      ],
+      "b": [
+       0,
+       0
+      ],
+      "v": 2
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       2,
+       4
+      ],
+      "v": 5
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       5,
+       0
+      ],
+      "v": 3
+     },
+     {
+      "t": "W",
+      "a": [
+       5,
+       0
+      ],
+      "b": [
+       6,
+       0
+      ]
+     },
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       6,
+       0
+      ],
+      "b": [
+       6,
+       4
+      ],
+      "v": 4,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       6,
+       4
+      ],
+      "b": [
+       2,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       4
+      ],
+      "b": [
+       0,
+       4
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       4
+      ]
+     }
+    ],
+    "grid": [
+     7,
+     5
+    ],
+    "omega": 0.0,
+    "ask": [
+     {
+      "q": "I.R1",
+      "label": "I1",
+      "unit": "A"
+     },
+     {
+      "q": "U.R2",
+      "label": "U2",
+      "unit": "V"
+     }
+    ],
+    "expect": {
+     "I.R1": 1.25,
+     "U.R2": 2.249999999999999
+    }
+   }
+  },
+  {
+   "id": "5",
+   "title": "Transferul maxim de putere",
+   "chapter": "2. Teoreme și proiectare",
+   "difficulty": "medie",
+   "source": "Examen ELTH · seria CD · 2022",
+   "statement": "Alege rezistența de sarcină $R_L$ astfel încât **puterea pe ea să fie maximă**. Apasă „măsoară” ca să vezi puterea cu valoarea ta, apoi verifică (se acceptă o abatere de 0,2% de la maxim).\n\n$E = 24\\,\\text{V}$, $R_1 = 6\\,\\Omega$, $R_2 = 3\\,\\Omega$.",
+   "hint": "Puterea e maximă când $R_L$ e egală cu rezistența Thévenin văzută de la bornele ei (cu sursa pasivizată).",
+   "solution": "$R_{Th} = R_1 \\parallel R_2 = 2\\,\\Omega$, $E_{Th} = 24 \\cdot 3/9 = 8\\,\\text{V}$; $P_{max} = E_{Th}^2/(4R_{Th}) = 8\\,\\text{W}$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       4
+      ],
+      "v": 24,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       1,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       1,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ],
+      "v": 6
+     },
+     {
+      "t": "W",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       4
+      ],
+      "v": 3
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       6,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "RL",
+      "a": [
+       6,
+       0
+      ],
+      "b": [
+       6,
+       4
+      ],
+      "v": 1.0
+     },
+     {
+      "t": "W",
+      "a": [
+       6,
+       4
+      ],
+      "b": [
+       4,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       4
+      ],
+      "b": [
+       0,
+       4
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       4
+      ]
+     }
+    ],
+    "grid": [
+     7,
+     5
+    ],
+    "omega": 0.0,
+    "design": {
+     "vars": [
+      {
+       "name": "RL",
+       "label": "R_L",
+       "unit": "Ω"
+      }
+     ],
+     "target": {
+      "q": "P.RL",
+      "value": 8.0,
+      "tol": 0.002,
+      "label": "puterea pe R_L e maximă",
+      "meter": "wattmetrul pe R_L",
+      "unit": "W"
+     },
+     "reference": {
+      "RL": "2"
+     }
+    }
+   }
+  },
+  {
+   "id": "6",
+   "title": "Un divizor pentru 3,3 V",
+   "chapter": "2. Teoreme și proiectare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un senzor are nevoie de 3,3 V, iar placa dă 5 V. Cu $R_1 = 1\\,\\text{k}\\Omega$, alege $R_2$ astfel încât tensiunea pe ea să fie **3,3 V** (±1%).",
+   "hint": "$U_2 = E \\frac{R_2}{R_1 + R_2}$; rezolvă după $R_2$.",
+   "solution": "$R_2 = R_1 \\frac{U_2}{E - U_2} = 1000 \\cdot \\frac{3{,}3}{1{,}7} \\approx 1941\\,\\Omega$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       3
+      ],
+      "v": 5,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ],
+      "v": 1000
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       5,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       5,
+       0
+      ],
+      "b": [
+       5,
+       3
+      ],
+      "v": 1000
+     },
+     {
+      "t": "W",
+      "a": [
+       5,
+       3
+      ],
+      "b": [
+       0,
+       3
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       3
+      ]
+     }
+    ],
+    "grid": [
+     6,
+     4
+    ],
+    "omega": 0.0,
+    "design": {
+     "vars": [
+      {
+       "name": "R2",
+       "label": "R2",
+       "unit": "Ω"
+      }
+     ],
+     "target": {
+      "q": "U.R2",
+      "value": 3.3,
+      "tol": 0.01,
+      "label": "tensiunea pe R2 e 3,3 V",
+      "meter": "voltmetrul pe R2",
+      "unit": "V"
+     },
+     "reference": {
+      "R2": "1941"
+     }
+    }
+   }
+  },
+  {
+   "id": "7",
+   "title": "Puntea Wheatstone",
+   "chapter": "2. Teoreme și proiectare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "În puntea de pe schemă, $R_g$ e galvanometrul. Alege $R_x$ astfel încât **prin galvanometru să nu treacă curent** (puntea echilibrată, |I| < 0,1 mA).",
+   "hint": "La echilibru, cele două noduri din mijloc au același potențial: rapoartele sunt egale.",
+   "solution": "$\\frac{R_1}{R_3} = \\frac{R_2}{R_x}$, deci $R_x = R_2 R_3 / R_1 = 300\\,\\Omega$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       6
+      ],
+      "v": 10,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       6,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       2,
+       3
+      ],
+      "v": 100
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       6,
+       0
+      ],
+      "b": [
+       6,
+       3
+      ],
+      "v": 200
+     },
+     {
+      "t": "R",
+      "n": "R3",
+      "a": [
+       2,
+       3
+      ],
+      "b": [
+       2,
+       6
+      ],
+      "v": 150
+     },
+     {
+      "t": "R",
+      "n": "Rx",
+      "a": [
+       6,
+       3
+      ],
+      "b": [
+       6,
+       6
+      ],
+      "v": 100
+     },
+     {
+      "t": "R",
+      "n": "Rg",
+      "a": [
+       2,
+       3
+      ],
+      "b": [
+       6,
+       3
+      ],
+      "v": 50
+     },
+     {
+      "t": "W",
+      "a": [
+       6,
+       6
+      ],
+      "b": [
+       2,
+       6
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       6
+      ],
+      "b": [
+       0,
+       6
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       6
+      ]
+     }
+    ],
+    "grid": [
+     7,
+     7
+    ],
+    "omega": 0.0,
+    "design": {
+     "vars": [
+      {
+       "name": "Rx",
+       "label": "R_x",
+       "unit": "Ω"
+      }
+     ],
+     "target": {
+      "q": "I.Rg",
+      "value": 0,
+      "abstol": 0.0001,
+      "label": "prin galvanometru nu trece curent",
+      "meter": "curentul prin galvanometru",
+      "unit": "A"
+     },
+     "reference": {
+      "Rx": "300"
+     }
+    }
+   }
+  },
+  {
+   "id": "8",
+   "title": "Circuit RC serie",
+   "chapter": "3. Regim sinusoidal",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Tensiunea sinusoidală are valoarea efectivă $U = 10\\,\\text{V}$ și faza 0, la $\\omega = 1000\\,\\text{rad/s}$; $R = 100\\,\\Omega$, $C = 10\\,\\mu\\text{F}$. Calculează valoarea efectivă a curentului și faza lui (în grade).",
+   "hint": "$\\underline{Z} = R - j/(\\omega C)$.",
+   "solution": "$X_C = 100\\,\\Omega$, $|Z| = 100\\sqrt2$, $|I| = 0\\,\\text{A}$; curentul e defazat înaintea tensiunii cu 45°.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "U",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       3
+      ],
+      "v": 10,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       1,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R",
+      "a": [
+       1,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ],
+      "v": 100
+     },
+     {
+      "t": "W",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "C",
+      "n": "C",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       3
+      ],
+      "v": 1e-05
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       3
+      ],
+      "b": [
+       0,
+       3
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       3
+      ]
+     }
+    ],
+    "grid": [
+     5,
+     4
+    ],
+    "omega": 1000.0,
+    "ask": [
+     {
+      "q": "absI.R",
+      "label": "|I|",
+      "unit": "A"
+     },
+     {
+      "q": "phI.R",
+      "label": "faza lui I",
+      "unit": "°"
+     }
+    ],
+    "expect": {
+     "absI.R": 0.07071067811865475,
+     "phI.R": 45.0
+    }
+   }
+  },
+  {
+   "id": "9",
+   "title": "Bobina reală la rețea",
+   "chapter": "3. Regim sinusoidal",
+   "difficulty": "medie",
+   "source": "Examen ELTH · seria CD · 2022",
+   "statement": "O bobină cu rezistența $R = 30\\,\\Omega$ și reactanța $X_L = 40\\,\\Omega$ (la 50 Hz) e legată la rețeaua de $220\\,\\text{V}$. Calculează curentul efectiv și puterea activă consumată.",
+   "hint": "$|Z| = \\sqrt{R^2 + X_L^2}$; puterea activă se consumă doar pe R.",
+   "solution": "$|Z| = 50\\,\\Omega$, $I = 4{,}4\\,\\text{A}$, $P = R I^2 = 1613\\,\\text{W}$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "U",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       3
+      ],
+      "v": 220,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       1,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R",
+      "a": [
+       1,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ],
+      "v": 30
+     },
+     {
+      "t": "W",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "L",
+      "n": "L",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       3
+      ],
+      "v": 0.12732395447351627
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       3
+      ],
+      "b": [
+       0,
+       3
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       3
+      ]
+     }
+    ],
+    "grid": [
+     5,
+     4
+    ],
+    "omega": 314.1592653589793,
+    "ask": [
+     {
+      "q": "absI.R",
+      "label": "|I|",
+      "unit": "A"
+     },
+     {
+      "q": "P.R",
+      "label": "P",
+      "unit": "W"
+     }
+    ],
+    "expect": {
+     "absI.R": 4.3999999999999995,
+     "P.R": 580.8
+    }
+   }
+  },
+  {
+   "id": "10",
+   "title": "Rezonanța serie",
+   "chapter": "3. Regim sinusoidal",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Alege capacitatea $C$ astfel încât circuitul RLC serie să fie **la rezonanță** la $\\omega = 1000\\,\\text{rad/s}$ ($R = 20\\,\\Omega$, $L = 0{,}1\\,\\text{H}$, $U = 10\\,\\text{V}$). La rezonanță curentul e maxim: $U/R$. Poți scrie `10e-6` pentru 10 µF.",
+   "hint": "Rezonanță: $\\omega L = \\frac{1}{\\omega C}$.",
+   "solution": "$C = \\frac{1}{\\omega^2 L} = \\frac{1}{10^6 \\cdot 0{,}1} = 10\\,\\mu\\text{F}$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "U",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       3
+      ],
+      "v": 10,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       1,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R",
+      "a": [
+       1,
+       0
+      ],
+      "b": [
+       3,
+       0
+      ],
+      "v": 20
+     },
+     {
+      "t": "W",
+      "a": [
+       3,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "L",
+      "n": "L",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       6,
+       0
+      ],
+      "v": 0.1
+     },
+     {
+      "t": "W",
+      "a": [
+       6,
+       0
+      ],
+      "b": [
+       7,
+       0
+      ]
+     },
+     {
+      "t": "C",
+      "n": "C",
+      "a": [
+       7,
+       0
+      ],
+      "b": [
+       7,
+       3
+      ],
+      "v": 5e-06
+     },
+     {
+      "t": "W",
+      "a": [
+       7,
+       3
+      ],
+      "b": [
+       0,
+       3
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       3
+      ]
+     }
+    ],
+    "grid": [
+     8,
+     4
+    ],
+    "omega": 1000.0,
+    "design": {
+     "vars": [
+      {
+       "name": "C",
+       "label": "C",
+       "unit": "F"
+      }
+     ],
+     "target": {
+      "q": "absI.R",
+      "value": 0.5,
+      "tol": 0.002,
+      "label": "curentul e maxim (U/R = 0,5 A)",
+      "meter": "ampermetrul",
+      "unit": "A"
+     },
+     "reference": {
+      "C": "10e-6"
+     }
+    }
+   }
+  }
+ ]
+}

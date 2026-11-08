@@ -1,0 +1,1280 @@
+{
+ "code": "sd",
+ "chapters": [
+  "1. Liste înlănțuite",
+  "2. Stive și cozi",
+  "3. Arbori binari",
+  "4. Heap și tabele de dispersie",
+  "5. Grafuri"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Duplicatele dintr-o listă",
+   "chapter": "1. Liste înlănțuite",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · iunie 2022 · numărul 2 · P1",
+   "statement": "Scrie o funcție **recursivă** care elimină dintr-o listă simplu înlănțuită elementele duplicate; dintre elementele egale se păstrează **ultima** apariție din listă. Definește tipul nodului: `typedef struct node { int val; struct node *next; } TNode, *TList;`\n\nExemplu din subiect: `1 2 1 3 5 4 5 3 1` devine `2 4 5 3 1`.\n\nProgramul citește lista, aplică funcția și afișează lista rămasă.\n\n**Date de intrare.** Pe prima linie n, pe a doua cele n valori ale listei, în ordine.\n\n**Date de ieșire.** Valorile rămase, separate prin spații, sau `vida` pentru o listă goală.\n\n**Restricții.**\n• 0 ≤ n ≤ 2000\n• valorile sunt întregi din [-10⁹, 10⁹]\n\n**Exemplu.** Pentru intrarea\n\n```\n9\n1 2 1 3 5 4 5 3 1\n```\n\nprogramul afișează\n\n```\n2 4 5 3 1\n```",
+   "hint": "Rezolvă întâi restul listei (apelul recursiv pe `next`), apoi decide pentru capul listei: rămâne doar dacă valoarea lui nu mai apare în restul deja curățat.",
+   "solution": "Recursivitatea curăță întâi coada listei. Când revine la un nod, toate valorile de după el apar o singură dată; dacă valoarea nodului e printre ele, nodul nu e ultima apariție și se șterge. Complexitate O(n²) pentru lista simplă, suficient aici.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int val;\n    struct node *next;\n} TNode, *TList;\n\nint contains(TList l, int x) {\n    for (; l; l = l->next)\n        if (l->val == x) return 1;\n    return 0;\n}\n\n/* removes duplicates, keeping the last occurrence of each value */\nTList dedup(TList l) {\n    if (!l) return NULL;\n    l->next = dedup(l->next);\n    if (contains(l->next, l->val)) {\n        TList rest = l->next;\n        free(l);\n        return rest;\n    }\n    return l;\n}\n\nint main(void) {\n    int n;\n    TList head = NULL, tail = NULL;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    for (int i = 0; i < n; i++) {\n        TList c = (TList)malloc(sizeof(TNode));\n        scanf(\"%d\", &c->val);\n        c->next = NULL;\n        if (tail) tail->next = c; else head = c;\n        tail = c;\n    }\n    head = dedup(head);\n    if (!head) puts(\"vida\");\n    for (TList p = head; p; p = p->next) printf(\"%d%c\", p->val, p->next ? ' ' : '\\n');\n    while (head) { TList p = head->next; free(head); head = p; }\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "9\n1 2 1 3 5 4 5 3 1\n",
+      "output": "2 4 5 3 1"
+     },
+     {
+      "input": "0\n\n",
+      "output": "vida"
+     },
+     {
+      "input": "5\n7 7 7 7 7\n",
+      "output": "7"
+     },
+     {
+      "input": "6\n1 2 3 4 5 6\n",
+      "output": "1 2 3 4 5 6"
+     },
+     {
+      "input": "7\n-1 5 -1 5 -1 0 0\n",
+      "output": "5 -1 0"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int val;\n    struct node *next;\n} TNode, *TList;\n\nint contains(TList l, int x) {\n    for (; l; l = l->next)\n        if (l->val == x) return 1;\n    return 0;\n}\n\n/* removes duplicates, keeping the last occurrence of each value */\nTList dedup(TList l) {\n    if (!l) return NULL;\n    l->next = dedup(l->next);\n    if (contains(l->next, l->val)) {\n        TList rest = l->next;\n        free(l);\n        return rest;\n    }\n    return l;\n}\n\nint main(void) {\n    int n;\n    TList head = NULL, tail = NULL;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    for (int i = 0; i < n; i++) {\n        TList c = (TList)malloc(sizeof(TNode));\n        scanf(\"%d\", &c->val);\n        c->next = NULL;\n        if (tail) tail->next = c; else head = c;\n        tail = c;\n    }\n    head = dedup(head);\n    if (!head) puts(\"vida\");\n    for (TList p = head; p; p = p->next) printf(\"%d%c\", p->val, p->next ? ' ' : '\\n');\n    while (head) { TList p = head->next; free(head); head = p; }\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "2",
+   "title": "Perechi cu suma k din două liste",
+   "chapter": "1. Liste înlănțuite",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · 12 iunie 2021 · proba practică · problema 1",
+   "statement": "Se dau două liste simplu înlănțuite, fiecare sortată **strict crescător**, și un număr k. Numără perechile (x, y), cu x din prima listă și y din a doua, pentru care x + y = k. Definește tipul nodului: `typedef struct node { int val; struct node *next; } TNode, *TList;`\n\nSoluția trebuie să fie liniară: parcurgi prima listă de la început și a doua de la sfârșit (inversează-o întâi).\n\n**Date de intrare.** Pe prima linie n, m și k. Pe a doua linie cele n valori ale primei liste, pe a treia cele m valori ale celei de-a doua.\n\n**Date de ieșire.** Numărul de perechi.\n\n**Restricții.**\n• 1 ≤ n, m ≤ 100 000\n• valorile și k sunt întregi din [-10⁹, 10⁹]\n\n**Exemplu.** Pentru intrarea\n\n```\n5 4 10\n1 3 5 7 9\n1 3 5 7\n```\n\nprogramul afișează\n\n```\n4\n```",
+   "hint": "După inversare a doua listă e descrescătoare. Dacă suma e prea mică, avansezi în prima; dacă e prea mare, în a doua; la egalitate, în amândouă.",
+   "solution": "Cu prima listă crescătoare și a doua descrescătoare, fiecare pas elimină cel puțin un element care nu mai poate face parte din vreo pereche: dacă x + y < k, x e prea mic pentru toți y rămași; dacă e prea mare, y e prea mare pentru toți x rămași. O(n + m). Suma se calculează în `long long`.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int val;\n    struct node *next;\n} TNode, *TList;\n\nTList readList(int n) {\n    TList head = NULL, tail = NULL;\n    for (int i = 0; i < n; i++) {\n        TList c = (TList)malloc(sizeof(TNode));\n        scanf(\"%d\", &c->val);\n        c->next = NULL;\n        if (tail) tail->next = c; else head = c;\n        tail = c;\n    }\n    return head;\n}\n\nTList reverse(TList l) {\n    TList prev = NULL;\n    while (l) {\n        TList nx = l->next;\n        l->next = prev;\n        prev = l;\n        l = nx;\n    }\n    return prev;\n}\n\nint count(TList l1, TList l2, long long k) {\n    int c = 0;\n    while (l1 && l2) {\n        long long s = (long long)l1->val + l2->val;\n        if (s == k) { c++; l1 = l1->next; l2 = l2->next; }\n        else if (s < k) l1 = l1->next;\n        else l2 = l2->next;\n    }\n    return c;\n}\n\nvoid freeList(TList l) {\n    while (l) { TList p = l->next; free(l); l = p; }\n}\n\nint main(void) {\n    int n, m;\n    long long k;\n    if (scanf(\"%d %d %lld\", &n, &m, &k) != 3) return 0;\n    TList a = readList(n), b = reverse(readList(m));\n    printf(\"%d\\n\", count(a, b, k));\n    freeList(a);\n    freeList(b);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "5 4 10\n1 3 5 7 9\n1 3 5 7\n",
+      "output": "4"
+     },
+     {
+      "input": "3 3 100\n1 2 3\n4 5 6\n",
+      "output": "0"
+     },
+     {
+      "input": "4 4 0\n-3 -1 1 3\n-3 -1 1 3\n",
+      "output": "4"
+     },
+     {
+      "input": "1 1 -2000000000\n-1000000000\n-1000000000\n",
+      "output": "1"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int val;\n    struct node *next;\n} TNode, *TList;\n\nTList readList(int n) {\n    TList head = NULL, tail = NULL;\n    for (int i = 0; i < n; i++) {\n        TList c = (TList)malloc(sizeof(TNode));\n        scanf(\"%d\", &c->val);\n        c->next = NULL;\n        if (tail) tail->next = c; else head = c;\n        tail = c;\n    }\n    return head;\n}\n\nTList reverse(TList l) {\n    TList prev = NULL;\n    while (l) {\n        TList nx = l->next;\n        l->next = prev;\n        prev = l;\n        l = nx;\n    }\n    return prev;\n}\n\nint count(TList l1, TList l2, long long k) {\n    int c = 0;\n    while (l1 && l2) {\n        long long s = (long long)l1->val + l2->val;\n        if (s == k) { c++; l1 = l1->next; l2 = l2->next; }\n        else if (s < k) l1 = l1->next;\n        else l2 = l2->next;\n    }\n    return c;\n}\n\nvoid freeList(TList l) {\n    while (l) { TList p = l->next; free(l); l = p; }\n}\n\nint main(void) {\n    int n, m;\n    long long k;\n    if (scanf(\"%d %d %lld\", &n, &m, &k) != 3) return 0;\n    TList a = readList(n), b = reverse(readList(m));\n    printf(\"%d\\n\", count(a, b, k));\n    freeList(a);\n    freeList(b);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "3",
+   "title": "Paranteze corect închise",
+   "chapter": "2. Stive și cozi",
+   "difficulty": "ușoară",
+   "source": "Laborator SD 4 · Stive și cozi",
+   "statement": "Pentru fiecare linie dată, verifică dacă parantezele `()`, `[]` și `{}` din ea sunt corect închise (fiecare paranteză închisă corespunde ultimei paranteze deschise încă neînchise și de același tip, iar la final nu rămâne nimic deschis). Celelalte caractere se ignoră.\n\nImplementează o stivă de caractere (cu `push`, `pop`, `top`, `isEmpty`).\n\n**Date de intrare.** Pe prima linie q. Pe fiecare din următoarele q linii, un șir de cel mult 10 000 de caractere (poate fi gol, poate conține spații).\n\n**Date de ieșire.** Pentru fiecare linie, `DA` sau `NU`.\n\n**Restricții.**\n• 1 ≤ q ≤ 100\n\n**Exemplu.** Pentru intrarea\n\n```\n4\n(a+b)*[c-{d}]\n([)]\n((\n```\n\nprogramul afișează\n\n```\nDA\nNU\nNU\nDA\n```",
+   "hint": "La paranteză deschisă faci push; la una închisă stiva trebuie să nu fie goală și vârful să fie perechea ei.",
+   "solution": "Clasicul algoritm cu stivă din laboratorul de stive și cozi. Linia goală e corectă.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    char *data;\n    int top, cap;\n} Stack;\n\nvoid push(Stack *s, char c) {\n    if (s->top == s->cap) {\n        s->cap = s->cap ? 2 * s->cap : 16;\n        s->data = (char *)realloc(s->data, s->cap);\n    }\n    s->data[s->top++] = c;\n}\nint isEmpty(Stack *s) { return s->top == 0; }\nchar top(Stack *s) { return s->data[s->top - 1]; }\nvoid pop(Stack *s) { s->top--; }\n\nint ok(const char *line) {\n    Stack s = {NULL, 0, 0};\n    int good = 1;\n    for (int i = 0; line[i] && good; i++) {\n        char c = line[i];\n        if (c == '(' || c == '[' || c == '{') push(&s, c);\n        else if (c == ')' || c == ']' || c == '}') {\n            char want = c == ')' ? '(' : c == ']' ? '[' : '{';\n            if (isEmpty(&s) || top(&s) != want) good = 0;\n            else pop(&s);\n        }\n    }\n    if (!isEmpty(&s)) good = 0;\n    free(s.data);\n    return good;\n}\n\nint main(void) {\n    static char line[10010];\n    int q;\n    if (!fgets(line, sizeof line, stdin)) return 0;\n    q = atoi(line);\n    for (int i = 0; i < q; i++) {\n        if (!fgets(line, sizeof line, stdin)) line[0] = '\\0';\n        line[strcspn(line, \"\\r\\n\")] = '\\0';\n        puts(ok(line) ? \"DA\" : \"NU\");\n    }\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "4\n(a+b)*[c-{d}]\n([)]\n((\n\n",
+      "output": "DA\nNU\nNU\nDA"
+     },
+     {
+      "input": "3\n}{\na(b)c[d]e{f}g\n{[()()]}\n",
+      "output": "NU\nDA\nDA"
+     },
+     {
+      "input": "2\n(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((())))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))\n[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]\n",
+      "output": "DA\nNU"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    char *data;\n    int top, cap;\n} Stack;\n\nvoid push(Stack *s, char c) {\n    if (s->top == s->cap) {\n        s->cap = s->cap ? 2 * s->cap : 16;\n        s->data = (char *)realloc(s->data, s->cap);\n    }\n    s->data[s->top++] = c;\n}\nint isEmpty(Stack *s) { return s->top == 0; }\nchar top(Stack *s) { return s->data[s->top - 1]; }\nvoid pop(Stack *s) { s->top--; }\n\nint ok(const char *line) {\n    Stack s = {NULL, 0, 0};\n    int good = 1;\n    for (int i = 0; line[i] && good; i++) {\n        char c = line[i];\n        if (c == '(' || c == '[' || c == '{') push(&s, c);\n        else if (c == ')' || c == ']' || c == '}') {\n            char want = c == ')' ? '(' : c == ']' ? '[' : '{';\n            if (isEmpty(&s) || top(&s) != want) good = 0;\n            else pop(&s);\n        }\n    }\n    if (!isEmpty(&s)) good = 0;\n    free(s.data);\n    return good;\n}\n\nint main(void) {\n    static char line[10010];\n    int q;\n    if (!fgets(line, sizeof line, stdin)) return 0;\n    q = atoi(line);\n    for (int i = 0; i < q; i++) {\n        if (!fgets(line, sizeof line, stdin)) line[0] = '\\0';\n        line[strcspn(line, \"\\r\\n\")] = '\\0';\n        puts(ok(line) ? \"DA\" : \"NU\");\n    }\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "4",
+   "title": "Diferența maximă față de succesor",
+   "chapter": "3. Arbori binari",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · iunie 2022 · numărul 2 · P2",
+   "statement": "Cheile date se inserează, în ordinea citirii, într-un arbore binar de căutare (o cheie care există deja se ignoră). Pentru fiecare nod, succesorul lui este nodul cu cea mai mică cheie mai mare decât a lui; dacă nodul nu are succesor, diferența se consideră 0.\n\nAfișează cheia nodului pentru care diferența, în modul, dintre cheia lui și cheia succesorului este maximă, și această diferență. La egalitate, nodul cu cheia mai mică.\n\n**Date de intrare.** Pe prima linie n, pe a doua cele n chei.\n\n**Date de ieșire.** Cheia nodului și diferența maximă.\n\n**Restricții.**\n• 1 ≤ n ≤ 100 000\n• cheile sunt întregi din [-10⁹, 10⁹]\n• arborele nu se echilibrează; în teste înălțimea lui e mică\n\n**Exemplu.** Pentru intrarea\n\n```\n7\n50 30 70 20 40 60 90\n```\n\nprogramul afișează\n\n```\n70 20\n```",
+   "hint": "Parcurgerea în inordine vizitează cheile crescător, deci succesorul fiecărui nod este nodul vizitat imediat după el.",
+   "solution": "În inordine cheile vin crescător, deci perechea (nod, succesor) e perechea de noduri vizitate consecutiv. Se păstrează diferența maximă; cu `>` strict, la egalitate rămâne primul nod, cel cu cheia mai mică. Nodul cu cheia maximă are diferența 0, care contează doar dacă arborele are un singur nod.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct tnode {\n    int key;\n    struct tnode *left, *right;\n} TNode;\n\nTNode *insert(TNode *t, int k) {\n    if (!t) {\n        t = (TNode *)malloc(sizeof(TNode));\n        t->key = k;\n        t->left = t->right = NULL;\n    } else if (k < t->key) t->left = insert(t->left, k);\n    else if (k > t->key) t->right = insert(t->right, k);\n    return t;\n}\n\nTNode *prev = NULL;\nlong long bestDiff = -1;\nint bestKey;\n\nvoid inorder(TNode *t) {\n    if (!t) return;\n    inorder(t->left);\n    if (prev) {\n        long long d = (long long)t->key - prev->key;\n        if (d > bestDiff) { bestDiff = d; bestKey = prev->key; }\n    }\n    prev = t;\n    inorder(t->right);\n}\n\nvoid destroy(TNode *t) {\n    if (!t) return;\n    destroy(t->left);\n    destroy(t->right);\n    free(t);\n}\n\nint main(void) {\n    int n;\n    TNode *root = NULL;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    for (int i = 0; i < n; i++) {\n        int k;\n        scanf(\"%d\", &k);\n        root = insert(root, k);\n    }\n    inorder(root);\n    if (bestDiff < 0) { /* a single node: no successor, difference 0 */\n        bestDiff = 0;\n        bestKey = prev->key;\n    }\n    printf(\"%d %lld\\n\", bestKey, bestDiff);\n    destroy(root);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "7\n50 30 70 20 40 60 90\n",
+      "output": "70 20"
+     },
+     {
+      "input": "1\n5\n",
+      "output": "5 0"
+     },
+     {
+      "input": "6\n10 5 15 1 7 100\n",
+      "output": "15 85"
+     },
+     {
+      "input": "5\n4 2 6 1 3\n",
+      "output": "4 2"
+     },
+     {
+      "input": "3\n-1000000000 0 1000000000\n",
+      "output": "-1000000000 1000000000"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct tnode {\n    int key;\n    struct tnode *left, *right;\n} TNode;\n\nTNode *insert(TNode *t, int k) {\n    if (!t) {\n        t = (TNode *)malloc(sizeof(TNode));\n        t->key = k;\n        t->left = t->right = NULL;\n    } else if (k < t->key) t->left = insert(t->left, k);\n    else if (k > t->key) t->right = insert(t->right, k);\n    return t;\n}\n\nTNode *prev = NULL;\nlong long bestDiff = -1;\nint bestKey;\n\nvoid inorder(TNode *t) {\n    if (!t) return;\n    inorder(t->left);\n    if (prev) {\n        long long d = (long long)t->key - prev->key;\n        if (d > bestDiff) { bestDiff = d; bestKey = prev->key; }\n    }\n    prev = t;\n    inorder(t->right);\n}\n\nvoid destroy(TNode *t) {\n    if (!t) return;\n    destroy(t->left);\n    destroy(t->right);\n    free(t);\n}\n\nint main(void) {\n    int n;\n    TNode *root = NULL;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    for (int i = 0; i < n; i++) {\n        int k;\n        scanf(\"%d\", &k);\n        root = insert(root, k);\n    }\n    inorder(root);\n    if (bestDiff < 0) { /* a single node: no successor, difference 0 */\n        bestDiff = 0;\n        bestKey = prev->key;\n    }\n    printf(\"%d %lld\\n\", bestKey, bestDiff);\n    destroy(root);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "5",
+   "title": "Subarbori cu multe valori y",
+   "chapter": "3. Arbori binari",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 4",
+   "statement": "Scrie funcția `Numara(arbore, t, y)` care întoarce câți subarbori ai arborelui binar dat au **mai mult de t** noduri cu valoarea egală cu y. Un subarbore este un nod împreună cu toți descendenții lui (fiecare nod dă un subarbore).\n\nPe prima linie n, numărul de noduri (numerotate de la 1, rădăcina este nodul 1). Pe linia i dintre următoarele n: valoarea nodului i, indicele fiului stâng și al fiului drept (0 dacă lipsește). Pe ultima linie, t și y.\n\n**Date de intrare.** Arborele, ca mai sus, apoi t și y.\n\n**Date de ieșire.** Numărul de subarbori.\n\n**Restricții.**\n• 1 ≤ n ≤ 100 000\n• 0 ≤ t ≤ n\n\n**Exemplu.** Pentru intrarea\n\n```\n7\n1 2 3\n5 4 5\n5 6 7\n5 0 0\n2 0 0\n5 0 0\n1 0 0\n1 5\n```\n\nprogramul afișează\n\n```\n3\n```",
+   "hint": "O funcție recursivă care întoarce câte valori y sunt în subarborele unui nod; tot ea numără nodurile la care valoarea întoarsă depășește t.",
+   "solution": "O singură parcurgere în postordine: fiecare nod află câte valori y are în stânga și în dreapta, adună propria valoare și compară cu t. O(n).\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct tnode {\n    int val;\n    struct tnode *left, *right;\n} TNode;\n\nTNode *build(int n) {\n    int *v = (int *)malloc((n + 1) * sizeof(int)), *l = (int *)malloc((n + 1) * sizeof(int)), *r = (int *)malloc((n + 1) * sizeof(int));\n    TNode **p = (TNode **)malloc((n + 1) * sizeof(TNode *));\n    p[0] = NULL;\n    for (int i = 1; i <= n; i++) {\n        scanf(\"%d %d %d\", &v[i], &l[i], &r[i]);\n        p[i] = (TNode *)malloc(sizeof(TNode));\n    }\n    for (int i = 1; i <= n; i++) {\n        p[i]->val = v[i];\n        p[i]->left = p[l[i]];\n        p[i]->right = p[r[i]];\n    }\n    TNode *root = p[1];\n    free(v); free(l); free(r); free(p);\n    return root;\n}\n\nvoid destroy(TNode *t) {\n    if (!t) return;\n    destroy(t->left);\n    destroy(t->right);\n    free(t);\n}\n\nint result = 0;\n\nint countY(TNode *t, int th, int y) {\n    if (!t) return 0;\n    int c = countY(t->left, th, y) + countY(t->right, th, y) + (t->val == y);\n    if (c > th) result++;\n    return c;\n}\n\nint Numara(TNode *root, int th, int y) {\n    result = 0;\n    countY(root, th, y);\n    return result;\n}\n\nint main(void) {\n    int n, th, y;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    TNode *root = build(n);\n    scanf(\"%d %d\", &th, &y);\n    printf(\"%d\\n\", Numara(root, th, y));\n    destroy(root);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "7\n1 2 3\n5 4 5\n5 6 7\n5 0 0\n2 0 0\n5 0 0\n1 0 0\n1 5\n",
+      "output": "3"
+     },
+     {
+      "input": "7\n1 2 3\n5 4 5\n5 6 7\n5 0 0\n2 0 0\n5 0 0\n1 0 0\n0 1\n",
+      "output": "3"
+     },
+     {
+      "input": "1\n42 0 0\n0 42\n",
+      "output": "1"
+     },
+     {
+      "input": "6\n3 2 0\n3 3 0\n3 4 0\n3 5 0\n3 6 0\n3 0 0\n2 3\n",
+      "output": "4"
+     },
+     {
+      "input": "5\n10 2 3\n-4 0 4\n7 5 0\n0 0 0\n8 0 0\n0 99\n",
+      "output": "0"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct tnode {\n    int val;\n    struct tnode *left, *right;\n} TNode;\n\nTNode *build(int n) {\n    int *v = (int *)malloc((n + 1) * sizeof(int)), *l = (int *)malloc((n + 1) * sizeof(int)), *r = (int *)malloc((n + 1) * sizeof(int));\n    TNode **p = (TNode **)malloc((n + 1) * sizeof(TNode *));\n    p[0] = NULL;\n    for (int i = 1; i <= n; i++) {\n        scanf(\"%d %d %d\", &v[i], &l[i], &r[i]);\n        p[i] = (TNode *)malloc(sizeof(TNode));\n    }\n    for (int i = 1; i <= n; i++) {\n        p[i]->val = v[i];\n        p[i]->left = p[l[i]];\n        p[i]->right = p[r[i]];\n    }\n    TNode *root = p[1];\n    free(v); free(l); free(r); free(p);\n    return root;\n}\n\nvoid destroy(TNode *t) {\n    if (!t) return;\n    destroy(t->left);\n    destroy(t->right);\n    free(t);\n}\n\nint result = 0;\n\nint countY(TNode *t, int th, int y) {\n    if (!t) return 0;\n    int c = countY(t->left, th, y) + countY(t->right, th, y) + (t->val == y);\n    if (c > th) result++;\n    return c;\n}\n\nint Numara(TNode *root, int th, int y) {\n    result = 0;\n    countY(root, th, y);\n    return result;\n}\n\nint main(void) {\n    int n, th, y;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    TNode *root = build(n);\n    scanf(\"%d %d\", &th, &y);\n    printf(\"%d\\n\", Numara(root, th, y));\n    destroy(root);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "6",
+   "title": "Nodurile pe niveluri",
+   "chapter": "3. Arbori binari",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 5",
+   "statement": "Scrie funcția `Transf` care primește un arbore binar și construiește un vector de liste: lista k conține nodurile de pe nivelul k (rădăcina e pe nivelul 1), de la stânga la dreapta. Programul afișează apoi fiecare listă pe câte o linie.\n\nPe prima linie n, numărul de noduri (numerotate de la 1, rădăcina este nodul 1). Pe linia i dintre următoarele n: valoarea nodului i, indicele fiului stâng și al fiului drept (0 dacă lipsește).\n\n**Date de intrare.** Arborele, ca mai sus.\n\n**Date de ieșire.** Câte o linie pentru fiecare nivel, cu valorile nodurilor de pe el.\n\n**Restricții.**\n• 1 ≤ n ≤ 100 000\n\n**Exemplu.** Pentru intrarea\n\n```\n7\n1 2 3\n5 4 5\n5 6 7\n5 0 0\n2 0 0\n5 0 0\n1 0 0\n```\n\nprogramul afișează\n\n```\n1\n5 5\n5 2 5 1\n```",
+   "hint": "O parcurgere în lățime (cu o coadă) vizitează nodurile exact nivel cu nivel; ține minte nivelul fiecărui nod din coadă și adaugă nodul la sfârșitul listei nivelului lui.",
+   "solution": "Coada dă nodurile în ordinea nivelurilor, iar pe același nivel de la stânga la dreapta, pentru că fiii stângi intră înaintea celor drepți. Fiecare listă păstrează și un pointer la ultimul nod, deci adăugarea e O(1).\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct tnode {\n    int val;\n    struct tnode *left, *right;\n} TNode;\n\nTNode *build(int n) {\n    int *v = (int *)malloc((n + 1) * sizeof(int)), *l = (int *)malloc((n + 1) * sizeof(int)), *r = (int *)malloc((n + 1) * sizeof(int));\n    TNode **p = (TNode **)malloc((n + 1) * sizeof(TNode *));\n    p[0] = NULL;\n    for (int i = 1; i <= n; i++) {\n        scanf(\"%d %d %d\", &v[i], &l[i], &r[i]);\n        p[i] = (TNode *)malloc(sizeof(TNode));\n    }\n    for (int i = 1; i <= n; i++) {\n        p[i]->val = v[i];\n        p[i]->left = p[l[i]];\n        p[i]->right = p[r[i]];\n    }\n    TNode *root = p[1];\n    free(v); free(l); free(r); free(p);\n    return root;\n}\n\nvoid destroy(TNode *t) {\n    if (!t) return;\n    destroy(t->left);\n    destroy(t->right);\n    free(t);\n}\n\ntypedef struct lnode {\n    int val;\n    struct lnode *next;\n} LNode;\n\n/* appends to the list of a level, keeping a pointer to its last node */\nvoid append(LNode **head, LNode **tail, int v) {\n    LNode *c = (LNode *)malloc(sizeof(LNode));\n    c->val = v;\n    c->next = NULL;\n    if (*tail) (*tail)->next = c; else *head = c;\n    *tail = c;\n}\n\nint Transf(TNode *root, int n, LNode ***levels) {\n    LNode **head = (LNode **)calloc(n + 1, sizeof(LNode *)), **tail = (LNode **)calloc(n + 1, sizeof(LNode *));\n    TNode **q = (TNode **)malloc(n * sizeof(TNode *));\n    int *lv = (int *)malloc(n * sizeof(int));\n    int b = 0, e = 0, depth = 0;\n    q[e] = root; lv[e++] = 1;\n    while (b < e) {\n        TNode *t = q[b];\n        int l = lv[b++];\n        if (l > depth) depth = l;\n        append(&head[l], &tail[l], t->val);\n        if (t->left) { q[e] = t->left; lv[e++] = l + 1; }\n        if (t->right) { q[e] = t->right; lv[e++] = l + 1; }\n    }\n    free(q); free(lv); free(tail);\n    *levels = head;\n    return depth;\n}\n\nint main(void) {\n    int n;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    TNode *root = build(n);\n    LNode **levels;\n    int depth = Transf(root, n, &levels);\n    for (int k = 1; k <= depth; k++) {\n        for (LNode *p = levels[k]; p; ) {\n            LNode *nx = p->next;\n            printf(\"%d%c\", p->val, nx ? ' ' : '\\n');\n            free(p);\n            p = nx;\n        }\n    }\n    free(levels);\n    destroy(root);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "7\n1 2 3\n5 4 5\n5 6 7\n5 0 0\n2 0 0\n5 0 0\n1 0 0\n",
+      "output": "1\n5 5\n5 2 5 1"
+     },
+     {
+      "input": "1\n42 0 0\n",
+      "output": "42"
+     },
+     {
+      "input": "6\n3 2 0\n3 3 0\n3 4 0\n3 5 0\n3 6 0\n3 0 0\n",
+      "output": "3\n3\n3\n3\n3\n3"
+     },
+     {
+      "input": "5\n10 2 3\n-4 0 4\n7 5 0\n0 0 0\n8 0 0\n",
+      "output": "10\n-4 7\n0 8"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct tnode {\n    int val;\n    struct tnode *left, *right;\n} TNode;\n\nTNode *build(int n) {\n    int *v = (int *)malloc((n + 1) * sizeof(int)), *l = (int *)malloc((n + 1) * sizeof(int)), *r = (int *)malloc((n + 1) * sizeof(int));\n    TNode **p = (TNode **)malloc((n + 1) * sizeof(TNode *));\n    p[0] = NULL;\n    for (int i = 1; i <= n; i++) {\n        scanf(\"%d %d %d\", &v[i], &l[i], &r[i]);\n        p[i] = (TNode *)malloc(sizeof(TNode));\n    }\n    for (int i = 1; i <= n; i++) {\n        p[i]->val = v[i];\n        p[i]->left = p[l[i]];\n        p[i]->right = p[r[i]];\n    }\n    TNode *root = p[1];\n    free(v); free(l); free(r); free(p);\n    return root;\n}\n\nvoid destroy(TNode *t) {\n    if (!t) return;\n    destroy(t->left);\n    destroy(t->right);\n    free(t);\n}\n\ntypedef struct lnode {\n    int val;\n    struct lnode *next;\n} LNode;\n\n/* appends to the list of a level, keeping a pointer to its last node */\nvoid append(LNode **head, LNode **tail, int v) {\n    LNode *c = (LNode *)malloc(sizeof(LNode));\n    c->val = v;\n    c->next = NULL;\n    if (*tail) (*tail)->next = c; else *head = c;\n    *tail = c;\n}\n\nint Transf(TNode *root, int n, LNode ***levels) {\n    LNode **head = (LNode **)calloc(n + 1, sizeof(LNode *)), **tail = (LNode **)calloc(n + 1, sizeof(LNode *));\n    TNode **q = (TNode **)malloc(n * sizeof(TNode *));\n    int *lv = (int *)malloc(n * sizeof(int));\n    int b = 0, e = 0, depth = 0;\n    q[e] = root; lv[e++] = 1;\n    while (b < e) {\n        TNode *t = q[b];\n        int l = lv[b++];\n        if (l > depth) depth = l;\n        append(&head[l], &tail[l], t->val);\n        if (t->left) { q[e] = t->left; lv[e++] = l + 1; }\n        if (t->right) { q[e] = t->right; lv[e++] = l + 1; }\n    }\n    free(q); free(lv); free(tail);\n    *levels = head;\n    return depth;\n}\n\nint main(void) {\n    int n;\n    if (scanf(\"%d\", &n) != 1) return 0;\n    TNode *root = build(n);\n    LNode **levels;\n    int depth = Transf(root, n, &levels);\n    for (int k = 1; k <= depth; k++) {\n        for (LNode *p = levels[k]; p; ) {\n            LNode *nx = p->next;\n            printf(\"%d%c\", p->val, nx ? ' ' : '\\n');\n            free(p);\n            p = nx;\n        }\n    }\n    free(levels);\n    destroy(root);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "11",
+   "title": "Construiește un arbore binar de căutare",
+   "chapter": "3. Arbori binari",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Inserează, în ordine, cheile\n\n`50, 30, 70, 20, 40, 60, 80, 35, 65, 45`\n\nîntr-un arbore binar de căutare inițial gol: la fiecare pas apasă **locul liber** (`+`) unde ajunge cheia. Cheile mai mici merg în stânga, cele mai mari sau egale în dreapta.\n\nAi voie la cel mult 2 greșeli.",
+   "hint": "Fiecare cheie nouă pornește din rădăcină și coboară: la stânga dacă e mai mică decât nodul, la dreapta altfel, până la un loc gol.",
+   "solution": "Parcurs în preordine, arborele final este `50 30 20 40 35 45 70 60 65 80`. Rădăcina e prima cheie, 50.",
+   "kind": "ds",
+   "spec": {
+    "mode": "bst",
+    "keys": [
+     50,
+     30,
+     70,
+     20,
+     40,
+     60,
+     80,
+     35,
+     65,
+     45
+    ],
+    "maxMistakes": 2,
+    "expect": {
+     "preorder": [
+      50,
+      30,
+      20,
+      40,
+      35,
+      45,
+      70,
+      60,
+      65,
+      80
+     ]
+    }
+   }
+  },
+  {
+   "id": "12",
+   "title": "Un arbore care s-a făcut listă",
+   "chapter": "3. Arbori binari",
+   "difficulty": "ușoară",
+   "source": "Examen SD · seria CD · test grilă · căutarea într-un BST neechilibrat",
+   "statement": "Inserează cheile `10, 20, 30, 40, 50, 25` într-un arbore binar de căutare gol.\n\nPrivește forma arborelui: ce se întâmplă cu căutarea când cheile vin **sortate**? (La examen: „Câte comparații face căutarea lui 50?”)",
+   "hint": "Fiecare cheie e mai mare decât toate de dinainte, deci merge mereu în dreapta.",
+   "solution": "Cheile sortate fac din arbore un lanț spre dreapta: înălțimea e n - 1, iar căutarea lui 50 trece prin 10, 20, 30, 40, 50 — 5 comparații, ca într-o listă. De aceea există arborii echilibrați (AVL, roșu-negru).",
+   "kind": "ds",
+   "spec": {
+    "mode": "bst",
+    "keys": [
+     10,
+     20,
+     30,
+     40,
+     50,
+     25
+    ],
+    "maxMistakes": 1,
+    "expect": {
+     "preorder": [
+      10,
+      20,
+      30,
+      25,
+      40,
+      50
+     ]
+    }
+   }
+  },
+  {
+   "id": "7",
+   "title": "Operații pe un max-heap",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 14",
+   "statement": "Implementează un max-heap într-un vector (fiii poziției i sunt 2i+1 și 2i+2), exact ca la curs:\n- **inserare** `i x`: x se pune la sfârșitul vectorului și urcă (se interschimbă cu părintele cât timp e strict mai mare decât el);\n- **ștergere** `d`: se afișează maximul (rădăcina), ultimul element trece în rădăcină și coboară: se interschimbă cu fiul mai mare (la egalitate, cu cel stâng) cât timp acesta e strict mai mare. Pe un heap gol, `d` afișează `gol` și nu face nimic.\n\nDupă toate operațiile, afișează conținutul vectorului heap-ului, de la poziția 0 (sau `gol`).\n\n**Date de intrare.** Pe prima linie q, apoi q operații, câte una pe linie: `i x` sau `d`.\n\n**Date de ieșire.** Câte o linie pentru fiecare `d`, apoi o linie cu vectorul heap-ului.\n\n**Restricții.**\n• 1 ≤ q ≤ 100 000\n• |x| ≤ 10⁹\n\n**Exemplu.** Pentru intrarea\n\n```\n9\ni 25\ni 14\ni 16\ni 13\ni 10\ni 8\ni 12\nd\nd\n```\n\nprogramul afișează\n\n```\n25\n16\n14 13 12 8 10\n```",
+   "hint": "Scrie funcțiile `siftUp(h, k)` și `siftDown(h, n, k)`; cu ele inserarea și ștergerea au câte 3 rânduri.",
+   "solution": "Primul test este exact grila de la examen: din movila `25 14 16 13 10 8 12`, după două ștergeri rămâne `14 13 12 8 10`. Ambele operații parcurg o singură ramură: O(log n).\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int *v;\n    int n, cap;\n} Heap;\n\nvoid swap(int *a, int *b) { int t = *a; *a = *b; *b = t; }\n\nvoid siftUp(Heap *h, int k) {\n    while (k > 0 && h->v[(k - 1) / 2] < h->v[k]) {\n        swap(&h->v[(k - 1) / 2], &h->v[k]);\n        k = (k - 1) / 2;\n    }\n}\n\nvoid siftDown(Heap *h, int k) {\n    for (;;) {\n        int c = 2 * k + 1;\n        if (c >= h->n) return;\n        if (c + 1 < h->n && h->v[c + 1] > h->v[c]) c++;\n        if (h->v[c] <= h->v[k]) return;\n        swap(&h->v[c], &h->v[k]);\n        k = c;\n    }\n}\n\nvoid insert(Heap *h, int x) {\n    if (h->n == h->cap) {\n        h->cap = h->cap ? 2 * h->cap : 16;\n        h->v = (int *)realloc(h->v, h->cap * sizeof(int));\n    }\n    h->v[h->n++] = x;\n    siftUp(h, h->n - 1);\n}\n\nint extractMax(Heap *h) {\n    int m = h->v[0];\n    h->v[0] = h->v[--h->n];\n    siftDown(h, 0);\n    return m;\n}\n\nint main(void) {\n    Heap h = {NULL, 0, 0};\n    int q;\n    char op[4];\n    if (scanf(\"%d\", &q) != 1) return 0;\n    while (q--) {\n        scanf(\"%3s\", op);\n        if (op[0] == 'i') {\n            int x;\n            scanf(\"%d\", &x);\n            insert(&h, x);\n        } else if (h.n == 0) puts(\"gol\");\n        else printf(\"%d\\n\", extractMax(&h));\n    }\n    if (h.n == 0) puts(\"gol\");\n    for (int i = 0; i < h.n; i++) printf(\"%d%c\", h.v[i], i + 1 < h.n ? ' ' : '\\n');\n    free(h.v);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "9\ni 25\ni 14\ni 16\ni 13\ni 10\ni 8\ni 12\nd\nd\n",
+      "output": "25\n16\n14 13 12 8 10"
+     },
+     {
+      "input": "3\nd\ni 5\nd\n",
+      "output": "gol\n5\ngol"
+     },
+     {
+      "input": "6\ni 1\ni 2\ni 3\ni 4\ni 5\ni 6\n",
+      "output": "6 4 5 1 3 2"
+     },
+     {
+      "input": "8\ni 5\ni 5\ni 5\ni 7\nd\ni 9\nd\nd\n",
+      "output": "7\n9\n5\n5 5"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int *v;\n    int n, cap;\n} Heap;\n\nvoid swap(int *a, int *b) { int t = *a; *a = *b; *b = t; }\n\nvoid siftUp(Heap *h, int k) {\n    while (k > 0 && h->v[(k - 1) / 2] < h->v[k]) {\n        swap(&h->v[(k - 1) / 2], &h->v[k]);\n        k = (k - 1) / 2;\n    }\n}\n\nvoid siftDown(Heap *h, int k) {\n    for (;;) {\n        int c = 2 * k + 1;\n        if (c >= h->n) return;\n        if (c + 1 < h->n && h->v[c + 1] > h->v[c]) c++;\n        if (h->v[c] <= h->v[k]) return;\n        swap(&h->v[c], &h->v[k]);\n        k = c;\n    }\n}\n\nvoid insert(Heap *h, int x) {\n    if (h->n == h->cap) {\n        h->cap = h->cap ? 2 * h->cap : 16;\n        h->v = (int *)realloc(h->v, h->cap * sizeof(int));\n    }\n    h->v[h->n++] = x;\n    siftUp(h, h->n - 1);\n}\n\nint extractMax(Heap *h) {\n    int m = h->v[0];\n    h->v[0] = h->v[--h->n];\n    siftDown(h, 0);\n    return m;\n}\n\nint main(void) {\n    Heap h = {NULL, 0, 0};\n    int q;\n    char op[4];\n    if (scanf(\"%d\", &q) != 1) return 0;\n    while (q--) {\n        scanf(\"%3s\", op);\n        if (op[0] == 'i') {\n            int x;\n            scanf(\"%d\", &x);\n            insert(&h, x);\n        } else if (h.n == 0) puts(\"gol\");\n        else printf(\"%d\\n\", extractMax(&h));\n    }\n    if (h.n == 0) puts(\"gol\");\n    for (int i = 0; i < h.n; i++) printf(\"%d%c\", h.v[i], i + 1 < h.n ? ' ' : '\\n');\n    free(h.v);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "8",
+   "title": "Tabela de dispersie cu liste",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "ușoară",
+   "source": "Curs SD 12 · Tabele de dispersie",
+   "statement": "O tabelă de dispersie are M liste (bucket-uri), iar funcția de dispersie este h(k) = k mod M. O cheie nouă se inserează **la începutul** listei din bucket-ul ei; o cheie care există deja în tabelă se ignoră.\n\nInserează cheile date, în ordine, și afișează tabela.\n\n**Date de intrare.** Pe prima linie M și n, pe a doua cele n chei (naturale).\n\n**Date de ieșire.** M linii, de forma `i: chei`, cu cheile din lista i în ordinea din listă.\n\n**Restricții.**\n• 1 ≤ M ≤ 1000\n• 1 ≤ n ≤ 10 000\n• cheile sunt mai mici decât 10⁹\n\n**Exemplu.** Pentru intrarea\n\n```\n5 7\n10 3 15 8 3 20 4\n```\n\nprogramul afișează\n\n```\n0: 20 15 10\n1:\n2:\n3: 8 3\n4: 4\n```",
+   "hint": "Un vector de M pointeri la liste; înainte de inserare cauți cheia în lista ei.",
+   "solution": "Rezolvarea coliziunilor prin înlănțuire: cheile cu același h(k) stau în aceeași listă; inserarea la început e O(1), dar căutarea duplicatului parcurge lista.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int key;\n    struct node *next;\n} TNode;\n\nint main(void) {\n    int m, n;\n    if (scanf(\"%d %d\", &m, &n) != 2) return 0;\n    TNode **b = (TNode **)calloc(m, sizeof(TNode *));\n    for (int i = 0; i < n; i++) {\n        int k;\n        scanf(\"%d\", &k);\n        int h = k % m, found = 0;\n        for (TNode *p = b[h]; p; p = p->next)\n            if (p->key == k) { found = 1; break; }\n        if (found) continue;\n        TNode *c = (TNode *)malloc(sizeof(TNode));\n        c->key = k;\n        c->next = b[h];\n        b[h] = c;\n    }\n    for (int i = 0; i < m; i++) {\n        printf(\"%d:\", i);\n        for (TNode *p = b[i]; p;) {\n            TNode *nx = p->next;\n            printf(\" %d\", p->key);\n            free(p);\n            p = nx;\n        }\n        printf(\"\\n\");\n    }\n    free(b);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "5 7\n10 3 15 8 3 20 4\n",
+      "output": "0: 20 15 10\n1:\n2:\n3: 8 3\n4: 4"
+     },
+     {
+      "input": "1 3\n1 2 3\n",
+      "output": "0: 3 2 1"
+     },
+     {
+      "input": "7 6\n0 7 14 21 1 0\n",
+      "output": "0: 21 14 7 0\n1: 1\n2:\n3:\n4:\n5:\n6:"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int key;\n    struct node *next;\n} TNode;\n\nint main(void) {\n    int m, n;\n    if (scanf(\"%d %d\", &m, &n) != 2) return 0;\n    TNode **b = (TNode **)calloc(m, sizeof(TNode *));\n    for (int i = 0; i < n; i++) {\n        int k;\n        scanf(\"%d\", &k);\n        int h = k % m, found = 0;\n        for (TNode *p = b[h]; p; p = p->next)\n            if (p->key == k) { found = 1; break; }\n        if (found) continue;\n        TNode *c = (TNode *)malloc(sizeof(TNode));\n        c->key = k;\n        c->next = b[h];\n        b[h] = c;\n    }\n    for (int i = 0; i < m; i++) {\n        printf(\"%d:\", i);\n        for (TNode *p = b[i]; p;) {\n            TNode *nx = p->next;\n            printf(\" %d\", p->key);\n            free(p);\n            p = nx;\n        }\n        printf(\"\\n\");\n    }\n    free(b);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "13",
+   "title": "Build-heap",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Transformă vectorul `[4, 10, 3, 5, 1, 8, 9, 2, 7]` într-un **max-heap** cu algoritmul build-heap: sift-down pentru fiecare nod intern, de la ultimul (`i = n/2 - 1`) spre rădăcină.\n\nFiecare pas e o interschimbare: apasă cele două noduri (în arbore sau în vector) care își schimbă locurile. Copiii nodului `i` sunt `2i + 1` și `2i + 2`.",
+   "hint": "La sift-down, nodul se compară cu ambii copii și se schimbă cu cel mai mare dintre ei, dacă acela e mai mare decât el; apoi continuă de pe noua poziție.",
+   "solution": "Heap-ul final: `[10, 7, 9, 5, 1, 8, 3, 2, 4]`. Build-heap face O(n) operații în total, mai puțin decât n inserări (O(n log n)).",
+   "kind": "ds",
+   "spec": {
+    "mode": "heap",
+    "op": "build",
+    "array": [
+     4,
+     10,
+     3,
+     5,
+     1,
+     8,
+     9,
+     2,
+     7
+    ],
+    "maxMistakes": 2,
+    "expect": {
+     "array": [
+      10,
+      7,
+      9,
+      5,
+      1,
+      8,
+      3,
+      2,
+      4
+     ]
+    }
+   }
+  },
+  {
+   "id": "14",
+   "title": "Inserare într-un max-heap",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Max-heap-ul `[90, 70, 80, 30, 60, 50]` primește, pe rând, cheile **85** și **95**. Fiecare cheie se pune la final și urcă (sift-up) cât timp e mai mare decât părintele ei.\n\nApasă perechile de noduri care se schimbă.",
+   "hint": "Părintele poziției `i` este `(i - 1) / 2`.",
+   "solution": "După inserări: `[95, 90, 85, 70, 60, 50, 80, 30]`. 95 urcă până în rădăcină.",
+   "kind": "ds",
+   "spec": {
+    "mode": "heap",
+    "op": "insert",
+    "array": [
+     90,
+     70,
+     80,
+     30,
+     60,
+     50
+    ],
+    "keys": [
+     85,
+     95
+    ],
+    "maxMistakes": 1,
+    "expect": {
+     "array": [
+      95,
+      90,
+      85,
+      70,
+      60,
+      50,
+      80,
+      30
+     ]
+    }
+   }
+  },
+  {
+   "id": "15",
+   "title": "Extragerea maximului",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · operații pe un max-heap",
+   "statement": "Din max-heap-ul `[100, 80, 90, 40, 70, 60, 50, 10, 30]` se scoate de **două ori** maximul. La fiecare extragere, ultimul element trece în rădăcină (asta se face automat), apoi coboară prin sift-down: tu faci interschimbările.",
+   "hint": "Coborând, elementul se schimbă cu copilul cel mai mare, cât timp acesta e mai mare decât el.",
+   "solution": "Se scot 100 și 90; heap-ul rămas: `[80, 70, 60, 40, 10, 30, 50]`.",
+   "kind": "ds",
+   "spec": {
+    "mode": "heap",
+    "op": "extract",
+    "array": [
+     100,
+     80,
+     90,
+     40,
+     70,
+     60,
+     50,
+     10,
+     30
+    ],
+    "extract": 2,
+    "maxMistakes": 2,
+    "expect": {
+     "array": [
+      80,
+      70,
+      60,
+      40,
+      10,
+      30,
+      50
+     ],
+     "extracted": [
+      100,
+      90
+     ]
+    }
+   }
+  },
+  {
+   "id": "16",
+   "title": "Dispersie cu adresare deschisă",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "ușoară",
+   "source": "Examen SD · seria CD · test grilă · coliziune în tabela de dispersie",
+   "statement": "O tabelă de dispersie are **11** celule, numerotate 0–10, funcția `h(k) = k mod 11` și rezolvă coliziunile prin **sondare liniară** (dacă celula e ocupată, încearcă următoarea, circular).\n\nInserează, în ordine, cheile `22, 1, 13, 11, 24, 33, 18, 42, 31`: apasă celula în care ajunge fiecare.",
+   "hint": "Calculează `k mod 11`; dacă acolo e deja o cheie, mergi la dreapta (după 10 vine 0).",
+   "solution": "Tabela finală: 0: 22, 1: 1, 2: 13, 3: 11, 4: 24, 5: 33, 6: —, 7: 18, 8: —, 9: 42, 10: 31. Cheile se adună în grupuri lipite (clustering primar): de aceea există sondarea pătratică și dubla dispersie.",
+   "kind": "ds",
+   "spec": {
+    "mode": "hash",
+    "m": 11,
+    "keys": [
+     22,
+     1,
+     13,
+     11,
+     24,
+     33,
+     18,
+     42,
+     31
+    ],
+    "probe": "linear",
+    "maxMistakes": 2,
+    "expect": {
+     "table": [
+      22,
+      1,
+      13,
+      11,
+      24,
+      33,
+      null,
+      18,
+      null,
+      42,
+      31
+     ]
+    }
+   }
+  },
+  {
+   "id": "17",
+   "title": "Dublă dispersie",
+   "chapter": "4. Heap și tabele de dispersie",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Tabela are **11** celule și folosește **dublă dispersie**: la încercarea `i` (de la 0) cheia `k` merge în\n\n$$(h_1(k) + i \\cdot h_2(k)) \\bmod 11, \\quad h_1(k) = k \\bmod 11, \\quad h_2(k) = 7 - (k \\bmod 7).$$\n\nInserează cheile `14, 17, 25, 37, 34, 16, 26`.",
+   "hint": "h₂ nu e niciodată 0 (e între 1 și 7), deci fiecare încercare sare în altă celulă.",
+   "solution": "Tabela finală: 0: —, 1: 34, 2: —, 3: 14, 4: 37, 5: 16, 6: 17, 7: —, 8: 26, 9: 25, 10: —.",
+   "kind": "ds",
+   "spec": {
+    "mode": "hash",
+    "m": 11,
+    "keys": [
+     14,
+     17,
+     25,
+     37,
+     34,
+     16,
+     26
+    ],
+    "probe": "double",
+    "h2": 7,
+    "maxMistakes": 2,
+    "expect": {
+     "table": [
+      null,
+      34,
+      null,
+      14,
+      37,
+      16,
+      17,
+      null,
+      26,
+      25,
+      null
+     ]
+    }
+   }
+  },
+  {
+   "id": "9",
+   "title": "Drum minim printr-un nod intermediar",
+   "chapter": "5. Grafuri",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · 12 iunie 2021 · proba practică · problema 2",
+   "statement": "Se dă un graf neorientat ponderat (costuri pozitive) și trei noduri: sursa s, nodul intermediar p și destinația d. Afișează costul minim al unui drum de la s la d care trece prin p, sau `-1` dacă nu există.\n\nImplementează singur Dijkstra (cu un min-heap sau, pentru n mic, cu căutarea liniară a minimului).\n\n**Date de intrare.** Pe prima linie n și m. Pe fiecare din următoarele m linii o muchie: a, b și costul ei. Pe ultima linie s, p și d.\n\n**Date de ieșire.** Costul minim sau -1.\n\n**Restricții.**\n• 1 ≤ n ≤ 10 000\n• 0 ≤ m ≤ 50 000\n• 1 ≤ cost ≤ 10 000\n\n**Exemplu.** Pentru intrarea\n\n```\n5 6\n1 2 4\n1 3 1\n3 2 1\n2 4 5\n3 4 8\n4 5 1\n1 2 5\n```\n\nprogramul afișează\n\n```\n8\n```",
+   "hint": "Drumul minim s → p → d este drumul minim s → p urmat de drumul minim p → d: două rulări de Dijkstra.",
+   "solution": "Un drum care trece prin p se împarte în două: s → p și p → d, iar fiecare parte trebuie să fie minimă. Se rulează Dijkstra din s și din p. Cu heap: O((n + m) log m).\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct edge {\n    int to, cost;\n    struct edge *next;\n} Edge;\n\ntypedef struct { long long d; int v; } Item;\n\n/* min-heap of (distance, node) */\ntypedef struct { Item *a; int n; } MinHeap;\n\nvoid hpush(MinHeap *h, Item x) {\n    int k = h->n++;\n    h->a[k] = x;\n    while (k > 0 && h->a[(k - 1) / 2].d > h->a[k].d) {\n        Item t = h->a[k]; h->a[k] = h->a[(k - 1) / 2]; h->a[(k - 1) / 2] = t;\n        k = (k - 1) / 2;\n    }\n}\n\nItem hpop(MinHeap *h) {\n    Item top = h->a[0];\n    h->a[0] = h->a[--h->n];\n    int k = 0;\n    for (;;) {\n        int c = 2 * k + 1;\n        if (c >= h->n) break;\n        if (c + 1 < h->n && h->a[c + 1].d < h->a[c].d) c++;\n        if (h->a[c].d >= h->a[k].d) break;\n        Item t = h->a[k]; h->a[k] = h->a[c]; h->a[c] = t;\n        k = c;\n    }\n    return top;\n}\n\nlong long dijkstra(Edge **adj, int n, int m, int s, int t) {\n    long long *d = (long long *)malloc((n + 1) * sizeof(long long));\n    for (int i = 1; i <= n; i++) d[i] = -1;\n    MinHeap h = {(Item *)malloc((2 * m + 2) * sizeof(Item)), 0};\n    Item st = {0, s};\n    d[s] = 0;\n    hpush(&h, st);\n    while (h.n) {\n        Item x = hpop(&h);\n        if (x.d > d[x.v]) continue;\n        for (Edge *e = adj[x.v]; e; e = e->next) {\n            long long nd = x.d + e->cost;\n            if (d[e->to] < 0 || nd < d[e->to]) {\n                d[e->to] = nd;\n                Item y = {nd, e->to};\n                hpush(&h, y);\n            }\n        }\n    }\n    long long r = d[t];\n    free(d);\n    free(h.a);\n    return r;\n}\n\nvoid addEdge(Edge **adj, int a, int b, int c) {\n    Edge *e = (Edge *)malloc(sizeof(Edge));\n    e->to = b; e->cost = c; e->next = adj[a];\n    adj[a] = e;\n}\n\nint main(void) {\n    int n, m, s, p, d;\n    if (scanf(\"%d %d\", &n, &m) != 2) return 0;\n    Edge **adj = (Edge **)calloc(n + 1, sizeof(Edge *));\n    for (int i = 0; i < m; i++) {\n        int a, b, c;\n        scanf(\"%d %d %d\", &a, &b, &c);\n        addEdge(adj, a, b, c);\n        addEdge(adj, b, a, c);\n    }\n    scanf(\"%d %d %d\", &s, &p, &d);\n    long long x = dijkstra(adj, n, m, s, p), y = dijkstra(adj, n, m, p, d);\n    printf(\"%lld\\n\", x < 0 || y < 0 ? -1LL : x + y);\n    for (int i = 1; i <= n; i++)\n        while (adj[i]) { Edge *e = adj[i]->next; free(adj[i]); adj[i] = e; }\n    free(adj);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "5 6\n1 2 4\n1 3 1\n3 2 1\n2 4 5\n3 4 8\n4 5 1\n1 2 5\n",
+      "output": "8"
+     },
+     {
+      "input": "4 2\n1 2 3\n3 4 3\n1 2 4\n",
+      "output": "-1"
+     },
+     {
+      "input": "3 2\n1 2 7\n2 3 7\n2 2 2\n",
+      "output": "0"
+     },
+     {
+      "input": "6 7\n1 2 1\n2 3 1\n3 6 1\n1 4 5\n4 5 1\n5 6 1\n2 5 10\n1 5 6\n",
+      "output": "5"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct edge {\n    int to, cost;\n    struct edge *next;\n} Edge;\n\ntypedef struct { long long d; int v; } Item;\n\n/* min-heap of (distance, node) */\ntypedef struct { Item *a; int n; } MinHeap;\n\nvoid hpush(MinHeap *h, Item x) {\n    int k = h->n++;\n    h->a[k] = x;\n    while (k > 0 && h->a[(k - 1) / 2].d > h->a[k].d) {\n        Item t = h->a[k]; h->a[k] = h->a[(k - 1) / 2]; h->a[(k - 1) / 2] = t;\n        k = (k - 1) / 2;\n    }\n}\n\nItem hpop(MinHeap *h) {\n    Item top = h->a[0];\n    h->a[0] = h->a[--h->n];\n    int k = 0;\n    for (;;) {\n        int c = 2 * k + 1;\n        if (c >= h->n) break;\n        if (c + 1 < h->n && h->a[c + 1].d < h->a[c].d) c++;\n        if (h->a[c].d >= h->a[k].d) break;\n        Item t = h->a[k]; h->a[k] = h->a[c]; h->a[c] = t;\n        k = c;\n    }\n    return top;\n}\n\nlong long dijkstra(Edge **adj, int n, int m, int s, int t) {\n    long long *d = (long long *)malloc((n + 1) * sizeof(long long));\n    for (int i = 1; i <= n; i++) d[i] = -1;\n    MinHeap h = {(Item *)malloc((2 * m + 2) * sizeof(Item)), 0};\n    Item st = {0, s};\n    d[s] = 0;\n    hpush(&h, st);\n    while (h.n) {\n        Item x = hpop(&h);\n        if (x.d > d[x.v]) continue;\n        for (Edge *e = adj[x.v]; e; e = e->next) {\n            long long nd = x.d + e->cost;\n            if (d[e->to] < 0 || nd < d[e->to]) {\n                d[e->to] = nd;\n                Item y = {nd, e->to};\n                hpush(&h, y);\n            }\n        }\n    }\n    long long r = d[t];\n    free(d);\n    free(h.a);\n    return r;\n}\n\nvoid addEdge(Edge **adj, int a, int b, int c) {\n    Edge *e = (Edge *)malloc(sizeof(Edge));\n    e->to = b; e->cost = c; e->next = adj[a];\n    adj[a] = e;\n}\n\nint main(void) {\n    int n, m, s, p, d;\n    if (scanf(\"%d %d\", &n, &m) != 2) return 0;\n    Edge **adj = (Edge **)calloc(n + 1, sizeof(Edge *));\n    for (int i = 0; i < m; i++) {\n        int a, b, c;\n        scanf(\"%d %d %d\", &a, &b, &c);\n        addEdge(adj, a, b, c);\n        addEdge(adj, b, a, c);\n    }\n    scanf(\"%d %d %d\", &s, &p, &d);\n    long long x = dijkstra(adj, n, m, s, p), y = dijkstra(adj, n, m, p, d);\n    printf(\"%lld\\n\", x < 0 || y < 0 ? -1LL : x + y);\n    for (int i = 1; i <= n; i++)\n        while (adj[i]) { Edge *e = adj[i]->next; free(adj[i]); adj[i] = e; }\n    free(adj);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "10",
+   "title": "Cel mai scurt drum într-un graf aciclic",
+   "chapter": "5. Grafuri",
+   "difficulty": "grea",
+   "source": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 6",
+   "statement": "Se dă un graf **orientat aciclic** ponderat, reprezentat prin liste de adiacență, și două noduri x și y. Scrie funcția `Drum` care întoarce un pointer la o structură cu costul celui mai scurt drum de la x la y și lista nodurilor de pe el, sau `NULL` dacă nu există drum.\n\nAfișează costul pe o linie și nodurile drumului pe a doua, sau `NU`. Costurile pot fi și negative (graful e aciclic, deci nu există cicluri negative). În teste, drumul minim e unic.\n\n**Date de intrare.** Pe prima linie n și m. Pe fiecare din următoarele m linii un arc: a, b și costul. Pe ultima linie x și y.\n\n**Date de ieșire.** Costul și drumul, sau `NU`.\n\n**Restricții.**\n• 1 ≤ n ≤ 10 000\n• 0 ≤ m ≤ 50 000\n• |cost| ≤ 10 000\n\n**Exemplu.** Pentru intrarea\n\n```\n6 8\n1 2 5\n1 3 3\n2 4 6\n3 2 1\n3 4 9\n4 5 -2\n2 5 10\n5 6 1\n1 6\n```\n\nprogramul afișează\n\n```\n9\n1 3 2 4 5 6\n```",
+   "hint": "Sortează topologic nodurile (DFS: un nod intră în stivă după ce i-ai terminat toți vecinii), apoi relaxează arcele în ordinea topologică, pornind din x. Păstrează pentru fiecare nod predecesorul pe drumul minim.",
+   "solution": "Într-un DAG, relaxarea arcelor în ordine topologică dă drumurile minime chiar și cu costuri negative: când ajungi la un nod, toate arcele care intră în el au fost deja relaxate. Sortarea topologică e DFS-ul cu stiva din curs. Drumul se reface din vectorul de predecesori. O(n + m).\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int v, cost;\n    struct node *next;\n} TNode, *ATNode;\n\ntypedef struct {\n    int nn;\n    ATNode *adl;\n} TGraphL;\n\ntypedef struct {\n    long long cost;\n    int len;\n    int *nodes;\n} TDrum;\n\nint *order, ordLen, *seen;\n\nvoid dfs(TGraphL *g, int u) { /* iterative-free recursion is fine for the given sizes on a DAG */\n    seen[u] = 1;\n    for (ATNode p = g->adl[u]; p; p = p->next)\n        if (!seen[p->v]) dfs(g, p->v);\n    order[ordLen++] = u; /* finished: goes on the \"stack\" */\n}\n\nTDrum *Drum(TGraphL *g, int x, int y) {\n    int n = g->nn;\n    order = (int *)malloc(n * sizeof(int));\n    seen = (int *)calloc(n + 1, sizeof(int));\n    ordLen = 0;\n    dfs(g, x); /* only the nodes reachable from x matter */\n    long long *d = (long long *)malloc((n + 1) * sizeof(long long));\n    int *pred = (int *)malloc((n + 1) * sizeof(int));\n    char *reach = (char *)calloc(n + 1, 1);\n    reach[x] = 1; d[x] = 0; pred[x] = 0;\n    for (int i = ordLen - 1; i >= 0; i--) { /* topological order = reverse finishing order */\n        int u = order[i];\n        if (!reach[u]) continue;\n        for (ATNode p = g->adl[u]; p; p = p->next)\n            if (!reach[p->v] || d[u] + p->cost < d[p->v]) {\n                reach[p->v] = 1;\n                d[p->v] = d[u] + p->cost;\n                pred[p->v] = u;\n            }\n    }\n    TDrum *r = NULL;\n    if (reach[y]) {\n        r = (TDrum *)malloc(sizeof(TDrum));\n        r->cost = d[y];\n        r->len = 0;\n        for (int v = y; v; v = pred[v]) r->len++;\n        r->nodes = (int *)malloc(r->len * sizeof(int));\n        int k = r->len;\n        for (int v = y; v; v = pred[v]) r->nodes[--k] = v;\n    }\n    free(order); free(seen); free(d); free(pred); free(reach);\n    return r;\n}\n\nint main(void) {\n    TGraphL g;\n    int m, x, y;\n    if (scanf(\"%d %d\", &g.nn, &m) != 2) return 0;\n    g.adl = (ATNode *)calloc(g.nn + 1, sizeof(ATNode));\n    for (int i = 0; i < m; i++) {\n        ATNode e = (ATNode)malloc(sizeof(TNode));\n        int a;\n        scanf(\"%d %d %d\", &a, &e->v, &e->cost);\n        e->next = g.adl[a];\n        g.adl[a] = e;\n    }\n    scanf(\"%d %d\", &x, &y);\n    TDrum *r = Drum(&g, x, y);\n    if (!r) puts(\"NU\");\n    else {\n        printf(\"%lld\\n\", r->cost);\n        for (int i = 0; i < r->len; i++) printf(\"%d%c\", r->nodes[i], i + 1 < r->len ? ' ' : '\\n');\n        free(r->nodes);\n        free(r);\n    }\n    for (int i = 1; i <= g.nn; i++)\n        while (g.adl[i]) { ATNode e = g.adl[i]->next; free(g.adl[i]); g.adl[i] = e; }\n    free(g.adl);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "6 8\n1 2 5\n1 3 3\n2 4 6\n3 2 1\n3 4 9\n4 5 -2\n2 5 10\n5 6 1\n1 6\n",
+      "output": "9\n1 3 2 4 5 6"
+     },
+     {
+      "input": "3 1\n1 2 4\n2 3\n",
+      "output": "NU"
+     },
+     {
+      "input": "4 4\n1 2 -5\n2 4 -5\n1 3 1\n3 4 1\n1 4\n",
+      "output": "-10\n1 2 4"
+     },
+     {
+      "input": "2 0\n1 1\n",
+      "output": "0\n1"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct node {\n    int v, cost;\n    struct node *next;\n} TNode, *ATNode;\n\ntypedef struct {\n    int nn;\n    ATNode *adl;\n} TGraphL;\n\ntypedef struct {\n    long long cost;\n    int len;\n    int *nodes;\n} TDrum;\n\nint *order, ordLen, *seen;\n\nvoid dfs(TGraphL *g, int u) { /* iterative-free recursion is fine for the given sizes on a DAG */\n    seen[u] = 1;\n    for (ATNode p = g->adl[u]; p; p = p->next)\n        if (!seen[p->v]) dfs(g, p->v);\n    order[ordLen++] = u; /* finished: goes on the \"stack\" */\n}\n\nTDrum *Drum(TGraphL *g, int x, int y) {\n    int n = g->nn;\n    order = (int *)malloc(n * sizeof(int));\n    seen = (int *)calloc(n + 1, sizeof(int));\n    ordLen = 0;\n    dfs(g, x); /* only the nodes reachable from x matter */\n    long long *d = (long long *)malloc((n + 1) * sizeof(long long));\n    int *pred = (int *)malloc((n + 1) * sizeof(int));\n    char *reach = (char *)calloc(n + 1, 1);\n    reach[x] = 1; d[x] = 0; pred[x] = 0;\n    for (int i = ordLen - 1; i >= 0; i--) { /* topological order = reverse finishing order */\n        int u = order[i];\n        if (!reach[u]) continue;\n        for (ATNode p = g->adl[u]; p; p = p->next)\n            if (!reach[p->v] || d[u] + p->cost < d[p->v]) {\n                reach[p->v] = 1;\n                d[p->v] = d[u] + p->cost;\n                pred[p->v] = u;\n            }\n    }\n    TDrum *r = NULL;\n    if (reach[y]) {\n        r = (TDrum *)malloc(sizeof(TDrum));\n        r->cost = d[y];\n        r->len = 0;\n        for (int v = y; v; v = pred[v]) r->len++;\n        r->nodes = (int *)malloc(r->len * sizeof(int));\n        int k = r->len;\n        for (int v = y; v; v = pred[v]) r->nodes[--k] = v;\n    }\n    free(order); free(seen); free(d); free(pred); free(reach);\n    return r;\n}\n\nint main(void) {\n    TGraphL g;\n    int m, x, y;\n    if (scanf(\"%d %d\", &g.nn, &m) != 2) return 0;\n    g.adl = (ATNode *)calloc(g.nn + 1, sizeof(ATNode));\n    for (int i = 0; i < m; i++) {\n        ATNode e = (ATNode)malloc(sizeof(TNode));\n        int a;\n        scanf(\"%d %d %d\", &a, &e->v, &e->cost);\n        e->next = g.adl[a];\n        g.adl[a] = e;\n    }\n    scanf(\"%d %d\", &x, &y);\n    TDrum *r = Drum(&g, x, y);\n    if (!r) puts(\"NU\");\n    else {\n        printf(\"%lld\\n\", r->cost);\n        for (int i = 0; i < r->len; i++) printf(\"%d%c\", r->nodes[i], i + 1 < r->len ? ' ' : '\\n');\n        free(r->nodes);\n        free(r);\n    }\n    for (int i = 1; i <= g.nn; i++)\n        while (g.adl[i]) { ATNode e = g.adl[i]->next; free(g.adl[i]); g.adl[i] = e; }\n    free(g.adl);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "18",
+   "title": "Parcurgerea în lățime",
+   "chapter": "5. Grafuri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Parcurge graful **în lățime** (BFS) pornind din `A`. Când un nod are mai mulți vecini nevizitați, îi ia în **ordine alfabetică**.\n\nApasă nodurile în ordinea în care sunt vizitate (scoase din coadă).",
+   "hint": "BFS folosește o coadă: vizitezi nodul din față și pui la final vecinii lui încă nevăzuți.",
+   "solution": "Ordinea BFS: `A B C D E F G H` — întâi nodurile la distanța 1 de A, apoi cele la distanța 2, apoi 3.",
+   "kind": "ds",
+   "spec": {
+    "mode": "graph",
+    "algo": "bfs",
+    "nodes": [
+     {
+      "name": "A",
+      "x": 0.1,
+      "y": 0.5
+     },
+     {
+      "name": "B",
+      "x": 0.35,
+      "y": 0.15
+     },
+     {
+      "name": "C",
+      "x": 0.35,
+      "y": 0.85
+     },
+     {
+      "name": "D",
+      "x": 0.6,
+      "y": 0.15
+     },
+     {
+      "name": "E",
+      "x": 0.6,
+      "y": 0.5
+     },
+     {
+      "name": "F",
+      "x": 0.6,
+      "y": 0.85
+     },
+     {
+      "name": "G",
+      "x": 0.88,
+      "y": 0.3
+     },
+     {
+      "name": "H",
+      "x": 0.88,
+      "y": 0.75
+     }
+    ],
+    "edges": [
+     [
+      "A",
+      "B"
+     ],
+     [
+      "A",
+      "C"
+     ],
+     [
+      "B",
+      "D"
+     ],
+     [
+      "B",
+      "E"
+     ],
+     [
+      "C",
+      "E"
+     ],
+     [
+      "C",
+      "F"
+     ],
+     [
+      "D",
+      "G"
+     ],
+     [
+      "E",
+      "G"
+     ],
+     [
+      "E",
+      "H"
+     ],
+     [
+      "F",
+      "H"
+     ]
+    ],
+    "start": "A",
+    "maxMistakes": 2,
+    "expect": {
+     "order": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H"
+     ]
+    }
+   }
+  },
+  {
+   "id": "19",
+   "title": "Parcurgerea în adâncime",
+   "chapter": "5. Grafuri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Același graf, parcurs **în adâncime** (DFS, recursiv) din `A`, vecinii în ordine alfabetică.",
+   "hint": "DFS merge mereu la primul vecin nevizitat al nodului curent; când nu mai are, se întoarce la nodul de dinainte.",
+   "solution": "Ordinea DFS: `A B D G E C F H`.",
+   "kind": "ds",
+   "spec": {
+    "mode": "graph",
+    "algo": "dfs",
+    "nodes": [
+     {
+      "name": "A",
+      "x": 0.1,
+      "y": 0.5
+     },
+     {
+      "name": "B",
+      "x": 0.35,
+      "y": 0.15
+     },
+     {
+      "name": "C",
+      "x": 0.35,
+      "y": 0.85
+     },
+     {
+      "name": "D",
+      "x": 0.6,
+      "y": 0.15
+     },
+     {
+      "name": "E",
+      "x": 0.6,
+      "y": 0.5
+     },
+     {
+      "name": "F",
+      "x": 0.6,
+      "y": 0.85
+     },
+     {
+      "name": "G",
+      "x": 0.88,
+      "y": 0.3
+     },
+     {
+      "name": "H",
+      "x": 0.88,
+      "y": 0.75
+     }
+    ],
+    "edges": [
+     [
+      "A",
+      "B"
+     ],
+     [
+      "A",
+      "C"
+     ],
+     [
+      "B",
+      "D"
+     ],
+     [
+      "B",
+      "E"
+     ],
+     [
+      "C",
+      "E"
+     ],
+     [
+      "C",
+      "F"
+     ],
+     [
+      "D",
+      "G"
+     ],
+     [
+      "E",
+      "G"
+     ],
+     [
+      "E",
+      "H"
+     ],
+     [
+      "F",
+      "H"
+     ]
+    ],
+    "start": "A",
+    "maxMistakes": 2,
+    "expect": {
+     "order": [
+      "A",
+      "B",
+      "D",
+      "G",
+      "E",
+      "C",
+      "F",
+      "H"
+     ]
+    }
+   }
+  },
+  {
+   "id": "20",
+   "title": "Dijkstra pas cu pas",
+   "chapter": "5. Grafuri",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · drum minim într-un graf",
+   "statement": "Rulează algoritmul lui **Dijkstra** din `S` pe graful orientat cu costuri. La fiecare pas, apasă nodul care se **fixează**: cel nefixat cu distanța provizorie cea mai mică. Sub fiecare nod vezi distanța lui provizorie, care se actualizează după fiecare pas.",
+   "hint": "La început doar S are distanța 0. Când fixezi un nod u, pentru fiecare muchie u→v încerci dist[u] + cost < dist[v].",
+   "solution": "Distanțele finale: A = 3, B = 1, C = 8, D = 9, S = 0, T = 11. Drumul minim până la T: S → B → A → C → T.",
+   "kind": "ds",
+   "spec": {
+    "mode": "graph",
+    "algo": "dijkstra",
+    "directed": true,
+    "nodes": [
+     {
+      "name": "S",
+      "x": 0.05,
+      "y": 0.5
+     },
+     {
+      "name": "A",
+      "x": 0.35,
+      "y": 0.12
+     },
+     {
+      "name": "B",
+      "x": 0.35,
+      "y": 0.88
+     },
+     {
+      "name": "C",
+      "x": 0.65,
+      "y": 0.12
+     },
+     {
+      "name": "D",
+      "x": 0.65,
+      "y": 0.88
+     },
+     {
+      "name": "T",
+      "x": 0.95,
+      "y": 0.5
+     }
+    ],
+    "edges": [
+     [
+      "S",
+      "A",
+      4
+     ],
+     [
+      "S",
+      "B",
+      1
+     ],
+     [
+      "B",
+      "A",
+      2
+     ],
+     [
+      "A",
+      "C",
+      5
+     ],
+     [
+      "B",
+      "D",
+      8
+     ],
+     [
+      "B",
+      "C",
+      9
+     ],
+     [
+      "C",
+      "D",
+      1
+     ],
+     [
+      "C",
+      "T",
+      3
+     ],
+     [
+      "D",
+      "T",
+      6
+     ]
+    ],
+    "start": "S",
+    "maxMistakes": 2,
+    "expect": {
+     "dist": {
+      "S": 0,
+      "A": 3,
+      "B": 1,
+      "C": 8,
+      "D": 9,
+      "T": 11
+     }
+    }
+   }
+  },
+  {
+   "id": "21",
+   "title": "Sortarea topologică",
+   "chapter": "5. Grafuri",
+   "difficulty": "medie",
+   "source": "Examen SD · seria CD · test grilă · sortarea topologică",
+   "statement": "O muchie `x → y` înseamnă „x trebuie făcut înainte de y”. Găsește o ordine în care pot fi făcute toate (o **sortare topologică**): apasă pe rând nodurile. Orice ordine corectă e acceptată.",
+   "hint": "Poți lua oricând un nod în care nu mai intră nicio muchie de la noduri neluate încă (algoritmul lui Kahn).",
+   "solution": "De exemplu `curs lab1 lab2 tema1 tema2 test examen`. Nu e singura: `lab1` și `lab2` pot fi luate în orice ordine după `curs`.",
+   "kind": "ds",
+   "spec": {
+    "mode": "graph",
+    "algo": "topo",
+    "directed": true,
+    "nodes": [
+     {
+      "name": "curs",
+      "x": 0.05,
+      "y": 0.5
+     },
+     {
+      "name": "lab1",
+      "x": 0.3,
+      "y": 0.15
+     },
+     {
+      "name": "lab2",
+      "x": 0.3,
+      "y": 0.85
+     },
+     {
+      "name": "tema1",
+      "x": 0.55,
+      "y": 0.15
+     },
+     {
+      "name": "tema2",
+      "x": 0.55,
+      "y": 0.85
+     },
+     {
+      "name": "test",
+      "x": 0.78,
+      "y": 0.5
+     },
+     {
+      "name": "examen",
+      "x": 0.97,
+      "y": 0.5
+     }
+    ],
+    "edges": [
+     [
+      "curs",
+      "lab1"
+     ],
+     [
+      "curs",
+      "lab2"
+     ],
+     [
+      "lab1",
+      "tema1"
+     ],
+     [
+      "lab2",
+      "tema2"
+     ],
+     [
+      "lab1",
+      "tema2"
+     ],
+     [
+      "tema1",
+      "test"
+     ],
+     [
+      "tema2",
+      "test"
+     ],
+     [
+      "test",
+      "examen"
+     ],
+     [
+      "lab2",
+      "test"
+     ]
+    ],
+    "maxMistakes": 2
+   }
+  },
+  {
+   "id": "22",
+   "title": "Kruskal",
+   "chapter": "5. Grafuri",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un **arbore parțial de cost minim** cu algoritmul lui **Kruskal**: apasă muchiile în ordinea în care le alege algoritmul (cea mai ieftină care nu închide un ciclu). La costuri egale, oricare e bună.",
+   "hint": "Sortează muchiile după cost. O muchie închide un ciclu dacă ambele capete sunt deja legate prin muchii alese.",
+   "solution": "Costul minim este 39. Muchiile alese: AD (5), CE (5), DF (6), AB (7), BE (7), EG (9).",
+   "kind": "ds",
+   "spec": {
+    "mode": "graph",
+    "algo": "kruskal",
+    "nodes": [
+     {
+      "name": "A",
+      "x": 0.08,
+      "y": 0.3
+     },
+     {
+      "name": "B",
+      "x": 0.38,
+      "y": 0.08
+     },
+     {
+      "name": "C",
+      "x": 0.4,
+      "y": 0.55
+     },
+     {
+      "name": "D",
+      "x": 0.12,
+      "y": 0.88
+     },
+     {
+      "name": "E",
+      "x": 0.68,
+      "y": 0.32
+     },
+     {
+      "name": "F",
+      "x": 0.66,
+      "y": 0.9
+     },
+     {
+      "name": "G",
+      "x": 0.95,
+      "y": 0.6
+     }
+    ],
+    "edges": [
+     [
+      "A",
+      "B",
+      7
+     ],
+     [
+      "A",
+      "D",
+      5
+     ],
+     [
+      "B",
+      "C",
+      8
+     ],
+     [
+      "B",
+      "D",
+      9
+     ],
+     [
+      "B",
+      "E",
+      7
+     ],
+     [
+      "C",
+      "E",
+      5
+     ],
+     [
+      "D",
+      "E",
+      15
+     ],
+     [
+      "D",
+      "F",
+      6
+     ],
+     [
+      "E",
+      "F",
+      8
+     ],
+     [
+      "E",
+      "G",
+      9
+     ],
+     [
+      "F",
+      "G",
+      11
+     ]
+    ],
+    "maxMistakes": 2,
+    "expect": {
+     "cost": 39
+    }
+   }
+  },
+  {
+   "id": "23",
+   "title": "Prim",
+   "chapter": "5. Grafuri",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Același graf, dar cu algoritmul lui **Prim**, pornind din `A`: arborele crește dintr-un singur nod, iar la fiecare pas intră cea mai ieftină muchie care iese din el.",
+   "hint": "Uită-te doar la muchiile cu un capăt în arbore și celălalt în afară.",
+   "solution": "Ordinea lui Prim: AD (5), DF (6), AB (7), BE (7), EC (5), EG (9); costul e tot 39. Prim și Kruskal aleg aceleași muchii aici, în altă ordine.",
+   "kind": "ds",
+   "spec": {
+    "mode": "graph",
+    "algo": "prim",
+    "nodes": [
+     {
+      "name": "A",
+      "x": 0.08,
+      "y": 0.3
+     },
+     {
+      "name": "B",
+      "x": 0.38,
+      "y": 0.08
+     },
+     {
+      "name": "C",
+      "x": 0.4,
+      "y": 0.55
+     },
+     {
+      "name": "D",
+      "x": 0.12,
+      "y": 0.88
+     },
+     {
+      "name": "E",
+      "x": 0.68,
+      "y": 0.32
+     },
+     {
+      "name": "F",
+      "x": 0.66,
+      "y": 0.9
+     },
+     {
+      "name": "G",
+      "x": 0.95,
+      "y": 0.6
+     }
+    ],
+    "edges": [
+     [
+      "A",
+      "B",
+      7
+     ],
+     [
+      "A",
+      "D",
+      5
+     ],
+     [
+      "B",
+      "C",
+      8
+     ],
+     [
+      "B",
+      "D",
+      9
+     ],
+     [
+      "B",
+      "E",
+      7
+     ],
+     [
+      "C",
+      "E",
+      5
+     ],
+     [
+      "D",
+      "E",
+      15
+     ],
+     [
+      "D",
+      "F",
+      6
+     ],
+     [
+      "E",
+      "F",
+      8
+     ],
+     [
+      "E",
+      "G",
+      9
+     ],
+     [
+      "F",
+      "G",
+      11
+     ]
+    ],
+    "start": "A",
+    "maxMistakes": 2,
+    "expect": {
+     "cost": 39
+    }
+   }
+  }
+ ]
+}

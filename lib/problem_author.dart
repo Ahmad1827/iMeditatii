@@ -1,8 +1,7 @@
 // =============================================================================
 // WHO MADE A PROBLEM
 //   The problems in the app's own files are the site's: written by Ahmad, or,
-//   when they come from a paper or a contest (BAC, AcadNet, an olympiad, an ACS
-//   exam, test or lab), added
+//   when they come from a paper or a contest (BAC, AcadNet, an olympiad), added
 //   by him, the problem itself being the paper's. A problem sent in by a visitor
 //   is credited only when it says who sent it ('autor').
 // =============================================================================
@@ -19,8 +18,6 @@ const String siteAuthor = 'Ahmad';
   final source = '${problem['sursa'] ?? ''}'.trim().toLowerCase();
   final fromPaper = grade == 'AcadNet' ||
       category.contains('olimpiad') ||
-      RegExp(r'^(bac|acadnet|oji|oni|olimpiad|simulare|model)\b').hasMatch(source) ||
-      // ACS: an exam, a test, a lab or a homework of the course
-      RegExp(r'^(examen|exemplu de subiect|test|restanță|tema|laborator|curs)(\s|$)').hasMatch(source);
+      RegExp(r'^(bac|acadnet|oji|oni|olimpiad|simulare|model)\b').hasMatch(source);
   return (fromPaper ? 'Adăugată de' : 'Creată de', siteAuthor);
 }

@@ -1,0 +1,691 @@
+{
+ "code": "algaed",
+ "chapters": [
+  "1. Sisteme și matrice",
+  "2. Valori și vectori proprii",
+  "3. Spații euclidiene",
+  "4. Ecuații diferențiale"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Un sistem prin Gauss-Jordan",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rezolvă sistemul\n\n$$\\begin{cases} x + y + z = 6 \\\\ 2x - y + z = 3 \\\\ x + 2y - z = 2 \\end{cases}$$\n\naducând matricea extinsă la **forma eșalon redusă** prin operații pe linii, apoi citește soluția.",
+   "hint": "Fă întâi 0 sub pivotul din colțul stânga sus: `L2 = L2 - 2L1`, `L3 = L3 - L1`. Apoi treci la coloana 2.",
+   "solution": "La final matricea e $[I_3 \\mid (1, 2, 3)^T]$: $x = 1$, $y = 2$, $z = 3$.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "1",
+      "1",
+      "1",
+      "6"
+     ],
+     [
+      "2",
+      "-1",
+      "1",
+      "3"
+     ],
+     [
+      "1",
+      "2",
+      "-1",
+      "2"
+     ]
+    ],
+    "goal": "rref",
+    "answers": [
+     {
+      "label": "x =",
+      "value": "1"
+     },
+     {
+      "label": "y =",
+      "value": "2"
+     },
+     {
+      "label": "z =",
+      "value": "3"
+     }
+    ],
+    "reference": [
+     "L2 = L2 - 2 L1",
+     "L3 = L3 - 1 L1",
+     "L2 = (-1/3) L2",
+     "L1 = L1 - 1 L2",
+     "L3 = L3 - 1 L2",
+     "L3 = (-3/7) L3",
+     "L1 = L1 - (2/3) L3",
+     "L2 = L2 - (1/3) L3"
+    ],
+    "split": 3
+   }
+  },
+  {
+   "id": "2",
+   "title": "Inversa unei matrice",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Calculează inversa matricei\n\n$$A = \\begin{pmatrix} 2 & 1 & 1 \\\\ 1 & 3 & 2 \\\\ 1 & 0 & 0 \\end{pmatrix}$$\n\nprin metoda Gauss-Jordan: lângă $A$ e scrisă matricea unitate; fă operații pe linii până ajunge $I_3$ în stânga. Ce rămâne în dreapta e $A^{-1}$.",
+   "hint": "Linia 3 are deja un singur element nenul: începe cu `L1 <-> L3`.",
+   "solution": "$A^{-1} = \\begin{pmatrix} 0 & 0 & 1 \\\\ -2 & 1 & 3 \\\\ 3 & -1 & -5 \\end{pmatrix}$. Verificare: $A \\cdot A^{-1} = I_3$.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "2",
+      "1",
+      "1"
+     ],
+     [
+      "1",
+      "3",
+      "2"
+     ],
+     [
+      "1",
+      "0",
+      "0"
+     ]
+    ],
+    "goal": "inverse",
+    "answers": [],
+    "reference": [
+     "L1 = (1/2) L1",
+     "L2 = L2 - 1 L1",
+     "L3 = L3 - 1 L1",
+     "L2 = (2/5) L2",
+     "L1 = L1 - (1/2) L2",
+     "L3 = L3 + (1/2) L2",
+     "L3 = -5 L3",
+     "L1 = L1 - (1/5) L3",
+     "L2 = L2 - (3/5) L3"
+    ]
+   }
+  },
+  {
+   "id": "3",
+   "title": "Rangul unei matrice",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "ușoară",
+   "source": "Examen ALGAED · seria CD · 10 februarie 2022",
+   "statement": "Adu matricea\n\n$$A = \\begin{pmatrix} 1 & 2 & -1 & 3 \\\\ 2 & 4 & 1 & 0 \\\\ 3 & 6 & 0 & 3 \\end{pmatrix}$$\n\nla o **formă eșalon** și citește rangul (numărul de linii nenule).",
+   "hint": "Observă că $L_3 = L_1 + L_2$: după eliminare, o linie devine 0.",
+   "solution": "Rangul e 2: $L_3 = L_1 + L_2$, iar $L_1$ și $L_2$ nu sunt proporționale.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "1",
+      "2",
+      "-1",
+      "3"
+     ],
+     [
+      "2",
+      "4",
+      "1",
+      "0"
+     ],
+     [
+      "3",
+      "6",
+      "0",
+      "3"
+     ]
+    ],
+    "goal": "echelon",
+    "answers": [
+     {
+      "label": "rang(A) =",
+      "value": "2"
+     }
+    ],
+    "reference": [
+     "L2 = L2 - 2 L1",
+     "L3 = L3 - 3 L1",
+     "L2 = (1/3) L2",
+     "L1 = L1 + 1 L2",
+     "L3 = L3 - 3 L2"
+    ]
+   }
+  },
+  {
+   "id": "4",
+   "title": "Determinant prin eliminare",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Calculează determinantul matricei\n\n$$\\begin{pmatrix} 2 & 1 & 0 & 3 \\\\ 4 & 3 & 1 & 7 \\\\ -2 & 0 & 2 & 1 \\\\ 6 & 2 & 1 & 9 \\end{pmatrix}$$\n\nadusă la formă **superior triunghiulară**. Ține minte: `Li = Li + k·Lj` nu schimbă determinantul, o schimbare de linii îi schimbă semnul, iar înmulțirea unei linii cu $k$ îl înmulțește cu $k$ (pagina îți arată factorul).",
+   "hint": "Folosește doar `Li = Li - k Lj` cu pivotul de pe diagonală: atunci determinantul e produsul diagonalei.",
+   "solution": "Determinantul este -10.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "2",
+      "1",
+      "0",
+      "3"
+     ],
+     [
+      "4",
+      "3",
+      "1",
+      "7"
+     ],
+     [
+      "-2",
+      "0",
+      "2",
+      "1"
+     ],
+     [
+      "6",
+      "2",
+      "1",
+      "9"
+     ]
+    ],
+    "goal": "triangular",
+    "answers": [
+     {
+      "label": "det =",
+      "value": "-10"
+     }
+    ],
+    "reference": [
+     "L2 = L2 - 2 L1",
+     "L3 = L3 + 1 L1",
+     "L4 = L4 - 3 L1",
+     "L3 = L3 - 1 L2",
+     "L4 = L4 + 1 L2",
+     "L4 = L4 - 2 L3"
+    ]
+   }
+  },
+  {
+   "id": "5",
+   "title": "Un sistem cu o infinitate de soluții",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Adu la forma eșalon redusă matricea extinsă a sistemului\n\n$$\\begin{cases} x + 2y - z = 3 \\\\ 2x + 4y + z = 9 \\\\ x + 2y + 2z = 6 \\end{cases}$$\n\nși spune câte necunoscute secundare (parametri) are soluția.",
+   "hint": "Coloana lui y nu va avea pivot.",
+   "solution": "Forma redusă dă $x + 2y = 4$, $z = 1$: $y$ e secundară, soluția e $(4 - 2t, t, 1)$.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "1",
+      "2",
+      "-1",
+      "3"
+     ],
+     [
+      "2",
+      "4",
+      "1",
+      "9"
+     ],
+     [
+      "1",
+      "2",
+      "2",
+      "6"
+     ]
+    ],
+    "goal": "rref",
+    "answers": [
+     {
+      "label": "rang(A) =",
+      "value": "2"
+     },
+     {
+      "label": "necunoscute secundare:",
+      "value": "1"
+     }
+    ],
+    "reference": [
+     "L2 = L2 - 2 L1",
+     "L3 = L3 - 1 L1",
+     "L2 = (1/3) L2",
+     "L1 = L1 + 1 L2",
+     "L3 = L3 - 3 L2"
+    ],
+    "split": 3
+   }
+  },
+  {
+   "id": "6",
+   "title": "Diagonalizarea unei matrice 2 × 2",
+   "chapter": "2. Valori și vectori proprii",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Diagonalizează $A = \\begin{pmatrix} 4 & 1 \\\\ 2 & 3 \\end{pmatrix}$: găsește o matrice inversabilă $P$ (vectorii proprii pe coloane) și o matrice diagonală $D$ (valorile proprii) cu $AP = PD$. Orice ordine și orice normare a vectorilor sunt bune.",
+   "hint": "Polinomul caracteristic: $\\lambda^2 - 7\\lambda + 10$.",
+   "solution": "$\\lambda = 2$: $v = (1, -2)$; $\\lambda = 5$: $v = (1, 1)$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "P =",
+      "type": "matrix",
+      "rows": 2,
+      "cols": 2,
+      "hint": ""
+     },
+     {
+      "name": "D",
+      "label": "D =",
+      "type": "matrix",
+      "rows": 2,
+      "cols": 2,
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "norm([4 1; 2 3]*P - P*D) < 1e-9",
+      "msg": "A P = P D"
+     },
+     {
+      "expr": "abs(det(P)) > 1e-9",
+      "msg": "P e inversabilă"
+     },
+     {
+      "expr": "norm(D - diag(diag(D))) < 1e-12",
+      "msg": "D e diagonală"
+     }
+    ],
+    "reference": {
+     "P": [
+      [
+       "1",
+       "1"
+      ],
+      [
+       "-2",
+       "1"
+      ]
+     ],
+     "D": [
+      [
+       "2",
+       "0"
+      ],
+      [
+       "0",
+       "5"
+      ]
+     ]
+    },
+    "wrong": {
+     "P": [
+      [
+       "1",
+       "0"
+      ],
+      [
+       "0",
+       "1"
+      ]
+     ],
+     "D": [
+      [
+       "4",
+       "0"
+      ],
+      [
+       "0",
+       "3"
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "id": "7",
+   "title": "Valori proprii multiple",
+   "chapter": "2. Valori și vectori proprii",
+   "difficulty": "medie",
+   "source": "Examen ALGAED · seria CD · 10 februarie 2022",
+   "statement": "Diagonalizează matricea simetrică $A = \\begin{pmatrix} 2 & 1 & 1 \\\\ 1 & 2 & 1 \\\\ 1 & 1 & 2 \\end{pmatrix}$: $AP = PD$, $P$ inversabilă, $D$ diagonală. Valoarea proprie 1 e dublă, deci îi trebuie doi vectori proprii independenți.",
+   "hint": "$A = J + I$, unde $J$ e matricea cu toți 1: valorile proprii ale lui $J$ sunt 3, 0, 0.",
+   "solution": "Valorile proprii 4 (vector $(1,1,1)$) și 1, dublă (orice vector cu suma componentelor 0, de ex. $(1,-1,0)$ și $(1,0,-1)$).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "P =",
+      "type": "matrix",
+      "rows": 3,
+      "cols": 3,
+      "hint": ""
+     },
+     {
+      "name": "D",
+      "label": "D =",
+      "type": "matrix",
+      "rows": 3,
+      "cols": 3,
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "norm([2 1 1; 1 2 1; 1 1 2]*P - P*D) < 1e-9",
+      "msg": "A P = P D"
+     },
+     {
+      "expr": "abs(det(P)) > 1e-9",
+      "msg": "P e inversabilă"
+     },
+     {
+      "expr": "norm(D - diag(diag(D))) < 1e-12",
+      "msg": "D e diagonală"
+     }
+    ],
+    "reference": {
+     "P": [
+      [
+       "1",
+       "1",
+       "1"
+      ],
+      [
+       "-1",
+       "0",
+       "1"
+      ],
+      [
+       "0",
+       "-1",
+       "1"
+      ]
+     ],
+     "D": [
+      [
+       "1",
+       "0",
+       "0"
+      ],
+      [
+       "0",
+       "1",
+       "0"
+      ],
+      [
+       "0",
+       "0",
+       "4"
+      ]
+     ]
+    },
+    "wrong": {
+     "P": [
+      [
+       "1",
+       "1",
+       "1"
+      ],
+      [
+       "-1",
+       "-1",
+       "1"
+      ],
+      [
+       "0",
+       "0",
+       "1"
+      ]
+     ],
+     "D": [
+      [
+       "1",
+       "0",
+       "0"
+      ],
+      [
+       "0",
+       "1",
+       "0"
+      ],
+      [
+       "0",
+       "0",
+       "4"
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "id": "8",
+   "title": "O bază ortonormată (Gram-Schmidt)",
+   "chapter": "3. Spații euclidiene",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Găsește o bază **ortonormată** a subspațiului din $\\mathbb{R}^3$ generat de $v_1 = (1, 1, 0)$ și $v_2 = (1, 0, 1)$: două coloane $q_1, q_2$, de normă 1, perpendiculare, care generează același plan. Poți scrie radicali: `1/sqrt(2)`.",
+   "hint": "$q_1 = v_1 / \\|v_1\\|$; apoi $w = v_2 - \\langle v_2, q_1\\rangle q_1$ și $q_2 = w / \\|w\\|$.",
+   "solution": "$q_1 = \\frac{1}{\\sqrt 2}(1, 1, 0)$, $w = (1, 0, 1) - \\frac{1}{2}(1, 1, 0) = (\\frac12, -\\frac12, 1)$, $q_2 = \\frac{1}{\\sqrt 6}(1, -1, 2)$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "Q",
+      "label": "Q = [q₁ q₂] =",
+      "type": "matrix",
+      "rows": 3,
+      "cols": 2,
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "norm(Q'*Q - eye(2)) < 1e-9",
+      "msg": "coloanele sunt ortonormate"
+     },
+     {
+      "expr": "rank([[1 1; 1 0; 0 1], Q]) == 2",
+      "msg": "generează același plan"
+     }
+    ],
+    "reference": {
+     "Q": [
+      [
+       "1/sqrt(2)",
+       "1/sqrt(6)"
+      ],
+      [
+       "1/sqrt(2)",
+       "-1/sqrt(6)"
+      ],
+      [
+       "0",
+       "2/sqrt(6)"
+      ]
+     ]
+    },
+    "wrong": {
+     "Q": [
+      [
+       "1",
+       "0"
+      ],
+      [
+       "0",
+       "1"
+      ],
+      [
+       "0",
+       "0"
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "id": "9",
+   "title": "Ecuație liniară de ordinul 2",
+   "chapter": "4. Ecuații diferențiale",
+   "difficulty": "medie",
+   "source": "Examen ALGAED · seria CD · 10 februarie 2022",
+   "statement": "Rezolvă problema Cauchy\n\n$$y'' - 3y' + 2y = 0, \\qquad y(0) = 1, \\quad y'(0) = 0.$$\n\nSe verifică direct că funcția ta satisface ecuația și condițiile inițiale (orice formă e acceptată).",
+   "hint": "Ecuația caracteristică $r^2 - 3r + 2 = 0$ are rădăcinile 1 și 2: $y = C_1 e^x + C_2 e^{2x}$.",
+   "solution": "$C_1 + C_2 = 1$, $C_1 + 2C_2 = 0$ dau $C_1 = 2$, $C_2 = -1$: $y = 2e^x - e^{2x}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "y",
+      "label": "y(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv2(y, [-1 -0.5 0 0.4 0.8 1.2]) - 3*deriv(y, [-1 -0.5 0 0.4 0.8 1.2]) + 2*y([-1 -0.5 0 0.4 0.8 1.2]), zeros(1, 6), 2e-3)",
+      "msg": "y'' - 3y' + 2y = 0"
+     },
+     {
+      "expr": "abs(y(0) - 1) < 1e-9",
+      "msg": "y(0) = 1"
+     },
+     {
+      "expr": "abs(deriv(y, 0)) < 1e-6",
+      "msg": "y'(0) = 0"
+     }
+    ],
+    "reference": {
+     "y": "2e^x - e^(2x)"
+    },
+    "wrong": {
+     "y": "e^x"
+    },
+    "plot": {
+     "field": "y",
+     "range": [
+      -2,
+      1
+     ],
+     "ref": "@(x) 2*exp(x) - exp(2*x)",
+     "refLabel": "soluția",
+     "label": "y(x)"
+    }
+   }
+  },
+  {
+   "id": "10",
+   "title": "Ecuație liniară de ordinul 1",
+   "chapter": "4. Ecuații diferențiale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rezolvă $y' + y = x$, $y(0) = 1$.",
+   "hint": "Factor integrant $e^x$: $(y e^x)' = x e^x$.",
+   "solution": "$y e^x = (x - 1)e^x + C$; din $y(0) = 1$, $C = 2$: $y = x - 1 + 2e^{-x}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "y",
+      "label": "y(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv(y, [-1 -0.5 0 0.4 0.8 1.2]) + y([-1 -0.5 0 0.4 0.8 1.2]), [-1 -0.5 0 0.4 0.8 1.2], 1e-5)",
+      "msg": "y' + y = x"
+     },
+     {
+      "expr": "abs(y(0) - 1) < 1e-9",
+      "msg": "y(0) = 1"
+     }
+    ],
+    "reference": {
+     "y": "x - 1 + 2e^(-x)"
+    },
+    "wrong": {
+     "y": "x - 1"
+    },
+    "plot": {
+     "field": "y",
+     "range": [
+      -1.5,
+      4
+     ],
+     "ref": "@(x) x - 1 + 2*exp(-x)",
+     "refLabel": "soluția",
+     "label": "y(x)"
+    }
+   }
+  },
+  {
+   "id": "11",
+   "title": "Variabile separabile",
+   "chapter": "4. Ecuații diferențiale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rezolvă $y' = 2xy$, $y(0) = 1$.",
+   "hint": "$\\frac{dy}{y} = 2x\\,dx$.",
+   "solution": "$\\ln|y| = x^2 + C$, deci $y = e^{x^2}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "y",
+      "label": "y(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv(y, [-1 -0.5 0 0.4 0.8 1.2]), 2*[-1 -0.5 0 0.4 0.8 1.2].*y([-1 -0.5 0 0.4 0.8 1.2]), 1e-5)",
+      "msg": "y' = 2xy"
+     },
+     {
+      "expr": "abs(y(0) - 1) < 1e-9",
+      "msg": "y(0) = 1"
+     }
+    ],
+    "reference": {
+     "y": "e^(x^2)"
+    },
+    "wrong": {
+     "y": "e^(2x)"
+    },
+    "plot": {
+     "field": "y",
+     "range": [
+      -1.5,
+      1.5
+     ],
+     "ref": "@(x) exp(x.^2)",
+     "refLabel": "soluția",
+     "label": "y(x)"
+    }
+   }
+  }
+ ]
+}

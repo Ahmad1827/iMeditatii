@@ -1,0 +1,862 @@
+{
+ "code": "uso",
+ "chapters": [
+  "1. Fișiere și directoare",
+  "2. Permisiuni",
+  "3. Filtre de text",
+  "4. Scripturi shell"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Scheletul unui proiect",
+   "chapter": "1. Fișiere și directoare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Creează, în directorul tău home, structura unui proiect C:\n\n```\nproiect/\n├── src/main.c\n├── include/main.h\n├── docs/\n└── README.md\n```\n\nFișierele `main.c` și `main.h` pot fi goale. `README.md` trebuie să conțină o singură linie: `Proiect USO`.\n\nLucrează în terminal. Când crezi că ai terminat, apasă **verifică**.",
+   "hint": "`mkdir -p` creează și directoarele părinte; acoladele `{src,include,docs}` scriu trei nume deodată. Cu `echo text > fisier` pui text într-un fișier.",
+   "solution": "```bash\nmkdir -p proiect/{src,include,docs}\ntouch proiect/src/main.c proiect/include/main.h\necho \"Proiect USO\" > proiect/README.md\n```\n`mkdir -p proiect/{src,include,docs}` se extinde la `mkdir -p proiect/src proiect/include proiect/docs`.",
+   "kind": "shell",
+   "spec": {
+    "setup": [],
+    "checks": [
+     {
+      "type": "dir",
+      "path": "~/proiect/src"
+     },
+     {
+      "type": "dir",
+      "path": "~/proiect/include"
+     },
+     {
+      "type": "dir",
+      "path": "~/proiect/docs"
+     },
+     {
+      "type": "file",
+      "path": "~/proiect/src/main.c"
+     },
+     {
+      "type": "file",
+      "path": "~/proiect/include/main.h"
+     },
+     {
+      "type": "file",
+      "path": "~/proiect/README.md",
+      "equals": "Proiect USO\n",
+      "msg": "README.md conține „Proiect USO”"
+     }
+    ],
+    "reference": [
+     "mkdir -p proiect/{src,include,docs}",
+     "touch proiect/src/main.c proiect/include/main.h",
+     "echo \"Proiect USO\" > proiect/README.md"
+    ]
+   }
+  },
+  {
+   "id": "2",
+   "title": "Ordine în Downloads",
+   "chapter": "1. Fișiere și directoare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Directorul `~/Downloads` s-a umplut. Fă ordine:\n\n• mută toate fișierele `.pdf` în `~/Documente/pdf` (directorul nu există încă);\n• șterge toate fișierele `.tmp`;\n• restul fișierelor rămân unde sunt.\n\nAtenție: un fișier are un spațiu în nume.",
+   "hint": "Un glob ca `*.pdf` se potrivește și cu nume care au spații: shell-ul îl înlocuiește cu nume întregi, nu le mai desparte.",
+   "solution": "```bash\nmkdir -p ~/Documente/pdf\nmv ~/Downloads/*.pdf ~/Documente/pdf/\nrm ~/Downloads/*.tmp\n```\nDacă ai fi scris numele de mână, `Laborator 4.pdf` ar fi trebuit pus între ghilimele.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/Downloads/curs1.pdf",
+      "content": "curs1.pdf\n"
+     },
+     {
+      "path": "~/Downloads/curs2.pdf",
+      "content": "curs2.pdf\n"
+     },
+     {
+      "path": "~/Downloads/tema3.pdf",
+      "content": "tema3.pdf\n"
+     },
+     {
+      "path": "~/Downloads/poza_mare.jpg",
+      "content": "poza_mare.jpg\n"
+     },
+     {
+      "path": "~/Downloads/vacanta.jpg",
+      "content": "vacanta.jpg\n"
+     },
+     {
+      "path": "~/Downloads/note.txt",
+      "content": "note.txt\n"
+     },
+     {
+      "path": "~/Downloads/a1.tmp",
+      "content": "a1.tmp\n"
+     },
+     {
+      "path": "~/Downloads/b2.tmp",
+      "content": "b2.tmp\n"
+     },
+     {
+      "path": "~/Downloads/cache.tmp",
+      "content": "cache.tmp\n"
+     },
+     {
+      "path": "~/Downloads/Laborator 4.pdf",
+      "content": "Laborator 4.pdf\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/Documente/pdf/curs1.pdf",
+      "msg": "curs1.pdf e în ~/Documente/pdf"
+     },
+     {
+      "type": "file",
+      "path": "~/Documente/pdf/curs2.pdf",
+      "msg": "curs2.pdf e în ~/Documente/pdf"
+     },
+     {
+      "type": "file",
+      "path": "~/Documente/pdf/tema3.pdf",
+      "msg": "tema3.pdf e în ~/Documente/pdf"
+     },
+     {
+      "type": "file",
+      "path": "~/Documente/pdf/Laborator 4.pdf",
+      "msg": "Laborator 4.pdf e în ~/Documente/pdf"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/curs1.pdf",
+      "msg": "curs1.pdf nu mai e în Downloads"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/curs2.pdf",
+      "msg": "curs2.pdf nu mai e în Downloads"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/tema3.pdf",
+      "msg": "tema3.pdf nu mai e în Downloads"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/a1.tmp",
+      "msg": "a1.tmp nu mai e în Downloads"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/b2.tmp",
+      "msg": "b2.tmp nu mai e în Downloads"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/cache.tmp",
+      "msg": "cache.tmp nu mai e în Downloads"
+     },
+     {
+      "type": "absent",
+      "path": "~/Downloads/Laborator 4.pdf",
+      "msg": "Laborator 4.pdf nu mai e în Downloads"
+     },
+     {
+      "type": "file",
+      "path": "~/Downloads/poza_mare.jpg",
+      "msg": "poza_mare.jpg a rămas în Downloads"
+     },
+     {
+      "type": "file",
+      "path": "~/Downloads/vacanta.jpg",
+      "msg": "vacanta.jpg a rămas în Downloads"
+     },
+     {
+      "type": "file",
+      "path": "~/Downloads/note.txt",
+      "msg": "note.txt a rămas în Downloads"
+     }
+    ],
+    "reference": [
+     "mkdir -p ~/Documente/pdf",
+     "mv ~/Downloads/*.pdf ~/Documente/pdf/",
+     "rm ~/Downloads/*.tmp"
+    ]
+   }
+  },
+  {
+   "id": "3",
+   "title": "Legătura ascunsă",
+   "chapter": "1. Fișiere și directoare",
+   "difficulty": "medie",
+   "source": "Test practic USO · varianta 103 · 30 august 2018 · 1d",
+   "statement": "În directorul `~/Models` creează o **legătură simbolică ascunsă**, cu numele `.RK800`, care duce la fișierul `~/CyberLife/Connor`. Folosește o cale **relativă** pentru țintă, astfel încât legătura să meargă și dacă tot directorul home e mutat.\n\nVerifică apoi cu `ls -la ~/Models` și `cat ~/Models/.RK800`.",
+   "hint": "`ln -s TINTA NUME`. O țintă relativă se citește față de directorul în care stă legătura, nu față de cel în care ești.",
+   "solution": "```bash\ncd ~/Models\nln -s ../CyberLife/Connor .RK800\n```\nȚinta `../CyberLife/Connor` e interpretată pornind din `~/Models`. Numele începe cu punct, deci `ls` fără `-a` nu-l arată.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/CyberLife/Connor",
+      "content": "Connor, RK800. Trimis de CyberLife.\n"
+     },
+     {
+      "path": "~/Models/",
+      "dir": true
+     }
+    ],
+    "checks": [
+     {
+      "type": "link",
+      "path": "~/Models/.RK800",
+      "target": "~/CyberLife/Connor",
+      "msg": "~/Models/.RK800 e o legătură către ~/CyberLife/Connor"
+     },
+     {
+      "type": "output",
+      "cmd": "readlink ~/Models/.RK800",
+      "regex": "^\\.\\./",
+      "msg": "ținta e scrisă relativ (../CyberLife/Connor)"
+     }
+    ],
+    "reference": [
+     "cd ~/Models",
+     "ln -s ../CyberLife/Connor .RK800"
+    ]
+   }
+  },
+  {
+   "id": "4",
+   "title": "Copii de siguranță",
+   "chapter": "1. Fișiere și directoare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "În `~/teme` sunt mai multe fișiere `.c`. Fă o copie de siguranță a fiecăruia **în același director**, cu extensia `.c.bak` (de exemplu `tema1.c` → `tema1.c.bak`), fără să scrii numele fișierelor de mână: folosește o buclă `for`.",
+   "hint": "`for f in *.c; do ...; done` ia pe rând fiecare nume. În buclă, `\"$f.bak\"` e numele nou.",
+   "solution": "```bash\ncd ~/teme\nfor f in *.c; do cp \"$f\" \"$f.bak\"; done\n```",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/teme/tema1.c",
+      "content": "/* tema1.c */\nint main(void) { return 0; }\n"
+     },
+     {
+      "path": "~/teme/tema2.c",
+      "content": "/* tema2.c */\nint main(void) { return 0; }\n"
+     },
+     {
+      "path": "~/teme/lab_liste.c",
+      "content": "/* lab_liste.c */\nint main(void) { return 0; }\n"
+     },
+     {
+      "path": "~/teme/heap.c",
+      "content": "/* heap.c */\nint main(void) { return 0; }\n"
+     },
+     {
+      "path": "~/teme/notite.txt",
+      "content": "nu e cod\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/teme/tema1.c.bak",
+      "equals": "/* tema1.c */\nint main(void) { return 0; }\n",
+      "msg": "tema1.c.bak e o copie a lui tema1.c"
+     },
+     {
+      "type": "file",
+      "path": "~/teme/tema2.c.bak",
+      "equals": "/* tema2.c */\nint main(void) { return 0; }\n",
+      "msg": "tema2.c.bak e o copie a lui tema2.c"
+     },
+     {
+      "type": "file",
+      "path": "~/teme/lab_liste.c.bak",
+      "equals": "/* lab_liste.c */\nint main(void) { return 0; }\n",
+      "msg": "lab_liste.c.bak e o copie a lui lab_liste.c"
+     },
+     {
+      "type": "file",
+      "path": "~/teme/heap.c.bak",
+      "equals": "/* heap.c */\nint main(void) { return 0; }\n",
+      "msg": "heap.c.bak e o copie a lui heap.c"
+     },
+     {
+      "type": "absent",
+      "path": "~/teme/notite.txt.bak",
+      "msg": "notite.txt nu are copie (nu e .c)"
+     },
+     {
+      "type": "history",
+      "regex": "\\bfor\\b",
+      "msg": "ai folosit o buclă for"
+     }
+    ],
+    "reference": [
+     "cd ~/teme",
+     "for f in *.c; do cp \"$f\" \"$f.bak\"; done"
+    ]
+   }
+  },
+  {
+   "id": "5",
+   "title": "Doar north are drepturi depline",
+   "chapter": "2. Permisiuni",
+   "difficulty": "ușoară",
+   "source": "Test practic USO · varianta 103 · 30 august 2018 · 1e",
+   "statement": "Directorul `~/Characters` și fișierul `~/Characters/secret.txt` au acum toate permisiunile pentru toată lumea (`777`). Repară-le:\n\n• doar proprietarul are drepturi depline asupra directorului; ceilalți (grupul și restul) pot **doar citi** conținutul lui, adică pot lista fișierele și pot intra în director ca să le citească;\n• `secret.txt` poate fi citit și scris doar de proprietar.\n\nFolosește `chmod` și verifică cu `ls -l`.",
+   "hint": "La un director, ca să poți citi un fișier din el îți trebuie și dreptul x (să intri în el). r = 4, w = 2, x = 1.",
+   "solution": "```bash\nchmod 755 ~/Characters            # rwxr-xr-x\nchmod 600 ~/Characters/secret.txt # rw-------\n```\nPentru „doar citire” la un director, ceilalți au nevoie de r (listare) și de x (traversare): r-x = 5. Cu 744 ar vedea numele fișierelor, dar n-ar putea deschide niciunul.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/Characters/",
+      "dir": true,
+      "mode": "777"
+     },
+     {
+      "path": "~/Characters/secret.txt",
+      "content": "north\n",
+      "mode": "777"
+     },
+     {
+      "path": "~/Characters/lista.txt",
+      "content": "kara\nmarkus\n",
+      "mode": "644"
+     }
+    ],
+    "checks": [
+     {
+      "type": "mode",
+      "path": "~/Characters",
+      "mode": "755"
+     },
+     {
+      "type": "mode",
+      "path": "~/Characters/secret.txt",
+      "mode": "600"
+     }
+    ],
+    "reference": [
+     "chmod 755 ~/Characters",
+     "chmod 600 ~/Characters/secret.txt"
+    ]
+   }
+  },
+  {
+   "id": "6",
+   "title": "Scriptul care nu pornește",
+   "chapter": "2. Permisiuni",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "În `~/bin` e un script, `salut.sh`, dar `~/bin/salut.sh` dă `Permission denied`. Fă-l executabil **doar pentru proprietar** (grupul și ceilalți rămân cum sunt) și rulează-l: scriptul lasă în `~/salut.log` un mesaj.",
+   "hint": "`chmod u+x` adaugă dreptul de execuție doar proprietarului (u = user). Apoi îl rulezi cu calea lui: `~/bin/salut.sh` sau `./salut.sh` din `~/bin`.",
+   "solution": "```bash\nchmod u+x ~/bin/salut.sh\n~/bin/salut.sh\n```\nForma simbolică `u+x` schimbă un singur bit; `chmod 744` ar fi dat același rezultat aici, dar îți cere să știi și celelalte permisiuni.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/bin/salut.sh",
+      "content": "#!/bin/bash\necho \"salut, $USER\" > ~/salut.log\necho \"am scris in ~/salut.log\"\n",
+      "mode": "644"
+     }
+    ],
+    "checks": [
+     {
+      "type": "mode",
+      "path": "~/bin/salut.sh",
+      "mode": "744",
+      "msg": "salut.sh are rwxr--r-- (744)"
+     },
+     {
+      "type": "file",
+      "path": "~/salut.log",
+      "equals": "salut, student\n",
+      "msg": "scriptul a rulat (~/salut.log există)"
+     }
+    ],
+    "reference": [
+     "chmod u+x ~/bin/salut.sh",
+     "~/bin/salut.sh"
+    ]
+   }
+  },
+  {
+   "id": "7",
+   "title": "umask pentru fișiere private",
+   "chapter": "2. Permisiuni",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Vrei ca tot ce creezi de acum să fie privat: fișierele noi cu `rw-------` (600) și directoarele noi cu `rwx------` (700).\n\nSetează `umask` potrivit, **apoi** creează directorul `~/privat` și în el fișierul gol `jurnal.txt` (fără `chmod`).",
+   "hint": "Un fișier nou pornește de la 666, un director de la 777; umask spune ce biți se scot.",
+   "solution": "```bash\numask 077\nmkdir ~/privat\ntouch ~/privat/jurnal.txt\n```\n666 fără 077 = 600, 777 fără 077 = 700. `umask` arată valoarea curentă (implicit 0022).",
+   "kind": "shell",
+   "spec": {
+    "setup": [],
+    "checks": [
+     {
+      "type": "mode",
+      "path": "~/privat",
+      "mode": "700"
+     },
+     {
+      "type": "mode",
+      "path": "~/privat/jurnal.txt",
+      "mode": "600"
+     },
+     {
+      "type": "history",
+      "regex": "\\bumask\\s+0?077\\b",
+      "msg": "ai setat umask-ul (077)"
+     }
+    ],
+    "reference": [
+     "umask 077",
+     "mkdir ~/privat",
+     "touch ~/privat/jurnal.txt"
+    ]
+   }
+  },
+  {
+   "id": "8",
+   "title": "Cei mai activi utilizatori",
+   "chapter": "3. Filtre de text",
+   "difficulty": "medie",
+   "source": "Test practic USO · prelucrarea unui jurnal",
+   "statement": "Fișierul `~/acces.log` are 320 de linii, de forma `utilizator ip acțiune`:\n\n```\nbogdan 10.0.1.130 upload\nbogdan 10.0.0.115 download\ndan 10.0.1.33 upload\n...\n```\n\nScrie în `~/top3.txt` numele celor **3 utilizatori cu cele mai multe linii**, câte unul pe linie, de la cel mai activ. Fișierul e prea mare ca să-l numeri de mână: folosește un pipeline.",
+   "hint": "`cut` scoate primul câmp, `sort | uniq -c` numără liniile egale, `sort -rn` le ordonează descrescător după număr, `head -3` le păstrează pe primele.",
+   "solution": "```bash\ncut -d' ' -f1 acces.log | sort | uniq -c | sort -rn | head -3 | awk '{print $2}' > top3.txt\n```\n`uniq -c` numără doar liniile egale **alăturate**, de aceea are nevoie de `sort` înainte. La final `awk '{print $2}'` scoate numărul și lasă numele.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/acces.log",
+      "content": "bogdan 10.0.1.130 upload\nbogdan 10.0.0.115 download\ndan 10.0.1.33 upload\ndan 10.0.2.228 upload\nhoria 10.0.1.130 upload\ndan 10.0.2.107 login\nbogdan 10.0.3.119 upload\nbogdan 10.0.2.38 download\nelena 10.0.0.192 login\nbogdan 10.0.1.220 login\nhoria 10.0.0.191 login\nhoria 10.0.3.125 upload\nana 10.0.2.81 delete\nbogdan 10.0.0.244 login\ndan 10.0.1.142 logout\nhoria 10.0.2.25 download\ndan 10.0.3.41 login\nbogdan 10.0.2.81 delete\nbogdan 10.0.3.216 upload\nelena 10.0.1.50 upload\nelena 10.0.2.72 delete\ncarmen 10.0.1.144 delete\nelena 10.0.3.250 upload\ncarmen 10.0.2.203 login\nbogdan 10.0.2.80 upload\nana 10.0.1.109 logout\nflorin 10.0.0.171 logout\ndan 10.0.3.123 upload\ndan 10.0.0.133 delete\nbogdan 10.0.0.233 upload\nbogdan 10.0.3.196 logout\nhoria 10.0.1.227 login\nbogdan 10.0.1.104 logout\nbogdan 10.0.0.111 login\ndan 10.0.1.7 delete\nflorin 10.0.3.103 login\nelena 10.0.2.74 delete\nana 10.0.0.206 upload\nflorin 10.0.3.113 login\ndan 10.0.3.161 delete\ncarmen 10.0.2.203 download\ndan 10.0.0.89 upload\ndan 10.0.1.147 logout\nbogdan 10.0.3.45 download\ncarmen 10.0.1.41 login\nflorin 10.0.0.189 download\nbogdan 10.0.3.216 delete\nana 10.0.0.235 upload\ncarmen 10.0.3.132 logout\ngabi 10.0.3.165 delete\ndan 10.0.3.103 delete\nbogdan 10.0.1.35 upload\ngabi 10.0.1.159 login\nana 10.0.0.95 upload\nbogdan 10.0.1.34 logout\nflorin 10.0.0.232 logout\nflorin 10.0.3.86 upload\nflorin 10.0.1.177 login\nbogdan 10.0.1.219 download\ndan 10.0.0.149 login\nhoria 10.0.3.150 logout\ndan 10.0.2.86 download\nhoria 10.0.2.57 delete\nelena 10.0.1.133 upload\nflorin 10.0.0.54 login\nbogdan 10.0.0.234 delete\ndan 10.0.1.230 login\nbogdan 10.0.3.241 login\nflorin 10.0.1.248 logout\nbogdan 10.0.3.124 download\nbogdan 10.0.3.45 delete\nelena 10.0.3.236 download\ncarmen 10.0.1.188 delete\nflorin 10.0.0.231 delete\nflorin 10.0.1.130 download\nflorin 10.0.1.238 upload\nflorin 10.0.3.137 upload\ncarmen 10.0.1.20 login\ndan 10.0.3.39 delete\nflorin 10.0.0.184 login\ncarmen 10.0.3.221 upload\nhoria 10.0.1.186 delete\nhoria 10.0.0.213 login\ncarmen 10.0.3.65 upload\nelena 10.0.3.25 upload\nflorin 10.0.3.105 login\nflorin 10.0.2.101 delete\ncarmen 10.0.1.106 upload\nhoria 10.0.1.50 upload\nbogdan 10.0.0.163 upload\nbogdan 10.0.0.83 download\nbogdan 10.0.1.35 logout\nelena 10.0.2.31 login\nflorin 10.0.3.75 upload\ndan 10.0.2.157 login\ncarmen 10.0.3.218 delete\ncarmen 10.0.0.178 login\ndan 10.0.0.5 upload\nbogdan 10.0.2.35 download\ndan 10.0.2.170 delete\ncarmen 10.0.1.120 delete\nelena 10.0.0.162 download\nbogdan 10.0.2.192 download\ndan 10.0.0.135 delete\nbogdan 10.0.0.111 download\nana 10.0.3.156 delete\nhoria 10.0.0.104 download\ndan 10.0.0.174 upload\ncarmen 10.0.3.116 delete\ndan 10.0.3.179 delete\ndan 10.0.3.51 login\ndan 10.0.3.129 download\nflorin 10.0.0.165 upload\nhoria 10.0.2.15 delete\nbogdan 10.0.2.200 download\nana 10.0.0.40 logout\nbogdan 10.0.0.48 logout\nbogdan 10.0.3.26 download\nbogdan 10.0.2.50 login\nbogdan 10.0.3.17 logout\ncarmen 10.0.0.67 upload\nflorin 10.0.1.98 download\ndan 10.0.0.168 upload\nbogdan 10.0.3.126 login\nana 10.0.3.115 delete\nflorin 10.0.1.157 logout\nbogdan 10.0.0.191 upload\nbogdan 10.0.1.230 upload\ndan 10.0.3.76 download\nana 10.0.2.28 download\nflorin 10.0.1.52 logout\ndan 10.0.0.52 download\nflorin 10.0.3.38 download\ndan 10.0.2.67 login\nbogdan 10.0.3.215 upload\nana 10.0.3.167 upload\nana 10.0.3.150 logout\nbogdan 10.0.2.79 login\nflorin 10.0.3.235 login\nhoria 10.0.2.250 download\nhoria 10.0.0.107 upload\nelena 10.0.2.85 logout\nhoria 10.0.1.17 login\ndan 10.0.1.141 delete\nbogdan 10.0.1.217 upload\ndan 10.0.2.179 download\nhoria 10.0.0.19 login\ndan 10.0.2.135 logout\nana 10.0.2.24 login\nhoria 10.0.1.161 download\ncarmen 10.0.2.201 upload\nhoria 10.0.3.133 download\nbogdan 10.0.0.91 upload\nbogdan 10.0.2.81 delete\nhoria 10.0.1.110 download\nbogdan 10.0.1.249 delete\nbogdan 10.0.0.52 delete\nhoria 10.0.2.162 download\nhoria 10.0.1.84 upload\ndan 10.0.0.105 delete\nelena 10.0.0.138 delete\nelena 10.0.2.186 logout\nbogdan 10.0.1.248 logout\nflorin 10.0.2.212 upload\nbogdan 10.0.2.205 delete\nbogdan 10.0.2.86 login\nbogdan 10.0.3.137 download\nbogdan 10.0.2.57 login\ndan 10.0.0.11 upload\ncarmen 10.0.2.244 login\ncarmen 10.0.2.58 logout\nflorin 10.0.0.33 upload\nflorin 10.0.0.128 login\ndan 10.0.0.61 download\nbogdan 10.0.0.248 upload\nana 10.0.1.8 logout\nbogdan 10.0.3.42 delete\nbogdan 10.0.1.48 delete\nbogdan 10.0.1.220 login\nbogdan 10.0.1.153 download\nflorin 10.0.2.194 upload\nana 10.0.3.54 delete\ndan 10.0.1.8 delete\nhoria 10.0.0.231 logout\nflorin 10.0.0.250 upload\ndan 10.0.0.76 login\nbogdan 10.0.1.235 logout\ndan 10.0.3.24 login\nbogdan 10.0.2.163 logout\ndan 10.0.2.194 login\nbogdan 10.0.0.164 download\ndan 10.0.3.217 upload\nbogdan 10.0.0.196 download\nbogdan 10.0.2.178 login\nbogdan 10.0.1.214 download\ncarmen 10.0.0.47 logout\ndan 10.0.2.40 delete\nhoria 10.0.2.171 login\nflorin 10.0.0.52 upload\nflorin 10.0.3.193 logout\nbogdan 10.0.2.49 download\nhoria 10.0.0.63 download\ndan 10.0.2.187 upload\ncarmen 10.0.2.150 upload\nana 10.0.1.147 login\ndan 10.0.1.157 delete\nana 10.0.3.128 login\ndan 10.0.2.35 logout\nflorin 10.0.1.14 logout\ndan 10.0.3.131 delete\nbogdan 10.0.3.37 download\ngabi 10.0.3.77 delete\nbogdan 10.0.2.118 upload\nhoria 10.0.1.169 upload\nflorin 10.0.0.196 logout\nflorin 10.0.2.130 download\nana 10.0.0.80 login\nbogdan 10.0.1.113 logout\nhoria 10.0.0.148 logout\ngabi 10.0.3.240 login\nana 10.0.0.91 upload\nbogdan 10.0.1.219 logout\ndan 10.0.1.187 download\nflorin 10.0.2.68 logout\nbogdan 10.0.2.63 upload\ndan 10.0.1.160 logout\ndan 10.0.1.212 login\nhoria 10.0.2.29 upload\nflorin 10.0.1.181 download\ngabi 10.0.2.145 logout\nhoria 10.0.2.150 login\ndan 10.0.2.50 download\nbogdan 10.0.2.206 login\nflorin 10.0.3.52 login\ncarmen 10.0.1.247 logout\ncarmen 10.0.1.97 download\ndan 10.0.0.43 delete\ndan 10.0.1.250 download\nbogdan 10.0.3.16 upload\ndan 10.0.2.192 logout\ndan 10.0.0.65 login\nflorin 10.0.3.170 upload\nbogdan 10.0.1.246 download\nbogdan 10.0.1.52 upload\ndan 10.0.2.172 download\ndan 10.0.2.93 download\nflorin 10.0.2.218 download\nbogdan 10.0.0.185 login\nbogdan 10.0.1.154 logout\ncarmen 10.0.1.231 download\nbogdan 10.0.1.160 upload\ncarmen 10.0.2.42 delete\nflorin 10.0.0.228 delete\ndan 10.0.1.68 upload\nbogdan 10.0.1.22 login\nana 10.0.0.179 download\ndan 10.0.1.100 download\nbogdan 10.0.2.146 delete\nbogdan 10.0.1.212 delete\nbogdan 10.0.2.135 delete\nbogdan 10.0.3.190 login\nbogdan 10.0.0.141 delete\nana 10.0.3.73 upload\nhoria 10.0.0.92 delete\nflorin 10.0.0.45 logout\nflorin 10.0.0.178 login\nhoria 10.0.1.17 download\nflorin 10.0.1.12 login\ncarmen 10.0.0.14 login\ndan 10.0.1.133 login\ndan 10.0.0.76 delete\ndan 10.0.2.170 login\nbogdan 10.0.2.224 download\nbogdan 10.0.0.85 download\nbogdan 10.0.1.240 logout\nflorin 10.0.2.187 download\nbogdan 10.0.3.147 delete\ndan 10.0.2.55 delete\ncarmen 10.0.2.230 upload\nbogdan 10.0.2.128 download\ncarmen 10.0.3.129 delete\nflorin 10.0.0.91 download\nhoria 10.0.2.95 download\nelena 10.0.3.160 upload\ncarmen 10.0.3.117 upload\nana 10.0.0.18 delete\nana 10.0.2.113 download\nana 10.0.0.188 login\nhoria 10.0.0.164 upload\nelena 10.0.0.9 download\nbogdan 10.0.3.246 delete\ndan 10.0.2.128 logout\nbogdan 10.0.3.33 download\nflorin 10.0.2.138 login\nelena 10.0.0.194 login\nana 10.0.1.44 upload\ndan 10.0.0.85 download\nbogdan 10.0.2.214 delete\ndan 10.0.2.208 logout\nbogdan 10.0.2.54 logout\nbogdan 10.0.0.230 logout\nbogdan 10.0.3.91 delete\ncarmen 10.0.0.204 download\nflorin 10.0.2.184 login\nflorin 10.0.0.247 login\ndan 10.0.2.182 logout\ndan 10.0.0.100 download\nflorin 10.0.0.19 logout\ncarmen 10.0.3.137 logout\nhoria 10.0.2.70 upload\nhoria 10.0.0.160 download\nflorin 10.0.3.16 upload\ncarmen 10.0.1.121 login\ndan 10.0.1.241 login\nhoria 10.0.2.199 download\ncarmen 10.0.1.131 download\nflorin 10.0.3.122 delete\nbogdan 10.0.1.157 logout\nflorin 10.0.1.68 delete\nbogdan 10.0.3.44 login\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/top3.txt",
+      "msg": "~/top3.txt are cei 3 utilizatori, în ordine",
+      "equals": "bogdan\ndan\nflorin\n"
+     }
+    ],
+    "reference": [
+     "cut -d' ' -f1 acces.log | sort | uniq -c | sort -rn | head -3 | awk '{print $2}' > top3.txt"
+    ]
+   }
+  },
+  {
+   "id": "9",
+   "title": "Liniile pare",
+   "chapter": "3. Filtre de text",
+   "difficulty": "ușoară",
+   "source": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 2c",
+   "statement": "Scrie în `~/pare.csv` doar liniile cu număr par (a 2-a, a 4-a, ...) din `~/catalog.csv`, în ordinea în care apar. Prima linie a fișierului (antetul) e linia 1.",
+   "hint": "În `sed`, adresa `prima~pas` alege liniile prima, prima+pas, ...; `-n` oprește afișarea automată, iar `p` afișează liniile alese.",
+   "solution": "```bash\nsed -n '2~2p' catalog.csv > pare.csv\n```\nMerge și `awk 'NR % 2 == 0' catalog.csv > pare.csv`.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/catalog.csv",
+      "content": "nume,grupa,nota\nPopescu,313CD,8\nIonescu,313CD,10\nMarin,312CD,10\nStan,312CD,4\nDinu,313CD,7\nTudor,312CD,8\nRadu,312CD,10\nNeagu,311CD,6\nMatei,314CD,3\nLupu,311CD,10\nEne,312CD,10\nToma,311CD,6\nSima,311CD,10\nBarbu,314CD,7\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/pare.csv",
+      "msg": "~/pare.csv are exact liniile pare",
+      "equals": "Popescu,313CD,8\nMarin,312CD,10\nDinu,313CD,7\nRadu,312CD,10\nMatei,314CD,3\nEne,312CD,10\nSima,311CD,10\n"
+     }
+    ],
+    "reference": [
+     "sed -n '2~2p' catalog.csv > pare.csv"
+    ]
+   }
+  },
+  {
+   "id": "10",
+   "title": "Studenții cu note de trecere",
+   "chapter": "3. Filtre de text",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Din `~/catalog.csv` (`nume,grupa,nota`, cu antet), scrie în `~/promovati.txt` numele studenților cu nota **cel puțin 5**, sortate alfabetic, câte unul pe linie. Antetul nu intră în rezultat.",
+   "hint": "`awk -F,` desparte liniile la virgulă; `NR > 1` sare peste antet, iar `$3 >= 5` alege nota.",
+   "solution": "```bash\nawk -F, 'NR > 1 && $3 >= 5 {print $1}' catalog.csv | sort > promovati.txt\n```",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/catalog.csv",
+      "content": "nume,grupa,nota\nPopescu,313CD,8\nIonescu,313CD,10\nMarin,312CD,10\nStan,312CD,4\nDinu,313CD,7\nTudor,312CD,8\nRadu,312CD,10\nNeagu,311CD,6\nMatei,314CD,3\nLupu,311CD,10\nEne,312CD,10\nToma,311CD,6\nSima,311CD,10\nBarbu,314CD,7\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/promovati.txt",
+      "msg": "~/promovati.txt are numele corecte, sortate",
+      "equals": "Barbu\nDinu\nEne\nIonescu\nLupu\nMarin\nNeagu\nPopescu\nRadu\nSima\nToma\nTudor\n"
+     }
+    ],
+    "reference": [
+     "awk -F, 'NR > 1 && $3 >= 5 {print $1}' catalog.csv | sort > promovati.txt"
+    ]
+   }
+  },
+  {
+   "id": "11",
+   "title": "Erorile din jurnale",
+   "chapter": "3. Filtre de text",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "În `~/logs` sunt mai multe fișiere `.log`. Fiecare linie are un nivel: `INFO`, `WARN` sau `ERROR`.\n\n• în `~/erori.txt` scrie **numărul total** de linii cu `ERROR` din toate jurnalele (doar numărul);\n• în `~/cu_erori.txt` scrie numele fișierelor (doar numele, fără `logs/`) care au cel puțin o eroare, sortate.",
+   "hint": "`grep -c` numără liniile potrivite, dar pe fiecare fișier în parte dacă îi dai mai multe; ca să ai un singur total, adună-le întâi cu `cat`. `grep -l` scrie doar numele fișierelor.",
+   "solution": "```bash\ncat logs/*.log | grep -c ERROR > erori.txt\ncd logs && grep -l ERROR *.log | sort > ../cu_erori.txt\n```",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/logs/web.log",
+      "content": "2024-01-28 23:58 INFO request served\n2024-01-13 17:58 INFO cache hit\n2024-01-22 22:23 WARN slow query\n2024-01-10 23:34 WARN retrying\n2024-01-10 21:38 ERROR timeout\n2024-01-28 11:30 INFO request served\n2024-01-10 20:44 INFO request served\n2024-01-16 16:56 WARN slow query\n2024-01-17 22:38 ERROR timeout\n2024-01-17 15:24 ERROR connection refused\n2024-01-24 14:11 INFO cache hit\n2024-01-13 12:50 ERROR connection refused\n2024-01-13 21:31 INFO user logged in\n2024-01-23 18:52 ERROR disk full\n2024-01-19 19:41 INFO user logged in\n2024-01-28 23:12 WARN retrying\n2024-01-22 16:52 INFO request served\n2024-01-27 21:59 INFO user logged in\n2024-01-12 17:52 INFO user logged in\n2024-01-15 18:35 INFO cache hit\n2024-01-10 17:12 WARN retrying\n2024-01-28 19:35 ERROR connection refused\n2024-01-15 18:24 INFO request served\n2024-01-27 23:45 INFO request served\n2024-01-26 15:46 WARN retrying\n2024-01-18 20:45 WARN slow query\n2024-01-26 22:18 WARN slow query\n2024-01-11 17:33 WARN slow query\n2024-01-23 17:32 ERROR timeout\n2024-01-10 18:44 INFO user logged in\n2024-01-20 17:48 ERROR disk full\n2024-01-15 18:47 INFO request served\n2024-01-27 22:26 INFO request served\n2024-01-12 23:11 INFO cache hit\n2024-01-18 13:27 INFO request served\n2024-01-15 15:28 ERROR disk full\n2024-01-15 14:43 INFO request served\n2024-01-19 17:54 INFO cache hit\n2024-01-25 11:11 WARN retrying\n2024-01-20 16:22 WARN retrying\n"
+     },
+     {
+      "path": "~/logs/db.log",
+      "content": "2024-01-12 11:33 INFO request served\n2024-01-18 19:23 INFO user logged in\n2024-01-28 20:20 INFO cache hit\n2024-01-26 15:44 WARN retrying\n2024-01-18 10:11 ERROR timeout\n2024-01-20 16:37 WARN slow query\n2024-01-15 13:24 ERROR disk full\n2024-01-20 12:18 INFO user logged in\n2024-01-21 18:53 ERROR connection refused\n2024-01-24 22:36 INFO user logged in\n2024-01-21 22:47 ERROR timeout\n2024-01-24 12:58 INFO cache hit\n2024-01-26 13:41 WARN retrying\n2024-01-26 18:32 WARN retrying\n2024-01-21 19:56 WARN retrying\n2024-01-17 15:54 WARN slow query\n2024-01-18 22:40 ERROR timeout\n2024-01-26 18:43 INFO user logged in\n2024-01-28 16:29 ERROR connection refused\n2024-01-25 18:33 INFO user logged in\n2024-01-12 22:31 ERROR connection refused\n2024-01-16 21:16 INFO request served\n2024-01-11 14:47 ERROR disk full\n2024-01-26 12:27 INFO request served\n2024-01-11 16:55 INFO request served\n"
+     },
+     {
+      "path": "~/logs/cron.log",
+      "content": "INFO job started\nINFO job finished\n"
+     },
+     {
+      "path": "~/logs/auth.log",
+      "content": "2024-01-28 18:18 INFO cache hit\n2024-01-25 20:47 ERROR disk full\n2024-01-10 23:40 ERROR timeout\n2024-01-17 13:55 ERROR timeout\n2024-01-27 17:35 ERROR connection refused\n2024-01-17 20:19 INFO user logged in\n2024-01-10 20:59 WARN slow query\n2024-01-28 10:29 INFO request served\n2024-01-25 19:56 INFO cache hit\n2024-01-22 21:46 WARN retrying\n2024-01-21 11:12 INFO request served\n2024-01-16 14:53 WARN retrying\n2024-01-23 18:34 INFO user logged in\n2024-01-27 19:36 INFO user logged in\n2024-01-20 20:11 INFO cache hit\n2024-01-15 21:30 ERROR connection refused\n2024-01-28 11:55 ERROR connection refused\n2024-01-28 14:28 INFO request served\n2024-01-25 23:50 INFO cache hit\n2024-01-21 22:14 INFO cache hit\n2024-01-10 14:37 INFO cache hit\n2024-01-11 19:49 INFO request served\n2024-01-28 15:45 WARN retrying\n2024-01-17 10:29 ERROR disk full\n2024-01-13 19:44 INFO request served\n2024-01-23 14:49 INFO cache hit\n2024-01-11 23:31 INFO cache hit\n2024-01-14 23:34 INFO cache hit\n2024-01-26 16:51 WARN slow query\n2024-01-26 14:37 ERROR connection refused\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/erori.txt",
+      "msg": "~/erori.txt are numărul corect de erori",
+      "equals": "25\n"
+     },
+     {
+      "type": "file",
+      "path": "~/cu_erori.txt",
+      "msg": "~/cu_erori.txt are fișierele cu erori",
+      "equals": "auth.log\ndb.log\nweb.log\n"
+     }
+    ],
+    "reference": [
+     "cat logs/*.log | grep -c ERROR > erori.txt",
+     "cd logs && grep -l ERROR *.log | sort > ../cu_erori.txt"
+    ]
+   }
+  },
+  {
+   "id": "12",
+   "title": "Configurare mutată pe server",
+   "chapter": "3. Filtre de text",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aplicația din `~/config/app.conf` trece de pe calculatorul tău pe un server. Modifică fișierul **pe loc** (fără să-l deschizi într-un editor):\n\n• fiecare `localhost` devine `10.0.0.5` (inclusiv în comentariu);\n• linia `port=8080` devine `port=9090`; celelalte porturi rămân.",
+   "hint": "`sed -i` scrie rezultatul înapoi în fișier. `s/a/b/g` înlocuiește toate aparițiile de pe linie; `^` și `$` leagă tiparul de începutul și sfârșitul liniei.",
+   "solution": "```bash\nsed -i 's/localhost/10.0.0.5/g; s/^port=8080$/port=9090/' config/app.conf\n```\nFără `^...$`, `s/port=8080/port=9090/` ar fi mers aici, dar ar fi atins și o linie ca `db_port=8080`.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/config/app.conf",
+      "content": "server=localhost\nport=8080\ndb_host=localhost\ndb_port=5432\n# localhost e doar pentru teste\nlog=/var/log/app.log\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/config/app.conf",
+      "msg": "app.conf are noile valori",
+      "equals": "server=10.0.0.5\nport=9090\ndb_host=10.0.0.5\ndb_port=5432\n# 10.0.0.5 e doar pentru teste\nlog=/var/log/app.log\n"
+     }
+    ],
+    "reference": [
+     "sed -i 's/localhost/10.0.0.5/g; s/^port=8080$/port=9090/' config/app.conf"
+    ]
+   }
+  },
+  {
+   "id": "13",
+   "title": "Câte fișiere sunt într-un director",
+   "chapter": "4. Scripturi shell",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Scrie scriptul `~/numara.sh` (cu `nano numara.sh`) care primește ca argument un director și afișează **numărul de fișiere obișnuite** din el (fără subdirectoare și fără ce e în ele).\n\n• fără argument afișează `Utilizare: numara.sh director` și iese cu codul 1;\n• dacă argumentul nu e un director, afișează `Nu e director: <arg>` și iese cu codul 2.\n\nScriptul e rulat de verificare cu `bash ~/numara.sh ...` pe alte directoare decât ale tale.",
+   "hint": "`$#` e numărul de argumente, `$1` primul. `[ -d x ]` testează un director, `[ -f x ]` un fișier obișnuit. Poți număra și cu `find \"$1\" -maxdepth 1 -type f | wc -l`.",
+   "solution": "```bash\n#!/bin/bash\nif [ $# -lt 1 ]; then\n    echo \"Utilizare: numara.sh director\"\n    exit 1\nfi\nif [ ! -d \"$1\" ]; then\n    echo \"Nu e director: $1\"\n    exit 2\nfi\nn=0\nfor f in \"$1\"/*; do\n    if [ -f \"$f\" ]; then\n        n=$((n + 1))\n    fi\ndone\necho $n\n```\nUn director gol lasă globul `\"$1\"/*` neschimbat (un singur „nume” care nu există), de aceea testul `-f` e necesar: îl elimină.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/exemplu/x.txt"
+     },
+     {
+      "path": "~/exemplu/y.txt"
+     },
+     {
+      "path": "~/exemplu/z/",
+      "dir": true
+     }
+    ],
+    "checks": [
+     {
+      "type": "script",
+      "path": "~/numara.sh",
+      "runs": [
+       {
+        "args": [
+         ".verif/date"
+        ],
+        "setup": [
+         {
+          "path": "~/.verif/date/a.txt"
+         },
+         {
+          "path": "~/.verif/date/b.txt"
+         },
+         {
+          "path": "~/.verif/date/c.csv"
+         },
+         {
+          "path": "~/.verif/date/sub/",
+          "dir": true
+         },
+         {
+          "path": "~/.verif/date/sub/d.txt"
+         }
+        ],
+        "stdout": "3\n",
+        "status": 0
+       },
+       {
+        "args": [
+         ".verif/gol"
+        ],
+        "setup": [
+         {
+          "path": "~/.verif/gol/",
+          "dir": true
+         }
+        ],
+        "stdout": "0\n",
+        "status": 0
+       },
+       {
+        "args": [],
+        "stdout": "Utilizare: numara.sh director\n",
+        "status": 1
+       },
+       {
+        "args": [
+         "nu_exista"
+        ],
+        "stdout": "Nu e director: nu_exista\n",
+        "status": 2
+       }
+      ]
+     }
+    ],
+    "reference": [
+     "cat > ~/numara.sh <<'EOF'\n#!/bin/bash\nif [ $# -lt 1 ]; then\n    echo \"Utilizare: numara.sh director\"\n    exit 1\nfi\nif [ ! -d \"$1\" ]; then\n    echo \"Nu e director: $1\"\n    exit 2\nfi\nn=0\nfor f in \"$1\"/*; do\n    if [ -f \"$f\" ]; then\n        n=$((n + 1))\n    fi\ndone\necho $n\nEOF"
+    ]
+   }
+  },
+  {
+   "id": "14",
+   "title": "Suma dintr-un fișier",
+   "chapter": "4. Scripturi shell",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Scrie `~/suma.sh`: primește numele unui fișier cu câte un număr întreg pe linie și afișează **suma** lor.\n\n• un fișier gol are suma 0;\n• dacă fișierul nu există, afișează `Fisierul nu exista` și iese cu codul 2.\n\nCitește fișierul linie cu linie, cu `while read`.",
+   "hint": "`while read -r x; do ...; done < fisier` citește câte o linie în `x`. Aritmetica se face cu `$((...))`.",
+   "solution": "```bash\n#!/bin/bash\nif [ ! -f \"$1\" ]; then\n    echo \"Fisierul nu exista\"\n    exit 2\nfi\ns=0\nwhile read -r x; do\n    s=$((s + x))\ndone < \"$1\"\necho $s\n```\nRedirectarea `< \"$1\"` stă după `done`: toată bucla citește din fișier.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/numere.txt",
+      "content": "4\n10\n-3\n7\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "script",
+      "path": "~/suma.sh",
+      "runs": [
+       {
+        "args": [
+         ".verif/numere.txt"
+        ],
+        "setup": [
+         {
+          "path": "~/.verif/numere.txt",
+          "content": "4\n10\n-3\n7\n"
+         }
+        ],
+        "stdout": "18\n",
+        "status": 0
+       },
+       {
+        "args": [
+         ".verif/mari.txt"
+        ],
+        "setup": [
+         {
+          "path": "~/.verif/mari.txt",
+          "content": "37\n74\n10\n47\n84\n20\n57\n94\n30\n67\n3\n40\n77\n13\n50\n87\n23\n60\n97\n33\n70\n6\n43\n80\n16\n53\n90\n26\n63\n100\n36\n73\n9\n46\n83\n19\n56\n93\n29\n66\n2\n39\n76\n12\n49\n86\n22\n59\n96\n32\n69\n5\n42\n79\n15\n52\n89\n25\n62\n"
+         }
+        ],
+        "stdout": "2971\n",
+        "status": 0
+       },
+       {
+        "args": [
+         ".verif/gol.txt"
+        ],
+        "setup": [
+         {
+          "path": "~/.verif/gol.txt",
+          "content": ""
+         }
+        ],
+        "stdout": "0\n",
+        "status": 0
+       },
+       {
+        "args": [
+         ".verif/lipsa.txt"
+        ],
+        "stdout": "Fisierul nu exista\n",
+        "status": 2
+       }
+      ]
+     }
+    ],
+    "reference": [
+     "cat > ~/suma.sh <<'EOF'\n#!/bin/bash\nif [ ! -f \"$1\" ]; then\n    echo \"Fisierul nu exista\"\n    exit 2\nfi\ns=0\nwhile read -r x; do\n    s=$((s + x))\ndone < \"$1\"\necho $s\nEOF"
+    ]
+   }
+  },
+  {
+   "id": "15",
+   "title": "Redenumire în serie",
+   "chapter": "4. Scripturi shell",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Scrie `~/redenumeste.sh`, care redenumește în **directorul curent** toate fișierele cu extensia `.jpeg` în `.jpg` (păstrând restul numelui) și afișează pentru fiecare o linie `vechi -> nou`, în ordine alfabetică.\n\nExemplu, cu `munte.jpeg` și `mare.jpeg`:\n\n```\nmare.jpeg -> mare.jpg\nmunte.jpeg -> munte.jpg\n```\n\nExtensia scrisă cu majuscule (`.JPEG`) nu se atinge. Verificarea rulează scriptul în alte directoare și se uită și la ce fișiere au rămas.",
+   "hint": "`${f%.jpeg}` taie sufixul `.jpeg` din valoarea lui `f`. Pune numele între ghilimele, ca să meargă și cu spații.",
+   "solution": "```bash\n#!/bin/bash\nfor f in *.jpeg; do\n    [ -e \"$f\" ] || continue\n    nou=\"${f%.jpeg}.jpg\"\n    mv \"$f\" \"$nou\"\n    echo \"$f -> $nou\"\ndone\n```\n`[ -e \"$f\" ] || continue` sare peste cazul în care nu există niciun `.jpeg` (globul rămâne atunci literal).",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/poze/munte.jpeg",
+      "content": "m"
+     },
+     {
+      "path": "~/poze/mare.jpeg",
+      "content": "x"
+     }
+    ],
+    "checks": [
+     {
+      "type": "script",
+      "path": "~/redenumeste.sh",
+      "runs": [
+       {
+        "cwd": "~/.verif/poze",
+        "setup": [
+         {
+          "path": "~/.verif/poze/munte.jpeg",
+          "content": "munte.jpeg"
+         },
+         {
+          "path": "~/.verif/poze/mare.jpeg",
+          "content": "mare.jpeg"
+         },
+         {
+          "path": "~/.verif/poze/oras.JPEG",
+          "content": "oras.JPEG"
+         },
+         {
+          "path": "~/.verif/poze/harta.png",
+          "content": "harta.png"
+         },
+         {
+          "path": "~/.verif/poze/deja.jpg",
+          "content": "deja.jpg"
+         }
+        ],
+        "stdout": "mare.jpeg -> mare.jpg\nmunte.jpeg -> munte.jpg\n",
+        "status": 0
+       },
+       {
+        "cwd": "~/.verif/poze",
+        "setup": [
+         {
+          "path": "~/.verif/poze/munte.jpeg",
+          "content": "munte.jpeg"
+         },
+         {
+          "path": "~/.verif/poze/mare.jpeg",
+          "content": "mare.jpeg"
+         },
+         {
+          "path": "~/.verif/poze/oras.JPEG",
+          "content": "oras.JPEG"
+         },
+         {
+          "path": "~/.verif/poze/harta.png",
+          "content": "harta.png"
+         },
+         {
+          "path": "~/.verif/poze/deja.jpg",
+          "content": "deja.jpg"
+         }
+        ],
+        "after": "ls ~/.verif/poze",
+        "stdout": "deja.jpg\nharta.png\nmare.jpg\nmunte.jpg\noras.JPEG\n",
+        "status": 0
+       },
+       {
+        "cwd": "~/.verif/alt",
+        "setup": [
+         {
+          "path": "~/.verif/alt/a b.jpeg",
+          "content": "1"
+         },
+         {
+          "path": "~/.verif/alt/c.txt",
+          "content": "2"
+         }
+        ],
+        "after": "ls ~/.verif/alt",
+        "stdout": "a b.jpg\nc.txt\n",
+        "status": 0
+       }
+      ]
+     }
+    ],
+    "reference": [
+     "cat > ~/redenumeste.sh <<'EOF'\n#!/bin/bash\nfor f in *.jpeg; do\n    [ -e \"$f\" ] || continue\n    nou=\"${f%.jpeg}.jpg\"\n    mv \"$f\" \"$nou\"\n    echo \"$f -> $nou\"\ndone\nEOF"
+    ]
+   }
+  }
+ ]
+}

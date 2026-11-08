@@ -28,7 +28,7 @@ void main() {
   });
 
   test('every listed problem has details, and every subject offered has problems', () {
-    for (final subject in ['Informatică', 'Matematică', 'ACS']) {
+    for (final subject in ['Informatică', 'Matematică']) {
       expect(list[subject], isNotNull, reason: subject);
       var count = 0;
       (list[subject] as Map<String, dynamic>).forEach((grade, chapters) {
@@ -307,69 +307,5 @@ void main() {
       }
       expect(failures, isEmpty);
     }, skip: gpp ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 10)));
-  });
-
-  group('ACS: the first year of the CD series, a section per course', () {
-    final sections = list['ACS'] as Map<String, dynamic>;
-    final problems = details['ACS'] as Map<String, dynamic>;
-
-    test('the eleven compulsory courses, no electives; chapters numbered; each problem with a hint and its solution', () {
-      expect(sections.keys, ['AM', 'ALGAED', 'PCLP', 'USO', 'PL', 'MS', 'ELTH', 'Fizică', 'MN', 'IOCLA', 'SD']);
-      for (final MapEntry(key: section, value: chapters) in sections.entries) {
-        final names = (chapters as Map<String, dynamic>).keys.toList();
-        for (var i = 0; i < names.length; i++) {
-          expect(names[i], startsWith('${i + 1}. '), reason: '$section: ${names[i]}');
-        }
-        var count = 0;
-        for (final items in chapters.values) {
-          for (final item in items as List) {
-            count++;
-            final d = problems[section][item['id']] as Map<String, dynamic>;
-            final id = '$section/${item['id']}';
-            expect(['ușoară', 'medie', 'grea'], contains(d['difficulty']), reason: id);
-            expect('${d['hint'] ?? ''}'.trim(), isNotEmpty, reason: id);
-            if (d['tip_exercitiu'] == 'grila') {
-              expect(d['variante'] as List, contains(d['raspuns_corect']), reason: id);
-            }
-            if (d['official_solution'] == null) {
-              expect('${d['raspuns_corect'] ?? ''}'.trim(), isNotEmpty, reason: id);
-              expect('${d['solutie'] ?? ''}'.trim(), isNotEmpty, reason: id);
-            } else {
-              expect((d['tests'] as List).length, greaterThanOrEqualTo(3), reason: id);
-            }
-          }
-        }
-        expect(count, greaterThanOrEqualTo(12), reason: section);
-      }
-    });
-
-    test('PCLP and SD: every C solution passes all its tests, run as C++ like in the editor', () async {
-      String norm(String s) => s.replaceAll(RegExp(r'\s+'), '').toLowerCase();
-      final tmp = Directory.systemTemp.createTempSync('acs');
-      addTearDown(() => tmp.deleteSync(recursive: true));
-      final failures = <String>[];
-      for (final section in ['PCLP', 'SD']) {
-        for (final MapEntry(key: id, value: p) in (problems[section] as Map<String, dynamic>).entries) {
-          if (p['official_solution'] == null) continue;
-          final dir = Directory('${tmp.path}/${section}_$id')..createSync();
-          File('${dir.path}/main.cpp').writeAsStringSync(p['official_solution']['code']);
-          final c = await Process.run('g++', ['-std=c++17', '-O2', 'main.cpp', '-o', 'main'], workingDirectory: dir.path);
-          if (c.exitCode != 0) {
-            failures.add('$section/$id: compile error');
-            continue;
-          }
-          for (final t in p['tests'] as List) {
-            final run = await Process.start('${dir.path}/main', [], workingDirectory: dir.path);
-            final reading = run.stdout.transform(const SystemEncoding().decoder).join();
-            run.stdin.write(t['input']);
-            await run.stdin.close();
-            final out = await reading;
-            await run.exitCode;
-            if (norm(out) != norm('${t['output']}')) failures.add('$section/$id: ${'${t['input']}'.split('\n').first}');
-          }
-        }
-      }
-      expect(failures, isEmpty);
-    }, skip: Process.runSync('which', ['g++']).exitCode == 0 ? false : 'needs g++', timeout: const Timeout(Duration(minutes: 5)));
   });
 }

@@ -3,7 +3,7 @@
 // it's in, run() answers {notReady} and the app runs the code on the server.
 //   imCpp.warm()                       start loading Clang now
 //   imCpp.isReady()                    loaded and waiting
-//   imCpp.run(code, stdin, timeoutMs, file)  -> Promise<{stdout, stderr, status, seconds} | {notReady} | {failed, error}>
+//   imCpp.run(code, stdin, timeoutMs, file, lang)  (lang 'c' for C)  -> Promise<{stdout, stderr, status, seconds} | {notReady} | {failed, error}>
 //     file: a problem with files: stdin goes in <file>.in, the keyboard is
 //     empty, and stdout is <file>.out (plus console: the screen, noFile)
 (function () {
@@ -36,15 +36,16 @@
     isReady = false;
   }
 
-  function compile(code) {
-    if (code === last.code) return Promise.resolve(last.result);
+  function compile(code, lang) {
+    const key = (lang || 'cpp') + '\u0000' + code;
+    if (key === last.code) return Promise.resolve(last.result);
     const id = ++seq;
     return new Promise((resolve) => {
       pending.set(id, resolve);
-      compiler.postMessage({ id, code });
+      compiler.postMessage({ id, code, lang: lang || 'cpp' });
     }).then(async (r) => {
       if (r.wasm) r = { module: await WebAssembly.compile(r.wasm) };
-      if (!r.failed) last = { code, result: r };
+      if (!r.failed) last = { code: key, result: r };
       return r;
     });
   }
@@ -77,9 +78,9 @@
   window.imCpp = {
     warm() { if (!compiler) start(); },
     isReady() { return isReady; },
-    async run(code, stdin, timeoutMs, file) {
+    async run(code, stdin, timeoutMs, file, lang) {
       if (!isReady) { this.warm(); return { notReady: true }; }
-      const c = await compile(code);
+      const c = await compile(code, lang);
       if (c.failed) return { failed: true };
       if (c.error != null) return { stdout: '', stderr: c.error, status: 'Compilation Error' };
       return execute(c.module, stdin, timeoutMs, file || null);
