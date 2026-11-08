@@ -32861,5 +32861,4522 @@
     }
    ]
   }
+ },
+ "ACS": {
+  "AM": {
+   "1": [
+    {
+     "q": "Cum se descompune 1/(n(n+1))?",
+     "o": [
+      "1/n − 1/(n+1)",
+      "1/n + 1/(n+1)",
+      "1/n²",
+      "(n+1)/n"
+     ],
+     "a": 0,
+     "e": "Fracții simple."
+    },
+    {
+     "q": "Ce rămâne dintr-o sumă telescopică?",
+     "o": [
+      "primul și ultimul termen",
+      "toți termenii",
+      "doar mijlocul",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Termenii intermediari se reduc."
+    }
+   ],
+   "2": [
+    {
+     "q": "Când converge seria geometrică Σ qⁿ?",
+     "o": [
+      "pentru |q| < 1",
+      "pentru orice q",
+      "pentru q > 1",
+      "pentru q = 1"
+     ],
+     "a": 0,
+     "e": "Altfel termenii nu tind la 0."
+    },
+    {
+     "q": "Ce sumă are Σ qⁿ (n ≥ 0) când converge?",
+     "o": [
+      "1/(1 − q)",
+      "q/(1 − q)",
+      "1/(1 + q)",
+      "1 − q"
+     ],
+     "a": 0,
+     "e": "Formula seriei geometrice."
+    }
+   ],
+   "3": [
+    {
+     "q": "Este seria armonică Σ 1/n convergentă?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Sumele parțiale cresc ca ln n."
+    },
+    {
+     "q": "Cu ce integrală se compară Σ 1/nᵖ?",
+     "o": [
+      "∫₁^∞ x⁻ᵖ dx",
+      "∫₀¹ x dx",
+      "∫ eˣ dx",
+      "cu niciuna"
+     ],
+     "a": 0,
+     "e": "Criteriul integral."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce formulă dă raza de convergență?",
+     "o": [
+      "R = lim |aₙ / aₙ₊₁|",
+      "R = lim aₙ",
+      "R = Σ aₙ",
+      "R = a₀"
+     ],
+     "a": 0,
+     "e": "Sau 1 / lim ⁿ√|aₙ|."
+    },
+    {
+     "q": "Pentru |x| < R seria de puteri...",
+     "o": [
+      "converge absolut",
+      "diverge",
+      "nu se știe",
+      "e zero"
+     ],
+     "a": 0,
+     "e": "Asta definește raza."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce coeficient are xⁿ în seria lui eˣ?",
+     "o": [
+      "1/n!",
+      "n!",
+      "1/n",
+      "1"
+     ],
+     "a": 0,
+     "e": "eˣ = Σ xⁿ/n!."
+    },
+    {
+     "q": "Cât este 3!?",
+     "o": [
+      "6",
+      "3",
+      "9",
+      "27"
+     ],
+     "a": 0,
+     "e": "1 · 2 · 3."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce înseamnă ∂f/∂x?",
+     "o": [
+      "derivata după x, cu y ținut constant",
+      "derivata după y",
+      "derivata totală",
+      "integrala după x"
+     ],
+     "a": 0,
+     "e": "Celelalte variabile sunt constante."
+    },
+    {
+     "q": "Contează ordinea derivatelor mixte pentru funcții de clasă C²?",
+     "o": [
+      "Nu (teorema lui Schwarz)",
+      "Da, mereu",
+      "Doar în 3D",
+      "Doar pentru polinoame"
+     ],
+     "a": 0,
+     "e": "f_xy = f_yx."
+    }
+   ],
+   "7": [
+    {
+     "q": "Ce condiție îndeplinește un punct de extrem liber?",
+     "o": [
+      "toate derivatele parțiale sunt 0",
+      "f = 0",
+      "f e maximă pe axe",
+      "nicio condiție"
+     ],
+     "a": 0,
+     "e": "Punct critic."
+    },
+    {
+     "q": "Cât este x² − 2x scris cu pătrat perfect?",
+     "o": [
+      "(x − 1)² − 1",
+      "(x − 2)²",
+      "(x + 1)² − 1",
+      "x(x − 2)²"
+     ],
+     "a": 0,
+     "e": "x² − 2x + 1 − 1."
+    }
+   ],
+   "8": [
+    {
+     "q": "Unde își poate atinge o funcție continuă extremele pe un compact?",
+     "o": [
+      "în puncte critice din interior sau pe frontieră",
+      "doar în interior",
+      "doar în vârfuri",
+      "nicăieri"
+     ],
+     "a": 0,
+     "e": "Teorema lui Weierstrass garantează existența lor."
+    },
+    {
+     "q": "Cât este f pe laturile x = 0 și y = 0?",
+     "o": [
+      "0",
+      "9",
+      "−9/16",
+      "nedefinit"
+     ],
+     "a": 0,
+     "e": "Factorul x²y se anulează."
+    }
+   ],
+   "9": [
+    {
+     "q": "Cât este 3x + 4y − 6 pe dreapta 3x + 4y = 9?",
+     "o": [
+      "3",
+      "9",
+      "0",
+      "−6"
+     ],
+     "a": 0,
+     "e": "9 − 6."
+    },
+    {
+     "q": "Unde se anulează derivata lui x²(3 − x)?",
+     "o": [
+      "x = 0 și x = 2",
+      "x = 3",
+      "x = 1",
+      "nicăieri"
+     ],
+     "a": 0,
+     "e": "6x − 3x² = 3x(2 − x)."
+    }
+   ],
+   "10": [
+    {
+     "q": "Cât este Γ(n) pentru n natural?",
+     "o": [
+      "(n − 1)!",
+      "n!",
+      "n",
+      "(n + 1)!"
+     ],
+     "a": 0,
+     "e": "Γ(1) = 1 și Γ(n + 1) = nΓ(n)."
+    },
+    {
+     "q": "Ce n dă integrala ∫₀^∞ x⁴e⁻ˣ dx?",
+     "o": [
+      "Γ(5)",
+      "Γ(4)",
+      "Γ(3)",
+      "Γ(1)"
+     ],
+     "a": 0,
+     "e": "Exponentul lui x este n − 1."
+    }
+   ],
+   "11": [
+    {
+     "q": "Cum se scrie B(p, q) cu Gamma?",
+     "o": [
+      "Γ(p)Γ(q)/Γ(p + q)",
+      "Γ(p + q)",
+      "Γ(p) + Γ(q)",
+      "Γ(pq)"
+     ],
+     "a": 0,
+     "e": "Legătura Beta–Gamma."
+    },
+    {
+     "q": "Ce p și q corespund integralei ∫₀¹ x²(1 − x)³ dx?",
+     "o": [
+      "p = 3, q = 4",
+      "p = 2, q = 3",
+      "p = 4, q = 3",
+      "p = 1, q = 1"
+     ],
+     "a": 0,
+     "e": "Exponenții sunt p − 1 și q − 1."
+    }
+   ],
+   "12": [
+    {
+     "q": "Cât este ∫_{−∞}^{∞} e^{−t²} dt?",
+     "o": [
+      "√π",
+      "π",
+      "1",
+      "2"
+     ],
+     "a": 0,
+     "e": "Integrala Gauss."
+    },
+    {
+     "q": "Ce relație leagă Γ(3/2) de Γ(1/2)?",
+     "o": [
+      "Γ(3/2) = ½ Γ(1/2)",
+      "Γ(3/2) = Γ(1/2)",
+      "Γ(3/2) = 2Γ(1/2)",
+      "niciuna"
+     ],
+     "a": 0,
+     "e": "Γ(x + 1) = xΓ(x)."
+    }
+   ],
+   "13": [
+    {
+     "q": "Când se poate despărți o integrală dublă în produs de două integrale simple?",
+     "o": [
+      "domeniu dreptunghi și integrand produs f(x)g(y)",
+      "mereu",
+      "niciodată",
+      "doar pe cerc"
+     ],
+     "a": 0,
+     "e": "Teorema lui Fubini."
+    },
+    {
+     "q": "Cât este ∫₀² y dy?",
+     "o": [
+      "2",
+      "4",
+      "1",
+      "½"
+     ],
+     "a": 0,
+     "e": "y²/2 între 0 și 2."
+    }
+   ],
+   "14": [
+    {
+     "q": "Ce suprafață este x² + y² + z² = 6z?",
+     "o": [
+      "o sferă de centru (0, 0, 3) și rază 3",
+      "un paraboloid",
+      "un con",
+      "un cilindru"
+     ],
+     "a": 0,
+     "e": "x² + y² + (z − 3)² = 9."
+    },
+    {
+     "q": "La ce z se intersectează cu x² + y² = 2z (z ≥ 3)?",
+     "o": [
+      "z = 4",
+      "z = 3",
+      "z = 6",
+      "z = 2"
+     ],
+     "a": 0,
+     "e": "Din 2z + z² = 6z."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce leagă formula lui Green?",
+     "o": [
+      "o integrală pe o curbă închisă de o integrală dublă",
+      "derivate de integrale simple",
+      "serii de integrale",
+      "volume de arii"
+     ],
+     "a": 0,
+     "e": "∮ P dx + Q dy = ∬ (Q_x − P_y) dx dy."
+    },
+    {
+     "q": "Ce arie are discul de rază 2?",
+     "o": [
+      "4π",
+      "2π",
+      "8π",
+      "π"
+     ],
+     "a": 0,
+     "e": "πr²."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce leagă formula Gauss–Ostrogradski?",
+     "o": [
+      "fluxul printr-o suprafață închisă de integrala divergenței",
+      "circulația de rotor",
+      "aria de lungime",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Teorema divergenței."
+    },
+    {
+     "q": "Cât este divergența câmpului (x, y, z)?",
+     "o": [
+      "3",
+      "1",
+      "0",
+      "x + y + z"
+     ],
+     "a": 0,
+     "e": "1 + 1 + 1."
+    }
+   ]
+  },
+  "ALGAED": {
+   "1": [
+    {
+     "q": "Ce face cu determinantul o scădere a unui multiplu de linie din alta?",
+     "o": [
+      "nu îl schimbă",
+      "îl dublează",
+      "îl anulează",
+      "îi schimbă semnul"
+     ],
+     "a": 0,
+     "e": "Proprietate a determinanților."
+    },
+    {
+     "q": "Pentru ce matrice se aplică regula lui Sarrus?",
+     "o": [
+      "3 × 3",
+      "2 × 2",
+      "orice mărime",
+      "4 × 4"
+     ],
+     "a": 0,
+     "e": "Doar pentru ordinul 3."
+    }
+   ],
+   "2": [
+    {
+     "q": "Ce este rangul unei matrice?",
+     "o": [
+      "ordinul maxim al unui minor nenul",
+      "numărul de linii",
+      "suma diagonalei",
+      "determinantul"
+     ],
+     "a": 0,
+     "e": "Echivalent: numărul maxim de linii liniar independente."
+    },
+    {
+     "q": "Dacă o linie e multiplul alteia, determinantul este...",
+     "o": [
+      "0",
+      "1",
+      "nedefinit",
+      "negativ"
+     ],
+     "a": 0,
+     "e": "Liniile sunt dependente."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce sistem rezolvă pseudosoluția?",
+     "o": [
+      "AᵀAx = Aᵀb",
+      "Ax = b",
+      "AAᵀx = b",
+      "x = A⁻¹b"
+     ],
+     "a": 0,
+     "e": "Sistemul normal."
+    },
+    {
+     "q": "Ce minimizează pseudosoluția?",
+     "o": [
+      "‖Ax − b‖",
+      "‖x‖",
+      "‖A‖",
+      "det A"
+     ],
+     "a": 0,
+     "e": "Metoda celor mai mici pătrate."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce spune teorema rang–defect?",
+     "o": [
+      "dim ker T + rang T = dimensiunea spațiului de plecare",
+      "dim ker T = rang T",
+      "rang T = dimensiunea spațiului de sosire",
+      "dim ker T = 0"
+     ],
+     "a": 0,
+     "e": "Pentru T : V → W, dim V = dim ker T + dim Im T."
+    },
+    {
+     "q": "Ce dimensiune are ℝ⁴?",
+     "o": [
+      "4",
+      "3",
+      "16",
+      "2"
+     ],
+     "a": 0,
+     "e": "Patru coordonate."
+    }
+   ],
+   "5": [
+    {
+     "q": "Cum găsești valorile proprii?",
+     "o": [
+      "rădăcinile lui det(A − λI) = 0",
+      "diagonala lui A",
+      "determinantul",
+      "urma"
+     ],
+     "a": 0,
+     "e": "Polinomul caracteristic."
+    },
+    {
+     "q": "Cu ce e egală suma valorilor proprii?",
+     "o": [
+      "urma matricei",
+      "determinantul",
+      "rangul",
+      "0"
+     ],
+     "a": 0,
+     "e": "2 + 2 = 1 + 3."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce matrice are forma 5x² + 12xy?",
+     "o": [
+      "[[5, 6], [6, 0]]",
+      "[[5, 12], [0, 0]]",
+      "[[5, 12], [12, 0]]",
+      "[[6, 5], [5, 6]]"
+     ],
+     "a": 0,
+     "e": "Coeficientul lui xy se împarte în două."
+    },
+    {
+     "q": "Ce conică dau două valori proprii de semne opuse?",
+     "o": [
+      "hiperbolă",
+      "elipsă",
+      "parabolă",
+      "cerc"
+     ],
+     "a": 0,
+     "e": "Forma canonică are un plus și un minus."
+    }
+   ],
+   "7": [
+    {
+     "q": "Cu ce e egal produsul valorilor proprii?",
+     "o": [
+      "determinantul",
+      "urma",
+      "rangul",
+      "1"
+     ],
+     "a": 0,
+     "e": "det A = λ₁λ₂."
+    },
+    {
+     "q": "Cât este det [[5, 6], [6, 0]]?",
+     "o": [
+      "−36",
+      "36",
+      "30",
+      "0"
+     ],
+     "a": 0,
+     "e": "0 − 36."
+    }
+   ],
+   "8": [
+    {
+     "q": "Cât este Aq pentru A = I − qqᵀ și ‖q‖ = 1?",
+     "o": [
+      "0",
+      "q",
+      "2q",
+      "−q"
+     ],
+     "a": 0,
+     "e": "q − q(qᵀq) = q − q."
+    },
+    {
+     "q": "Ce transformare este A?",
+     "o": [
+      "proiecția pe planul perpendicular pe q",
+      "o rotație",
+      "o simetrie",
+      "identitatea"
+     ],
+     "a": 0,
+     "e": "Păstrează vectorii perpendiculari pe q."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce matrice dă valorile singulare?",
+     "o": [
+      "AᵀA (rădăcinile valorilor ei proprii)",
+      "A + Aᵀ",
+      "A⁻¹",
+      "A²"
+     ],
+     "a": 0,
+     "e": "σᵢ = √λᵢ(AᵀA)."
+    },
+    {
+     "q": "Pot fi valorile singulare negative?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "Sunt rădăcini pătrate ale unor numere ≥ 0."
+    }
+   ],
+   "10": [
+    {
+     "q": "Ce este vectorul (a, b, c) pentru planul ax + by + cz + d = 0?",
+     "o": [
+      "un vector normal la plan",
+      "un punct din plan",
+      "un vector din plan",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Perpendicular pe plan."
+    },
+    {
+     "q": "Cât este √(4 + 1 + 4)?",
+     "o": [
+      "3",
+      "9",
+      "√5",
+      "5"
+     ],
+     "a": 0,
+     "e": "√9."
+    }
+   ],
+   "11": [
+    {
+     "q": "Ce măsoară ‖u × v‖?",
+     "o": [
+      "aria paralelogramului construit pe u și v",
+      "volumul",
+      "unghiul",
+      "lungimea lui u"
+     ],
+     "a": 0,
+     "e": "Triunghiul are jumătate."
+    },
+    {
+     "q": "Este u × v perpendicular pe u și pe v?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Produsul vectorial."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce înseamnă u · v = 0?",
+     "o": [
+      "vectorii sunt perpendiculari",
+      "sunt paraleli",
+      "sunt egali",
+      "unul e nul"
+     ],
+     "a": 0,
+     "e": "cos θ = 0."
+    },
+    {
+     "q": "Cum calculezi cos θ?",
+     "o": [
+      "(u · v) / (‖u‖ ‖v‖)",
+      "u · v",
+      "‖u × v‖",
+      "‖u‖ + ‖v‖"
+     ],
+     "a": 0,
+     "e": "Din definiția produsului scalar."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce tip de ecuație e x′ = −x + 2cos t?",
+     "o": [
+      "liniară de ordinul I",
+      "neliniară",
+      "de ordinul II",
+      "cu variabile separabile"
+     ],
+     "a": 0,
+     "e": "x apare la puterea întâi."
+    },
+    {
+     "q": "Ce funcție rezolvă ecuația omogenă x′ = −x?",
+     "o": [
+      "Ce⁻ᵗ",
+      "Ceᵗ",
+      "C cos t",
+      "Ct"
+     ],
+     "a": 0,
+     "e": "Derivata e opusul funcției."
+    }
+   ],
+   "14": [
+    {
+     "q": "Ce soluții are ecuația omogenă x″ + 4x = 0?",
+     "o": [
+      "c₁cos 2t + c₂sin 2t",
+      "c₁e²ᵗ + c₂e⁻²ᵗ",
+      "c₁ + c₂t",
+      "c₁cos t"
+     ],
+     "a": 0,
+     "e": "Ecuația caracteristică r² + 4 = 0, r = ±2i."
+    },
+    {
+     "q": "Ce formă cauți pentru soluția particulară cu membrul drept 3 sin t?",
+     "o": [
+      "A sin t (sau A sin t + B cos t)",
+      "At²",
+      "Ae²ᵗ",
+      "A"
+     ],
+     "a": 0,
+     "e": "1 nu e rădăcină a ecuației caracteristice (±2i)."
+    }
+   ],
+   "15": [
+    {
+     "q": "Cum stabilești tipul punctului de echilibru?",
+     "o": [
+      "din valorile proprii ale matricei sistemului",
+      "din determinantul ei, atât",
+      "din condițiile inițiale",
+      "nu se poate"
+     ],
+     "a": 0,
+     "e": "Semnul și natura valorilor proprii."
+    },
+    {
+     "q": "Ce înseamnă două valori proprii reale pozitive?",
+     "o": [
+      "nod instabil",
+      "nod stabil",
+      "șa",
+      "centru"
+     ],
+     "a": 0,
+     "e": "Toate traiectoriile se îndepărtează."
+    }
+   ]
+  },
+  "PCLP": {
+   "1": [
+    {
+     "q": "Ce întoarce fun(n, fp) pentru n ≤ 1?",
+     "o": [
+      "1, și pune *fp = 1",
+      "0",
+      "n",
+      "valoarea lui x"
+     ],
+     "a": 0,
+     "e": "Cazul de bază: *fp = 1 și return 1."
+    },
+    {
+     "q": "La ce șir seamănă valorile întoarse pentru n = 1, 2, 3, ...?",
+     "o": [
+      "Fibonacci",
+      "puterile lui 2",
+      "numerele prime",
+      "factorialele"
+     ],
+     "a": 0,
+     "e": "f = t + *fp adună ultimele două valori, ca la Fibonacci."
+    }
+   ],
+   "2": [
+    {
+     "q": "Cu ce literă se compară p[current]?",
+     "o": [
+      "cu p[current - 1]",
+      "cu p[i]",
+      "cu p[0]",
+      "cu ultima literă"
+     ],
+     "a": 0,
+     "e": "Condiția este p[current] != p[current - 1]."
+    },
+    {
+     "q": "Poate i să fie mai mare decât current?",
+     "o": [
+      "Nu, i ≤ current mereu",
+      "Da",
+      "Doar la final",
+      "Doar dacă șirul e gol"
+     ],
+     "a": 0,
+     "e": "i crește cel mult o dată pe pas, ca și current, și pornește tot de la 1."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce fel de recursivitate folosesc F și M?",
+     "o": [
+      "indirectă (se apelează una pe alta)",
+      "doar directă",
+      "iterativă",
+      "fără recursivitate"
+     ],
+     "a": 0,
+     "e": "F apelează M și M apelează F."
+    },
+    {
+     "q": "Cât este F(0)?",
+     "o": [
+      "1",
+      "0",
+      "2",
+      "nedefinit"
+     ],
+     "a": 0,
+     "e": "F(0) = 1, iar M(0) = 0."
+    }
+   ],
+   "4": [
+    {
+     "q": "Cât este 1 << 1?",
+     "o": [
+      "2",
+      "1",
+      "0",
+      "4"
+     ],
+     "a": 0,
+     "e": "Deplasarea la stânga cu 1 înmulțește cu 2."
+    },
+    {
+     "q": "Când este !(n & 1) egal cu 1?",
+     "o": [
+      "când n e par",
+      "când n e impar",
+      "mereu",
+      "niciodată"
+     ],
+     "a": 0,
+     "e": "n & 1 este ultimul bit, 0 la numerele pare."
+    }
+   ],
+   "5": [
+    {
+     "q": "De ce memmove și nu memcpy aici?",
+     "o": [
+      "zonele sursă și destinație se suprapun",
+      "memcpy nu copiază caractere",
+      "memmove e mai rapid",
+      "nu există diferență"
+     ],
+     "a": 0,
+     "e": "memcpy pe zone suprapuse are comportament nedefinit; memmove le tratează corect."
+    },
+    {
+     "q": "La ce indice începe cuvântul „mare” în \"Trec cu nota mare la PC!\"?",
+     "o": [
+      "13",
+      "12",
+      "17",
+      "9"
+     ],
+     "a": 0,
+     "e": "„Trec cu nota ” are 13 caractere (indicii 0–12), deci „mare” începe la 13; la 12 e spațiul dinaintea lui."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce se întâmplă cu două litere egale alăturate?",
+     "o": [
+      "se șterg amândouă",
+      "se păstrează una",
+      "se dublează",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "memmove mută restul șirului peste ele."
+    },
+    {
+     "q": "De ce i scade cu 1 după o ștergere?",
+     "o": [
+      "pot apărea perechi noi la stânga",
+      "ca să nu iasă din șir",
+      "pentru a trece la final",
+      "nu scade"
+     ],
+     "a": 0,
+     "e": "După ștergerea lui „bb” din „abba”, cele două „a” devin vecine."
+    }
+   ],
+   "7": [
+    {
+     "q": "Câte iterații face bucla din f pentru x = 0 (N = 3)?",
+     "o": [
+      "3",
+      "1",
+      "2",
+      "6"
+     ],
+     "a": 0,
+     "e": "i merge de la x = 0 la N - 1 = 2."
+    },
+    {
+     "q": "Când se apelează g (afișarea)?",
+     "o": [
+      "când x == N - 1",
+      "la fiecare apel",
+      "doar o dată",
+      "niciodată"
+     ],
+     "a": 0,
+     "e": "Doar pe ultimul nivel al recursivității."
+    }
+   ],
+   "8": [
+    {
+     "q": "Ce înseamnă little-endian?",
+     "o": [
+      "octetul cel mai puțin semnificativ e primul în memorie",
+      "octetul cel mai semnificativ e primul",
+      "biții sunt inversați",
+      "nu există octeți"
+     ],
+     "a": 0,
+     "e": "Pe x86, 0x0101 se scrie în memorie 01 01 00 00."
+    },
+    {
+     "q": "Cu cât crește x când crește octetul de la adresa (char*)&x + 1?",
+     "o": [
+      "256",
+      "1",
+      "2",
+      "65536"
+     ],
+     "a": 0,
+     "e": "Al doilea octet valorează 2⁸ = 256."
+    }
+   ],
+   "9": [
+    {
+     "q": "Câți octeți alocă calloc(10, sizeof(int))?",
+     "o": [
+      "40",
+      "10",
+      "4",
+      "14"
+     ],
+     "a": 0,
+     "e": "10 · 4 = 40, toți puși pe 0."
+    },
+    {
+     "q": "Ce valoare are int-ul format din octeții 00 01 00 00 (little-endian)?",
+     "o": [
+      "256",
+      "1",
+      "16",
+      "65536"
+     ],
+     "a": 0,
+     "e": "Octetul al doilea valorează 256."
+    }
+   ],
+   "10": [
+    {
+     "q": "Ce dă sizeof aplicat unui pointer pe 64 de biți?",
+     "o": [
+      "8",
+      "lungimea șirului",
+      "4",
+      "1"
+     ],
+     "a": 0,
+     "e": "Un pointer are 8 octeți pe 64 de biți, oricât de lung ar fi șirul."
+    },
+    {
+     "q": "Ce dă sizeof aplicat lui char p[20]?",
+     "o": [
+      "20",
+      "8",
+      "1",
+      "21"
+     ],
+     "a": 0,
+     "e": "Pentru un tablou, sizeof dă mărimea întregului tablou."
+    }
+   ],
+   "11": [
+    {
+     "q": "Ce întoarce strcmp pentru două șiruri egale?",
+     "o": [
+      "0",
+      "1",
+      "-1",
+      "lungimea lor"
+     ],
+     "a": 0,
+     "e": "strcmp întoarce 0 la egalitate."
+    },
+    {
+     "q": "Unde se află literalul \"abcd\" spre care arată s1?",
+     "o": [
+      "într-o zonă doar pentru citire",
+      "pe stivă",
+      "în heap",
+      "în registre"
+     ],
+     "a": 0,
+     "e": "Scrierea într-un literal de șir este comportament nedefinit."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce structură de date rezolvă eficient eliminarea perechilor?",
+     "o": [
+      "o stivă",
+      "o coadă",
+      "un heap",
+      "un arbore"
+     ],
+     "a": 0,
+     "e": "Fiecare literă se compară cu ultima rămasă: vârful stivei."
+    },
+    {
+     "q": "Ce rămâne din „abba”?",
+     "o": [
+      "nimic (vid)",
+      "„aa”",
+      "„ab”",
+      "„ba”"
+     ],
+     "a": 0,
+     "e": "„bb” dispare, apoi „aa” dispare."
+    }
+   ],
+   "13": [
+    {
+     "q": "Cu ce funcție citești o linie care conține spații?",
+     "o": [
+      "fgets",
+      "scanf(\"%s\")",
+      "getchar o singură dată",
+      "puts"
+     ],
+     "a": 0,
+     "e": "scanf(\"%s\") se oprește la primul spațiu."
+    },
+    {
+     "q": "Ce verifică isupper(c)?",
+     "o": [
+      "dacă c e literă mare",
+      "dacă c e cifră",
+      "dacă c e spațiu",
+      "dacă c e literă mică"
+     ],
+     "a": 0,
+     "e": "isupper este din ctype.h."
+    }
+   ],
+   "14": [
+    {
+     "q": "Cum extragi numărul de stele din biții 2–4?",
+     "o": [
+      "(st >> 2) & 7",
+      "st & 7",
+      "st >> 4",
+      "(st & 4) >> 2"
+     ],
+     "a": 0,
+     "e": "Muți biții 2–4 pe pozițiile 0–2 și păstrezi trei biți (7 = 111)."
+    },
+    {
+     "q": "Când e o cursă încheiată?",
+     "o": [
+      "când (st & 3) == 0",
+      "când st == 0",
+      "când bitul 0 e 1",
+      "când are 5 stele"
+     ],
+     "a": 0,
+     "e": "Nici bitul 0 (anulată), nici bitul 1 (în desfășurare)."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce test spune că volumul e împrumutat?",
+     "o": [
+      "st & 2",
+      "st & 1",
+      "st == 2",
+      "st > 0"
+     ],
+     "a": 0,
+     "e": "Bitul 1 valorează 2."
+    },
+    {
+     "q": "Cum numeri volumele pentru fiecare persoană?",
+     "o": [
+      "cu un vector de frecvență indexat după id",
+      "cu o sortare",
+      "cu o stivă",
+      "cu recursivitate"
+     ],
+     "a": 0,
+     "e": "Identificatorii sunt între 1 și 10 000."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce face x &= x - 1?",
+     "o": [
+      "șterge cel mai din dreapta bit de 1",
+      "adună 1",
+      "inversează biții",
+      "înjumătățește x"
+     ],
+     "a": 0,
+     "e": "x - 1 inversează biții de la ultimul 1 încolo."
+    },
+    {
+     "q": "Cum se scrie 0xB6 în binar?",
+     "o": [
+      "1011 0110",
+      "1101 0110",
+      "1011 1001",
+      "0110 1011"
+     ],
+     "a": 0,
+     "e": "B = 1011, 6 = 0110."
+    }
+   ],
+   "17": [
+    {
+     "q": "Ce funcție standard sortează un vector de structuri?",
+     "o": [
+      "qsort",
+      "sort",
+      "strcmp",
+      "memcpy"
+     ],
+     "a": 0,
+     "e": "qsort din stdlib.h, cu o funcție de comparare."
+    },
+    {
+     "q": "După ce compari a doua oară, la același destinatar?",
+     "o": [
+      "după timestamp",
+      "după text",
+      "după lungime",
+      "nu mai compari"
+     ],
+     "a": 0,
+     "e": "Ordinea cerută: destinatar, apoi timestamp."
+    }
+   ],
+   "18": [
+    {
+     "q": "Ai nevoie de sqrt pentru a compara distanțele?",
+     "o": [
+      "Nu, ajung pătratele lor",
+      "Da, obligatoriu",
+      "Doar pentru numere negative",
+      "Doar la egalitate"
+     ],
+     "a": 0,
+     "e": "Radicalul păstrează ordinea numerelor pozitive."
+    },
+    {
+     "q": "Ce faci la distanțe egale?",
+     "o": [
+      "ordonezi alfabetic după nume",
+      "păstrezi ordinea citirii",
+      "îl iei pe ultimul",
+      "le elimini"
+     ],
+     "a": 0,
+     "e": "Așa cere enunțul."
+    }
+   ],
+   "19": [
+    {
+     "q": "Cum alegi funcția generator după tip?",
+     "o": [
+      "un vector de pointeri la funcții",
+      "cu goto",
+      "cu un fișier",
+      "nu se poate în C"
+     ],
+     "a": 0,
+     "e": "gen[t](...) apelează funcția potrivită."
+    },
+    {
+     "q": "Ce tip încape al 90-lea termen Fibonacci?",
+     "o": [
+      "unsigned long long",
+      "int",
+      "short",
+      "char"
+     ],
+     "a": 0,
+     "e": "Depășește mult 2³¹."
+    }
+   ],
+   "20": [
+    {
+     "q": "Cum intersectezi două șiruri sortate în timp liniar?",
+     "o": [
+      "cu doi indici",
+      "cu căutare binară pentru fiecare pereche",
+      "cu trei bucle",
+      "nu se poate"
+     ],
+     "a": 0,
+     "e": "Avansezi indicele cu valoarea mai mică."
+    },
+    {
+     "q": "Ce afișezi dacă intersecția e goală?",
+     "o": [
+      "-1",
+      "0",
+      "nimic",
+      "NULL"
+     ],
+     "a": 0,
+     "e": "Așa cere enunțul."
+    }
+   ],
+   "21": [
+    {
+     "q": "Cum afli anul dintr-o dată „zz/ll/aaaa”?",
+     "o": [
+      "atoi(data + 6)",
+      "atoi(data)",
+      "data[6]",
+      "strlen(data)"
+     ],
+     "a": 0,
+     "e": "Anul începe la poziția 6."
+    },
+    {
+     "q": "După sortarea numelor, unde sunt numele egale?",
+     "o": [
+      "unul lângă altul",
+      "la capete",
+      "oriunde",
+      "pe poziții pare"
+     ],
+     "a": 0,
+     "e": "De aceea grupurile se numără ușor."
+    }
+   ],
+   "22": [
+    {
+     "q": "Pe ce direcții se mișcă tura?",
+     "o": [
+      "orizontal și vertical",
+      "pe diagonale",
+      "în L",
+      "o singură căsuță"
+     ],
+     "a": 0,
+     "e": "Tura merge pe linie și pe coloană."
+    },
+    {
+     "q": "Ce se întâmplă când tura întâlnește o piesă de culoare opusă?",
+     "o": [
+      "o poate captura și se oprește",
+      "sare peste ea",
+      "nu o poate atinge",
+      "continuă"
+     ],
+     "a": 0,
+     "e": "Căsuța piesei se numără, apoi direcția se oprește."
+    }
+   ]
+  },
+  "USO": {
+   "1": [
+    {
+     "q": "Cât valorează dreptul w în octal?",
+     "o": [
+      "2",
+      "4",
+      "1",
+      "7"
+     ],
+     "a": 0,
+     "e": "r = 4, w = 2, x = 1."
+    },
+    {
+     "q": "Ce cifră dă r-x?",
+     "o": [
+      "5",
+      "6",
+      "3",
+      "4"
+     ],
+     "a": 0,
+     "e": "4 + 1."
+    }
+   ],
+   "2": [
+    {
+     "q": "Ce permisiuni pornește touch pentru un fișier nou, înainte de umask?",
+     "o": [
+      "666",
+      "777",
+      "644",
+      "755"
+     ],
+     "a": 0,
+     "e": "Fișierele nu primesc execuție din oficiu."
+    },
+    {
+     "q": "Ce face umask?",
+     "o": [
+      "scoate biții din permisiunile implicite",
+      "adaugă permisiuni",
+      "schimbă proprietarul",
+      "șterge fișiere"
+     ],
+     "a": 0,
+     "e": "Masca indică ce drepturi lipsesc."
+    }
+   ],
+   "3": [
+    {
+     "q": "De ce drept ai nevoie ca să intri într-un director (cd)?",
+     "o": [
+      "x",
+      "r",
+      "w",
+      "niciunul"
+     ],
+     "a": 0,
+     "e": "La directoare, x înseamnă traversare."
+    },
+    {
+     "q": "Ce cifră înseamnă rwx?",
+     "o": [
+      "7",
+      "6",
+      "5",
+      "4"
+     ],
+     "a": 0,
+     "e": "4 + 2 + 1."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce opțiune face ln să creeze o legătură simbolică?",
+     "o": [
+      "-s",
+      "-h",
+      "-l",
+      "-f"
+     ],
+     "a": 0,
+     "e": "Fără ea, ln creează o legătură hard."
+    },
+    {
+     "q": "Cum faci un fișier ascuns?",
+     "o": [
+      "numele începe cu punct",
+      "chmod 000",
+      "îl muți în /tmp",
+      "cu attrib +h"
+     ],
+     "a": 0,
+     "e": "ls nu le arată fără -a."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce face opțiunea -d la cut?",
+     "o": [
+      "alege separatorul",
+      "șterge linii",
+      "numără câmpuri",
+      "sortează"
+     ],
+     "a": 0,
+     "e": "-d: delimitator."
+    },
+    {
+     "q": "Ce conține al 6-lea câmp din /etc/passwd?",
+     "o": [
+      "directorul home",
+      "shell-ul",
+      "parola",
+      "UID-ul"
+     ],
+     "a": 0,
+     "e": "nume:x:UID:GID:comentariu:home:shell."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce face sed -n?",
+     "o": [
+      "nu mai afișează automat fiecare linie",
+      "numără liniile",
+      "afișează numerele liniilor",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Se afișează doar ce ceri cu p."
+    },
+    {
+     "q": "Ce variabilă awk e numărul liniei?",
+     "o": [
+      "NR",
+      "NF",
+      "$0",
+      "FS"
+     ],
+     "a": 0,
+     "e": "NF e numărul de câmpuri."
+    }
+   ],
+   "7": [
+    {
+     "q": "De ce sort înainte de uniq?",
+     "o": [
+      "uniq grupează doar liniile egale consecutive",
+      "uniq sortează singur",
+      "pentru viteză",
+      "nu e nevoie"
+     ],
+     "a": 0,
+     "e": "Liniile egale trebuie să fie vecine."
+    },
+    {
+     "q": "Ce face sort -rn?",
+     "o": [
+      "sortează numeric descrescător",
+      "sortează aleator",
+      "sortează alfabetic",
+      "inversează textul"
+     ],
+     "a": 0,
+     "e": "-n numeric, -r invers."
+    }
+   ],
+   "8": [
+    {
+     "q": "Cum compară sort, fără opțiuni?",
+     "o": [
+      "ca text",
+      "ca numere",
+      "după lungime",
+      "după dată"
+     ],
+     "a": 0,
+     "e": "Caracter cu caracter."
+    },
+    {
+     "q": "Ce opțiune sortează numeric?",
+     "o": [
+      "-n",
+      "-r",
+      "-u",
+      "-k"
+     ],
+     "a": 0,
+     "e": "sort -n."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce scrie 2#1011 într-o expresie aritmetică bash?",
+     "o": [
+      "numărul 1011 în baza 2",
+      "2 înmulțit cu 1011",
+      "un comentariu",
+      "o eroare"
+     ],
+     "a": 0,
+     "e": "Sintaxa baza#număr."
+    },
+    {
+     "q": "Cât e 1011 în baza 2?",
+     "o": [
+      "11",
+      "13",
+      "9",
+      "1011"
+     ],
+     "a": 0,
+     "e": "8 + 2 + 1."
+    }
+   ],
+   "10": [
+    {
+     "q": "Se expandează variabilele între ghilimele duble?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Între ghilimele simple, nu."
+    },
+    {
+     "q": "Ce afișează echo între ghilimele simple?",
+     "o": [
+      "textul exact",
+      "valoarea variabilei",
+      "nimic",
+      "o eroare"
+     ],
+     "a": 0,
+     "e": "Nicio expandare."
+    }
+   ],
+   "11": [
+    {
+     "q": "Ce dă ${#s}?",
+     "o": [
+      "lungimea șirului s",
+      "primul caracter",
+      "numărul de parametri",
+      "s inversat"
+     ],
+     "a": 0,
+     "e": "Lungimea."
+    },
+    {
+     "q": "De la ce poziție se numără în ${s:start:len}?",
+     "o": [
+      "0",
+      "1",
+      "-1",
+      "de la final"
+     ],
+     "a": 0,
+     "e": "Ca în C."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce înseamnă $# într-un script?",
+     "o": [
+      "numărul de parametri",
+      "toți parametrii",
+      "PID-ul",
+      "codul de ieșire"
+     ],
+     "a": 0,
+     "e": "$@ sunt parametrii."
+    },
+    {
+     "q": "Ce face $(( ... ))?",
+     "o": [
+      "evaluează o expresie aritmetică",
+      "rulează o comandă",
+      "definește un vector",
+      "comentează"
+     ],
+     "a": 0,
+     "e": "Expansiune aritmetică."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce face useradd -m?",
+     "o": [
+      "creează directorul home",
+      "setează parola",
+      "mută utilizatorul",
+      "șterge utilizatorul"
+     ],
+     "a": 0,
+     "e": "Fără -m, directorul home nu se creează."
+    },
+    {
+     "q": "Ce diferență e între -g și -G?",
+     "o": [
+      "-g grupul principal, -G grupuri suplimentare",
+      "niciuna",
+      "-G grupul principal",
+      "-g e pentru home"
+     ],
+     "a": 0,
+     "e": "Un utilizator are un singur grup principal."
+    }
+   ],
+   "14": [
+    {
+     "q": "Unde e trecut shell-ul implicit al unui utilizator?",
+     "o": [
+      "în ultimul câmp din /etc/passwd",
+      "în /etc/shadow",
+      "în ~/.bashrc",
+      "în /etc/hosts"
+     ],
+     "a": 0,
+     "e": "chsh îl modifică."
+    },
+    {
+     "q": "Ce comandă schimbă shell-ul implicit?",
+     "o": [
+      "chsh",
+      "chmod",
+      "chown",
+      "passwd -s"
+     ],
+     "a": 0,
+     "e": "Sau usermod -s."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce face sudo -u nume comandă?",
+     "o": [
+      "rulează comanda ca utilizatorul nume",
+      "creează utilizatorul",
+      "schimbă parola",
+      "deschide o sesiune interactivă"
+     ],
+     "a": 0,
+     "e": "Fără autentificare ca el."
+    },
+    {
+     "q": "Între ghilimele simple, cine expandează variabila?",
+     "o": [
+      "shell-ul care primește comanda",
+      "shell-ul tău",
+      "nimeni",
+      "sudo"
+     ],
+     "a": 0,
+     "e": "Textul ajunge neschimbat la bash -c."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce separator are /etc/passwd?",
+     "o": [
+      ":",
+      ",",
+      "spațiu",
+      ";"
+     ],
+     "a": 0,
+     "e": "Câmpurile sunt separate de două puncte."
+    },
+    {
+     "q": "Al câtelea câmp e shell-ul?",
+     "o": [
+      "al 7-lea",
+      "al 6-lea",
+      "al 1-lea",
+      "al 3-lea"
+     ],
+     "a": 0,
+     "e": "Ultimul."
+    }
+   ],
+   "17": [
+    {
+     "q": "Ce înseamnă -l la ss?",
+     "o": [
+      "doar socket-urile care ascultă",
+      "listare lungă",
+      "local",
+      "log"
+     ],
+     "a": 0,
+     "e": "listening."
+    },
+    {
+     "q": "Ce face -n?",
+     "o": [
+      "arată porturile ca numere",
+      "arată numele",
+      "nu arată nimic",
+      "numără"
+     ],
+     "a": 0,
+     "e": "Fără rezolvarea numelor."
+    }
+   ],
+   "18": [
+    {
+     "q": "Ce face ping -c 5?",
+     "o": [
+      "trimite 5 pachete",
+      "așteaptă 5 secunde",
+      "trimite la 5 adrese",
+      "repetă la infinit"
+     ],
+     "a": 0,
+     "e": "count."
+    },
+    {
+     "q": "Ce protocol folosește ping?",
+     "o": [
+      "ICMP",
+      "TCP",
+      "UDP",
+      "HTTP"
+     ],
+     "a": 0,
+     "e": "Echo request / echo reply."
+    }
+   ],
+   "19": [
+    {
+     "q": "Ce cheie se copiază pe server?",
+     "o": [
+      "cheia publică",
+      "cheia privată",
+      "amândouă",
+      "niciuna"
+     ],
+     "a": 0,
+     "e": "Cheia privată nu pleacă niciodată de pe mașina ta."
+    },
+    {
+     "q": "În ce fișier ajunge cheia pe server?",
+     "o": [
+      "~/.ssh/authorized_keys",
+      "~/.ssh/known_hosts",
+      "/etc/passwd",
+      "~/.bashrc"
+     ],
+     "a": 0,
+     "e": "ssh-copy-id o adaugă acolo."
+    }
+   ],
+   "20": [
+    {
+     "q": "Ce opțiune a lui openssl enc decriptează?",
+     "o": [
+      "-d",
+      "-e",
+      "-k",
+      "-in"
+     ],
+     "a": 0,
+     "e": "decrypt."
+    },
+    {
+     "q": "Ce este aes-256-cbc?",
+     "o": [
+      "un cifru simetric",
+      "o funcție hash",
+      "un algoritm de compresie",
+      "o semnătură"
+     ],
+     "a": 0,
+     "e": "Aceeași parolă criptează și decriptează."
+    }
+   ]
+  },
+  "PL": {
+   "1": [
+    {
+     "q": "Ce valoare are cifra hexazecimală A?",
+     "o": [
+      "10",
+      "11",
+      "16",
+      "1"
+     ],
+     "a": 0,
+     "e": "A = 10, …, F = 15."
+    },
+    {
+     "q": "Cât este 16²?",
+     "o": [
+      "256",
+      "32",
+      "162",
+      "1024"
+     ],
+     "a": 0,
+     "e": "16 · 16."
+    }
+   ],
+   "2": [
+    {
+     "q": "Cum se obține −x în complement față de 2?",
+     "o": [
+      "inversezi biții lui x și aduni 1",
+      "pui 1 pe primul bit",
+      "inversezi doar biții",
+      "scazi 1"
+     ],
+     "a": 0,
+     "e": "Complementul față de 1, plus 1."
+    },
+    {
+     "q": "Cum se scrie 37 pe 8 biți?",
+     "o": [
+      "00100101",
+      "00100111",
+      "01001010",
+      "00110111"
+     ],
+     "a": 0,
+     "e": "32 + 4 + 1."
+    }
+   ],
+   "3": [
+    {
+     "q": "Prin câți biți diferă două coduri Gray consecutive?",
+     "o": [
+      "unul",
+      "doi",
+      "toți",
+      "niciunul"
+     ],
+     "a": 0,
+     "e": "De aceea codul Gray e folosit la diagramele Karnaugh."
+    },
+    {
+     "q": "Cum se calculează codul Gray al lui n?",
+     "o": [
+      "n XOR (n >> 1)",
+      "n + 1",
+      "NOT n",
+      "n << 1"
+     ],
+     "a": 0,
+     "e": "Fiecare bit e XOR între el și vecinul din stânga."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce numere reprezinți fără semn pe k biți?",
+     "o": [
+      "0 … 2ᵏ − 1",
+      "0 … 2ᵏ",
+      "1 … 2ᵏ",
+      "−2ᵏ … 2ᵏ"
+     ],
+     "a": 0,
+     "e": "2ᵏ valori."
+    },
+    {
+     "q": "Cât este 2¹⁰?",
+     "o": [
+      "1024",
+      "1000",
+      "512",
+      "2048"
+     ],
+     "a": 0,
+     "e": "Un kilo binar."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce operație este NAND?",
+     "o": [
+      "AND urmat de NOT",
+      "OR urmat de NOT",
+      "XOR",
+      "NOT urmat de AND"
+     ],
+     "a": 0,
+     "e": "Not-AND."
+    },
+    {
+     "q": "Ce se întâmplă cu operația la negarea unui produs după De Morgan?",
+     "o": [
+      "devine sumă",
+      "rămâne produs",
+      "dispare",
+      "devine XOR"
+     ],
+     "a": 0,
+     "e": "Și invers, negarea unei sume devine produs."
+    }
+   ],
+   "6": [
+    {
+     "q": "Cât este A · A în algebra booleană?",
+     "o": [
+      "A",
+      "A²",
+      "0",
+      "1"
+     ],
+     "a": 0,
+     "e": "Idempotență."
+    },
+    {
+     "q": "Cât este A + AB?",
+     "o": [
+      "A",
+      "AB",
+      "B",
+      "1"
+     ],
+     "a": 0,
+     "e": "Absorbție."
+    }
+   ],
+   "7": [
+    {
+     "q": "Câte căsuțe are o diagramă Karnaugh cu 4 variabile?",
+     "o": [
+      "16",
+      "8",
+      "4",
+      "32"
+     ],
+     "a": 0,
+     "e": "2⁴."
+    },
+    {
+     "q": "Ce mărime poate avea un grup în diagramă?",
+     "o": [
+      "o putere a lui 2",
+      "orice număr",
+      "doar 2",
+      "doar 4"
+     ],
+     "a": 0,
+     "e": "1, 2, 4, 8, 16 căsuțe."
+    }
+   ],
+   "8": [
+    {
+     "q": "Sunt colțurile diagramei Karnaugh adiacente?",
+     "o": [
+      "Da, diagrama se „închide” la margini",
+      "Nu",
+      "Doar două dintre ele",
+      "Doar în diagramele cu 3 variabile"
+     ],
+     "a": 0,
+     "e": "Marginile opuse sunt vecine."
+    },
+    {
+     "q": "Ce exprimă ȳ·t̄ + y·t?",
+     "o": [
+      "y și t au aceeași valoare",
+      "y diferit de t",
+      "y = 1",
+      "t = 0"
+     ],
+     "a": 0,
+     "e": "Este XNOR."
+    }
+   ],
+   "9": [
+    {
+     "q": "Cum tratezi o indiferență (*) la minimizare?",
+     "o": [
+      "o iei 1 sau 0, cum ajută",
+      "mereu 1",
+      "mereu 0",
+      "o ignori complet"
+     ],
+     "a": 0,
+     "e": "Doar dacă mărește un grup."
+    },
+    {
+     "q": "Ce valoare are z în mintermenii 1, 3, 5, 7 (xyz)?",
+     "o": [
+      "1",
+      "0",
+      "variază"
+     ],
+     "a": 0,
+     "e": "Toți sunt impari."
+    }
+   ],
+   "10": [
+    {
+     "q": "Cum faci un inversor dintr-un NAND?",
+     "o": [
+      "legi intrările împreună",
+      "legi o intrare la 0",
+      "nu se poate",
+      "cu două NAND-uri"
+     ],
+     "a": 0,
+     "e": "NAND(A, A) = NOT A."
+    },
+    {
+     "q": "De ce se spune că NAND e universală?",
+     "o": [
+      "orice funcție se poate construi numai din NAND-uri",
+      "e cea mai rapidă",
+      "are 3 intrări",
+      "nu consumă curent"
+     ],
+     "a": 0,
+     "e": "NOT, AND și OR se obțin din NAND."
+    }
+   ],
+   "11": [
+    {
+     "q": "Câte intrări de date are un MUX 4:1?",
+     "o": [
+      "4",
+      "2",
+      "1",
+      "8"
+     ],
+     "a": 0,
+     "e": "Plus 2 intrări de selecție."
+    },
+    {
+     "q": "Ce ieșire dă un MUX cu selecția xy = 10?",
+     "o": [
+      "intrarea I₂",
+      "intrarea I₁",
+      "intrarea I₀",
+      "intrarea I₃"
+     ],
+     "a": 0,
+     "e": "10 în binar e 2."
+    }
+   ],
+   "12": [
+    {
+     "q": "Câte ieșiri are un decodificator 3:8?",
+     "o": [
+      "8",
+      "3",
+      "6",
+      "16"
+     ],
+     "a": 0,
+     "e": "Câte una pentru fiecare combinație."
+    },
+    {
+     "q": "Câte ieșiri sunt active odată?",
+     "o": [
+      "una",
+      "toate",
+      "trei",
+      "niciuna"
+     ],
+     "a": 0,
+     "e": "Doar ieșirea cu numărul de pe intrări."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce funcție dă bitul de sumă al unui sumator complet?",
+     "o": [
+      "a ⊕ b ⊕ cᵢₙ",
+      "a · b · cᵢₙ",
+      "a + b + cᵢₙ",
+      "a ⊕ b"
+     ],
+     "a": 0,
+     "e": "Paritatea celor trei intrări."
+    },
+    {
+     "q": "Când apare transport de ieșire?",
+     "o": [
+      "când cel puțin două intrări sunt 1",
+      "când toate sunt 0",
+      "doar când a = 1",
+      "niciodată"
+     ],
+     "a": 0,
+     "e": "Funcția majoritate."
+    }
+   ],
+   "14": [
+    {
+     "q": "Câte intrări poate alege un MUX 4:1?",
+     "o": [
+      "4",
+      "16",
+      "2",
+      "8"
+     ],
+     "a": 0,
+     "e": "Pentru 16 intrări trebuie mai multe."
+    },
+    {
+     "q": "Câte intrări de selecție are un MUX 16:1?",
+     "o": [
+      "4",
+      "16",
+      "2",
+      "8"
+     ],
+     "a": 0,
+     "e": "2⁴ = 16."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce face un bistabil JK cu J = K = 1?",
+     "o": [
+      "basculează",
+      "se resetează",
+      "se setează",
+      "își păstrează starea"
+     ],
+     "a": 0,
+     "e": "Q devine Q̄."
+    },
+    {
+     "q": "Ce face cu J = 1, K = 0?",
+     "o": [
+      "Q devine 1",
+      "Q devine 0",
+      "basculează",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Set."
+    }
+   ],
+   "16": [
+    {
+     "q": "Câte stări are un numărător modulo 10?",
+     "o": [
+      "10",
+      "9",
+      "16",
+      "4"
+     ],
+     "a": 0,
+     "e": "De la 0 la 9."
+    },
+    {
+     "q": "Câte stări poți codifica cu 3 bistabili?",
+     "o": [
+      "8",
+      "3",
+      "6",
+      "9"
+     ],
+     "a": 0,
+     "e": "2³."
+    }
+   ],
+   "17": [
+    {
+     "q": "În organigrama unui automat Moore, unde stau ieșirile?",
+     "o": [
+      "în stări",
+      "pe tranziții",
+      "în ceas",
+      "nicăieri"
+     ],
+     "a": 0,
+     "e": "Depind doar de stare."
+    },
+    {
+     "q": "De ce depind ieșirile unui automat Mealy?",
+     "o": [
+      "de stare și de intrări",
+      "doar de stare",
+      "doar de ceas",
+      "doar de intrări"
+     ],
+     "a": 0,
+     "e": "De aceea pot reacționa în același ciclu."
+    }
+   ],
+   "18": [
+    {
+     "q": "Câte coduri dau 4 biți?",
+     "o": [
+      "16",
+      "8",
+      "4",
+      "10"
+     ],
+     "a": 0,
+     "e": "2⁴."
+    },
+    {
+     "q": "Ce faci cu codurile nefolosite la minimizare?",
+     "o": [
+      "le poți trata ca indiferențe",
+      "le pui obligatoriu pe 1",
+      "adaugi bistabili",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Simplifică funcțiile de excitație."
+    }
+   ]
+  },
+  "MS": {
+   "1": [
+    {
+     "q": "Cum calculezi |a + bi|?",
+     "o": [
+      "√(a² + b²)",
+      "a + b",
+      "a² + b²",
+      "|a| + |b|"
+     ],
+     "a": 0,
+     "e": "Distanța până la origine."
+    },
+    {
+     "q": "Cât este √25?",
+     "o": [
+      "5",
+      "25",
+      "12,5",
+      "625"
+     ],
+     "a": 0,
+     "e": "5²."
+    }
+   ],
+   "2": [
+    {
+     "q": "Cât este (1 + i)²?",
+     "o": [
+      "2i",
+      "2",
+      "1 + i²",
+      "0"
+     ],
+     "a": 0,
+     "e": "1 + 2i + i² = 2i."
+    },
+    {
+     "q": "Cât este i⁴?",
+     "o": [
+      "1",
+      "−1",
+      "i",
+      "−i"
+     ],
+     "a": 0,
+     "e": "i² = −1, deci i⁴ = 1."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce poli are 1/(z² + 1)?",
+     "o": [
+      "i și −i",
+      "1 și −1",
+      "0",
+      "niciunul"
+     ],
+     "a": 0,
+     "e": "z² + 1 = (z − i)(z + i)."
+    },
+    {
+     "q": "Cât este 1/i?",
+     "o": [
+      "−i",
+      "i",
+      "1",
+      "−1"
+     ],
+     "a": 0,
+     "e": "Înmulțești cu i/i: i/i² = −i."
+    }
+   ],
+   "4": [
+    {
+     "q": "Este z = 1 în interiorul cercului |z| = 2?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "|1| < 2."
+    },
+    {
+     "q": "Ce dă formula lui Cauchy pentru ∮ f(z)/(z − a) dz?",
+     "o": [
+      "2πi f(a)",
+      "f(a)",
+      "0",
+      "πf(a)"
+     ],
+     "a": 0,
+     "e": "Pentru a în interior și f olomorfă."
+    }
+   ],
+   "5": [
+    {
+     "q": "Cât este L{1}?",
+     "o": [
+      "1/s",
+      "s",
+      "1",
+      "1/s²"
+     ],
+     "a": 0,
+     "e": "∫₀^∞ e⁻ˢᵗ dt."
+    },
+    {
+     "q": "Ce dă L{tⁿ}?",
+     "o": [
+      "n!/sⁿ⁺¹",
+      "n/sⁿ",
+      "1/sⁿ",
+      "n!sⁿ"
+     ],
+     "a": 0,
+     "e": "Formula de tabel."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce original are 1/(s + a)?",
+     "o": [
+      "e⁻ᵃᵗ",
+      "eᵃᵗ",
+      "sin at",
+      "t"
+     ],
+     "a": 0,
+     "e": "L{e⁻ᵃᵗ} = 1/(s + a)."
+    },
+    {
+     "q": "Ce metodă folosești pentru 1/(s(s + 1))?",
+     "o": [
+      "descompunerea în fracții simple",
+      "integrarea prin părți",
+      "seria Taylor",
+      "nicio metodă"
+     ],
+     "a": 0,
+     "e": "1/s − 1/(s + 1)."
+    }
+   ],
+   "7": [
+    {
+     "q": "Ce definiție are transformata Z?",
+     "o": [
+      "Σ xₙ z⁻ⁿ",
+      "Σ xₙ zⁿ",
+      "∫ x(t) e⁻ˢᵗ dt",
+      "Σ xₙ"
+     ],
+     "a": 0,
+     "e": "Pentru n ≥ 0."
+    },
+    {
+     "q": "Ce serie e Σ (a/z)ⁿ?",
+     "o": [
+      "geometrică",
+      "armonică",
+      "de puteri cu raza 0",
+      "Fourier"
+     ],
+     "a": 0,
+     "e": "Cu rația a/z."
+    }
+   ],
+   "8": [
+    {
+     "q": "Ce transformată are y′?",
+     "o": [
+      "sY − y(0)",
+      "sY",
+      "Y/s",
+      "Y′"
+     ],
+     "a": 0,
+     "e": "Derivarea originalului."
+    },
+    {
+     "q": "Cât este lim e⁻ᵗ când t → ∞?",
+     "o": [
+      "0",
+      "1",
+      "∞",
+      "e"
+     ],
+     "a": 0,
+     "e": "Exponențiala scade."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce condiții are o densitate de repartiție?",
+     "o": [
+      "f ≥ 0 și integrala ei pe ℝ este 1",
+      "f ≤ 1",
+      "f crescătoare",
+      "f continuă"
+     ],
+     "a": 0,
+     "e": "Cele două condiții."
+    },
+    {
+     "q": "Cât este ∫₀^{π/2} cos x dx?",
+     "o": [
+      "1",
+      "0",
+      "π/2",
+      "−1"
+     ],
+     "a": 0,
+     "e": "sin(π/2) − sin 0."
+    }
+   ],
+   "10": [
+    {
+     "q": "Ce formulă are P(A | B)?",
+     "o": [
+      "P(A ∩ B) / P(B)",
+      "P(A) · P(B)",
+      "P(A) + P(B)",
+      "P(B | A)"
+     ],
+     "a": 0,
+     "e": "Probabilitatea condiționată."
+    },
+    {
+     "q": "Cât este sin(π/4)?",
+     "o": [
+      "√2/2",
+      "1/2",
+      "√3/2",
+      "1"
+     ],
+     "a": 0,
+     "e": "Valoare remarcabilă."
+    }
+   ],
+   "11": [
+    {
+     "q": "Cum obții densitatea marginală a lui Y?",
+     "o": [
+      "integrezi f(x, y) după x",
+      "derivezi după y",
+      "pui x = 0",
+      "integrezi după y"
+     ],
+     "a": 0,
+     "e": "f_Y(y) = ∫ f(x, y) dx."
+    },
+    {
+     "q": "Între ce limite variază x pentru un y fixat în triunghiul x + y ≤ 1?",
+     "o": [
+      "0 și 1 − y",
+      "0 și 1",
+      "y și 1",
+      "0 și y"
+     ],
+     "a": 0,
+     "e": "x ≥ 0 și x ≤ 1 − y."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce valoare are Φ(2) aproximativ?",
+     "o": [
+      "0,977",
+      "0,5",
+      "0,841",
+      "0,999"
+     ],
+     "a": 0,
+     "e": "Din tabelul normalei."
+    },
+    {
+     "q": "Ce simetrie folosești pentru P(|Z| < 2)?",
+     "o": [
+      "2Φ(2) − 1",
+      "Φ(2)",
+      "1 − Φ(2)",
+      "Φ(2)²"
+     ],
+     "a": 0,
+     "e": "Normala standard e simetrică."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce maximizezi la metoda verosimilității maxime?",
+     "o": [
+      "funcția de verosimilitate L(θ)",
+      "media",
+      "dispersia",
+      "eroarea"
+     ],
+     "a": 0,
+     "e": "De obicei, ln L."
+    },
+    {
+     "q": "De ce se lucrează cu ln L?",
+     "o": [
+      "produsul devine sumă",
+      "L e negativă",
+      "ln e mai mare",
+      "nu se lucrează"
+     ],
+     "a": 0,
+     "e": "Și are aceleași puncte de maxim."
+    }
+   ],
+   "14": [
+    {
+     "q": "Ce ipoteză nulă testezi?",
+     "o": [
+      "p = 1/3",
+      "p > 1/3",
+      "p = 0,4",
+      "p < 1/3"
+     ],
+     "a": 0,
+     "e": "Afirmația de verificat e ipoteza alternativă."
+    },
+    {
+     "q": "Ce proporție arată selecția?",
+     "o": [
+      "30/75 = 0,4",
+      "1/3",
+      "75/30",
+      "0,3"
+     ],
+     "a": 0,
+     "e": "30 din 75."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce medie are repartiția exponențială de parametru λ?",
+     "o": [
+      "1/λ",
+      "λ",
+      "λ²",
+      "√λ"
+     ],
+     "a": 0,
+     "e": "De aceea λ̂ = 1/x̄."
+    },
+    {
+     "q": "Cât este ln(λⁿ)?",
+     "o": [
+      "n ln λ",
+      "ln λ",
+      "λ ln n",
+      "nλ"
+     ],
+     "a": 0,
+     "e": "Proprietatea logaritmului."
+    }
+   ]
+  },
+  "ELTH": {
+   "1": [
+    {
+     "q": "Cum se calculează rezistența a două rezistoare în paralel?",
+     "o": [
+      "R₁R₂/(R₁ + R₂)",
+      "R₁ + R₂",
+      "R₁ − R₂",
+      "(R₁ + R₂)/2"
+     ],
+     "a": 0,
+     "e": "Conductanțele se adună."
+    },
+    {
+     "q": "Ce lege dă curentul?",
+     "o": [
+      "I = U/R (legea lui Ohm)",
+      "I = UR",
+      "I = R/U",
+      "I = U²"
+     ],
+     "a": 0,
+     "e": "Pentru circuitul întreg."
+    }
+   ],
+   "2": [
+    {
+     "q": "Cum pasivizezi o sursă ideală de tensiune?",
+     "o": [
+      "o înlocuiești cu un scurtcircuit",
+      "cu o întrerupere",
+      "cu un rezistor",
+      "o dublezi"
+     ],
+     "a": 0,
+     "e": "Tensiunea ei devine 0."
+    },
+    {
+     "q": "Ce rezistență au două rezistoare de 10 Ω în paralel?",
+     "o": [
+      "5 Ω",
+      "20 Ω",
+      "10 Ω",
+      "0 Ω"
+     ],
+     "a": 0,
+     "e": "Jumătate."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce randament are transferul maxim de putere?",
+     "o": [
+      "50%",
+      "100%",
+      "25%",
+      "75%"
+     ],
+     "a": 0,
+     "e": "Jumătate din putere se disipă în generator."
+    },
+    {
+     "q": "Ce putere primește sarcina pentru R = r?",
+     "o": [
+      "E²/(4r)",
+      "E²/r",
+      "E/r",
+      "0"
+     ],
+     "a": 0,
+     "e": "I = E/(2r), P = I²r."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce spune prima teoremă a lui Kirchhoff?",
+     "o": [
+      "suma curenților care intră într-un nod e egală cu a celor care ies",
+      "suma tensiunilor pe un ochi e zero",
+      "U = RI",
+      "P = UI"
+     ],
+     "a": 0,
+     "e": "Conservarea sarcinii."
+    },
+    {
+     "q": "Ce arată un ampermetru de c.a.?",
+     "o": [
+      "valoarea efectivă (modulul curentului complex)",
+      "partea reală",
+      "valoarea maximă",
+      "faza"
+     ],
+     "a": 0,
+     "e": "Valoare efectivă."
+    }
+   ],
+   "5": [
+    {
+     "q": "Care e legătura dintre valoarea maximă și cea efectivă?",
+     "o": [
+      "I_max = I√2",
+      "I_max = I",
+      "I_max = I/√2",
+      "I_max = 2I"
+     ],
+     "a": 0,
+     "e": "Pentru mărimi sinusoidale."
+    },
+    {
+     "q": "Cât este |3 + 4j|?",
+     "o": [
+      "5",
+      "7",
+      "1",
+      "25"
+     ],
+     "a": 0,
+     "e": "√(9 + 16)."
+    }
+   ],
+   "6": [
+    {
+     "q": "În ce cadran e −1 + j?",
+     "o": [
+      "al II-lea",
+      "I",
+      "al III-lea",
+      "al IV-lea"
+     ],
+     "a": 0,
+     "e": "Real negativ, imaginar pozitiv."
+    },
+    {
+     "q": "Cât este 3π/4 aproximativ?",
+     "o": [
+      "2,36",
+      "0,79",
+      "3,14",
+      "1,57"
+     ],
+     "a": 0,
+     "e": "0,75 · 3,1416."
+    }
+   ],
+   "7": [
+    {
+     "q": "Ce impedanță are o bobină reală?",
+     "o": [
+      "R + jX_L",
+      "R − jX_L",
+      "jX_L",
+      "R"
+     ],
+     "a": 0,
+     "e": "Rezistență plus reactanță inductivă."
+    },
+    {
+     "q": "Ce este cos φ?",
+     "o": [
+      "raportul R/|Z|",
+      "raportul X/R",
+      "|Z|",
+      "R · X"
+     ],
+     "a": 0,
+     "e": "Factorul de putere."
+    }
+   ],
+   "8": [
+    {
+     "q": "Ce formulă are puterea activă?",
+     "o": [
+      "P = UI cos φ",
+      "P = UI",
+      "P = UI sin φ",
+      "P = U/I"
+     ],
+     "a": 0,
+     "e": "Doar componenta în fază face lucru."
+    },
+    {
+     "q": "În ce unitate se măsoară puterea reactivă?",
+     "o": [
+      "var",
+      "W",
+      "VA",
+      "J"
+     ],
+     "a": 0,
+     "e": "volt-amper reactiv."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce condiție dă rezonanța într-un RLC serie?",
+     "o": [
+      "X_L = X_C",
+      "R = 0",
+      "L = C",
+      "I = 0"
+     ],
+     "a": 0,
+     "e": "ωL = 1/(ωC)."
+    },
+    {
+     "q": "Cât este √(10⁻⁹)?",
+     "o": [
+      "≈ 3,16 · 10⁻⁵",
+      "10⁻³",
+      "10⁻⁹",
+      "3,16 · 10⁻⁴"
+     ],
+     "a": 0,
+     "e": "10⁻⁴·⁵."
+    }
+   ],
+   "10": [
+    {
+     "q": "Ce constantă de timp are un circuit RC?",
+     "o": [
+      "τ = RC",
+      "τ = R/C",
+      "τ = C/R",
+      "τ = √(RC)"
+     ],
+     "a": 0,
+     "e": "În secunde, cu ohmi și farazi."
+    },
+    {
+     "q": "Cât este 1 μF?",
+     "o": [
+      "10⁻⁶ F",
+      "10⁻³ F",
+      "10⁻⁹ F",
+      "10⁶ F"
+     ],
+     "a": 0,
+     "e": "micro = 10⁻⁶."
+    }
+   ],
+   "11": [
+    {
+     "q": "Ce lege are tensiunea la încărcarea condensatorului?",
+     "o": [
+      "E(1 − e^(−t/τ))",
+      "E e^(−t/τ)",
+      "Et/τ",
+      "E"
+     ],
+     "a": 0,
+     "e": "Pornește de la 0 și tinde la E."
+    },
+    {
+     "q": "Cât este e⁻¹ aproximativ?",
+     "o": [
+      "0,368",
+      "0,5",
+      "0,632",
+      "2,718"
+     ],
+     "a": 0,
+     "e": "1/e."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce energie are o bobină?",
+     "o": [
+      "LI²/2",
+      "LI",
+      "L²I/2",
+      "LI/2"
+     ],
+     "a": 0,
+     "e": "Energia câmpului magnetic."
+    },
+    {
+     "q": "Cât este 3²?",
+     "o": [
+      "9",
+      "6",
+      "3",
+      "27"
+     ],
+     "a": 0,
+     "e": "3 · 3."
+    }
+   ],
+   "13": [
+    {
+     "q": "Poate tensiunea pe condensator să sară brusc?",
+     "o": [
+      "Nu (fără impulsuri ideale)",
+      "Da, mereu",
+      "Doar în c.a.",
+      "Doar la descărcare"
+     ],
+     "a": 0,
+     "e": "Ar însemna un curent infinit."
+    },
+    {
+     "q": "Poate curentul prin bobină să sară brusc?",
+     "o": [
+      "Nu (fără impulsuri ideale)",
+      "Da",
+      "Doar la închidere",
+      "Doar în c.c."
+     ],
+     "a": 0,
+     "e": "Ar însemna o tensiune infinită."
+    }
+   ],
+   "14": [
+    {
+     "q": "Cum depinde forța Coulomb de distanță?",
+     "o": [
+      "invers proporțional cu r²",
+      "proporțional cu r",
+      "invers proporțional cu r",
+      "nu depinde"
+     ],
+     "a": 0,
+     "e": "F = kq₁q₂/r²."
+    },
+    {
+     "q": "Cât este 10⁻⁶ · 10⁻⁶?",
+     "o": [
+      "10⁻¹²",
+      "10⁻⁶",
+      "10⁻³⁶",
+      "10¹²"
+     ],
+     "a": 0,
+     "e": "Exponenții se adună."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce lege dă fluxul electric printr-o suprafață închisă?",
+     "o": [
+      "legea lui Gauss",
+      "legea lui Ohm",
+      "legea lui Faraday",
+      "legea lui Ampère"
+     ],
+     "a": 0,
+     "e": "Fluxul electric."
+    },
+    {
+     "q": "Cât e fluxul dacă sarcina e în afara suprafeței?",
+     "o": [
+      "0",
+      "q/ε₀",
+      "infinit",
+      "q"
+     ],
+     "a": 0,
+     "e": "Câte linii intră, atâtea ies."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce energie înmagazinează un condensator?",
+     "o": [
+      "CU²/2",
+      "CU",
+      "C²U/2",
+      "U/C"
+     ],
+     "a": 0,
+     "e": "Energia câmpului electric."
+    },
+    {
+     "q": "Cât este 10 μF în farazi?",
+     "o": [
+      "10⁻⁵",
+      "10⁻⁶",
+      "10⁻⁴",
+      "10"
+     ],
+     "a": 0,
+     "e": "10 · 10⁻⁶."
+    }
+   ]
+  },
+  "Fizică": {
+   "1": [
+    {
+     "q": "Ce lege dă înălțimea în căderea liberă?",
+     "o": [
+      "h = gt²/2",
+      "h = gt",
+      "h = vt",
+      "h = g/t"
+     ],
+     "a": 0,
+     "e": "Mișcare uniform accelerată din repaus."
+    },
+    {
+     "q": "Cât este √9?",
+     "o": [
+      "3",
+      "9",
+      "4,5",
+      "81"
+     ],
+     "a": 0,
+     "e": "3 · 3 = 9."
+    }
+   ],
+   "2": [
+    {
+     "q": "Ce viteză are proiectilul pe verticală la înălțimea maximă?",
+     "o": [
+      "0",
+      "v₀",
+      "v₀ cos α",
+      "g"
+     ],
+     "a": 0,
+     "e": "Apoi începe să coboare."
+    },
+    {
+     "q": "Cât este sin 30°?",
+     "o": [
+      "1/2",
+      "√3/2",
+      "1",
+      "√2/2"
+     ],
+     "a": 0,
+     "e": "Valoare remarcabilă."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce formulă are bătaia pe teren orizontal?",
+     "o": [
+      "v₀² sin 2α / g",
+      "v₀² / g",
+      "v₀ sin α / g",
+      "v₀² sin α / (2g)"
+     ],
+     "a": 0,
+     "e": "Din timpul de zbor și viteza orizontală."
+    },
+    {
+     "q": "Sub ce unghi e bătaia maximă?",
+     "o": [
+      "45°",
+      "30°",
+      "60°",
+      "90°"
+     ],
+     "a": 0,
+     "e": "sin 2α = 1."
+    }
+   ],
+   "4": [
+    {
+     "q": "Cum se compun vitezele?",
+     "o": [
+      "vectorial",
+      "se adună modulele",
+      "se înmulțesc",
+      "nu se compun"
+     ],
+     "a": 0,
+     "e": "Viteza față de mal = viteza față de apă + viteza apei."
+    },
+    {
+     "q": "Cât este √(25 − 9)?",
+     "o": [
+      "4",
+      "16",
+      "5",
+      "3"
+     ],
+     "a": 0,
+     "e": "√16."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce forță de frecare acționează pe plan?",
+     "o": [
+      "μN = μmg cos α",
+      "μmg",
+      "mg sin α",
+      "μmg sin α"
+     ],
+     "a": 0,
+     "e": "Normala este mg cos α."
+    },
+    {
+     "q": "Cât este cos 30°?",
+     "o": [
+      "√3/2 ≈ 0,866",
+      "1/2",
+      "1",
+      "√2/2"
+     ],
+     "a": 0,
+     "e": "Valoare remarcabilă."
+    }
+   ],
+   "6": [
+    {
+     "q": "Încotro e orientată accelerația centripetă?",
+     "o": [
+      "spre centrul cercului",
+      "tangent la cerc",
+      "spre exterior",
+      "în sus"
+     ],
+     "a": 0,
+     "e": "Schimbă direcția vitezei."
+    },
+    {
+     "q": "Ce formulă are?",
+     "o": [
+      "v²/r",
+      "vr",
+      "v/r²",
+      "r/v"
+     ],
+     "a": 0,
+     "e": "Sau ω²r."
+    }
+   ],
+   "7": [
+    {
+     "q": "Ce lege spune F = ma?",
+     "o": [
+      "a doua lege a lui Newton",
+      "prima lege",
+      "a treia lege",
+      "legea gravitației"
+     ],
+     "a": 0,
+     "e": "Principiul fundamental."
+    },
+    {
+     "q": "Ce accelerație are un corp cu forța rezultantă nulă?",
+     "o": [
+      "0",
+      "g",
+      "infinită",
+      "negativă"
+     ],
+     "a": 0,
+     "e": "a = F/m."
+    }
+   ],
+   "8": [
+    {
+     "q": "Cum se calculează lucrul mecanic al unei forțe constante?",
+     "o": [
+      "produs scalar F · d",
+      "F · |d| mereu",
+      "F + d",
+      "F × d"
+     ],
+     "a": 0,
+     "e": "Doar componenta pe direcția deplasării contează."
+    },
+    {
+     "q": "Cât este (3, 4) · (2, 1)?",
+     "o": [
+      "10",
+      "7",
+      "14",
+      "5"
+     ],
+     "a": 0,
+     "e": "6 + 4."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce energie se transformă când corpul coboară fără frecare?",
+     "o": [
+      "potențială în cinetică",
+      "cinetică în potențială",
+      "termică în cinetică",
+      "niciuna"
+     ],
+     "a": 0,
+     "e": "Energia mecanică se conservă."
+    },
+    {
+     "q": "Depinde viteza finală de forma toboganului?",
+     "o": [
+      "Nu, doar de înălțime",
+      "Da",
+      "Doar de lungime",
+      "Doar de masă"
+     ],
+     "a": 0,
+     "e": "v = √(2gh)."
+    }
+   ],
+   "10": [
+    {
+     "q": "Ce se conservă într-o ciocnire plastică?",
+     "o": [
+      "impulsul",
+      "energia cinetică",
+      "viteza fiecărui corp",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Energia cinetică scade."
+    },
+    {
+     "q": "Cât este impulsul corpului de 2 kg cu 3 m/s?",
+     "o": [
+      "6 kg·m/s",
+      "5",
+      "9",
+      "1,5"
+     ],
+     "a": 0,
+     "e": "p = mv."
+    }
+   ],
+   "11": [
+    {
+     "q": "Ce formulă are momentul de inerție al unui disc față de axa lui?",
+     "o": [
+      "MR²/2",
+      "MR²",
+      "2MR²/5",
+      "MR"
+     ],
+     "a": 0,
+     "e": "Un inel ar avea MR²."
+    },
+    {
+     "q": "Cât este 0,5²?",
+     "o": [
+      "0,25",
+      "0,5",
+      "1",
+      "0,05"
+     ],
+     "a": 0,
+     "e": "0,5 · 0,5."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce se conservă când patinatorul își strânge brațele?",
+     "o": [
+      "momentul cinetic Iω",
+      "energia cinetică",
+      "viteza unghiulară",
+      "momentul de inerție"
+     ],
+     "a": 0,
+     "e": "Nu acționează moment exterior."
+    },
+    {
+     "q": "Ce se întâmplă cu ω dacă I se înjumătățește?",
+     "o": [
+      "se dublează",
+      "se înjumătățește",
+      "rămâne la fel",
+      "devine 0"
+     ],
+     "a": 0,
+     "e": "Iω = constant."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce formulă are pulsația oscilatorului elastic?",
+     "o": [
+      "√(k/m)",
+      "√(m/k)",
+      "k/m",
+      "km"
+     ],
+     "a": 0,
+     "e": "Din ma = −kx."
+    },
+    {
+     "q": "Cât este 200/0,5?",
+     "o": [
+      "400",
+      "100",
+      "40",
+      "1000"
+     ],
+     "a": 0,
+     "e": "Împărțirea la 0,5 dublează."
+    }
+   ],
+   "14": [
+    {
+     "q": "Cum obții viteza din elongație?",
+     "o": [
+      "derivezi x(t)",
+      "integrezi x(t)",
+      "împarți la t",
+      "înmulțești cu t"
+     ],
+     "a": 0,
+     "e": "v = dx/dt."
+    },
+    {
+     "q": "Unde e viteza maximă?",
+     "o": [
+      "la trecerea prin poziția de echilibru",
+      "la elongația maximă",
+      "mereu aceeași",
+      "la t = 0 mereu"
+     ],
+     "a": 0,
+     "e": "Acolo energia e toată cinetică."
+    }
+   ]
+  },
+  "MN": {
+   "1": [
+    {
+     "q": "Ce are L pe diagonală în factorizarea Doolittle?",
+     "o": [
+      "1",
+      "0",
+      "valorile proprii",
+      "pivoții"
+     ],
+     "a": 0,
+     "e": "U are pivoții."
+    },
+    {
+     "q": "Ce este multiplicatorul l₂₁?",
+     "o": [
+      "a₂₁ / a₁₁",
+      "a₁₁ / a₂₁",
+      "a₂₂",
+      "1"
+     ],
+     "a": 0,
+     "e": "Factorul cu care se scade linia 1 din linia 2."
+    }
+   ],
+   "2": [
+    {
+     "q": "Pentru ce matrice există factorizarea Cholesky?",
+     "o": [
+      "simetrice pozitiv definite",
+      "orice matrice",
+      "triunghiulare",
+      "singulare"
+     ],
+     "a": 0,
+     "e": "A = LLᵀ."
+    },
+    {
+     "q": "Cât este l₁₁ pentru a₁₁ = 4?",
+     "o": [
+      "2",
+      "4",
+      "16",
+      "1"
+     ],
+     "a": 0,
+     "e": "√4."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce arată un număr de condiționare mare?",
+     "o": [
+      "sistemul e sensibil la erori în date",
+      "sistemul nu are soluție",
+      "matricea e mică",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "Erorile se amplifică."
+    },
+    {
+     "q": "Ce valoare minimă poate avea κ₂(A)?",
+     "o": [
+      "1",
+      "0",
+      "−1",
+      "∞"
+     ],
+     "a": 0,
+     "e": "Pentru matricele ortogonale."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce proprietate au coloanele lui Q?",
+     "o": [
+      "sunt ortonormate",
+      "sunt egale",
+      "sunt nule",
+      "sunt sortate"
+     ],
+     "a": 0,
+     "e": "QᵀQ = I."
+    },
+    {
+     "q": "Ce formă are R?",
+     "o": [
+      "superior triunghiulară",
+      "diagonală",
+      "inferior triunghiulară",
+      "simetrică"
+     ],
+     "a": 0,
+     "e": "Din construcția Gram–Schmidt."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce valori folosește Jacobi la o iterație?",
+     "o": [
+      "doar cele din iterația anterioară",
+      "cele noi, imediat",
+      "valorile exacte",
+      "zero"
+     ],
+     "a": 0,
+     "e": "Spre deosebire de Gauss–Seidel."
+    },
+    {
+     "q": "O condiție suficientă de convergență pentru Jacobi este...",
+     "o": [
+      "matricea diagonal dominantă",
+      "matricea simetrică",
+      "determinantul 1",
+      "nicio condiție"
+     ],
+     "a": 0,
+     "e": "|aᵢᵢ| > Σ |aᵢⱼ| pe fiecare linie."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce face Gauss–Seidel diferit de Jacobi?",
+     "o": [
+      "folosește imediat valorile noi",
+      "nu folosește diagonala",
+      "face mai mulți pași",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "De obicei converge mai repede."
+    },
+    {
+     "q": "Cât este 7 − 9/4?",
+     "o": [
+      "19/4",
+      "5",
+      "9/4",
+      "4"
+     ],
+     "a": 0,
+     "e": "28/4 − 9/4."
+    }
+   ],
+   "7": [
+    {
+     "q": "Ce înmulțire repetă metoda puterii?",
+     "o": [
+      "xₖ₊₁ = A xₖ (normalizat)",
+      "xₖ₊₁ = A⁻¹ xₖ",
+      "xₖ₊₁ = xₖ + 1",
+      "xₖ₊₁ = Aᵀ"
+     ],
+     "a": 0,
+     "e": "Puteri ale lui A aplicate unui vector."
+    },
+    {
+     "q": "De ce depinde viteza de convergență?",
+     "o": [
+      "de raportul |λ₂/λ₁|",
+      "de urmă",
+      "de rang",
+      "de determinant"
+     ],
+     "a": 0,
+     "e": "Cu cât raportul e mai mic, cu atât mai repede."
+    }
+   ],
+   "8": [
+    {
+     "q": "Cât este AᵀA pentru A = [[2, 2], [−1, 1]]?",
+     "o": [
+      "[[5, 3], [3, 5]]",
+      "[[4, 4], [1, 1]]",
+      "[[5, −3], [−3, 5]]",
+      "[[8, 0], [0, 2]]"
+     ],
+     "a": 0,
+     "e": "Produsul coloanelor: 2·2 + (−1)·1 = 3."
+    },
+    {
+     "q": "Ce produs au valorile singulare ale unei matrice pătratice?",
+     "o": [
+      "|det A|",
+      "urma",
+      "rangul",
+      "1"
+     ],
+     "a": 0,
+     "e": "det A = det U · det Σ · det Vᵀ."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce reprezintă d în PageRank?",
+     "o": [
+      "probabilitatea de a urma o legătură",
+      "numărul de pagini",
+      "costul",
+      "distanța"
+     ],
+     "a": 0,
+     "e": "Cu 1 − d se sare la o pagină oarecare."
+    },
+    {
+     "q": "Cât fac împreună valorile PageRank (cu această formulă)?",
+     "o": [
+      "1",
+      "N",
+      "0",
+      "d"
+     ],
+     "a": 0,
+     "e": "Sunt o distribuție de probabilitate."
+    }
+   ],
+   "10": [
+    {
+     "q": "Câte puncte determină un polinom de grad cel mult 2?",
+     "o": [
+      "3",
+      "2",
+      "4",
+      "1"
+     ],
+     "a": 0,
+     "e": "Interpolarea are soluție unică."
+    },
+    {
+     "q": "Cât este p(0) = c dacă p trece prin (0, 1)?",
+     "o": [
+      "1",
+      "0",
+      "3",
+      "7"
+     ],
+     "a": 0,
+     "e": "Termenul liber."
+    }
+   ],
+   "11": [
+    {
+     "q": "Cât este f[x₀, x₁] pentru (0, 1) și (1, 3)?",
+     "o": [
+      "2",
+      "1",
+      "3",
+      "4"
+     ],
+     "a": 0,
+     "e": "(3 − 1)/(1 − 0)."
+    },
+    {
+     "q": "Ce reprezintă f[x₀, x₁, x₂]?",
+     "o": [
+      "coeficientul dominant al polinomului de interpolare",
+      "f(x₂)",
+      "panta",
+      "suma valorilor"
+     ],
+     "a": 0,
+     "e": "Din forma Newton."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce minimizează dreapta celor mai mici pătrate?",
+     "o": [
+      "suma pătratelor abaterilor verticale",
+      "distanța maximă",
+      "numărul de puncte",
+      "panta"
+     ],
+     "a": 0,
+     "e": "Σ (yᵢ − axᵢ − b)²."
+    },
+    {
+     "q": "Prin ce punct trece mereu această dreaptă?",
+     "o": [
+      "(x̄, ȳ)",
+      "(0, 0)",
+      "primul punct",
+      "ultimul punct"
+     ],
+     "a": 0,
+     "e": "Din ecuațiile normale."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce formulă are metoda lui Newton?",
+     "o": [
+      "xₖ₊₁ = xₖ − f(xₖ)/f′(xₖ)",
+      "xₖ₊₁ = (a + b)/2",
+      "xₖ₊₁ = f(xₖ)",
+      "xₖ₊₁ = xₖ + h"
+     ],
+     "a": 0,
+     "e": "Tangenta la grafic."
+    },
+    {
+     "q": "Cât este f′(x) pentru f(x) = x² − 2?",
+     "o": [
+      "2x",
+      "x",
+      "2x − 2",
+      "x²"
+     ],
+     "a": 0,
+     "e": "Derivata."
+    }
+   ],
+   "14": [
+    {
+     "q": "Cu cât scade intervalul la fiecare pas de bisecție?",
+     "o": [
+      "se înjumătățește",
+      "cu 1",
+      "de 10 ori",
+      "nu scade"
+     ],
+     "a": 0,
+     "e": "Se păstrează jumătatea cu schimbare de semn."
+    },
+    {
+     "q": "Cât este 2¹⁰?",
+     "o": [
+      "1024",
+      "1000",
+      "512",
+      "2048"
+     ],
+     "a": 0,
+     "e": "Deci 2⁻¹⁰ < 10⁻³."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce formă are regula trapezelor pe [a, b]?",
+     "o": [
+      "(b − a)(f(a) + f(b))/2",
+      "(b − a) f((a + b)/2)",
+      "f(b) − f(a)",
+      "(b − a)²"
+     ],
+     "a": 0,
+     "e": "Aria trapezului."
+    },
+    {
+     "q": "Pentru ce polinoame e exactă regula lui Simpson?",
+     "o": [
+      "grad cel mult 3",
+      "grad cel mult 1",
+      "orice grad",
+      "doar constante"
+     ],
+     "a": 0,
+     "e": "Un grad în plus față de construcție."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce formulă are pasul Euler explicit?",
+     "o": [
+      "yₖ₊₁ = yₖ + h f(tₖ, yₖ)",
+      "yₖ₊₁ = yₖ − h",
+      "yₖ₊₁ = h yₖ",
+      "yₖ₊₁ = f(tₖ)"
+     ],
+     "a": 0,
+     "e": "Tangenta în punctul curent."
+    },
+    {
+     "q": "Câți pași de 0,5 duc de la t = 0 la t = 1?",
+     "o": [
+      "2",
+      "1",
+      "4",
+      "5"
+     ],
+     "a": 0,
+     "e": "1 / 0,5."
+    }
+   ]
+  },
+  "IOCLA": {
+   "1": [
+    {
+     "q": "Pe câți biți e un char?",
+     "o": [
+      "8",
+      "16",
+      "32",
+      "4"
+     ],
+     "a": 0,
+     "e": "Un octet."
+    },
+    {
+     "q": "Ce valori ia un unsigned char?",
+     "o": [
+      "0–255",
+      "-128–127",
+      "0–127",
+      "0–65535"
+     ],
+     "a": 0,
+     "e": "2⁸ valori fără semn."
+    }
+   ],
+   "2": [
+    {
+     "q": "Pe câți biți e un short?",
+     "o": [
+      "16",
+      "8",
+      "32",
+      "64"
+     ],
+     "a": 0,
+     "e": "Doi octeți."
+    },
+    {
+     "q": "De ce domeniul cu semn are un număr negativ în plus?",
+     "o": [
+      "zero ocupă o valoare pozitivă",
+      "e o eroare",
+      "semnul ocupă doi biți",
+      "nu are"
+     ],
+     "a": 0,
+     "e": "În complement față de 2: −2ⁿ⁻¹ … 2ⁿ⁻¹ − 1."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce pune a ^ b pe 1?",
+     "o": [
+      "biții unde a și b diferă",
+      "biții egali",
+      "biții de 1 din a",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "XOR e 1 exact la biți diferiți."
+    },
+    {
+     "q": "Ce valoare are x & (x - 1) pentru o putere a lui 2?",
+     "o": [
+      "0",
+      "x",
+      "1",
+      "x - 1"
+     ],
+     "a": 0,
+     "e": "O putere a lui 2 are un singur bit de 1."
+    }
+   ],
+   "4": [
+    {
+     "q": "Ce face rol?",
+     "o": [
+      "rotește biții la stânga, cei ieșiți intră prin dreapta",
+      "deplasează și pune 0",
+      "inversează biții",
+      "adună"
+     ],
+     "a": 0,
+     "e": "Nu se pierde niciun bit."
+    },
+    {
+     "q": "Cum anulezi rol al, 3?",
+     "o": [
+      "ror al, 3",
+      "shr al, 3",
+      "shl al, 3",
+      "not al"
+     ],
+     "a": 0,
+     "e": "Rotirea inversă cu același număr de poziții; shr ar pierde biții ieșiți."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce bit ajunge în CF după shr?",
+     "o": [
+      "ultimul bit ieșit prin dreapta",
+      "bitul de semn",
+      "mereu 0",
+      "primul bit"
+     ],
+     "a": 0,
+     "e": "CF primește ultimul bit deplasat afară."
+    },
+    {
+     "q": "Cum se scrie 0x76 în binar?",
+     "o": [
+      "0111 0110",
+      "0110 0111",
+      "1110 0110",
+      "0111 1100"
+     ],
+     "a": 0,
+     "e": "7 = 0111, 6 = 0110."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce instrucțiune împarte corect la 2 un număr negativ (rotunjind în jos)?",
+     "o": [
+      "sar",
+      "shr",
+      "rol",
+      "shl"
+     ],
+     "a": 0,
+     "e": "sar păstrează semnul."
+    },
+    {
+     "q": "Ce intră în stânga la shr?",
+     "o": [
+      "0",
+      "bitul de semn",
+      "1",
+      "CF"
+     ],
+     "a": 0,
+     "e": "Deplasare logică."
+    }
+   ],
+   "7": [
+    {
+     "q": "Ce interval are un octet cu semn?",
+     "o": [
+      "-128…127",
+      "0…255",
+      "-127…127",
+      "-255…255"
+     ],
+     "a": 0,
+     "e": "Complement față de 2 pe 8 biți."
+    },
+    {
+     "q": "Ce indicator semnalează depășirea pentru numere cu semn?",
+     "o": [
+      "OF",
+      "CF",
+      "ZF",
+      "PF"
+     ],
+     "a": 0,
+     "e": "CF e pentru numere fără semn."
+    }
+   ],
+   "8": [
+    {
+     "q": "Unde e deîmpărțitul la div cu un operand de 16 biți?",
+     "o": [
+      "DX:AX",
+      "AX",
+      "EAX",
+      "DX"
+     ],
+     "a": 0,
+     "e": "32 de biți împărțiți în două registre."
+    },
+    {
+     "q": "Unde ajunge câtul?",
+     "o": [
+      "AX",
+      "DX",
+      "BX",
+      "CX"
+     ],
+     "a": 0,
+     "e": "Câtul în AX, restul în DX."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce reține EIP?",
+     "o": [
+      "adresa instrucțiunii următoare",
+      "vârful stivei",
+      "rezultatul",
+      "indicatorii"
+     ],
+     "a": 0,
+     "e": "Instruction pointer."
+    },
+    {
+     "q": "Poți scrie mov eip, eax?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "EIP se schimbă doar prin salturi, call, ret."
+    }
+   ],
+   "10": [
+    {
+     "q": "Ce valori poate avea scala în adresare?",
+     "o": [
+      "1, 2, 4, 8",
+      "orice număr",
+      "0–16",
+      "doar 4"
+     ],
+     "a": 0,
+     "e": "Corespund mărimii elementelor."
+    },
+    {
+     "q": "Ce adresare e [ebp + 8]?",
+     "o": [
+      "bazată cu deplasament",
+      "directă",
+      "indexată cu scală",
+      "imediată"
+     ],
+     "a": 0,
+     "e": "EBP e baza, 8 deplasamentul."
+    }
+   ],
+   "11": [
+    {
+     "q": "Citește lea memoria?",
+     "o": [
+      "Nu, doar calculează adresa",
+      "Da",
+      "Doar pe stivă",
+      "Doar în modul real"
+     ],
+     "a": 0,
+     "e": "Load effective address."
+    },
+    {
+     "q": "Cât e ebx + ebx*4 pentru ebx = 7?",
+     "o": [
+      "35",
+      "28",
+      "11",
+      "49"
+     ],
+     "a": 0,
+     "e": "7 + 28 = 35."
+    }
+   ],
+   "12": [
+    {
+     "q": "Ce registre folosește movsb?",
+     "o": [
+      "ESI și EDI",
+      "EAX și EBX",
+      "ECX și EDX",
+      "ESP și EBP"
+     ],
+     "a": 0,
+     "e": "Sursa la [ESI], destinația la [EDI]."
+    },
+    {
+     "q": "Ce prefix repetă movsb de ECX ori?",
+     "o": [
+      "rep",
+      "loop",
+      "jmp",
+      "call"
+     ],
+     "a": 0,
+     "e": "rep movsb."
+    }
+   ],
+   "13": [
+    {
+     "q": "În ce ordine se pun parametrii pe stivă în cdecl?",
+     "o": [
+      "de la dreapta la stânga",
+      "de la stânga la dreapta",
+      "nu se pun",
+      "în ordine alfabetică"
+     ],
+     "a": 0,
+     "e": "Primul parametru ajunge cel mai aproape de adresa de retur."
+    },
+    {
+     "q": "Cine curăță stiva în cdecl?",
+     "o": [
+      "apelantul",
+      "funcția apelată",
+      "sistemul de operare",
+      "nimeni"
+     ],
+     "a": 0,
+     "e": "De aceea cdecl permite funcții cu număr variabil de parametri."
+    }
+   ],
+   "14": [
+    {
+     "q": "Ce principiu urmează stiva?",
+     "o": [
+      "LIFO",
+      "FIFO",
+      "aleator",
+      "după prioritate"
+     ],
+     "a": 0,
+     "e": "Ultimul intrat, primul ieșit."
+    },
+    {
+     "q": "Ce face pop?",
+     "o": [
+      "scoate elementul din vârf",
+      "scoate primul inserat",
+      "golește stiva",
+      "adaugă"
+     ],
+     "a": 0,
+     "e": "LIFO."
+    }
+   ],
+   "15": [
+    {
+     "q": "După push a; push b, ce e în vârf?",
+     "o": [
+      "b",
+      "a",
+      "nimic",
+      "a + b"
+     ],
+     "a": 0,
+     "e": "Ultimul pus."
+    },
+    {
+     "q": "Ce primește a la primul pop a?",
+     "o": [
+      "vechea valoare a lui b",
+      "vechea valoare a lui a",
+      "0",
+      "adresa lui b"
+     ],
+     "a": 0,
+     "e": "Vârful era b."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce se află la [rbp]?",
+     "o": [
+      "vechiul RBP salvat",
+      "adresa de retur",
+      "bufferul",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "push rbp la intrarea în funcție."
+    },
+    {
+     "q": "Câți octeți are o adresă pe 64 de biți?",
+     "o": [
+      "8",
+      "4",
+      "16",
+      "2"
+     ],
+     "a": 0,
+     "e": "Deci adresa de retur e la rbp + 8."
+    }
+   ],
+   "17": [
+    {
+     "q": "Ce produce preprocesorul?",
+     "o": [
+      "cod C cu include-urile și macrourile expandate",
+      "cod mașină",
+      "executabilul",
+      "cod de asamblare"
+     ],
+     "a": 0,
+     "e": "Fișierul .i."
+    },
+    {
+     "q": "Ce leagă linkerul?",
+     "o": [
+      "fișierele obiect și bibliotecile",
+      "fișierele sursă",
+      "macrourile",
+      "registrele"
+     ],
+     "a": 0,
+     "e": "Rezultă executabilul."
+    }
+   ],
+   "18": [
+    {
+     "q": "Ce instrucțiune scade ESP?",
+     "o": [
+      "push",
+      "pop",
+      "ret",
+      "nop"
+     ],
+     "a": 0,
+     "e": "Stiva crește spre adrese mici."
+    },
+    {
+     "q": "Încotro crește heap-ul?",
+     "o": [
+      "spre adrese mari",
+      "spre adrese mici",
+      "nu crește",
+      "aleator"
+     ],
+     "a": 0,
+     "e": "În sens opus stivei."
+    }
+   ],
+   "19": [
+    {
+     "q": "Unde e adresa de retur pe 32 de biți?",
+     "o": [
+      "ebp + 4",
+      "ebp",
+      "ebp - 4",
+      "esp + 8"
+     ],
+     "a": 0,
+     "e": "La ebp e vechiul EBP, de 4 octeți."
+    },
+    {
+     "q": "Câți octeți are p32(adresă)?",
+     "o": [
+      "4",
+      "8",
+      "2",
+      "1"
+     ],
+     "a": 0,
+     "e": "O adresă pe 32 de biți."
+    }
+   ]
+  },
+  "SD": {
+   "1": [
+    {
+     "q": "Pe care apariție a unei valori o păstrezi?",
+     "o": [
+      "pe ultima",
+      "pe prima",
+      "pe toate",
+      "pe niciuna"
+     ],
+     "a": 0,
+     "e": "Așa cere subiectul."
+    },
+    {
+     "q": "În ce ordine lucrează funcția recursivă?",
+     "o": [
+      "întâi curăță restul listei, apoi decide pentru cap",
+      "întâi capul, apoi restul",
+      "de la mijloc",
+      "fără ordine"
+     ],
+     "a": 0,
+     "e": "După apelul pe next, restul nu mai are duplicate."
+    }
+   ],
+   "2": [
+    {
+     "q": "Ce faci cu a doua listă pentru a o parcurge descrescător?",
+     "o": [
+      "o inversezi",
+      "o sortezi din nou",
+      "o copiezi într-un vector",
+      "nimic"
+     ],
+     "a": 0,
+     "e": "O listă simplu înlănțuită se parcurge doar înainte."
+    },
+    {
+     "q": "Dacă x + y < k, ce avansezi?",
+     "o": [
+      "prima listă (x crește)",
+      "a doua listă",
+      "amândouă",
+      "te oprești"
+     ],
+     "a": 0,
+     "e": "Ai nevoie de o sumă mai mare."
+    }
+   ],
+   "3": [
+    {
+     "q": "Ce faci la o paranteză deschisă?",
+     "o": [
+      "push pe stivă",
+      "pop",
+      "nimic",
+      "o ștergi"
+     ],
+     "a": 0,
+     "e": "Ea așteaptă să fie închisă."
+    },
+    {
+     "q": "E corectă linia „([)]”?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "La „)” vârful stivei este „[”."
+    }
+   ],
+   "4": [
+    {
+     "q": "În ce ordine vizitează parcurgerea în inordine cheile unui BST?",
+     "o": [
+      "crescător",
+      "descrescător",
+      "pe niveluri",
+      "aleator"
+     ],
+     "a": 0,
+     "e": "Stânga, rădăcina, dreapta."
+    },
+    {
+     "q": "Care e succesorul unui nod?",
+     "o": [
+      "nodul cu cea mai mică cheie mai mare",
+      "fiul lui drept mereu",
+      "părintele",
+      "rădăcina"
+     ],
+     "a": 0,
+     "e": "În inordine e nodul vizitat imediat după el."
+    }
+   ],
+   "5": [
+    {
+     "q": "Ce parcurgere folosești ca să știi conținutul fiecărui subarbore?",
+     "o": [
+      "postordine",
+      "preordine",
+      "în lățime",
+      "nicio parcurgere"
+     ],
+     "a": 0,
+     "e": "Un nod se tratează după fiii lui."
+    },
+    {
+     "q": "Câți subarbori are un arbore cu n noduri?",
+     "o": [
+      "n",
+      "1",
+      "2n",
+      "n - 1"
+     ],
+     "a": 0,
+     "e": "Fiecare nod e rădăcina unui subarbore."
+    }
+   ],
+   "6": [
+    {
+     "q": "Ce structură parcurge arborele nivel cu nivel?",
+     "o": [
+      "o coadă",
+      "o stivă",
+      "un heap",
+      "un vector sortat"
+     ],
+     "a": 0,
+     "e": "Parcurgerea în lățime (BFS)."
+    },
+    {
+     "q": "Pe ce nivel e rădăcina?",
+     "o": [
+      "1",
+      "0",
+      "n",
+      "ultimul"
+     ],
+     "a": 0,
+     "e": "Enunțul numără nivelurile de la 1."
+    }
+   ],
+   "7": [
+    {
+     "q": "Unde sunt fiii poziției i?",
+     "o": [
+      "2i + 1 și 2i + 2",
+      "2i și 2i + 1",
+      "i + 1 și i + 2",
+      "i / 2"
+     ],
+     "a": 0,
+     "e": "Cu indexare de la 0."
+    },
+    {
+     "q": "Ce element e mereu în rădăcina unui max-heap?",
+     "o": [
+      "maximul",
+      "minimul",
+      "ultimul inserat",
+      "mediana"
+     ],
+     "a": 0,
+     "e": "Fiecare nod e cel puțin cât fiii lui."
+    }
+   ],
+   "8": [
+    {
+     "q": "Unde ajunge cheia 15 cu h(k) = k mod 5?",
+     "o": [
+      "în lista 0",
+      "în lista 15",
+      "în lista 3",
+      "în lista 1"
+     ],
+     "a": 0,
+     "e": "15 mod 5 = 0."
+    },
+    {
+     "q": "Ce este o coliziune?",
+     "o": [
+      "două chei diferite cu același h(k)",
+      "o cheie inserată de două ori",
+      "o listă goală",
+      "un h(k) negativ"
+     ],
+     "a": 0,
+     "e": "Se rezolvă aici prin liste înlănțuite."
+    }
+   ],
+   "9": [
+    {
+     "q": "Ce algoritm găsește drumul minim cu costuri pozitive?",
+     "o": [
+      "Dijkstra",
+      "BFS simplu",
+      "DFS",
+      "Kruskal"
+     ],
+     "a": 0,
+     "e": "BFS ar merge doar cu toate costurile egale."
+    },
+    {
+     "q": "Cum descompui drumul s → p → d?",
+     "o": [
+      "drum minim s → p plus drum minim p → d",
+      "drum minim s → d",
+      "cel mai lung drum",
+      "doar s → p"
+     ],
+     "a": 0,
+     "e": "Fiecare jumătate trebuie să fie minimă."
+    }
+   ],
+   "10": [
+    {
+     "q": "În ce ordine relaxezi arcele într-un DAG?",
+     "o": [
+      "în ordine topologică",
+      "aleator",
+      "după cost",
+      "invers alfabetic"
+     ],
+     "a": 0,
+     "e": "Atunci fiecare nod e final când îl tratezi."
+    },
+    {
+     "q": "Merge Dijkstra cu costuri negative?",
+     "o": [
+      "Nu, în general",
+      "Da, mereu",
+      "Doar pe arbori",
+      "Doar cu heap"
+     ],
+     "a": 0,
+     "e": "Într-un DAG, ordinea topologică le suportă."
+    }
+   ],
+   "11": [
+    {
+     "q": "Ce complexitate are mergesort?",
+     "o": [
+      "O(N log N)",
+      "O(N²)",
+      "O(N)",
+      "O(log N)"
+     ],
+     "a": 0,
+     "e": "În orice caz."
+    },
+    {
+     "q": "După sortare, unde sunt valorile egale?",
+     "o": [
+      "pe poziții vecine",
+      "la capete",
+      "pe poziții pare",
+      "oriunde"
+     ],
+     "a": 0,
+     "e": "Se verifică într-o singură parcurgere."
+    }
+   ],
+   "12": [
+    {
+     "q": "După o inserare într-un AVL, încotro verifici echilibrul?",
+     "o": [
+      "de la nodul inserat spre rădăcină",
+      "de la rădăcină spre frunze",
+      "doar la rădăcină",
+      "nu verifici"
+     ],
+     "a": 0,
+     "e": "Doar strămoșii nodului își schimbă înălțimea."
+    },
+    {
+     "q": "Este un AVL un arbore binar de căutare?",
+     "o": [
+      "Da",
+      "Nu"
+     ],
+     "a": 0,
+     "e": "Un BST echilibrat."
+    }
+   ],
+   "13": [
+    {
+     "q": "Ce face o funcție de dispersie?",
+     "o": [
+      "duce o cheie într-un indice de tabelă",
+      "sortează cheile",
+      "criptează valorile",
+      "numără cheile"
+     ],
+     "a": 0,
+     "e": "h(k) dă poziția."
+    },
+    {
+     "q": "Pot două chei egale avea indici diferiți?",
+     "o": [
+      "Nu",
+      "Da"
+     ],
+     "a": 0,
+     "e": "h e o funcție: aceeași cheie, același rezultat."
+    }
+   ],
+   "14": [
+    {
+     "q": "Unde e minimul subarborelui drept?",
+     "o": [
+      "în nodul cel mai din stânga al lui",
+      "în rădăcina lui",
+      "în cel mai din dreapta",
+      "la frunza cea mai adâncă"
+     ],
+     "a": 0,
+     "e": "Cobori la stânga cât poți."
+    },
+    {
+     "q": "Ce nod e succesorul în inordine dacă X are fiu drept?",
+     "o": [
+      "minimul subarborelui drept",
+      "părintele lui X",
+      "fiul stâng",
+      "rădăcina"
+     ],
+     "a": 0,
+     "e": "E cea mai mică cheie mai mare ca X."
+    }
+   ],
+   "15": [
+    {
+     "q": "Ce înălțime poate avea un BST cu n chei inserate crescător?",
+     "o": [
+      "n",
+      "log n",
+      "2",
+      "√n"
+     ],
+     "a": 0,
+     "e": "Devine un lanț."
+    },
+    {
+     "q": "Ce arbori garantează O(log n)?",
+     "o": [
+      "cei echilibrați (AVL, roșu-negru)",
+      "toți BST",
+      "listele",
+      "niciunul"
+     ],
+     "a": 0,
+     "e": "Își păstrează înălțimea logaritmică."
+    }
+   ],
+   "16": [
+    {
+     "q": "Ce parcurgere stă la baza sortării topologice de la curs?",
+     "o": [
+      "în adâncime (DFS)",
+      "în lățime",
+      "inordine",
+      "niciuna"
+     ],
+     "a": 0,
+     "e": "Nodul intră în stivă când îi termini vecinii."
+    },
+    {
+     "q": "Pentru ce grafuri există o ordine topologică?",
+     "o": [
+      "orientate aciclice",
+      "neorientate",
+      "cu cicluri",
+      "complete"
+     ],
+     "a": 0,
+     "e": "Un ciclu ar face ordinea imposibilă."
+    }
+   ],
+   "17": [
+    {
+     "q": "Câte legături (spre fii) are un nod intern într-un arbore binar complet extins?",
+     "o": [
+      "2",
+      "1",
+      "0",
+      "3"
+     ],
+     "a": 0,
+     "e": "Fiecare legătură duce la un nod intern sau extern."
+    },
+    {
+     "q": "Care nod nu e ținta niciunei legături?",
+     "o": [
+      "rădăcina",
+      "o frunză",
+      "un nod extern",
+      "toate sunt ținte"
+     ],
+     "a": 0,
+     "e": "De aici relația N + E − 1 = 2N."
+    }
+   ]
+  }
  }
 }

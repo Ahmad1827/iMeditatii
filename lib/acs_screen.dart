@@ -5,31 +5,71 @@
 //   light / dark is the app's own theme, Terminal / Notebook is remembered apart.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_link.dart';
 import 'theme_manager.dart';
 
-/// A subject of the section. The problems come later; until then a subject
-/// shows as coming soon.
+/// A course of the section. Its problems are in assets/data/exercises.json under
+/// "ACS", in the section named [section] (shown and solved like any other problem);
+/// a course with no section yet shows as coming soon.
 class AcsSubject {
-  final String code; // the folder name in the terminal: "pc"
+  final String code; // the folder name in the terminal: "pclp"
+  final String section; // its key under "ACS" in exercises.json; '' while it has no problems
   final String name;
   final String about;
-  final int problems;
-  final int solved;
-  const AcsSubject(this.code, this.name, this.about, {this.problems = 0, this.solved = 0});
+  final int semester; // 1 or 2 of the first year; 0: coming later
+  const AcsSubject(this.code, this.section, this.name, this.about, {this.semester = 0});
+
+  bool get ready => section.isNotEmpty;
+  String get route => '/lista-exercitii?materie=ACS&clasa=${Uri.encodeComponent(section)}';
 }
 
+/// The first year of the CD series; the electives (history, philosophy...) have no problems here.
 const List<AcsSubject> acsSubjects = [
-  AcsSubject('admitere', 'Admitere ACS', 'Subiectele de matematică și informatică de la admitere'),
-  AcsSubject('pc', 'Programarea Calculatoarelor', 'C: pointeri, alocare dinamică, fișiere, structuri'),
-  AcsSubject('uso', 'Utilizarea Sistemelor de Operare', 'Shell, permisiuni, procese, scripturi'),
-  AcsSubject('sda', 'Structuri de Date și Algoritmi', 'Liste, stive, cozi, arbori, tabele de dispersie'),
-  AcsSubject('poo', 'Programare Orientată pe Obiecte', 'Clase, moștenire, polimorfism'),
-  AcsSubject('pa', 'Proiectarea Algoritmilor', 'Divide et impera, programare dinamică, greedy, grafuri'),
+  AcsSubject('am', 'AM', 'Analiză Matematică', 'Serii, derivate parțiale, extreme, integrale multiple', semester: 1),
+  AcsSubject('algaed', 'ALGAED', 'Algebră, Geometrie și Ecuații Diferențiale', 'Matrice, valori proprii, DVS, geometrie, ecuații diferențiale', semester: 1),
+  AcsSubject('pclp', 'PCLP', 'Programarea Calculatoarelor', 'C: pointeri, șiruri, biți, structuri, alocare dinamică', semester: 1),
+  AcsSubject('uso', 'USO', 'Utilizarea Sistemelor de Operare', 'Fișiere, permisiuni, filtre de text, scripturi, rețea', semester: 1),
+  AcsSubject('pl', 'PL', 'Proiectare Logică', 'Numerație, Karnaugh, multiplexoare, bistabili, automate', semester: 1),
+  AcsSubject('ms', 'MS', 'Matematici Speciale', 'Funcții complexe, Laplace și Z, probabilități, statistică', semester: 2),
+  AcsSubject('elth', 'ELTH', 'Electrotehnică', 'Circuite de c.c. și c.a., regim tranzitoriu, câmp', semester: 2),
+  AcsSubject('fizica', 'Fizică', 'Fizică (Mecanică)', 'Cinematică, dinamică, energie, rotație, oscilații', semester: 2),
+  AcsSubject('mn', 'MN', 'Metode Numerice', 'LU, Cholesky, iterații, interpolare, Newton, Euler', semester: 2),
+  AcsSubject('iocla', 'IOCLA', 'Calculatoare și Limbaje de Asamblare', 'Biți, registre x86, stiva, apeluri, buffere', semester: 2),
+  AcsSubject('sd', 'SD', 'Structuri de Date', 'Liste, stive, arbori, heap, dispersie, grafuri', semester: 2),
+  AcsSubject('admitere', '', 'Admitere ACS', 'Subiectele de matematică și informatică de la admitere'),
+  AcsSubject('poo', '', 'Programare Orientată pe Obiecte', 'Anul II: clase, moștenire, polimorfism'),
+  AcsSubject('pa', '', 'Proiectarea Algoritmilor', 'Anul II: divide et impera, programare dinamică, greedy'),
 ];
+
+/// How many problems a course has, and how many of them are solved on this device.
+typedef AcsCount = ({int problems, int solved});
+
+/// Every course's count, from exercises.json and the solved marks (`ACS_<section>_<id>`).
+Future<Map<String, AcsCount>> loadAcsCounts() async {
+  final data = json.decode(await rootBundle.loadString('assets/data/exercises.json')) as Map<String, dynamic>;
+  final acs = data['ACS'] as Map<String, dynamic>? ?? const {};
+  final prefs = await SharedPreferences.getInstance();
+  return {
+    for (final MapEntry(key: section, value: chapters) in acs.entries)
+      section: () {
+        var n = 0, done = 0;
+        for (final items in (chapters as Map<String, dynamic>).values) {
+          for (final item in items as List) {
+            n++;
+            if (prefs.get('ACS_${section}_${item['id']}') == true) done++;
+          }
+        }
+        return (problems: n, solved: done);
+      }(),
+  };
+}
 
 const String _font = 'Iosevka';
 const List<String> _fallback = ['monospace'];
@@ -68,8 +108,30 @@ class _Ink {
   }
 }
 
-class AcsScreen extends StatelessWidget {
+class AcsScreen extends StatefulWidget {
   const AcsScreen({super.key});
+
+  @override
+  State<AcsScreen> createState() => _AcsScreenState();
+}
+
+class _AcsScreenState extends State<AcsScreen> {
+  Map<String, AcsCount> _counts = const {};
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final c = await loadAcsCounts();
+      if (mounted) setState(() => _counts = c);
+    } catch (e) {
+      debugPrint('ACS counts: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,8 +163,8 @@ class AcsScreen extends StatelessWidget {
                           Align(alignment: Alignment.centerRight, child: _Switches(ink: ink, style: style, dark: dark)),
                           const SizedBox(height: 14),
                           style == AcsStyle.terminal
-                              ? _Terminal(ink: ink, narrow: narrow)
-                              : _Notebook(ink: ink, narrow: narrow),
+                              ? _Terminal(ink: ink, narrow: narrow, counts: _counts)
+                              : _Notebook(ink: ink, narrow: narrow, counts: _counts),
                         ],
                       ),
                     ),
@@ -232,22 +294,39 @@ class _Nav extends StatelessWidget {
   }
 }
 
-/// "██████░░░░ 61%", or "în curând" while a subject has no problems.
-String _bar(AcsSubject s) {
-  if (s.problems == 0) return '';
-  final filled = (s.solved * 10 / s.problems).round().clamp(0, 10);
-  return '█' * filled;
+/// "██████░░░░ 61%", or "în curând" while a course has no problems.
+int _filled(AcsCount c) => c.problems == 0 ? 0 : (c.solved * 10 / c.problems).round().clamp(0, 10);
+
+String _bar(AcsCount c) => '█' * _filled(c);
+
+String _barRest(AcsCount c) => c.problems == 0 ? '' : '█' * (10 - _filled(c));
+
+String _pct(AcsCount c) => c.problems == 0 ? 'în curând' : '${(c.solved * 100 / c.problems).round()}%'.padLeft(4);
+
+const AcsCount _none = (problems: 0, solved: 0);
+
+/// The courses in groups: first-year semesters, then those still to come.
+const List<(String, String, int)> _groups = [
+  ('anul-1/sem-1', 'Anul I · semestrul 1', 1),
+  ('anul-1/sem-2', 'Anul I · semestrul 2', 2),
+  ('in-curand', 'În curând', 0),
+];
+
+/// A course opens its problems; one coming soon does nothing.
+Widget _courseLink(BuildContext context, AcsSubject s, Widget Function(bool hover) builder) {
+  if (!s.ready) return builder(false);
+  return AppLink(
+    to: s.route,
+    child: _Tap(label: s.name, onTap: () => context.go(s.route), builder: builder),
+  );
 }
-
-String _barRest(AcsSubject s) => s.problems == 0 ? '' : '█' * (10 - (s.solved * 10 / s.problems).round().clamp(0, 10));
-
-String _pct(AcsSubject s) => s.problems == 0 ? 'în curând' : '${(s.solved * 100 / s.problems).round()}%'.padLeft(4);
 
 // ---------------------------------------------------------------- terminal
 class _Terminal extends StatelessWidget {
   final _Ink ink;
   final bool narrow;
-  const _Terminal({required this.ink, required this.narrow});
+  final Map<String, AcsCount> counts;
+  const _Terminal({required this.ink, required this.narrow, required this.counts});
 
   @override
   Widget build(BuildContext context) {
@@ -263,25 +342,53 @@ class _Terminal extends StatelessWidget {
         );
 
     final cells = TextStyle(fontSize: narrow ? 13 : 14, color: ink.fg);
-    final table = Table(
-      defaultColumnWidth: const IntrinsicColumnWidth(),
-      defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: [
-        for (final s in acsSubjects)
-          TableRow(children: [
-            if (!narrow) _cell(Text('drwxr-xr-x', style: cells.copyWith(color: ink.dim))),
-            _cell(Text('${s.code}/', style: cells.copyWith(color: ink.accent, fontWeight: FontWeight.w700))),
-            _cell(Text(s.name, style: cells)),
-            if (!narrow) _cell(Text('${s.problems}', textAlign: TextAlign.right, style: cells.copyWith(color: ink.muted, fontFeatures: const [FontFeature.tabularFigures()]))),
-            _cell(Text.rich(TextSpan(children: [
-              TextSpan(text: _bar(s), style: TextStyle(color: ink.accent)),
-              TextSpan(text: _barRest(s), style: TextStyle(color: ink.line)),
-              TextSpan(text: s.problems == 0 ? _pct(s) : ' ${_pct(s)}', style: TextStyle(color: ink.muted)),
-            ]), style: cells), last: true),
-          ]),
-      ],
-    );
+    // one line per course: the folder opens its problems
+    Widget row(AcsSubject s) {
+      final c = counts[s.section] ?? _none;
+      return _courseLink(
+        context,
+        s,
+        (h) => Container(
+          color: h ? ink.hover : Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              if (!narrow) SizedBox(width: 104, child: Text(s.ready ? 'drwxr-xr-x' : 'd---------', style: cells.copyWith(color: ink.dim))),
+              SizedBox(
+                width: narrow ? 72 : 84,
+                child: Text('${s.code}/',
+                    style: cells.copyWith(
+                        color: s.ready ? ink.accent : ink.muted,
+                        fontWeight: FontWeight.w700,
+                        decoration: h ? TextDecoration.underline : null,
+                        decorationColor: ink.accent)),
+              ),
+              Expanded(child: Text(s.name, style: cells.copyWith(color: s.ready ? ink.fg : ink.muted), overflow: TextOverflow.ellipsis)),
+              if (!narrow)
+                SizedBox(
+                  width: 44,
+                  child: Text(c.problems == 0 ? '' : '${c.problems}',
+                      textAlign: TextAlign.right, style: cells.copyWith(color: ink.muted, fontFeatures: const [FontFeature.tabularFigures()])),
+                ),
+              const SizedBox(width: 14),
+              SizedBox(
+                width: narrow ? 92 : 128,
+                child: Text.rich(
+                    TextSpan(children: [
+                      if (!narrow) TextSpan(text: _bar(c), style: TextStyle(color: ink.accent)),
+                      if (!narrow) TextSpan(text: _barRest(c), style: TextStyle(color: ink.line)),
+                      TextSpan(text: c.problems == 0 || narrow ? _pct(c).trim() : ' ${_pct(c)}', style: TextStyle(color: ink.muted)),
+                    ]),
+                    style: cells,
+                    textAlign: narrow ? TextAlign.right : TextAlign.left),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,10 +411,12 @@ class _Terminal extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         _Nav(ink: ink),
-        prompt('ls -l materii/'),
-        SingleChildScrollView(scrollDirection: Axis.horizontal, child: table),
+        for (final (dir, _, sem) in _groups) ...[
+          prompt('ls -l $dir/'),
+          for (final s in acsSubjects.where((s) => s.ready ? s.semester == sem : sem == 0)) row(s),
+        ],
         prompt('cat README'),
-        Text('Problemele de la fiecare materie se adaugă pe rând.\nPână atunci, exersează la iMeditatii → Probleme.',
+        Text('Seria CD, anul I: probleme din examenele, testele și laboratoarele fiecărei materii.\nDeschide un director ca să vezi problemele. Materiile opționale nu sunt incluse.',
             style: TextStyle(color: ink.muted, fontSize: 14)),
         const SizedBox(height: 18),
         Row(children: [
@@ -322,8 +431,6 @@ class _Terminal extends StatelessWidget {
     );
   }
 
-  Widget _cell(Widget child, {bool last = false}) =>
-      Padding(padding: EdgeInsets.only(right: last ? 0 : 18, top: 3, bottom: 3), child: child);
 }
 
 /// The blinking block at the prompt; still when the system asks for less motion.
@@ -371,11 +478,12 @@ class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
 class _Notebook extends StatelessWidget {
   final _Ink ink;
   final bool narrow;
-  const _Notebook({required this.ink, required this.narrow});
+  final Map<String, AcsCount> counts;
+  const _Notebook({required this.ink, required this.narrow, required this.counts});
 
   @override
   Widget build(BuildContext context) {
-    final total = acsSubjects.fold<int>(0, (n, s) => n + s.problems);
+    final total = counts.values.fold<int>(0, (n, c) => n + c.problems);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -393,19 +501,24 @@ class _Notebook extends StatelessWidget {
           child: _Nav(ink: ink, size: narrow ? 15 : 17),
         ),
         const SizedBox(height: 26),
-        Text('Materii, anul I și II',
+        Text('Materii, anul I',
             style: TextStyle(fontSize: narrow ? 24 : 32, fontWeight: FontWeight.w700, color: ink.strong, height: 1.15)),
         const SizedBox(height: 4),
         Text.rich(TextSpan(children: [
-          TextSpan(text: '${acsSubjects.length} materii', style: const TextStyle(fontWeight: FontWeight.w700)),
+          TextSpan(text: '${acsSubjects.where((s) => s.ready).length} materii', style: const TextStyle(fontWeight: FontWeight.w700)),
           TextSpan(
               text: total == 0 ? ' • problemele vin în curând' : ' • $total probleme',
               style: TextStyle(color: ink.muted)),
         ]), style: TextStyle(fontSize: 14, color: ink.fg)),
         const SizedBox(height: 22),
-        for (final s in acsSubjects) ...[
-          _NotebookRow(ink: ink, s: s, narrow: narrow),
-          const SizedBox(height: 18),
+        for (final (_, title, sem) in _groups) ...[
+          const SizedBox(height: 8),
+          Text(title, style: TextStyle(fontSize: narrow ? 18 : 21, fontWeight: FontWeight.w700, color: ink.strong)),
+          const SizedBox(height: 14),
+          for (final s in acsSubjects.where((s) => s.ready ? s.semester == sem : sem == 0)) ...[
+            _NotebookRow(ink: ink, s: s, c: counts[s.section] ?? _none, narrow: narrow),
+            const SizedBox(height: 18),
+          ],
         ],
       ],
     );
@@ -415,18 +528,27 @@ class _Notebook extends StatelessWidget {
 class _NotebookRow extends StatelessWidget {
   final _Ink ink;
   final AcsSubject s;
+  final AcsCount c;
   final bool narrow;
-  const _NotebookRow({required this.ink, required this.s, required this.narrow});
+  const _NotebookRow({required this.ink, required this.s, required this.c, required this.narrow});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => _courseLink(context, s, (h) => _row(h));
+
+  Widget _row(bool h) {
     final code = Text('[${s.code.toUpperCase()}]',
-        style: TextStyle(fontWeight: FontWeight.w700, color: ink.accent, fontSize: 15));
-    final pct = Text(s.problems == 0 ? 'în curând' : _pct(s).trim(),
+        style: TextStyle(fontWeight: FontWeight.w700, color: s.ready ? ink.accent : ink.muted, fontSize: 15));
+    final pct = Text(c.problems == 0 ? 'în curând' : _pct(c).trim(),
         style: TextStyle(color: ink.muted, fontSize: 14, fontFeatures: const [FontFeature.tabularFigures()]));
-    final title = Text(s.name, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17, color: ink.strong));
+    final title = Text(s.name,
+        style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 17,
+            color: s.ready ? ink.strong : ink.muted,
+            decoration: h ? TextDecoration.underline : null,
+            decorationColor: ink.strong));
     final about = Text(
-        s.problems == 0 ? s.about : '${s.about} · ${s.problems} probleme',
+        c.problems == 0 ? s.about : '${s.about} · ${c.problems} probleme',
         style: TextStyle(color: ink.muted, fontSize: 14));
 
     if (narrow) {

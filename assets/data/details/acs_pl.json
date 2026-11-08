@@ -1,0 +1,255 @@
+{
+  "1": {
+    "id": "1",
+    "title": "Din hexazecimal în zecimal",
+    "category": "1. Sisteme de numerație și coduri",
+    "difficulty": "ușoară",
+    "description": "Scrie în baza 10 numărul $3A7_{(16)}$.",
+    "cerinta": "Scrie în baza 10 numărul $3A7_{(16)}$.",
+    "hint": "Fiecare cifră hexazecimală înmulțește o putere a lui 16; A = 10.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "935",
+    "solutie": "$3 \\cdot 16^2 + 10 \\cdot 16 + 7 = 768 + 160 + 7 = 935$."
+  },
+  "2": {
+    "id": "2",
+    "title": "Complement față de 2",
+    "category": "1. Sisteme de numerație și coduri",
+    "difficulty": "ușoară",
+    "description": "Cum se reprezintă numărul −37 în complement față de 2, pe 8 biți? Scrie cei 8 biți.",
+    "cerinta": "Cum se reprezintă numărul −37 în complement față de 2, pe 8 biți? Scrie cei 8 biți.",
+    "hint": "Scrie 37 în binar pe 8 biți, inversează toți biții și adună 1.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "11011011",
+    "solutie": "37 = 00100101. Inversat: 11011010. Plus 1: **11011011** (= 219 = 256 − 37)."
+  },
+  "3": {
+    "id": "3",
+    "title": "Codul Gray",
+    "category": "1. Sisteme de numerație și coduri",
+    "difficulty": "medie",
+    "description": "Care este cuvântul de cod Gray (pe 3 biți) al numărului 6?",
+    "cerinta": "Care este cuvântul de cod Gray (pe 3 biți) al numărului 6?",
+    "hint": "Codul Gray al lui n este n XOR (n deplasat la dreapta cu 1).",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "101",
+    "solutie": "6 = 110, iar 6 >> 1 = 011. $110 \\oplus 011 = 101$. În codul Gray, două numere consecutive diferă printr-un singur bit: 5 → 111, 6 → 101, 7 → 100."
+  },
+  "4": {
+    "id": "4",
+    "title": "Câți biți îți trebuie",
+    "category": "1. Sisteme de numerație și coduri",
+    "difficulty": "ușoară",
+    "description": "Câți biți sunt necesari, cel puțin, pentru a reprezenta fără semn numerele de la 0 la 1000?",
+    "cerinta": "Câți biți sunt necesari, cel puțin, pentru a reprezenta fără semn numerele de la 0 la 1000?",
+    "hint": "Cu k biți reprezinți numerele de la 0 la 2ᵏ − 1.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "10",
+    "solutie": "$2^9 - 1 = 511 < 1000 \\le 2^{10} - 1 = 1023$, deci sunt necesari **10** biți."
+  },
+  "5": {
+    "id": "5",
+    "title": "Legea lui De Morgan",
+    "category": "2. Algebră booleană și diagrame Karnaugh",
+    "difficulty": "ușoară",
+    "description": "Cu ce este egală expresia $\\overline{A \\cdot B}$?",
+    "cerinta": "Cu ce este egală expresia $\\overline{A \\cdot B}$?",
+    "hint": "Negația unui produs devine suma negațiilor.",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "$\\overline{A} \\cdot \\overline{B}$",
+      "$\\overline{A} + \\overline{B}$",
+      "$A + B$",
+      "$\\overline{A + B}$"
+    ],
+    "raspuns_corect": "$\\overline{A} + \\overline{B}$",
+    "solutie": "De Morgan: $\\overline{A \\cdot B} = \\overline{A} + \\overline{B}$ și $\\overline{A + B} = \\overline{A} \\cdot \\overline{B}$. De aceea poarta NAND este echivalentă cu o poartă OR cu intrările negate."
+  },
+  "6": {
+    "id": "6",
+    "title": "Simplificare algebrică",
+    "category": "2. Algebră booleană și diagrame Karnaugh",
+    "difficulty": "medie",
+    "description": "Simplifică expresia $(A + B)(A + C)$.",
+    "cerinta": "Simplifică expresia $(A + B)(A + C)$.",
+    "hint": "Desfă parantezele și folosește $A \\cdot A = A$ și absorbția $A + AX = A$.",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "$A + BC$",
+      "$AB + AC$",
+      "$A$",
+      "$A + B + C$"
+    ],
+    "raspuns_corect": "$A + BC$",
+    "solutie": "$(A + B)(A + C) = A + AC + AB + BC = A(1 + C + B) + BC = A + BC$. Este distributivitatea sumei față de produs, valabilă în algebra booleană."
+  },
+  "7": {
+    "id": "7",
+    "title": "Karnaugh cu 4 variabile",
+    "category": "2. Algebră booleană și diagrame Karnaugh",
+    "difficulty": "ușoară",
+    "description": "Funcția $f(x, y, z, t)$ ia valoarea 1 pe mintermenii 0, 1, 2, 3, 8, 9, 10, 11 (x este bitul cel mai semnificativ). Care este forma ei minimă?",
+    "cerinta": "Funcția $f(x, y, z, t)$ ia valoarea 1 pe mintermenii 0, 1, 2, 3, 8, 9, 10, 11 (x este bitul cel mai semnificativ). Care este forma ei minimă?",
+    "hint": "Scrie mintermenii în binar: ce bit e 0 la toți?",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "$\\overline{y}$",
+      "$\\overline{x}\\,\\overline{y}$",
+      "$\\overline{y} + \\overline{x}$",
+      "$x \\oplus y$"
+    ],
+    "raspuns_corect": "$\\overline{y}$",
+    "solutie": "Mintermenii 0–3 sunt 00zt, iar 8–11 sunt 10zt: în toți, y = 0, iar x, z, t iau toate valorile. Cele 8 căsuțe formează un singur grup în diagrama Karnaugh: $f = \\overline{y}$."
+  },
+  "8": {
+    "id": "8",
+    "title": "Câți termeni în forma minimă",
+    "category": "2. Algebră booleană și diagrame Karnaugh",
+    "difficulty": "medie",
+    "description": "Funcția $f(x, y, z, t) = \\sum m(0, 2, 5, 7, 8, 10, 13, 15)$ (x bitul cel mai semnificativ). Din câți termeni (produse) este formată forma disjunctivă minimă?",
+    "cerinta": "Funcția $f(x, y, z, t) = \\sum m(0, 2, 5, 7, 8, 10, 13, 15)$ (x bitul cel mai semnificativ). Din câți termeni (produse) este formată forma disjunctivă minimă?",
+    "hint": "Uită-te doar la y și t în mintermeni.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "2",
+    "solutie": "0, 2, 8, 10 au y = 0, t = 0 (colțurile diagramei), iar 5, 7, 13, 15 au y = 1, t = 1 (centrul). Două grupuri de câte 4: $f = \\overline{y}\\,\\overline{t} + y\\,t$, adică $f = \\overline{y \\oplus t}$. Forma minimă are **2** termeni."
+  },
+  "9": {
+    "id": "9",
+    "title": "Cu indiferențe",
+    "category": "2. Algebră booleană și diagrame Karnaugh",
+    "difficulty": "medie",
+    "description": "Funcția $f(x, y, z)$ este 1 pe mintermenii 1, 3, 6, 7, este indiferentă (*) pe mintermenul 5 și 0 în rest. Care este forma minimă?",
+    "cerinta": "Funcția $f(x, y, z)$ este 1 pe mintermenii 1, 3, 6, 7, este indiferentă (*) pe mintermenul 5 și 0 în rest. Care este forma minimă?",
+    "hint": "Indiferența poate fi luată 1 dacă ajută la un grup mai mare.",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "$z + xy$",
+      "$\\overline{x}z + xy$",
+      "$z$",
+      "$xz + y$"
+    ],
+    "raspuns_corect": "$z + xy$",
+    "solutie": "Luând mintermenul 5 ca 1, mintermenii 1, 3, 5, 7 (toți cu z = 1) formează un grup de 4: $z$. Rămâne mintermenul 6 = 110, grupat cu 7 în $xy$. Deci $f = z + xy$."
+  },
+  "10": {
+    "id": "10",
+    "title": "NAND universal",
+    "category": "2. Algebră booleană și diagrame Karnaugh",
+    "difficulty": "medie",
+    "description": "De câte porți NAND cu 2 intrări ai nevoie, cel puțin, pentru a obține funcția $A + B$ (OR)?",
+    "cerinta": "De câte porți NAND cu 2 intrări ai nevoie, cel puțin, pentru a obține funcția $A + B$ (OR)?",
+    "hint": "$A + B = \\overline{\\overline{A} \\cdot \\overline{B}}$, iar un NAND cu intrările legate împreună e un inversor.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "3",
+    "solutie": "Două porți NAND cu intrările legate fac $\\overline{A}$ și $\\overline{B}$, iar a treia dă $\\overline{\\overline{A}\\,\\overline{B}} = A + B$. Total **3** porți."
+  },
+  "11": {
+    "id": "11",
+    "title": "XOR cu un MUX 4:1",
+    "category": "3. Circuite combinaționale: MUX, decodificatoare, sumatoare",
+    "difficulty": "grea",
+    "description": "Implementăm $f = x \\oplus y \\oplus z$ cu un multiplexor 4:1, cu variabilele de selecție $x$ (cea mai semnificativă) și $y$. Ce se leagă la intrările $I_0, I_1, I_2, I_3$?",
+    "cerinta": "Implementăm $f = x \\oplus y \\oplus z$ cu un multiplexor 4:1, cu variabilele de selecție $x$ (cea mai semnificativă) și $y$. Ce se leagă la intrările $I_0, I_1, I_2, I_3$?",
+    "hint": "Pentru fiecare combinație xy, scrie f ca funcție doar de z.",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "$z, \\overline{z}, \\overline{z}, z$",
+      "$z, z, \\overline{z}, \\overline{z}$",
+      "$0, 1, 1, 0$",
+      "$\\overline{z}, z, z, \\overline{z}$"
+    ],
+    "raspuns_corect": "$z, \\overline{z}, \\overline{z}, z$",
+    "solutie": "$I_k$ este f pentru xy = k: xy = 00 → $f = z$; 01 → $\\overline{z}$; 10 → $\\overline{z}$; 11 → $z$. Este „multiplexarea intrărilor” din testul de PL: un singur MUX, iar variabila rămasă intră pe date."
+  },
+  "12": {
+    "id": "12",
+    "title": "Ieșirea decodificatorului",
+    "category": "3. Circuite combinaționale: MUX, decodificatoare, sumatoare",
+    "difficulty": "ușoară",
+    "description": "Un decodificator 3:8 cu ieșiri active pe 1 primește pe intrări $A_2A_1A_0 = 101$. Care ieșire (0–7) este activă?",
+    "cerinta": "Un decodificator 3:8 cu ieșiri active pe 1 primește pe intrări $A_2A_1A_0 = 101$. Care ieșire (0–7) este activă?",
+    "hint": "Decodificatorul activează ieșirea cu numărul scris pe intrări.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "5",
+    "solutie": "101 în binar este 5, deci e activă ieșirea $Y_5$, iar toate celelalte sunt 0."
+  },
+  "13": {
+    "id": "13",
+    "title": "Sumatorul complet",
+    "category": "3. Circuite combinaționale: MUX, decodificatoare, sumatoare",
+    "difficulty": "ușoară",
+    "description": "Un sumator complet pe 1 bit primește $a = 1$, $b = 1$ și transportul de intrare $c_{in} = 1$. Scrie suma $s$ și transportul de ieșire $c_{out}$, separate printr-un spațiu.",
+    "cerinta": "Un sumator complet pe 1 bit primește $a = 1$, $b = 1$ și transportul de intrare $c_{in} = 1$. Scrie suma $s$ și transportul de ieșire $c_{out}$, separate printr-un spațiu.",
+    "hint": "1 + 1 + 1 = 3. Cum se scrie 3 în binar?",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "1 1",
+    "solutie": "$1 + 1 + 1 = 3 = 11_{(2)}$: bitul de sumă $s = a \\oplus b \\oplus c_{in} = 1$, iar transportul $c_{out} = ab + c_{in}(a \\oplus b) = 1$."
+  },
+  "14": {
+    "id": "14",
+    "title": "Câte multiplexoare 4:1",
+    "category": "3. Circuite combinaționale: MUX, decodificatoare, sumatoare",
+    "difficulty": "medie",
+    "description": "Câte multiplexoare 4:1 sunt necesare pentru a construi, în cascadă (pe două niveluri), un multiplexor 16:1?",
+    "cerinta": "Câte multiplexoare 4:1 sunt necesare pentru a construi, în cascadă (pe două niveluri), un multiplexor 16:1?",
+    "hint": "Primul nivel reduce 16 intrări la 4.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "5",
+    "solutie": "Pe nivelul de intrare, 4 MUX-uri 4:1 aleg câte una din 4 intrări (16 intrări în total), iar un al cincilea MUX alege una din cele 4 ieșiri. Total **5**, exact structura din testul de PL (4 MUX pe nivelul 2, 1 pe nivelul 1)."
+  },
+  "15": {
+    "id": "15",
+    "title": "Bistabilul JK",
+    "category": "4. Circuite secvențiale: bistabili și automate",
+    "difficulty": "medie",
+    "description": "Un bistabil JK pornește cu $Q = 0$. La cinci fronturi de ceas consecutive primește $(J, K)$ = (1, 0), (0, 0), (1, 1), (0, 1), (1, 1). Ce valoare are $Q$ după ultimul front?",
+    "cerinta": "Un bistabil JK pornește cu $Q = 0$. La cinci fronturi de ceas consecutive primește $(J, K)$ = (1, 0), (0, 0), (1, 1), (0, 1), (1, 1). Ce valoare are $Q$ după ultimul front?",
+    "hint": "JK: 00 păstrează, 10 pune pe 1, 01 pune pe 0, 11 basculează.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "1",
+    "solutie": "Q: 0 → (1,0) set → 1 → (0,0) păstrează → 1 → (1,1) basculează → 0 → (0,1) reset → 0 → (1,1) basculează → **1**."
+  },
+  "16": {
+    "id": "16",
+    "title": "Bistabili pentru un numărător",
+    "category": "4. Circuite secvențiale: bistabili și automate",
+    "difficulty": "ușoară",
+    "description": "Câți bistabili sunt necesari, cel puțin, pentru un numărător modulo 10?",
+    "cerinta": "Câți bistabili sunt necesari, cel puțin, pentru un numărător modulo 10?",
+    "hint": "Fiecare bistabil ține un bit al stării.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "4",
+    "solutie": "Numărătorul are 10 stări, iar cu k bistabili sunt $2^k$ stări posibile: $2^3 = 8 < 10 \\le 16 = 2^4$. Sunt necesari **4** bistabili."
+  },
+  "17": {
+    "id": "17",
+    "title": "Moore și Mealy",
+    "category": "4. Circuite secvențiale: bistabili și automate",
+    "difficulty": "ușoară",
+    "description": "Prin ce se deosebește un automat Moore de un automat Mealy?",
+    "cerinta": "Prin ce se deosebește un automat Moore de un automat Mealy?",
+    "hint": "În organigramă, unde sunt scrise ieșirile: în stări sau pe tranziții?",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "La Moore ieșirile depind doar de starea curentă; la Mealy depind de stare și de intrări",
+      "La Moore ieșirile depind de stare și de intrări; la Mealy doar de stare",
+      "Automatul Moore nu are memorie",
+      "Automatul Mealy nu poate avea mai mult de două stări"
+    ],
+    "raspuns_corect": "La Moore ieșirile depind doar de starea curentă; la Mealy depind de stare și de intrări",
+    "solutie": "La Moore ieșirile sunt asociate stărilor; la Mealy, tranzițiilor, deci depind și de intrarea curentă. De aceea un automat Mealy poate reacționa mai repede și are de obicei mai puține stări."
+  },
+  "18": {
+    "id": "18",
+    "title": "Biți de stare pentru un automat",
+    "category": "4. Circuite secvențiale: bistabili și automate",
+    "difficulty": "ușoară",
+    "description": "Un automat are 10 stări, $S_0$–$S_9$, codificate binar (ca în subiectul de examen, cu $Q_3Q_2Q_1Q_0$). Câte variabile de stare (bistabili) sunt necesare, cel puțin?",
+    "cerinta": "Un automat are 10 stări, $S_0$–$S_9$, codificate binar (ca în subiectul de examen, cu $Q_3Q_2Q_1Q_0$). Câte variabile de stare (bistabili) sunt necesare, cel puțin?",
+    "hint": "Câte coduri distincte dau 3 biți? Dar 4?",
+    "sursa": "Examen PL · seria CD",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "4",
+    "solutie": "3 biți dau 8 coduri, prea puține; 4 biți dau 16 ≥ 10. Sunt necesari **4** bistabili, iar 6 coduri rămân nefolosite (pot fi tratate ca indiferențe la minimizare)."
+  }
+}

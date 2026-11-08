@@ -112,8 +112,10 @@ void markupTests() {
         for (final e in (grade as Map<String, dynamic>).values) {
           for (final f in ['context', 'cerinta', 'input', 'output', 'explicatie', 'hint', 'solutie']) {
             final t = (e[f] ?? '').toString().replaceAll(r'\$', '');
-            expect(RegExp(r'\$').allMatches(t).length.isEven, isTrue, reason: '${e['title']}: $f has an open \$');
             expect(RegExp('`').allMatches(t).length.isEven, isTrue, reason: '${e['title']}: $f has an open `');
+            // a $ in code (a shell's variable) is shown as it is, not a formula
+            final prose = t.replaceAll(RegExp(r'^```[\s\S]*?^```', multiLine: true), '').replaceAll(RegExp(r'`[^`\n]*`'), '');
+            expect(RegExp(r'\$').allMatches(prose).length.isEven, isTrue, reason: '${e['title']}: $f has an open \$');
           }
         }
       }

@@ -1,0 +1,338 @@
+{
+  "1": {
+    "id": "1",
+    "title": "Permisiuni în octal",
+    "category": "1. Sistemul de fișiere și permisiuni",
+    "difficulty": "ușoară",
+    "description": "Vrei ca proprietarul unui fișier să aibă toate drepturile, grupul să poată citi și executa, iar ceilalți să nu aibă niciun drept (`rwxr-x---`). Ce număr scrii în `chmod ___ fisier`?",
+    "cerinta": "Vrei ca proprietarul unui fișier să aibă toate drepturile, grupul să poată citi și executa, iar ceilalți să nu aibă niciun drept (`rwxr-x---`). Ce număr scrii în `chmod ___ fisier`?",
+    "hint": "Fiecare grup de trei litere e o cifră în baza 8: r = 4, w = 2, x = 1.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "750",
+    "solutie": "`rwx` = 4 + 2 + 1 = 7, `r-x` = 4 + 1 = 5, `---` = 0. Comanda este `chmod 750 fisier`."
+  },
+  "2": {
+    "id": "2",
+    "title": "umask",
+    "category": "1. Sistemul de fișiere și permisiuni",
+    "difficulty": "medie",
+    "description": "Cu `umask 022`, ce permisiuni (în octal) are un fișier obișnuit nou creat cu `touch`?",
+    "cerinta": "Cu `umask 022`, ce permisiuni (în octal) are un fișier obișnuit nou creat cu `touch`?",
+    "hint": "Un fișier nou pornește de la 666 (fără drept de execuție), iar umask arată biții care se scot.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "644",
+    "solutie": "Pentru fișiere, permisiunile cerute de `touch` sunt 666; umask 022 scoate dreptul de scriere pentru grup și ceilalți: 666 & ~022 = **644** (`rw-r--r--`). Un director ar porni de la 777 și ar ieși 755."
+  },
+  "3": {
+    "id": "3",
+    "title": "Doar north are drepturi depline",
+    "category": "1. Sistemul de fișiere și permisiuni",
+    "difficulty": "medie",
+    "description": "Directorul `Characters` aparține utilizatorului `north`. Vrei ca doar `north` să aibă drepturi depline asupra lui, iar ceilalți utilizatori să poată doar citi (și intra în director ca să citească). Ce comandă folosești?",
+    "cerinta": "Directorul `Characters` aparține utilizatorului `north`. Vrei ca doar `north` să aibă drepturi depline asupra lui, iar ceilalți utilizatori să poată doar citi (și intra în director ca să citească). Ce comandă folosești?",
+    "hint": "La un director, ca să citești conținutul unui fișier din el îți trebuie și dreptul x (traversare).",
+    "sursa": "Test practic USO · varianta 103 · 30 august 2018 · 1e",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`chmod 744 Characters`",
+      "`chmod 755 Characters`",
+      "`chmod 700 Characters`",
+      "`chmod 777 Characters`"
+    ],
+    "raspuns_corect": "`chmod 755 Characters`",
+    "solutie": "Proprietarul primește rwx (7). Pentru „doar citire” pe un director, ceilalți au nevoie de r ca să listeze și de x ca să poată intra în el: r-x (5). Cu 744 ar vedea numele fișierelor, dar n-ar putea accesa nimic din director."
+  },
+  "4": {
+    "id": "4",
+    "title": "Legătură simbolică ascunsă",
+    "category": "1. Sistemul de fișiere și permisiuni",
+    "difficulty": "ușoară",
+    "description": "Ești în directorul `Models`. Cum creezi aici o legătură simbolică **ascunsă**, cu numele `.RK800`, către fișierul `../CyberLife/Connor`?",
+    "cerinta": "Ești în directorul `Models`. Cum creezi aici o legătură simbolică **ascunsă**, cu numele `.RK800`, către fișierul `../CyberLife/Connor`?",
+    "hint": "Ordinea argumentelor la `ln` este aceeași ca la `cp`: întâi ținta, apoi numele nou. Un fișier ascuns începe cu punct.",
+    "sursa": "Test practic USO · varianta 103 · 30 august 2018 · 1d",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`ln ../CyberLife/Connor .RK800`",
+      "`ln -s ../CyberLife/Connor .RK800`",
+      "`ln -s .RK800 ../CyberLife/Connor`",
+      "`cp -s ../CyberLife/Connor RK800`"
+    ],
+    "raspuns_corect": "`ln -s ../CyberLife/Connor .RK800`",
+    "solutie": "`ln -s TINTA NUME` creează o legătură simbolică (fără `-s` ar fi o legătură hard). Numele care începe cu `.` face legătura ascunsă pentru `ls` fără `-a`."
+  },
+  "5": {
+    "id": "5",
+    "title": "Al doilea câmp",
+    "category": "2. Linia de comandă și filtre de text",
+    "difficulty": "ușoară",
+    "description": "Ce afișează comanda de mai jos?\n\n```bash\necho \"root:x:0:0:root:/root:/bin/bash\" | cut -d: -f6\n```",
+    "cerinta": "Ce afișează comanda de mai jos?\n\n```bash\necho \"root:x:0:0:root:/root:/bin/bash\" | cut -d: -f6\n```",
+    "hint": "`-d:` alege separatorul, `-f6` al șaselea câmp.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "/root",
+    "solutie": "Câmpurile separate de `:` sunt `root`, `x`, `0`, `0`, `root`, `/root`, `/bin/bash`. Al șaselea este `/root` (directorul home din `/etc/passwd`)."
+  },
+  "6": {
+    "id": "6",
+    "title": "Liniile pare ale unui fișier",
+    "category": "2. Linia de comandă și filtre de text",
+    "difficulty": "medie",
+    "description": "Care comandă afișează doar liniile cu număr par (a 2-a, a 4-a, ...) din `users.csv`?",
+    "cerinta": "Care comandă afișează doar liniile cu număr par (a 2-a, a 4-a, ...) din `users.csv`?",
+    "hint": "`-n` oprește afișarea automată; `p` afișează liniile alese.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 2c",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`sed -n '2~2p' users.csv`",
+      "`sed '2~2d' users.csv`",
+      "`grep -n 2 users.csv`",
+      "`awk 'NR % 2 == 1' users.csv`"
+    ],
+    "raspuns_corect": "`sed -n '2~2p' users.csv`",
+    "solutie": "`2~2` înseamnă „începând cu linia 2, din 2 în 2”, iar `-n` cu `p` le afișează doar pe acestea. Echivalent: `awk 'NR % 2 == 0' users.csv`. Varianta cu `d` ar afișa liniile impare."
+  },
+  "7": {
+    "id": "7",
+    "title": "Cel mai frecvent",
+    "category": "2. Linia de comandă și filtre de text",
+    "difficulty": "medie",
+    "description": "Fișierul `log` are pe fiecare linie numele unui utilizator. Ce număr afișează pipeline-ul de mai jos dacă fișierul conține, pe linii separate, `b a b a c b`?\n\n```bash\nsort log | uniq -c | sort -rn | head -1\n```\n\nScrie linia afișată (numărul și numele).",
+    "cerinta": "Fișierul `log` are pe fiecare linie numele unui utilizator. Ce număr afișează pipeline-ul de mai jos dacă fișierul conține, pe linii separate, `b a b a c b`?\n\n```bash\nsort log | uniq -c | sort -rn | head -1\n```\n\nScrie linia afișată (numărul și numele).",
+    "hint": "`uniq -c` numără liniile egale **consecutive**, de aceea e precedat de `sort`.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "3 b",
+    "solutie": "După `sort`: a a b b b c. `uniq -c` dă `2 a`, `3 b`, `1 c` (numărul în fața liniei); `sort -rn` le ordonează descrescător după număr, iar `head -1` păstrează prima linie: **3 b**."
+  },
+  "8": {
+    "id": "8",
+    "title": "Sortare numerică",
+    "category": "2. Linia de comandă și filtre de text",
+    "difficulty": "ușoară",
+    "description": "Fișierul `n.txt` conține pe linii separate 3, 1, 2, 10. Ce afișează `sort n.txt` (fără opțiuni)?",
+    "cerinta": "Fișierul `n.txt` conține pe linii separate 3, 1, 2, 10. Ce afișează `sort n.txt` (fără opțiuni)?",
+    "hint": "Fără `-n`, `sort` compară liniile ca text.",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "1 2 3 10",
+      "1 10 2 3",
+      "10 3 2 1",
+      "3 1 2 10"
+    ],
+    "raspuns_corect": "1 10 2 3",
+    "solutie": "Ca text, „10” vine înaintea lui „2” pentru că primul caracter, „1”, e mai mic decât „2”. Rezultatul este 1, 10, 2, 3, câte unul pe linie. Pentru ordinea numerică se folosește `sort -n`."
+  },
+  "9": {
+    "id": "9",
+    "title": "Numere în baza 2",
+    "category": "3. Shell scripting",
+    "difficulty": "ușoară",
+    "description": "Ce afișează `echo $((2#1011))` în bash?",
+    "cerinta": "Ce afișează `echo $((2#1011))` în bash?",
+    "hint": "Sintaxa `baza#număr` din expresiile aritmetice.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "11",
+    "solutie": "`2#1011` este numărul 1011 scris în baza 2: 8 + 2 + 1 = **11**."
+  },
+  "10": {
+    "id": "10",
+    "title": "Ghilimele",
+    "category": "3. Shell scripting",
+    "difficulty": "ușoară",
+    "description": "Ce afișează scriptul?\n\n```bash\nx=5\necho \"$x\" '$x'\n```",
+    "cerinta": "Ce afișează scriptul?\n\n```bash\nx=5\necho \"$x\" '$x'\n```",
+    "hint": "Între ghilimele simple nu se expandează nimic.",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`5 5`",
+      "`$x $x`",
+      "`5 $x`",
+      "`$x 5`"
+    ],
+    "raspuns_corect": "`5 $x`",
+    "solutie": "Între ghilimele duble variabila se înlocuiește cu valoarea ei; între ghilimele simple textul rămâne exact cum e. Se afișează `5 $x`."
+  },
+  "11": {
+    "id": "11",
+    "title": "Lungime și subșir",
+    "category": "3. Shell scripting",
+    "difficulty": "medie",
+    "description": "Ce afișează scriptul?\n\n```bash\ns=\"examen\"\necho ${#s} ${s:2:3}\n```",
+    "cerinta": "Ce afișează scriptul?\n\n```bash\ns=\"examen\"\necho ${#s} ${s:2:3}\n```",
+    "hint": "`${#s}` e lungimea; `${s:start:len}` e un subșir, cu pozițiile numărate de la 0.",
+    "tip_exercitiu": "text",
+    "raspuns_corect": "6 ame",
+    "solutie": "„examen” are 6 litere. `${s:2:3}` ia 3 caractere de la poziția 2 (a treia literă): `ame`. Se afișează `6 ame`."
+  },
+  "12": {
+    "id": "12",
+    "title": "Suma parametrilor",
+    "category": "3. Shell scripting",
+    "difficulty": "medie",
+    "description": "Scriptul `task2c.sh` primește oricâte numere întregi ca parametri și trebuie să afișeze suma lor. Care corp de script e corect?",
+    "cerinta": "Scriptul `task2c.sh` primește oricâte numere întregi ca parametri și trebuie să afișeze suma lor. Care corp de script e corect?",
+    "hint": "`$@` sunt toți parametrii, `$#` este numărul lor.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 2d",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`s=0; for x in \"$@\"; do s=$((s + x)); done; echo $s`",
+      "`s=0; for x in $#; do s=$((s + x)); done; echo $s`",
+      "`s=0; for x in \"$@\"; do s=$s+$x; done; echo $s`",
+      "`echo $(( $1 + $2 ))`"
+    ],
+    "raspuns_corect": "`s=0; for x in \"$@\"; do s=$((s + x)); done; echo $s`",
+    "solutie": "`\"$@\"` parcurge toți parametrii, iar `$(( ))` face adunarea. `$#` e doar numărul de parametri; `s=$s+$x` lipește text („0+1+2”); varianta cu `$1 + $2` merge doar pentru doi parametri."
+  },
+  "13": {
+    "id": "13",
+    "title": "Utilizator cu home și grup dat",
+    "category": "4. Utilizatori și procese",
+    "difficulty": "medie",
+    "description": "Cum creezi utilizatorul `IronMan`, cu grupul principal `Avengers` (care există) și directorul home `/home/avengers/Iron-Man`?",
+    "cerinta": "Cum creezi utilizatorul `IronMan`, cu grupul principal `Avengers` (care există) și directorul home `/home/avengers/Iron-Man`?",
+    "hint": "`-g` este grupul principal, `-G` grupurile suplimentare.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 1b",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`sudo useradd -m -d /home/avengers/Iron-Man -g Avengers IronMan`",
+      "`sudo useradd -m -d /home/avengers/Iron-Man -G Avengers IronMan`",
+      "`sudo usermod -d /home/avengers/Iron-Man IronMan`",
+      "`sudo groupadd -m IronMan Avengers`"
+    ],
+    "raspuns_corect": "`sudo useradd -m -d /home/avengers/Iron-Man -g Avengers IronMan`",
+    "solutie": "`-m` creează directorul home, `-d` îi dă calea, `-g` alege grupul principal (default). Cu `-G`, Avengers ar fi doar un grup suplimentar, iar utilizatorul ar primi un grup principal nou. `usermod` modifică un utilizator care există deja."
+  },
+  "14": {
+    "id": "14",
+    "title": "Shell-ul implicit",
+    "category": "4. Utilizatori și procese",
+    "difficulty": "ușoară",
+    "description": "Cum îi schimbi utilizatorului `IronMan` shell-ul implicit în `zsh`?",
+    "cerinta": "Cum îi schimbi utilizatorului `IronMan` shell-ul implicit în `zsh`?",
+    "hint": "Shell-ul implicit e ultimul câmp din `/etc/passwd`.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 1d",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`sudo chsh -s /usr/bin/zsh IronMan`",
+      "`sudo zsh IronMan`",
+      "`export SHELL=zsh`",
+      "`sudo chmod +x /usr/bin/zsh`"
+    ],
+    "raspuns_corect": "`sudo chsh -s /usr/bin/zsh IronMan`",
+    "solutie": "`chsh -s` (sau `usermod -s`) schimbă ultimul câmp din `/etc/passwd`. `export SHELL=...` schimbă doar o variabilă în sesiunea curentă."
+  },
+  "15": {
+    "id": "15",
+    "title": "Comandă ca alt utilizator",
+    "category": "4. Utilizatori și procese",
+    "difficulty": "medie",
+    "description": "Cum rulezi comanda `echo \"I am $USER\"` ca utilizatorul `luther`, fără să te autentifici interactiv ca el (ai drepturi sudo)?",
+    "cerinta": "Cum rulezi comanda `echo \"I am $USER\"` ca utilizatorul `luther`, fără să te autentifici interactiv ca el (ai drepturi sudo)?",
+    "hint": "Atenție și la cine expandează `$USER`: shell-ul tău sau cel al lui luther?",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 5c",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`sudo -u luther bash -c 'echo \"I am $USER\"'`",
+      "`su luther`",
+      "`sudo echo \"I am $USER\"`",
+      "`chown luther echo`"
+    ],
+    "raspuns_corect": "`sudo -u luther bash -c 'echo \"I am $USER\"'`",
+    "solutie": "`sudo -u luther` rulează comanda ca luther. Ghilimelele simple din jur fac ca `$USER` să fie expandat de shell-ul pornit ca luther, deci se afișează „I am luther”. `su luther` deschide o sesiune interactivă, iar `sudo echo` rulează ca root."
+  },
+  "16": {
+    "id": "16",
+    "title": "Utilizatorii fără bash",
+    "category": "4. Utilizatori și procese",
+    "difficulty": "medie",
+    "description": "Care comandă afișează toți utilizatorii care **nu** au ca shell implicit `/bin/bash`?",
+    "cerinta": "Care comandă afișează toți utilizatorii care **nu** au ca shell implicit `/bin/bash`?",
+    "hint": "În `/etc/passwd` câmpurile sunt separate de `:`, iar shell-ul este al 7-lea.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 5d",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`awk -F: '$7 != \"/bin/bash\" {print $1}' /etc/passwd`",
+      "`grep /bin/bash /etc/passwd`",
+      "`cut -d: -f1 /etc/shadow`",
+      "`awk '{print $7}' /etc/passwd`"
+    ],
+    "raspuns_corect": "`awk -F: '$7 != \"/bin/bash\" {print $1}' /etc/passwd`",
+    "solutie": "awk cu separatorul `:` compară câmpul 7 (shell-ul) și afișează câmpul 1 (numele). Echivalent: `grep -v '/bin/bash$' /etc/passwd | cut -d: -f1`."
+  },
+  "17": {
+    "id": "17",
+    "title": "Porturile TCP care ascultă",
+    "category": "5. Rețelistică și securitate",
+    "difficulty": "ușoară",
+    "description": "Ce comandă afișează porturile TCP pe care ascultă mașina?",
+    "cerinta": "Ce comandă afișează porturile TCP pe care ascultă mașina?",
+    "hint": "`-t` TCP, `-l` listening, `-n` numeric.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 3c",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`ss -tln`",
+      "`ping -t localhost`",
+      "`ip addr show`",
+      "`traceroute -T`"
+    ],
+    "raspuns_corect": "`ss -tln`",
+    "solutie": "`ss -tln` (sau vechiul `netstat -tln`) listează socket-urile TCP în starea LISTEN, cu porturile ca numere."
+  },
+  "18": {
+    "id": "18",
+    "title": "Cinci pachete la 0,7 secunde",
+    "category": "5. Rețelistică și securitate",
+    "difficulty": "ușoară",
+    "description": "Cum testezi conectivitatea la `elf.cs.pub.ro` trimițând 5 pachete, la interval de 0,7 secunde?",
+    "cerinta": "Cum testezi conectivitatea la `elf.cs.pub.ro` trimițând 5 pachete, la interval de 0,7 secunde?",
+    "hint": "`-c` count, `-i` interval.",
+    "sursa": "Test practic USO · varianta 103 · 30 august 2018 · 2a",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`ping -c 5 -i 0.7 elf.cs.pub.ro`",
+      "`ping -i 5 -c 0.7 elf.cs.pub.ro`",
+      "`traceroute -c 5 elf.cs.pub.ro`",
+      "`ssh -c 5 elf.cs.pub.ro`"
+    ],
+    "raspuns_corect": "`ping -c 5 -i 0.7 elf.cs.pub.ro`",
+    "solutie": "`ping -c 5` se oprește după 5 pachete, iar `-i 0.7` setează intervalul dintre ele."
+  },
+  "19": {
+    "id": "19",
+    "title": "Autentificare SSH fără parolă",
+    "category": "5. Rețelistică și securitate",
+    "difficulty": "medie",
+    "description": "Vrei să te conectezi prin SSH ca `student@10.0.0.21` fără parolă. Ce pași faci?",
+    "cerinta": "Vrei să te conectezi prin SSH ca `student@10.0.0.21` fără parolă. Ce pași faci?",
+    "hint": "Autentificarea cu chei: cheia publică trebuie să ajungă pe server.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 3d",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`ssh-keygen`, apoi `ssh-copy-id student@10.0.0.21`",
+      "`ssh -X student@10.0.0.21`",
+      "`passwd -d student` pe mașina locală",
+      "`scp ~/.ssh/known_hosts student@10.0.0.21:`"
+    ],
+    "raspuns_corect": "`ssh-keygen`, apoi `ssh-copy-id student@10.0.0.21`",
+    "solutie": "`ssh-keygen` creează perechea de chei; `ssh-copy-id` adaugă cheia publică în `~/.ssh/authorized_keys` pe server. De atunci serverul te autentifică prin cheia privată, fără parolă."
+  },
+  "20": {
+    "id": "20",
+    "title": "Decriptare aes-256-cbc",
+    "category": "5. Rețelistică și securitate",
+    "difficulty": "medie",
+    "description": "Fișierul `encrypted_file` a fost criptat cu `aes-256-cbc`, cu parola `uso_rullz`. Cum îl decriptezi?",
+    "cerinta": "Fișierul `encrypted_file` a fost criptat cu `aes-256-cbc`, cu parola `uso_rullz`. Cum îl decriptezi?",
+    "hint": "Opțiunea `-d` înseamnă „decrypt”.",
+    "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 4c",
+    "tip_exercitiu": "grila",
+    "variante": [
+      "`openssl enc -d -aes-256-cbc -in encrypted_file -out decrypted -k uso_rullz`",
+      "`openssl enc -aes-256-cbc -in encrypted_file -k uso_rullz`",
+      "`md5sum encrypted_file`",
+      "`gpg --sign encrypted_file`"
+    ],
+    "raspuns_corect": "`openssl enc -d -aes-256-cbc -in encrypted_file -out decrypted -k uso_rullz`",
+    "solutie": "`openssl enc` cu `-d` decriptează, cu cifrul dat și parola dată prin `-k` (sau `-pass pass:...`). Fără `-d` ar cripta din nou; `md5sum` doar calculează un hash."
+  }
+}

@@ -27,6 +27,8 @@ TEX = {
     r'\sqrt': '√', r'\int': '∫', r'\sum': 'Σ', r'\lim': 'lim', r'\ln': 'ln', r'\log': 'log', r'\sin': 'sin', r'\cos': 'cos',
     r'\tg': 'tg', r'\ctg': 'ctg', r'\{': '\x01', r'\}': '\x02', r'\varepsilon': 'ε', r'\epsilon': 'ε', r'\Delta': 'Δ', r'\lambda': 'λ', r'\,': ' ', r'\;': ' ', r'\quad': ' ', r'\left': '', r'\right': '',
     r'\dots': '…', r'\ldots': '…', r'\cdots': '…', r'\%': '%', r'\ast': '∗', r'\star': '⋆', r'\perp': '⊥',
+    r'\mid': '|', r'\|': '‖', r'\ ': ' ', r'\Omega': 'Ω', r'\omega': 'ω', r'\mu': 'μ', r'\varphi': 'φ', r'\kappa': 'κ', r'\theta': 'θ',
+    r'\sigma': 'σ', r'\tau': 'τ', r'\Gamma': 'Γ', r'\partial': '∂', r'\oint': '∮', r'\iint': '∬',
     r'\parallel': '∥', r'\angle': '∠', r'\triangle': '△', r'\equiv': '≡', r'\approx': '≈', r'\pm': '±',
 }
 SUP = str.maketrans('0123456789+-n', '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ')

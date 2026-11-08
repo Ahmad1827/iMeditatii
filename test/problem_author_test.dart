@@ -9,6 +9,11 @@ void main() {
     expect(problemCredit({'category': '1. AcadNet 2026'}, fromSiteFiles: true, grade: 'AcadNet'), ('Adăugată de', 'Ahmad'));
     expect(problemCredit({'category': '11. Olimpiadă'}, fromSiteFiles: true, grade: '9'), ('Adăugată de', 'Ahmad'));
     expect(problemCredit({'sursa': 'BAC 2021 · Test de antrenament 1 · Subiectul III.2'}, fromSiteFiles: true, grade: '12'), ('Adăugată de', 'Ahmad'));
+    // ACS: from a course's exam or lab, or the site's own
+    expect(problemCredit({'sursa': 'Examen PCLP · seria CD · 31 ianuarie 2020 · Subiectul 2.3'}, fromSiteFiles: true, grade: 'PCLP'), ('Adăugată de', 'Ahmad'));
+    expect(problemCredit({'sursa': 'Test practic USO · varianta 125'}, fromSiteFiles: true, grade: 'USO'), ('Adăugată de', 'Ahmad'));
+    expect(problemCredit({'sursa': 'Restanță MN 2022'}, fromSiteFiles: true, grade: 'MN'), ('Adăugată de', 'Ahmad'));
+    expect(problemCredit({'category': '1. Cinematică'}, fromSiteFiles: true, grade: 'Fizică'), ('Creată de', 'Ahmad'));
     // the site's own practice problems in the style of Subiectul III are his
     expect(
       problemCredit({'sursa': 'Exercițiu de antrenament (nu e dintr-o variantă BAC)', 'category': '1. Subiectul III.1 · Subprograme'},

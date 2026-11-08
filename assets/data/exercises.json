@@ -6958,5 +6958,1157 @@
         }
       ]
     }
+  },
+  "ACS": {
+    "AM": {
+      "1. Serii de numere și serii de puteri": [
+        {
+          "id": "1",
+          "title": "Serie telescopică",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Serie geometrică",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Seria armonică generalizată",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "4",
+          "title": "Raza de convergență",
+          "difficulty": "medie"
+        },
+        {
+          "id": "5",
+          "title": "Coeficient Taylor",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Derivate parțiale și extreme": [
+        {
+          "id": "6",
+          "title": "Derivată parțială mixtă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "7",
+          "title": "Minim liber",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "8",
+          "title": "Extremele pe un triunghi: minimul",
+          "difficulty": "grea",
+          "sursa": "Examen AM · seria CD · februarie 2022 · subiectul 3"
+        },
+        {
+          "id": "9",
+          "title": "Extremele pe un triunghi: maximul",
+          "difficulty": "grea",
+          "sursa": "Examen AM · seria CD · februarie 2022 · subiectul 3"
+        }
+      ],
+      "3. Integrale improprii, Gamma și Beta": [
+        {
+          "id": "10",
+          "title": "Funcția Gamma",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "11",
+          "title": "Funcția Beta",
+          "difficulty": "medie"
+        },
+        {
+          "id": "12",
+          "title": "Gamma de o doime",
+          "difficulty": "ușoară"
+        }
+      ],
+      "4. Integrale multiple, curbilinii și de suprafață": [
+        {
+          "id": "13",
+          "title": "Integrală dublă pe un dreptunghi",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "14",
+          "title": "Volumul dintre sferă și paraboloid",
+          "difficulty": "grea",
+          "sursa": "Examen AM · seria CD · februarie 2022 · subiectul 5"
+        },
+        {
+          "id": "15",
+          "title": "Aria cu o integrală curbilinie",
+          "difficulty": "medie"
+        },
+        {
+          "id": "16",
+          "title": "Fluxul printr-o sferă",
+          "difficulty": "medie"
+        }
+      ]
+    },
+    "ALGAED": {
+      "1. Matrice, determinanți și sisteme": [
+        {
+          "id": "1",
+          "title": "Determinant 3 × 3",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Rangul unei matrice",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Pseudosoluția unui sistem",
+          "difficulty": "grea",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 1"
+        },
+        {
+          "id": "4",
+          "title": "Dimensiunea nucleului",
+          "difficulty": "ușoară"
+        }
+      ],
+      "2. Valori proprii, forme pătratice și DVS": [
+        {
+          "id": "5",
+          "title": "Cea mai mare valoare proprie",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "6",
+          "title": "Forma pătratică și conica",
+          "difficulty": "medie",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 2"
+        },
+        {
+          "id": "7",
+          "title": "Produsul valorilor proprii",
+          "difficulty": "ușoară",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 2"
+        },
+        {
+          "id": "8",
+          "title": "Valorile singulare ale unui proiector",
+          "difficulty": "grea",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 3a"
+        },
+        {
+          "id": "9",
+          "title": "Valoarea singulară maximă",
+          "difficulty": "medie"
+        }
+      ],
+      "3. Geometrie analitică în spațiu": [
+        {
+          "id": "10",
+          "title": "Distanța de la un punct la un plan",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "11",
+          "title": "Aria unui triunghi",
+          "difficulty": "medie"
+        },
+        {
+          "id": "12",
+          "title": "Unghiul dintre doi vectori",
+          "difficulty": "ușoară"
+        }
+      ],
+      "4. Ecuații diferențiale": [
+        {
+          "id": "13",
+          "title": "Ecuație liniară de ordinul I",
+          "difficulty": "medie",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 3b"
+        },
+        {
+          "id": "14",
+          "title": "Câte rădăcini are soluția",
+          "difficulty": "grea",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 4"
+        },
+        {
+          "id": "15",
+          "title": "Portretul de fază",
+          "difficulty": "medie",
+          "sursa": "Examen ALGAED · 10 februarie 2022 · subiectul 5"
+        }
+      ]
+    },
+    "PCLP": {
+      "1. Subiectul 2 · Ce afișează programul": [
+        {
+          "id": "1",
+          "title": "Recursivitate cu pointer de ieșire",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2019 · Subiectul 2.3"
+        },
+        {
+          "id": "2",
+          "title": "Litere repetate alăturate",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2019 · Subiectul 2.2"
+        },
+        {
+          "id": "3",
+          "title": "Șirurile lui Hofstadter",
+          "difficulty": "grea",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2017 · Subiectul 2.1"
+        },
+        {
+          "id": "4",
+          "title": "Macrouri pentru paritate",
+          "difficulty": "ușoară",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2017 · Subiectul 2.3"
+        },
+        {
+          "id": "5",
+          "title": "memmove peste propriul șir",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 31 ianuarie 2020 · Subiectul 2.3"
+        },
+        {
+          "id": "6",
+          "title": "Ștergerea perechilor egale",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 2 februarie 2016 · Subiectul 2.2"
+        },
+        {
+          "id": "7",
+          "title": "Recursivitate pe un vector",
+          "difficulty": "grea",
+          "sursa": "Examen PCLP · seria CD · 30 ianuarie 2018 · Subiectul 2.3"
+        },
+        {
+          "id": "8",
+          "title": "Octetul al doilea al unui int",
+          "difficulty": "grea",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2019 · Subiectul 2.1"
+        },
+        {
+          "id": "9",
+          "title": "calloc citit ca int",
+          "difficulty": "grea",
+          "sursa": "Examen PCLP · seria CD · 31 ianuarie 2020 · Subiectul 2.2"
+        },
+        {
+          "id": "10",
+          "title": "sizeof pe pointer și pe tablou",
+          "difficulty": "ușoară",
+          "sursa": "Examen PCLP · seria CD · 30 ianuarie 2018 · Subiectul 2.1"
+        },
+        {
+          "id": "11",
+          "title": "strcmp și literal de șir",
+          "difficulty": "medie",
+          "sursa": "Exemplu de subiect PCLP · 2015"
+        }
+      ],
+      "2. Șiruri de caractere": [
+        {
+          "id": "12",
+          "title": "Reducerea perechilor egale",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 2 februarie 2016 · după Subiectul 2.2"
+        },
+        {
+          "id": "13",
+          "title": "Număr de mașină valid",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2017 · după Subiectul 1"
+        }
+      ],
+      "3. Operații pe biți": [
+        {
+          "id": "14",
+          "title": "Șoferul cu rating maxim",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2017 · Subiectul 1.5"
+        },
+        {
+          "id": "15",
+          "title": "Cine nu a returnat cărțile",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 2 februarie 2016 · Subiectul 1.6"
+        },
+        {
+          "id": "16",
+          "title": "Câți biți de 1",
+          "difficulty": "ușoară"
+        }
+      ],
+      "4. Structuri și alocare dinamică": [
+        {
+          "id": "17",
+          "title": "Mesaje sortate după destinatar",
+          "difficulty": "medie",
+          "sursa": "Exemplu de subiect PCLP · 2015 · punctul d"
+        },
+        {
+          "id": "18",
+          "title": "Cei mai apropiați șoferi",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2017 · Subiectul 1.6"
+        }
+      ],
+      "5. Subiectul 1 · Probleme de examen": [
+        {
+          "id": "19",
+          "title": "Seriile de numere",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 31 ianuarie 2020 · Subiectul 1.2 și 1.4"
+        },
+        {
+          "id": "20",
+          "title": "Termenul comun al seriilor",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 31 ianuarie 2020 · Subiectul 1.6"
+        },
+        {
+          "id": "21",
+          "title": "Persoana cu cele mai multe tranzacții",
+          "difficulty": "medie",
+          "sursa": "Examen PCLP · seria CD · 30 ianuarie 2018 · Subiectul 1.6"
+        },
+        {
+          "id": "22",
+          "title": "Mutările turei",
+          "difficulty": "grea",
+          "sursa": "Examen PCLP · seria CD · 5 februarie 2019 · Subiectul 1.5"
+        }
+      ]
+    },
+    "USO": {
+      "1. Sistemul de fișiere și permisiuni": [
+        {
+          "id": "1",
+          "title": "Permisiuni în octal",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "umask",
+          "difficulty": "medie"
+        },
+        {
+          "id": "3",
+          "title": "Doar north are drepturi depline",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 103 · 30 august 2018 · 1e"
+        },
+        {
+          "id": "4",
+          "title": "Legătură simbolică ascunsă",
+          "difficulty": "ușoară",
+          "sursa": "Test practic USO · varianta 103 · 30 august 2018 · 1d"
+        }
+      ],
+      "2. Linia de comandă și filtre de text": [
+        {
+          "id": "5",
+          "title": "Al doilea câmp",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "6",
+          "title": "Liniile pare ale unui fișier",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 2c"
+        },
+        {
+          "id": "7",
+          "title": "Cel mai frecvent",
+          "difficulty": "medie"
+        },
+        {
+          "id": "8",
+          "title": "Sortare numerică",
+          "difficulty": "ușoară"
+        }
+      ],
+      "3. Shell scripting": [
+        {
+          "id": "9",
+          "title": "Numere în baza 2",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "10",
+          "title": "Ghilimele",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "11",
+          "title": "Lungime și subșir",
+          "difficulty": "medie"
+        },
+        {
+          "id": "12",
+          "title": "Suma parametrilor",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 2d"
+        }
+      ],
+      "4. Utilizatori și procese": [
+        {
+          "id": "13",
+          "title": "Utilizator cu home și grup dat",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 1b"
+        },
+        {
+          "id": "14",
+          "title": "Shell-ul implicit",
+          "difficulty": "ușoară",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 1d"
+        },
+        {
+          "id": "15",
+          "title": "Comandă ca alt utilizator",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 5c"
+        },
+        {
+          "id": "16",
+          "title": "Utilizatorii fără bash",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 5d"
+        }
+      ],
+      "5. Rețelistică și securitate": [
+        {
+          "id": "17",
+          "title": "Porturile TCP care ascultă",
+          "difficulty": "ușoară",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 3c"
+        },
+        {
+          "id": "18",
+          "title": "Cinci pachete la 0,7 secunde",
+          "difficulty": "ușoară",
+          "sursa": "Test practic USO · varianta 103 · 30 august 2018 · 2a"
+        },
+        {
+          "id": "19",
+          "title": "Autentificare SSH fără parolă",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 3d"
+        },
+        {
+          "id": "20",
+          "title": "Decriptare aes-256-cbc",
+          "difficulty": "medie",
+          "sursa": "Test practic USO · varianta 125 · 30 ianuarie 2022 · 4c"
+        }
+      ]
+    },
+    "PL": {
+      "1. Sisteme de numerație și coduri": [
+        {
+          "id": "1",
+          "title": "Din hexazecimal în zecimal",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Complement față de 2",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Codul Gray",
+          "difficulty": "medie"
+        },
+        {
+          "id": "4",
+          "title": "Câți biți îți trebuie",
+          "difficulty": "ușoară"
+        }
+      ],
+      "2. Algebră booleană și diagrame Karnaugh": [
+        {
+          "id": "5",
+          "title": "Legea lui De Morgan",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "6",
+          "title": "Simplificare algebrică",
+          "difficulty": "medie"
+        },
+        {
+          "id": "7",
+          "title": "Karnaugh cu 4 variabile",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "8",
+          "title": "Câți termeni în forma minimă",
+          "difficulty": "medie"
+        },
+        {
+          "id": "9",
+          "title": "Cu indiferențe",
+          "difficulty": "medie"
+        },
+        {
+          "id": "10",
+          "title": "NAND universal",
+          "difficulty": "medie"
+        }
+      ],
+      "3. Circuite combinaționale: MUX, decodificatoare, sumatoare": [
+        {
+          "id": "11",
+          "title": "XOR cu un MUX 4:1",
+          "difficulty": "grea"
+        },
+        {
+          "id": "12",
+          "title": "Ieșirea decodificatorului",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "13",
+          "title": "Sumatorul complet",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "14",
+          "title": "Câte multiplexoare 4:1",
+          "difficulty": "medie"
+        }
+      ],
+      "4. Circuite secvențiale: bistabili și automate": [
+        {
+          "id": "15",
+          "title": "Bistabilul JK",
+          "difficulty": "medie"
+        },
+        {
+          "id": "16",
+          "title": "Bistabili pentru un numărător",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "17",
+          "title": "Moore și Mealy",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "18",
+          "title": "Biți de stare pentru un automat",
+          "difficulty": "ușoară",
+          "sursa": "Examen PL · seria CD"
+        }
+      ]
+    },
+    "MS": {
+      "1. Funcții complexe și reziduuri": [
+        {
+          "id": "1",
+          "title": "Modulul unui număr complex",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "O putere a lui 1 + i",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Un reziduu",
+          "difficulty": "medie"
+        },
+        {
+          "id": "4",
+          "title": "Formula integrală a lui Cauchy",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Transformatele Laplace, Fourier și Z": [
+        {
+          "id": "5",
+          "title": "Transformata Laplace a lui t²",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "6",
+          "title": "Original din transformată",
+          "difficulty": "medie"
+        },
+        {
+          "id": "7",
+          "title": "Transformata Z",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "8",
+          "title": "Ecuație diferențială cu Laplace",
+          "difficulty": "medie"
+        }
+      ],
+      "3. Probabilități și variabile aleatoare": [
+        {
+          "id": "9",
+          "title": "Constanta unei densități",
+          "difficulty": "medie",
+          "sursa": "Examen final MS · seria CD · 10 iunie 2022 · subiectul 1a"
+        },
+        {
+          "id": "10",
+          "title": "Probabilitate condiționată",
+          "difficulty": "grea",
+          "sursa": "Examen final MS · seria CD · 10 iunie 2022 · subiectul 1c"
+        },
+        {
+          "id": "11",
+          "title": "Media unei marginale",
+          "difficulty": "grea",
+          "sursa": "Examen final MS · seria CD · 10 iunie 2022 · subiectul 2"
+        },
+        {
+          "id": "12",
+          "title": "Regula celor 2σ",
+          "difficulty": "ușoară"
+        }
+      ],
+      "4. Statistică: estimare și teste": [
+        {
+          "id": "13",
+          "title": "Verosimilitate maximă (Pareto)",
+          "difficulty": "grea",
+          "sursa": "Examen final MS · seria CD · 10 iunie 2022 · subiectul 3b"
+        },
+        {
+          "id": "14",
+          "title": "Testul pentru o proporție",
+          "difficulty": "grea",
+          "sursa": "Examen final MS · seria CD · 10 iunie 2022 · subiectul 4"
+        },
+        {
+          "id": "15",
+          "title": "Estimatorul parametrului exponențial",
+          "difficulty": "medie"
+        }
+      ]
+    },
+    "ELTH": {
+      "1. Circuite de curent continuu": [
+        {
+          "id": "1",
+          "title": "Rezistențe serie și paralel",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Generatorul echivalent Thévenin",
+          "difficulty": "medie"
+        },
+        {
+          "id": "3",
+          "title": "Transferul maxim de putere",
+          "difficulty": "ușoară"
+        }
+      ],
+      "2. Circuite de curent alternativ": [
+        {
+          "id": "4",
+          "title": "Teorema lui Kirchhoff I în complex",
+          "difficulty": "medie",
+          "sursa": "Examen final ELTH · seria CD · problema de c.a."
+        },
+        {
+          "id": "5",
+          "title": "Valoarea maximă a curentului",
+          "difficulty": "ușoară",
+          "sursa": "Examen final ELTH · seria CD · problema de c.a."
+        },
+        {
+          "id": "6",
+          "title": "Faza inițială",
+          "difficulty": "medie",
+          "sursa": "Examen final ELTH · seria CD · problema de c.a."
+        },
+        {
+          "id": "7",
+          "title": "Factorul de putere",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "8",
+          "title": "Puterea activă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "9",
+          "title": "Pulsația de rezonanță",
+          "difficulty": "medie"
+        }
+      ],
+      "3. Regim tranzitoriu": [
+        {
+          "id": "10",
+          "title": "Constanta de timp",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "11",
+          "title": "Încărcarea condensatorului",
+          "difficulty": "medie",
+          "sursa": "Examen final ELTH · seria CD · problema de regim tranzitoriu"
+        },
+        {
+          "id": "12",
+          "title": "Energia din bobină",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "13",
+          "title": "Continuitatea la comutare",
+          "difficulty": "ușoară",
+          "sursa": "Examen final ELTH · seria CD · problema de regim tranzitoriu"
+        }
+      ],
+      "4. Teoria câmpului electromagnetic": [
+        {
+          "id": "14",
+          "title": "Legea lui Coulomb",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "15",
+          "title": "Legea fluxului electric",
+          "difficulty": "ușoară",
+          "sursa": "Examen final ELTH · seria CD · teorie câmp"
+        },
+        {
+          "id": "16",
+          "title": "Energia din condensator",
+          "difficulty": "ușoară"
+        }
+      ]
+    },
+    "Fizică": {
+      "1. Cinematică": [
+        {
+          "id": "1",
+          "title": "Căderea liberă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Înălțimea maximă a unei aruncări oblice",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Bătaia",
+          "difficulty": "medie"
+        },
+        {
+          "id": "4",
+          "title": "Traversarea râului",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Dinamică: legile lui Newton": [
+        {
+          "id": "5",
+          "title": "Planul înclinat cu frecare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "6",
+          "title": "Accelerația centripetă",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "7",
+          "title": "Principiul inerției",
+          "difficulty": "ușoară"
+        }
+      ],
+      "3. Lucru mecanic, energie și impuls": [
+        {
+          "id": "8",
+          "title": "Lucrul mecanic al unei forțe constante",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "9",
+          "title": "Conservarea energiei",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "10",
+          "title": "Ciocnirea plastică",
+          "difficulty": "medie"
+        }
+      ],
+      "4. Mișcarea de rotație și oscilații": [
+        {
+          "id": "11",
+          "title": "Momentul de inerție al unui disc",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "12",
+          "title": "Patinatorul",
+          "difficulty": "medie"
+        },
+        {
+          "id": "13",
+          "title": "Pulsația unui oscilator",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "14",
+          "title": "Viteza maximă în oscilație",
+          "difficulty": "ușoară"
+        }
+      ]
+    },
+    "MN": {
+      "1. Sisteme liniare: metode directe": [
+        {
+          "id": "1",
+          "title": "Factorizarea LU",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "2",
+          "title": "Factorizarea Cholesky",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "3",
+          "title": "Numărul de condiționare",
+          "difficulty": "medie"
+        },
+        {
+          "id": "4",
+          "title": "Gram–Schmidt și QR",
+          "difficulty": "medie"
+        }
+      ],
+      "2. Metode iterative și valori proprii": [
+        {
+          "id": "5",
+          "title": "Un pas Jacobi",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "6",
+          "title": "Un pas Gauss–Seidel",
+          "difficulty": "medie"
+        },
+        {
+          "id": "7",
+          "title": "Metoda puterii",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "8",
+          "title": "DVS a unei matrice 2 × 2",
+          "difficulty": "medie",
+          "sursa": "Restanță MN 2022"
+        },
+        {
+          "id": "9",
+          "title": "PageRank pe un ciclu",
+          "difficulty": "medie",
+          "sursa": "Tema 1 MN 2022 · PageRank"
+        }
+      ],
+      "3. Interpolare și aproximare": [
+        {
+          "id": "10",
+          "title": "Interpolare Lagrange",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "11",
+          "title": "Diferențe divizate",
+          "difficulty": "medie"
+        },
+        {
+          "id": "12",
+          "title": "Dreapta celor mai mici pătrate",
+          "difficulty": "medie"
+        }
+      ],
+      "4. Ecuații neliniare, integrare și ecuații diferențiale": [
+        {
+          "id": "13",
+          "title": "Metoda lui Newton",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "14",
+          "title": "Câți pași de bisecție",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "15",
+          "title": "Regula trapezelor",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "16",
+          "title": "Metoda Euler explicită",
+          "difficulty": "ușoară"
+        }
+      ]
+    },
+    "IOCLA": {
+      "1. Reprezentarea datelor și operații pe biți": [
+        {
+          "id": "1",
+          "title": "Cast la unsigned char",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Reprezentarea datelor"
+        },
+        {
+          "id": "2",
+          "title": "Domeniul lui short",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Reprezentarea datelor"
+        },
+        {
+          "id": "3",
+          "title": "Diferă printr-un singur bit",
+          "difficulty": "medie",
+          "sursa": "Test de curs IOCLA · Operații pe biți"
+        },
+        {
+          "id": "4",
+          "title": "Rotire la stânga",
+          "difficulty": "medie",
+          "sursa": "Test de curs IOCLA · Operații pe biți"
+        },
+        {
+          "id": "5",
+          "title": "shr și Carry Flag",
+          "difficulty": "medie",
+          "sursa": "Test de curs IOCLA · Operații pe biți"
+        },
+        {
+          "id": "6",
+          "title": "sar față de shr",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Operații pe biți"
+        }
+      ],
+      "2. Registre și instrucțiuni x86": [
+        {
+          "id": "7",
+          "title": "Overflow la adunare",
+          "difficulty": "medie",
+          "sursa": "Test de curs IOCLA · Instrucțiuni aritmetice"
+        },
+        {
+          "id": "8",
+          "title": "Restul împărțirii pe 16 biți",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Instrucțiuni aritmetice"
+        },
+        {
+          "id": "9",
+          "title": "Registrul care se schimbă mereu",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Registre"
+        },
+        {
+          "id": "10",
+          "title": "Adresare bazată și indexată",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Moduri de adresare"
+        },
+        {
+          "id": "11",
+          "title": "lea pentru înmulțire",
+          "difficulty": "ușoară"
+        },
+        {
+          "id": "12",
+          "title": "strcpy în asamblare",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Instrucțiuni pe șiruri"
+        }
+      ],
+      "3. Stiva și apelul de funcții": [
+        {
+          "id": "13",
+          "title": "Parametrii în cdecl",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Funcții"
+        },
+        {
+          "id": "14",
+          "title": "Vârful stivei",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Stiva"
+        },
+        {
+          "id": "15",
+          "title": "Interschimbare cu stiva",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Stiva"
+        },
+        {
+          "id": "16",
+          "title": "Offsetul până la adresa de retur",
+          "difficulty": "medie",
+          "sursa": "Test de curs IOCLA · Gestiunea bufferelor"
+        }
+      ],
+      "4. Compilare și securitatea bufferelor": [
+        {
+          "id": "17",
+          "title": "Etapele compilării",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Introducere"
+        },
+        {
+          "id": "18",
+          "title": "Zona care crește în jos",
+          "difficulty": "ușoară",
+          "sursa": "Test de curs IOCLA · Memoria unui proces"
+        },
+        {
+          "id": "19",
+          "title": "Payload pentru adresa de retur",
+          "difficulty": "grea",
+          "sursa": "Test de curs IOCLA · Gestiunea bufferelor"
+        }
+      ]
+    },
+    "SD": {
+      "1. Liste înlănțuite": [
+        {
+          "id": "1",
+          "title": "Duplicatele dintr-o listă",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · iunie 2022 · numărul 2 · P1"
+        },
+        {
+          "id": "2",
+          "title": "Perechi cu suma k din două liste",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · proba practică · problema 1"
+        }
+      ],
+      "2. Stive și cozi": [
+        {
+          "id": "3",
+          "title": "Paranteze corect închise",
+          "difficulty": "ușoară",
+          "sursa": "Laborator SD 4 · Stive și cozi"
+        }
+      ],
+      "3. Arbori binari": [
+        {
+          "id": "4",
+          "title": "Diferența maximă față de succesor",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · iunie 2022 · numărul 2 · P2"
+        },
+        {
+          "id": "5",
+          "title": "Subarbori cu multe valori y",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 4"
+        },
+        {
+          "id": "6",
+          "title": "Nodurile pe niveluri",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 5"
+        }
+      ],
+      "4. Heap și tabele de dispersie": [
+        {
+          "id": "7",
+          "title": "Operații pe un max-heap",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 14"
+        },
+        {
+          "id": "8",
+          "title": "Tabela de dispersie cu liste",
+          "difficulty": "ușoară",
+          "sursa": "Curs SD 12 · Tabele de dispersie"
+        }
+      ],
+      "5. Grafuri": [
+        {
+          "id": "9",
+          "title": "Drum minim printr-un nod intermediar",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · proba practică · problema 2"
+        },
+        {
+          "id": "10",
+          "title": "Cel mai scurt drum într-un graf aciclic",
+          "difficulty": "grea",
+          "sursa": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 6"
+        }
+      ],
+      "6. Test grilă de examen": [
+        {
+          "id": "11",
+          "title": "Duplicate într-un vector",
+          "difficulty": "ușoară",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 2"
+        },
+        {
+          "id": "12",
+          "title": "Echilibrarea unui AVL",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 3"
+        },
+        {
+          "id": "13",
+          "title": "Coliziune în tabela de dispersie",
+          "difficulty": "ușoară",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 5"
+        },
+        {
+          "id": "14",
+          "title": "Succesorul în inordine",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 12"
+        },
+        {
+          "id": "15",
+          "title": "Căutarea într-un BST neechilibrat",
+          "difficulty": "ușoară",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 13"
+        },
+        {
+          "id": "16",
+          "title": "Sortarea topologică",
+          "difficulty": "ușoară",
+          "sursa": "Examen SD · seria CD · 12 iunie 2021 · test grilă · întrebarea 9"
+        },
+        {
+          "id": "17",
+          "title": "Noduri externe",
+          "difficulty": "medie",
+          "sursa": "Examen SD · seria CD · 2019 · numărul 1 · subiectul 2"
+        }
+      ]
+    }
   }
 }

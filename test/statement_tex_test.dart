@@ -13,8 +13,11 @@ void main() {
     var n = 0;
     void check(String where, String text) {
       for (final b in Markup.blocks(text)) {
+        // a code box is shown as it is, never typeset: a shell's $ is no formula there
         final formulas = b.kind == BlockKind.math
             ? [b.text]
+            : b.kind == BlockKind.code
+            ? const <String>[]
             : [for (final item in b.items) for (final s in Markup.spans(item)) if (s.kind == SpanKind.tex) s.text];
         for (final f in formulas) {
           n++;

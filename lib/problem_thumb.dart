@@ -14,7 +14,9 @@ enum ThumbKind {
   sequence, branch, digits, divisors, array, frequency, sort, prefix, repeat, pseudo, olympiad, bug,
   matrix, lee, text, stack, subprogram, recursion, divide, greedy, record, bignum, backtracking, tree,
   graph, dp, linked, combinatorics, file, sets, progression, induction, function, parabola, vectors,
-  trig, analytic, complex, exponential, composition, integral, probability, system, other,
+  trig, analytic, complex, exponential, composition, integral, probability, system,
+  // ACS: the faculty's courses
+  shell, logic, circuit, cpu, mechanics, other,
 }
 
 /// The kind of drawing for a chapter, from its name ("5. Tablouri unidimensionale" -> array).
@@ -22,6 +24,23 @@ ThumbKind thumbKindOf(String chapter) {
   final c = chapter.toLowerCase();
   bool has(String s) => c.contains(s);
   if (has('acadnet')) return ThumbKind.bug;
+  // ACS chapters, before the school words they contain ("Circuite secvențiale", "Dinamică")
+  if (has('linia de comandă') || has('shell') || has('utilizatori și procese')) return ThumbKind.shell;
+  if (has('booleană') || has('circuite combina') || has('circuite secvențiale')) return ThumbKind.logic;
+  if (has('curent') || has('tranzitoriu')) return ThumbKind.circuit;
+  if (has('registre') || has('compilare') || has('stiva și apelul')) return ThumbKind.cpu;
+  if (has('cinematic') || has('legile lui newton') || has('lucru mecanic') || has('rotație și oscila')) return ThumbKind.mechanics;
+  if (has('numerație') || has('biți')) return ThumbKind.digits;
+  if (has('stive')) return ThumbKind.stack;
+  if (has('heap')) return ThumbKind.tree;
+  if (has('rețelistic')) return ThumbKind.graph;
+  if (has('grilă')) return ThumbKind.pseudo;
+  if (has('valori proprii')) return ThumbKind.matrix;
+  if (has('serii')) return ThumbKind.progression;
+  if (has('câmpului')) return ThumbKind.vectors;
+  if (has('laplace')) return ThumbKind.integral;
+  if (has('statistic')) return ThumbKind.probability;
+  if (has('diferențiale') || has('interpol') || has('neliniare')) return ThumbKind.function;
   if (has('olimpiad')) return ThumbKind.olympiad;
   if (has('fișier')) return ThumbKind.file;
   if (has('subprogram')) return ThumbKind.subprogram;
@@ -395,6 +414,51 @@ class _ThumbPainter extends CustomPainter {
         _text(k, '{', const Offset(28, 29), 34);
         k.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(38, 18, 40, 5), const Radius.circular(2)), _fill(0.8));
         k.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(38, 36, 32, 5), const Radius.circular(2)), _fill(0.8));
+      case ThumbKind.shell: // a terminal: the prompt and a cursor
+        _box(k, 14, 10, 72, 40);
+        _text(k, '\$_', const Offset(36, 30), 17);
+        k.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(50, 27, 24, 4.5), const Radius.circular(2)), _fill(0.45));
+      case ThumbKind.logic: // an AND gate, two inputs and an output
+        final gate = Path()
+          ..moveTo(38, 14)
+          ..lineTo(52, 14)
+          ..arcToPoint(const Offset(52, 46), radius: const Radius.circular(16))
+          ..lineTo(38, 46)
+          ..close();
+        k.drawPath(gate, _fill(0.3));
+        k.drawPath(gate, _line);
+        k.drawLine(const Offset(18, 22), const Offset(38, 22), _line);
+        k.drawLine(const Offset(18, 38), const Offset(38, 38), _line);
+        k.drawLine(const Offset(68, 30), const Offset(84, 30), _line);
+      case ThumbKind.circuit: // a loop with a resistor and a source
+        final wire = Path()
+          ..moveTo(30, 14)
+          ..lineTo(16, 14)
+          ..lineTo(16, 46)
+          ..lineTo(84, 46)
+          ..lineTo(84, 14)
+          ..lineTo(70, 14);
+        k.drawPath(wire, _line);
+        final zig = Path()..moveTo(30, 14);
+        for (var i = 0; i < 6; i++) {
+          zig.lineTo(33.3 + i * 6.7, i.isEven ? 8 : 20);
+        }
+        zig.lineTo(70, 14);
+        k.drawPath(zig, _line);
+        k.drawCircle(const Offset(50, 46), 7, _fill(1));
+      case ThumbKind.cpu: // a chip with its pins
+        _box(k, 32, 12, 36, 36, fill: 0.3);
+        for (var i = 0; i < 3; i++) {
+          final d = 20.0 + i * 10;
+          k.drawLine(Offset(24, d), Offset(32, d), _line);
+          k.drawLine(Offset(68, d), Offset(76, d), _line);
+        }
+        _text(k, 'x86', const Offset(50, 30), 10);
+      case ThumbKind.mechanics: // a thrown body's arc and its velocity
+        _axes(k);
+        _curve(k, (x) => 50 - (x - 20) * (86 - x) / 26);
+        _dots(k, const [Offset(36, 27)], r: 5);
+        _arrow(k, const Offset(36, 27), const Offset(50, 17));
       case ThumbKind.other:
         _text(k, number.isEmpty ? '?' : number, const Offset(50, 30), 22);
     }

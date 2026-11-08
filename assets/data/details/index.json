@@ -29,5 +29,40 @@
     "12": [
       "matematica_12.json"
     ]
+  },
+  "ACS": {
+    "AM": [
+      "acs_am.json"
+    ],
+    "ALGAED": [
+      "acs_algaed.json"
+    ],
+    "PCLP": [
+      "acs_pclp.json"
+    ],
+    "USO": [
+      "acs_uso.json"
+    ],
+    "PL": [
+      "acs_pl.json"
+    ],
+    "MS": [
+      "acs_ms.json"
+    ],
+    "ELTH": [
+      "acs_elth.json"
+    ],
+    "Fizică": [
+      "acs_fizica.json"
+    ],
+    "MN": [
+      "acs_mn.json"
+    ],
+    "IOCLA": [
+      "acs_iocla.json"
+    ],
+    "SD": [
+      "acs_sd.json"
+    ]
   }
 }
