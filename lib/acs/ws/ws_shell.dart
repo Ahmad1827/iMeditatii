@@ -137,8 +137,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
         _pending = full;
         _input.clear();
       });
-      _focus.requestFocus();
-      _toBottom();
+      _keepFocus();
       return;
     }
     final dir = _sh.shortCwd;
@@ -158,8 +157,14 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
         _save();
       }
     });
+    _keepFocus();
+  }
+
+  /// After Enter: the keyboard stays in the prompt, and the view at the bottom.
+  void _keepFocus() {
     _focus.requestFocus();
     _toBottom();
+    WidgetsBinding.instance.addPostFrameCallback((_) => reattachKeyboard());
   }
 
   void _toBottom() {
@@ -383,13 +388,19 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
             ),
             Expanded(
               child: SelectionArea(
-                child: ListView.builder(
+                // the prompt is its own sliver after the lines, so it stays the
+                // same widget (and keeps the keyboard) however many lines come
+                child: CustomScrollView(
                   controller: _scroll,
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-                  itemCount: _lines.length + 1,
-                  itemBuilder: (context, i) {
-                    if (i < _lines.length) return line(_lines[i]);
-                    return SelectionContainer.disabled(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                      sliver: SliverList.builder(itemCount: _lines.length, itemBuilder: (context, i) => line(_lines[i])),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                      sliver: SliverToBoxAdapter(
+                    child: SelectionContainer.disabled(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -420,14 +431,18 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
                                 smartDashesType: SmartDashesType.disabled,
                                 textInputAction: TextInputAction.send,
                                 onSubmitted: _submit,
+                                // Enter must not let go of the keyboard
+                                onEditingComplete: () {},
                                 decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
                               ),
                             ),
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

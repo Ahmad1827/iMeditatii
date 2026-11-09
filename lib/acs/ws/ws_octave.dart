@@ -94,6 +94,8 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
     });
     _cmdFocus.requestFocus();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (!_cmdFocus.hasFocus) _cmdFocus.requestFocus();
       if (_scroll.hasClients) _scroll.jumpTo(_scroll.position.maxScrollExtent);
     });
   }
@@ -185,6 +187,7 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
                       autocorrect: false,
                       enableSuggestions: false,
                       onSubmitted: _exec,
+                      onEditingComplete: () {},
                       decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 9)),
                     ),
                   ),

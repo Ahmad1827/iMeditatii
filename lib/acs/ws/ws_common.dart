@@ -116,6 +116,8 @@ class AcsField extends StatelessWidget {
         focusNode: focusNode,
         onChanged: onChanged,
         onSubmitted: onSubmitted,
+        // Enter keeps the keyboard here, for the next line
+        onEditingComplete: onSubmitted == null ? null : () {},
         textAlign: align,
         style: ink.mono(14.5, color: ink.strong),
         cursorColor: ink.accent,
@@ -346,6 +348,28 @@ mixin TypeToConsole<T extends StatefulWidget> on State<T> {
   void focusConsole({bool evenOnTouch = false}) {
     if (!mounted || !consoleActive || (acsTouchDevice && !evenOnTouch)) return;
     consoleFocus.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) => reattachKeyboard());
+  }
+
+  /// On the web the focus can stay on the field while the browser's own text
+  /// input has let go (after Enter, say): the cursor blinks and nothing types.
+  /// This hands the keyboard back to the field that has the focus.
+  void reattachKeyboard() {
+    if (!mounted || !consoleActive) return;
+    if (!consoleFocus.hasFocus) consoleFocus.requestFocus();
+    EditableTextState? found;
+    void visit(Element e) {
+      if (found != null) return;
+      if (e is StatefulElement && e.state is EditableTextState && (e.widget as EditableText).focusNode == consoleFocus) {
+        found = e.state as EditableTextState;
+        return;
+      }
+      e.visitChildren(visit);
+    }
+
+    final root = consoleKey.currentContext;
+    if (root is Element) root.visitChildren(visit);
+    found?.requestKeyboard();
   }
 
   bool _onScreen() {

@@ -35,6 +35,25 @@ void main() {
     expect(prompt(t).focusNode!.hasFocus, isTrue);
   }, variant: desktop);
 
+  testWidgets('keeps the keyboard after every Enter, however long the output', (t) async {
+    await open(t);
+    final field = prompt(t).focusNode!;
+    for (final cmd in ['ls -la', 'pwd', 'seq 1 200', '', 'echo "a', 'b"', 'cd /', 'ls', 'seq 1 300']) {
+      await t.enterText(find.byWidgetPredicate((w) => w is TextField && w.textInputAction == TextInputAction.send), cmd);
+      await t.testTextInput.receiveAction(TextInputAction.send);
+      await t.pump();
+      await t.pump();
+      expect(prompt(t).focusNode, same(field));
+      expect(field.hasFocus, isTrue, reason: 'after "$cmd"');
+      expect(prompt(t).controller!.text, '');
+    }
+    // and typing goes on straight into it, with no click
+    await t.sendKeyEvent(LogicalKeyboardKey.keyL, character: 'l');
+    await t.pump();
+    expect(field.hasFocus, isTrue);
+    expect(t.takeException(), isNull);
+  }, variant: desktop);
+
   testWidgets('a key typed while nothing has the focus goes to the shell', (t) async {
     await open(t);
     FocusManager.instance.primaryFocus?.unfocus();
