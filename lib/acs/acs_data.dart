@@ -4,7 +4,7 @@
 //   {"code", "chapters": [...], "problems": [{id, title, chapter, difficulty,
 //   source, statement, hint, solution, kind, spec}]}. The kind says which
 //   workspace solves it (shell, asm, c, logic, octave, rowops, math, circuit,
-//   sim, ds) and spec holds what that workspace needs.
+//   sim, ds, grila) and spec holds what that workspace needs.
 // =============================================================================
 
 import 'dart:convert';
@@ -72,6 +72,7 @@ const Map<String, String> acsKindLabels = {
   'circuit': 'circuit',
   'sim': 'simulare',
   'ds': 'structuri',
+  'grila': 'grilă',
 };
 
 class AcsCourseData {

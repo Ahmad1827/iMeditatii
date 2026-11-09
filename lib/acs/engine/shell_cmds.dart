@@ -2163,7 +2163,14 @@ class _FindExpr {
         return _node.isDir ? _node.kids.isEmpty : _node.isFile && _node.data.isEmpty;
       case '-perm':
         final p = _arg();
-        final want = int.parse(p.replaceFirst(RegExp(r'^[-/]'), ''), radix: 8);
+        // octal (644) or symbolic (o=x, u+rw,g+r), as GNU find: symbolic starts from 000
+        final body = p.replaceFirst(RegExp(r'^[-/]'), '');
+        final int want;
+        try {
+          want = Vfs.applyMode(0, body, false);
+        } on ShError {
+          throw ShError("invalid mode '$body'");
+        }
         final m = _node.mode & 0xfff;
         if (p.startsWith('-')) return m & want == want;
         if (p.startsWith('/')) return m & want != 0;

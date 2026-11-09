@@ -1,0 +1,1167 @@
+{
+ "code": "admitere",
+ "chapters": [
+  "1. Algebră: ecuații, progresii, combinatorică",
+  "2. Algebră: matrice, sisteme, legi de compoziție",
+  "3. Analiză: limite și derivate",
+  "4. Analiză: integrale",
+  "5. Informatică: ce afișează programul",
+  "6. Informatică: algoritmi"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "O ecuație exponențială",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Suma soluțiilor reale ale ecuației $4^x - 3 \\cdot 2^x + 2 = 0$ este:",
+   "hint": "Notează $t = 2^x > 0$: ecuația devine de gradul al doilea în $t$.",
+   "solution": "$t^2 - 3t + 2 = 0$ dă $t = 1$ sau $t = 2$, adică $x = 0$ sau $x = 1$. Suma: $1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$3$",
+     "$\\frac{3}{2}$",
+     "$1$",
+     "$-1$",
+     "$0$",
+     "$2$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "2",
+   "title": "O ecuație cu logaritmi",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Mulțimea soluțiilor ecuației $\\log_2(x + 1) + \\log_2(x - 1) = 3$ este:",
+   "hint": "Condițiile de existență: $x + 1 > 0$ și $x - 1 > 0$, deci $x > 1$. Apoi $\\log_2 a + \\log_2 b = \\log_2(ab)$.",
+   "solution": "$(x + 1)(x - 1) = 2^3$, adică $x^2 = 9$. Doar $x = 3$ respectă $x > 1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\{3\\}$",
+     "$\\{9\\}$",
+     "$\\{-3, 3\\}$",
+     "$\\{2\\sqrt{2}\\}$",
+     "$\\{-3\\}$",
+     "$\\emptyset$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "3",
+   "title": "Suma unei progresii aritmetice",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Într-o progresie aritmetică $(a_n)_{n \\ge 1}$ avem $a_1 = 2$ și $a_5 = 14$. Suma primilor 10 termeni este:",
+   "hint": "$a_5 = a_1 + 4r$, apoi $S_n = \\frac{(a_1 + a_n)\\,n}{2}$.",
+   "solution": "$r = 3$, $a_{10} = 2 + 9 \\cdot 3 = 29$, $S_{10} = \\frac{(2 + 29) \\cdot 10}{2} = 155$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$145$",
+     "$165$",
+     "$140$",
+     "$290$",
+     "$150$",
+     "$155$"
+    ],
+    "answer": 5
+   }
+  },
+  {
+   "id": "4",
+   "title": "Combinări și aranjamente",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Valoarea expresiei $C_6^2 + A_5^2$ este:",
+   "hint": "$C_n^k = \\frac{n!}{k!(n-k)!}$, $A_n^k = \\frac{n!}{(n-k)!}$.",
+   "solution": "$C_6^2 = 15$, $A_5^2 = 5 \\cdot 4 = 20$; suma: $35$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$30$",
+     "$45$",
+     "$36$",
+     "$50$",
+     "$35$",
+     "$25$"
+    ],
+    "answer": 4
+   }
+  },
+  {
+   "id": "5",
+   "title": "Un polinom divizibil cu X - 2",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Polinomul $f = X^3 - 2X^2 + aX + 4$ este divizibil cu $X - 2$ pentru $a$ egal cu:",
+   "hint": "Teorema lui Bézout: $X - 2$ divide $f$ dacă și numai dacă $f(2) = 0$.",
+   "solution": "$f(2) = 8 - 8 + 2a + 4 = 0$, deci $a = -2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$-4$",
+     "$2$",
+     "$4$",
+     "$-2$",
+     "$0$",
+     "$-1$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "6",
+   "title": "Relațiile lui Viète",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Dacă $x_1, x_2$ sunt soluțiile ecuației $x^2 - 5x + 3 = 0$, atunci $x_1^2 + x_2^2$ este:",
+   "hint": "$x_1^2 + x_2^2 = (x_1 + x_2)^2 - 2x_1x_2$.",
+   "solution": "$S = 5$, $P = 3$: $25 - 6 = 19$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$19$",
+     "$16$",
+     "$22$",
+     "$31$",
+     "$25$",
+     "$28$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "7",
+   "title": "Numere întregi într-o inecuație",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Numărul de numere întregi $x$ care verifică $|2x - 3| \\le 5$ este:",
+   "hint": "$|u| \\le 5$ înseamnă $-5 \\le u \\le 5$.",
+   "solution": "$-5 \\le 2x - 3 \\le 5$ dă $-1 \\le x \\le 4$: numerele $-1, 0, 1, 2, 3, 4$, adică $6$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$5$",
+     "$10$",
+     "$6$",
+     "$4$",
+     "$8$",
+     "$7$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "8",
+   "title": "Minimul unei funcții de gradul al doilea",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Valoarea minimă a funcției $f : \\mathbb{R} \\to \\mathbb{R}$, $f(x) = x^2 - 4x + 3$ este:",
+   "hint": "Vârful parabolei: $x_V = -\\frac{b}{2a}$, $y_V = -\\frac{\\Delta}{4a}$.",
+   "solution": "$x_V = 2$, $f(2) = 4 - 8 + 3 = -1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$0$",
+     "$1$",
+     "$-2$",
+     "$-1$",
+     "$3$",
+     "$2$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "9",
+   "title": "Termeni raționali într-o dezvoltare",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Numărul termenilor raționali din dezvoltarea $\\left(\\sqrt{2} + \\sqrt[3]{3}\\right)^{12}$ este:",
+   "hint": "$T_{k+1} = C_{12}^k\\, 2^{\\frac{12-k}{2}}\\, 3^{\\frac{k}{3}}$: e rațional când ambii exponenți sunt întregi.",
+   "solution": "$12 - k$ par și $k$ multiplu de 3: $k \\in \\{0, 6, 12\\}$, deci 3 termeni.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$3$",
+     "$2$",
+     "$5$",
+     "$4$",
+     "$13$",
+     "$6$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "10",
+   "title": "Modulul unei puteri complexe",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Modulul numărului complex $z = (1 + i)^{10}$ este:",
+   "hint": "$|z^n| = |z|^n$.",
+   "solution": "$|1 + i| = \\sqrt{2}$, deci $|z| = (\\sqrt{2})^{10} = 2^5 = 32$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$10$",
+     "$\\sqrt{2}$",
+     "$32$",
+     "$1024$",
+     "$64$",
+     "$16$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "11",
+   "title": "Mulțimea valorilor unei funcții",
+   "chapter": "1. Algebră: ecuații, progresii, combinatorică",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Pentru câte valori naturale ale lui $m$ ecuația $x^2 - 2mx + m + 6 = 0$ **nu** are soluții reale?",
+   "hint": "Fără soluții reale: $\\Delta < 0$.",
+   "solution": "$\\Delta = 4m^2 - 4(m + 6) = 4(m^2 - m - 6) = 4(m - 3)(m + 2) < 0$ pentru $m \\in (-2, 3)$: naturalele $0, 1, 2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$1$",
+     "$4$",
+     "$3$",
+     "$5$",
+     "$0$",
+     "$2$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "12",
+   "title": "Un determinant de ordinul 3",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Determinantul matricei $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 2 & 3 & 1 \\\\ 3 & 1 & 2 \\end{pmatrix}$ este:",
+   "hint": "Regula lui Sarrus, sau adună toate coloanele la prima (toate liniile au suma 6).",
+   "solution": "Adunând coloanele la prima: $6 \\cdot \\begin{vmatrix} 1 & 2 & 3 \\\\ 1 & 3 & 1 \\\\ 1 & 1 & 2 \\end{vmatrix} = 6 \\cdot (-3) = -18$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$-18$",
+     "$-12$",
+     "$-6$",
+     "$6$",
+     "$18$",
+     "$0$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "13",
+   "title": "Puterea unei matrice",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Fie $A = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$. Suma elementelor matricei $A^{10}$ este:",
+   "hint": "Calculează $A^2$, $A^3$ și ghicește forma lui $A^n$ (apoi inducție).",
+   "solution": "$A^n = \\begin{pmatrix} 1 & n \\\\ 0 & 1 \\end{pmatrix}$, deci $A^{10}$ are suma $1 + 10 + 0 + 1 = 12$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$20$",
+     "$12$",
+     "$1024$",
+     "$4$",
+     "$13$",
+     "$11$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "14",
+   "title": "Când are un sistem soluție unică",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Sistemul $\\begin{cases} x + y + z = 1 \\\\ x + my + z = 2 \\\\ x + y + mz = 3 \\end{cases}$ are soluție unică dacă și numai dacă:",
+   "hint": "Soluție unică (sistem Cramer) când determinantul sistemului e nenul.",
+   "solution": "$\\det = (m - 1)^2$, nenul pentru $m \\ne 1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$m \\in \\mathbb{R} \\setminus \\{-1\\}$",
+     "$m \\in \\mathbb{R}$",
+     "$m \\in \\mathbb{R} \\setminus \\{1\\}$",
+     "$m \\in \\mathbb{R} \\setminus \\{-1, 1\\}$",
+     "$m \\in \\mathbb{R} \\setminus \\{0\\}$",
+     "$m = 1$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "15",
+   "title": "Elementul neutru al unei legi",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Pe $(2, \\infty)$ se definește legea $x \\circ y = xy - 2x - 2y + 6$. Elementul neutru al legii este:",
+   "hint": "Scrie legea ca $x \\circ y = (x - 2)(y - 2) + 2$.",
+   "solution": "$x \\circ e = x$ înseamnă $(x - 2)(e - 2) = x - 2$ pentru orice $x > 2$, deci $e - 2 = 1$, $e = 3$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$4$",
+     "$\\frac{5}{2}$",
+     "$2$",
+     "$3$",
+     "$6$",
+     "$1$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "16",
+   "title": "Inversa unei matrice",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Fie $A = \\begin{pmatrix} 2 & 1 \\\\ 5 & 3 \\end{pmatrix}$. Suma elementelor matricei $A^{-1}$ este:",
+   "hint": "Pentru $2 \\times 2$: $A^{-1} = \\frac{1}{\\det A}\\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$.",
+   "solution": "$\\det A = 1$, $A^{-1} = \\begin{pmatrix} 3 & -1 \\\\ -5 & 2 \\end{pmatrix}$, suma $-1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$11$",
+     "$1$",
+     "$-11$",
+     "$0$",
+     "$-1$",
+     "$\\frac{1}{11}$"
+    ],
+    "answer": 4
+   }
+  },
+  {
+   "id": "17",
+   "title": "Rangul unei matrice",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rangul matricei $\\begin{pmatrix} 1 & 2 & 3 \\\\ 2 & 4 & 6 \\\\ 1 & 0 & 1 \\end{pmatrix}$ este:",
+   "hint": "A doua linie e de două ori prima. Caută un minor de ordin 2 nenul.",
+   "solution": "Determinantul e $0$ (liniile 1 și 2 proporționale), iar $\\begin{vmatrix} 1 & 2 \\\\ 1 & 0 \\end{vmatrix} = -2 \\ne 0$: rangul e $2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$2$",
+     "$6$",
+     "$1$",
+     "$3$",
+     "$4$",
+     "$0$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "18",
+   "title": "Câte matrice comută cu A",
+   "chapter": "2. Algebră: matrice, sisteme, legi de compoziție",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Fie $A = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$. Câte matrice $X \\in \\mathcal{M}_2(\\mathbb{Z}_2)$ (cu elemente din $\\{0, 1\\}$, operații modulo 2) verifică $AX = XA$?",
+   "hint": "Scrie $X = \\begin{pmatrix} p & q \\\\ r & s \\end{pmatrix}$ și egalează $AX$ cu $XA$.",
+   "solution": "$AX = XA$ dă $r = 0$ și $p = s$; $q$ e oarecare: $X = \\begin{pmatrix} p & q \\\\ 0 & p \\end{pmatrix}$, $2 \\cdot 2 = 4$ matrice.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$6$",
+     "$1$",
+     "$16$",
+     "$8$",
+     "$2$",
+     "$4$"
+    ],
+    "answer": 5
+   }
+  },
+  {
+   "id": "19",
+   "title": "Limita unui raport de polinoame",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "$\\displaystyle\\lim_{n \\to \\infty} \\frac{n^2 + 3n}{2n^2 + 1}$ este:",
+   "hint": "Același grad sus și jos: raportul coeficienților dominanți.",
+   "solution": "Împărțind la $n^2$: $\\frac{1 + 3/n}{2 + 1/n^2} \\to \\frac{1}{2}$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$1$",
+     "$\\frac{1}{2}$",
+     "$2$",
+     "$0$",
+     "$\\infty$",
+     "$3$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "20",
+   "title": "O limită remarcabilă",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "$\\displaystyle\\lim_{x \\to 0} \\frac{e^{2x} - 1}{x}$ este:",
+   "hint": "$\\lim_{u \\to 0} \\frac{e^u - 1}{u} = 1$.",
+   "solution": "$\\frac{e^{2x} - 1}{2x} \\cdot 2 \\to 1 \\cdot 2 = 2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$2$",
+     "$0$",
+     "$e^2$",
+     "$\\infty$",
+     "$1$",
+     "$\\frac{1}{2}$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "21",
+   "title": "Limita care dă un e",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "$\\displaystyle\\lim_{n \\to \\infty} \\left(1 + \\frac{2}{n}\\right)^n$ este:",
+   "hint": "$\\left(1 + \\frac{1}{u}\\right)^u \\to e$ când $u \\to \\infty$.",
+   "solution": "$\\left[\\left(1 + \\frac{2}{n}\\right)^{n/2}\\right]^2 \\to e^2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\infty$",
+     "$1$",
+     "$e^2$",
+     "$2$",
+     "$e$",
+     "$\\sqrt{e}$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "22",
+   "title": "Derivata într-un punct",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Pentru $f : (0, \\infty) \\to \\mathbb{R}$, $f(x) = x \\ln x$, valoarea $f'(e)$ este:",
+   "hint": "$(uv)' = u'v + uv'$.",
+   "solution": "$f'(x) = \\ln x + 1$, deci $f'(e) = 2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$2$",
+     "$e$",
+     "$e + 1$",
+     "$1$",
+     "$0$",
+     "$\\frac{1}{e}$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "23",
+   "title": "Maximul local",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Valoarea maximă locală a funcției $f(x) = x^3 - 3x$ este:",
+   "hint": "Punctele critice: $f'(x) = 0$; maxim acolo unde $f'' < 0$.",
+   "solution": "$f'(x) = 3x^2 - 3 = 0$ dă $x = \\pm 1$; $f''(-1) = -6 < 0$: maxim local $f(-1) = -1 + 3 = 2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$2$",
+     "$-2$",
+     "$1$",
+     "$-1$",
+     "$3$",
+     "$0$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "24",
+   "title": "Ecuația tangentei",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Tangenta la graficul funcției $f(x) = x^2$ în punctul de abscisă $x_0 = 1$ are ecuația:",
+   "hint": "$y - f(x_0) = f'(x_0)(x - x_0)$.",
+   "solution": "$f(1) = 1$, $f'(1) = 2$: $y - 1 = 2(x - 1)$, adică $y = 2x - 1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$y = 2x$",
+     "$y = -2x + 3$",
+     "$y = x + 1$",
+     "$y = 2x + 1$",
+     "$y = x$",
+     "$y = 2x - 1$"
+    ],
+    "answer": 5
+   }
+  },
+  {
+   "id": "25",
+   "title": "Asimptota oblică",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Asimptota oblică spre $+\\infty$ a graficului funcției $f(x) = \\dfrac{x^2 + 1}{x - 1}$ este:",
+   "hint": "$m = \\lim \\frac{f(x)}{x}$, $n = \\lim (f(x) - mx)$.",
+   "solution": "$m = 1$, $n = \\lim \\frac{x^2 + 1 - x^2 + x}{x - 1} = 1$: $y = x + 1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$y = x - 1$",
+     "$y = x$",
+     "$y = 1$",
+     "$y = x + 1$",
+     "$y = x + 2$",
+     "$y = 2x + 1$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "26",
+   "title": "O limită cu radical",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "$\\displaystyle\\lim_{x \\to \\infty} \\left(\\sqrt{x^2 + 4x} - x\\right)$ este:",
+   "hint": "Amplifică cu conjugatul $\\sqrt{x^2 + 4x} + x$.",
+   "solution": "$\\frac{4x}{\\sqrt{x^2 + 4x} + x} = \\frac{4}{\\sqrt{1 + 4/x} + 1} \\to 2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\infty$",
+     "$1$",
+     "$4$",
+     "$0$",
+     "$-2$",
+     "$2$"
+    ],
+    "answer": 5
+   }
+  },
+  {
+   "id": "27",
+   "title": "Monotonia unei funcții",
+   "chapter": "3. Analiză: limite și derivate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Funcția $f : \\mathbb{R} \\to \\mathbb{R}$, $f(x) = x^3 + ax$ este strict crescătoare pe $\\mathbb{R}$ dacă și numai dacă:",
+   "hint": "$f'(x) = 3x^2 + a$. Atenție la $a = 0$: $f' $ se anulează doar în $0$.",
+   "solution": "Pentru $a \\ge 0$, $f'(x) = 3x^2 + a \\ge 0$ și se anulează cel mult în $x = 0$, deci $f$ e strict crescătoare (și $x^3$ e). Pentru $a < 0$, $f'(0) = a < 0$: $f$ scade lângă 0.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$a > 0$",
+     "$a \\in \\mathbb{R}$",
+     "$a \\le 0$",
+     "$a < 0$",
+     "$a = 0$",
+     "$a \\ge 0$"
+    ],
+    "answer": 5
+   }
+  },
+  {
+   "id": "28",
+   "title": "O integrală definită",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "$\\displaystyle\\int_0^1 (3x^2 + 2x)\\,dx$ este:",
+   "hint": "O primitivă: $x^3 + x^2$.",
+   "solution": "$(x^3 + x^2)\\big|_0^1 = 2$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$0$",
+     "$\\frac{5}{6}$",
+     "$2$",
+     "$1$",
+     "$3$",
+     "$5$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "29",
+   "title": "Sinus ori cosinus",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "$\\displaystyle\\int_0^{\\pi/2} \\sin x \\cos x\\,dx$ este:",
+   "hint": "Substituția $u = \\sin x$, sau $\\sin x \\cos x = \\frac{1}{2}\\sin 2x$.",
+   "solution": "$\\frac{\\sin^2 x}{2}\\Big|_0^{\\pi/2} = \\frac{1}{2}$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\frac{\\pi}{4}$",
+     "$-\\frac{1}{2}$",
+     "$1$",
+     "$\\frac{1}{2}$",
+     "$0$",
+     "$2$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "30",
+   "title": "Integrala logaritmului",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "$\\displaystyle\\int_1^e \\ln x\\,dx$ este:",
+   "hint": "Prin părți: $u = \\ln x$, $dv = dx$.",
+   "solution": "$(x \\ln x - x)\\big|_1^e = (e - e) - (0 - 1) = 1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$2$",
+     "$0$",
+     "$e$",
+     "$\\frac{1}{e}$",
+     "$1$",
+     "$e - 1$"
+    ],
+    "answer": 4
+   }
+  },
+  {
+   "id": "31",
+   "title": "Aria dintre două curbe",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aria suprafeței cuprinse între graficele funcțiilor $f(x) = x$ și $g(x) = x^2$ este:",
+   "hint": "Curbele se taie în $x = 0$ și $x = 1$; pe $[0, 1]$, $x \\ge x^2$.",
+   "solution": "$\\int_0^1 (x - x^2)\\,dx = \\frac{1}{2} - \\frac{1}{3} = \\frac{1}{6}$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\frac{1}{3}$",
+     "$\\frac{1}{6}$",
+     "$\\frac{2}{3}$",
+     "$1$",
+     "$\\frac{5}{6}$",
+     "$\\frac{1}{2}$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "32",
+   "title": "Prin părți, cu exponențiala",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "$\\displaystyle\\int_0^1 x e^x\\,dx$ este:",
+   "hint": "Prin părți: $u = x$, $dv = e^x dx$.",
+   "solution": "$(x - 1)e^x\\big|_0^1 = 0 - (-1) = 1$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$0$",
+     "$e$",
+     "$e - 1$",
+     "$1$",
+     "$2e - 1$",
+     "$\\frac{e}{2}$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "33",
+   "title": "O sumă Riemann",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "$\\displaystyle\\lim_{n \\to \\infty} \\frac{1^2 + 2^2 + \\ldots + n^2}{n^3}$ este:",
+   "hint": "Fie formula $\\sum k^2 = \\frac{n(n+1)(2n+1)}{6}$, fie suma Riemann $\\frac{1}{n}\\sum \\left(\\frac{k}{n}\\right)^2$.",
+   "solution": "$\\frac{1}{n}\\sum_{k=1}^n \\left(\\frac{k}{n}\\right)^2 \\to \\int_0^1 x^2\\,dx = \\frac{1}{3}$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\frac{1}{6}$",
+     "$\\frac{1}{3}$",
+     "$1$",
+     "$\\infty$",
+     "$0$",
+     "$\\frac{1}{2}$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "34",
+   "title": "Integrala unei funcții pare și impare",
+   "chapter": "4. Analiză: integrale",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "$\\displaystyle\\int_{-1}^{1} \\left(x^5 \\cos x + x^2\\right)dx$ este:",
+   "hint": "Pe un interval simetric, integrala unei funcții impare e $0$.",
+   "solution": "$x^5 \\cos x$ e impară (integrala $0$), iar $\\int_{-1}^1 x^2\\,dx = \\frac{2}{3}$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\frac{1}{3}$",
+     "$1$",
+     "$\\frac{2}{3}$",
+     "$0$",
+     "$2$",
+     "$\\frac{4}{3}$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "35",
+   "title": "Cifrele unui număr",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Ce afișează programul de mai jos?\n\n```\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int n = 52817, s = 0, p = 1;\n    while (n > 0) {\n        int c = n % 10;\n        if (c % 2 == 0) s = s + c * p;\n        else p = p * 10;\n        n = n / 10;\n    }\n    cout << s;\n    return 0;\n}\n```",
+   "hint": "Urmărește pe hârtie $n$, $c$, $s$ și $p$ la fiecare pas: cifrele se iau de la dreapta, iar $p$ crește doar la cifrele impare.",
+   "solution": "Cifrele, de la dreapta: 7 impară ($p = 10$), 1 impară ($p = 100$), 8 pară ($s = 8 \\cdot 100 = 800$), 2 pară ($s = 800 + 2 \\cdot 100 = 1000$), 5 impară ($p = 1000$). Se afișează 1000.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`28`",
+     "`820`",
+     "`82`",
+     "`208`",
+     "`1000`",
+     "`800`"
+    ],
+    "answer": 4,
+    "output": "1000"
+   }
+  },
+  {
+   "id": "36",
+   "title": "Recursivitate: un șir",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint f(int n) {\n    if (n <= 1) return 1;\n    return f(n - 1) + f(n - 2);\n}\n\nint main() {\n    cout << f(6);\n    return 0;\n}\n```",
+   "hint": "Calculează de jos în sus: $f(0) = f(1) = 1$, apoi $f(2) = 2$, ...",
+   "solution": "$f$: 1, 1, 2, 3, 5, 8, 13: $f(6) = 13$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`5`",
+     "`8`",
+     "`6`",
+     "`13`",
+     "`21`",
+     "`720`"
+    ],
+    "answer": 3,
+    "output": "13"
+   }
+  },
+  {
+   "id": "37",
+   "title": "Afișare la intrare și la ieșire",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nvoid f(int n) {\n    if (n > 0) {\n        cout << n;\n        f(n - 2);\n        cout << n;\n    }\n}\n\nint main() {\n    f(5);\n    return 0;\n}\n```",
+   "hint": "Fiecare apel scrie $n$ înainte și după apelul pentru $n - 2$.",
+   "solution": "Scrie 5, 3, 1 coborând, $f(-1)$ nu scrie nimic, apoi 1, 3, 5 la întoarcere: 531135.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`5311`",
+     "`531`",
+     "`135531`",
+     "`53135`",
+     "`5310135`",
+     "`531135`"
+    ],
+    "answer": 5,
+    "output": "531135"
+   }
+  },
+  {
+   "id": "38",
+   "title": "Bucle imbricate",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int n = 10, cnt = 0;\n    for (int i = 1; i <= n; i++)\n        for (int j = i; j <= n; j++)\n            cnt++;\n    cout << cnt;\n    return 0;\n}\n```",
+   "hint": "Pentru un $i$ fixat, bucla interioară face $n - i + 1$ pași.",
+   "solution": "$10 + 9 + \\ldots + 1 = 55$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`110`",
+     "`100`",
+     "`45`",
+     "`10`",
+     "`50`",
+     "`55`"
+    ],
+    "answer": 5,
+    "output": "55"
+   }
+  },
+  {
+   "id": "39",
+   "title": "Operații pe biți",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 13;\n    cout << (x & 6) << ' ' << (x | 2) << ' ' << (x ^ 5) << ' ' << (x >> 1);\n    return 0;\n}\n```",
+   "hint": "Scrie în baza 2: $13 = 1101_2$, $6 = 0110_2$, $5 = 0101_2$.",
+   "solution": "$1101 \\,\\&\\, 0110 = 0100 = 4$, $1101 \\,|\\, 0010 = 1111 = 15$, $1101 \\oplus 0101 = 1000 = 8$, $13 \\gg 1 = 6$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`4 15 8 6`",
+     "`4 15 18 7`",
+     "`1 15 8 6`",
+     "`4 15 8 26`",
+     "`6 15 8 6`",
+     "`4 13 8 6`"
+    ],
+    "answer": 0,
+    "output": "4 15 8 6"
+   }
+  },
+  {
+   "id": "40",
+   "title": "Un vector inversat pe jumătate",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int v[] = {1, 2, 3, 4, 5, 6}, n = 6;\n    for (int i = 0; i < n / 2; i += 2) {\n        int t = v[i];\n        v[i] = v[n - 1 - i];\n        v[n - 1 - i] = t;\n    }\n    for (int i = 0; i < n; i++) cout << v[i];\n    return 0;\n}\n```",
+   "hint": "Atenție la pasul $i$ += 2: se schimbă doar perechile cu $i = 0$ și $i = 2$.",
+   "solution": "Se schimbă $v[0] \\leftrightarrow v[5]$ și $v[2] \\leftrightarrow v[3]$: 6 2 4 3 5 1.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`623451`",
+     "`123456`",
+     "`524361`",
+     "`624351`",
+     "`654321`",
+     "`624531`"
+    ],
+    "answer": 3,
+    "output": "624351"
+   }
+  },
+  {
+   "id": "41",
+   "title": "Un șir de caractere",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\n#include <cstring>\nusing namespace std;\n\nint main() {\n    char s[] = \"admitere\";\n    int n = strlen(s), k = 0;\n    for (int i = 0; i < n; i++)\n        if (strchr(\"aeiou\", s[i]) == NULL) s[k++] = s[i];\n    s[k] = 0;\n    cout << s << ' ' << n - k;\n    return 0;\n}\n```",
+   "hint": "`strchr(\"aeiou\", c)` e diferit de NULL exact când c e vocală.",
+   "solution": "Rămân consoanele d, m, t, r (vocalele a, i, e, e sunt scoase, 4 la număr): „dmtr 4”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`dmitr 3`",
+     "`dmtr 3`",
+     "`admtr 3`",
+     "`aiee 4`",
+     "`dmtr 4`",
+     "`dmtr 8`"
+    ],
+    "answer": 4,
+    "output": "dmtr 4"
+   }
+  },
+  {
+   "id": "42",
+   "title": "Diagonalele unei matrice",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int a[4][4], s = 0;\n    for (int i = 0; i < 4; i++)\n        for (int j = 0; j < 4; j++)\n            a[i][j] = i * 4 + j;\n    for (int i = 0; i < 4; i++)\n        s += a[i][i] - a[i][3 - i];\n    cout << s << ' ' << a[2][1];\n    return 0;\n}\n```",
+   "hint": "$a[i][j] = 4i + j$: scrie matricea (0..15).",
+   "solution": "Diagonala principală: 0 + 5 + 10 + 15 = 30; secundara: 3 + 6 + 9 + 12 = 30; diferența 0. $a[2][1] = 9$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`0 6`",
+     "`30 9`",
+     "`60 9`",
+     "`0 9`",
+     "`-30 9`",
+     "`0 10`"
+    ],
+    "answer": 3,
+    "output": "0 9"
+   }
+  },
+  {
+   "id": "43",
+   "title": "Câte apeluri face recursivitatea",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint apeluri = 0;\n\nint fib(int n) {\n    apeluri++;\n    if (n < 2) return n;\n    return fib(n - 1) + fib(n - 2);\n}\n\nint main() {\n    int r = fib(6);\n    cout << r << ' ' << apeluri;\n    return 0;\n}\n```",
+   "hint": "Numărul de apeluri $A(n) = 1 + A(n - 1) + A(n - 2)$, cu $A(0) = A(1) = 1$.",
+   "solution": "$fib(6) = 8$; $A$: 1, 1, 3, 5, 9, 15, 25: 25 de apeluri.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`13 41`",
+     "`8 13`",
+     "`8 24`",
+     "`13 25`",
+     "`8 15`",
+     "`8 25`"
+    ],
+    "answer": 5,
+    "output": "8 25"
+   }
+  },
+  {
+   "id": "44",
+   "title": "Împărțiri întregi",
+   "chapter": "5. Informatică: ce afișează programul",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Ce afișează programul?\n\n```\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 17, b = 5;\n    double c = a / b;\n    cout << a / b * b + a % b << ' ' << c << ' ' << (double)a / b;\n    return 0;\n}\n```",
+   "hint": "`a / b` între două `int` e o împărțire întreagă, chiar dacă rezultatul se pune într-un `double`.",
+   "solution": "$17 / 5 \\cdot 5 + 17 \\% 5 = 15 + 2 = 17$; `c = 3`; `(double)a / b = 3.4`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`17 3 3.4`",
+     "`12 3 3.4`",
+     "`15 3 3.4`",
+     "`17 3.4 3`",
+     "`17 3.4 3.4`",
+     "`17 3 3`"
+    ],
+    "answer": 0,
+    "output": "17 3 3.4"
+   }
+  },
+  {
+   "id": "45",
+   "title": "Permutări în ordine lexicografică",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Se generează, cu metoda backtracking, în ordine lexicografică, toate permutările mulțimii $\\{1, 2, 3, 4\\}$. A **zecea** permutare generată este:",
+   "hint": "Primele 6 permutări încep cu 1; numără de acolo.",
+   "solution": "Primele 6 încep cu 1. Apoi: a 7-a e 2134, a 8-a 2143, a 9-a 2314, a 10-a 2341.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`2 3 1 4`",
+     "`2 4 1 3`",
+     "`2 4 3 1`",
+     "`2 1 4 3`",
+     "`2 3 4 1`",
+     "`3 1 2 4`"
+    ],
+    "answer": 4
+   }
+  },
+  {
+   "id": "46",
+   "title": "Șiruri de biți fără doi de 1 alăturați",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Câte șiruri de lungime 6, formate din cifrele 0 și 1, **nu** conțin doi de 1 pe poziții alăturate?",
+   "hint": "Fie $a_n$ numărul lor: un șir bun de lungime $n$ se termină cu 0 (orice șir bun de $n - 1$ înainte) sau cu 01.",
+   "solution": "$a_n = a_{n-1} + a_{n-2}$, $a_1 = 2$, $a_2 = 3$: 2, 3, 5, 8, 13, 21.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$64$",
+     "$21$",
+     "$34$",
+     "$13$",
+     "$32$",
+     "$20$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "47",
+   "title": "Muchiile unei păduri",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un graf neorientat fără cicluri are 10 noduri și 3 componente conexe. Câte muchii are?",
+   "hint": "Fiecare componentă e un arbore: un arbore cu $k$ noduri are $k - 1$ muchii.",
+   "solution": "Însumând pe componente: $(k_1 - 1) + (k_2 - 1) + (k_3 - 1) = 10 - 3 = 7$.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$9$",
+     "$10$",
+     "$7$",
+     "$13$",
+     "$6$",
+     "$8$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "48",
+   "title": "Frunzele unui arbore din vectorul de tați",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un arbore cu rădăcină, cu 8 noduri numerotate de la 1 la 8, este dat prin vectorul de tați $t = (2, 0, 2, 1, 1, 3, 6, 6)$ ($t_i$ este tatăl nodului $i$, iar $0$ marchează rădăcina). Câte frunze are arborele?",
+   "hint": "O frunză e un nod care nu apare în vectorul de tați.",
+   "solution": "În $t$ apar 2, 1, 3, 6 (tați). Frunzele: 4, 5, 7, 8, adică 4.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$3$",
+     "$5$",
+     "$1$",
+     "$4$",
+     "$6$",
+     "$2$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "49",
+   "title": "Căutarea binară",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Într-un vector **sortat** cu 1000 de elemente se caută o valoare prin căutare binară. Numărul maxim de elemente comparate cu valoarea căutată este:",
+   "hint": "La fiecare pas intervalul se înjumătățește.",
+   "solution": "$2^9 = 512 < 1000 < 1024 = 2^{10}$: cel mult 10 comparații.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$9$",
+     "$10$",
+     "$500$",
+     "$32$",
+     "$11$",
+     "$1000$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "50",
+   "title": "Interschimbările sortării prin metoda bulelor",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Câte interschimbări face sortarea prin metoda bulelor (bubble sort), crescător, pe vectorul $(5, 1, 4, 2, 8)$?",
+   "hint": "Fiecare interschimbare a doi vecini scoate exact o inversiune.",
+   "solution": "Inversiunile: (5,1), (5,4), (5,2), (4,2): 4 interschimbări.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$3$",
+     "$10$",
+     "$5$",
+     "$2$",
+     "$6$",
+     "$4$"
+    ],
+    "answer": 5
+   }
+  },
+  {
+   "id": "51",
+   "title": "Submulțimi cu suma pară",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Se generează toate submulțimile cu **3 elemente** ale mulțimii $\\{1, 2, 3, 4, 5, 6\\}$. Câte dintre ele au suma elementelor pară?",
+   "hint": "Suma a trei numere e pară dacă are 0 sau 2 numere impare.",
+   "solution": "Trei pare: $C_3^3 = 1$; două impare și un par: $C_3^2 \\cdot C_3^1 = 9$. Total 10.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$9$",
+     "$11$",
+     "$10$",
+     "$8$",
+     "$12$",
+     "$20$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "52",
+   "title": "Muchiile unui graf complet",
+   "chapter": "6. Informatică: algoritmi",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Câte muchii trebuie **adăugate** unui arbore cu 7 noduri pentru a obține graful complet cu 7 noduri?",
+   "hint": "Graful complet cu $n$ noduri are $\\frac{n(n-1)}{2}$ muchii.",
+   "solution": "$K_7$ are 21 de muchii, arborele are 6: lipsesc 15.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$42$",
+     "$21$",
+     "$14$",
+     "$15$",
+     "$6$",
+     "$16$"
+    ],
+    "answer": 3
+   }
+  }
+ ]
+}

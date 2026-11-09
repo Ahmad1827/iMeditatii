@@ -592,4 +592,185 @@ Așa se apără programele de buffer overflow (`strcpy` nu verifică nimic: dac�
     hint='Numără câte caractere mai ai voie (`n - 1`) și oprește-te la primul dintre: bufferul plin sau `\\0` în sursă. Terminatorul se scrie mereu (dacă `n > 0`).',
     source='Curs IOCLA · buffer overflow')
 
+# ------------------------------------------------------------------ more (2026-11)
+solution_code[17] = '''section .text
+global putere
+
+putere:
+    push ebp
+    mov ebp, esp
+    mov ecx, [ebp+12]   ; e
+    mov eax, 1
+bucla:
+    test ecx, ecx
+    jz gata
+    imul eax, [ebp+8]   ; eax = eax * b (păstrează doar ultimii 32 de biți)
+    dec ecx
+    jmp bucla
+gata:
+    leave
+    ret
+'''
+add(17, 'Ridicarea la putere', C1, 'ușoară', '''
+```c
+int putere(int b, int e);   // b la puterea e, e >= 0
+```
+
+Întoarce $b^e$ prin înmulțiri repetate. Ca în C, dacă rezultatul nu încape pe 32 de biți, se păstrează doar ultimii 32 (testele au și un astfel de caz). $b^0 = 1$.''',
+    'putere', 'int putere(int b, int e)', ['int', 'int'], 'int',
+    [[2, 10], [3, 0], [-2, 5], [7, 3], [10, 9], [2, 31], [3, 25], [-1, 1001]],
+    lambda b, e: s32(b ** e),
+    hint='`imul eax, [ebp+8]` înmulțește `eax` cu `b` și păstrează rezultatul pe 32 de biți. Un contor în `ecx`, decrementat până la 0.')
+
+solution_code[18] = '''section .text
+global paritate
+
+paritate:
+    push ebp
+    mov ebp, esp
+    mov edx, [ebp+8]
+    xor eax, eax
+bucla:
+    test edx, edx
+    jz gata
+    xor eax, edx        ; bitul 0 al lui eax adună (xor) toți biții
+    shr edx, 1
+    jmp bucla
+gata:
+    and eax, 1
+    leave
+    ret
+'''
+add(18, 'Bitul de paritate', C2, 'medie', '''
+```c
+int paritate(unsigned int x);
+```
+
+Întoarce **1** dacă `x` are un număr **impar** de biți de 1 și **0** altfel: e bitul de paritate pe care îl adaugă un protocol de comunicație ca să descopere o eroare de un bit.''',
+    'paritate', 'int paritate(unsigned int x)', ['int'], 'int',
+    [[0], [1], [3], [7], [0xff], [0x80000000], [0xffffffff], [0x12345678], [1023]],
+    lambda x: bin(x & 0xffffffff).count('1') % 2,
+    hint='XOR-ul tuturor biților dă paritatea. Sau numără biții de 1 și păstrează doar bitul 0 al numărului.')
+
+solution_code[19] = '''section .text
+global produs_scalar
+
+produs_scalar:
+    push ebp
+    mov ebp, esp
+    push esi
+    push edi
+    push ebx
+    mov esi, [ebp+8]    ; a
+    mov edi, [ebp+12]   ; b
+    mov ecx, [ebp+16]   ; n
+    xor ebx, ebx        ; suma
+    xor edx, edx        ; i
+bucla:
+    cmp edx, ecx
+    jge gata
+    mov eax, [esi + 4*edx]
+    imul eax, [edi + 4*edx]
+    add ebx, eax
+    inc edx
+    jmp bucla
+gata:
+    mov eax, ebx
+    pop ebx
+    pop edi
+    pop esi
+    leave
+    ret
+'''
+add(19, 'Produsul scalar', C3, 'medie', '''
+```c
+int produs_scalar(int *a, int *b, int n);
+```
+
+Întoarce $\\sum_{i=0}^{n-1} a_i b_i$. Vectorii au câte `n` elemente (`n` poate fi 0).
+
+Ai nevoie de mai multe registre decât `eax`, `ecx`, `edx`: dacă folosești `ebx`, `esi`, `edi`, salvează-le și refă-le (cdecl).''',
+    'produs_scalar', 'int produs_scalar(int *a, int *b, int n)', ['ptr_int', 'ptr_int', 'int'], 'int',
+    [[[1, 2, 3], [4, 5, 6], 3], [[], [], 0], [[-1, 2], [3, -4], 2], [[7], [6], 1], [[1] * 20, list(range(20)), 20], [[100000, 100000], [30000, 1], 2]],
+    lambda a, b, n: s32(sum(x * y for x, y in zip(a[:n], b[:n]))),
+    hint='Adresarea `[esi + 4*edx]` ia elementul `edx` al vectorului de la `esi`. `imul` cu un operand din memorie scutește o încărcare.')
+
+solution_code[20] = '''section .text
+global cuvinte
+
+cuvinte:
+    push ebp
+    mov ebp, esp
+    push esi
+    mov esi, [ebp+8]
+    xor eax, eax        ; numărul de cuvinte
+    xor ecx, ecx        ; 1 dacă suntem într-un cuvânt
+bucla:
+    mov dl, [esi]
+    test dl, dl
+    jz gata
+    cmp dl, ' '
+    je spatiu
+    test ecx, ecx
+    jnz urm
+    inc eax             ; începe un cuvânt nou
+    mov ecx, 1
+    jmp urm
+spatiu:
+    xor ecx, ecx
+urm:
+    inc esi
+    jmp bucla
+gata:
+    pop esi
+    leave
+    ret
+'''
+add(20, 'Câte cuvinte are un șir', C3, 'medie', '''
+```c
+int cuvinte(char *s);
+```
+
+Întoarce numărul de **cuvinte** din șirul `s`: secvențe de caractere diferite de spațiu, despărțite de unul sau mai multe spații. Șirul poate începe sau se poate termina cu spații, sau poate fi gol.''',
+    'cuvinte', 'int cuvinte(char *s)', ['str'], 'int',
+    [['ana are mere'], [''], ['   '], ['  doua   cuvinte  '], ['x'], ['a b c d e f'], ['unu  ']],
+    lambda s: len(s.split()),
+    hint='Un cuvânt începe acolo unde un caracter nu e spațiu, dar cel dinainte era (sau e începutul). Ține un registru „sunt într-un cuvânt”.')
+
+solution_code[21] = '''section .text
+global suma_cifre
+
+suma_cifre:
+    push ebp
+    mov ebp, esp
+    mov eax, [ebp+8]
+    cmp eax, 10
+    jb baza             ; n < 10: chiar n
+    xor edx, edx
+    mov ecx, 10
+    div ecx             ; eax = n / 10, edx = n % 10
+    push edx            ; păstrează ultima cifră peste apel
+    push eax
+    call suma_cifre     ; eax = suma_cifre(n / 10)
+    add esp, 4
+    pop edx
+    add eax, edx
+baza:
+    leave
+    ret
+'''
+add(21, 'Suma cifrelor, recursiv', C4, 'medie', '''
+```c
+unsigned int suma_cifre(unsigned int n);
+```
+
+Scrie funcția **recursiv**: pentru `n < 10` întoarce `n`, altfel ultima cifră plus `suma_cifre(n / 10)`.
+
+Atenție: apelul recursiv poate strica `edx` și `ecx` (cdecl nu le păstrează). Ce vrei să ai și după apel trebuie pus pe stivă.''',
+    'suma_cifre', 'unsigned int suma_cifre(unsigned int n)', ['int'], 'uint',
+    [[0], [7], [10], [12345], [99999], [4294967295], [1000000000]],
+    lambda n: sum(map(int, str(n))),
+    hint='`div ecx` (fără semn) împarte `edx:eax` la `ecx`: pune `edx = 0` înainte. Restul apare în `edx`: salvează-l cu `push` înainte de `call`.',
+    source='Curs IOCLA · stiva și apelurile de funcții')
+
 write_course('iocla', CHAPTERS, PROBLEMS)

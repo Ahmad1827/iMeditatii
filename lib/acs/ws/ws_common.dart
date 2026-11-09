@@ -5,6 +5,7 @@
 //   when a check failed. [ChecksView] lists what was checked, ✓ or ✗.
 // =============================================================================
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -310,3 +311,143 @@ class _AcsCodeEditorState extends State<AcsCodeEditor> {
 /// A controller that colours [keywords] for [AcsCodeEditor].
 TextEditingController acsCodeController(String text, Set<String> keywords, {String comment = '//'}) =>
     _HlController(text, () => AcsInk.current, () => keywords, () => comment);
+
+/// True on a phone or tablet, where focusing a field opens the keyboard
+/// (so nothing is focused before the student taps).
+bool get acsTouchDevice => defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
+
+/// A console that takes the keyboard without a click: typing anywhere on the
+/// page, while no other text field has the focus and the console is on the
+/// screen, goes into [consoleInput] (the first character included).
+mixin TypeToConsole<T extends StatefulWidget> on State<T> {
+  FocusNode get consoleFocus;
+  TextEditingController get consoleInput;
+
+  /// The console's box, to know it is on the screen.
+  final GlobalKey consoleKey = GlobalKey();
+
+  /// False while something else is shown in its place (an editor).
+  bool get consoleActive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    HardwareKeyboard.instance.addHandler(_typed);
+    if (!acsTouchDevice) WidgetsBinding.instance.addPostFrameCallback((_) => focusConsole());
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_typed);
+    super.dispose();
+  }
+
+  /// Gives the console the keyboard (on a computer; on a phone only when asked).
+  void focusConsole({bool evenOnTouch = false}) {
+    if (!mounted || !consoleActive || (acsTouchDevice && !evenOnTouch)) return;
+    consoleFocus.requestFocus();
+  }
+
+  bool _onScreen() {
+    final box = consoleKey.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.attached || !box.hasSize) return false;
+    final top = box.localToGlobal(Offset.zero).dy;
+    final h = MediaQuery.maybeOf(context)?.size.height ?? 0;
+    return top < h && top + box.size.height > 0;
+  }
+
+  bool _typed(KeyEvent e) {
+    if (e is! KeyDownEvent || !mounted || !consoleActive || consoleFocus.hasFocus) return false;
+    final kb = HardwareKeyboard.instance;
+    if (kb.isControlPressed || kb.isMetaPressed || kb.isAltPressed) return false;
+    final ch = e.character;
+    if (ch == null || ch.isEmpty || ch.codeUnitAt(0) < 0x20 || ch.codeUnitAt(0) == 0x7F) return false;
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) return false;
+    // another text field is being typed in: leave it alone
+    final ctx = FocusManager.instance.primaryFocus?.context;
+    if (ctx != null && (ctx.widget is EditableText || ctx.findAncestorWidgetOfExactType<EditableText>() != null)) return false;
+    if (!_onScreen()) return false;
+    final v = consoleInput.value;
+    final at = v.selection.isValid ? v.selection.end : v.text.length;
+    final text = v.text.replaceRange(at, at, ch);
+    consoleInput.value = TextEditingValue(text: text, selection: TextSelection.collapsed(offset: at + ch.length));
+    consoleFocus.requestFocus();
+    return true;
+  }
+}
+
+/// Focuses [focus] when the area is tapped (a click, not a drag that selects
+/// text), even inside a [SelectionArea], whose own gestures would win.
+class TapToFocus extends StatefulWidget {
+  final VoidCallback onTap;
+  final Widget child;
+  const TapToFocus({super.key, required this.onTap, required this.child});
+
+  @override
+  State<TapToFocus> createState() => _TapToFocusState();
+}
+
+class _TapToFocusState extends State<TapToFocus> {
+  Offset? _down;
+
+  @override
+  Widget build(BuildContext context) => Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (e) => _down = e.position,
+        onPointerUp: (e) {
+          final d = _down;
+          _down = null;
+          if (d == null || (e.position - d).distance >= 6) return;
+          // after the gestures inside (a SelectionArea focuses itself on a tap)
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) widget.onTap();
+          });
+          WidgetsBinding.instance.scheduleFrame();
+        },
+        onPointerCancel: (_) => _down = null,
+        child: widget.child,
+      );
+}
+
+/// A button that throws work away (the starter code back, the files reset):
+/// the first click asks "sigur?", the second, within a few seconds, does it.
+class AcsConfirmButton extends StatefulWidget {
+  final AcsInk ink;
+  final String label;
+  final VoidCallback? onConfirm;
+  const AcsConfirmButton(this.ink, this.label, this.onConfirm, {super.key});
+
+  @override
+  State<AcsConfirmButton> createState() => _AcsConfirmButtonState();
+}
+
+class _AcsConfirmButtonState extends State<AcsConfirmButton> {
+  bool _asking = false;
+  int _token = 0;
+
+  void _tap() {
+    if (_asking) {
+      setState(() => _asking = false);
+      widget.onConfirm?.call();
+      return;
+    }
+    final t = ++_token;
+    setState(() => _asking = true);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _token == t) setState(() => _asking = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => AcsButton(
+        widget.ink,
+        _asking ? 'sigur? se pierde ce ai scris · apasă din nou' : widget.label,
+        widget.onConfirm == null ? null : _tap,
+        icon: _asking ? Icons.warning_amber_rounded : null,
+      );
+}
+
+/// The editor's keys, in small print after a row of buttons (none on a phone).
+Widget acsKeysHint(AcsInk ink, String text) => acsTouchDevice
+    ? const SizedBox.shrink()
+    : Padding(padding: const EdgeInsets.only(left: 4), child: Text(text, style: ink.mono(12, color: ink.dim)));

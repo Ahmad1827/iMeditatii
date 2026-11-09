@@ -270,6 +270,86 @@
    }
   },
   {
+   "id": "17",
+   "title": "Ridicarea la putere",
+   "chapter": "1. Registre și aritmetică",
+   "difficulty": "ușoară",
+   "source": "Laborator IOCLA",
+   "statement": "```c\nint putere(int b, int e);   // b la puterea e, e >= 0\n```\n\nÎntoarce $b^e$ prin înmulțiri repetate. Ca în C, dacă rezultatul nu încape pe 32 de biți, se păstrează doar ultimii 32 (testele au și un astfel de caz). $b^0 = 1$.",
+   "hint": "`imul eax, [ebp+8]` înmulțește `eax` cu `b` și păstrează rezultatul pe 32 de biți. Un contor în `ecx`, decrementat până la 0.",
+   "solution": "```nasm\nsection .text\nglobal putere\n\nputere:\n    push ebp\n    mov ebp, esp\n    mov ecx, [ebp+12]   ; e\n    mov eax, 1\nbucla:\n    test ecx, ecx\n    jz gata\n    imul eax, [ebp+8]   ; eax = eax * b (păstrează doar ultimii 32 de biți)\n    dec ecx\n    jmp bucla\ngata:\n    leave\n    ret\n```",
+   "kind": "asm",
+   "spec": {
+    "entry": "putere",
+    "signature": "int putere(int b, int e)",
+    "args": [
+     "int",
+     "int"
+    ],
+    "returns": "int",
+    "tests": [
+     {
+      "args": [
+       2,
+       10
+      ],
+      "ret": 1024
+     },
+     {
+      "args": [
+       3,
+       0
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       -2,
+       5
+      ],
+      "ret": -32
+     },
+     {
+      "args": [
+       7,
+       3
+      ],
+      "ret": 343
+     },
+     {
+      "args": [
+       10,
+       9
+      ],
+      "ret": 1000000000
+     },
+     {
+      "args": [
+       2,
+       31
+      ],
+      "ret": -2147483648
+     },
+     {
+      "args": [
+       3,
+       25
+      ],
+      "ret": 1180052131
+     },
+     {
+      "args": [
+       -1,
+       1001
+      ],
+      "ret": -1
+     }
+    ],
+    "starter": "section .text\nglobal putere\n\n; int putere(int b, int e)\nputere:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
+    "reference": "section .text\nglobal putere\n\nputere:\n    push ebp\n    mov ebp, esp\n    mov ecx, [ebp+12]   ; e\n    mov eax, 1\nbucla:\n    test ecx, ecx\n    jz gata\n    imul eax, [ebp+8]   ; eax = eax * b (păstrează doar ultimii 32 de biți)\n    dec ecx\n    jmp bucla\ngata:\n    leave\n    ret\n"
+   }
+  },
+  {
    "id": "4",
    "title": "Câți biți de 1",
    "chapter": "2. Operații pe biți",
@@ -534,6 +614,83 @@
     ],
     "starter": "section .text\nglobal roteste\n\n; unsigned int roteste(unsigned int x, int k)\nroteste:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
     "reference": "section .text\nglobal roteste\n\nroteste:\n    push ebp\n    mov ebp, esp\n    mov eax, [ebp+8]\n    mov ecx, [ebp+12]\n    rol eax, cl\n    leave\n    ret\n"
+   }
+  },
+  {
+   "id": "18",
+   "title": "Bitul de paritate",
+   "chapter": "2. Operații pe biți",
+   "difficulty": "medie",
+   "source": "Laborator IOCLA",
+   "statement": "```c\nint paritate(unsigned int x);\n```\n\nÎntoarce **1** dacă `x` are un număr **impar** de biți de 1 și **0** altfel: e bitul de paritate pe care îl adaugă un protocol de comunicație ca să descopere o eroare de un bit.",
+   "hint": "XOR-ul tuturor biților dă paritatea. Sau numără biții de 1 și păstrează doar bitul 0 al numărului.",
+   "solution": "```nasm\nsection .text\nglobal paritate\n\nparitate:\n    push ebp\n    mov ebp, esp\n    mov edx, [ebp+8]\n    xor eax, eax\nbucla:\n    test edx, edx\n    jz gata\n    xor eax, edx        ; bitul 0 al lui eax adună (xor) toți biții\n    shr edx, 1\n    jmp bucla\ngata:\n    and eax, 1\n    leave\n    ret\n```",
+   "kind": "asm",
+   "spec": {
+    "entry": "paritate",
+    "signature": "int paritate(unsigned int x)",
+    "args": [
+     "int"
+    ],
+    "returns": "int",
+    "tests": [
+     {
+      "args": [
+       0
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       1
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       3
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       7
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       255
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       2147483648
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       4294967295
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       305419896
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       1023
+      ],
+      "ret": 0
+     }
+    ],
+    "starter": "section .text\nglobal paritate\n\n; int paritate(unsigned int x)\nparitate:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
+    "reference": "section .text\nglobal paritate\n\nparitate:\n    push ebp\n    mov ebp, esp\n    mov edx, [ebp+8]\n    xor eax, eax\nbucla:\n    test edx, edx\n    jz gata\n    xor eax, edx        ; bitul 0 al lui eax adună (xor) toți biții\n    shr edx, 1\n    jmp bucla\ngata:\n    and eax, 1\n    leave\n    ret\n"
    }
   },
   {
@@ -979,6 +1136,210 @@
    }
   },
   {
+   "id": "19",
+   "title": "Produsul scalar",
+   "chapter": "3. Vectori și șiruri",
+   "difficulty": "medie",
+   "source": "Laborator IOCLA",
+   "statement": "```c\nint produs_scalar(int *a, int *b, int n);\n```\n\nÎntoarce $\\sum_{i=0}^{n-1} a_i b_i$. Vectorii au câte `n` elemente (`n` poate fi 0).\n\nAi nevoie de mai multe registre decât `eax`, `ecx`, `edx`: dacă folosești `ebx`, `esi`, `edi`, salvează-le și refă-le (cdecl).",
+   "hint": "Adresarea `[esi + 4*edx]` ia elementul `edx` al vectorului de la `esi`. `imul` cu un operand din memorie scutește o încărcare.",
+   "solution": "```nasm\nsection .text\nglobal produs_scalar\n\nprodus_scalar:\n    push ebp\n    mov ebp, esp\n    push esi\n    push edi\n    push ebx\n    mov esi, [ebp+8]    ; a\n    mov edi, [ebp+12]   ; b\n    mov ecx, [ebp+16]   ; n\n    xor ebx, ebx        ; suma\n    xor edx, edx        ; i\nbucla:\n    cmp edx, ecx\n    jge gata\n    mov eax, [esi + 4*edx]\n    imul eax, [edi + 4*edx]\n    add ebx, eax\n    inc edx\n    jmp bucla\ngata:\n    mov eax, ebx\n    pop ebx\n    pop edi\n    pop esi\n    leave\n    ret\n```",
+   "kind": "asm",
+   "spec": {
+    "entry": "produs_scalar",
+    "signature": "int produs_scalar(int *a, int *b, int n)",
+    "args": [
+     "ptr_int",
+     "ptr_int",
+     "int"
+    ],
+    "returns": "int",
+    "tests": [
+     {
+      "args": [
+       [
+        1,
+        2,
+        3
+       ],
+       [
+        4,
+        5,
+        6
+       ],
+       3
+      ],
+      "ret": 32
+     },
+     {
+      "args": [
+       [],
+       [],
+       0
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       [
+        -1,
+        2
+       ],
+       [
+        3,
+        -4
+       ],
+       2
+      ],
+      "ret": -11
+     },
+     {
+      "args": [
+       [
+        7
+       ],
+       [
+        6
+       ],
+       1
+      ],
+      "ret": 42
+     },
+     {
+      "args": [
+       [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+       ],
+       [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+       ],
+       20
+      ],
+      "ret": 190
+     },
+     {
+      "args": [
+       [
+        100000,
+        100000
+       ],
+       [
+        30000,
+        1
+       ],
+       2
+      ],
+      "ret": -1294867296
+     }
+    ],
+    "starter": "section .text\nglobal produs_scalar\n\n; int produs_scalar(int *a, int *b, int n)\nprodus_scalar:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
+    "reference": "section .text\nglobal produs_scalar\n\nprodus_scalar:\n    push ebp\n    mov ebp, esp\n    push esi\n    push edi\n    push ebx\n    mov esi, [ebp+8]    ; a\n    mov edi, [ebp+12]   ; b\n    mov ecx, [ebp+16]   ; n\n    xor ebx, ebx        ; suma\n    xor edx, edx        ; i\nbucla:\n    cmp edx, ecx\n    jge gata\n    mov eax, [esi + 4*edx]\n    imul eax, [edi + 4*edx]\n    add ebx, eax\n    inc edx\n    jmp bucla\ngata:\n    mov eax, ebx\n    pop ebx\n    pop edi\n    pop esi\n    leave\n    ret\n"
+   }
+  },
+  {
+   "id": "20",
+   "title": "Câte cuvinte are un șir",
+   "chapter": "3. Vectori și șiruri",
+   "difficulty": "medie",
+   "source": "Laborator IOCLA",
+   "statement": "```c\nint cuvinte(char *s);\n```\n\nÎntoarce numărul de **cuvinte** din șirul `s`: secvențe de caractere diferite de spațiu, despărțite de unul sau mai multe spații. Șirul poate începe sau se poate termina cu spații, sau poate fi gol.",
+   "hint": "Un cuvânt începe acolo unde un caracter nu e spațiu, dar cel dinainte era (sau e începutul). Ține un registru „sunt într-un cuvânt”.",
+   "solution": "```nasm\nsection .text\nglobal cuvinte\n\ncuvinte:\n    push ebp\n    mov ebp, esp\n    push esi\n    mov esi, [ebp+8]\n    xor eax, eax        ; numărul de cuvinte\n    xor ecx, ecx        ; 1 dacă suntem într-un cuvânt\nbucla:\n    mov dl, [esi]\n    test dl, dl\n    jz gata\n    cmp dl, ' '\n    je spatiu\n    test ecx, ecx\n    jnz urm\n    inc eax             ; începe un cuvânt nou\n    mov ecx, 1\n    jmp urm\nspatiu:\n    xor ecx, ecx\nurm:\n    inc esi\n    jmp bucla\ngata:\n    pop esi\n    leave\n    ret\n```",
+   "kind": "asm",
+   "spec": {
+    "entry": "cuvinte",
+    "signature": "int cuvinte(char *s)",
+    "args": [
+     "str"
+    ],
+    "returns": "int",
+    "tests": [
+     {
+      "args": [
+       "ana are mere"
+      ],
+      "ret": 3
+     },
+     {
+      "args": [
+       ""
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       "   "
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       "  doua   cuvinte  "
+      ],
+      "ret": 2
+     },
+     {
+      "args": [
+       "x"
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       "a b c d e f"
+      ],
+      "ret": 6
+     },
+     {
+      "args": [
+       "unu  "
+      ],
+      "ret": 1
+     }
+    ],
+    "starter": "section .text\nglobal cuvinte\n\n; int cuvinte(char *s)\ncuvinte:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
+    "reference": "section .text\nglobal cuvinte\n\ncuvinte:\n    push ebp\n    mov ebp, esp\n    push esi\n    mov esi, [ebp+8]\n    xor eax, eax        ; numărul de cuvinte\n    xor ecx, ecx        ; 1 dacă suntem într-un cuvânt\nbucla:\n    mov dl, [esi]\n    test dl, dl\n    jz gata\n    cmp dl, ' '\n    je spatiu\n    test ecx, ecx\n    jnz urm\n    inc eax             ; începe un cuvânt nou\n    mov ecx, 1\n    jmp urm\nspatiu:\n    xor ecx, ecx\nurm:\n    inc esi\n    jmp bucla\ngata:\n    pop esi\n    leave\n    ret\n"
+   }
+  },
+  {
    "id": "13",
    "title": "Factorial recursiv",
    "chapter": "4. Stiva și apeluri de funcții",
@@ -1251,6 +1612,71 @@
     ],
     "starter": "section .text\nglobal copiaza\n\n; int copiaza(char *dst, char *src, int n)\ncopiaza:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
     "reference": "section .text\nglobal copiaza\n\ncopiaza:\n    push ebp\n    mov ebp, esp\n    push esi\n    push edi\n    mov edi, [ebp+8]    ; dst\n    mov esi, [ebp+12]   ; src\n    mov ecx, [ebp+16]   ; n\n    xor eax, eax\n    test ecx, ecx\n    jz gata\n    dec ecx             ; loc pentru terminator\nbucla:\n    test ecx, ecx\n    jz pune_zero\n    mov dl, [esi + eax]\n    test dl, dl\n    jz pune_zero\n    mov [edi + eax], dl\n    inc eax\n    dec ecx\n    jmp bucla\npune_zero:\n    mov byte [edi + eax], 0\ngata:\n    pop edi\n    pop esi\n    leave\n    ret\n"
+   }
+  },
+  {
+   "id": "21",
+   "title": "Suma cifrelor, recursiv",
+   "chapter": "4. Stiva și apeluri de funcții",
+   "difficulty": "medie",
+   "source": "Curs IOCLA · stiva și apelurile de funcții",
+   "statement": "```c\nunsigned int suma_cifre(unsigned int n);\n```\n\nScrie funcția **recursiv**: pentru `n < 10` întoarce `n`, altfel ultima cifră plus `suma_cifre(n / 10)`.\n\nAtenție: apelul recursiv poate strica `edx` și `ecx` (cdecl nu le păstrează). Ce vrei să ai și după apel trebuie pus pe stivă.",
+   "hint": "`div ecx` (fără semn) împarte `edx:eax` la `ecx`: pune `edx = 0` înainte. Restul apare în `edx`: salvează-l cu `push` înainte de `call`.",
+   "solution": "```nasm\nsection .text\nglobal suma_cifre\n\nsuma_cifre:\n    push ebp\n    mov ebp, esp\n    mov eax, [ebp+8]\n    cmp eax, 10\n    jb baza             ; n < 10: chiar n\n    xor edx, edx\n    mov ecx, 10\n    div ecx             ; eax = n / 10, edx = n % 10\n    push edx            ; păstrează ultima cifră peste apel\n    push eax\n    call suma_cifre     ; eax = suma_cifre(n / 10)\n    add esp, 4\n    pop edx\n    add eax, edx\nbaza:\n    leave\n    ret\n```",
+   "kind": "asm",
+   "spec": {
+    "entry": "suma_cifre",
+    "signature": "unsigned int suma_cifre(unsigned int n)",
+    "args": [
+     "int"
+    ],
+    "returns": "uint",
+    "tests": [
+     {
+      "args": [
+       0
+      ],
+      "ret": 0
+     },
+     {
+      "args": [
+       7
+      ],
+      "ret": 7
+     },
+     {
+      "args": [
+       10
+      ],
+      "ret": 1
+     },
+     {
+      "args": [
+       12345
+      ],
+      "ret": 15
+     },
+     {
+      "args": [
+       99999
+      ],
+      "ret": 45
+     },
+     {
+      "args": [
+       4294967295
+      ],
+      "ret": 57
+     },
+     {
+      "args": [
+       1000000000
+      ],
+      "ret": 1
+     }
+    ],
+    "starter": "section .text\nglobal suma_cifre\n\n; unsigned int suma_cifre(unsigned int n)\nsuma_cifre:\n    push ebp\n    mov ebp, esp\n    ; primul argument e la [ebp+8], al doilea la [ebp+12], ...\n\n    ; scrie codul aici\n\n    leave\n    ret\n",
+    "reference": "section .text\nglobal suma_cifre\n\nsuma_cifre:\n    push ebp\n    mov ebp, esp\n    mov eax, [ebp+8]\n    cmp eax, 10\n    jb baza             ; n < 10: chiar n\n    xor edx, edx\n    mov ecx, 10\n    div ecx             ; eax = n / 10, edx = n % 10\n    push edx            ; păstrează ultima cifră peste apel\n    push eax\n    call suma_cifre     ; eax = suma_cifre(n / 10)\n    add esp, 4\n    pop edx\n    add eax, edx\nbaza:\n    leave\n    ret\n"
    }
   }
  ]

@@ -190,6 +190,42 @@
    }
   },
   {
+   "id": "12",
+   "title": "Laplace pentru sin 3t",
+   "chapter": "1. Transformata Laplace",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează transformata Laplace a funcției $f(t) = \\sin 3t$, $t \\ge 0$.",
+   "hint": "$\\mathcal{L}\\{\\sin \\omega t\\} = \\frac{\\omega}{s^2 + \\omega^2}$.",
+   "solution": "$F(s) = \\frac{3}{s^2 + 9}$, pentru $s > 0$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "F",
+      "label": "F(s) =",
+      "type": "expr",
+      "vars": [
+       "s"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(F([0.5 1 1.7 2.3 3 4.5]), 3 ./ ([0.5 1 1.7 2.3 3 4.5].^2 + 9), 1e-9)",
+      "msg": "e transformata lui sin 3t"
+     }
+    ],
+    "reference": {
+     "F": "3/(s^2 + 9)"
+    },
+    "wrong": {
+     "F": "s/(s^2 + 9)"
+    }
+   }
+  },
+  {
    "id": "5",
    "title": "Transformata Z a unui șir geometric",
    "chapter": "2. Transformata Z",
@@ -255,6 +291,42 @@
     ],
     "reference": {
      "X": "z/(z - 1)^2"
+    },
+    "wrong": {
+     "X": "z/(z - 1)"
+    }
+   }
+  },
+  {
+   "id": "13",
+   "title": "O treaptă întârziată",
+   "chapter": "2. Transformata Z",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Calculează transformata Z a șirului $x_n = 1$ pentru $n \\ge 2$ și $x_0 = x_1 = 0$ (treapta unitate întârziată cu 2), pentru $|z| > 1$.",
+   "hint": "Întârzierea cu $k$ pași înmulțește transformata cu $z^{-k}$.",
+   "solution": "$X(z) = z^{-2} \\cdot \\frac{z}{z - 1} = \\frac{1}{z(z - 1)}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "X",
+      "label": "X(z) =",
+      "type": "expr",
+      "vars": [
+       "z"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(X([1.5 2 2.7 3.5 5]), 1 ./ ([1.5 2 2.7 3.5 5] .* ([1.5 2 2.7 3.5 5] - 1)), 1e-9)",
+      "msg": "e transformata treptei întârziate"
+     }
+    ],
+    "reference": {
+     "X": "1/(z(z - 1))"
     },
     "wrong": {
      "X": "z/(z - 1)"
@@ -367,6 +439,54 @@
      "ref": "@(x) abs(x - 2*pi*round(x/(2*pi)))",
      "refLabel": "|x| (periodică)",
      "label": "suma Fourier, 15 termeni"
+    }
+   }
+  },
+  {
+   "id": "14",
+   "title": "Seria Fourier a lui x²",
+   "chapter": "3. Serii Fourier",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Pentru $f(x) = x^2$ pe $[-\\pi, \\pi]$, extinsă periodic, scrie termenul liber $\\frac{a_0}{2}$ și coeficienții $a_n$ ($n \\ge 1$) ai seriei Fourier $\\frac{a_0}{2} + \\sum_{n \\ge 1} a_n \\cos nx$ (funcția e pară, deci $b_n = 0$).",
+   "hint": "$a_n = \\frac{2}{\\pi}\\int_0^\\pi x^2 \\cos nx\\,dx$: de două ori prin părți. $\\cos n\\pi = (-1)^n$.",
+   "solution": "$\\frac{a_0}{2} = \\frac{1}{2\\pi}\\int_{-\\pi}^{\\pi} x^2 dx = \\frac{\\pi^2}{3}$, $a_n = \\frac{4(-1)^n}{n^2}$. În $x = \\pi$ se obține $\\sum \\frac{1}{n^2} = \\frac{\\pi^2}{6}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "c",
+      "label": "a₀/2 =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "a",
+      "label": "aₙ =",
+      "type": "expr",
+      "vars": [
+       "n"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(c - pi^2/3) < 1e-9",
+      "msg": "termenul liber e corect"
+     },
+     {
+      "expr": "close(a([1 2 3 4 5 6 7 10]), 4*(-1).^[1 2 3 4 5 6 7 10] ./ [1 2 3 4 5 6 7 10].^2, 1e-9)",
+      "msg": "coeficienții aₙ sunt corecți"
+     }
+    ],
+    "reference": {
+     "c": "pi^2/3",
+     "a": "4(-1)^n/n^2"
+    },
+    "wrong": {
+     "c": "pi^2/3",
+     "a": "4/n^2"
     }
    }
   },
@@ -490,6 +610,51 @@
     },
     "wrong": {
      "I": "pi"
+    }
+   }
+  },
+  {
+   "id": "15",
+   "title": "Repartiția Poisson",
+   "chapter": "4. Probabilități și reziduuri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Numărul de cereri care ajung la un server într-o secundă urmează o repartiție Poisson cu $\\lambda = 3$. Calculează $P(X = 2)$ și $P(X \\ge 1)$.",
+   "hint": "$P(X = k) = e^{-\\lambda}\\frac{\\lambda^k}{k!}$. Pentru $P(X \\ge 1)$, treci prin evenimentul contrar.",
+   "solution": "$P(X = 2) = e^{-3}\\frac{9}{2} \\approx 0{,}224$, $P(X \\ge 1) = 1 - P(X = 0) = 1 - e^{-3} \\approx 0{,}950$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "p2",
+      "label": "P(X = 2) =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "p1",
+      "label": "P(X ≥ 1) =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(p2 - 9/2*exp(-3)) < 1e-9",
+      "msg": "P(X = 2) e corectă"
+     },
+     {
+      "expr": "abs(p1 - (1 - exp(-3))) < 1e-9",
+      "msg": "P(X ≥ 1) e corectă"
+     }
+    ],
+    "reference": {
+     "p2": "9/2 e^(-3)",
+     "p1": "1 - e^(-3)"
+    },
+    "wrong": {
+     "p2": "9 e^(-3)",
+     "p1": "e^(-3)"
     }
    }
   }

@@ -449,9 +449,9 @@
      }
     ],
     "expect": {
-     "I.R1": 1.9090909090909083,
-     "I.R2": 0.5454545454545459,
-     "I.R3": 1.3636363636363638
+     "I.R1": 1.9090909090909092,
+     "I.R2": 0.5454545454545454,
+     "I.R3": 1.3636363636363635
     }
    }
   },
@@ -603,6 +603,174 @@
     "expect": {
      "I.R1": 1.25,
      "U.R2": 2.249999999999999
+    }
+   }
+  },
+  {
+   "id": "11",
+   "title": "Trei rezistențe în paralel",
+   "chapter": "1. Circuite de curent continuu",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Sursa $E = 12\\,\\text{V}$ alimentează în paralel $R_1 = 4\\,\\Omega$, $R_2 = 6\\,\\Omega$ și $R_3 = 12\\,\\Omega$. Calculează curentul prin $R_1$, curentul prin $R_3$ și puterea disipată pe $R_2$.",
+   "hint": "În paralel, fiecare rezistență are la borne toată tensiunea sursei.",
+   "solution": "$I_1 = 12/4 = 3\\,\\text{A}$, $I_3 = 12/12 = 1\\,\\text{A}$, $P_2 = U^2/R_2 = 144/6 = 24\\,\\text{W}$. Rezistența echivalentă: $\\frac{1}{R_e} = \\frac14 + \\frac16 + \\frac{1}{12} = \\frac12$, $R_e = 2\\,\\Omega$, curentul total 6 A.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       4
+      ],
+      "v": 12,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       6,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       2,
+       4
+      ],
+      "v": 4
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       4
+      ],
+      "v": 6
+     },
+     {
+      "t": "R",
+      "n": "R3",
+      "a": [
+       6,
+       0
+      ],
+      "b": [
+       6,
+       4
+      ],
+      "v": 12
+     },
+     {
+      "t": "W",
+      "a": [
+       6,
+       4
+      ],
+      "b": [
+       4,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       4
+      ],
+      "b": [
+       2,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       4
+      ],
+      "b": [
+       0,
+       4
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       4
+      ]
+     }
+    ],
+    "grid": [
+     7,
+     5
+    ],
+    "omega": 0.0,
+    "ask": [
+     {
+      "q": "I.R1",
+      "label": "I1",
+      "unit": "A"
+     },
+     {
+      "q": "I.R3",
+      "label": "I3",
+      "unit": "A"
+     },
+     {
+      "q": "P.R2",
+      "label": "P2",
+      "unit": "W"
+     }
+    ],
+    "expect": {
+     "I.R1": 3.0,
+     "I.R3": 1.0,
+     "P.R2": 24.0
     }
    }
   },
@@ -1052,6 +1220,126 @@
    }
   },
   {
+   "id": "12",
+   "title": "Rezistența pentru un curent dat",
+   "chapter": "2. Teoreme și proiectare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Sursa $E = 12\\,\\text{V}$ și rezistența interioară $R_1 = 4\\,\\Omega$ alimentează sarcina $R_2$. Alege $R_2$ astfel încât **curentul prin ea să fie 1 A** (±1%).",
+   "hint": "În serie: $I = \\frac{E}{R_1 + R_2}$; rezolvă după $R_2$.",
+   "solution": "$R_1 + R_2 = E / I = 12\\,\\Omega$, deci $R_2 = 8\\,\\Omega$.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "E",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       3
+      ],
+      "v": 12,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R1",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ],
+      "v": 4
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       5,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R2",
+      "a": [
+       5,
+       0
+      ],
+      "b": [
+       5,
+       3
+      ],
+      "v": 2
+     },
+     {
+      "t": "W",
+      "a": [
+       5,
+       3
+      ],
+      "b": [
+       0,
+       3
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       3
+      ]
+     }
+    ],
+    "grid": [
+     6,
+     4
+    ],
+    "omega": 0.0,
+    "design": {
+     "vars": [
+      {
+       "name": "R2",
+       "label": "R2",
+       "unit": "Ω"
+      }
+     ],
+     "target": {
+      "q": "I.R2",
+      "value": 1.0,
+      "tol": 0.01,
+      "label": "curentul prin R2 e 1 A",
+      "meter": "ampermetrul",
+      "unit": "A"
+     },
+     "reference": {
+      "R2": "8"
+     }
+    }
+   }
+  },
+  {
    "id": "8",
    "title": "Circuit RC serie",
    "chapter": "3. Regim sinusoidal",
@@ -1059,7 +1347,7 @@
    "source": "",
    "statement": "Tensiunea sinusoidală are valoarea efectivă $U = 10\\,\\text{V}$ și faza 0, la $\\omega = 1000\\,\\text{rad/s}$; $R = 100\\,\\Omega$, $C = 10\\,\\mu\\text{F}$. Calculează valoarea efectivă a curentului și faza lui (în grade).",
    "hint": "$\\underline{Z} = R - j/(\\omega C)$.",
-   "solution": "$X_C = 100\\,\\Omega$, $|Z| = 100\\sqrt2$, $|I| = 0\\,\\text{A}$; curentul e defazat înaintea tensiunii cu 45°.",
+   "solution": "$X_C = 100\\,\\Omega$, $|Z| = 100\\sqrt2$, $|I| = 0,0707\\,\\text{A}$; curentul e defazat înaintea tensiunii cu 45°.",
    "kind": "circuit",
    "spec": {
     "elems": [
@@ -1175,7 +1463,7 @@
    "source": "Examen ELTH · seria CD · 2022",
    "statement": "O bobină cu rezistența $R = 30\\,\\Omega$ și reactanța $X_L = 40\\,\\Omega$ (la 50 Hz) e legată la rețeaua de $220\\,\\text{V}$. Calculează curentul efectiv și puterea activă consumată.",
    "hint": "$|Z| = \\sqrt{R^2 + X_L^2}$; puterea activă se consumă doar pe R.",
-   "solution": "$|Z| = 50\\,\\Omega$, $I = 4{,}4\\,\\text{A}$, $P = R I^2 = 1613\\,\\text{W}$.",
+   "solution": "$|Z| = 50\\,\\Omega$, $I = 4{,}4\\,\\text{A}$, $P = R I^2 = 580,8\\,\\text{W}$.",
    "kind": "circuit",
    "spec": {
     "elems": [
@@ -1278,7 +1566,7 @@
      }
     ],
     "expect": {
-     "absI.R": 4.3999999999999995,
+     "absI.R": 4.4,
      "P.R": 580.8
     }
    }
@@ -1424,6 +1712,139 @@
      "reference": {
       "C": "10e-6"
      }
+    }
+   }
+  },
+  {
+   "id": "13",
+   "title": "R și L în paralel",
+   "chapter": "3. Regim sinusoidal",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O tensiune sinusoidală cu valoarea efectivă $U = 10\\,\\text{V}$, faza 0, $\\omega = 1000\\,\\text{rad/s}$, alimentează în paralel $R = 100\\,\\Omega$ și $L = 0{,}1\\,\\text{H}$. Calculează valoarea efectivă a curentului prin bobină și faza lui, apoi puterea activă pe $R$.",
+   "hint": "Fiecare ramură are la borne toată tensiunea; $\\underline{Z}_L = j\\omega L$.",
+   "solution": "$X_L = \\omega L = 100\\,\\Omega$, $\\underline{I}_L = \\frac{10}{j \\cdot 100} = -0{,}1j$: $|I_L| = 0,1\\,\\text{A}$, defazat cu 90° în urma tensiunii. $P = U^2/R = 1\\,\\text{W}$; bobina ideală nu consumă putere activă.",
+   "kind": "circuit",
+   "spec": {
+    "elems": [
+     {
+      "t": "V",
+      "n": "U",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       0,
+       4
+      ],
+      "v": 10,
+      "ph": 0
+     },
+     {
+      "t": "W",
+      "a": [
+       0,
+       0
+      ],
+      "b": [
+       2,
+       0
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       4,
+       0
+      ]
+     },
+     {
+      "t": "R",
+      "n": "R",
+      "a": [
+       2,
+       0
+      ],
+      "b": [
+       2,
+       4
+      ],
+      "v": 100
+     },
+     {
+      "t": "L",
+      "n": "L",
+      "a": [
+       4,
+       0
+      ],
+      "b": [
+       4,
+       4
+      ],
+      "v": 0.1
+     },
+     {
+      "t": "W",
+      "a": [
+       4,
+       4
+      ],
+      "b": [
+       2,
+       4
+      ]
+     },
+     {
+      "t": "W",
+      "a": [
+       2,
+       4
+      ],
+      "b": [
+       0,
+       4
+      ]
+     },
+     {
+      "t": "G",
+      "a": [
+       0,
+       4
+      ]
+     }
+    ],
+    "grid": [
+     5,
+     5
+    ],
+    "omega": 1000.0,
+    "ask": [
+     {
+      "q": "absI.L",
+      "label": "|I_L|",
+      "unit": "A"
+     },
+     {
+      "q": "phI.L",
+      "label": "faza lui I_L",
+      "unit": "°"
+     },
+     {
+      "q": "P.R",
+      "label": "P",
+      "unit": "W"
+     }
+    ],
+    "expect": {
+     "absI.L": 0.1,
+     "phI.L": -90.0,
+     "P.R": 1.0
     }
    }
   }

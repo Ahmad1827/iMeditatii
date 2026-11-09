@@ -167,6 +167,10 @@ class Shell {
     } on StackOverflowError {
       err.write('bash: maximum recursion depth exceeded\n');
       status = 1;
+    } catch (e) {
+      // a case the in-page bash doesn't know: an error line, never a broken terminal
+      err.write('bash: ${e is FormatException ? e.message : e}\n');
+      status = 1;
     }
     return chunks;
   }

@@ -71,7 +71,15 @@ def fill_expectations(spec):
     try:
         for c in spec['checks']:
             if c.pop('from_ref', False):
-                c['equals'] = box.read(c['path'])
+                if c['type'] == 'output':
+                    # what the command prints on the files the reference left
+                    b2 = box.copy()
+                    try:
+                        c['equals'], _, _ = run(b2.home, c['cmd'])
+                    finally:
+                        b2.close()
+                else:
+                    c['equals'] = box.read(c['path'])
             if c['type'] == 'script':
                 for r in c['runs']:
                     if r.pop('from_ref', False):

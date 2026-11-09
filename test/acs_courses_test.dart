@@ -307,4 +307,21 @@ void main() {
       });
     }
   });
+
+  group('Admitere: six answers, exactly one correct, each shown', () {
+    for (final p in course('admitere').problems) {
+      test('${p.id}. ${p.title}', () {
+        expect(p.kind, 'grila');
+        final opts = p.spec['options'] as List;
+        expect(opts, hasLength(6));
+        expect(opts.toSet(), hasLength(6), reason: 'two options read the same');
+        final ans = (p.spec['answer'] as num).toInt();
+        expect(ans, inInclusiveRange(0, 5));
+        // a program's question: its real output is the correct option
+        final out = p.spec['output'] as String?;
+        if (out != null) expect(opts[ans], '`$out`');
+        expect(p.solution, isNotEmpty);
+      });
+    }
+  });
 }

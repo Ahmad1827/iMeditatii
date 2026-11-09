@@ -303,6 +303,175 @@
    }
   },
   {
+   "id": "16",
+   "title": "Toate jurnalele într-un loc",
+   "chapter": "1. Fișiere și directoare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "În `~/proiect` sunt fișiere `.log` împrăștiate prin mai multe subdirectoare (`build/`, `build/test/`, ...). Strânge-le pe toate, **copiate** (originalele rămân), direct în directorul nou `~/loguri`, fără subdirectoare:\n\n```\nloguri/\n├── install.log\n├── make.log\n└── run.log\n```",
+   "hint": "`find dir -name '*.log'` le găsește la orice adâncime; `-exec cp {} dest \\;` rulează `cp` pentru fiecare, cu `{}` în locul numelui. Pune ghilimele la `'*.log'`, altfel shell-ul îl expandează înainte ca `find` să-l vadă.",
+   "solution": "```bash\nmkdir ~/loguri\nfind ~/proiect -name '*.log' -exec cp {} ~/loguri \\;\n```\nSau, fără `-exec`: `for f in $(find ~/proiect -name '*.log'); do cp \"$f\" ~/loguri; done` (merge cât timp numele n-au spații).",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/proiect/src/main.c",
+      "content": "int main(void) { return 0; }\n"
+     },
+     {
+      "path": "~/proiect/src/main.c~",
+      "content": "int main() {}\n"
+     },
+     {
+      "path": "~/proiect/src/util.c",
+      "content": "/* util */\n"
+     },
+     {
+      "path": "~/proiect/src/.util.c.swp",
+      "content": "x"
+     },
+     {
+      "path": "~/proiect/build/make.log",
+      "content": "gcc -c main.c\ngcc -c util.c\n"
+     },
+     {
+      "path": "~/proiect/build/test/run.log",
+      "content": "ok 1\nok 2\nnot ok 3\n"
+     },
+     {
+      "path": "~/proiect/notes.txt~",
+      "content": "vechi\n"
+     },
+     {
+      "path": "~/proiect/notes.txt",
+      "content": "nou\n"
+     },
+     {
+      "path": "~/proiect/install.log",
+      "content": "done\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/loguri/make.log",
+      "equals": "gcc -c main.c\ngcc -c util.c\n",
+      "msg": "loguri/make.log e copia jurnalului din build/"
+     },
+     {
+      "type": "file",
+      "path": "~/loguri/run.log",
+      "equals": "ok 1\nok 2\nnot ok 3\n",
+      "msg": "loguri/run.log e copia celui din build/test/"
+     },
+     {
+      "type": "file",
+      "path": "~/loguri/install.log",
+      "equals": "done\n"
+     },
+     {
+      "type": "file",
+      "path": "~/proiect/build/test/run.log",
+      "msg": "originalele au rămas pe loc"
+     },
+     {
+      "type": "output",
+      "cmd": "ls ~/loguri",
+      "msg": "în ~/loguri sunt doar cele trei jurnale",
+      "equals": "install.log\nmake.log\nrun.log\n"
+     }
+    ],
+    "reference": [
+     "mkdir ~/loguri",
+     "find ~/proiect -name '*.log' -exec cp {} ~/loguri \\;"
+    ]
+   }
+  },
+  {
+   "id": "17",
+   "title": "Curățenie după editor",
+   "chapter": "1. Fișiere și directoare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Editorul a lăsat prin `~/proiect` copii de siguranță: fișiere al căror nume se termină în `~` (de exemplu `main.c~`) și fișiere de swap, ascunse, terminate în `.swp`. Șterge-le pe **toate**, oricât de adânc ar fi, fără să atingi nimic altceva.",
+   "hint": "`find` cu `-o` (sau) între două `-name`, totul între paranteze scrise `\\(` și `\\)`; la final `-delete`. Întâi rulează fără `-delete`, să vezi ce ar șterge.",
+   "solution": "```bash\nfind ~/proiect -type f \\( -name '*~' -o -name '*.swp' \\) -delete\n```\nFără paranteze, `-delete` s-ar lega doar de al doilea `-name`. Două comenzi separate (`find ... -name '*~' -delete`, apoi pentru `.swp`) dau același rezultat.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/proiect/src/main.c",
+      "content": "int main(void) { return 0; }\n"
+     },
+     {
+      "path": "~/proiect/src/main.c~",
+      "content": "int main() {}\n"
+     },
+     {
+      "path": "~/proiect/src/util.c",
+      "content": "/* util */\n"
+     },
+     {
+      "path": "~/proiect/src/.util.c.swp",
+      "content": "x"
+     },
+     {
+      "path": "~/proiect/build/make.log",
+      "content": "gcc -c main.c\ngcc -c util.c\n"
+     },
+     {
+      "path": "~/proiect/build/test/run.log",
+      "content": "ok 1\nok 2\nnot ok 3\n"
+     },
+     {
+      "path": "~/proiect/notes.txt~",
+      "content": "vechi\n"
+     },
+     {
+      "path": "~/proiect/notes.txt",
+      "content": "nou\n"
+     },
+     {
+      "path": "~/proiect/install.log",
+      "content": "done\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "absent",
+      "path": "~/proiect/src/main.c~"
+     },
+     {
+      "type": "absent",
+      "path": "~/proiect/notes.txt~"
+     },
+     {
+      "type": "absent",
+      "path": "~/proiect/src/.util.c.swp"
+     },
+     {
+      "type": "file",
+      "path": "~/proiect/src/main.c",
+      "msg": "main.c a rămas"
+     },
+     {
+      "type": "file",
+      "path": "~/proiect/notes.txt",
+      "msg": "notes.txt a rămas"
+     },
+     {
+      "type": "output",
+      "cmd": "cd ~/proiect && find . -type f | sort",
+      "msg": "au rămas exact celelalte fișiere",
+      "equals": "./build/make.log\n./build/test/run.log\n./install.log\n./notes.txt\n./src/main.c\n./src/util.c\n"
+     }
+    ],
+    "reference": [
+     "find ~/proiect -type f \\( -name '*~' -o -name '*.swp' \\) -delete"
+    ]
+   }
+  },
+  {
    "id": "5",
    "title": "Doar north are drepturi depline",
    "chapter": "2. Permisiuni",
@@ -419,6 +588,83 @@
      "umask 077",
      "mkdir ~/privat",
      "touch ~/privat/jurnal.txt"
+    ]
+   }
+  },
+  {
+   "id": "18",
+   "title": "Ce poate rula oricine",
+   "chapter": "2. Permisiuni",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "În `~/scripturi` sunt câteva fișiere, cu permisiuni diferite. Scrie în `~/publice.txt` numele (doar numele, sortate) fișierelor pe care **ceilalți** (others) le pot executa.\n\nApoi scoate dreptul de **scriere** pentru grup și pentru ceilalți de pe **toate** fișierele din `~/scripturi`, fără să schimbi altceva.",
+   "hint": "`ls -l` arată permisiunile: al treilea grup `rwx` e al celorlalți. `find -perm -o=x` alege fișierele care au cel puțin bitul x pentru others. Pentru a doua parte, `chmod` simbolic: `go-w`.",
+   "solution": "```bash\ncd ~/scripturi\nfind . -type f -perm -o=x | sed 's|^./||' | sort > ~/publice.txt\nchmod go-w ~/scripturi/*\n```\nCu octal ar trebui un `chmod` diferit pentru fiecare fișier; forma simbolică `go-w` scoate un singur bit și le lasă pe celelalte cum erau.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/scripturi/backup.sh",
+      "content": "#!/bin/bash\n",
+      "mode": "775"
+     },
+     {
+      "path": "~/scripturi/deploy.sh",
+      "content": "#!/bin/bash\n",
+      "mode": "770"
+     },
+     {
+      "path": "~/scripturi/curata.sh",
+      "content": "#!/bin/bash\n",
+      "mode": "777"
+     },
+     {
+      "path": "~/scripturi/note.txt",
+      "content": "x\n",
+      "mode": "666"
+     },
+     {
+      "path": "~/scripturi/run.sh",
+      "content": "#!/bin/bash\n",
+      "mode": "751"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/publice.txt",
+      "equals": "backup.sh\ncurata.sh\nrun.sh\n",
+      "msg": "~/publice.txt are fișierele executabile de oricine"
+     },
+     {
+      "type": "mode",
+      "path": "~/scripturi/backup.sh",
+      "mode": "755"
+     },
+     {
+      "type": "mode",
+      "path": "~/scripturi/deploy.sh",
+      "mode": "750"
+     },
+     {
+      "type": "mode",
+      "path": "~/scripturi/curata.sh",
+      "mode": "755"
+     },
+     {
+      "type": "mode",
+      "path": "~/scripturi/note.txt",
+      "mode": "644"
+     },
+     {
+      "type": "mode",
+      "path": "~/scripturi/run.sh",
+      "mode": "751"
+     }
+    ],
+    "reference": [
+     "cd ~/scripturi && find . -type f -perm -o=x | sed \"s|^./||\" | sort > ~/publice.txt",
+     "chmod go-w ~/scripturi/*"
     ]
    }
   },
@@ -588,6 +834,36 @@
     ],
     "reference": [
      "sed -i 's/localhost/10.0.0.5/g; s/^port=8080$/port=9090/' config/app.conf"
+    ]
+   }
+  },
+  {
+   "id": "19",
+   "title": "Cuvintele cele mai dese",
+   "chapter": "3. Filtre de text",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "În `~/text.txt` e un paragraf. Scrie în `~/frecvente.txt` cele **5 cuvinte cele mai frecvente**, cu numărul lor, în formatul `numar cuvant` (un spațiu între ele), de la cel mai frecvent. Cuvintele se compară **fără a ține cont de majuscule** (scrie-le cu litere mici), iar punctuația nu face parte din cuvânt. La egalitate, ordinea alfabetică.",
+   "hint": "Pașii: litere mici (`tr 'A-Z' 'a-z'`), un cuvânt pe linie (`tr -cs 'a-z-' '\\n'` înlocuiește tot ce nu e literă sau cratimă cu un singur `\\n`), apoi `sort | uniq -c`, sortare după număr descrescător și după cuvânt.",
+   "solution": "```bash\ntr 'A-Z' 'a-z' < text.txt | tr -cs 'a-z-' '\\n' | grep -v '^$' \\\n  | sort | uniq -c | sort -k1,1nr -k2,2 | head -5 | awk '{print $1, $2}' > frecvente.txt\n```\n`sort -k1,1nr -k2,2`: întâi după primul câmp, numeric și descrescător, apoi după cuvânt. `awk` scoate spațiile de aliniere pe care le pune `uniq -c`.",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/text.txt",
+      "content": "Shell-ul citeste o linie. Shell-ul o imparte in cuvinte, apoi cauta comanda.\nComanda primeste cuvintele ca argumente; argumentele sunt cuvinte, iar cuvintele sunt separate de spatii.\nO linie, o comanda: asa lucreaza shell-ul. Linie dupa linie.\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "file",
+      "path": "~/frecvente.txt",
+      "msg": "~/frecvente.txt are cele 5 cuvinte, cu numărul lor",
+      "equals": "4 linie\n4 o\n3 comanda\n3 shell-ul\n2 cuvinte\n"
+     }
+    ],
+    "reference": [
+     "tr 'A-Z' 'a-z' < text.txt | tr -cs 'a-z-' '\\n' | grep -v '^$' | sort | uniq -c | sort -k1,1nr -k2,2 | head -5 | awk '{print $1, $2}' > frecvente.txt"
     ]
    }
   },
@@ -855,6 +1131,90 @@
     ],
     "reference": [
      "cat > ~/redenumeste.sh <<'EOF'\n#!/bin/bash\nfor f in *.jpeg; do\n    [ -e \"$f\" ] || continue\n    nou=\"${f%.jpeg}.jpg\"\n    mv \"$f\" \"$nou\"\n    echo \"$f -> $nou\"\ndone\nEOF"
+    ]
+   }
+  },
+  {
+   "id": "20",
+   "title": "Un script cu opțiuni",
+   "chapter": "4. Scripturi shell",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Scrie `~/numara.sh`, care primește un **cuvânt** și apoi unul sau mai multe **fișiere** și afișează, pentru fiecare fișier, pe câte o linie, `fisier: N`, unde N e numărul de linii ale fișierului care conțin cuvântul. La final afișează `total: S`.\n\n• fără argumente suficiente (mai puțin de 2), afișează `Utilizare: numara.sh cuvant fisier...` și iese cu codul **1**;\n• un fișier care nu există se raportează ca `fisier: lipsa` și nu intră în total.\n\n```\n$ ~/numara.sh ERROR web.log db.log nu_e.log\nweb.log: 7\ndb.log: 3\nnu_e.log: lipsa\ntotal: 10\n```",
+   "hint": "`$#` e numărul de argumente; după `shift`, `\"$@\"` sunt doar fișierele. `grep -c` dă numărul de linii potrivite, iar `$(...)` îl pune într-o variabilă.",
+   "solution": "```bash\n#!/bin/bash\nif [ $# -lt 2 ]; then\n    echo \"Utilizare: numara.sh cuvant fisier...\"\n    exit 1\nfi\nw=\"$1\"\nshift\ntotal=0\nfor f in \"$@\"; do\n    if [ -f \"$f\" ]; then\n        n=$(grep -c -- \"$w\" \"$f\")\n        echo \"$f: $n\"\n        total=$((total + n))\n    else\n        echo \"$f: lipsa\"\n    fi\ndone\necho \"total: $total\"\n```\n`--` îi spune lui `grep` că ce urmează nu mai sunt opțiuni (cuvântul ar putea începe cu `-`).",
+   "kind": "shell",
+   "spec": {
+    "setup": [
+     {
+      "path": "~/web.log",
+      "content": "2024-01-28 23:58 INFO request served\n2024-01-13 17:58 INFO cache hit\n2024-01-22 22:23 WARN slow query\n2024-01-10 23:34 WARN retrying\n2024-01-10 21:38 ERROR timeout\n2024-01-28 11:30 INFO request served\n2024-01-10 20:44 INFO request served\n2024-01-16 16:56 WARN slow query\n2024-01-17 22:38 ERROR timeout\n2024-01-17 15:24 ERROR connection refused\n2024-01-24 14:11 INFO cache hit\n2024-01-13 12:50 ERROR connection refused\n2024-01-13 21:31 INFO user logged in\n2024-01-23 18:52 ERROR disk full\n2024-01-19 19:41 INFO user logged in\n2024-01-28 23:12 WARN retrying\n2024-01-22 16:52 INFO request served\n2024-01-27 21:59 INFO user logged in\n2024-01-12 17:52 INFO user logged in\n2024-01-15 18:35 INFO cache hit\n2024-01-10 17:12 WARN retrying\n2024-01-28 19:35 ERROR connection refused\n2024-01-15 18:24 INFO request served\n2024-01-27 23:45 INFO request served\n2024-01-26 15:46 WARN retrying\n2024-01-18 20:45 WARN slow query\n2024-01-26 22:18 WARN slow query\n2024-01-11 17:33 WARN slow query\n2024-01-23 17:32 ERROR timeout\n2024-01-10 18:44 INFO user logged in\n2024-01-20 17:48 ERROR disk full\n2024-01-15 18:47 INFO request served\n2024-01-27 22:26 INFO request served\n2024-01-12 23:11 INFO cache hit\n2024-01-18 13:27 INFO request served\n2024-01-15 15:28 ERROR disk full\n2024-01-15 14:43 INFO request served\n2024-01-19 17:54 INFO cache hit\n2024-01-25 11:11 WARN retrying\n2024-01-20 16:22 WARN retrying\n"
+     },
+     {
+      "path": "~/db.log",
+      "content": "2024-01-12 11:33 INFO request served\n2024-01-18 19:23 INFO user logged in\n2024-01-28 20:20 INFO cache hit\n2024-01-26 15:44 WARN retrying\n2024-01-18 10:11 ERROR timeout\n2024-01-20 16:37 WARN slow query\n2024-01-15 13:24 ERROR disk full\n2024-01-20 12:18 INFO user logged in\n2024-01-21 18:53 ERROR connection refused\n2024-01-24 22:36 INFO user logged in\n2024-01-21 22:47 ERROR timeout\n2024-01-24 12:58 INFO cache hit\n2024-01-26 13:41 WARN retrying\n2024-01-26 18:32 WARN retrying\n2024-01-21 19:56 WARN retrying\n2024-01-17 15:54 WARN slow query\n2024-01-18 22:40 ERROR timeout\n2024-01-26 18:43 INFO user logged in\n2024-01-28 16:29 ERROR connection refused\n2024-01-25 18:33 INFO user logged in\n2024-01-12 22:31 ERROR connection refused\n2024-01-16 21:16 INFO request served\n2024-01-11 14:47 ERROR disk full\n2024-01-26 12:27 INFO request served\n2024-01-11 16:55 INFO request served\n"
+     }
+    ],
+    "checks": [
+     {
+      "type": "script",
+      "path": "~/numara.sh",
+      "runs": [
+       {
+        "cwd": "~/.verif",
+        "setup": [
+         {
+          "path": "~/.verif/a.log",
+          "content": "2024-01-14 16:51 INFO request served\n2024-01-27 11:33 INFO user logged in\n2024-01-26 13:12 INFO request served\n2024-01-23 11:25 WARN slow query\n2024-01-23 10:46 ERROR disk full\n2024-01-28 10:46 INFO user logged in\n2024-01-11 13:12 WARN slow query\n2024-01-23 12:44 INFO request served\n2024-01-19 18:53 ERROR disk full\n2024-01-28 19:50 INFO request served\n2024-01-13 18:55 INFO request served\n2024-01-11 19:23 ERROR timeout\n2024-01-23 22:30 ERROR timeout\n2024-01-24 15:29 ERROR disk full\n2024-01-17 11:46 INFO cache hit\n2024-01-25 15:56 ERROR timeout\n2024-01-12 11:42 INFO cache hit\n2024-01-20 12:41 INFO cache hit\n2024-01-12 22:45 INFO user logged in\n2024-01-20 21:32 INFO user logged in\n2024-01-28 22:39 WARN slow query\n2024-01-18 17:54 INFO user logged in\n2024-01-11 21:54 INFO cache hit\n2024-01-24 14:55 ERROR timeout\n2024-01-10 17:32 INFO request served\n2024-01-13 17:13 ERROR disk full\n2024-01-14 21:25 INFO cache hit\n2024-01-25 11:20 WARN retrying\n2024-01-27 14:18 WARN retrying\n2024-01-18 21:36 ERROR timeout\n"
+         },
+         {
+          "path": "~/.verif/b.log",
+          "content": "2024-01-21 16:18 INFO request served\n2024-01-12 12:25 INFO user logged in\n2024-01-22 20:11 INFO cache hit\n2024-01-24 16:41 WARN slow query\n2024-01-12 17:24 WARN slow query\n2024-01-26 16:40 INFO cache hit\n2024-01-18 11:14 INFO cache hit\n2024-01-22 11:52 ERROR disk full\n2024-01-17 21:15 INFO cache hit\n2024-01-16 19:19 ERROR connection refused\n2024-01-27 10:41 INFO user logged in\n2024-01-14 23:47 INFO cache hit\n"
+         }
+        ],
+        "args": [
+         "ERROR",
+         "a.log",
+         "b.log"
+        ],
+        "stdout": "a.log: 9\nb.log: 2\ntotal: 11\n",
+        "status": 0
+       },
+       {
+        "cwd": "~/.verif",
+        "setup": [
+         {
+          "path": "~/.verif/a.log",
+          "content": "2024-01-14 16:51 INFO request served\n2024-01-27 11:33 INFO user logged in\n2024-01-26 13:12 INFO request served\n2024-01-23 11:25 WARN slow query\n2024-01-23 10:46 ERROR disk full\n2024-01-28 10:46 INFO user logged in\n2024-01-11 13:12 WARN slow query\n2024-01-23 12:44 INFO request served\n2024-01-19 18:53 ERROR disk full\n2024-01-28 19:50 INFO request served\n2024-01-13 18:55 INFO request served\n2024-01-11 19:23 ERROR timeout\n2024-01-23 22:30 ERROR timeout\n2024-01-24 15:29 ERROR disk full\n2024-01-17 11:46 INFO cache hit\n2024-01-25 15:56 ERROR timeout\n2024-01-12 11:42 INFO cache hit\n2024-01-20 12:41 INFO cache hit\n2024-01-12 22:45 INFO user logged in\n2024-01-20 21:32 INFO user logged in\n2024-01-28 22:39 WARN slow query\n2024-01-18 17:54 INFO user logged in\n2024-01-11 21:54 INFO cache hit\n2024-01-24 14:55 ERROR timeout\n2024-01-10 17:32 INFO request served\n2024-01-13 17:13 ERROR disk full\n2024-01-14 21:25 INFO cache hit\n2024-01-25 11:20 WARN retrying\n2024-01-27 14:18 WARN retrying\n2024-01-18 21:36 ERROR timeout\n"
+         }
+        ],
+        "args": [
+         "WARN",
+         "a.log",
+         "lipsa.log"
+        ],
+        "stdout": "a.log: 5\nlipsa.log: lipsa\ntotal: 5\n",
+        "status": 0
+       },
+       {
+        "cwd": "~/.verif",
+        "setup": [
+         {
+          "path": "~/.verif/a.log",
+          "content": "ERROR x\n"
+         }
+        ],
+        "args": [
+         "ERROR"
+        ],
+        "stdout": "Utilizare: numara.sh cuvant fisier...\n",
+        "status": 1
+       }
+      ]
+     }
+    ],
+    "reference": [
+     "cat > ~/numara.sh <<'EOF'\n#!/bin/bash\nif [ $# -lt 2 ]; then\n    echo \"Utilizare: numara.sh cuvant fisier...\"\n    exit 1\nfi\nw=\"$1\"\nshift\ntotal=0\nfor f in \"$@\"; do\n    if [ -f \"$f\" ]; then\n        n=$(grep -c -- \"$w\" \"$f\")\n        echo \"$f: $n\"\n        total=$((total + n))\n    else\n        echo \"$f: lipsa\"\n    fi\ndone\necho \"total: $total\"\nEOF"
     ]
    }
   }

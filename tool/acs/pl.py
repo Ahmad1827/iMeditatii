@@ -211,4 +211,70 @@ Automatul trebuie să aibă cel mult 3 stări.''', 'logic',
     'Ține minte doar restul împărțirii la 3. Un bit nou `x` transformă numărul `n` în `2n + x`, deci restul `r` devine `(2r + x) mod 3`.',
     'Stările sunt resturile 0, 1, 2. Din restul r, cu bitul x, mergi în (2r + x) mod 3, iar ieșirea e 1 când acesta e 0.'))
 
+# ------------------------------------------------------------------ more (2026-11)
+expr(15, 'Implicația doar din porți NOR', C1, 'medie', '''
+Implicația `a → b` e 0 doar când `a = 1` și `b = 0`, adică `f = a' + b`. Scrie-o folosind **numai porți NOR** (operatorul `↓`, de exemplu `a ↓ b`). Negația se scrie `a ↓ a`.
+
+Ca NAND, și NOR e o poartă universală.''',
+    ['a', 'b'], [{'name': 'f', 'ones': minterms(2, lambda a, b: (not a) or b)}],
+    "O sumă negată e un NOR: `a' + b = ((a' ↓ b))'`, iar o negație e un NOR cu ea însăși.",
+    "`a' = a ↓ a`; `t = a' ↓ b` e `(a' + b)'`; `f = t ↓ t`. Deci `f = ((a↓a)↓b)↓((a↓a)↓b)`: 3 porți distincte.",
+    allowed=['nor'], ref={'f': '((a↓a)↓b)↓((a↓a)↓b)'})
+
+o16 = [1, 3, 4, 6, 9, 11, 12, 14]
+expr(16, 'O hartă în tablă de șah', C2, 'ușoară', f'''
+Forma minimă disjunctivă a funcției
+
+$$f(a, b, c, d) = \\sum m({', '.join(map(str, o16))}).$$
+
+Uită-te bine la hartă înainte să grupezi: doar două variabile contează.''',
+    ['a', 'b', 'c', 'd'], [{'name': 'f', 'ones': o16}],
+    'Verifică pentru fiecare variabilă dacă schimbarea ei schimbă valoarea funcției.',
+    "Funcția depinde doar de b și d: `f = b'd + bd'` (adică `b ⊕ d`), două grupuri de câte 4 celule, care se închid peste marginile hărții.",
+    form='sop', max_lit=min_sop_literals(4, o16), ref={'f': "b'd + bd'"})
+
+y1 = minterms(4, lambda d3, d2, d1, d0: d3 or d2)
+y0 = minterms(4, lambda d3, d2, d1, d0: d3 or ((not d2) and d1))
+vv = minterms(4, lambda d3, d2, d1, d0: d3 or d2 or d1 or d0)
+expr(17, 'Codificatorul cu prioritate', C3, 'medie', '''
+Un codificator cu prioritate 4:2 are intrările `d3 d2 d1 d0` și dă pe `y1 y0` indicele **celei mai mari** intrări egale cu 1 (`d3` are prioritatea cea mai mare). Ieșirea `v` spune dacă vreo intrare e activă; când `v = 0`, `y1 y0 = 00`.
+
+Scrie cele trei ieșiri ca sume de produse minime.''',
+    ['d3', 'd2', 'd1', 'd0'],
+    [{'name': 'y1', 'ones': y1}, {'name': 'y0', 'ones': y0}, {'name': 'v', 'ones': vv}],
+    'Indicele e 3 dacă `d3 = 1`, oricare ar fi celelalte; e 2 dacă `d3 = 0` și `d2 = 1`, și tot așa.',
+    "`y1 = d3 + d2` (indicele 2 sau 3), `y0 = d3 + d2'd1` (indicele 3 sau 1), `v = d3 + d2 + d1 + d0`.",
+    form='sop', max_lit=min_sop_literals(4, y1) + min_sop_literals(4, y0) + min_sop_literals(4, vv),
+    ref={'y1': 'd3 + d2', 'y0': "d3 + d2'd1", 'v': 'd3 + d2 + d1 + d0'}, source='Test PL · codificatoare')
+
+mux3 = [0, 3, 5, 6]
+PROBLEMS.append(problem(18, 'Paritatea pe un MUX 4:1', C3, 'ușoară', f'''
+Realizează cu un **multiplexor 4:1** funcția
+
+$$f(a, b, c) = \\sum m({', '.join(map(str, mux3))}),$$
+
+care e 1 când are un număr **par** de intrări egale cu 1. Pe selecție pui două variabile, pe date `0`, `1`, a treia variabilă sau negata ei.''', 'logic',
+    {'mode': 'mux', 'vars': ['a', 'b', 'c'], 'outputs': [{'name': 'f', 'ones': mux3}], 'selects': 2, 'reference': {'sel': ['a', 'b'], 'data': ["c'", 'c', 'c', "c'"]}},
+    'Pentru `ab = 00`, f e 1 doar dacă c = 0; pentru `ab = 01`, doar dacă c = 1...',
+    "Cu `a b` pe selecție: D0 = c', D1 = c, D2 = c, D3 = c'. Nicio intrare nu e o constantă: paritatea depinde mereu de toți biții."))
+
+par = {'states': ['P', 'I'], 'start': 'P', 't': {'P': [['P', 0], ['I', 1]], 'I': [['I', 1], ['P', 0]]}}
+PROBLEMS.append(problem(19, 'Paritatea biților primiți', C4, 'ușoară', '''
+Proiectează un automat **Mealy** cu o intrare `x` și o ieșire `z`: după fiecare bit, `z = 1` dacă până atunci au venit un număr **impar** de biți de 1. De exemplu, pentru `1101` ieșirea e `1001`.
+
+Ajung 2 stări.''', 'logic',
+    {'mode': 'fsm', 'target': par, 'maxStates': 2, 'reference': par},
+    'Automatul trebuie să țină minte un singur lucru: paritatea de până acum.',
+    'P = par, I = impar. Un 0 nu schimbă starea, un 1 o schimbă; ieșirea e 1 când starea în care ajungi e I.'))
+
+det110 = {'states': ['A', 'B', 'C'], 'start': 'A', 't': {'A': [['A', 0], ['B', 0]], 'B': [['A', 0], ['C', 0]], 'C': [['A', 1], ['C', 0]]}}
+PROBLEMS.append(problem(20, 'Detectorul de secvență 110', C4, 'medie', '''
+Un automat **Mealy** cu intrarea `x` dă `z = 1` exact la bitul care încheie secvența `110`. De exemplu, pe intrarea `111010110` ieșirea e `000100001`.
+
+Ajung 3 stări.''', 'logic',
+    {'mode': 'fsm', 'target': det110, 'maxStates': 3, 'reference': det110},
+    'Stările: nimic util, „1”, „11”. Din „11”, încă un 1 te lasă tot în „11” (ultimii doi biți sunt tot 11).',
+    'A = nimic, B = „1”, C = „11”. A: 0 → A, 1 → B. B: 0 → A, 1 → C. C: 0 → A cu ieșirea 1, 1 → C.',
+    'Test PL · automate de recunoaștere a secvențelor'))
+
 write_course('pl', CHAPTERS, PROBLEMS)

@@ -133,7 +133,8 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
         const SizedBox(height: 10),
         ToolRow([
           AcsButton(ink, 'rulează testele', _runTests, primary: true, icon: Icons.play_arrow),
-          AcsButton(ink, 'cod inițial', () => setState(() => _code.text = spec['starter'] as String? ?? '')),
+          AcsConfirmButton(ink, 'cod inițial', () => setState(() => _code.text = spec['starter'] as String? ?? '')),
+          acsKeysHint(ink, 'Ctrl+Enter rulează testele'),
         ]),
         if (_results != null) ...[
           const SizedBox(height: 12),
@@ -141,7 +142,12 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
               title: _results!.every((r) => r.ok) ? 'teste: toate trec' : 'teste: ${_results!.where((r) => r.ok).length} din ${_results!.length}'),
         ],
         const SizedBox(height: 14),
-        Container(
+        TapToFocus(
+          // a click anywhere on the console types into it
+          onTap: () {
+            if (!_cmdFocus.hasFocus) _cmdFocus.requestFocus();
+          },
+          child: Container(
           height: widget.narrow ? 220 : 260,
           decoration: BoxDecoration(color: ink.panel, border: Border.all(color: ink.line), borderRadius: ink.terminal ? null : BorderRadius.circular(4)),
           child: Column(children: [
@@ -186,6 +192,7 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
               ]),
             ),
           ]),
+          ),
         ),
       ],
     );

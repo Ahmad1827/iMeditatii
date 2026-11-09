@@ -20,7 +20,7 @@ class AcsSubject {
   final String short; // "PCLP"
   final String name;
   final String about;
-  final int semester; // 1 or 2 of the first year; 0: coming later
+  final int semester; // 1 or 2 of the first year, -1 the admission exam; 0: coming later
   const AcsSubject(this.code, this.short, this.name, this.about, {this.semester = 0});
 
   bool get ready => semester != 0;
@@ -29,6 +29,7 @@ class AcsSubject {
 
 /// The first year of the CD series; the electives (history, philosophy...) have no problems here.
 const List<AcsSubject> acsSubjects = [
+  AcsSubject('admitere', 'ADM', 'Admitere ACS', 'Testul grilă: matematică (algebră, analiză) și informatică (C++)', semester: -1),
   AcsSubject('am', 'AM', 'Analiză Matematică', 'Serii Taylor, derivate parțiale, extreme, integrale — cu grafice', semester: 1),
   AcsSubject('algaed', 'ALGAED', 'Algebră, Geometrie și Ecuații Diferențiale', 'Operații pe linii, valori proprii, ecuații diferențiale', semester: 1),
   AcsSubject('pclp', 'PCLP', 'Programarea Calculatoarelor', 'C cu teste: pointeri, șiruri, biți, structuri, alocare dinamică', semester: 1),
@@ -40,7 +41,6 @@ const List<AcsSubject> acsSubjects = [
   AcsSubject('mn', 'MN', 'Metode Numerice', 'Un Octave în browser: LU, iterații, interpolare, Newton', semester: 2),
   AcsSubject('iocla', 'IOCLA', 'Calculatoare și Limbaje de Asamblare', 'Asamblare x86 pe un emulator: registre, stivă, apeluri', semester: 2),
   AcsSubject('sd', 'SD', 'Structuri de Date', 'C cu teste și structuri construite pas cu pas', semester: 2),
-  AcsSubject('admitere', 'ADM', 'Admitere ACS', 'Subiectele de matematică și informatică de la admitere'),
   AcsSubject('poo', 'POO', 'Programare Orientată pe Obiecte', 'Anul II: clase, moștenire, polimorfism'),
   AcsSubject('pa', 'PA', 'Proiectarea Algoritmilor', 'Anul II: divide et impera, programare dinamică, greedy'),
 ];
@@ -110,8 +110,9 @@ String _pct(AcsCount c) => c.problems == 0 ? 'în curând' : '${(c.solved * 100 
 
 const AcsCount _none = (problems: 0, solved: 0);
 
-/// The courses in groups: first-year semesters, then those still to come.
+/// The courses in groups: the admission exam, first-year semesters, then those still to come.
 const List<(String, String, int)> _groups = [
+  ('pregatire', 'Înainte de anul I · admiterea', -1),
   ('anul-1/sem-1', 'Anul I · semestrul 1', 1),
   ('anul-1/sem-2', 'Anul I · semestrul 2', 2),
   ('in-curand', 'În curând', 0),
@@ -221,7 +222,7 @@ class _Terminal extends StatelessWidget {
           for (final s in acsSubjects.where((s) => s.ready ? s.semester == sem : sem == 0)) row(s),
         ],
         prompt('cat README'),
-        Text('Seria CD, anul I: probleme din examenele, testele și laboratoarele fiecărei materii, rezolvate\nîn unealta materiei: un shell la USO, un emulator x86 la IOCLA, Octave la MN, circuite la ELTH...\nMateriile opționale nu sunt incluse.',
+        Text('Admiterea: testul grilă de matematică și informatică, cu câte șase variante.\nSeria CD, anul I: probleme din examenele, testele și laboratoarele fiecărei materii, rezolvate\nîn unealta materiei: un shell la USO, un emulator x86 la IOCLA, Octave la MN, circuite la ELTH...\nMateriile opționale nu sunt incluse.',
             style: TextStyle(color: ink.muted, fontSize: 14)),
 
         const SizedBox(height: 18),
@@ -266,7 +267,7 @@ class _Notebook extends StatelessWidget {
           child: AcsNav(ink: ink, size: narrow ? 15 : 17),
         ),
         const SizedBox(height: 26),
-        Text('Materii, anul I',
+        Text('Admitere și anul I',
             style: TextStyle(fontSize: narrow ? 24 : 32, fontWeight: FontWeight.w700, color: ink.strong, height: 1.15)),
         const SizedBox(height: 4),
         Text.rich(TextSpan(children: [

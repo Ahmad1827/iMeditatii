@@ -321,4 +321,130 @@ Același graf, dar cu algoritmul lui **Prim**, pornind din `A`: arborele crește
     hint='Uită-te doar la muchiile cu un capăt în arbore și celălalt în afară.',
     solution=f'Ordinea lui Prim: AD (5), DF (6), AB (7), BE (7), EC (5), EG (9); costul e tot {cost}. Prim și Kruskal aleg aceleași muchii aici, în altă ordine.')
 
+# ------------------------------------------------------------------ more (2026-11)
+keys3 = [8, 3, 10, 1, 6, 14, 4, 7, 13]
+root3, tree3 = bst_shape(keys3)
+ds('Arborele din manual', '3. Arbori binari', 'ușoară', f'''
+Inserează, în ordine, cheile `{', '.join(map(str, keys3))}` într-un arbore binar de căutare gol.
+
+După ce îl construiești, gândește-te: ce dă parcurgerea lui în **inordine**?''',
+    {'mode': 'bst', 'keys': keys3, 'maxMistakes': 2, 'expect': {'preorder': preorder(root3, tree3)}},
+    hint='Fiecare cheie coboară din rădăcină: la stânga dacă e mai mică, la dreapta altfel.',
+    solution=f'Preordinea: `{" ".join(map(str, preorder(root3, tree3)))}`. Inordinea (stânga, nod, dreapta) a unui arbore binar de căutare dă mereu cheile **sortate**: `{" ".join(map(str, sorted(keys3)))}`.')
+
+arr2 = [9, 4, 7, 1, 8, 2, 6, 3]
+minh = [-v for v in build_heap([-v for v in arr2])]
+ds('Build-heap pentru un min-heap', '4. Heap și tabele de dispersie', 'medie', f'''
+Transformă vectorul `{arr2}` într-un **min-heap** (în rădăcină, cel mai mic element), cu build-heap: sift-down de la ultimul nod intern spre rădăcină. Apasă perechile care se schimbă.''',
+    {'mode': 'heap', 'op': 'build', 'array': arr2, 'min': True, 'maxMistakes': 2, 'expect': {'array': minh}},
+    hint='Într-un min-heap, nodul se schimbă cu copilul **cel mai mic**, dacă acela e mai mic decât el.',
+    solution=f'Min-heap-ul final: `{minh}`. E același algoritm ca la max-heap, cu comparațiile inversate.')
+
+qk = [27, 38, 49, 16, 12, 5]
+qt = hash_fill(11, qk, 'quadratic')
+assert sum(v is not None for v in qt) == len(qk), 'quadratic probing left a key out'
+ds('Sondare pătratică', '4. Heap și tabele de dispersie', 'medie', f'''
+Tabela are **11** celule și sondare **pătratică**: la încercarea `i` (de la 0), cheia `k` merge în $(k \\bmod 11 + i^2) \\bmod 11$.
+
+Inserează cheile `{', '.join(map(str, qk))}`. Multe dintre ele au același rest la 11: urmărește cum se împrăștie.''',
+    {'mode': 'hash', 'm': 11, 'keys': qk, 'probe': 'quadratic', 'maxMistakes': 2, 'expect': {'table': qt}},
+    hint='Încercările pentru o cheie cu restul 5: 5, 6, 9, 3 (14 mod 11), 10 (21 mod 11)...',
+    solution='Tabela finală: ' + ', '.join(f'{i}: {v}' if v is not None else f'{i}: —' for i, v in enumerate(qt)) + '. Spre deosebire de sondarea liniară, cheile nu se mai lipesc într-un singur bloc (fără clustering primar).')
+
+bn = ['1', '2', '3', '4', '5', '6', '7']
+bc = [(0.08, 0.5), (0.35, 0.15), (0.35, 0.85), (0.62, 0.15), (0.62, 0.5), (0.62, 0.85), (0.92, 0.5)]
+be = [['1', '2'], ['1', '3'], ['2', '4'], ['2', '5'], ['3', '5'], ['3', '6'], ['5', '7'], ['6', '7'], ['4', '7'], ['7', '1']]
+gb = adj(bn, be, True)
+ds('BFS pe un graf orientat', '5. Grafuri', 'ușoară', '''
+Parcurge graful **orientat** în lățime din nodul `1`: un nod are ca vecini doar nodurile spre care pleacă săgeți din el. Vecinii se iau în ordine crescătoare.''',
+    {'mode': 'graph', 'algo': 'bfs', 'directed': True, 'nodes': place(bn, bc), 'edges': be, 'start': '1', 'maxMistakes': 2, 'expect': {'order': bfs(gb, '1')}},
+    hint='Muchia `7 → 1` nu face din 1 un vecin nou: 1 e deja vizitat.',
+    solution=f'Ordinea BFS: `{" ".join(bfs(gb, "1"))}`.')
+
+un = ['A', 'B', 'C', 'D', 'E', 'F']
+uc = [(0.06, 0.5), (0.35, 0.12), (0.35, 0.88), (0.65, 0.12), (0.65, 0.88), (0.94, 0.5)]
+ue = [['A', 'B', 2], ['A', 'C', 6], ['B', 'C', 3], ['B', 'D', 7], ['C', 'E', 2], ['D', 'E', 1], ['D', 'F', 3], ['E', 'F', 6]]
+ud = dijkstra(adj(un, ue, False), 'A')
+ds('Dijkstra pe un graf neorientat', '5. Grafuri', 'medie', '''
+Dijkstra din `A`, pe un graf **neorientat** (o muchie se poate parcurge în ambele sensuri). Apasă nodurile în ordinea în care se fixează.''',
+    {'mode': 'graph', 'algo': 'dijkstra', 'nodes': place(un, uc), 'edges': ue, 'start': 'A', 'maxMistakes': 2, 'expect': {'dist': ud}},
+    hint='Drumul cel mai scurt spre un nod nu e mereu cel cu cele mai puține muchii.',
+    solution='Distanțele finale: ' + ', '.join(f'{k} = {v}' for k, v in sorted(ud.items())) + '. De exemplu, până la D nu se merge direct pe B–D (2 + 7 = 9), ci pe A–B–C–E–D (2 + 3 + 2 + 1 = 8).')
+
+
+def cwrite(chapter, title, diff, desc, inp, out, constraints, ref, tests, hint, sol):
+    nid[0] += 1
+    t = check(title, ref, [{'input': x} for x in tests])
+    st = statement(desc, inp, out, constraints, (t[0]['input'], t[0]['output']))
+    PROBLEMS.append(problem(nid[0], title, chapter, diff, st, 'c', {'tests': t, 'starter': C_START, 'reference': ref}, hint, sol + '\n\n```c\n' + ref.strip() + '\n```'))
+
+
+cwrite('1. Liste înlănțuite', 'Inversarea unei liste', 'medie', '''
+Citește `n` numere și pune-le, în ordine, într-o **listă simplu înlănțuită** (fiecare nod nou la final). Inversează lista **pe loc**, schimbând legăturile (fără vector auxiliar și fără noduri noi), apoi afișeaz-o.''',
+    'Pe prima linie `n`; pe a doua `n` numere întregi.', 'Lista inversată, pe o linie, numerele separate prin spațiu.', ['1 ≤ n ≤ 100 000'],
+    """#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Nod {
+    int val;
+    struct Nod *next;
+} Nod;
+
+int main(void) {
+    int n;
+    scanf("%d", &n);
+    Nod *cap = NULL, *coada = NULL;
+    for (int i = 0; i < n; i++) {
+        Nod *x = malloc(sizeof *x);
+        scanf("%d", &x->val);
+        x->next = NULL;
+        if (coada) coada->next = x; else cap = x;
+        coada = x;
+    }
+    Nod *prev = NULL;
+    while (cap) {
+        Nod *urm = cap->next;
+        cap->next = prev;
+        prev = cap;
+        cap = urm;
+    }
+    for (Nod *p = prev; p; ) {
+        Nod *urm = p->next;
+        printf("%d%c", p->val, urm ? ' ' : '\\n');
+        free(p);
+        p = urm;
+    }
+    return 0;
+}
+""", ['5\n1 2 3 4 5\n', '1\n42\n', '2\n-1 1\n', '6\n3 3 1 2 2 1\n'],
+    'Trei pointeri: nodul de dinainte (`prev`), cel curent și următorul, salvat înainte să schimbi `next`.',
+    'La fiecare pas legătura nodului curent se întoarce spre `prev`; la final `prev` e noul cap. O(n) timp, O(1) memorie în plus.')
+
+cwrite('2. Stive și cozi', 'Paranteze echilibrate', 'ușoară', '''
+Pentru fiecare linie citită, spune dacă parantezele `()`, `[]` și `{}` din ea sunt **corect închise** (orice altceva se ignoră). Afișează `DA` sau `NU`. Folosește o stivă.''',
+    'Mai multe linii, fiecare cu cel mult 10 000 de caractere, până la sfârșitul intrării.', 'Pentru fiecare linie, `DA` sau `NU`.', [],
+    """#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    static char s[10005], st[10005];
+    while (fgets(s, sizeof s, stdin)) {
+        int k = 0, ok = 1;
+        for (int i = 0; s[i] && ok; i++) {
+            char c = s[i];
+            if (c == '(' || c == '[' || c == '{') st[k++] = c;
+            else if (c == ')' || c == ']' || c == '}') {
+                char want = c == ')' ? '(' : c == ']' ? '[' : '{';
+                if (k == 0 || st[k - 1] != want) ok = 0;
+                else k--;
+            }
+        }
+        printf("%s\\n", ok && k == 0 ? "DA" : "NU");
+    }
+    return 0;
+}
+""", ['{[()()]}\n([)]\n', 'v[i] = (a + b) * c;\n', '((\n', ')(\n', 'if (x) { f(a[0]); }\n}\n'],
+    'Deschiderea intră în stivă; o închidere trebuie să găsească în vârf deschiderea ei. La final stiva trebuie să fie goală.',
+    'Trei moduri de a greși: o închidere cu stiva goală, o închidere care nu se potrivește cu vârful, deschideri rămase la final.')
+
 write_course('sd', CHAPTERS, PROBLEMS)

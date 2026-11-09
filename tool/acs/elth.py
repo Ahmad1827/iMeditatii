@@ -176,14 +176,14 @@ c8 = [V('U', [0, 0], [0, 3], 10), W([0, 0], [1, 0]), R('R', [1, 0], [3, 0], 100)
 circuit(8, 'Circuit RC serie', C3, 'medie', f'''
 Tensiunea sinusoidală are valoarea efectivă $U = 10\\,\\text{{V}}$ și faza 0, la $\\omega = 1000\\,\\text{{rad/s}}$; $R = 100\\,\\Omega$, $C = 10\\,\\mu\\text{{F}}$. Calculează valoarea efectivă a curentului și faza lui (în grade).''',
     c8, [5, 4], omega=w1, ask=[{'q': 'absI.R', 'label': '|I|', 'unit': 'A'}, {'q': 'phI.R', 'label': 'faza lui I', 'unit': '°'}],
-    hint='$\\underline{Z} = R - j/(\\omega C)$.', solution=f"$X_C = 100\\,\\Omega$, $|Z| = 100\\sqrt2$, $|I| = {fmt(q(c8, 'absI.R'))}\\,\\text{{A}}$; curentul e defazat înaintea tensiunii cu 45°.")
+    hint='$\\underline{Z} = R - j/(\\omega C)$.', solution=f"$X_C = 100\\,\\Omega$, $|Z| = 100\\sqrt2$, $|I| = {fmt(q(c8, 'absI.R', w1))}\\,\\text{{A}}$; curentul e defazat înaintea tensiunii cu 45°.")
 
 w2 = 2 * math.pi * 50
 c9 = [V('U', [0, 0], [0, 3], 220), W([0, 0], [1, 0]), R('R', [1, 0], [3, 0], 30), W([3, 0], [4, 0]), Ll('L', [4, 0], [4, 3], 40 / w2), W([4, 3], [0, 3]), G([0, 3])]
 circuit(9, 'Bobina reală la rețea', C3, 'medie', f'''
 O bobină cu rezistența $R = 30\\,\\Omega$ și reactanța $X_L = 40\\,\\Omega$ (la 50 Hz) e legată la rețeaua de $220\\,\\text{{V}}$. Calculează curentul efectiv și puterea activă consumată.''',
     c9, [5, 4], omega=w2, ask=[{'q': 'absI.R', 'label': '|I|', 'unit': 'A'}, {'q': 'P.R', 'label': 'P', 'unit': 'W'}],
-    hint='$|Z| = \\sqrt{R^2 + X_L^2}$; puterea activă se consumă doar pe R.', solution=f"$|Z| = 50\\,\\Omega$, $I = 4{{,}}4\\,\\text{{A}}$, $P = R I^2 = {fmt(q(c9, 'P.R'), 4)}\\,\\text{{W}}$.", source=E)
+    hint='$|Z| = \\sqrt{R^2 + X_L^2}$; puterea activă se consumă doar pe R.', solution=f"$|Z| = 50\\,\\Omega$, $I = 4{{,}}4\\,\\text{{A}}$, $P = R I^2 = {fmt(q(c9, 'P.R', w2), 4)}\\,\\text{{W}}$.", source=E)
 
 def rlc(c):
     return [V('U', [0, 0], [0, 3], 10), W([0, 0], [1, 0]), R('R', [1, 0], [3, 0], 20), W([3, 0], [4, 0]), Ll('L', [4, 0], [6, 0], 0.1), W([6, 0], [7, 0]), Cc('C', [7, 0], [7, 3], c), W([7, 3], [0, 3]), G([0, 3])]
@@ -191,5 +191,32 @@ circuit(10, 'Rezonanța serie', C3, 'medie', '''
 Alege capacitatea $C$ astfel încât circuitul RLC serie să fie **la rezonanță** la $\\omega = 1000\\,\\text{rad/s}$ ($R = 20\\,\\Omega$, $L = 0{,}1\\,\\text{H}$, $U = 10\\,\\text{V}$). La rezonanță curentul e maxim: $U/R$. Poți scrie `10e-6` pentru 10 µF.''',
     rlc(5e-6), [8, 4], omega=1000.0, design={'vars': [{'name': 'C', 'label': 'C', 'unit': 'F'}], 'target': {'q': 'absI.R', 'value': 0.5, 'tol': 0.002, 'label': 'curentul e maxim (U/R = 0,5 A)', 'meter': 'ampermetrul', 'unit': 'A'}, 'reference': {'C': '10e-6'}},
     hint='Rezonanță: $\\omega L = \\frac{1}{\\omega C}$.', solution='$C = \\frac{1}{\\omega^2 L} = \\frac{1}{10^6 \\cdot 0{,}1} = 10\\,\\mu\\text{F}$.')
+
+# ------------------------------------------------------------------ more (2026-11)
+c11 = [V('E', [0, 0], [0, 4], 12), W([0, 0], [2, 0]), W([2, 0], [4, 0]), W([4, 0], [6, 0]),
+       R('R1', [2, 0], [2, 4], 4), R('R2', [4, 0], [4, 4], 6), R('R3', [6, 0], [6, 4], 12),
+       W([6, 4], [4, 4]), W([4, 4], [2, 4]), W([2, 4], [0, 4]), G([0, 4])]
+circuit(11, 'Trei rezistențe în paralel', C1, 'ușoară', '''
+Sursa $E = 12\\,\\text{V}$ alimentează în paralel $R_1 = 4\\,\\Omega$, $R_2 = 6\\,\\Omega$ și $R_3 = 12\\,\\Omega$. Calculează curentul prin $R_1$, curentul prin $R_3$ și puterea disipată pe $R_2$.''',
+    c11, [7, 5], ask=[{'q': 'I.R1', 'label': 'I1', 'unit': 'A'}, {'q': 'I.R3', 'label': 'I3', 'unit': 'A'}, {'q': 'P.R2', 'label': 'P2', 'unit': 'W'}],
+    hint='În paralel, fiecare rezistență are la borne toată tensiunea sursei.',
+    solution=f"$I_1 = 12/4 = 3\\,\\text{{A}}$, $I_3 = 12/12 = 1\\,\\text{{A}}$, $P_2 = U^2/R_2 = 144/6 = {fmt(q(c11, 'P.R2'))}\\,\\text{{W}}$. Rezistența echivalentă: $\\frac{{1}}{{R_e}} = \\frac14 + \\frac16 + \\frac{{1}}{{12}} = \\frac12$, $R_e = 2\\,\\Omega$, curentul total 6 A.")
+
+
+def lim(r2):
+    return [V('E', [0, 0], [0, 3], 12), W([0, 0], [2, 0]), R('R1', [2, 0], [4, 0], 4), W([4, 0], [5, 0]), R('R2', [5, 0], [5, 3], r2), W([5, 3], [0, 3]), G([0, 3])]
+circuit(12, 'Rezistența pentru un curent dat', C2, 'ușoară', '''
+Sursa $E = 12\\,\\text{V}$ și rezistența interioară $R_1 = 4\\,\\Omega$ alimentează sarcina $R_2$. Alege $R_2$ astfel încât **curentul prin ea să fie 1 A** (±1%).''',
+    lim(2), [6, 4], design={'vars': [{'name': 'R2', 'label': 'R2', 'unit': 'Ω'}], 'target': {'q': 'I.R2', 'value': 1.0, 'tol': 0.01, 'label': 'curentul prin R2 e 1 A', 'meter': 'ampermetrul', 'unit': 'A'}, 'reference': {'R2': '8'}},
+    hint='În serie: $I = \\frac{E}{R_1 + R_2}$; rezolvă după $R_2$.', solution='$R_1 + R_2 = E / I = 12\\,\\Omega$, deci $R_2 = 8\\,\\Omega$.')
+
+w3 = 1000.0
+c13 = [V('U', [0, 0], [0, 4], 10), W([0, 0], [2, 0]), W([2, 0], [4, 0]), R('R', [2, 0], [2, 4], 100), Ll('L', [4, 0], [4, 4], 0.1),
+       W([4, 4], [2, 4]), W([2, 4], [0, 4]), G([0, 4])]
+circuit(13, 'R și L în paralel', C3, 'medie', f'''
+O tensiune sinusoidală cu valoarea efectivă $U = 10\\,\\text{{V}}$, faza 0, $\\omega = 1000\\,\\text{{rad/s}}$, alimentează în paralel $R = 100\\,\\Omega$ și $L = 0{{,}}1\\,\\text{{H}}$. Calculează valoarea efectivă a curentului prin bobină și faza lui, apoi puterea activă pe $R$.''',
+    c13, [5, 5], omega=w3, ask=[{'q': 'absI.L', 'label': '|I_L|', 'unit': 'A'}, {'q': 'phI.L', 'label': 'faza lui I_L', 'unit': '°'}, {'q': 'P.R', 'label': 'P', 'unit': 'W'}],
+    hint='Fiecare ramură are la borne toată tensiunea; $\\underline{Z}_L = j\\omega L$.',
+    solution=f"$X_L = \\omega L = 100\\,\\Omega$, $\\underline{{I}}_L = \\frac{{10}}{{j \\cdot 100}} = -0{{,}}1j$: $|I_L| = {fmt(q(c13, 'absI.L', w3))}\\,\\text{{A}}$, defazat cu 90° în urma tensiunii. $P = U^2/R = {fmt(q(c13, 'P.R', w3))}\\,\\text{{W}}$; bobina ideală nu consumă putere activă.")
 
 write_course('elth', CHAPTERS, PROBLEMS)

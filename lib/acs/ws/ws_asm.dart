@@ -212,7 +212,8 @@ class _AsmWorkspaceState extends State<AsmWorkspace> {
         ToolRow([
           AcsButton(ink, 'rulează testele', _runTests, primary: true, icon: Icons.play_arrow),
           AcsButton(ink, 'pas cu pas', _startStep, icon: Icons.skip_next),
-          AcsButton(ink, 'cod inițial', () => setState(() => _code.text = spec['starter'] as String? ?? '')),
+          AcsConfirmButton(ink, 'cod inițial', () => setState(() => _code.text = spec['starter'] as String? ?? '')),
+          acsKeysHint(ink, 'Ctrl+Enter rulează testele'),
         ]),
         if (_error != null) ...[
           const SizedBox(height: 10),

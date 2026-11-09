@@ -32,7 +32,7 @@ class _Line {
   const _Line(this.text, this.kind, [this.dir = '']);
 }
 
-class _ShellWorkspaceState extends State<ShellWorkspace> {
+class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
   late ShellTask _task;
   late Shell _sh;
   final List<_Line> _lines = [];
@@ -48,6 +48,14 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
   // the editor (nano)
   String? _editing;
   TextEditingController? _editor;
+  final FocusNode _editorFocus = FocusNode();
+
+  @override
+  FocusNode get consoleFocus => _focus;
+  @override
+  TextEditingController get consoleInput => _input;
+  @override
+  bool get consoleActive => _editing == null;
 
   @override
   void initState() {
@@ -63,7 +71,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
     _sh.onClear = () => _lines.clear();
     _lines
       ..clear()
-      ..add(const _Line('Shell-ul USO (bash). help: comenzile; nano fisier: editorul; Verifică: verifică ce ai făcut.', 3));
+      ..add(const _Line('Shell-ul USO (bash): scrie direct, fără click. help: comenzile; nano fisier: editorul; ↑↓ istoricul, Tab completează; Verifică: verifică ce ai făcut.', 3));
   }
 
   Future<void> _restore() async {
@@ -85,6 +93,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
         if (list.isNotEmpty) _lines.add(const _Line('(sesiunea de data trecută, refăcută)', 3));
       });
       _toBottom();
+      focusConsole();
     } catch (_) {
       // an old draft we can't read: start clean
     }
@@ -96,6 +105,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
   void dispose() {
     _input.dispose();
     _focus.dispose();
+    _editorFocus.dispose();
     _scroll.dispose();
     _editor?.dispose();
     super.dispose();
@@ -268,6 +278,9 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
     _editor?.dispose();
     _editor = acsCodeController(n?.data ?? '', const {'if', 'then', 'else', 'elif', 'fi', 'for', 'in', 'do', 'done', 'while', 'until', 'case', 'esac', 'function', 'return', 'echo', 'read', 'local', 'exit', 'shift'}, comment: '#');
     _editing = path;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _editing != null) _editorFocus.requestFocus();
+    });
   }
 
   void _saveEditor() {
@@ -288,7 +301,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
     setState(() {
       _editing = null;
     });
-    _focus.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) => focusConsole(evenOnTouch: true));
     _toBottom();
   }
 
@@ -299,6 +312,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
     final r = _task.verify(_sh);
     setState(() => _checks = r);
     widget.onVerdict(ShellTask.passed(r));
+    focusConsole();
   }
 
   void _reset() {
@@ -310,7 +324,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
       _editing = null;
       _start();
     });
-    _focus.requestFocus();
+    focusConsole();
   }
 
   @override
@@ -346,9 +360,13 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
       }
     }
 
-    final terminal = GestureDetector(
-      onTap: () => _focus.requestFocus(),
+    final terminal = TapToFocus(
+      onTap: () {
+        // a click that ends a text selection leaves it to be copied
+        if (!_focus.hasFocus) focusConsole(evenOnTouch: true);
+      },
       child: Container(
+        key: consoleKey,
         height: h,
         decoration: BoxDecoration(color: term, borderRadius: ink.terminal ? null : BorderRadius.circular(6), border: Border.all(color: ink.line)),
         child: Column(
@@ -392,7 +410,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
                               child: TextField(
                                 controller: _input,
                                 focusNode: _focus,
-                                autofocus: !widget.narrow,
+                                autofocus: !acsTouchDevice,
                                 style: style,
                                 cursorColor: tacc,
                                 cursorWidth: 8,
@@ -426,9 +444,12 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 color: ink.accent,
-                child: Text('  GNU nano   ${_short(_editing!)}', style: ink.mono(13, weight: FontWeight.w700, color: ink.bg)),
+                child: Text('  GNU nano   ${_short(_editing!)}   ·   ^S salvează · Esc salvează și închide', style: ink.mono(13, weight: FontWeight.w700, color: ink.bg), overflow: TextOverflow.ellipsis),
               ),
-              AcsCodeEditor(ink, _editor!, minHeight: h - 80, comment: '#', onSave: _saveEditor),
+              CallbackShortcuts(
+                bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => _closeEditor(save: true)},
+                child: AcsCodeEditor(ink, _editor!, minHeight: h - 80, comment: '#', onSave: _saveEditor, focusNode: _editorFocus),
+              ),
               const SizedBox(height: 8),
               ToolRow([
                 AcsButton(ink, 'salvează ^S', _saveEditor, primary: true),
@@ -445,7 +466,8 @@ class _ShellWorkspaceState extends State<ShellWorkspace> {
         const SizedBox(height: 10),
         ToolRow([
           AcsButton(ink, 'verifică', _verify, primary: true, icon: Icons.check),
-          AcsButton(ink, 'resetează fișierele', _reset),
+          AcsConfirmButton(ink, 'resetează fișierele', _reset),
+          acsKeysHint(ink, '↑↓ istoric · Tab completează · Ctrl+L curăță'),
         ]),
         if (_checks != null) ...[
           const SizedBox(height: 12),

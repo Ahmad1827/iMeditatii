@@ -211,6 +211,39 @@
    }
   },
   {
+   "id": "23",
+   "title": "Media care iese întreagă",
+   "chapter": "1. Programe de reparat",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Programul citește `n` note și ar trebui să afișeze media lor, cu două zecimale.\n\nProgramul de mai jos (în editor) se compilează, dar nu face ce trebuie. **Găsește greșeala și repar-o**: testele trebuie să treacă.\n\n**Date de intrare.** Pe prima linie `n` (1 ≤ n ≤ 100), pe a doua `n` note întregi între 1 și 10.\n\n**Date de ieșire.** Media, cu două zecimale.\n\n**Exemplu.** Pentru intrarea\n\n```\n3\n7 8 10\n```\n\nprogramul afișează\n\n```\n8.33\n```",
+   "hint": "Ce tip are `s / n` când `s` și `n` sunt `int`? Contează că rezultatul ajunge într-un `double`?",
+   "solution": "`s / n` e o împărțire **întreagă** (25 / 3 = 8), făcută înainte de conversia la `double`. Unul dintre operanzi trebuie să fie real: `(double)s / n`.\n\n```c\n#include <stdio.h>\n\nint main(void) {\n    int n, x, s = 0;\n    scanf(\"%d\", &n);\n    for (int i = 0; i < n; i++) {\n        scanf(\"%d\", &x);\n        s += x;\n    }\n    double m = (double)s / n;\n    printf(\"%.2f\\n\", m);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "3\n7 8 10\n",
+      "output": "8.33\n"
+     },
+     {
+      "input": "2\n10 10\n",
+      "output": "10.00\n"
+     },
+     {
+      "input": "4\n5 6 6 6\n",
+      "output": "5.75\n"
+     },
+     {
+      "input": "1\n9\n",
+      "output": "9.00\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n\nint main(void) {\n    int n, x, s = 0;\n    scanf(\"%d\", &n);\n    for (int i = 0; i < n; i++) {\n        scanf(\"%d\", &x);\n        s += x;\n    }\n    double m = s / n;\n    printf(\"%.2f\\n\", m);\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n\nint main(void) {\n    int n, x, s = 0;\n    scanf(\"%d\", &n);\n    for (int i = 0; i < n; i++) {\n        scanf(\"%d\", &x);\n        s += x;\n    }\n    double m = (double)s / n;\n    printf(\"%.2f\\n\", m);\n    return 0;\n}\n"
+   }
+  },
+  {
    "id": "7",
    "title": "Reducerea perechilor egale",
    "chapter": "2. Șiruri de caractere",
@@ -285,6 +318,84 @@
    }
   },
   {
+   "id": "17",
+   "title": "Cel mai lung cuvânt",
+   "chapter": "2. Șiruri de caractere",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Se citește o linie de text (cel mult 1000 de caractere). Cuvintele sunt despărțite de unul sau mai multe spații. Afișează cel mai lung cuvânt și lungimea lui; dacă sunt mai multe la fel de lungi, pe **primul**.\n\n**Date de intrare.** O linie de text, cu cel puțin un cuvânt.\n\n**Date de ieșire.** Cuvântul, un spațiu și lungimea lui.\n\n**Restricții.**\n• linia are cel mult 1000 de caractere\n\n**Exemplu.** Pentru intrarea\n\n```\nprogramarea calculatoarelor e frumoasa\n```\n\nprogramul afișează\n\n```\ncalculatoarelor 15\n```",
+   "hint": "`strtok(s, \" \")` dă pe rând cuvintele (sare peste spațiile repetate). Nu uita să scoți `\\n` pe care îl lasă `fgets`.",
+   "solution": "Ții cel mai lung cuvânt găsit până acum și îl înlocuiești doar la o lungime **strict** mai mare: așa rămâne primul dintre cele egale.\n\n```c\n#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char s[1002], best[1002] = \"\";\n    if (!fgets(s, sizeof s, stdin)) return 0;\n    s[strcspn(s, \"\\n\")] = 0;\n    for (char *w = strtok(s, \" \"); w; w = strtok(NULL, \" \"))\n        if (strlen(w) > strlen(best)) strcpy(best, w);\n    printf(\"%s %zu\\n\", best, strlen(best));\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "programarea calculatoarelor e frumoasa\n",
+      "output": "calculatoarelor 15\n"
+     },
+     {
+      "input": "a bb cc d\n",
+      "output": "bb 2\n"
+     },
+     {
+      "input": "   spatii   la   inceput\n",
+      "output": "inceput 7\n"
+     },
+     {
+      "input": "unu\n",
+      "output": "unu 3\n"
+     },
+     {
+      "input": "x yy zzz yyy zzzz\n",
+      "output": "zzzz 4\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char s[1002], best[1002] = \"\";\n    if (!fgets(s, sizeof s, stdin)) return 0;\n    s[strcspn(s, \"\\n\")] = 0;\n    for (char *w = strtok(s, \" \"); w; w = strtok(NULL, \" \"))\n        if (strlen(w) > strlen(best)) strcpy(best, w);\n    printf(\"%s %zu\\n\", best, strlen(best));\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "18",
+   "title": "Palindrom, fără spații și semne",
+   "chapter": "2. Șiruri de caractere",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Se citește o linie de text. Spune dacă e palindrom când se iau în seamă **doar literele**, fără să conteze majusculele (de exemplu `Ene purta patru pene.` e palindrom). Afișează `DA` sau `NU`.\n\n**Date de intrare.** O linie de text, cu cel puțin o literă.\n\n**Date de ieșire.** `DA` sau `NU`.\n\n**Restricții.**\n• linia are cel mult 1000 de caractere\n• textul folosește doar caractere ASCII\n\n**Exemplu.** Pentru intrarea\n\n```\nEne purta patru pene.\n```\n\nprogramul afișează\n\n```\nDA\n```",
+   "hint": "Doi indici, unul de la început și unul de la sfârșit, care sar peste ce nu e literă (`isalpha`) și compară cu `tolower`.",
+   "solution": "Fără să copiezi textul: indicii se apropie, fiecare oprindu-se doar la litere.\n\n```c\n#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint main(void) {\n    char s[1002];\n    if (!fgets(s, sizeof s, stdin)) return 0;\n    int i = 0, j = (int)strlen(s) - 1, ok = 1;\n    while (i < j) {\n        if (!isalpha((unsigned char)s[i])) { i++; continue; }\n        if (!isalpha((unsigned char)s[j])) { j--; continue; }\n        if (tolower((unsigned char)s[i]) != tolower((unsigned char)s[j])) { ok = 0; break; }\n        i++; j--;\n    }\n    printf(\"%s\\n\", ok ? \"DA\" : \"NU\");\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "Ene purta patru pene.\n",
+      "output": "DA\n"
+     },
+     {
+      "input": "Ana are mere\n",
+      "output": "NU\n"
+     },
+     {
+      "input": "Step on no pets!\n",
+      "output": "DA\n"
+     },
+     {
+      "input": "a\n",
+      "output": "DA\n"
+     },
+     {
+      "input": "ab, BA\n",
+      "output": "DA\n"
+     },
+     {
+      "input": "abca\n",
+      "output": "NU\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint main(void) {\n    char s[1002];\n    if (!fgets(s, sizeof s, stdin)) return 0;\n    int i = 0, j = (int)strlen(s) - 1, ok = 1;\n    while (i < j) {\n        if (!isalpha((unsigned char)s[i])) { i++; continue; }\n        if (!isalpha((unsigned char)s[j])) { j--; continue; }\n        if (tolower((unsigned char)s[i]) != tolower((unsigned char)s[j])) { ok = 0; break; }\n        i++; j--;\n    }\n    printf(\"%s\\n\", ok ? \"DA\" : \"NU\");\n    return 0;\n}\n"
+   }
+  },
+  {
    "id": "9",
    "title": "Șoferul cu rating maxim",
    "chapter": "3. Operații pe biți",
@@ -351,6 +462,84 @@
    }
   },
   {
+   "id": "19",
+   "title": "Biți de 1 și puteri ale lui 2",
+   "chapter": "3. Operații pe biți",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Pentru fiecare număr natural citit, afișează câți biți de 1 are în reprezentarea binară și dacă e o putere a lui 2 (`DA` / `NU`).\n\n**Date de intrare.** Numere naturale mai mici decât $2^{32}$, câte unul pe linie, până la sfârșitul intrării.\n\n**Date de ieșire.** Pentru fiecare număr, o linie: numărul de biți de 1, un spațiu, `DA` sau `NU`.\n\n**Restricții.**\n• 0 nu e putere a lui 2\n\n**Exemplu.** Pentru intrarea\n\n```\n1\n6\n64\n```\n\nprogramul afișează\n\n```\n1 DA\n2 NU\n1 DA\n```",
+   "hint": "`x & (x - 1)` șterge cel mai din dreapta bit de 1 al lui `x`.",
+   "solution": "De câte ori poți face `x &= x - 1` până ajungi la 0: atâția biți de 1. O putere a lui 2 are exact un bit de 1: `x != 0 && (x & (x - 1)) == 0`.\n\n```c\n#include <stdio.h>\n\nint main(void) {\n    unsigned int x;\n    while (scanf(\"%u\", &x) == 1) {\n        int c = 0;\n        for (unsigned int y = x; y; y &= y - 1) c++;\n        printf(\"%d %s\\n\", c, x != 0 && (x & (x - 1)) == 0 ? \"DA\" : \"NU\");\n    }\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "1\n6\n64\n",
+      "output": "1 DA\n2 NU\n1 DA\n"
+     },
+     {
+      "input": "0\n",
+      "output": "0 NU\n"
+     },
+     {
+      "input": "4294967295\n2147483648\n",
+      "output": "32 NU\n1 DA\n"
+     },
+     {
+      "input": "255\n256\n257\n",
+      "output": "8 NU\n1 DA\n2 NU\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n\nint main(void) {\n    unsigned int x;\n    while (scanf(\"%u\", &x) == 1) {\n        int c = 0;\n        for (unsigned int y = x; y; y &= y - 1) c++;\n        printf(\"%d %s\\n\", c, x != 0 && (x & (x - 1)) == 0 ? \"DA\" : \"NU\");\n    }\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "20",
+   "title": "Rotația unui octet",
+   "chapter": "3. Operații pe biți",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Se citesc un octet `b` (0 ≤ b ≤ 255) și un număr `k`. Afișează octetul rotit **la stânga** cu `k` poziții (biții care ies prin stânga intră prin dreapta), în zecimal și apoi pe 8 biți.\n\n**Date de intrare.** Pe o linie, `b` și `k`.\n\n**Date de ieșire.** Valoarea rotită, un spațiu, și cei 8 biți ai ei.\n\n**Restricții.**\n• 0 ≤ b ≤ 255\n• 0 ≤ k ≤ 1000\n\n**Exemplu.** Pentru intrarea\n\n```\n150 1\n```\n\nprogramul afișează\n\n```\n45 00101101\n```",
+   "hint": "O rotație cu 8 poziții lasă octetul neschimbat: lucrează cu `k % 8`. Rotația = `(b << k) | (b >> (8 - k))`, păstrând doar ultimii 8 biți.",
+   "solution": "Atenție la `k % 8 == 0`: atunci deplasarea la dreapta trebuie să fie tot 0 (de aici `% 8`). Rezultatul pus într-un `unsigned char` taie biții de peste 8.\n\n```c\n#include <stdio.h>\n\nint main(void) {\n    unsigned int b, k;\n    scanf(\"%u %u\", &b, &k);\n    k %= 8;\n    unsigned char r = (unsigned char)((b << k) | (b >> ((8 - k) % 8)));\n    printf(\"%u \", r);\n    for (int i = 7; i >= 0; i--) putchar(r >> i & 1 ? '1' : '0');\n    putchar('\\n');\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "150 1\n",
+      "output": "45 00101101\n"
+     },
+     {
+      "input": "1 7\n",
+      "output": "128 10000000\n"
+     },
+     {
+      "input": "255 3\n",
+      "output": "255 11111111\n"
+     },
+     {
+      "input": "128 1\n",
+      "output": "1 00000001\n"
+     },
+     {
+      "input": "77 0\n",
+      "output": "77 01001101\n"
+     },
+     {
+      "input": "77 8\n",
+      "output": "77 01001101\n"
+     },
+     {
+      "input": "6 1003\n",
+      "output": "48 00110000\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n\nint main(void) {\n    unsigned int b, k;\n    scanf(\"%u %u\", &b, &k);\n    k %= 8;\n    unsigned char r = (unsigned char)((b << k) | (b >> ((8 - k) % 8)));\n    printf(\"%u \", r);\n    for (int i = 7; i >= 0; i--) putchar(r >> i & 1 ? '1' : '0');\n    putchar('\\n');\n    return 0;\n}\n"
+   }
+  },
+  {
    "id": "11",
    "title": "Mesaje sortate după destinatar",
    "chapter": "4. Structuri și alocare dinamică",
@@ -406,6 +595,72 @@
     ],
     "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
     "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    char nume[21];\n    double x, y, d;\n} TSofer;\n\nint cmp(const void *a, const void *b) {\n    const TSofer *p = (const TSofer *)a, *q = (const TSofer *)b;\n    if (p->d < q->d) return -1;\n    if (p->d > q->d) return 1;\n    return strcmp(p->nume, q->nume);\n}\n\nint main(void) {\n    int n, nr;\n    double px, py;\n    if (scanf(\"%d %d\", &n, &nr) != 2) return 0;\n    TSofer *s = (TSofer *)malloc(n * sizeof(TSofer));\n    for (int i = 0; i < n; i++) scanf(\"%20s %lf %lf\", s[i].nume, &s[i].x, &s[i].y);\n    scanf(\"%lf %lf\", &px, &py);\n    for (int i = 0; i < n; i++)\n        s[i].d = (s[i].x - px) * (s[i].x - px) + (s[i].y - py) * (s[i].y - py);\n    qsort(s, n, sizeof(TSofer), cmp);\n    for (int i = 0; i < nr; i++) puts(s[i].nume);\n    free(s);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "21",
+   "title": "Clasamentul",
+   "chapter": "4. Structuri și alocare dinamică",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Se citesc `n` studenți, fiecare cu nume și medie. Afișează-i în ordinea **descrescătoare a mediei**; la medii egale, în ordine **alfabetică** a numelui. Folosește un vector de structuri și `qsort`.\n\n**Date de intrare.** Pe prima linie `n`; pe următoarele `n` linii, un nume (fără spații, cel mult 30 de caractere) și o medie cu două zecimale.\n\n**Date de ieșire.** Câte un student pe linie: numele și media, cu două zecimale.\n\n**Restricții.**\n• 1 ≤ n ≤ 1000\n\n**Exemplu.** Pentru intrarea\n\n```\n4\nIonescu 8.50\nPopescu 9.25\nAdam 8.50\nMarin 7.00\n```\n\nprogramul afișează\n\n```\nPopescu 9.25\nAdam 8.50\nIonescu 8.50\nMarin 7.00\n```",
+   "hint": "Funcția de comparare întoarce un număr negativ când primul trebuie să stea înainte. Compară mediile, iar la egalitate numele cu `strcmp`.",
+   "solution": "Nu întoarce `y->medie - x->medie` convertit la `int`: diferențele sub 1 ar deveni 0. Compară explicit.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    char nume[32];\n    double medie;\n} Student;\n\nint cmp(const void *a, const void *b) {\n    const Student *x = a, *y = b;\n    if (x->medie != y->medie) return x->medie < y->medie ? 1 : -1;\n    return strcmp(x->nume, y->nume);\n}\n\nint main(void) {\n    int n;\n    scanf(\"%d\", &n);\n    Student *v = malloc(n * sizeof *v);\n    for (int i = 0; i < n; i++) scanf(\"%31s %lf\", v[i].nume, &v[i].medie);\n    qsort(v, n, sizeof *v, cmp);\n    for (int i = 0; i < n; i++) printf(\"%s %.2f\\n\", v[i].nume, v[i].medie);\n    free(v);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "4\nIonescu 8.50\nPopescu 9.25\nAdam 8.50\nMarin 7.00\n",
+      "output": "Popescu 9.25\nAdam 8.50\nIonescu 8.50\nMarin 7.00\n"
+     },
+     {
+      "input": "1\nUnul 10.00\n",
+      "output": "Unul 10.00\n"
+     },
+     {
+      "input": "3\nc 5.00\nb 5.00\na 5.00\n",
+      "output": "a 5.00\nb 5.00\nc 5.00\n"
+     },
+     {
+      "input": "5\nE 6.10\nD 9.90\nC 6.10\nB 9.90\nA 1.00\n",
+      "output": "B 9.90\nD 9.90\nC 6.10\nE 6.10\nA 1.00\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    char nume[32];\n    double medie;\n} Student;\n\nint cmp(const void *a, const void *b) {\n    const Student *x = a, *y = b;\n    if (x->medie != y->medie) return x->medie < y->medie ? 1 : -1;\n    return strcmp(x->nume, y->nume);\n}\n\nint main(void) {\n    int n;\n    scanf(\"%d\", &n);\n    Student *v = malloc(n * sizeof *v);\n    for (int i = 0; i < n; i++) scanf(\"%31s %lf\", v[i].nume, &v[i].medie);\n    qsort(v, n, sizeof *v, cmp);\n    for (int i = 0; i < n; i++) printf(\"%s %.2f\\n\", v[i].nume, v[i].medie);\n    free(v);\n    return 0;\n}\n"
+   }
+  },
+  {
+   "id": "22",
+   "title": "Transpusa, alocată dinamic",
+   "chapter": "4. Structuri și alocare dinamică",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Se citește o matrice cu `n` linii și `m` coloane. Alocă dinamic (cu `malloc`) matricea și transpusa ei, afișează transpusa (`m` linii cu câte `n` numere) și eliberează memoria.\n\n**Date de intrare.** Pe prima linie `n` și `m`; apoi `n` linii cu câte `m` numere întregi.\n\n**Date de ieșire.** Transpusa: `m` linii cu câte `n` numere separate prin spațiu.\n\n**Restricții.**\n• 1 ≤ n, m ≤ 300\n\n**Exemplu.** Pentru intrarea\n\n```\n2 3\n1 2 3\n4 5 6\n```\n\nprogramul afișează\n\n```\n1 4\n2 5\n3 6\n```",
+   "hint": "O matrice dinamică: un vector de `n` pointeri (`int **`), fiecare spre o linie de `m` întregi.",
+   "solution": "Fiecare `malloc` are perechea lui `free`: întâi liniile, apoi vectorul de pointeri.\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n, m;\n    scanf(\"%d %d\", &n, &m);\n    int **a = malloc(n * sizeof *a);\n    for (int i = 0; i < n; i++) {\n        a[i] = malloc(m * sizeof **a);\n        for (int j = 0; j < m; j++) scanf(\"%d\", &a[i][j]);\n    }\n    int **t = malloc(m * sizeof *t);\n    for (int j = 0; j < m; j++) {\n        t[j] = malloc(n * sizeof **t);\n        for (int i = 0; i < n; i++) t[j][i] = a[i][j];\n    }\n    for (int j = 0; j < m; j++) {\n        for (int i = 0; i < n; i++) printf(\"%d%c\", t[j][i], i + 1 < n ? ' ' : '\\n');\n        free(t[j]);\n    }\n    for (int i = 0; i < n; i++) free(a[i]);\n    free(a);\n    free(t);\n    return 0;\n}\n```",
+   "kind": "c",
+   "spec": {
+    "tests": [
+     {
+      "input": "2 3\n1 2 3\n4 5 6\n",
+      "output": "1 4\n2 5\n3 6\n"
+     },
+     {
+      "input": "1 1\n7\n",
+      "output": "7\n"
+     },
+     {
+      "input": "3 1\n1\n2\n3\n",
+      "output": "1 2 3\n"
+     },
+     {
+      "input": "1 4\n-1 0 1 2\n",
+      "output": "-1\n0\n1\n2\n"
+     }
+    ],
+    "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(void) {\n    // scrie codul aici\n\n    return 0;\n}\n",
+    "reference": "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n, m;\n    scanf(\"%d %d\", &n, &m);\n    int **a = malloc(n * sizeof *a);\n    for (int i = 0; i < n; i++) {\n        a[i] = malloc(m * sizeof **a);\n        for (int j = 0; j < m; j++) scanf(\"%d\", &a[i][j]);\n    }\n    int **t = malloc(m * sizeof *t);\n    for (int j = 0; j < m; j++) {\n        t[j] = malloc(n * sizeof **t);\n        for (int i = 0; i < n; i++) t[j][i] = a[i][j];\n    }\n    for (int j = 0; j < m; j++) {\n        for (int i = 0; i < n; i++) printf(\"%d%c\", t[j][i], i + 1 < n ? ' ' : '\\n');\n        free(t[j]);\n    }\n    for (int i = 0; i < n; i++) free(a[i]);\n    free(a);\n    free(t);\n    return 0;\n}\n"
    }
   },
   {

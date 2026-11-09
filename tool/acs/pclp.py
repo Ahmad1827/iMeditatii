@@ -256,4 +256,190 @@ int main(void) {
     'Cazul de bază (`n < 10`) e chiar ultima cifră, care trebuie adunată: `return n;`, nu `return 0;`.',
     'Examen PCLP · Subiectul 2 · recursivitate')
 
+def write(id, title, chapter, diff, desc, inp, out, constraints, ref, tests, hint, sol, source=''):
+    """A program written from the start: the reference must pass every test."""
+    tests = check(title, ref, [{'input': t} for t in tests])
+    st = statement(desc, inp, out, constraints, (tests[0]['input'], tests[0]['output']))
+    PROBLEMS.append(problem(id, title, chapter, diff, st, 'c', {'tests': tests, 'starter': C_START, 'reference': ref}, hint, sol + '\n\n```c\n' + ref.strip() + '\n```', source))
+
+
+S2, S3, S4 = CHAPTERS[1], CHAPTERS[2], CHAPTERS[3]
+
+write(17, 'Cel mai lung cuvânt', S2, 'ușoară', '''
+Se citește o linie de text (cel mult 1000 de caractere). Cuvintele sunt despărțite de unul sau mai multe spații. Afișează cel mai lung cuvânt și lungimea lui; dacă sunt mai multe la fel de lungi, pe **primul**.''',
+    'O linie de text, cu cel puțin un cuvânt.', 'Cuvântul, un spațiu și lungimea lui.', ['linia are cel mult 1000 de caractere'],
+    """#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char s[1002], best[1002] = "";
+    if (!fgets(s, sizeof s, stdin)) return 0;
+    s[strcspn(s, "\\n")] = 0;
+    for (char *w = strtok(s, " "); w; w = strtok(NULL, " "))
+        if (strlen(w) > strlen(best)) strcpy(best, w);
+    printf("%s %zu\\n", best, strlen(best));
+    return 0;
+}
+""", ['programarea calculatoarelor e frumoasa\n', 'a bb cc d\n', '   spatii   la   inceput\n', 'unu\n', 'x yy zzz yyy zzzz\n'],
+    '`strtok(s, " ")` dă pe rând cuvintele (sare peste spațiile repetate). Nu uita să scoți `\\n` pe care îl lasă `fgets`.',
+    'Ții cel mai lung cuvânt găsit până acum și îl înlocuiești doar la o lungime **strict** mai mare: așa rămâne primul dintre cele egale.')
+
+write(18, 'Palindrom, fără spații și semne', S2, 'medie', '''
+Se citește o linie de text. Spune dacă e palindrom când se iau în seamă **doar literele**, fără să conteze majusculele (de exemplu `Ene purta patru pene.` e palindrom). Afișează `DA` sau `NU`.''',
+    'O linie de text, cu cel puțin o literă.', '`DA` sau `NU`.', ['linia are cel mult 1000 de caractere', 'textul folosește doar caractere ASCII'],
+    """#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main(void) {
+    char s[1002];
+    if (!fgets(s, sizeof s, stdin)) return 0;
+    int i = 0, j = (int)strlen(s) - 1, ok = 1;
+    while (i < j) {
+        if (!isalpha((unsigned char)s[i])) { i++; continue; }
+        if (!isalpha((unsigned char)s[j])) { j--; continue; }
+        if (tolower((unsigned char)s[i]) != tolower((unsigned char)s[j])) { ok = 0; break; }
+        i++; j--;
+    }
+    printf("%s\\n", ok ? "DA" : "NU");
+    return 0;
+}
+""", ['Ene purta patru pene.\n', 'Ana are mere\n', 'Step on no pets!\n', 'a\n', 'ab, BA\n', 'abca\n'],
+    'Doi indici, unul de la început și unul de la sfârșit, care sar peste ce nu e literă (`isalpha`) și compară cu `tolower`.',
+    'Fără să copiezi textul: indicii se apropie, fiecare oprindu-se doar la litere.')
+
+write(19, 'Biți de 1 și puteri ale lui 2', S3, 'ușoară', '''
+Pentru fiecare număr natural citit, afișează câți biți de 1 are în reprezentarea binară și dacă e o putere a lui 2 (`DA` / `NU`).''',
+    'Numere naturale mai mici decât $2^{32}$, câte unul pe linie, până la sfârșitul intrării.', 'Pentru fiecare număr, o linie: numărul de biți de 1, un spațiu, `DA` sau `NU`.', ['0 nu e putere a lui 2'],
+    """#include <stdio.h>
+
+int main(void) {
+    unsigned int x;
+    while (scanf("%u", &x) == 1) {
+        int c = 0;
+        for (unsigned int y = x; y; y &= y - 1) c++;
+        printf("%d %s\\n", c, x != 0 && (x & (x - 1)) == 0 ? "DA" : "NU");
+    }
+    return 0;
+}
+""", ['1\n6\n64\n', '0\n', '4294967295\n2147483648\n', '255\n256\n257\n'],
+    '`x & (x - 1)` șterge cel mai din dreapta bit de 1 al lui `x`.',
+    'De câte ori poți face `x &= x - 1` până ajungi la 0: atâția biți de 1. O putere a lui 2 are exact un bit de 1: `x != 0 && (x & (x - 1)) == 0`.')
+
+write(20, 'Rotația unui octet', S3, 'medie', '''
+Se citesc un octet `b` (0 ≤ b ≤ 255) și un număr `k`. Afișează octetul rotit **la stânga** cu `k` poziții (biții care ies prin stânga intră prin dreapta), în zecimal și apoi pe 8 biți.''',
+    'Pe o linie, `b` și `k`.', 'Valoarea rotită, un spațiu, și cei 8 biți ai ei.', ['0 ≤ b ≤ 255', '0 ≤ k ≤ 1000'],
+    """#include <stdio.h>
+
+int main(void) {
+    unsigned int b, k;
+    scanf("%u %u", &b, &k);
+    k %= 8;
+    unsigned char r = (unsigned char)((b << k) | (b >> ((8 - k) % 8)));
+    printf("%u ", r);
+    for (int i = 7; i >= 0; i--) putchar(r >> i & 1 ? '1' : '0');
+    putchar('\\n');
+    return 0;
+}
+""", ['150 1\n', '1 7\n', '255 3\n', '128 1\n', '77 0\n', '77 8\n', '6 1003\n'],
+    'O rotație cu 8 poziții lasă octetul neschimbat: lucrează cu `k % 8`. Rotația = `(b << k) | (b >> (8 - k))`, păstrând doar ultimii 8 biți.',
+    'Atenție la `k % 8 == 0`: atunci deplasarea la dreapta trebuie să fie tot 0 (de aici `% 8`). Rezultatul pus într-un `unsigned char` taie biții de peste 8.')
+
+write(21, 'Clasamentul', S4, 'medie', '''
+Se citesc `n` studenți, fiecare cu nume și medie. Afișează-i în ordinea **descrescătoare a mediei**; la medii egale, în ordine **alfabetică** a numelui. Folosește un vector de structuri și `qsort`.''',
+    'Pe prima linie `n`; pe următoarele `n` linii, un nume (fără spații, cel mult 30 de caractere) și o medie cu două zecimale.', 'Câte un student pe linie: numele și media, cu două zecimale.', ['1 ≤ n ≤ 1000'],
+    """#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char nume[32];
+    double medie;
+} Student;
+
+int cmp(const void *a, const void *b) {
+    const Student *x = a, *y = b;
+    if (x->medie != y->medie) return x->medie < y->medie ? 1 : -1;
+    return strcmp(x->nume, y->nume);
+}
+
+int main(void) {
+    int n;
+    scanf("%d", &n);
+    Student *v = malloc(n * sizeof *v);
+    for (int i = 0; i < n; i++) scanf("%31s %lf", v[i].nume, &v[i].medie);
+    qsort(v, n, sizeof *v, cmp);
+    for (int i = 0; i < n; i++) printf("%s %.2f\\n", v[i].nume, v[i].medie);
+    free(v);
+    return 0;
+}
+""", ['4\nIonescu 8.50\nPopescu 9.25\nAdam 8.50\nMarin 7.00\n', '1\nUnul 10.00\n', '3\nc 5.00\nb 5.00\na 5.00\n', '5\nE 6.10\nD 9.90\nC 6.10\nB 9.90\nA 1.00\n'],
+    'Funcția de comparare întoarce un număr negativ când primul trebuie să stea înainte. Compară mediile, iar la egalitate numele cu `strcmp`.',
+    'Nu întoarce `y->medie - x->medie` convertit la `int`: diferențele sub 1 ar deveni 0. Compară explicit.')
+
+write(22, 'Transpusa, alocată dinamic', S4, 'medie', '''
+Se citește o matrice cu `n` linii și `m` coloane. Alocă dinamic (cu `malloc`) matricea și transpusa ei, afișează transpusa (`m` linii cu câte `n` numere) și eliberează memoria.''',
+    'Pe prima linie `n` și `m`; apoi `n` linii cu câte `m` numere întregi.', 'Transpusa: `m` linii cu câte `n` numere separate prin spațiu.', ['1 ≤ n, m ≤ 300'],
+    """#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    int **a = malloc(n * sizeof *a);
+    for (int i = 0; i < n; i++) {
+        a[i] = malloc(m * sizeof **a);
+        for (int j = 0; j < m; j++) scanf("%d", &a[i][j]);
+    }
+    int **t = malloc(m * sizeof *t);
+    for (int j = 0; j < m; j++) {
+        t[j] = malloc(n * sizeof **t);
+        for (int i = 0; i < n; i++) t[j][i] = a[i][j];
+    }
+    for (int j = 0; j < m; j++) {
+        for (int i = 0; i < n; i++) printf("%d%c", t[j][i], i + 1 < n ? ' ' : '\\n');
+        free(t[j]);
+    }
+    for (int i = 0; i < n; i++) free(a[i]);
+    free(a);
+    free(t);
+    return 0;
+}
+""", ['2 3\n1 2 3\n4 5 6\n', '1 1\n7\n', '3 1\n1\n2\n3\n', '1 4\n-1 0 1 2\n'],
+    'O matrice dinamică: un vector de `n` pointeri (`int **`), fiecare spre o linie de `m` întregi.',
+    'Fiecare `malloc` are perechea lui `free`: întâi liniile, apoi vectorul de pointeri.')
+
+fix(23, 'Media care iese întreagă', 'ușoară', '''
+Programul citește `n` note și ar trebui să afișeze media lor, cu două zecimale.''',
+    'Pe prima linie `n` (1 ≤ n ≤ 100), pe a doua `n` note întregi între 1 și 10.', 'Media, cu două zecimale.',
+    """#include <stdio.h>
+
+int main(void) {
+    int n, x, s = 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        s += x;
+    }
+    double m = s / n;
+    printf("%.2f\\n", m);
+    return 0;
+}
+""", """#include <stdio.h>
+
+int main(void) {
+    int n, x, s = 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        s += x;
+    }
+    double m = (double)s / n;
+    printf("%.2f\\n", m);
+    return 0;
+}
+""", ['3\n7 8 10\n', '2\n10 10\n', '4\n5 6 6 6\n', '1\n9\n'],
+    'Ce tip are `s / n` când `s` și `n` sunt `int`? Contează că rezultatul ajunge într-un `double`?',
+    '`s / n` e o împărțire **întreagă** (25 / 3 = 8), făcută înainte de conversia la `double`. Unul dintre operanzi trebuie să fie real: `(double)s / n`.')
+
 write_course('pclp', CHAPTERS, PROBLEMS)

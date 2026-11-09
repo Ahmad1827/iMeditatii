@@ -148,7 +148,7 @@
        "[8.0; -11.0; -3.0]"
       ],
       "expect": [
-       "[2.0000000000000004; 2.9999999999999996; -0.9999999999999994]"
+       "[2.0; 3.0000000000000004; -0.9999999999999999]"
       ],
       "tol": 1e-08
      },
@@ -178,7 +178,7 @@
        "[5.0; 8.0; 12.0; 9.0]"
       ],
       "expect": [
-       "[0.9712230215827338; 1.6264988009592325; 1.6252997601918466; 0.9142685851318944]"
+       "[0.9712230215827338; 1.6264988009592325; 1.6252997601918466; 0.9142685851318946]"
       ],
       "tol": 1e-08
      }
@@ -340,6 +340,74 @@
    }
   },
   {
+   "id": "17",
+   "title": "Determinantul prin eliminare",
+   "chapter": "1. Sisteme liniare: metode directe",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Scrie `d = determinant(A)`: determinantul matricei pătrate `A`, calculat prin **eliminare Gauss cu pivotare parțială**. Determinantul e produsul pivoților, cu semnul schimbat la fiecare interschimbare de linii. Dacă pe o coloană nu găsești niciun pivot nenul, determinantul e 0.\n\nFuncția `det` nu e voie.",
+   "hint": "Pornește cu `d = 1`; la fiecare coloană, după pivotare, înmulțește `d` cu pivotul. O interschimbare de linii schimbă semnul.",
+   "solution": "O(n³) operații, față de O(n!) pentru dezvoltarea după o linie. A treia matrice din teste e singulară: determinantul iese 0 (până la erorile de rotunjire).\n\n```matlab\nfunction d = determinant(A)\n    n = rows(A);\n    d = 1;\n    for k = 1:n\n        [~, p] = max(abs(A(k:n, k)));\n        p = p + k - 1;\n        if A(p, k) == 0\n            d = 0;\n            return;\n        end\n        if p ~= k\n            A([k p], :) = A([p k], :);\n            d = -d;\n        end\n        d = d * A(k, k);\n        for i = k+1:n\n            A(i, k:n) = A(i, k:n) - A(i, k) / A(k, k) * A(k, k:n);\n        end\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "determinant",
+    "signature": "function d = determinant(A)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[2.0 1.0 3.0; 4.0 1.0 7.0; -2.0 5.0 1.0]"
+      ],
+      "expect": [
+       "-20"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "[0.0 2.0; 3.0 1.0]"
+      ],
+      "expect": [
+       "-6"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "[1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0]"
+      ],
+      "expect": [
+       "6.661338147750939e-16"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "[5.0]"
+      ],
+      "expect": [
+       "5"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "[1.0 0.0 2.0 -1.0; 3.0 0.0 0.0 5.0; 2.0 1.0 4.0 -3.0; 1.0 0.0 5.0 0.0]"
+      ],
+      "expect": [
+       "30"
+      ],
+      "tol": 1e-09
+     }
+    ],
+    "forbid": [
+     "det"
+    ],
+    "starter": "function d = determinant(A)\n    % scrie codul aici\n\nend\n",
+    "reference": "function d = determinant(A)\n    n = rows(A);\n    d = 1;\n    for k = 1:n\n        [~, p] = max(abs(A(k:n, k)));\n        p = p + k - 1;\n        if A(p, k) == 0\n            d = 0;\n            return;\n        end\n        if p ~= k\n            A([k p], :) = A([p k], :);\n            d = -d;\n        end\n        d = d * A(k, k);\n        for i = k+1:n\n            A(i, k:n) = A(i, k:n) - A(i, k) / A(k, k) * A(k, k:n);\n        end\n    end\nend"
+   }
+  },
+  {
    "id": "6",
    "title": "Metoda Jacobi",
    "chapter": "2. Sisteme liniare: metode iterative",
@@ -472,6 +540,66 @@
    }
   },
   {
+   "id": "18",
+   "title": "Numărul de condiționare",
+   "chapter": "2. Sisteme liniare: metode iterative",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie `c = cond_inf(A)`: numărul de condiționare al matricei inversabile `A` în **norma infinit**,\n\n$$\\kappa_\\infty(A) = \\|A\\|_\\infty \\cdot \\|A^{-1}\\|_\\infty, \\qquad \\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|.$$\n\nPoți folosi `inv`, dar nu `cond` sau `norm`. Un număr mare înseamnă că sistemul `A x = b` e sensibil la erori în date (al treilea test).",
+   "hint": "`sum(abs(A), 2)` dă sumele pe linii (vector coloană); maximul lor e norma infinit.",
+   "solution": "Pentru matricea aproape singulară din testul 3, κ ≈ 4·10⁴: o eroare relativă de 10⁻⁶ în b poate da o eroare de 4% în x.\n\n```matlab\nfunction c = cond_inf(A)\n    c = max(sum(abs(A), 2)) * max(sum(abs(inv(A)), 2));\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "cond_inf",
+    "signature": "function c = cond_inf(A)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[1.0 2.0; 3.0 4.0]"
+      ],
+      "expect": [
+       "21"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[4.0 1.0; 2.0 5.0]"
+      ],
+      "expect": [
+       "2.3333333333333335"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[1.0 1.0; 1.0 1.0001]"
+      ],
+      "expect": [
+       "40004.0001000044"
+      ],
+      "tol": 1e-06
+     },
+     {
+      "args": [
+       "[10.0 -1.0 2.0; -1.0 11.0 -1.0; 2.0 -1.0 10.0]"
+      ],
+      "expect": [
+       "1.725"
+      ],
+      "tol": 1e-06
+     }
+    ],
+    "forbid": [
+     "cond",
+     "norm"
+    ],
+    "starter": "function c = cond_inf(A)\n    % scrie codul aici\n\nend\n",
+    "reference": "function c = cond_inf(A)\n    c = max(sum(abs(A), 2)) * max(sum(abs(inv(A)), 2));\nend"
+   }
+  },
+  {
    "id": "8",
    "title": "Interpolarea Lagrange",
    "chapter": "3. Interpolare",
@@ -574,6 +702,64 @@
     "forbid": [],
     "starter": "function c = dif_div(xs, ys)\n    % scrie codul aici\n\nend\n",
     "reference": "function c = dif_div(xs, ys)\n    n = length(xs);\n    c = ys;\n    for j = 2:n\n        for i = n:-1:j\n            c(i) = (c(i) - c(i-1)) / (xs(i) - xs(i-j+1));\n        end\n    end\nend"
+   }
+  },
+  {
+   "id": "19",
+   "title": "Interpolarea liniară pe porțiuni",
+   "chapter": "3. Interpolare",
+   "difficulty": "ușoară",
+   "source": "Laborator MN",
+   "statement": "Scrie `y = interp_liniar(xs, ys, x)`: nodurile `xs` (vector linie, crescător) au valorile `ys`; pentru fiecare element din vectorul linie `x` (aflat în `[xs(1), xs(end)]`), `y` are valoarea pe **segmentul** dintre cele două noduri vecine:\n\n$$y = y_k + \\frac{y_{k+1} - y_k}{x_{k+1} - x_k}\\,(x - x_k), \\quad x_k \\le x \\le x_{k+1}.$$\n\n`y` are aceeași formă ca `x`. Funcțiile `interp1`, `polyfit` nu sunt voie.",
+   "hint": "Pentru fiecare `x(i)`, caută segmentul: cel mai mare `k` cu `xs(k) <= x(i)` (dar cel mult `n - 1`, ca să existe `k + 1`).",
+   "solution": "Spre deosebire de polinomul Lagrange, interpolarea pe porțiuni nu oscilează între noduri, dar derivata ei sare în noduri.\n\n```matlab\nfunction y = interp_liniar(xs, ys, x)\n    y = zeros(size(x));\n    n = numel(xs);\n    for i = 1:numel(x)\n        k = 1;\n        while k < n - 1 && x(i) > xs(k + 1)\n            k = k + 1;\n        end\n        y(i) = ys(k) + (ys(k+1) - ys(k)) / (xs(k+1) - xs(k)) * (x(i) - xs(k));\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "interp_liniar",
+    "signature": "function y = interp_liniar(xs, ys, x)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "[0.0 1.0 2.0 4.0]",
+       "[1.0 3.0 2.0 6.0]",
+       "[0.0 0.5 1.0 1.5 3.0 4.0]"
+      ],
+      "expect": [
+       "[1.0 2.0 3.0 2.5 4.0 6.0]"
+      ],
+      "tol": 1e-12
+     },
+     {
+      "args": [
+       "[-1.0 0.0 1.0]",
+       "[1.0 0.0 1.0]",
+       "[-1.0 -0.25 0.75]"
+      ],
+      "expect": [
+       "[1.0 0.25 0.75]"
+      ],
+      "tol": 1e-12
+     },
+     {
+      "args": [
+       "[0.0 10.0]",
+       "[5.0 -5.0]",
+       "[2.5 10.0]"
+      ],
+      "expect": [
+       "[2.5 -5.0]"
+      ],
+      "tol": 1e-12
+     }
+    ],
+    "forbid": [
+     "interp1",
+     "polyfit",
+     "polyval"
+    ],
+    "starter": "function y = interp_liniar(xs, ys, x)\n    % scrie codul aici\n\nend\n",
+    "reference": "function y = interp_liniar(xs, ys, x)\n    y = zeros(size(x));\n    n = numel(xs);\n    for i = 1:numel(x)\n        k = 1;\n        while k < n - 1 && x(i) > xs(k + 1)\n            k = k + 1;\n        end\n        y(i) = ys(k) + (ys(k+1) - ys(k)) / (xs(k+1) - xs(k)) * (x(i) - xs(k));\n    end\nend"
    }
   },
   {
@@ -708,6 +894,69 @@
     "forbid": [],
     "starter": "function r = bisectie(f, a, b, tol)\n    % scrie codul aici\n\nend\n",
     "reference": "function r = bisectie(f, a, b, tol)\n    while (b - a) / 2 > tol\n        c = (a + b) / 2;\n        if f(a) * f(c) <= 0\n            b = c;\n        else\n            a = c;\n        end\n    end\n    r = (a + b) / 2;\nend"
+   }
+  },
+  {
+   "id": "20",
+   "title": "Metoda secantei",
+   "chapter": "4. Ecuații neliniare",
+   "difficulty": "medie",
+   "source": "Laborator MN · ecuații neliniare",
+   "statement": "Scrie `[r, k] = secanta(f, x0, x1, tol, maxit)`: ca Newton, dar fără derivată; tangenta e înlocuită de dreapta prin ultimele două puncte:\n\n$$x_{k+1} = x_k - f(x_k)\\,\\frac{x_k - x_{k-1}}{f(x_k) - f(x_{k-1})}.$$\n\n**Oprirea**: după iterația `k` (de la 1), dacă `abs(x_nou - x_k) < tol` întorci `x_nou` și `k`; după `maxit` iterații întorci ultimul punct.",
+   "hint": "Ține ultimele două puncte în `x0` și `x1` și mută-le la fiecare pas.",
+   "solution": "Secanta converge cu ordinul (1 + √5)/2 ≈ 1.618, mai încet decât Newton, dar fără să calculezi derivata: un singur `f` nou pe pas.\n\n```matlab\nfunction [r, k] = secanta(f, x0, x1, tol, maxit)\n    for k = 1:maxit\n        r = x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0));\n        if abs(r - x1) < tol\n            return;\n        end\n        x0 = x1;\n        x1 = r;\n    end\n    r = x1;\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "secanta",
+    "signature": "function [r, k] = secanta(f, x0, x1, tol, maxit)",
+    "nout": 2,
+    "tests": [
+     {
+      "args": [
+       "@(x) x.^3 - 2*x - 5",
+       "2",
+       "3",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "2.0945514815423265",
+       "7"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "@(x) cos(x) - x",
+       "0",
+       "1",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "0.7390851332151607",
+       "6"
+      ],
+      "tol": 1e-09
+     },
+     {
+      "args": [
+       "@(x) x.^2 - 2",
+       "1",
+       "2",
+       "1e-12",
+       "100"
+      ],
+      "expect": [
+       "1.4142135623730951",
+       "7"
+      ],
+      "tol": 1e-09
+     }
+    ],
+    "forbid": [],
+    "starter": "function [r, k] = secanta(f, x0, x1, tol, maxit)\n    % scrie codul aici\n\nend\n",
+    "reference": "function [r, k] = secanta(f, x0, x1, tol, maxit)\n    for k = 1:maxit\n        r = x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0));\n        if abs(r - x1) < tol\n            return;\n        end\n        x0 = x1;\n        x1 = r;\n    end\n    r = x1;\nend"
    }
   },
   {
@@ -930,6 +1179,66 @@
     "forbid": [],
     "starter": "function y = euler(f, t0, y0, h, n)\n    % scrie codul aici\n\nend\n",
     "reference": "function y = euler(f, t0, y0, h, n)\n    y = zeros(1, n + 1);\n    y(1) = y0;\n    t = t0;\n    for k = 1:n\n        y(k+1) = y(k) + h * f(t, y(k));\n        t = t + h;\n    end\nend"
+   }
+  },
+  {
+   "id": "21",
+   "title": "Runge-Kutta de ordinul 4",
+   "chapter": "5. Integrare și ecuații diferențiale",
+   "difficulty": "medie",
+   "source": "Laborator MN",
+   "statement": "Scrie `y = rk4(f, t0, y0, h, n)` pentru `y' = f(t, y)`, `y(t0) = y0`, cu metoda **Runge-Kutta clasică**: `n` pași de lungime `h`, întorci vectorul linie `y_0, ..., y_n`.\n\n$$\\begin{aligned} k_1 &= f(t_k, y_k), & k_2 &= f(t_k + \\tfrac{h}{2}, y_k + \\tfrac{h}{2}k_1),\\\\ k_3 &= f(t_k + \\tfrac{h}{2}, y_k + \\tfrac{h}{2}k_2), & k_4 &= f(t_k + h, y_k + h k_3),\\end{aligned}$$\n$$y_{k+1} = y_k + \\frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4).$$",
+   "hint": "E ca Euler, doar că panta folosită e o medie ponderată a patru pante.",
+   "solution": "Pe primul test (y' = y), RK4 dă e¹ ≈ 2.7182797 cu h = 0.1, față de 2.59374 la Euler: eroarea e O(h⁴).\n\n```matlab\nfunction y = rk4(f, t0, y0, h, n)\n    y = zeros(1, n + 1);\n    y(1) = y0;\n    t = t0;\n    for k = 1:n\n        k1 = f(t, y(k));\n        k2 = f(t + h/2, y(k) + h/2 * k1);\n        k3 = f(t + h/2, y(k) + h/2 * k2);\n        k4 = f(t + h, y(k) + h * k3);\n        y(k+1) = y(k) + h/6 * (k1 + 2*k2 + 2*k3 + k4);\n        t = t + h;\n    end\nend\n```",
+   "kind": "octave",
+   "spec": {
+    "function": "rk4",
+    "signature": "function y = rk4(f, t0, y0, h, n)",
+    "nout": 1,
+    "tests": [
+     {
+      "args": [
+       "@(t, y) y",
+       "0",
+       "1",
+       "0.1",
+       "10"
+      ],
+      "expect": [
+       "[1.0 1.1051708333333332 1.2214025708506944 1.3498584970625376 1.4918242400806856 1.648720638596838 1.822117962091933 2.0137516265967768 2.2255395632923154 2.459601413780071 2.718279744135166]"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(t, y) -2 * t * y",
+       "0",
+       "1",
+       "0.05",
+       "20"
+      ],
+      "expect": [
+       "[1.0 0.9975031223958334 0.9900498337331386 0.9777512371397334 0.9607894390350064 0.9394130626180999 0.9139311850187046 0.8847059047223081 0.85214378897252 0.8166864831810325 0.7788007847801561 0.7389684918872786 0.6976763326942259 0.6554062653264316 0.6126264112563984 0.5697828498740909 0.5272924595254775 0.48553694345733933 0.4448581299653422 0.4055545869051802 0.3678795437068706]"
+      ],
+      "tol": 1e-10
+     },
+     {
+      "args": [
+       "@(t, y) t - y",
+       "0",
+       "2",
+       "0.5",
+       "4"
+      ],
+      "expect": [
+       "[2.0 1.3203125 1.1045125325520833 1.1701859898037381 1.406649311521539]"
+      ],
+      "tol": 1e-10
+     }
+    ],
+    "forbid": [],
+    "starter": "function y = rk4(f, t0, y0, h, n)\n    % scrie codul aici\n\nend\n",
+    "reference": "function y = rk4(f, t0, y0, h, n)\n    y = zeros(1, n + 1);\n    y(1) = y0;\n    t = t0;\n    for k = 1:n\n        k1 = f(t, y(k));\n        k2 = f(t + h/2, y(k) + h/2 * k1);\n        k3 = f(t + h/2, y(k) + h/2 * k2);\n        k4 = f(t + h, y(k) + h * k3);\n        y(k+1) = y(k) + h/6 * (k1 + 2*k2 + 2*k3 + k4);\n        t = t + h;\n    end\nend"
    }
   },
   {

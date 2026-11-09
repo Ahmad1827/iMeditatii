@@ -117,6 +117,43 @@
    }
   },
   {
+   "id": "11",
+   "title": "Peste gard",
+   "chapter": "1. Cinematică",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Mingea pleacă de la $h_0 = 1\\,\\text{m}$, sub $30^\\circ$ față de orizontală, și trebuie să treacă exact peste marginea unui gard înalt de $2\\,\\text{m}$, aflat la $10\\,\\text{m}$. Cu ce viteză trebuie aruncată și când ajunge deasupra gardului?",
+   "hint": "Aceeași ecuație a traiectoriei ca la coș: $y(d) = h_0 + d\\tan\\alpha - \\frac{g d^2}{2v_0^2\\cos^2\\alpha}$, cu $y(d)$ = înălțimea gardului.",
+   "solution": "$v_0 \\approx 11.70\\,\\text{m/s}$, $t \\approx 0.99\\,\\text{s}$.",
+   "kind": "sim",
+   "spec": {
+    "sim": "projectile",
+    "params": {
+     "angle": 30,
+     "h0": 1.0,
+     "d": 10.0,
+     "ht": 2.0
+    },
+    "fields": [
+     {
+      "name": "v0",
+      "label": "v₀",
+      "unit": "m/s"
+     },
+     {
+      "name": "t",
+      "label": "t (până la gard)",
+      "unit": "s"
+     }
+    ],
+    "expect": {
+     "v0": 11.704969550597605,
+     "t": 0.9865045213383724
+    },
+    "tol": 0.01
+   }
+  },
+  {
    "id": "4",
    "title": "Planul înclinat cu frecare",
    "chapter": "2. Dinamică și frecare",
@@ -216,6 +253,77 @@
    }
   },
   {
+   "id": "12",
+   "title": "Planul fără frecare",
+   "chapter": "2. Dinamică și frecare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un corp alunecă din repaus, **fără frecare**, pe un plan înclinat cu $20^\\circ$, lung de $5\\,\\text{m}$. Află accelerația și viteza cu care ajunge jos. Ar fi aceeași viteza dacă ar cădea liber de la aceeași înălțime?",
+   "hint": "Fără frecare, $a = g\\sin\\theta$; apoi $v^2 = 2aL$.",
+   "solution": "$a = g\\sin\\theta \\approx 3.355\\,\\text{m/s}^2$, $v = \\sqrt{2aL} \\approx 5.79\\,\\text{m/s}$. Da: $2aL = 2gL\\sin\\theta = 2gh$, viteza depinde doar de înălțime (conservarea energiei).",
+   "kind": "sim",
+   "spec": {
+    "sim": "incline",
+    "params": {
+     "angle": 20,
+     "mu": 0,
+     "L": 5.0
+    },
+    "fields": [
+     {
+      "name": "a",
+      "label": "a",
+      "unit": "m/s²"
+     },
+     {
+      "name": "v",
+      "label": "v (jos)",
+      "unit": "m/s"
+     }
+    ],
+    "expect": {
+     "a": 3.3552176060248105,
+     "v": 5.792424022829138
+    },
+    "tol": 0.01
+   }
+  },
+  {
+   "id": "13",
+   "title": "Atwood cu mase apropiate",
+   "chapter": "2. Dinamică și frecare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Mașina Atwood a fost inventată ca să **încetinească** căderea, ca s-o poți măsura. Cu $m_1 = 1{,}1\\,\\text{kg}$ și $m_2 = 1\\,\\text{kg}$, află accelerația și tensiunea din fir. De câte ori e accelerația mai mică decât $g$?",
+   "hint": "$a = \\frac{m_1 - m_2}{m_1 + m_2}g$.",
+   "solution": "$a = \\frac{0{,}1}{2{,}1} g \\approx 0.467\\,\\text{m/s}^2$, de 21 de ori mai mică decât $g$; $T \\approx 10.28\\,\\text{N}$, aproape greutatea fiecărui corp.",
+   "kind": "sim",
+   "spec": {
+    "sim": "atwood",
+    "params": {
+     "m1": 1.1,
+     "m2": 1.0
+    },
+    "fields": [
+     {
+      "name": "a",
+      "label": "a",
+      "unit": "m/s²"
+     },
+     {
+      "name": "T",
+      "label": "T",
+      "unit": "N"
+     }
+    ],
+    "expect": {
+     "a": 0.4671428571428572,
+     "T": 10.27714285714286
+    },
+    "tol": 0.01
+   }
+  },
+  {
    "id": "7",
    "title": "Ciocnirea plastică",
    "chapter": "3. Impuls și ciocniri",
@@ -292,6 +400,44 @@
    }
   },
   {
+   "id": "14",
+   "title": "Ciocnire elastică, mase egale",
+   "chapter": "3. Impuls și ciocniri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Două bile de câte 2 kg se apropie una de alta, fiecare cu 3 m/s, și se ciocnesc frontal, **perfect elastic**. Ce viteze au după ciocnire (pozitiv: sensul inițial al primei bile)?",
+   "hint": "La mase egale, într-o ciocnire elastică frontală bilele își **schimbă** vitezele.",
+   "solution": "$v_1' = v_2 = -3\\,\\text{m/s}$, $v_2' = v_1 = 3\\,\\text{m/s}$: fiecare se întoarce cu viteza cu care a venit.",
+   "kind": "sim",
+   "spec": {
+    "sim": "collision",
+    "params": {
+     "m1": 2,
+     "v1": 3,
+     "m2": 2,
+     "v2": -3,
+     "elastic": 1
+    },
+    "fields": [
+     {
+      "name": "v1p",
+      "label": "v₁'",
+      "unit": "m/s"
+     },
+     {
+      "name": "v2p",
+      "label": "v₂'",
+      "unit": "m/s"
+     }
+    ],
+    "expect": {
+     "v1p": -3.0,
+     "v2p": 3.0
+    },
+    "tol": 0.01
+   }
+  },
+  {
    "id": "9",
    "title": "Oscilatorul cu resort",
    "chapter": "4. Oscilații",
@@ -351,6 +497,42 @@
     ],
     "expect": {
      "T": 2.0060666807106475
+    },
+    "tol": 0.01
+   }
+  },
+  {
+   "id": "15",
+   "title": "Un resort mai tare",
+   "chapter": "4. Oscilații",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un corp de $2\\,\\text{kg}$ pe un resort cu $k = 200\\,\\text{N/m}$ oscilează cu amplitudinea $5\\,\\text{cm}$. Află perioada și viteza maximă. Cum se schimbă perioada dacă dublezi masa?",
+   "hint": "$\\omega = \\sqrt{k/m}$.",
+   "solution": "$\\omega = 10\\,\\text{rad/s}$, $T = \\pi/5 \\approx 0.6283\\,\\text{s}$, $v_{max} = \\omega A = 0{,}5\\,\\text{m/s}$. Cu masa dublă, $T$ crește de $\\sqrt{2}$ ori.",
+   "kind": "sim",
+   "spec": {
+    "sim": "spring",
+    "params": {
+     "m": 2.0,
+     "k": 200.0,
+     "A": 0.05
+    },
+    "fields": [
+     {
+      "name": "T",
+      "label": "T",
+      "unit": "s"
+     },
+     {
+      "name": "vmax",
+      "label": "v max",
+      "unit": "m/s"
+     }
+    ],
+    "expect": {
+     "T": 0.6283185307179586,
+     "vmax": 0.5
     },
     "tol": 0.01
    }

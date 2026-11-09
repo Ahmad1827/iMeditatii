@@ -486,4 +486,167 @@ Coloana `j` din Q se obține din coloana `j` din A scăzând proiecțiile pe col
 end''', '`R(i, j) = Q(:, i)\' * A(:, j)` e proiecția; după ce le-ai scăzut pe toate, `norm(v)` e `R(j, j)`.',
     'Așa se rezolvă și problemele de cele mai mici pătrate: `A x ≈ b` devine `R x = Q\' b`.', forbid=['qr'])
 
+# ------------------------------------------------------------------ more (2026-11)
+def det_gauss(A):
+    A = np.array(A, float)
+    n, d = len(A), 1.0
+    for k in range(n):
+        p = k + int(np.argmax(np.abs(A[k:, k])))
+        if A[p, k] == 0:
+            return 0.0
+        if p != k:
+            A[[k, p]] = A[[p, k]]
+            d = -d
+        d *= A[k, k]
+        for i in range(k + 1, n):
+            A[i, k:] -= A[i, k] / A[k, k] * A[k, k:]
+    return d
+
+
+dets = [[[2, 1, 3], [4, 1, 7], [-2, 5, 1]], [[0, 2], [3, 1]], [[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[5]], [[1, 0, 2, -1], [3, 0, 0, 5], [2, 1, 4, -3], [1, 0, 5, 0]]]
+for D in dets:
+    assert abs(det_gauss(D) - np.linalg.det(np.array(D, float))) < 1e-9
+task(17, 'Determinantul prin eliminare', C1, 'medie', '''
+Scrie `d = determinant(A)`: determinantul matricei pătrate `A`, calculat prin **eliminare Gauss cu pivotare parțială**. Determinantul e produsul pivoților, cu semnul schimbat la fiecare interschimbare de linii. Dacă pe o coloană nu găsești niciun pivot nenul, determinantul e 0.
+
+Funcția `det` nu e voie.''',
+    'determinant', 'function d = determinant(A)', 1,
+    [T([D], [det_gauss(D)], tol=1e-9) for D in dets],
+    '''function d = determinant(A)
+    n = rows(A);
+    d = 1;
+    for k = 1:n
+        [~, p] = max(abs(A(k:n, k)));
+        p = p + k - 1;
+        if A(p, k) == 0
+            d = 0;
+            return;
+        end
+        if p ~= k
+            A([k p], :) = A([p k], :);
+            d = -d;
+        end
+        d = d * A(k, k);
+        for i = k+1:n
+            A(i, k:n) = A(i, k:n) - A(i, k) / A(k, k) * A(k, k:n);
+        end
+    end
+end''', 'Pornește cu `d = 1`; la fiecare coloană, după pivotare, înmulțește `d` cu pivotul. O interschimbare de linii schimbă semnul.',
+    'O(n³) operații, față de O(n!) pentru dezvoltarea după o linie. A treia matrice din teste e singulară: determinantul iese 0 (până la erorile de rotunjire).', forbid=['det'])
+
+
+def cond_inf(A):
+    A = np.array(A, float)
+    return np.abs(A).sum(axis=1).max() * np.abs(np.linalg.inv(A)).sum(axis=1).max()
+
+
+conds = [[[1, 2], [3, 4]], [[4, 1], [2, 5]], [[1, 1], [1, 1.0001]], [[10, -1, 2], [-1, 11, -1], [2, -1, 10]]]
+task(18, 'Numărul de condiționare', C2, 'ușoară', '''
+Scrie `c = cond_inf(A)`: numărul de condiționare al matricei inversabile `A` în **norma infinit**,
+
+$$\\kappa_\\infty(A) = \\|A\\|_\\infty \\cdot \\|A^{-1}\\|_\\infty, \\qquad \\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|.$$
+
+Poți folosi `inv`, dar nu `cond` sau `norm`. Un număr mare înseamnă că sistemul `A x = b` e sensibil la erori în date (al treilea test).''',
+    'cond_inf', 'function c = cond_inf(A)', 1,
+    [T([A], [cond_inf(A)], tol=1e-6) for A in conds],
+    '''function c = cond_inf(A)
+    c = max(sum(abs(A), 2)) * max(sum(abs(inv(A)), 2));
+end''', '`sum(abs(A), 2)` dă sumele pe linii (vector coloană); maximul lor e norma infinit.',
+    'Pentru matricea aproape singulară din testul 3, κ ≈ 4·10⁴: o eroare relativă de 10⁻⁶ în b poate da o eroare de 4% în x.', forbid=['cond', 'norm'])
+
+
+def interp_lin(xs, ys, x):
+    return np.interp(x, xs, ys)
+
+
+il = [([0, 1, 2, 4], [1, 3, 2, 6], [0, 0.5, 1, 1.5, 3, 4]), ([-1, 0, 1], [1, 0, 1], [-1, -0.25, 0.75]), ([0, 10], [5, -5], [2.5, 10])]
+task(19, 'Interpolarea liniară pe porțiuni', C3, 'ușoară', '''
+Scrie `y = interp_liniar(xs, ys, x)`: nodurile `xs` (vector linie, crescător) au valorile `ys`; pentru fiecare element din vectorul linie `x` (aflat în `[xs(1), xs(end)]`), `y` are valoarea pe **segmentul** dintre cele două noduri vecine:
+
+$$y = y_k + \\frac{y_{k+1} - y_k}{x_{k+1} - x_k}\\,(x - x_k), \\quad x_k \\le x \\le x_{k+1}.$$
+
+`y` are aceeași formă ca `x`. Funcțiile `interp1`, `polyfit` nu sunt voie.''',
+    'interp_liniar', 'function y = interp_liniar(xs, ys, x)', 1,
+    [T([np.array(xs, float).reshape(1, -1), np.array(ys, float).reshape(1, -1), np.array(x, float).reshape(1, -1)], [interp_lin(xs, ys, np.array(x, float)).reshape(1, -1)], tol=1e-12) for xs, ys, x in il],
+    '''function y = interp_liniar(xs, ys, x)
+    y = zeros(size(x));
+    n = numel(xs);
+    for i = 1:numel(x)
+        k = 1;
+        while k < n - 1 && x(i) > xs(k + 1)
+            k = k + 1;
+        end
+        y(i) = ys(k) + (ys(k+1) - ys(k)) / (xs(k+1) - xs(k)) * (x(i) - xs(k));
+    end
+end''', 'Pentru fiecare `x(i)`, caută segmentul: cel mai mare `k` cu `xs(k) <= x(i)` (dar cel mult `n - 1`, ca să existe `k + 1`).',
+    'Spre deosebire de polinomul Lagrange, interpolarea pe porțiuni nu oscilează între noduri, dar derivata ei sare în noduri.', forbid=['interp1', 'polyfit', 'polyval'])
+
+
+def secant(f, x0, x1, tol, maxit):
+    for k in range(1, maxit + 1):
+        x2 = x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0))
+        if abs(x2 - x1) < tol:
+            return x2, k
+        x0, x1 = x1, x2
+    return x1, maxit
+
+
+st = [('@(x) x.^3 - 2*x - 5', lambda x: x ** 3 - 2 * x - 5, 2, 3), ('@(x) cos(x) - x', lambda x: np.cos(x) - x, 0, 1), ('@(x) x.^2 - 2', lambda x: x * x - 2, 1, 2)]
+task(20, 'Metoda secantei', C4, 'medie', '''
+Scrie `[r, k] = secanta(f, x0, x1, tol, maxit)`: ca Newton, dar fără derivată; tangenta e înlocuită de dreapta prin ultimele două puncte:
+
+$$x_{k+1} = x_k - f(x_k)\\,\\frac{x_k - x_{k-1}}{f(x_k) - f(x_{k-1})}.$$
+
+**Oprirea**: după iterația `k` (de la 1), dacă `abs(x_nou - x_k) < tol` întorci `x_nou` și `k`; după `maxit` iterații întorci ultimul punct.''',
+    'secanta', 'function [r, k] = secanta(f, x0, x1, tol, maxit)', 2,
+    [T([fs, str(a), str(b), '1e-12', '100'], list(secant(f, float(a), float(b), 1e-12, 100)), tol=1e-9) for fs, f, a, b in st],
+    '''function [r, k] = secanta(f, x0, x1, tol, maxit)
+    for k = 1:maxit
+        r = x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0));
+        if abs(r - x1) < tol
+            return;
+        end
+        x0 = x1;
+        x1 = r;
+    end
+    r = x1;
+end''', 'Ține ultimele două puncte în `x0` și `x1` și mută-le la fiecare pas.',
+    'Secanta converge cu ordinul (1 + √5)/2 ≈ 1.618, mai încet decât Newton, dar fără să calculezi derivata: un singur `f` nou pe pas.', source='Laborator MN · ecuații neliniare')
+
+
+def rk4(f, t0, y0, h, n):
+    ys, t, y = [y0], t0, y0
+    for _ in range(n):
+        k1 = f(t, y)
+        k2 = f(t + h / 2, y + h / 2 * k1)
+        k3 = f(t + h / 2, y + h / 2 * k2)
+        k4 = f(t + h, y + h * k3)
+        y = y + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+        t = t + h
+        ys.append(y)
+    return ys
+
+
+task(21, 'Runge-Kutta de ordinul 4', C5, 'medie', '''
+Scrie `y = rk4(f, t0, y0, h, n)` pentru `y' = f(t, y)`, `y(t0) = y0`, cu metoda **Runge-Kutta clasică**: `n` pași de lungime `h`, întorci vectorul linie `y_0, ..., y_n`.
+
+$$\\begin{aligned} k_1 &= f(t_k, y_k), & k_2 &= f(t_k + \\tfrac{h}{2}, y_k + \\tfrac{h}{2}k_1),\\\\ k_3 &= f(t_k + \\tfrac{h}{2}, y_k + \\tfrac{h}{2}k_2), & k_4 &= f(t_k + h, y_k + h k_3),\\end{aligned}$$
+$$y_{k+1} = y_k + \\frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4).$$''',
+    'rk4', 'function y = rk4(f, t0, y0, h, n)', 1,
+    [T([fs, str(t0), str(y0), str(h), str(n)], [np.array(rk4(f, t0, y0, h, n)).reshape(1, -1)], tol=1e-10) for fs, f, t0, y0, h, n in et],
+    '''function y = rk4(f, t0, y0, h, n)
+    y = zeros(1, n + 1);
+    y(1) = y0;
+    t = t0;
+    for k = 1:n
+        k1 = f(t, y(k));
+        k2 = f(t + h/2, y(k) + h/2 * k1);
+        k3 = f(t + h/2, y(k) + h/2 * k2);
+        k4 = f(t + h, y(k) + h * k3);
+        y(k+1) = y(k) + h/6 * (k1 + 2*k2 + 2*k3 + k4);
+        t = t + h;
+    end
+end''', 'E ca Euler, doar că panta folosită e o medie ponderată a patru pante.',
+    'Pe primul test (y\' = y), RK4 dă e¹ ≈ 2.7182797 cu h = 0.1, față de 2.59374 la Euler: eroarea e O(h⁴).')
+
 write_course('mn', CHAPTERS, PROBLEMS)

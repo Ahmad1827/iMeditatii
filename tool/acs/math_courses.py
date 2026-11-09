@@ -465,6 +465,125 @@ Rezolvă $y' = 2xy$, $y(0) = 1$.''',
     '$\\frac{dy}{y} = 2x\\,dx$.', '$\\ln|y| = x^2 + C$, deci $y = e^{x^2}$.',
     plot={'field': 'y', 'range': [-1.5, 1.5], 'ref': '@(x) exp(x.^2)', 'refLabel': 'soluția', 'label': 'y(x)'})
 
+# ============================================================ more (2026-11)
+# ---- AM
+math_problem(AM, 14, 'Taylor pentru √(1 + x)', AM1, 'ușoară', '''
+Scrie polinomul Taylor de **grad 2** al funcției $f(x) = \\sqrt{1 + x}$ în $x_0 = 0$. Folosește-l apoi în gând ca să aproximezi $\\sqrt{1{,}1}$.''',
+    [expr('P', 'T₂(x) =')],
+    [ck(same_fn('P', '@(x) 1 + x/2 - x.^2/8'), 'e polinomul Taylor de grad 2 în 0')],
+    {'P': '1 + x/2 - x^2/8'}, {'P': '1 + x/2'},
+    "$f'(x) = \\frac{1}{2}(1+x)^{-1/2}$, $f''(x) = -\\frac{1}{4}(1+x)^{-3/2}$; coeficientul lui $x^2$ e $\\frac{f''(0)}{2}$.",
+    '$T_2(x) = 1 + \\frac{x}{2} - \\frac{x^2}{8}$; $\\sqrt{1{,}1} \\approx 1 + 0{,}05 - 0{,}00125 = 1{,}04875$ (valoarea exactă: 1,04881).',
+    plot={'field': 'P', 'range': [-0.99, 3], 'ref': '@(x) sqrt(1 + x)', 'refLabel': '√(1 + x)', 'label': 'T₂(x)', 'yrange': [-0.5, 2.5]})
+
+math_problem(AM, 15, 'Derivata unui cât', AM2, 'medie', '''
+Calculează derivata funcției $f(x) = \\dfrac{e^x}{x^2 + 1}$. Unde se anulează?''',
+    [expr('d', "f'(x) =")],
+    [ck(f"close(d({XS}), deriv(@(x) exp(x)./(x.^2 + 1), {XS}), 1e-6)", "e derivata lui eˣ/(x² + 1)")],
+    {'d': 'e^x (x - 1)^2 / (x^2 + 1)^2'}, {'d': 'e^x / (2x)'},
+    "$\\left(\\frac{u}{v}\\right)' = \\frac{u'v - uv'}{v^2}$.",
+    "$f'(x) = \\frac{e^x(x^2 + 1) - e^x \\cdot 2x}{(x^2+1)^2} = \\frac{e^x (x - 1)^2}{(x^2 + 1)^2} \\ge 0$: se anulează doar în $x = 1$, iar $f$ e crescătoare pe tot $\\mathbb{R}$ (fără extrem).",
+    plot={'field': 'd', 'range': [-3, 3], 'ref': '@(x) exp(x).*(x - 1).^2./(x.^2 + 1).^2', 'refLabel': "f'(x)", 'label': 'derivata ta'})
+
+math_problem(AM, 16, 'Derivata după o direcție', AM3, 'medie', '''
+Pentru $f(x, y) = x^2 y + y^3$, calculează gradientul în punctul $(1, 2)$ și derivata lui $f$ în acest punct după direcția vectorului $v = (3, 4)$ (normat).''',
+    [num('gx', '∂f/∂x (1, 2) ='), num('gy', '∂f/∂y (1, 2) ='), num('D', 'D_v f (1, 2) =')],
+    [ck('abs(gx - 4) < 1e-9 && abs(gy - 13) < 1e-9', 'gradientul în (1, 2) e corect'), ck('abs(D - 64/5) < 1e-9', 'derivata după direcție e corectă')],
+    {'gx': '4', 'gy': '13', 'D': '64/5'}, {'gx': '4', 'gy': '13', 'D': '64'},
+    'Direcția trebuie normată: $u = v / \\|v\\| = (\\frac35, \\frac45)$. Apoi $D_u f = \\nabla f \\cdot u$.',
+    '$\\nabla f = (2xy, x^2 + 3y^2) = (4, 13)$ în $(1, 2)$; $D_u f = 4 \\cdot \\frac35 + 13 \\cdot \\frac45 = \\frac{64}{5}$.')
+
+math_problem(AM, 17, 'Raza de convergență', AM4, 'ușoară', '''
+Găsește raza de convergență a seriei de puteri $\\displaystyle\\sum_{n \\ge 1} \\frac{x^n}{n \\cdot 3^n}$ și suma ei în $x = -3$ (unde converge, ca serie alternată).''',
+    [num('R', 'R ='), num('S', 'suma în x = −3:')],
+    [ck('abs(R - 3) < 1e-9', 'raza de convergență e corectă'), ck('abs(S + log(2)) < 1e-9', 'suma în x = −3 e corectă')],
+    {'R': '3', 'S': '-ln 2'}, {'R': '1/3', 'S': 'ln 2'},
+    'Criteriul raportului: $\\left|\\frac{a_{n+1}}{a_n}\\right| \\to \\frac{|x|}{3}$. În $x = -3$, seria devine $\\sum \\frac{(-1)^n}{n}$.',
+    '$R = 3$. În $x = -3$: $\\sum_{n \\ge 1} \\frac{(-1)^n}{n} = -\\ln 2$ (seria lui $\\ln(1 + t)$ în $t = 1$, cu semn schimbat).')
+
+math_problem(AM, 18, 'O integrală improprie', AM4, 'ușoară', '''
+Calculează $\\displaystyle\\int_0^{\\infty} \\frac{dx}{1 + x^2}$ și $\\displaystyle\\int_1^{\\infty} \\frac{dx}{x^2}$.''',
+    [num('I', '∫₀^∞ 1/(1 + x²) dx ='), num('J', '∫₁^∞ 1/x² dx =')],
+    [ck('abs(I - pi/2) < 1e-9', 'prima integrală e corectă'), ck('abs(J - 1) < 1e-9', 'a doua integrală e corectă')],
+    {'I': 'pi/2', 'J': '1'}, {'I': 'pi', 'J': '1'},
+    'O integrală improprie e limita integralelor pe $[0, b]$, cu $b \\to \\infty$.',
+    '$\\arctan b \\to \\frac{\\pi}{2}$, iar $1 - \\frac{1}{b} \\to 1$.')
+
+# ---- MS
+SL = '[0.5 1 1.7 2.3 3 4.5]'  # s for sin 3t: any s > 0
+math_problem(MS, 12, 'Laplace pentru sin 3t', MS1, 'ușoară', '''
+Calculează transformata Laplace a funcției $f(t) = \\sin 3t$, $t \\ge 0$.''',
+    [expr('F', 'F(s) =', ('s',))], [ck(f'close(F({SL}), 3 ./ ({SL}.^2 + 9), 1e-9)', 'e transformata lui sin 3t')],
+    {'F': '3/(s^2 + 9)'}, {'F': 's/(s^2 + 9)'},
+    '$\\mathcal{L}\\{\\sin \\omega t\\} = \\frac{\\omega}{s^2 + \\omega^2}$.', '$F(s) = \\frac{3}{s^2 + 9}$, pentru $s > 0$.')
+
+math_problem(MS, 13, 'O treaptă întârziată', MS2, 'medie', '''
+Calculează transformata Z a șirului $x_n = 1$ pentru $n \\ge 2$ și $x_0 = x_1 = 0$ (treapta unitate întârziată cu 2), pentru $|z| > 1$.''',
+    [expr('X', 'X(z) =', ('z',))], [ck(f'close(X({ZZ}), 1 ./ ({ZZ} .* ({ZZ} - 1)), 1e-9)', 'e transformata treptei întârziate')],
+    {'X': '1/(z(z - 1))'}, {'X': 'z/(z - 1)'},
+    'Întârzierea cu $k$ pași înmulțește transformata cu $z^{-k}$.', '$X(z) = z^{-2} \\cdot \\frac{z}{z - 1} = \\frac{1}{z(z - 1)}$.')
+
+math_problem(MS, 14, 'Seria Fourier a lui x²', MS3, 'medie', '''
+Pentru $f(x) = x^2$ pe $[-\\pi, \\pi]$, extinsă periodic, scrie termenul liber $\\frac{a_0}{2}$ și coeficienții $a_n$ ($n \\ge 1$) ai seriei Fourier $\\frac{a_0}{2} + \\sum_{n \\ge 1} a_n \\cos nx$ (funcția e pară, deci $b_n = 0$).''',
+    [num('c', 'a₀/2 ='), expr('a', 'aₙ =', ('n',))],
+    [ck('abs(c - pi^2/3) < 1e-9', 'termenul liber e corect'), ck(f'close(a({NN}), 4*(-1).^{NN} ./ {NN}.^2, 1e-9)', 'coeficienții aₙ sunt corecți')],
+    {'c': 'pi^2/3', 'a': '4(-1)^n/n^2'}, {'c': 'pi^2/3', 'a': '4/n^2'},
+    '$a_n = \\frac{2}{\\pi}\\int_0^\\pi x^2 \\cos nx\\,dx$: de două ori prin părți. $\\cos n\\pi = (-1)^n$.',
+    '$\\frac{a_0}{2} = \\frac{1}{2\\pi}\\int_{-\\pi}^{\\pi} x^2 dx = \\frac{\\pi^2}{3}$, $a_n = \\frac{4(-1)^n}{n^2}$. În $x = \\pi$ se obține $\\sum \\frac{1}{n^2} = \\frac{\\pi^2}{6}$.')
+
+math_problem(MS, 15, 'Repartiția Poisson', MS4, 'ușoară', '''
+Numărul de cereri care ajung la un server într-o secundă urmează o repartiție Poisson cu $\\lambda = 3$. Calculează $P(X = 2)$ și $P(X \\ge 1)$.''',
+    [num('p2', 'P(X = 2) ='), num('p1', 'P(X ≥ 1) =')],
+    [ck('abs(p2 - 9/2*exp(-3)) < 1e-9', 'P(X = 2) e corectă'), ck('abs(p1 - (1 - exp(-3))) < 1e-9', 'P(X ≥ 1) e corectă')],
+    {'p2': '9/2 e^(-3)', 'p1': '1 - e^(-3)'}, {'p2': '9 e^(-3)', 'p1': 'e^(-3)'},
+    '$P(X = k) = e^{-\\lambda}\\frac{\\lambda^k}{k!}$. Pentru $P(X \\ge 1)$, treci prin evenimentul contrar.',
+    '$P(X = 2) = e^{-3}\\frac{9}{2} \\approx 0{,}224$, $P(X \\ge 1) = 1 - P(X = 0) = 1 - e^{-3} \\approx 0{,}950$.')
+
+# ---- ALGAED
+S12 = [[1, 2, 1, 4], [2, 1, -1, 2], [1, -1, 2, 2]]
+rowops(12, 'Încă un sistem, prin Gauss-Jordan', AL1, 'ușoară', '''
+Rezolvă prin operații pe linii sistemul
+
+$$\\begin{cases} x + 2y + z = 4 \\\\ 2x + y - z = 2 \\\\ x - y + 2z = 2 \\end{cases}$$''',
+    S12, 'rref', split=3, answers=[{'label': 'x =', 'value': '1'}, {'label': 'y =', 'value': '1'}, {'label': 'z =', 'value': '1'}],
+    hint='Primul pivot e deja 1: `L2 = L2 - 2L1`, `L3 = L3 - L1`.',
+    solution='Forma eșalon redusă e $[I_3 \\mid (1, 1, 1)^T]$.')
+
+A13 = [[1, 2, 0], [0, 1, 3], [0, 0, 1]]
+rowops(13, 'Inversa unei matrice triunghiulare', AL1, 'ușoară', '''
+Calculează inversa matricei superior triunghiulare
+
+$$A = \\begin{pmatrix} 1 & 2 & 0 \\\\ 0 & 1 & 3 \\\\ 0 & 0 & 1 \\end{pmatrix}$$
+
+prin Gauss-Jordan. Matricea e deja în formă eșalon: lucrezi doar **de jos în sus**.''',
+    A13, 'inverse', hint='Începe cu `L2 = L2 - 3L3`, apoi `L1 = L1 - 2L2`.',
+    solution='$A^{-1} = \\begin{pmatrix} 1 & -2 & 6 \\\\ 0 & 1 & -3 \\\\ 0 & 0 & 1 \\end{pmatrix}$: inversa unei matrice superior triunghiulare e tot superior triunghiulară.')
+
+math_problem(ALG, 14, 'Diagonalizarea unei matrice triunghiulare', AL2, 'medie', '''
+Diagonalizează $A = \\begin{pmatrix} 2 & 0 & 0 \\\\ 1 & 3 & 0 \\\\ 0 & 1 & 4 \\end{pmatrix}$: $AP = PD$, cu $P$ inversabilă și $D$ diagonală.''',
+    [mat('P', 'P =', 3, 3), mat('D', 'D =', 3, 3)],
+    [ck('norm([2 0 0; 1 3 0; 0 1 4]*P - P*D) < 1e-9', 'A P = P D'), ck('abs(det(P)) > 1e-9', 'P e inversabilă'), ck('norm(D - diag(diag(D))) < 1e-12', 'D e diagonală')],
+    {'P': [['2', '0', '0'], ['-2', '1', '0'], ['1', '-1', '1']], 'D': [['2', '0', '0'], ['0', '3', '0'], ['0', '0', '4']]},
+    {'P': [['1', '0', '0'], ['0', '1', '0'], ['0', '0', '1']], 'D': [['2', '0', '0'], ['0', '3', '0'], ['0', '0', '4']]},
+    'Valorile proprii ale unei matrice triunghiulare sunt pe diagonală. Pentru fiecare, rezolvă $(A - \\lambda I)v = 0$.',
+    '$\\lambda = 2$: $v = (2, -2, 1)$; $\\lambda = 3$: $v = (0, 1, -1)$; $\\lambda = 4$: $v = (0, 0, 1)$. Trei valori proprii distincte: matricea e diagonalizabilă.')
+
+math_problem(ALG, 15, 'Proiecția pe o dreaptă', AL3, 'ușoară', '''
+Găsește proiecția ortogonală $p$ a vectorului $v = (1, 2, 3)$ pe dreapta generată de $u = (1, 1, 1)$. Se verifică: $p$ e pe dreaptă și $v - p \\perp u$.''',
+    [mat('p', 'p =', 3, 1)],
+    [ck('abs(([1; 2; 3] - p)\' * [1; 1; 1]) < 1e-9', 'v − p e perpendicular pe u'), ck('norm(p - (p\' * [1; 1; 1]) / 3 * [1; 1; 1]) < 1e-9', 'p e pe dreapta lui u')],
+    {'p': [['2'], ['2'], ['2']]}, {'p': [['1'], ['1'], ['1']]},
+    '$p = \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle}\\,u$.', '$\\langle v, u\\rangle = 6$, $\\langle u, u\\rangle = 3$: $p = 2u = (2, 2, 2)$.')
+
+math_problem(ALG, 16, 'Oscilatorul armonic', AL4, 'ușoară', '''
+Rezolvă $y'' + 4y = 0$, $y(0) = 0$, $y'(0) = 2$.''',
+    [expr('y', 'y(x) =')],
+    [ck(f'close(deriv2(y, {XX}) + 4*y({XX}), zeros(1, 6), 2e-3)', "y'' + 4y = 0"), ck('abs(y(0)) < 1e-9', 'y(0) = 0'), ck('abs(deriv(y, 0) - 2) < 1e-6', "y'(0) = 2")],
+    {'y': 'sin 2x'}, {'y': '2 sin x'},
+    'Ecuația caracteristică $r^2 + 4 = 0$ are rădăcinile $\\pm 2i$: $y = C_1 \\cos 2x + C_2 \\sin 2x$.',
+    '$y(0) = C_1 = 0$, $y\'(0) = 2C_2 = 2$: $y = \\sin 2x$.',
+    plot={'field': 'y', 'range': [-3.2, 3.2], 'ref': '@(x) sin(2*x)', 'refLabel': 'soluția', 'label': 'y(x)'})
+
 write_course('am', [AM1, AM2, AM3, AM4], AM)
 write_course('ms', [MS1, MS2, MS3, MS4], MS)
 write_course('algaed', [AL1, AL2, AL3, AL4], ALG)

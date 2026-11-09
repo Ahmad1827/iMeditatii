@@ -419,4 +419,167 @@ done
 ```
 `[ -e "$f" ] || continue` sare peste cazul în care nu există niciun `.jpeg` (globul rămâne atunci literal).''')
 
+# ------------------------------------------------------------------ more (2026-11)
+proj = [
+    {'path': '~/proiect/src/main.c', 'content': 'int main(void) { return 0; }\n'},
+    {'path': '~/proiect/src/main.c~', 'content': 'int main() {}\n'},
+    {'path': '~/proiect/src/util.c', 'content': '/* util */\n'},
+    {'path': '~/proiect/src/.util.c.swp', 'content': 'x'},
+    {'path': '~/proiect/build/make.log', 'content': 'gcc -c main.c\ngcc -c util.c\n'},
+    {'path': '~/proiect/build/test/run.log', 'content': 'ok 1\nok 2\nnot ok 3\n'},
+    {'path': '~/proiect/notes.txt~', 'content': 'vechi\n'},
+    {'path': '~/proiect/notes.txt', 'content': 'nou\n'},
+    {'path': '~/proiect/install.log', 'content': 'done\n'},
+]
+add(16, 'Toate jurnalele într-un loc', C1, 'medie', '''
+În `~/proiect` sunt fișiere `.log` împrăștiate prin mai multe subdirectoare (`build/`, `build/test/`, ...). Strânge-le pe toate, **copiate** (originalele rămân), direct în directorul nou `~/loguri`, fără subdirectoare:
+
+```
+loguri/
+├── install.log
+├── make.log
+└── run.log
+```''', {
+    'setup': proj,
+    'checks': [
+        {'type': 'file', 'path': '~/loguri/make.log', 'equals': 'gcc -c main.c\ngcc -c util.c\n', 'msg': 'loguri/make.log e copia jurnalului din build/'},
+        {'type': 'file', 'path': '~/loguri/run.log', 'equals': 'ok 1\nok 2\nnot ok 3\n', 'msg': 'loguri/run.log e copia celui din build/test/'},
+        {'type': 'file', 'path': '~/loguri/install.log', 'equals': 'done\n'},
+        {'type': 'file', 'path': '~/proiect/build/test/run.log', 'msg': 'originalele au rămas pe loc'},
+        {'type': 'output', 'cmd': 'ls ~/loguri', 'from_ref': True, 'msg': 'în ~/loguri sunt doar cele trei jurnale'},
+    ],
+    'reference': ['mkdir ~/loguri', "find ~/proiect -name '*.log' -exec cp {} ~/loguri \\;"],
+}, hint="`find dir -name '*.log'` le găsește la orice adâncime; `-exec cp {} dest \\;` rulează `cp` pentru fiecare, cu `{}` în locul numelui. Pune ghilimele la `'*.log'`, altfel shell-ul îl expandează înainte ca `find` să-l vadă.",
+   solution='''
+```bash
+mkdir ~/loguri
+find ~/proiect -name '*.log' -exec cp {} ~/loguri \\;
+```
+Sau, fără `-exec`: `for f in $(find ~/proiect -name '*.log'); do cp "$f" ~/loguri; done` (merge cât timp numele n-au spații).''')
+
+add(17, 'Curățenie după editor', C1, 'ușoară', '''
+Editorul a lăsat prin `~/proiect` copii de siguranță: fișiere al căror nume se termină în `~` (de exemplu `main.c~`) și fișiere de swap, ascunse, terminate în `.swp`. Șterge-le pe **toate**, oricât de adânc ar fi, fără să atingi nimic altceva.''', {
+    'setup': proj,
+    'checks': [
+        {'type': 'absent', 'path': '~/proiect/src/main.c~'},
+        {'type': 'absent', 'path': '~/proiect/notes.txt~'},
+        {'type': 'absent', 'path': '~/proiect/src/.util.c.swp'},
+        {'type': 'file', 'path': '~/proiect/src/main.c', 'msg': 'main.c a rămas'},
+        {'type': 'file', 'path': '~/proiect/notes.txt', 'msg': 'notes.txt a rămas'},
+        {'type': 'output', 'cmd': 'cd ~/proiect && find . -type f | sort', 'from_ref': True, 'msg': 'au rămas exact celelalte fișiere'},
+    ],
+    'reference': ["find ~/proiect -type f \\( -name '*~' -o -name '*.swp' \\) -delete"],
+}, hint="`find` cu `-o` (sau) între două `-name`, totul între paranteze scrise `\\(` și `\\)`; la final `-delete`. Întâi rulează fără `-delete`, să vezi ce ar șterge.",
+   solution='''
+```bash
+find ~/proiect -type f \\( -name '*~' -o -name '*.swp' \\) -delete
+```
+Fără paranteze, `-delete` s-ar lega doar de al doilea `-name`. Două comenzi separate (`find ... -name '*~' -delete`, apoi pentru `.swp`) dau același rezultat.''')
+
+add(18, 'Ce poate rula oricine', C2, 'medie', '''
+În `~/scripturi` sunt câteva fișiere, cu permisiuni diferite. Scrie în `~/publice.txt` numele (doar numele, sortate) fișierelor pe care **ceilalți** (others) le pot executa.
+
+Apoi scoate dreptul de **scriere** pentru grup și pentru ceilalți de pe **toate** fișierele din `~/scripturi`, fără să schimbi altceva.''', {
+    'setup': [
+        {'path': '~/scripturi/backup.sh', 'content': '#!/bin/bash\n', 'mode': '775'},
+        {'path': '~/scripturi/deploy.sh', 'content': '#!/bin/bash\n', 'mode': '770'},
+        {'path': '~/scripturi/curata.sh', 'content': '#!/bin/bash\n', 'mode': '777'},
+        {'path': '~/scripturi/note.txt', 'content': 'x\n', 'mode': '666'},
+        {'path': '~/scripturi/run.sh', 'content': '#!/bin/bash\n', 'mode': '751'},
+    ],
+    'checks': [
+        {'type': 'file', 'path': '~/publice.txt', 'equals': 'backup.sh\ncurata.sh\nrun.sh\n', 'msg': '~/publice.txt are fișierele executabile de oricine'},
+        {'type': 'mode', 'path': '~/scripturi/backup.sh', 'mode': '755'},
+        {'type': 'mode', 'path': '~/scripturi/deploy.sh', 'mode': '750'},
+        {'type': 'mode', 'path': '~/scripturi/curata.sh', 'mode': '755'},
+        {'type': 'mode', 'path': '~/scripturi/note.txt', 'mode': '644'},
+        {'type': 'mode', 'path': '~/scripturi/run.sh', 'mode': '751'},
+    ],
+    'reference': ['cd ~/scripturi && find . -type f -perm -o=x | sed "s|^./||" | sort > ~/publice.txt', 'chmod go-w ~/scripturi/*'],
+}, hint='`ls -l` arată permisiunile: al treilea grup `rwx` e al celorlalți. `find -perm -o=x` alege fișierele care au cel puțin bitul x pentru others. Pentru a doua parte, `chmod` simbolic: `go-w`.',
+   solution='''
+```bash
+cd ~/scripturi
+find . -type f -perm -o=x | sed 's|^./||' | sort > ~/publice.txt
+chmod go-w ~/scripturi/*
+```
+Cu octal ar trebui un `chmod` diferit pentru fiecare fișier; forma simbolică `go-w` scoate un singur bit și le lasă pe celelalte cum erau.''')
+
+add(19, 'Cuvintele cele mai dese', C3, 'grea', '''
+În `~/text.txt` e un paragraf. Scrie în `~/frecvente.txt` cele **5 cuvinte cele mai frecvente**, cu numărul lor, în formatul `numar cuvant` (un spațiu între ele), de la cel mai frecvent. Cuvintele se compară **fără a ține cont de majuscule** (scrie-le cu litere mici), iar punctuația nu face parte din cuvânt. La egalitate, ordinea alfabetică.''', {
+    'setup': [{'path': '~/text.txt', 'content': 'Shell-ul citeste o linie. Shell-ul o imparte in cuvinte, apoi cauta comanda.\nComanda primeste cuvintele ca argumente; argumentele sunt cuvinte, iar cuvintele sunt separate de spatii.\nO linie, o comanda: asa lucreaza shell-ul. Linie dupa linie.\n'}],
+    'checks': [{'type': 'file', 'path': '~/frecvente.txt', 'from_ref': True, 'msg': '~/frecvente.txt are cele 5 cuvinte, cu numărul lor'}],
+    'reference': ["tr 'A-Z' 'a-z' < text.txt | tr -cs 'a-z-' '\\n' | grep -v '^$' | sort | uniq -c | sort -k1,1nr -k2,2 | head -5 | awk '{print $1, $2}' > frecvente.txt"],
+}, hint="Pașii: litere mici (`tr 'A-Z' 'a-z'`), un cuvânt pe linie (`tr -cs 'a-z-' '\\n'` înlocuiește tot ce nu e literă sau cratimă cu un singur `\\n`), apoi `sort | uniq -c`, sortare după număr descrescător și după cuvânt.",
+   solution='''
+```bash
+tr 'A-Z' 'a-z' < text.txt | tr -cs 'a-z-' '\\n' | grep -v '^$' \\
+  | sort | uniq -c | sort -k1,1nr -k2,2 | head -5 | awk '{print $1, $2}' > frecvente.txt
+```
+`sort -k1,1nr -k2,2`: întâi după primul câmp, numeric și descrescător, apoi după cuvânt. `awk` scoate spațiile de aliniere pe care le pune `uniq -c`.''')
+
+add(20, 'Un script cu opțiuni', C4, 'grea', '''
+Scrie `~/numara.sh`, care primește un **cuvânt** și apoi unul sau mai multe **fișiere** și afișează, pentru fiecare fișier, pe câte o linie, `fisier: N`, unde N e numărul de linii ale fișierului care conțin cuvântul. La final afișează `total: S`.
+
+• fără argumente suficiente (mai puțin de 2), afișează `Utilizare: numara.sh cuvant fisier...` și iese cu codul **1**;
+• un fișier care nu există se raportează ca `fisier: lipsa` și nu intră în total.
+
+```
+$ ~/numara.sh ERROR web.log db.log nu_e.log
+web.log: 7
+db.log: 3
+nu_e.log: lipsa
+total: 10
+```''', {
+    'setup': [{'path': '~/web.log', 'content': mklog(40, 1)}, {'path': '~/db.log', 'content': mklog(25, 2)}],
+    'checks': [{'type': 'script', 'path': '~/numara.sh', 'runs': [
+        {'cwd': '~/.verif', 'setup': [{'path': '~/.verif/a.log', 'content': mklog(30, 7)}, {'path': '~/.verif/b.log', 'content': mklog(12, 8)}], 'args': ['ERROR', 'a.log', 'b.log'], 'from_ref': True},
+        {'cwd': '~/.verif', 'setup': [{'path': '~/.verif/a.log', 'content': mklog(30, 7)}], 'args': ['WARN', 'a.log', 'lipsa.log'], 'from_ref': True},
+        {'cwd': '~/.verif', 'setup': [{'path': '~/.verif/a.log', 'content': 'ERROR x\n'}], 'args': ['ERROR'], 'from_ref': True},
+    ]}],
+    'reference': ['''cat > ~/numara.sh <<'EOF'
+#!/bin/bash
+if [ $# -lt 2 ]; then
+    echo "Utilizare: numara.sh cuvant fisier..."
+    exit 1
+fi
+w="$1"
+shift
+total=0
+for f in "$@"; do
+    if [ -f "$f" ]; then
+        n=$(grep -c -- "$w" "$f")
+        echo "$f: $n"
+        total=$((total + n))
+    else
+        echo "$f: lipsa"
+    fi
+done
+echo "total: $total"
+EOF'''],
+}, hint='`$#` e numărul de argumente; după `shift`, `"$@"` sunt doar fișierele. `grep -c` dă numărul de linii potrivite, iar `$(...)` îl pune într-o variabilă.',
+   solution='''
+```bash
+#!/bin/bash
+if [ $# -lt 2 ]; then
+    echo "Utilizare: numara.sh cuvant fisier..."
+    exit 1
+fi
+w="$1"
+shift
+total=0
+for f in "$@"; do
+    if [ -f "$f" ]; then
+        n=$(grep -c -- "$w" "$f")
+        echo "$f: $n"
+        total=$((total + n))
+    else
+        echo "$f: lipsa"
+    fi
+done
+echo "total: $total"
+```
+`--` îi spune lui `grep` că ce urmează nu mai sunt opțiuni (cuvântul ar putea începe cu `-`).''')
+
+
 write_course('uso', CHAPTERS, PROBLEMS)

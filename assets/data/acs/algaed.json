@@ -263,6 +263,102 @@
    }
   },
   {
+   "id": "12",
+   "title": "Încă un sistem, prin Gauss-Jordan",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rezolvă prin operații pe linii sistemul\n\n$$\\begin{cases} x + 2y + z = 4 \\\\ 2x + y - z = 2 \\\\ x - y + 2z = 2 \\end{cases}$$",
+   "hint": "Primul pivot e deja 1: `L2 = L2 - 2L1`, `L3 = L3 - L1`.",
+   "solution": "Forma eșalon redusă e $[I_3 \\mid (1, 1, 1)^T]$.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "1",
+      "2",
+      "1",
+      "4"
+     ],
+     [
+      "2",
+      "1",
+      "-1",
+      "2"
+     ],
+     [
+      "1",
+      "-1",
+      "2",
+      "2"
+     ]
+    ],
+    "goal": "rref",
+    "answers": [
+     {
+      "label": "x =",
+      "value": "1"
+     },
+     {
+      "label": "y =",
+      "value": "1"
+     },
+     {
+      "label": "z =",
+      "value": "1"
+     }
+    ],
+    "reference": [
+     "L2 = L2 - 2 L1",
+     "L3 = L3 - 1 L1",
+     "L2 = (-1/3) L2",
+     "L1 = L1 - 2 L2",
+     "L3 = L3 + 3 L2",
+     "L3 = (1/4) L3",
+     "L1 = L1 + 1 L3",
+     "L2 = L2 - 1 L3"
+    ],
+    "split": 3
+   }
+  },
+  {
+   "id": "13",
+   "title": "Inversa unei matrice triunghiulare",
+   "chapter": "1. Sisteme și matrice",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează inversa matricei superior triunghiulare\n\n$$A = \\begin{pmatrix} 1 & 2 & 0 \\\\ 0 & 1 & 3 \\\\ 0 & 0 & 1 \\end{pmatrix}$$\n\nprin Gauss-Jordan. Matricea e deja în formă eșalon: lucrezi doar **de jos în sus**.",
+   "hint": "Începe cu `L2 = L2 - 3L3`, apoi `L1 = L1 - 2L2`.",
+   "solution": "$A^{-1} = \\begin{pmatrix} 1 & -2 & 6 \\\\ 0 & 1 & -3 \\\\ 0 & 0 & 1 \\end{pmatrix}$: inversa unei matrice superior triunghiulare e tot superior triunghiulară.",
+   "kind": "rowops",
+   "spec": {
+    "matrix": [
+     [
+      "1",
+      "2",
+      "0"
+     ],
+     [
+      "0",
+      "1",
+      "3"
+     ],
+     [
+      "0",
+      "0",
+      "1"
+     ]
+    ],
+    "goal": "inverse",
+    "answers": [],
+    "reference": [
+     "L1 = L1 - 2 L2",
+     "L1 = L1 + 6 L3",
+     "L2 = L2 - 3 L3"
+    ]
+   }
+  },
+  {
    "id": "6",
    "title": "Diagonalizarea unei matrice 2 × 2",
    "chapter": "2. Valori și vectori proprii",
@@ -469,6 +565,123 @@
    }
   },
   {
+   "id": "14",
+   "title": "Diagonalizarea unei matrice triunghiulare",
+   "chapter": "2. Valori și vectori proprii",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Diagonalizează $A = \\begin{pmatrix} 2 & 0 & 0 \\\\ 1 & 3 & 0 \\\\ 0 & 1 & 4 \\end{pmatrix}$: $AP = PD$, cu $P$ inversabilă și $D$ diagonală.",
+   "hint": "Valorile proprii ale unei matrice triunghiulare sunt pe diagonală. Pentru fiecare, rezolvă $(A - \\lambda I)v = 0$.",
+   "solution": "$\\lambda = 2$: $v = (2, -2, 1)$; $\\lambda = 3$: $v = (0, 1, -1)$; $\\lambda = 4$: $v = (0, 0, 1)$. Trei valori proprii distincte: matricea e diagonalizabilă.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "P =",
+      "type": "matrix",
+      "rows": 3,
+      "cols": 3,
+      "hint": ""
+     },
+     {
+      "name": "D",
+      "label": "D =",
+      "type": "matrix",
+      "rows": 3,
+      "cols": 3,
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "norm([2 0 0; 1 3 0; 0 1 4]*P - P*D) < 1e-9",
+      "msg": "A P = P D"
+     },
+     {
+      "expr": "abs(det(P)) > 1e-9",
+      "msg": "P e inversabilă"
+     },
+     {
+      "expr": "norm(D - diag(diag(D))) < 1e-12",
+      "msg": "D e diagonală"
+     }
+    ],
+    "reference": {
+     "P": [
+      [
+       "2",
+       "0",
+       "0"
+      ],
+      [
+       "-2",
+       "1",
+       "0"
+      ],
+      [
+       "1",
+       "-1",
+       "1"
+      ]
+     ],
+     "D": [
+      [
+       "2",
+       "0",
+       "0"
+      ],
+      [
+       "0",
+       "3",
+       "0"
+      ],
+      [
+       "0",
+       "0",
+       "4"
+      ]
+     ]
+    },
+    "wrong": {
+     "P": [
+      [
+       "1",
+       "0",
+       "0"
+      ],
+      [
+       "0",
+       "1",
+       "0"
+      ],
+      [
+       "0",
+       "0",
+       "1"
+      ]
+     ],
+     "D": [
+      [
+       "2",
+       "0",
+       "0"
+      ],
+      [
+       "0",
+       "3",
+       "0"
+      ],
+      [
+       "0",
+       "0",
+       "4"
+      ]
+     ]
+    }
+   }
+  },
+  {
    "id": "8",
    "title": "O bază ortonormată (Gram-Schmidt)",
    "chapter": "3. Spații euclidiene",
@@ -528,6 +741,65 @@
       [
        "0",
        "0"
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "id": "15",
+   "title": "Proiecția pe o dreaptă",
+   "chapter": "3. Spații euclidiene",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Găsește proiecția ortogonală $p$ a vectorului $v = (1, 2, 3)$ pe dreapta generată de $u = (1, 1, 1)$. Se verifică: $p$ e pe dreaptă și $v - p \\perp u$.",
+   "hint": "$p = \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle}\\,u$.",
+   "solution": "$\\langle v, u\\rangle = 6$, $\\langle u, u\\rangle = 3$: $p = 2u = (2, 2, 2)$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "p",
+      "label": "p =",
+      "type": "matrix",
+      "rows": 3,
+      "cols": 1,
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(([1; 2; 3] - p)' * [1; 1; 1]) < 1e-9",
+      "msg": "v - p e perpendicular pe u"
+     },
+     {
+      "expr": "norm(p - (p' * [1; 1; 1]) / 3 * [1; 1; 1]) < 1e-9",
+      "msg": "p e pe dreapta lui u"
+     }
+    ],
+    "reference": {
+     "p": [
+      [
+       "2"
+      ],
+      [
+       "2"
+      ],
+      [
+       "2"
+      ]
+     ]
+    },
+    "wrong": {
+     "p": [
+      [
+       "1"
+      ],
+      [
+       "1"
+      ],
+      [
+       "1"
       ]
      ]
     }
@@ -682,6 +954,60 @@
       1.5
      ],
      "ref": "@(x) exp(x.^2)",
+     "refLabel": "soluția",
+     "label": "y(x)"
+    }
+   }
+  },
+  {
+   "id": "16",
+   "title": "Oscilatorul armonic",
+   "chapter": "4. Ecuații diferențiale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rezolvă $y'' + 4y = 0$, $y(0) = 0$, $y'(0) = 2$.",
+   "hint": "Ecuația caracteristică $r^2 + 4 = 0$ are rădăcinile $\\pm 2i$: $y = C_1 \\cos 2x + C_2 \\sin 2x$.",
+   "solution": "$y(0) = C_1 = 0$, $y'(0) = 2C_2 = 2$: $y = \\sin 2x$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "y",
+      "label": "y(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(deriv2(y, [-1 -0.5 0 0.4 0.8 1.2]) + 4*y([-1 -0.5 0 0.4 0.8 1.2]), zeros(1, 6), 2e-3)",
+      "msg": "y'' + 4y = 0"
+     },
+     {
+      "expr": "abs(y(0)) < 1e-9",
+      "msg": "y(0) = 0"
+     },
+     {
+      "expr": "abs(deriv(y, 0) - 2) < 1e-6",
+      "msg": "y'(0) = 2"
+     }
+    ],
+    "reference": {
+     "y": "sin 2x"
+    },
+    "wrong": {
+     "y": "2 sin x"
+    },
+    "plot": {
+     "field": "y",
+     "range": [
+      -3.2,
+      3.2
+     ],
+     "ref": "@(x) sin(2*x)",
      "refLabel": "soluția",
      "label": "y(x)"
     }

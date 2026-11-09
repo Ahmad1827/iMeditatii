@@ -158,6 +158,56 @@
    }
   },
   {
+   "id": "14",
+   "title": "Taylor pentru √(1 + x)",
+   "chapter": "1. Formula lui Taylor",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie polinomul Taylor de **grad 2** al funcției $f(x) = \\sqrt{1 + x}$ în $x_0 = 0$. Folosește-l apoi în gând ca să aproximezi $\\sqrt{1{,}1}$.",
+   "hint": "$f'(x) = \\frac{1}{2}(1+x)^{-1/2}$, $f''(x) = -\\frac{1}{4}(1+x)^{-3/2}$; coeficientul lui $x^2$ e $\\frac{f''(0)}{2}$.",
+   "solution": "$T_2(x) = 1 + \\frac{x}{2} - \\frac{x^2}{8}$; $\\sqrt{1{,}1} \\approx 1 + 0{,}05 - 0{,}00125 = 1{,}04875$ (valoarea exactă: 1,04881).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "P",
+      "label": "T₂(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(P([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), (@(x) 1 + x/2 - x.^2/8)([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), 1e-7)",
+      "msg": "e polinomul Taylor de grad 2 în 0"
+     }
+    ],
+    "reference": {
+     "P": "1 + x/2 - x^2/8"
+    },
+    "wrong": {
+     "P": "1 + x/2"
+    },
+    "plot": {
+     "field": "P",
+     "range": [
+      -0.99,
+      3
+     ],
+     "ref": "@(x) sqrt(1 + x)",
+     "refLabel": "√(1 + x)",
+     "label": "T₂(x)",
+     "yrange": [
+      -0.5,
+      2.5
+     ]
+    }
+   }
+  },
+  {
    "id": "4",
    "title": "Derivata unui produs",
    "chapter": "2. Derivate și primitive",
@@ -292,6 +342,52 @@
      "ref": "@(x) atan(x/2)/2",
      "refLabel": "½ arctg(x/2)",
      "label": "F(x)"
+    }
+   }
+  },
+  {
+   "id": "15",
+   "title": "Derivata unui cât",
+   "chapter": "2. Derivate și primitive",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Calculează derivata funcției $f(x) = \\dfrac{e^x}{x^2 + 1}$. Unde se anulează?",
+   "hint": "$\\left(\\frac{u}{v}\\right)' = \\frac{u'v - uv'}{v^2}$.",
+   "solution": "$f'(x) = \\frac{e^x(x^2 + 1) - e^x \\cdot 2x}{(x^2+1)^2} = \\frac{e^x (x - 1)^2}{(x^2 + 1)^2} \\ge 0$: se anulează doar în $x = 1$, iar $f$ e crescătoare pe tot $\\mathbb{R}$ (fără extrem).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "d",
+      "label": "f'(x) =",
+      "type": "expr",
+      "vars": [
+       "x"
+      ],
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "close(d([-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), deriv(@(x) exp(x)./(x.^2 + 1), [-1.7 -0.9 -0.35 0.2 0.6 1.1 1.6]), 1e-6)",
+      "msg": "e derivata lui eˣ/(x² + 1)"
+     }
+    ],
+    "reference": {
+     "d": "e^x (x - 1)^2 / (x^2 + 1)^2"
+    },
+    "wrong": {
+     "d": "e^x / (2x)"
+    },
+    "plot": {
+     "field": "d",
+     "range": [
+      -3,
+      3
+     ],
+     "ref": "@(x) exp(x).*(x - 1).^2./(x.^2 + 1).^2",
+     "refLabel": "f'(x)",
+     "label": "derivata ta"
     }
    }
   },
@@ -564,6 +660,59 @@
    }
   },
   {
+   "id": "16",
+   "title": "Derivata după o direcție",
+   "chapter": "3. Funcții de mai multe variabile",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Pentru $f(x, y) = x^2 y + y^3$, calculează gradientul în punctul $(1, 2)$ și derivata lui $f$ în acest punct după direcția vectorului $v = (3, 4)$ (normat).",
+   "hint": "Direcția trebuie normată: $u = v / \\|v\\| = (\\frac35, \\frac45)$. Apoi $D_u f = \\nabla f \\cdot u$.",
+   "solution": "$\\nabla f = (2xy, x^2 + 3y^2) = (4, 13)$ în $(1, 2)$; $D_u f = 4 \\cdot \\frac35 + 13 \\cdot \\frac45 = \\frac{64}{5}$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "gx",
+      "label": "∂f/∂x (1, 2) =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "gy",
+      "label": "∂f/∂y (1, 2) =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "D",
+      "label": "D_v f (1, 2) =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(gx - 4) < 1e-9 && abs(gy - 13) < 1e-9",
+      "msg": "gradientul în (1, 2) e corect"
+     },
+     {
+      "expr": "abs(D - 64/5) < 1e-9",
+      "msg": "derivata după direcție e corectă"
+     }
+    ],
+    "reference": {
+     "gx": "4",
+     "gy": "13",
+     "D": "64/5"
+    },
+    "wrong": {
+     "gx": "4",
+     "gy": "13",
+     "D": "64"
+    }
+   }
+  },
+  {
    "id": "11",
    "title": "Suma unei serii de puteri",
    "chapter": "4. Serii și integrale",
@@ -672,6 +821,96 @@
     },
     "wrong": {
      "I": "1/12"
+    }
+   }
+  },
+  {
+   "id": "17",
+   "title": "Raza de convergență",
+   "chapter": "4. Serii și integrale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Găsește raza de convergență a seriei de puteri $\\displaystyle\\sum_{n \\ge 1} \\frac{x^n}{n \\cdot 3^n}$ și suma ei în $x = -3$ (unde converge, ca serie alternată).",
+   "hint": "Criteriul raportului: $\\left|\\frac{a_{n+1}}{a_n}\\right| \\to \\frac{|x|}{3}$. În $x = -3$, seria devine $\\sum \\frac{(-1)^n}{n}$.",
+   "solution": "$R = 3$. În $x = -3$: $\\sum_{n \\ge 1} \\frac{(-1)^n}{n} = -\\ln 2$ (seria lui $\\ln(1 + t)$ în $t = 1$, cu semn schimbat).",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "R",
+      "label": "R =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "S",
+      "label": "suma în x = -3:",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(R - 3) < 1e-9",
+      "msg": "raza de convergență e corectă"
+     },
+     {
+      "expr": "abs(S + log(2)) < 1e-9",
+      "msg": "suma în x = -3 e corectă"
+     }
+    ],
+    "reference": {
+     "R": "3",
+     "S": "-ln 2"
+    },
+    "wrong": {
+     "R": "1/3",
+     "S": "ln 2"
+    }
+   }
+  },
+  {
+   "id": "18",
+   "title": "O integrală improprie",
+   "chapter": "4. Serii și integrale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Calculează $\\displaystyle\\int_0^{\\infty} \\frac{dx}{1 + x^2}$ și $\\displaystyle\\int_1^{\\infty} \\frac{dx}{x^2}$.",
+   "hint": "O integrală improprie e limita integralelor pe $[0, b]$, cu $b \\to \\infty$.",
+   "solution": "$\\arctan b \\to \\frac{\\pi}{2}$, iar $1 - \\frac{1}{b} \\to 1$.",
+   "kind": "math",
+   "spec": {
+    "fields": [
+     {
+      "name": "I",
+      "label": "∫₀^∞ 1/(1 + x²) dx =",
+      "type": "number",
+      "hint": ""
+     },
+     {
+      "name": "J",
+      "label": "∫₁^∞ 1/x² dx =",
+      "type": "number",
+      "hint": ""
+     }
+    ],
+    "checks": [
+     {
+      "expr": "abs(I - pi/2) < 1e-9",
+      "msg": "prima integrală e corectă"
+     },
+     {
+      "expr": "abs(J - 1) < 1e-9",
+      "msg": "a doua integrală e corectă"
+     }
+    ],
+    "reference": {
+     "I": "pi/2",
+     "J": "1"
+    },
+    "wrong": {
+     "I": "pi",
+     "J": "1"
     }
    }
   }

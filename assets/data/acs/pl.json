@@ -168,6 +168,40 @@
    }
   },
   {
+   "id": "15",
+   "title": "Implicația doar din porți NOR",
+   "chapter": "1. Porți și expresii",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Implicația `a → b` e 0 doar când `a = 1` și `b = 0`, adică `f = a' + b`. Scrie-o folosind **numai porți NOR** (operatorul `↓`, de exemplu `a ↓ b`). Negația se scrie `a ↓ a`.\n\nCa NAND, și NOR e o poartă universală.",
+   "hint": "O sumă negată e un NOR: `a' + b = ((a' ↓ b))'`, iar o negație e un NOR cu ea însăși.",
+   "solution": "`a' = a ↓ a`; `t = a' ↓ b` e `(a' + b)'`; `f = t ↓ t`. Deci `f = ((a↓a)↓b)↓((a↓a)↓b)`: 3 porți distincte.",
+   "kind": "logic",
+   "spec": {
+    "mode": "expr",
+    "vars": [
+     "a",
+     "b"
+    ],
+    "outputs": [
+     {
+      "name": "f",
+      "ones": [
+       0,
+       1,
+       3
+      ]
+     }
+    ],
+    "allowed": [
+     "nor"
+    ],
+    "reference": {
+     "f": "((a↓a)↓b)↓((a↓a)↓b)"
+    }
+   }
+  },
+  {
    "id": "5",
    "title": "Karnaugh cu patru variabile",
    "chapter": "2. Forme minime (Karnaugh)",
@@ -336,6 +370,46 @@
     "maxLiterals": 6,
     "reference": {
      "s": "a + c + bd + b'd'"
+    }
+   }
+  },
+  {
+   "id": "16",
+   "title": "O hartă în tablă de șah",
+   "chapter": "2. Forme minime (Karnaugh)",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Forma minimă disjunctivă a funcției\n\n$$f(a, b, c, d) = \\sum m(1, 3, 4, 6, 9, 11, 12, 14).$$\n\nUită-te bine la hartă înainte să grupezi: doar două variabile contează.",
+   "hint": "Verifică pentru fiecare variabilă dacă schimbarea ei schimbă valoarea funcției.",
+   "solution": "Funcția depinde doar de b și d: `f = b'd + bd'` (adică `b ⊕ d`), două grupuri de câte 4 celule, care se închid peste marginile hărții.",
+   "kind": "logic",
+   "spec": {
+    "mode": "expr",
+    "vars": [
+     "a",
+     "b",
+     "c",
+     "d"
+    ],
+    "outputs": [
+     {
+      "name": "f",
+      "ones": [
+       1,
+       3,
+       4,
+       6,
+       9,
+       11,
+       12,
+       14
+      ]
+     }
+    ],
+    "form": "sop",
+    "maxLiterals": 4,
+    "reference": {
+     "f": "b'd + bd'"
     }
    }
   },
@@ -513,6 +587,130 @@
       "0",
       "d'",
       "1"
+     ]
+    }
+   }
+  },
+  {
+   "id": "17",
+   "title": "Codificatorul cu prioritate",
+   "chapter": "3. Circuite combinaționale",
+   "difficulty": "medie",
+   "source": "Test PL · codificatoare",
+   "statement": "Un codificator cu prioritate 4:2 are intrările `d3 d2 d1 d0` și dă pe `y1 y0` indicele **celei mai mari** intrări egale cu 1 (`d3` are prioritatea cea mai mare). Ieșirea `v` spune dacă vreo intrare e activă; când `v = 0`, `y1 y0 = 00`.\n\nScrie cele trei ieșiri ca sume de produse minime.",
+   "hint": "Indicele e 3 dacă `d3 = 1`, oricare ar fi celelalte; e 2 dacă `d3 = 0` și `d2 = 1`, și tot așa.",
+   "solution": "`y1 = d3 + d2` (indicele 2 sau 3), `y0 = d3 + d2'd1` (indicele 3 sau 1), `v = d3 + d2 + d1 + d0`.",
+   "kind": "logic",
+   "spec": {
+    "mode": "expr",
+    "vars": [
+     "d3",
+     "d2",
+     "d1",
+     "d0"
+    ],
+    "outputs": [
+     {
+      "name": "y1",
+      "ones": [
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15
+      ]
+     },
+     {
+      "name": "y0",
+      "ones": [
+       2,
+       3,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15
+      ]
+     },
+     {
+      "name": "v",
+      "ones": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15
+      ]
+     }
+    ],
+    "form": "sop",
+    "maxLiterals": 9,
+    "reference": {
+     "y1": "d3 + d2",
+     "y0": "d3 + d2'd1",
+     "v": "d3 + d2 + d1 + d0"
+    }
+   }
+  },
+  {
+   "id": "18",
+   "title": "Paritatea pe un MUX 4:1",
+   "chapter": "3. Circuite combinaționale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Realizează cu un **multiplexor 4:1** funcția\n\n$$f(a, b, c) = \\sum m(0, 3, 5, 6),$$\n\ncare e 1 când are un număr **par** de intrări egale cu 1. Pe selecție pui două variabile, pe date `0`, `1`, a treia variabilă sau negata ei.",
+   "hint": "Pentru `ab = 00`, f e 1 doar dacă c = 0; pentru `ab = 01`, doar dacă c = 1...",
+   "solution": "Cu `a b` pe selecție: D0 = c', D1 = c, D2 = c, D3 = c'. Nicio intrare nu e o constantă: paritatea depinde mereu de toți biții.",
+   "kind": "logic",
+   "spec": {
+    "mode": "mux",
+    "vars": [
+     "a",
+     "b",
+     "c"
+    ],
+    "outputs": [
+     {
+      "name": "f",
+      "ones": [
+       0,
+       3,
+       5,
+       6
+      ]
+     }
+    ],
+    "selects": 2,
+    "reference": {
+     "sel": [
+      "a",
+      "b"
+     ],
+     "data": [
+      "c'",
+      "c",
+      "c",
+      "c'"
      ]
     }
    }
@@ -700,6 +898,174 @@
        ],
        [
         "R2",
+        0
+       ]
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "19",
+   "title": "Paritatea biților primiți",
+   "chapter": "4. Automate secvențiale",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Proiectează un automat **Mealy** cu o intrare `x` și o ieșire `z`: după fiecare bit, `z = 1` dacă până atunci au venit un număr **impar** de biți de 1. De exemplu, pentru `1101` ieșirea e `1001`.\n\nAjung 2 stări.",
+   "hint": "Automatul trebuie să țină minte un singur lucru: paritatea de până acum.",
+   "solution": "P = par, I = impar. Un 0 nu schimbă starea, un 1 o schimbă; ieșirea e 1 când starea în care ajungi e I.",
+   "kind": "logic",
+   "spec": {
+    "mode": "fsm",
+    "target": {
+     "states": [
+      "P",
+      "I"
+     ],
+     "start": "P",
+     "t": {
+      "P": [
+       [
+        "P",
+        0
+       ],
+       [
+        "I",
+        1
+       ]
+      ],
+      "I": [
+       [
+        "I",
+        1
+       ],
+       [
+        "P",
+        0
+       ]
+      ]
+     }
+    },
+    "maxStates": 2,
+    "reference": {
+     "states": [
+      "P",
+      "I"
+     ],
+     "start": "P",
+     "t": {
+      "P": [
+       [
+        "P",
+        0
+       ],
+       [
+        "I",
+        1
+       ]
+      ],
+      "I": [
+       [
+        "I",
+        1
+       ],
+       [
+        "P",
+        0
+       ]
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "20",
+   "title": "Detectorul de secvență 110",
+   "chapter": "4. Automate secvențiale",
+   "difficulty": "medie",
+   "source": "Test PL · automate de recunoaștere a secvențelor",
+   "statement": "Un automat **Mealy** cu intrarea `x` dă `z = 1` exact la bitul care încheie secvența `110`. De exemplu, pe intrarea `111010110` ieșirea e `000100001`.\n\nAjung 3 stări.",
+   "hint": "Stările: nimic util, „1”, „11”. Din „11”, încă un 1 te lasă tot în „11” (ultimii doi biți sunt tot 11).",
+   "solution": "A = nimic, B = „1”, C = „11”. A: 0 → A, 1 → B. B: 0 → A, 1 → C. C: 0 → A cu ieșirea 1, 1 → C.",
+   "kind": "logic",
+   "spec": {
+    "mode": "fsm",
+    "target": {
+     "states": [
+      "A",
+      "B",
+      "C"
+     ],
+     "start": "A",
+     "t": {
+      "A": [
+       [
+        "A",
+        0
+       ],
+       [
+        "B",
+        0
+       ]
+      ],
+      "B": [
+       [
+        "A",
+        0
+       ],
+       [
+        "C",
+        0
+       ]
+      ],
+      "C": [
+       [
+        "A",
+        1
+       ],
+       [
+        "C",
+        0
+       ]
+      ]
+     }
+    },
+    "maxStates": 3,
+    "reference": {
+     "states": [
+      "A",
+      "B",
+      "C"
+     ],
+     "start": "A",
+     "t": {
+      "A": [
+       [
+        "A",
+        0
+       ],
+       [
+        "B",
+        0
+       ]
+      ],
+      "B": [
+       [
+        "A",
+        0
+       ],
+       [
+        "C",
+        0
+       ]
+      ],
+      "C": [
+       [
+        "A",
+        1
+       ],
+       [
+        "C",
         0
        ]
       ]

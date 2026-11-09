@@ -11,6 +11,7 @@ import 'ws_asm.dart';
 import 'ws_c.dart';
 import 'ws_circuit.dart';
 import 'ws_ds.dart';
+import 'ws_grila.dart';
 import 'ws_logic.dart';
 import 'ws_math.dart';
 import 'ws_octave.dart';
@@ -38,6 +39,8 @@ Widget buildWorkspace(AcsProblem p, AcsInk ink, bool narrow, Verdict onVerdict) 
       return CircuitWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'sim':
       return SimWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
+    case 'grila':
+      return GrilaWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'rowops':
       return RowOpsWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
   }

@@ -160,7 +160,8 @@ class _CWorkspaceState extends State<CWorkspace> {
         ToolRow([
           AcsButton(ink, 'rulează testele', _busy ? null : _runTests, primary: true, icon: Icons.play_arrow),
           AcsButton(ink, 'rulează cu intrarea mea', _busy ? null : _runOwn),
-          AcsButton(ink, 'cod inițial', _busy ? null : () => setState(() => _code.text = widget.problem.spec['starter'] as String? ?? '')),
+          AcsConfirmButton(ink, 'cod inițial', _busy ? null : () => setState(() => _code.text = widget.problem.spec['starter'] as String? ?? '')),
+          acsKeysHint(ink, 'Ctrl+Enter rulează testele'),
         ], trailing: _busy ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: ink.accent)) : null),
         if (_status.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_status, style: ink.mono(13, color: ink.muted))),
         if (_compileError != null) ...[

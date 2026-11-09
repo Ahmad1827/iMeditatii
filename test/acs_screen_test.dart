@@ -45,7 +45,7 @@ void main() {
     }
     expect(counts['pclp']!.solved, 2);
     expect(counts['sd']!.solved, 0);
-    expect(acsSubjects.where((s) => s.ready).map((s) => s.semester).toSet(), {1, 2});
+    expect(acsSubjects.where((s) => s.ready).map((s) => s.semester).toSet(), {-1, 1, 2});
   });
 
   for (final style in AcsStyle.values) {
