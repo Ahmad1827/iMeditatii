@@ -12,8 +12,20 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="iMeditații">
-  <meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#18191B" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F7F8FA">
+
+  <!-- The splash in the theme the app will open in: the one saved by the visitor
+       (shared_preferences keeps it in localStorage), light when nothing is saved. -->
+  <script>
+    (function () {
+      var dark = false;
+      try { dark = localStorage.getItem('flutter.is_dark_mode') === 'true'; } catch (e) {}
+      if (dark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18191B');
+      }
+    })();
+  </script>
 
   <!-- Favicon: open book with a spark (same drawing as BrandMark in the app) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2322C55E'/><stop offset='1' stop-color='%230F766E'/></linearGradient></defs><rect width='64' height='64' rx='18' fill='url(%23g)'/><path d='M32 31C27 27 20 26 13 28L13 49C20 47 27 48 32 52Z' fill='white'/><path d='M32 31C37 27 44 26 51 28L51 49C44 47 37 48 32 52Z' fill='white' fill-opacity='.78'/><path d='M32 9Q33.3 16.7 41 18Q33.3 19.3 32 27Q30.7 19.3 23 18Q30.7 16.7 32 9Z' fill='%23FDE68A'/></svg>">
@@ -23,12 +35,52 @@
   <title>iMeditații</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- Same font as the app (Inter) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- Asked for while this page is still being read, not after the script
+       before them has run: the app, its drawing engine and Firebase (the
+       version is the one firebase_core loads; test/startup_test.dart checks). -->
+  <link rel="preload" href="main.dart.js" as="script">
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-functions.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-messaging.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js">
+
+  <!-- The app's fonts are fetched before its first page is drawn. Asked for
+       now, they arrive while the app itself is still downloading. -->
+  <script>
+    fetch('assets/FontManifest.json').then(function (r) { return r.json(); }).then(function (families) {
+      families.forEach(function (family) {
+        family.fonts.forEach(function (font) {
+          var link = document.createElement('link');
+          link.rel = 'preload';
+          link.as = 'fetch';
+          link.crossOrigin = 'anonymous';
+          link.href = 'assets/' + font.asset;
+          document.head.appendChild(link);
+        });
+      });
+    }).catch(function () {});
+    // the home page's landscape, when it is the home page that opens
+    if (location.pathname === new URL(document.baseURI).pathname) {
+      var sky = document.createElement('link');
+      sky.rel = 'preload';
+      sky.as = 'fetch';
+      sky.crossOrigin = 'anonymous';
+      sky.href = 'assets/assets/images/background.jpg';
+      document.head.appendChild(sky);
+    }
+  </script>
 
   <style>
+    /* Same font as the app (Inter), from the app's own files */
+    @font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('assets/assets/fonts/Inter-Regular.ttf') format('truetype'); }
+    @font-face { font-family: 'Inter'; font-weight: 700; font-display: swap; src: url('assets/assets/fonts/Inter-Bold.ttf') format('truetype'); }
+
     :root {
       --page-top: #EAF3EC;
       --page-bottom: #F7F8FA;
@@ -46,23 +98,21 @@
       --shadow: 0 24px 60px rgba(21, 128, 61, 0.14), 0 6px 18px rgba(0, 0, 0, 0.06);
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --page-top: #1B2420;
-        --page-bottom: #18191B;
-        --surface: #242629;
-        --border: rgba(255, 255, 255, 0.08);
-        --text: #E6E6E6;
-        --muted: #9CA3AF;
-        --primary: #4ADE80;
-        --track: #33363A;
-        --hill-1: #1F2E26;
-        --hill-2: #1A2820;
-        --hill-3: #15211A;
-        --cloud: rgba(255, 255, 255, 0.10);
-        --bird: #B8C4BA;
-        --shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 6px 18px rgba(0, 0, 0, 0.3);
-      }
+    :root[data-theme="dark"] {
+      --page-top: #1B2420;
+      --page-bottom: #18191B;
+      --surface: #242629;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #E6E6E6;
+      --muted: #9CA3AF;
+      --primary: #4ADE80;
+      --track: #33363A;
+      --hill-1: #1F2E26;
+      --hill-2: #1A2820;
+      --hill-3: #15211A;
+      --cloud: rgba(255, 255, 255, 0.10);
+      --bird: #B8C4BA;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 6px 18px rgba(0, 0, 0, 0.3);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -84,13 +134,20 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: opacity .55s ease, transform .55s ease;
+      transition: opacity .42s ease-out;
     }
 
+    /* The app is drawn underneath: the card lets go first, the sky after it. */
     #loader.fade-out {
       opacity: 0;
-      transform: scale(1.015);
       pointer-events: none;
+    }
+    #loader.fade-out .card {
+      opacity: 0;
+      transform: translateY(-10px) scale(.98);
+    }
+    #loader.fade-out .hills {
+      transform: translateY(28px);
     }
 
     /* ---------- soft clouds ---------- */
@@ -149,6 +206,7 @@
       height: 36vh;
       min-height: 190px;
       pointer-events: none;
+      transition: transform .42s ease-in;
     }
     .hills svg { position: absolute; bottom: 0; width: 100%; height: 100%; }
 
@@ -163,7 +221,8 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       text-align: center;
-      animation: rise .7s cubic-bezier(.2, .8, .2, 1) both;
+      animation: rise .7s cubic-bezier(.2, .8, .2, 1) backwards;
+      transition: opacity .22s ease-out, transform .3s ease-out;
     }
 
     @keyframes rise {
@@ -225,23 +284,35 @@
     }
     .bar {
       height: 100%;
-      width: 6%;
+      width: 100%;
       border-radius: 999px;
       background: var(--primary);
-      animation: fill 2.6s cubic-bezier(.25, .7, .3, 1) forwards;
+      transform: scaleX(.04);
+      transform-origin: left center;
+      transition: transform .5s cubic-bezier(.25, .7, .3, 1);
     }
-    .bar.done { animation: none; width: 100%; transition: width .35s ease; }
+    .bar.done { transition-duration: .2s; }
 
-    @keyframes fill {
-      0%   { width: 6%; }
-      40%  { width: 55%; }
-      75%  { width: 82%; }
-      100% { width: 92%; }
+    /* shown only when the app is late or couldn't be fetched */
+    .retry {
+      display: none;
+      margin-top: 16px;
+      padding: 9px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--primary);
+      font: 600 14px 'Inter', system-ui, sans-serif;
+      cursor: pointer;
     }
+    .retry.show { display: inline-block; }
+    .retry:hover { background: var(--track); }
 
     @media (prefers-reduced-motion: reduce) {
       .cloud, .bird, .mark, .mark .spark, .card { animation: none !important; }
       .bird { display: none; }
+      #loader, .card, .hills, .bar { transition-duration: .01s !important; }
+      #loader.fade-out .card, #loader.fade-out .hills { transform: none; }
     }
   </style>
 </head>
@@ -276,11 +347,23 @@
       </div>
       <div class="msg" id="msg">Pregătim lecțiile…</div>
       <div class="track"><div class="bar" id="bar"></div></div>
+      <button class="retry" id="retry" type="button" onclick="location.reload()">Reîncarcă pagina</button>
     </div>
   </div>
 
   <script>
     (function () {
+      var loader = document.getElementById('loader');
+      var el = document.getElementById('msg');
+      var bar = document.getElementById('bar');
+      var retry = document.getElementById('retry');
+      var done = false;
+
+      function say(text) {
+        el.classList.add('swap');
+        setTimeout(function () { el.textContent = text; el.classList.remove('swap'); }, 220);
+      }
+
       // friendly rotating messages
       var msgs = [
         'Pregătim lecțiile…',
@@ -290,30 +373,82 @@
         'Aproape gata…'
       ];
       var i = 0;
-      var el = document.getElementById('msg');
       var timer = setInterval(function () {
         i = (i + 1) % msgs.length;
-        el.classList.add('swap');
-        setTimeout(function () { el.textContent = msgs[i]; el.classList.remove('swap'); }, 220);
+        say(msgs[i]);
       }, 1500);
 
-      // keep the splash for at least 1.4 s so it never just flashes
-      var minDelay = new Promise(function (r) { setTimeout(r, 1400); });
-      var ready = new Promise(function (r) {
-        window.addEventListener('flutter-first-frame', r, { once: true });
-      });
+      // The bar follows what has really arrived. Everything is asked for at
+      // once, so each arrival adds its share, in whatever order they come;
+      // in between, the bar creeps a little, so it never sits still and
+      // never gets far ahead of the truth.
+      var shares = [
+        [/main\.dart\.js$/, 0.40],             // the app
+        [/canvaskit\.wasm|skwasm.*\.wasm/, 0.20], // its drawing engine
+        [/canvaskit\.js|skwasm.*\.js/, 0.04],
+        [/firebase-app\.js/, 0.04],
+        [/firebase-firestore\.js/, 0.06],
+        [/firebase-auth\.js/, 0.04],
+        [/Inter-Regular\.ttf/, 0.04],          // the fonts
+        [/gsi\/client|assets\/\.env/, 0.08]     // asked for by the app itself: it is running
+      ];
+      var reached = 0.04, shown = 0.04, seen = {};
+      function draw(v) {
+        shown = Math.max(shown, Math.min(v, 1));
+        bar.style.transform = 'scaleX(' + shown + ')';
+      }
+      function arrived(name) {
+        for (var k = 0; k < shares.length; k++) {
+          if (!seen[k] && shares[k][0].test(name)) { seen[k] = true; reached += shares[k][1]; }
+        }
+        draw(reached);
+      }
+      try {
+        new PerformanceObserver(function (list) {
+          list.getEntries().forEach(function (e) { arrived(e.name); });
+        }).observe({ type: 'resource', buffered: true });
+      } catch (e) {}
+      var creep = setInterval(function () {
+        // a part of the way to a little past what has arrived, never onto the end
+        var limit = Math.min(reached + 0.1, 0.95);
+        draw(shown + (limit - shown) * 0.15);
+      }, 400);
 
-      Promise.all([minDelay, ready]).then(function () {
+      // Late, or the app couldn't be fetched: say so and offer a way out,
+      // instead of clouds drifting for ever.
+      function trouble(text) {
+        if (done) return;
         clearInterval(timer);
-        var bar = document.getElementById('bar');
-        if (bar) bar.classList.add('done');
-        setTimeout(function () {
-          var loader = document.getElementById('loader');
-          if (!loader) return;
-          loader.classList.add('fade-out');
-          setTimeout(function () { loader.remove(); }, 600);
-        }, 250);
-      });
+        say(text);
+        retry.classList.add('show');
+      }
+      var late = setTimeout(function () {
+        trouble(navigator.onLine === false ? 'Nu ești conectat la internet.' : 'Durează mai mult decât de obicei…');
+      }, 20000);
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (t && t.tagName === 'SCRIPT' && /main\.dart\.js|flutter_bootstrap\.js|canvaskit/.test(t.src || '')) {
+          trouble(navigator.onLine === false ? 'Nu ești conectat la internet.' : 'Aplicația nu s-a putut încărca.');
+        }
+      }, true);
+
+      // The app has drawn its first page (in its own font, with its own data
+      // on the way): the splash lifts off it at once. No waiting on purpose.
+      window.addEventListener('flutter-first-frame', function () {
+        done = true;
+        clearInterval(timer);
+        clearInterval(creep);
+        clearTimeout(late);
+        bar.classList.add('done');
+        draw(1);
+        // two frames, so the app's page is on the screen under the splash
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            loader.classList.add('fade-out');
+            setTimeout(function () { loader.remove(); }, 460);
+          });
+        });
+      }, { once: true });
     })();
   </script>
 

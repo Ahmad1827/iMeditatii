@@ -130,8 +130,8 @@ Future<Map<String, dynamic>?> Function(String subject, String grade, String id) 
 /// A problem by subject, grade and id: those that come with the app, then Firestore.
 Future<Map<String, dynamic>?> loadExercise(String subject, String grade, String id) async {
   try {
-    final e = (await loadGradeDetails(subject, grade))[id];
-    if (e is Map) return Map<String, dynamic>.from(e);
+    final e = await loadProblem(subject, grade, id);
+    if (e != null) return e;
   } catch (_) {}
   try {
     final d = await FirebaseFirestore.instance.collection('exercises').doc(id).get();

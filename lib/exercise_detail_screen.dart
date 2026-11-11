@@ -357,11 +357,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
   Future<void> _loadExerciseDetails() async {
     try {
-      final grade = await loadGradeDetails(widget.subject, widget.grade);
-      if (grade[widget.id] != null) {
+      // the statement and the problem's own tests, not the whole grade's
+      final problem = await loadProblem(widget.subject, widget.grade, widget.id);
+      if (problem != null) {
         if (!mounted) return;
         setState(() {
-          exerciseData = grade[widget.id];
+          exerciseData = problem;
           _fromSiteFiles = true;
         });
         _fileTemplate();
@@ -550,6 +551,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     });
 
     try {
+      // tests kept in their own file that didn't arrive with the page (offline): asked for again
+      if (exerciseData != null && !await loadTests(exerciseData!)) {
+        testResults.add({"index": 1, "passed": false, "expected": "testele problemei", "got": "testele nu s-au putut încărca; verifică internetul și încearcă din nou"});
+        if (mounted) setState(() => solutionChecked = true);
+        return;
+      }
       final List<Map<String, dynamic>> tests = [];
       for (final ex in _examples) {
         tests.add({"input": ex['input'], "output": ex['output']});
@@ -2054,6 +2061,23 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     if (code.isEmpty) return;
 
     final sampleCount = _examples.length;
+    // tests kept in their own file that didn't arrive with the page (offline): asked for again
+    if (submit && exerciseData != null && !await loadTests(exerciseData!)) {
+      if (!mounted) return;
+      setState(() {
+        isRunningCode = false;
+        solutionChecked = true;
+        solutionOk = false;
+        testResults
+          ..clear()
+          ..add({'index': 1, 'passed': false, 'sample': true, 'input': '', 'expected': 'testele problemei', 'got': 'testele nu s-au putut încărca; verifică internetul și încearcă din nou', 'error': ''});
+        _cBottom = 1;
+        _cSelTest = 0;
+        _cLastWasRun = false;
+      });
+      return;
+    }
+    if (!mounted) return;
     final tests = <Map<String, String>>[
       for (final ex in _examples) {'input': ex['input']!, 'output': ex['output']!},
       if (submit && exerciseData?['tests'] is List)

@@ -866,6 +866,15 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
         fit: BoxFit.cover,
         alignment: Alignment.bottomCenter,
         filterQuality: FilterQuality.medium,
+        // arrives a moment after the page: fades in instead of popping in
+        frameBuilder: (_, child, frame, alreadyThere) => alreadyThere
+            ? child
+            : AnimatedOpacity(
+                opacity: frame == null ? 0 : 1,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOut,
+                child: child,
+              ),
         errorBuilder: (_, __, ___) {
           debugPrint('iMeditatii: nu găsesc assets/images/background.jpg (verifică pubspec.yaml)');
           return const SizedBox.shrink();

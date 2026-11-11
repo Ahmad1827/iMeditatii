@@ -3,7 +3,7 @@
   "short_name": "iMeditații",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#141A1F",
+  "background_color": "#F7F8FA",
   "theme_color": "#141A1F",
   "description": "Probleme, lecții și meditații pentru liceu. Ce ai deschis o dată merge și fără internet.",
   "orientation": "any",

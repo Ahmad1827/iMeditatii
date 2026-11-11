@@ -172,6 +172,27 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       debugPrint("Eroare JSON: $e");
     }
 
+    void show() {
+      if (!mounted) return;
+      setState(() {
+        allExercises = List.of(fetched);
+        availableGrades = tempGrades.toList()
+          ..sort((a, b) => (int.tryParse(a) ?? 99).compareTo(int.tryParse(b) ?? 99));
+
+        if (!availableGrades.contains(selectedGrade) && availableGrades.isNotEmpty) {
+          selectedGrade = availableGrades.first;
+        }
+        isLoading = false;
+      });
+
+      _updateCategoriesAndFilter();
+    }
+
+    // The app's own problems are on the page at once; those added by teachers
+    // join them when the network answers (it used to hold back the whole list).
+    final fromApp = fetched.length;
+    if (fromApp > 0) show();
+
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('exercises')
@@ -199,20 +220,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       debugPrint("Eroare Firestore: $e");
     }
 
-    if (mounted) {
-      setState(() {
-        allExercises = fetched;
-        availableGrades = tempGrades.toList()
-          ..sort((a, b) => (int.tryParse(a) ?? 99).compareTo(int.tryParse(b) ?? 99));
-
-        if (!availableGrades.contains(selectedGrade) && availableGrades.isNotEmpty) {
-          selectedGrade = availableGrades.first;
-        }
-        isLoading = false;
-      });
-
-      _updateCategoriesAndFilter();
-    }
+    if (fetched.length != fromApp || fromApp == 0) show();
   }
 
   void _updateCategoriesAndFilter() async {

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'exercise_details.dart';
 import 'app_link.dart';
 import 'app_colors.dart';
 import 'custom_navbar.dart';
@@ -233,38 +233,48 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
+    // The list of problems (subject → grade → chapter → problems), not their
+    // details: those are megabytes, and a list shows a name and a difficulty.
     try {
-      (await loadAllDetails()).forEach((subject, grades) {
+      final list = json.decode(await rootBundle.loadString('assets/data/exercises.json')) as Map<String, dynamic>;
+      list.forEach((subject, grades) {
         if (grades is! Map) return;
-        grades.forEach((grade, items) {
-          if (items is! Map) return;
-          items.forEach((id, ex) {
-            if (ex is Map) add(subject, '$grade', '$id', ex);
-          });
+        final kind = isMathSubject(subject) ? 'text' : 'cod';
+        grades.forEach((grade, chapters) {
+          if (chapters is! Map) return;
+          final items = <Map>[for (final c in chapters.values) if (c is List) ...c.whereType<Map>()];
+          int number(Map e) => int.tryParse('${e['id']}') ?? 1 << 30;
+          items.sort((x, y) => number(x).compareTo(number(y)));
+          for (final ex in items) {
+            add(subject, '$grade', '${ex['id']}', {...ex, 'tip_exercitiu': kind});
+          }
         });
       });
     } catch (e) {
       debugPrint('Exercises (json): $e');
     }
 
+    // the app's own problems are shown at once; those added by teachers join
+    // them when the network answers
+    final prefs = await SharedPreferences.getInstance();
+    final solved = prefs.getKeys().where((k) => prefs.get(k) == true).toSet();
+    if (!mounted) return;
+    setState(() {
+      _hExercises = List.of(out);
+      _hSolved = solved;
+    });
+
     try {
       final snap = await FirebaseFirestore.instance.collection('exercises').limit(200).get();
+      final before = out.length;
       for (final d in snap.docs) {
         final m = d.data();
         if (m['title'] == null) continue;
         add('${m['materie'] ?? m['subject'] ?? 'Informatică'}', '${m['clasa'] ?? m['grade'] ?? '9'}', d.id, m);
       }
+      if (mounted && out.length != before) setState(() => _hExercises = out);
     } catch (e) {
       debugPrint('Exercises (firestore): $e');
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    final solved = prefs.getKeys().where((k) => prefs.get(k) == true).toSet();
-    if (mounted) {
-      setState(() {
-        _hExercises = out;
-        _hSolved = solved;
-      });
     }
   }
 

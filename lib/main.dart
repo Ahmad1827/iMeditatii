@@ -11,7 +11,7 @@ import 'firebase_options.dart';
 
 import 'app_link.dart' show rootNavigatorKey;
 import 'theme_manager.dart';
-import 'design_system.dart' show AppStyleScope;
+import 'design_system.dart' show AppStyle, AppStyleScope;
 import 'app_colors.dart';
 
 import 'home_screen.dart';
@@ -48,7 +48,6 @@ import 'resource_detail_screen.dart';
 import 'add_article_screen.dart';
 import 'workspace_screen.dart';
 import 'material_screen.dart';
-import 'seed_problems.dart';
 import 'classes_screen.dart';
 import 'homework_dock.dart';
 import 'offline.dart';
@@ -59,12 +58,22 @@ void main() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
+  // What the first page needs, asked for together instead of one after another;
+  // none of them stops the others, or the app, if it fails.
+  await Future.wait([_loadEnv(), _startFirebase(), _loadTheme()]);
+
+  runApp(const IMeditatiiApp());
+}
+
+Future<void> _loadEnv() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     debugPrint("DotEnv loading warning: $e");
   }
+}
 
+Future<void> _startFirebase() async {
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -75,21 +84,13 @@ void main() async {
   } catch (e) {
     debugPrint("Firebase init error: $e");
   }
+}
 
+Future<void> _loadTheme() async {
   try {
     await ThemeManager.loadTheme();
   } catch (e) {
     debugPrint("ThemeManager error: $e");
-  }
-
-  runApp(const IMeditatiiApp());
-
-  try {
-    populeazaCele50DeProbleme().catchError((e) {
-      debugPrint("Seeder warning (ignorat): $e");
-    });
-  } catch (e) {
-    debugPrint("Seeder error: $e");
   }
 }
 
@@ -299,6 +300,43 @@ final GoRouter _router = GoRouter(
   ],
 );
 
+/// One page gives way to the next with a short fade and a slight rise, the same
+/// in every browser. (Flutter's own choice goes by the operating system: a page
+/// zooming in like an Android app, or sliding in from the side on a Mac.)
+class _FadeRise extends PageTransitionsBuilder {
+  const _FadeRise();
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 220);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 160);
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final fade = CurvedAnimation(parent: animation, curve: Curves.easeOut, reverseCurve: Curves.easeIn);
+    if (MediaQuery.of(context).disableAnimations) return FadeTransition(opacity: fade, child: child);
+    return FadeTransition(
+      opacity: fade,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.012), end: Offset.zero)
+            .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+        child: child,
+      ),
+    );
+  }
+}
+
+final PageTransitionsTheme _pageTransitions = PageTransitionsTheme(
+  builders: {for (final platform in TargetPlatform.values) platform: const _FadeRise()},
+);
+
 class IMeditatiiApp extends StatelessWidget {
   const IMeditatiiApp({super.key});
 
@@ -316,7 +354,7 @@ class IMeditatiiApp extends StatelessWidget {
           final base = brightness == Brightness.dark 
               ? ThemeData.dark().textTheme 
               : ThemeData.light().textTheme;
-          return isRetro ? GoogleFonts.vt323TextTheme(base) : GoogleFonts.interTextTheme(base);
+          return isRetro ? GoogleFonts.vt323TextTheme(base) : AppStyle.cleanTextTheme(base);
         }
 
         return MaterialApp.router(
@@ -328,7 +366,9 @@ class IMeditatiiApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: false,
             brightness: Brightness.light,
+            fontFamily: isRetro ? null : AppStyle.cleanFont,
             textTheme: getTextTheme(Brightness.light),
+            pageTransitionsTheme: _pageTransitions,
             scaffoldBackgroundColor: const Color(0xFFF9F7F1),
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF2C363F),
@@ -342,7 +382,9 @@ class IMeditatiiApp extends StatelessWidget {
           darkTheme: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
+            fontFamily: isRetro ? null : AppStyle.cleanFont,
             textTheme: getTextTheme(Brightness.dark),
+            pageTransitionsTheme: _pageTransitions,
             scaffoldBackgroundColor: const Color(0xFF141A1F),
             colorScheme: const ColorScheme.dark(
               primary: Color(0xFF5BA8B5),

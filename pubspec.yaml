@@ -116,6 +116,7 @@ flutter:
     - assets/data/exercises.json
     - assets/data/summaries.json
     - assets/data/details/
+    - assets/data/details/tests/
     - assets/data/acs/
     - assets/data/problem_quizzes.json
     - assets/icons/
@@ -124,6 +125,22 @@ flutter:
     - assets/bac/
     - assets/acadnet/
   fonts:
+    # Inter (SIL OFL 1.1), cut down to Latin, Romanian, Greek and symbols: the text of the whole
+    # site. It comes with the app so the first page is drawn in it (fetched from Google Fonts,
+    # it arrived after the page, and the text changed shape under the reader).
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    # Source Code Pro Regular (SIL OFL 1.1), cut down the same way and renamed: code and examples
+    - family: IMCode
+      fonts:
+        - asset: assets/fonts/IMCode-Regular.ttf
     # Iosevka (SIL OFL 1.1), cut down to Latin, Romanian and box drawing: the ACS section
     - family: Iosevka
       fonts:

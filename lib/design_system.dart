@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 import 'theme_manager.dart';
@@ -31,7 +30,10 @@ class AppStyle {
   T pick<T>(T retro, T clean) => isClean ? clean : retro;
 
   /// Clean font. Used by main.dart (getTextTheme).
-  static TextTheme cleanTextTheme(TextTheme base) => GoogleFonts.interTextTheme(base);
+  static TextTheme cleanTextTheme(TextTheme base) => base.apply(fontFamily: cleanFont);
+
+  /// Inter, from assets/fonts (pubspec.yaml): there before the first page is drawn.
+  static const String cleanFont = 'Inter';
 
   /// "CALCUL INTEGRAL" -> "Calcul integral". Leaves mixed-case text alone.
   static String sentence(String t) {
@@ -115,7 +117,7 @@ class Pb {
   static TextStyle body([double size = 16]) => TextStyle(fontSize: size, color: text, height: 1.6);
 
   static TextStyle mono(double size, {Color? color, double height = 1.5}) =>
-      GoogleFonts.sourceCodePro(fontSize: size, color: color ?? text, height: height);
+      TextStyle(fontFamily: 'IMCode', fontFamilyFallback: const ['monospace'], fontSize: size, color: color ?? text, height: height);
 
   static InputDecoration input({String? hint}) {
     OutlineInputBorder b(Color c) => OutlineInputBorder(borderRadius: radius, borderSide: BorderSide(color: c));

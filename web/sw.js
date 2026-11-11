@@ -22,7 +22,8 @@ self.addEventListener('install', (event) => {
         const url = new URL(path, self.registration.scope).href;
         return fetch(url, { cache: 'no-cache' }).then((res) => (res.ok ? cache.put(url, res.clone()).then(() => res) : null)).catch(() => null);
       };
-      // every problem, so any of them opens offline, not only those seen: one file per grade, listed in index.json
+      // every problem's statement, so any of them opens offline, not only those seen: one file per grade, listed in
+      // index.json. The megabytes of tests some problems have (details/tests/) are kept when the problem is opened.
       const details = put('assets/assets/data/details/index.json')
         .then((res) => (res ? res.json() : {}))
         .then((index) => Promise.all(Object.values(index).flatMap((grades) => Object.values(grades).flat()).map((f) => put(`assets/assets/data/details/${f}`))))
