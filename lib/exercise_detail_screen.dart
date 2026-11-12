@@ -243,7 +243,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   void _onCodeChanged() {
     if (!_isUndoingOrRedoing) _recordHistorySnapshot(_codeController.value);
     BrowserRun.warm('cpp'); // the student is writing code: load the compiler meanwhile
-    if (mounted) setState(() {});
+    HomeSky.noteTyping();
+    // no setState: the line numbers listen to the code themselves (_buildEditor),
+    // and nothing else on the page is drawn from it, so a key redraws the editor alone
   }
 
   void _recordHistorySnapshot(TextEditingValue value) {
@@ -639,9 +641,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   Widget _buildEditor({required bool clean, required bool isMobile}) {
-    final lineCount = '\n'.allMatches(_codeController.text).length + 1;
-    final currentLine = _getCurrentLine();
-
     final double fontSz = isMobile ? 13.0 : 14.5;
     const double lineH = 1.55;
     final double gutterW = isMobile ? 40 : 50;
@@ -690,7 +689,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   children: [
                     SizedBox(
                       width: gutterW,
-                      child: Stack(
+                      // the only part drawn from the code besides the field itself
+                      child: ListenableBuilder(
+                        listenable: _codeController,
+                        builder: (context, _) {
+                          final lineCount = '\n'.allMatches(_codeController.text).length + 1;
+                          final currentLine = _getCurrentLine();
+                          return Stack(
                         fit: StackFit.passthrough,
                         children: [
                           Positioned(
@@ -728,6 +733,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                             ),
                           ),
                         ],
+                      );
+                        },
                       ),
                     ),
                     Expanded(
@@ -1040,9 +1047,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }).catchError((_) {});
   }
 
-  Widget _cCard({Widget? header, required Widget child, bool fill = false}) => GlassBox(
+  Widget _cCard({Widget? header, required Widget child, bool fill = false, bool frost = true}) => GlassBox(
         radius: 14,
         dense: true,
+        frost: frost,
         child: Column(
           mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1548,6 +1556,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return _cCard(
       header: header,
       fill: fill,
+      frost: false, // the editor covers its card
       child: Column(
         mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

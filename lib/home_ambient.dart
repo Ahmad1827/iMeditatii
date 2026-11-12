@@ -49,6 +49,12 @@ class HomeSky extends StatefulWidget {
     this.cheerSignal = 0,
   });
 
+  /// Called by a code editor on every change; for a moment after it the scene
+  /// behind the editor is drawn less often, so the frames go to the typing.
+  static void noteTyping() => _typedAt = DateTime.now().millisecondsSinceEpoch;
+  static int _typedAt = 0;
+  static bool get typing => DateTime.now().millisecondsSinceEpoch - _typedAt < 700;
+
   @override
   State<HomeSky> createState() => _HomeSkyState();
 }
@@ -205,6 +211,7 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
   // The scene redraws at most 30 times a second. If even that is too much for
   // this computer, the animations turn off (ThemeManager.motionTooSlow).
   static const double _paintEvery = 1 / 30;
+  static const double _paintEveryTyping = 1 / 12;
   double _t0 = 0; // time already run before the ticker last started
   double _lastPaint = -1;
   double _runSince = 0;
@@ -618,13 +625,20 @@ class _HomeSkyState extends State<HomeSky> with SingleTickerProviderStateMixin {
     }
 
     final gap = _now - _lastPaint;
-    if (gap < _paintEvery - 0.002) return;
+    // while code is being typed the keys come first: the scene keeps moving,
+    // drawn fewer times a second, and is back to its pace when the typing stops
+    final typing = HomeSky.typing;
+    if (gap < (typing ? _paintEveryTyping : _paintEvery) - 0.002) return;
     _lastPaint = _now;
     _frame.value++;
     final fx = _weapon != null || _shots.isNotEmpty || _sparks.isNotEmpty;
     if (fx || _fxBusy) _fxFrame.value++;
     _fxBusy = fx;
-    _checkPace(gap);
+    if (typing) {
+      _gaps.clear(); // these gaps are ours, not a slow computer's
+    } else {
+      _checkPace(gap);
+    }
   }
 
   // A slow computer shows up as long gaps between our own paints. Skip the
@@ -1471,15 +1485,17 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
     final k = s._kFor(a, m);
     final isDown = m.downLeft > 0;
 
-    canvas.drawOval(
+    _softOval(
+      canvas,
       Rect.fromCenter(
         center: Offset(wx + (isDown && isFoot ? 22 * k : 0), wy + 1),
         width: (isFoot ? (isDown ? 48 : 22) : 62) * k,
         height: 6 * k,
       ),
-      Paint()
-        ..color = Colors.black.withOpacity(dark ? 0.22 : 0.12)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+      Colors.black.withOpacity(dark ? 0.22 : 0.12),
+      refW: 62,
+      refH: 6,
+      sigma: 3,
     );
 
     final shoulder = isFoot ? 35.0 : 69.0;
@@ -1523,11 +1539,41 @@ void _paintArmy(Canvas canvas, _HomeSkyState s, _Army a, bool dark) {
   }
   canvas.restore();
 
-  canvas.drawOval(
+  _softOval(
+    canvas,
     Rect.fromLTRB(left, g - 6 * sc, right, g + 24 * sc),
+    (dark ? const Color(0xFF8FA0A8) : Colors.white).withOpacity(dark ? 0.16 : 0.34),
+    refW: 600,
+    refH: 30,
+    sigma: 14,
+  );
+}
+
+// A blurred oval (a shadow on the ground, the mist under an army) is blurred
+// once into an image and then only stretched and tinted: a blur on every frame,
+// for every soldier, is what the scene spent most of its time on.
+final Map<(double, double, double), ui.Image> _softOvals = {};
+
+void _softOval(Canvas canvas, Rect oval, Color color, {required double refW, required double refH, required double sigma}) {
+  final m = sigma * 3; // how far the blur reaches past the oval
+  final img = _softOvals[(refW, refH, sigma)] ??= () {
+    final rec = ui.PictureRecorder();
+    Canvas(rec).drawOval(
+      Rect.fromLTWH(m, m, refW, refH),
+      Paint()
+        ..color = Colors.white
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, sigma),
+    );
+    return rec.endRecording().toImageSync((refW + 2 * m).ceil(), (refH + 2 * m).ceil());
+  }();
+  final kx = oval.width / refW, ky = oval.height / refH;
+  canvas.drawImageRect(
+    img,
+    Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+    Rect.fromLTRB(oval.left - m * kx, oval.top - m * ky, oval.right + m * kx, oval.bottom + m * ky),
     Paint()
-      ..color = (dark ? const Color(0xFF8FA0A8) : Colors.white).withOpacity(dark ? 0.16 : 0.34)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14),
+      ..filterQuality = FilterQuality.low
+      ..colorFilter = ColorFilter.mode(color, BlendMode.srcIn),
   );
 }
 

@@ -9,18 +9,21 @@ import 'app_colors.dart';
 /// blurred, a light edge, the shadow only outside. Narrow screens (phones) get
 /// a denser pane and no blur, which is the costly part while the sky moves.
 /// [dense] is for cards read closely (code, long text over a busy sky).
+/// [frost] false is for a card its own content covers (the code editor): the
+/// blur behind it would be worked out on every frame and never seen.
 class GlassBox extends StatelessWidget {
   final Widget child;
   final double radius;
   final EdgeInsetsGeometry? padding;
   final bool dense;
+  final bool frost;
 
-  const GlassBox({super.key, required this.child, this.radius = 16, this.padding, this.dense = false});
+  const GlassBox({super.key, required this.child, this.radius = 16, this.padding, this.dense = false, this.frost = true});
 
   @override
   Widget build(BuildContext context) {
     final dark = AppColors.isDark;
-    final blur = MediaQuery.of(context).size.width >= 700;
+    final blur = frost && MediaQuery.of(context).size.width >= 700;
     final r = BorderRadius.circular(radius);
     final alpha = !blur ? (dark ? 0.9 : 0.92) : (dense ? (dark ? 0.8 : 0.84) : (dark ? 0.62 : 0.68));
     final pane = DecoratedBox(

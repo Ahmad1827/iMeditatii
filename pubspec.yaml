@@ -141,6 +141,17 @@ flutter:
     - family: IMCode
       fonts:
         - asset: assets/fonts/IMCode-Regular.ttf
+    # Arimo and Cousine Bold (SIL OFL 1.1), cut down like Inter: the faces of the exam papers
+    # (they set the same as Arial and Courier New), for a statement shown as on the sheet
+    - family: Arimo
+      fonts:
+        - asset: assets/fonts/Arimo-Regular.ttf
+        - asset: assets/fonts/Arimo-Bold.ttf
+          weight: 700
+    - family: Cousine
+      fonts:
+        - asset: assets/fonts/Cousine-Bold.ttf
+          weight: 700
     # Iosevka (SIL OFL 1.1), cut down to Latin, Romanian and box drawing: the ACS section
     - family: Iosevka
       fonts:

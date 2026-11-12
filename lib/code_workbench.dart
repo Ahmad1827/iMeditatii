@@ -116,6 +116,7 @@ class _CodeEditorState extends State<CodeEditor> {
   void initState() {
     super.initState();
     _c.addListener(_changed);
+    widget.assistant?.addListener(_changed); // its suggestion is drawn here
   }
 
   @override
@@ -125,11 +126,16 @@ class _CodeEditorState extends State<CodeEditor> {
       old.controller.removeListener(_changed);
       _c.addListener(_changed);
     }
+    if (old.assistant != widget.assistant) {
+      old.assistant?.removeListener(_changed);
+      widget.assistant?.addListener(_changed);
+    }
   }
 
   @override
   void dispose() {
     _c.removeListener(_changed);
+    widget.assistant?.removeListener(_changed);
     _v.dispose();
     _h.dispose();
     _ownFocus?.dispose();
@@ -742,7 +748,7 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
     _lastText = _code.text;
     _code.addListener(_onCode);
     if (widget.autocomplete && !widget.readOnly) {
-      _ai = CodeAssistant(_code)..addListener(_onAi);
+      _ai = CodeAssistant(_code); // the editor and the status line listen to it themselves
     }
     _relint();
     BrowserRun.warm(_code.lang);
@@ -764,19 +770,16 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
     super.dispose();
   }
 
-  void _onAi() {
-    if (mounted) setState(() {});
-  }
-
   void _onCode() {
     if (_code.text != _lastText) {
       _lastText = _code.text;
       widget.onCodeChanged?.call(_code.text);
-      _compile = const [];
       _lint?.cancel();
       _lint = Timer(const Duration(milliseconds: 400), _relint);
+      // the compiler's marks are for the old text; only then is there anything
+      // here to redraw: the editor and the status line follow the code themselves
+      if (_compile.isNotEmpty && mounted) setState(() => _compile = const []);
     }
-    if (mounted) setState(() {}); // Ln / Col
   }
 
   void _relint() {
@@ -1377,10 +1380,6 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
 
   @override
   Widget build(BuildContext context) {
-    final (ln, col) = _lnCol;
-    final lines = '\n'.allMatches(_code.text).length + 1;
-    final here = _issues.where((i) => i.line == ln).toList()..sort((a, b) => a.level.index - b.level.index);
-
     final editor = CodeEditor(
       controller: _code,
       undoController: _undo,
@@ -1392,7 +1391,15 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
       assistant: _ai,
     );
 
-    final status = Container(
+    // the status line follows the caret by itself, so moving it or typing
+    // does not redraw the toolbar, the console and the panels
+    final status = ListenableBuilder(
+      listenable: Listenable.merge([_code, _ai]),
+      builder: (context, _) {
+        final (ln, col) = _lnCol;
+        final lines = '\n'.allMatches(_code.text).length + 1;
+        final here = _issues.where((i) => i.line == ln).toList()..sort((a, b) => a.level.index - b.level.index);
+        return Container(
       decoration: BoxDecoration(color: Pb.hoverBg, border: Border(top: BorderSide(color: Pb.border))),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(
@@ -1427,6 +1434,8 @@ class _CodeWorkbenchState extends State<CodeWorkbench> {
           ),
         ],
       ),
+    );
+      },
     );
 
     return LayoutBuilder(

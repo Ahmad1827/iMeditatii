@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 import 'statement.dart';
+import 'statement_sheet.dart';
 import 'statement_text.dart';
 import 'ui_components.dart';
 
@@ -84,7 +85,10 @@ class _ProblemStatementState extends State<ProblemStatement> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (source != null || pictures.isNotEmpty) ...[_cOrigin(source, pictures), const SizedBox(height: 16)],
+          if (source != null || pictures.isNotEmpty)
+            ...[_cOrigin(source, pictures), const SizedBox(height: 16)]
+          else if (parts.body.isNotEmpty)
+            ...[Align(alignment: Alignment.centerRight, child: _cSheetButton()), const SizedBox(height: 10)],
           if (_str(['nota_examen']) != null) ...[_cExamNote(_str(['nota_examen'])!), const SizedBox(height: 16)],
           if (_file != null) ...[
             PbAlert(
@@ -145,9 +149,21 @@ class _ProblemStatementState extends State<ProblemStatement> {
                 size: PbSize.sm,
                 onPressed: () => _showOriginal(pictures, source),
               ),
+            ] else ...[
+              const SizedBox(width: 8),
+              _cSheetButton(),
             ],
           ],
         ),
+      );
+
+  /// A problem with no picture of a paper: its own statement, set like one.
+  Widget _cSheetButton() => PbButton(
+        text: 'Pe foaie',
+        icon: Icons.description_outlined,
+        variant: PbVariant.outlineSecondary,
+        size: PbSize.sm,
+        onPressed: () => showStatementSheet(context, widget.problem),
       );
 
   void _showOriginal(List<String> pictures, String? source) => showDialog<void>(

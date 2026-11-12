@@ -1157,14 +1157,34 @@ class CodeHighlighter {
     );
   }
 
+  // The last one made: an editor asks again for the same code whenever the
+  // caret moves or its parent redraws, and the same span back lets the field
+  // skip laying the text out again.
+  static String? _lastCode, _lastLang;
+  static TextStyle? _lastBase;
+  static _CodePalette? _lastPalette;
+  static TextSpan? _lastSpan;
+
   static TextSpan span(String code, TextStyle base, {String lang = 'cpp'}) {
     final p = _palette();
+    if (_lastSpan != null && _lastCode == code && _lastLang == lang && _lastBase == base && identical(_lastPalette, p)) return _lastSpan!;
+    final made = _span(code, base, lang, p);
+    _lastCode = code;
+    _lastLang = lang;
+    _lastBase = base;
+    _lastPalette = p;
+    return _lastSpan = made;
+  }
+
+  static TextSpan _span(String code, TextStyle base, String lang, _CodePalette p) {
     final b = base.copyWith(color: p.text);
     final isPy = lang == 'python';
     final children = <TextSpan>[];
     var last = 0;
 
-    TextStyle st(Color c, {bool strong = false, bool italic = false}) => b.copyWith(
+    // one style per kind of token, not one per token
+    final styles = <(Color, bool, bool), TextStyle>{};
+    TextStyle st(Color c, {bool strong = false, bool italic = false}) => styles[(c, strong, italic)] ??= b.copyWith(
           color: c,
           fontWeight: strong && p.bold ? FontWeight.bold : null,
           fontStyle: italic ? FontStyle.italic : null,
