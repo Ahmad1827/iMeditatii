@@ -23,6 +23,8 @@ import 'problem_quiz.dart';
 import 'progress.dart';
 import 'statement.dart';
 import 'statement_text.dart';
+import 'glass.dart';
+import 'submission_log.dart';
 import 'workspace_screen.dart' show wsAgo;
 import 'custom_navbar.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
@@ -147,6 +149,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }).catchError((_) {});
     _isExerciseDone().then((done) {
       if (mounted && done) setState(() => _alreadyDone = true);
+    });
+    loadSent(_progressKey).then((saved) {
+      // after whatever was sent while they were being read
+      if (mounted && saved.isNotEmpty) setState(() => _cSubmissions.addAll(saved));
     });
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
@@ -1034,16 +1040,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     }).catchError((_) {});
   }
 
-  Widget _cCard({Widget? header, required Widget child, bool fill = false}) => Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: Pb.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Pb.border.withOpacity(0.7)),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07), blurRadius: 24, offset: const Offset(0, 8)),
-          ],
-        ),
+  Widget _cCard({Widget? header, required Widget child, bool fill = false}) => GlassBox(
+        radius: 14,
+        dense: true,
         child: Column(
           mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1132,17 +1131,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             ],
           );
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
+    return GlassBox(
+      radius: 14,
       padding: EdgeInsets.fromLTRB(isMobile ? 14 : 20, 14, isMobile ? 14 : 20, 0),
-      decoration: BoxDecoration(
-        color: Pb.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Pb.border.withOpacity(0.7)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.07), blurRadius: 24, offset: const Offset(0, 8)),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1425,14 +1416,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       return SheetHistory(uid: uid, problemKey: _progressKey, current: _sent);
     }
     if (_cSubmissions.isEmpty) {
-      return Text('Nu ai trimis încă nicio soluție în această sesiune.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
+      return Text('Nu ai trimis încă nicio soluție la această problemă.', style: TextStyle(fontSize: 14.5, color: Pb.muted));
     }
     return PbTable(
-      headers: const ['Ora', 'Tip', 'Verdict', 'Teste', 'Punctaj'],
+      headers: const ['Data', 'Tip', 'Verdict', 'Teste', 'Punctaj'],
       rows: [
         for (final s in _cSubmissions)
           [
-            Text('${s['time']}'),
+            Text(sentWhen(s['at'])),
             Text(s['submit'] == true ? 'Trimitere' : 'Rulare'),
             Text(
               s['ok'] == true
@@ -2144,7 +2135,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionChecked = true;
       solutionOk = all;
       _cSubmissions.insert(0, {
-        'time': TimeOfDay.now().format(context),
+        'at': DateTime.now().toIso8601String(),
         'submit': submit,
         'ok': all,
         'verdict': _cFailVerdict,
@@ -2154,6 +2145,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       });
     });
 
+    if (submit) saveSent(_progressKey, _cSubmissions);
     if (submit) _saveSolution(code, 'cpp', all);
     if (submit && !all && !_alreadyDone) markTried(_progressKey);
     if (submit && all) {

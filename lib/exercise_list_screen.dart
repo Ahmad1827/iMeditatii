@@ -1,3 +1,4 @@
+import 'glass.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -365,15 +366,6 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
     return s != null && (s.pending || s.rejected) ? s : null;
   }
 
-  BoxDecoration _cDeco({double r = 16}) => BoxDecoration(
-        color: Pb.surface,
-        borderRadius: BorderRadius.circular(r),
-        border: Border.all(color: Pb.border.withOpacity(0.7)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(AppColors.isDark ? 0.3 : 0.06), blurRadius: 24, offset: const Offset(0, 8)),
-        ],
-      );
-
   Widget _buildClean(bool isMobile) {
     final inGrade = allExercises.where((e) => e['grade'] == selectedGrade).toList();
     final rows = displayedExercises.where((e) {
@@ -398,9 +390,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
 
     final Widget body;
     if (isLoading) {
-      body = Container(
+      body = GlassBox(
+        radius: 14,
         padding: const EdgeInsets.all(28),
-        decoration: _cDeco(r: 14),
         child: Row(
           children: [
             const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
@@ -675,9 +667,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       ],
     );
 
-    return Container(
+    return GlassBox(
+      radius: 18,
       padding: EdgeInsets.all(isMobile ? 18 : 24),
-      decoration: _cDeco(r: 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -751,9 +743,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
 
     int doneIn(Iterable<Map<String, dynamic>> l) => l.where(_isSolved).length;
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: _cDeco(r: 14),
+    return GlassBox(
+      radius: 14,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -842,9 +833,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       ],
     );
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: _cDeco(r: 14),
+    return GlassBox(
+      radius: 14,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
