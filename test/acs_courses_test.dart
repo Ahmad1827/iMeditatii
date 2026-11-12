@@ -6,8 +6,13 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:iMeditatii/acs/acs_data.dart';
+import 'package:iMeditatii/acs/engine/apd.dart';
 import 'package:iMeditatii/acs/engine/circuit.dart';
+import 'package:iMeditatii/acs/engine/crypto.dart';
 import 'package:iMeditatii/acs/engine/ds.dart';
+import 'package:iMeditatii/acs/engine/egc.dart';
+import 'package:iMeditatii/acs/engine/fields.dart';
+import 'package:iMeditatii/acs/engine/lfa.dart';
 import 'package:iMeditatii/acs/engine/logic.dart';
 import 'package:iMeditatii/acs/engine/math_task.dart';
 import 'package:iMeditatii/acs/engine/octave_task.dart';
@@ -323,5 +328,193 @@ void main() {
         expect(p.solution, isNotEmpty);
       });
     }
+  });
+
+  group('LFA: the reference answer describes the language, an empty one does not', () {
+    for (final p in course('lfa').problems.where((p) => p.kind == 'lfa')) {
+      test('${p.id}. ${p.title}', () {
+        final t = LfaTask.fromSpec(p.spec);
+        for (final (label, ok, detail) in t.checkReference()) {
+          expect(ok, isTrue, reason: '$label: $detail');
+        }
+        final empty = switch (t.mode) {
+          'regex' => t.checkRegex('∅'),
+          'cfg' => t.checkGrammar('S -> SS'),
+          _ => t.checkAutomaton(const Nfa(1, {}, {})),
+        };
+        expect(empty.every((c) => c.$2), isFalse);
+      });
+    }
+
+    test('a wrong automaton gets the shortest word that gives it away', () {
+      final t = LfaTask.fromSpec(course('lfa').byId('1')!.spec); // ends in ab
+      final r = t.checkAutomaton(Nfa.fromJson({
+        'states': 2,
+        'final': [1],
+        't': {
+          '0': {'a': [0], 'b': [1]},
+          '1': {'a': [0], 'b': [1]},
+        },
+      }));
+      expect(r.last.$2, isFalse);
+      expect(r.last.$3, contains('„b”'));
+    });
+
+    test('the expression is read as the course writes it', () {
+      final n = Regex.parse('(a ∪ b)* a b | ε', ['a', 'b']);
+      expect(n.accepts(''), isTrue);
+      expect(n.accepts('bab'), isTrue);
+      expect(n.accepts('ba'), isFalse);
+      expect(() => Regex.parse('(a∪b', ['a', 'b']), throwsA(isA<LfaError>()));
+      expect(() => Regex.parse('ac', ['a', 'b']), throwsA(isA<LfaError>()));
+      expect(Regex.parse('(a∪b)*a(a∪b)(a∪b)', ['a', 'b']).toDfa(['a', 'b']).minimalStates, 8);
+    });
+  });
+
+  group('APD: every interleaving, as the explorer finds them', () {
+    for (final p in course('apd').problems.where((p) => p.kind == 'threads')) {
+      test('${p.id}. ${p.title}', () {
+        final t = ApdTask.fromSpec(p.spec);
+        final prog = Program.parse(t.program);
+        final x = prog.explore();
+        expect(x.truncated, isFalse);
+        switch (t.mode) {
+          case 'outcomes':
+            expect(x.valuesOf(t.ask!).toList()..sort(), p.spec['values']);
+            expect(x.deadlock, isNull);
+            expect(t.checkOutcomes((p.spec['values'] as List).join(', ')).every((c) => c.$2), isTrue);
+            expect(t.checkOutcomes('${(p.spec['values'] as List).first}, 99').every((c) => c.$2), isFalse);
+          case 'schedule':
+            // the schedule the explorer found reaches the goal when replayed, and the start is not there yet
+            final way = t.goalDeadlock ? x.deadlock : [for (final f in x.finals) if (t.goal.entries.every((e) => f.$1[e.key] == e.value)) f.$2].firstOrNull;
+            expect(way, isNotNull, reason: 'the goal cannot be reached');
+            var s = prog.start();
+            expect(t.reached(prog, s), isFalse);
+            for (final name in way!) {
+              s = prog.step(s, prog.threads.indexWhere((th) => th.name == name));
+            }
+            expect(t.reached(prog, s), isTrue);
+            // and not every order gets there
+            expect(t.goalDeadlock ? x.finals.isNotEmpty : x.finals.length > 1, isTrue);
+          default:
+            for (final (label, ok, detail) in t.checkFix(t.reference!)) {
+              expect(ok, isTrue, reason: '$label: $detail');
+            }
+            expect(t.checkFix(t.program).every((c) => c.$2), isFalse, reason: 'the code given already passes');
+        }
+      });
+    }
+
+    test('a fix that deletes the work, or deadlocks, is refused with the order that breaks it', () {
+      final t = ApdTask.fromSpec(course('apd').byId('14')!.spec);
+      expect(t.checkFix('shared x = 0\nthread A:\n  x = 2\nthread B:\n  x = 2').every((c) => c.$2), isFalse);
+      final r = t.checkFix('shared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\nthread B:\n  lock(m)\n  x = x + 1\n  unlock(m)');
+      expect(r.firstWhere((c) => c.$1.contains('blochează')).$2, isFalse);
+      expect(r.firstWhere((c) => c.$1.contains('blochează')).$3, contains('A'));
+      expect(() => Program.parse('thread A:\n  lock(q)'), throwsA(isA<ApdError>()));
+    });
+  });
+
+  group('EGC: the reference list has the target matrix, and the rasters are judged pixel by pixel', () {
+    for (final p in course('egc').problems.where((p) => p.kind == 'transform')) {
+      test('${p.id}. ${p.title}', () {
+        final t = TransformTask.fromSpec(p.spec);
+        for (final (label, ok, detail) in t.check(t.reference)) {
+          expect(ok, isTrue, reason: '$label: $detail');
+        }
+        expect(t.check(const []).every((c) => c.$2), isFalse, reason: 'nothing to do');
+        // the shape really lands on the target
+        final m = compose(t.reference);
+        for (final (x, y) in t.shape) {
+          final (a, b) = m.apply(x, y);
+          final (c, d) = t.target.apply(x, y);
+          expect((a - c).abs() + (b - d).abs(), lessThan(1e-6));
+        }
+      });
+    }
+
+    for (final p in course('egc').problems.where((p) => p.kind == 'raster')) {
+      test('${p.id}. ${p.title}', () {
+        final t = RasterTask.fromSpec(p.spec);
+        expect(t.check(t.pixels).every((c) => c.$2), isTrue);
+        expect(t.check(t.given).every((c) => c.$2), isFalse);
+        expect(t.pixels.containsAll(t.given), isTrue);
+        expect(t.check({...t.pixels, (0, t.height - 1)}).first.$2, t.pixels.contains((0, t.height - 1)));
+      });
+    }
+
+    test('a product is applied right to left, and another way to the same matrix is accepted', () {
+      // rotating about (2, 1): the translation to the origin first
+      final m = compose(const [Op('T', -2, -1), Op('R', 90), Op('T', 2, 1)]);
+      final (x, y) = m.apply(2, 1);
+      expect([x, y], [closeTo(2, 1e-9), closeTo(1, 1e-9)]);
+      expect(productText(const [Op('T', -2, -1), Op('R', 90)]), 'M = R(90°) · T(-2, -1)');
+      final t = TransformTask.fromSpec(course('egc').byId('9')!.spec); // 180° about (2.5, 1)
+      expect(t.check(const [Op('T', -2.5, -1), Op('S', -1, -1), Op('T', 2.5, 1)]).every((c) => c.$2), isTrue);
+      expect(t.check(const [Op('R', 180), Op('T', 5, 2)]).every((c) => c.$2), isTrue);
+      expect(t.check(const [Op('R', 180)]).every((c) => c.$2), isFalse);
+    });
+  });
+
+  group('RL and EG: the answers typed in fields', () {
+    for (final code in ['rl', 'eg']) {
+      for (final p in course(code).problems.where((p) => p.kind == 'net' || p.kind == 'market')) {
+        test('$code ${p.id}. ${p.title}', () {
+          final t = FieldsTask.fromSpec(p.spec);
+          expect(t.fields, isNotEmpty);
+          expect(t.fields.map((f) => f.id).toSet().length, t.fields.length);
+          expect(t.check(t.reference).values.every((ok) => ok), isTrue);
+          expect(t.check(const {}).values.any((ok) => ok), isFalse);
+          // one wrong field is the only one marked
+          final first = t.fields.first;
+          final r = t.check({...t.reference, first.id: first.number ? '${double.parse(first.answer) + 7}' : 'altceva'});
+          expect(r[first.id], isFalse);
+          expect(r.values.where((ok) => !ok).length, 1);
+        });
+      }
+    }
+
+    test('the addresses of RL 2 (192.168.1.70/26), worked out here on the bits', () {
+      final ip = parseIp('192.168.1.70')!, mask = maskOf(26);
+      final t = FieldsTask.fromSpec(course('rl').byId('2')!.spec);
+      expect(t.reference['net'], ipText(ip & mask));
+      expect(t.reference['bc'], ipText((ip & mask) | (~mask & 0xFFFFFFFF)));
+      expect(t.reference['mask'], ipText(mask));
+      expect(bitsOf(mask).where((b) => b == 1).length, 26);
+      expect(parseIp('1.2.3'), isNull);
+      expect(parseIp('1.2.3.256'), isNull);
+    });
+
+    test('numbers are read the way they are written here: a comma, a percent sign, a fraction', () {
+      const f = AnswerField('x', '', '0.6667', true, 0.01, '');
+      expect(f.accepts('0,67'), isTrue);
+      expect(f.accepts('2/3'), isTrue);
+      expect(f.accepts('0.7'), isFalse);
+      expect(const AnswerField('p', '', '25', true, 0.01, '').accepts('25%'), isTrue);
+      expect(const AnswerField('k', '', 'elastică|elastica', false, 0, '').accepts(' Elastica '), isTrue);
+      expect(const AnswerField('n', '', '/26|26', false, 0, '').accepts('/26'), isTrue);
+    });
+  });
+
+  group('ISC: the reference steps turn the scrambled text into the flag', () {
+    for (final p in course('isc').problems.where((p) => p.kind == 'crypto')) {
+      test('${p.id}. ${p.title}', () {
+        final t = CryptoTask.fromSpec(p.spec);
+        expect(t.solvedBy(t.reference), isTrue);
+        expect(t.solvedBy(const []), isFalse);
+        expect(t.solvedBy(t.reference.sublist(0, t.reference.length - 1)), isFalse);
+        expect(t.flag, startsWith('ISC{'));
+        expect(t.cipher, isNot(contains('ISC{')));
+      });
+    }
+
+    test('a step that cannot read its input says so, and the run stops there', () {
+      final r = CryptoRun.of('not hex!', const [CryptoOp('hex'), CryptoOp('rev')]);
+      expect(r.outputs, isEmpty);
+      expect(r.error, contains('hex'));
+      expect(showBytes(const CryptoOp('rot', '3').apply('Fdhvdu'.codeUnits)), 'Caesar');
+      expect(showBytes(const CryptoOp('xor', 'K').apply([0x02])), 'I');
+      expect(showBytes([0, 255]), '00 ff');
+    });
   });
 }

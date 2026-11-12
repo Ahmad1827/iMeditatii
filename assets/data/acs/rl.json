@@ -1,0 +1,1354 @@
+{
+ "code": "rl",
+ "chapters": [
+  "1. Adrese, măști, subrețele",
+  "2. Împărțirea în subrețele (VLSM)",
+  "3. Rutare",
+  "4. Legătura de date și comutare",
+  "5. Servicii și securitate"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "O rețea /24",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O stație are adresa `192.168.10.77/24`. Completează datele rețelei din care face parte.",
+   "hint": "Ultimul octet întreg e de stație.",
+   "solution": "`/24` lasă `8` biți de stație: `2^8 - 2 = 254` stații. Masca: `255.255.255.0`. Rețea `192.168.10.0`, difuzare `192.168.10.255`, stații de la `192.168.10.1` la `192.168.10.254`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "192.168.10.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "192.168.10.255",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "192.168.10.1",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "192.168.10.254",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "254",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.10.77",
+    "prefix": 24
+   }
+  },
+  {
+   "id": "2",
+   "title": "O rețea /26",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O stație are adresa `192.168.1.70/26`. Completează datele rețelei din care face parte.",
+   "hint": "Doi biți din ultimul octet sunt de rețea: subrețelele încep la 0, 64, 128, 192.",
+   "solution": "`/26` lasă `6` biți de stație: `2^6 - 2 = 62` stații. Masca: `255.255.255.192`. Rețea `192.168.1.64`, difuzare `192.168.1.127`, stații de la `192.168.1.65` la `192.168.1.126`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "192.168.1.64",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "192.168.1.127",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "192.168.1.65",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "192.168.1.126",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.192",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "62",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.1.70",
+    "prefix": 26
+   }
+  },
+  {
+   "id": "3",
+   "title": "O rețea /28",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O stație are adresa `10.0.5.200/28`. Completează datele rețelei din care face parte.",
+   "hint": "Subrețelele au câte 16 adrese: caută multiplul de 16 de sub 200.",
+   "solution": "`/28` lasă `4` biți de stație: `2^4 - 2 = 14` stații. Masca: `255.255.255.240`. Rețea `10.0.5.192`, difuzare `10.0.5.207`, stații de la `10.0.5.193` la `10.0.5.206`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "10.0.5.192",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "10.0.5.207",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "10.0.5.193",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "10.0.5.206",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.240",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "14",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "10.0.5.200",
+    "prefix": 28
+   }
+  },
+  {
+   "id": "4",
+   "title": "O rețea /30",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O stație are adresa `172.16.0.9/30`. Completează datele rețelei din care face parte.",
+   "hint": "O legătură punct la punct: 4 adrese, din care 2 de stație.",
+   "solution": "`/30` lasă `2` biți de stație: `2^2 - 2 = 2` stații. Masca: `255.255.255.252`. Rețea `172.16.0.8`, difuzare `172.16.0.11`, stații de la `172.16.0.9` la `172.16.0.10`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "172.16.0.8",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "172.16.0.11",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "172.16.0.9",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "172.16.0.10",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.252",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "2",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "172.16.0.9",
+    "prefix": 30
+   }
+  },
+  {
+   "id": "5",
+   "title": "O rețea /20",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O stație are adresa `172.16.37.5/20`. Completează datele rețelei din care face parte.",
+   "hint": "Granița e în al treilea octet: 4 biți de rețea, deci blocuri de câte 16 (0, 16, 32, 48...).",
+   "solution": "`/20` lasă `12` biți de stație: `2^12 - 2 = 4094` stații. Masca: `255.255.240.0`. Rețea `172.16.32.0`, difuzare `172.16.47.255`, stații de la `172.16.32.1` la `172.16.47.254`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "172.16.32.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "172.16.47.255",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "172.16.32.1",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "172.16.47.254",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.240.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "4094",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "172.16.37.5",
+    "prefix": 20
+   }
+  },
+  {
+   "id": "6",
+   "title": "O rețea /22",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O stație are adresa `10.10.45.130/22`. Completează datele rețelei din care face parte.",
+   "hint": "Al treilea octet merge în blocuri de câte 4: 44 e multiplu de 4.",
+   "solution": "`/22` lasă `10` biți de stație: `2^10 - 2 = 1022` stații. Masca: `255.255.252.0`. Rețea `10.10.44.0`, difuzare `10.10.47.255`, stații de la `10.10.44.1` la `10.10.47.254`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "10.10.44.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "10.10.47.255",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "10.10.44.1",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "10.10.47.254",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.252.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "1022",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "10.10.45.130",
+    "prefix": 22
+   }
+  },
+  {
+   "id": "7",
+   "title": "O rețea /27",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O stație are adresa `192.168.200.99/27`. Completează datele rețelei din care face parte.",
+   "hint": "Blocuri de 32 de adrese: 0, 32, 64, 96...",
+   "solution": "`/27` lasă `5` biți de stație: `2^5 - 2 = 30` stații. Masca: `255.255.255.224`. Rețea `192.168.200.96`, difuzare `192.168.200.127`, stații de la `192.168.200.97` la `192.168.200.126`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "192.168.200.96",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "192.168.200.127",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "192.168.200.97",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "192.168.200.126",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.224",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "30",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.200.99",
+    "prefix": 27
+   }
+  },
+  {
+   "id": "8",
+   "title": "O rețea /19",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "O stație are adresa `10.200.100.1/19`. Completează datele rețelei din care face parte.",
+   "hint": "Blocuri de câte 32 în al treilea octet: 96 ≤ 100 < 128.",
+   "solution": "`/19` lasă `13` biți de stație: `2^13 - 2 = 8190` stații. Masca: `255.255.224.0`. Rețea `10.200.96.0`, difuzare `10.200.127.255`, stații de la `10.200.96.1` la `10.200.127.254`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "10.200.96.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "10.200.127.255",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "10.200.96.1",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "10.200.127.254",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.224.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "8190",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "10.200.100.1",
+    "prefix": 19
+   }
+  },
+  {
+   "id": "9",
+   "title": "Aceeași rețea?",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Stațiile `192.168.1.126` și `192.168.1.129` au amândouă masca `/25`. Găsește rețeaua fiecăreia și spune dacă pot comunica direct, fără ruter.",
+   "hint": "Două stații comunică direct doar dacă au aceeași adresă de rețea.",
+   "solution": "`192.168.1.126` e în `192.168.1.0/25`, `192.168.1.129` e în `192.168.1.128/25`: rețele diferite, e nevoie de un ruter.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "rețeaua lui 192.168.1.126",
+      "answer": "192.168.1.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "b",
+      "label": "rețeaua lui 192.168.1.129",
+      "answer": "192.168.1.128",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "same",
+      "label": "sunt în aceeași rețea? (da / nu)",
+      "answer": "nu",
+      "hint": "da sau nu"
+     }
+    ],
+    "ip": "192.168.1.126",
+    "prefix": 25
+   }
+  },
+  {
+   "id": "10",
+   "title": "Aceeași rețea? (2)",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Stațiile `10.1.34.200` și `10.1.47.3` au amândouă masca `/20`. Găsește rețeaua fiecăreia și spune dacă pot comunica direct, fără ruter.",
+   "hint": "Două stații comunică direct doar dacă au aceeași adresă de rețea.",
+   "solution": "`10.1.34.200` e în `10.1.32.0/20`, `10.1.47.3` e în `10.1.32.0/20`: aceeași rețea, comunică direct.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "rețeaua lui 10.1.34.200",
+      "answer": "10.1.32.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "b",
+      "label": "rețeaua lui 10.1.47.3",
+      "answer": "10.1.32.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "same",
+      "label": "sunt în aceeași rețea? (da / nu)",
+      "answer": "da",
+      "hint": "da sau nu"
+     }
+    ],
+    "ip": "10.1.34.200",
+    "prefix": 20
+   }
+  },
+  {
+   "id": "11",
+   "title": "Aceeași rețea? (3)",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Stațiile `172.16.5.62` și `172.16.5.65` au amândouă masca `/26`. Găsește rețeaua fiecăreia și spune dacă pot comunica direct, fără ruter.",
+   "hint": "Două stații comunică direct doar dacă au aceeași adresă de rețea.",
+   "solution": "`172.16.5.62` e în `172.16.5.0/26`, `172.16.5.65` e în `172.16.5.64/26`: rețele diferite, e nevoie de un ruter.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "rețeaua lui 172.16.5.62",
+      "answer": "172.16.5.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "b",
+      "label": "rețeaua lui 172.16.5.65",
+      "answer": "172.16.5.64",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "same",
+      "label": "sunt în aceeași rețea? (da / nu)",
+      "answer": "nu",
+      "hint": "da sau nu"
+     }
+    ],
+    "ip": "172.16.5.62",
+    "prefix": 26
+   }
+  },
+  {
+   "id": "12",
+   "title": "Masca pentru 50 de stații",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O rețea trebuie să aibă loc pentru 50 stații. Alege cea mai mică rețea care le cuprinde.",
+   "hint": "Caută cea mai mică putere a lui 2 din care, scăzând 2 (rețea și difuzare), rămân destule adrese.",
+   "solution": "`2^6 - 2 = 62 ≥ 50`, iar `2^5 - 2 = 30` nu ajunge: `6` biți de stație, prefix `/26`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul",
+      "answer": "/26|26",
+      "hint": "/n"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.192",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte adrese de stație are",
+      "answer": "62",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.0.0",
+    "prefix": 26
+   }
+  },
+  {
+   "id": "13",
+   "title": "Masca pentru 500 de stații",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O rețea trebuie să aibă loc pentru 500 stații. Alege cea mai mică rețea care le cuprinde.",
+   "hint": "Caută cea mai mică putere a lui 2 din care, scăzând 2 (rețea și difuzare), rămân destule adrese.",
+   "solution": "`2^9 - 2 = 510 ≥ 500`, iar `2^8 - 2 = 254` nu ajunge: `9` biți de stație, prefix `/23`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul",
+      "answer": "/23|23",
+      "hint": "/n"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.254.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte adrese de stație are",
+      "answer": "510",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.0.0",
+    "prefix": 23
+   }
+  },
+  {
+   "id": "14",
+   "title": "Masca pentru 30 de stații",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O rețea trebuie să aibă loc pentru 30 stații. Alege cea mai mică rețea care le cuprinde.",
+   "hint": "Caută cea mai mică putere a lui 2 din care, scăzând 2 (rețea și difuzare), rămân destule adrese.",
+   "solution": "`2^5 - 2 = 30 ≥ 30`, iar `2^4 - 2 = 14` nu ajunge: `5` biți de stație, prefix `/27`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul",
+      "answer": "/27|27",
+      "hint": "/n"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.224",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte adrese de stație are",
+      "answer": "30",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.0.0",
+    "prefix": 27
+   }
+  },
+  {
+   "id": "15",
+   "title": "Masca pentru 31 de stații",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O rețea trebuie să aibă loc pentru 31 stații. Alege cea mai mică rețea care le cuprinde.",
+   "hint": "Caută cea mai mică putere a lui 2 din care, scăzând 2 (rețea și difuzare), rămân destule adrese.",
+   "solution": "`2^6 - 2 = 62 ≥ 31`, iar `2^5 - 2 = 30` nu ajunge: `6` biți de stație, prefix `/26`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul",
+      "answer": "/26|26",
+      "hint": "/n"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.192",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte adrese de stație are",
+      "answer": "62",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.0.0",
+    "prefix": 26
+   }
+  },
+  {
+   "id": "16",
+   "title": "Trei rețele dintr-un /24",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Împarte blocul `192.168.1.0/24` între rețelele: LAN A cu 100 stații, LAN B cu 50 stații, LAN C cu 20 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- LAN A: `192.168.1.0/25` (126 adrese de stație)\n- LAN B: `192.168.1.128/26` (62 adrese de stație)\n- LAN C: `192.168.1.192/27` (30 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "LAN A",
+      "label": "LAN A (100 stații)",
+      "answer": "192.168.1.0/25",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "LAN B",
+      "label": "LAN B (50 stații)",
+      "answer": "192.168.1.128/26",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "LAN C",
+      "label": "LAN C (20 stații)",
+      "answer": "192.168.1.192/27",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "192.168.1.0",
+    "prefix": 24
+   }
+  },
+  {
+   "id": "17",
+   "title": "Rețele și legături",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "medie",
+   "source": "Pregătire parțial RL",
+   "statement": "Împarte blocul `10.0.0.0/24` între rețelele: LAN A cu 60 stații, LAN B cu 25 stații, LAN C cu 10 stații, R1-R2 cu 2 stații, R2-R3 cu 2 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- LAN A: `10.0.0.0/26` (62 adrese de stație)\n- LAN B: `10.0.0.64/27` (30 adrese de stație)\n- LAN C: `10.0.0.96/28` (14 adrese de stație)\n- R1-R2: `10.0.0.112/30` (2 adrese de stație)\n- R2-R3: `10.0.0.116/30` (2 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "LAN A",
+      "label": "LAN A (60 stații)",
+      "answer": "10.0.0.0/26",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "LAN B",
+      "label": "LAN B (25 stații)",
+      "answer": "10.0.0.64/27",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "LAN C",
+      "label": "LAN C (10 stații)",
+      "answer": "10.0.0.96/28",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R1-R2",
+      "label": "R1-R2 (2 stații)",
+      "answer": "10.0.0.112/30",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R2-R3",
+      "label": "R2-R3 (2 stații)",
+      "answer": "10.0.0.116/30",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "10.0.0.0",
+    "prefix": 24
+   }
+  },
+  {
+   "id": "18",
+   "title": "Un /23 pentru patru departamente",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Împarte blocul `172.16.8.0/23` între rețelele: Vânzări cu 200 stații, Tehnic cu 100 stații, Contabilitate cu 50 stații, Conducere cu 12 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- Vânzări: `172.16.8.0/24` (254 adrese de stație)\n- Tehnic: `172.16.9.0/25` (126 adrese de stație)\n- Contabilitate: `172.16.9.128/26` (62 adrese de stație)\n- Conducere: `172.16.9.192/28` (14 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "Vânzări",
+      "label": "Vânzări (200 stații)",
+      "answer": "172.16.8.0/24",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Tehnic",
+      "label": "Tehnic (100 stații)",
+      "answer": "172.16.9.0/25",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Contabilitate",
+      "label": "Contabilitate (50 stații)",
+      "answer": "172.16.9.128/26",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Conducere",
+      "label": "Conducere (12 stații)",
+      "answer": "172.16.9.192/28",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "172.16.8.0",
+    "prefix": 23
+   }
+  },
+  {
+   "id": "19",
+   "title": "Un /26 strâns",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Împarte blocul `192.168.5.64/26` între rețelele: LAN A cu 20 stații, LAN B cu 10 stații, LAN C cu 5 stații, R1-R2 cu 2 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- LAN A: `192.168.5.64/27` (30 adrese de stație)\n- LAN B: `192.168.5.96/28` (14 adrese de stație)\n- LAN C: `192.168.5.112/29` (6 adrese de stație)\n- R1-R2: `192.168.5.120/30` (2 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "LAN A",
+      "label": "LAN A (20 stații)",
+      "answer": "192.168.5.64/27",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "LAN B",
+      "label": "LAN B (10 stații)",
+      "answer": "192.168.5.96/28",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "LAN C",
+      "label": "LAN C (5 stații)",
+      "answer": "192.168.5.112/29",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R1-R2",
+      "label": "R1-R2 (2 stații)",
+      "answer": "192.168.5.120/30",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "192.168.5.64",
+    "prefix": 26
+   }
+  },
+  {
+   "id": "20",
+   "title": "Șase rețele dintr-un /22",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Împarte blocul `10.20.0.0/22` între rețelele: Sală 1 cu 250 stații, Sală 2 cu 120 stații, Sală 3 cu 120 stații, Wi-Fi cu 60 stații, Servere cu 14 stații, R1-R2 cu 2 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- Sală 1: `10.20.0.0/24` (254 adrese de stație)\n- Sală 2: `10.20.1.0/25` (126 adrese de stație)\n- Sală 3: `10.20.1.128/25` (126 adrese de stație)\n- Wi-Fi: `10.20.2.0/26` (62 adrese de stație)\n- Servere: `10.20.2.64/28` (14 adrese de stație)\n- R1-R2: `10.20.2.80/30` (2 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "Sală 1",
+      "label": "Sală 1 (250 stații)",
+      "answer": "10.20.0.0/24",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Sală 2",
+      "label": "Sală 2 (120 stații)",
+      "answer": "10.20.1.0/25",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Sală 3",
+      "label": "Sală 3 (120 stații)",
+      "answer": "10.20.1.128/25",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Wi-Fi",
+      "label": "Wi-Fi (60 stații)",
+      "answer": "10.20.2.0/26",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Servere",
+      "label": "Servere (14 stații)",
+      "answer": "10.20.2.64/28",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R1-R2",
+      "label": "R1-R2 (2 stații)",
+      "answer": "10.20.2.80/30",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "10.20.0.0",
+    "prefix": 22
+   }
+  },
+  {
+   "id": "21",
+   "title": "Agregarea a patru rețele",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un ruter anunță rețelele `192.168.4.0/24`, `192.168.5.0/24`, `192.168.6.0/24`, `192.168.7.0/24`. Scrie cea mai specifică rută agregată (sumarizată) care le acoperă pe toate.",
+   "hint": "Scrie în binar octetul în care rețelele diferă și păstrează biții comuni de la stânga.",
+   "solution": "Biții comuni tuturor adreselor dau prefixul `/22`: `192.168.4.0/22`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "ruta agregată",
+      "answer": "192.168.4.0/22",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "192.168.4.0",
+    "prefix": 22
+   }
+  },
+  {
+   "id": "22",
+   "title": "Agregarea a două rețele",
+   "chapter": "3. Rutare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un ruter anunță rețelele `10.1.2.0/24`, `10.1.3.0/24`. Scrie cea mai specifică rută agregată (sumarizată) care le acoperă pe toate.",
+   "hint": "Scrie în binar octetul în care rețelele diferă și păstrează biții comuni de la stânga.",
+   "solution": "Biții comuni tuturor adreselor dau prefixul `/23`: `10.1.2.0/23`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "ruta agregată",
+      "answer": "10.1.2.0/23",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "10.1.2.0",
+    "prefix": 23
+   }
+  },
+  {
+   "id": "23",
+   "title": "Agregare cu o rețea în plus",
+   "chapter": "3. Rutare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Un ruter anunță rețelele `172.16.16.0/22`, `172.16.20.0/23`, `172.16.22.0/24`. Scrie cea mai specifică rută agregată (sumarizată) care le acoperă pe toate.",
+   "hint": "Scrie în binar octetul în care rețelele diferă și păstrează biții comuni de la stânga.",
+   "solution": "Biții comuni tuturor adreselor dau prefixul `/21`: `172.16.16.0/21`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "ruta agregată",
+      "answer": "172.16.16.0/21",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "172.16.16.0",
+    "prefix": 21
+   }
+  },
+  {
+   "id": "24",
+   "title": "Cea mai lungă potrivire",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un ruter are tabela de rutare:\n\n```\n10.0.0.0/8           eth0\n10.1.0.0/16          eth1\n10.1.2.0/24          eth2\n0.0.0.0/0            ppp0\n```\n\nPe ce interfață trimite fiecare pachet?",
+   "hint": "Dintre rutele care conțin destinația câștigă cea cu prefixul cel mai lung; ruta implicită `0.0.0.0/0` se potrivește cu orice.",
+   "solution": "- `10.1.2.9` se potrivește cel mai lung cu `10.1.2.0/24` → `eth2`\n- `10.1.3.9` se potrivește cel mai lung cu `10.1.0.0/16` → `eth1`\n- `10.200.0.1` se potrivește cel mai lung cu `10.0.0.0/8` → `eth0`\n- `8.8.8.8` se potrivește cel mai lung cu `0.0.0.0/0` → `ppp0`",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "d0",
+      "label": "pachet către 10.1.2.9",
+      "answer": "eth2",
+      "hint": "interfața"
+     },
+     {
+      "id": "d1",
+      "label": "pachet către 10.1.3.9",
+      "answer": "eth1",
+      "hint": "interfața"
+     },
+     {
+      "id": "d2",
+      "label": "pachet către 10.200.0.1",
+      "answer": "eth0",
+      "hint": "interfața"
+     },
+     {
+      "id": "d3",
+      "label": "pachet către 8.8.8.8",
+      "answer": "ppp0",
+      "hint": "interfața"
+     }
+    ],
+    "ip": "10.1.2.9",
+    "prefix": 8
+   }
+  },
+  {
+   "id": "25",
+   "title": "Rute care se suprapun",
+   "chapter": "3. Rutare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Un ruter are tabela de rutare:\n\n```\n192.168.0.0/16       eth0\n192.168.64.0/18      eth1\n192.168.96.0/20      eth2\n192.168.100.0/24     eth3\n0.0.0.0/0            eth4\n```\n\nPe ce interfață trimite fiecare pachet?",
+   "hint": "Dintre rutele care conțin destinația câștigă cea cu prefixul cel mai lung; ruta implicită `0.0.0.0/0` se potrivește cu orice.",
+   "solution": "- `192.168.100.200` se potrivește cel mai lung cu `192.168.100.0/24` → `eth3`\n- `192.168.101.1` se potrivește cel mai lung cu `192.168.96.0/20` → `eth2`\n- `192.168.127.1` se potrivește cel mai lung cu `192.168.64.0/18` → `eth1`\n- `192.168.130.1` se potrivește cel mai lung cu `192.168.0.0/16` → `eth0`\n- `192.169.0.1` se potrivește cel mai lung cu `0.0.0.0/0` → `eth4`",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "d0",
+      "label": "pachet către 192.168.100.200",
+      "answer": "eth3",
+      "hint": "interfața"
+     },
+     {
+      "id": "d1",
+      "label": "pachet către 192.168.101.1",
+      "answer": "eth2",
+      "hint": "interfața"
+     },
+     {
+      "id": "d2",
+      "label": "pachet către 192.168.127.1",
+      "answer": "eth1",
+      "hint": "interfața"
+     },
+     {
+      "id": "d3",
+      "label": "pachet către 192.168.130.1",
+      "answer": "eth0",
+      "hint": "interfața"
+     },
+     {
+      "id": "d4",
+      "label": "pachet către 192.169.0.1",
+      "answer": "eth4",
+      "hint": "interfața"
+     }
+    ],
+    "ip": "192.168.100.200",
+    "prefix": 16
+   }
+  },
+  {
+   "id": "26",
+   "title": "Ruta implicită",
+   "chapter": "3. Rutare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un ruter are tabela de rutare:\n\n```\n172.16.0.0/24        eth0\n172.16.1.0/24        eth1\n0.0.0.0/0            eth2\n```\n\nPe ce interfață trimite fiecare pachet?",
+   "hint": "Dintre rutele care conțin destinația câștigă cea cu prefixul cel mai lung; ruta implicită `0.0.0.0/0` se potrivește cu orice.",
+   "solution": "- `172.16.1.254` se potrivește cel mai lung cu `172.16.1.0/24` → `eth1`\n- `172.16.2.1` se potrivește cel mai lung cu `0.0.0.0/0` → `eth2`\n- `172.16.0.0` se potrivește cel mai lung cu `172.16.0.0/24` → `eth0`",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "d0",
+      "label": "pachet către 172.16.1.254",
+      "answer": "eth1",
+      "hint": "interfața"
+     },
+     {
+      "id": "d1",
+      "label": "pachet către 172.16.2.1",
+      "answer": "eth2",
+      "hint": "interfața"
+     },
+     {
+      "id": "d2",
+      "label": "pachet către 172.16.0.0",
+      "answer": "eth0",
+      "hint": "interfața"
+     }
+    ],
+    "ip": "172.16.1.254",
+    "prefix": 24
+   }
+  },
+  {
+   "id": "36",
+   "title": "OSPF",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023",
+   "statement": "Pe ce se bazează costul unei legături în OSPF?",
+   "hint": "Cost = lățimea de bandă de referință / lățimea de bandă a interfeței.",
+   "solution": "OSPF e un protocol de tip stare a legăturilor: fiecare ruter rulează Dijkstra pe aceeași hartă. RIP numără salturi.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pe lățimea de bandă a legăturii",
+     "pe numărul de salturi",
+     "pe întârzierea măsurată cu ping",
+     "pe adresa IP a vecinului"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "27",
+   "title": "Ce face ARP",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O stație știe adresa IP a destinației din rețeaua ei, dar nu și adresa MAC. Ce protocol folosește ca s-o afle?",
+   "hint": "Leagă nivelul rețea de nivelul legătură de date.",
+   "solution": "Cererea ARP e trimisă prin difuzare (`FF:FF:FF:FF:FF:FF`); răspunde doar stația cu acel IP.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ARP",
+     "DNS",
+     "DHCP",
+     "ICMP"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "28",
+   "title": "Adresa MAC destinație, printr-un ruter",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023 · antetele cadrelor",
+   "statement": "Stația A trimite un pachet stației B, aflată în altă rețea, prin ruterul implicit R. Ce adresă MAC destinație are cadrul care pleacă de la A?",
+   "hint": "Adresele MAC au sens doar într-o rețea locală; adresele IP rămân aceleași cap la cap.",
+   "solution": "A trimite cadrul ruterului implicit; antetul IP are în continuare destinația B. La fiecare salt se schimbă adresele MAC, nu și cele IP.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adresa MAC a lui B",
+     "adresa de difuzare FF:FF:FF:FF:FF:FF",
+     "adresa MAC a interfeței lui R din rețeaua lui A",
+     "adresa MAC a interfeței lui R din rețeaua lui B"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "29",
+   "title": "Tabela CAM",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un switch primește un cadru către o adresă MAC pe care nu o are în tabela CAM. Ce face?",
+   "hint": "Switch-ul învață adresele sursă și caută adresele destinație.",
+   "solution": "Inundare (flooding). Adresa sursă a cadrului e învățată pe portul de intrare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "îl aruncă",
+     "îl trimite pe toate porturile din același VLAN, mai puțin cel de intrare",
+     "îl trimite înapoi pe portul de intrare",
+     "îl trimite doar pe porturile trunchi"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "30",
+   "title": "Root bridge",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023 · „Cum poate un switch să devină Root Switch?”",
+   "statement": "Cum este ales switch-ul rădăcină (root bridge) în STP?",
+   "hint": "Bridge ID = prioritate + adresă MAC.",
+   "solution": "Pentru a face un switch rădăcină, i se micșorează prioritatea. Toate porturile rădăcinii sunt „designated”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cel cu cele mai multe porturi",
+     "cel cu cel mai mic Bridge ID (prioritate, apoi adresa MAC)",
+     "cel cu cea mai mare adresă MAC",
+     "cel pornit primul"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "31",
+   "title": "Costuri STP",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023",
+   "statement": "În STP clasic, ce cost are o legătură FastEthernet (100 Mb/s) și ce cost are una GigabitEthernet?",
+   "hint": "Costul scade când viteza crește.",
+   "solution": "10 Mb/s: 100; 100 Mb/s: 19; 1 Gb/s: 4; 10 Gb/s: 2. Portul rădăcină e cel cu costul total cel mai mic până la rădăcină.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "19 și 4",
+     "100 și 10",
+     "10 și 1",
+     "4 și 19"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "32",
+   "title": "Trunchi și VLAN nativ",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023",
+   "statement": "Pe o legătură trunchi 802.1Q, cum circulă cadrele din VLAN-ul nativ?",
+   "hint": "Eticheta 802.1Q are 4 octeți și conține identificatorul VLAN-ului.",
+   "solution": "Toate celelalte VLAN-uri sunt etichetate; cel nativ trece neetichetat, de aceea trebuie să fie același la ambele capete.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cu eticheta 0",
+     "fără etichetă (untagged)",
+     "cu două etichete",
+     "nu pot circula pe trunchi"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "33",
+   "title": "Codificarea Manchester",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023",
+   "statement": "Ce proprietate are codificarea Manchester?",
+   "hint": "Receptorul se sincronizează pe tranziții.",
+   "solution": "Prețul: lățimea de bandă necesară e dublă față de NRZ.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "folosește trei niveluri de tensiune",
+     "fiecare bit are o tranziție la mijlocul intervalului, deci semnalul își duce singur ceasul",
+     "nu are nicio tranziție pentru șiruri lungi de 0",
+     "dublează viteza de transfer față de NRZ"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "34",
+   "title": "NAT cu supraîncărcare",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Cum deosebește un ruter care face PAT (NAT cu supraîncărcare) conexiunile mai multor stații care ies cu aceeași adresă publică?",
+   "hint": "PAT = Port Address Translation.",
+   "solution": "Fiecare conexiune primește un port sursă unic pe adresa publică; răspunsurile sunt translatate înapoi după tabelă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "după adresa MAC a stației",
+     "după TTL",
+     "nu le poate deosebi",
+     "după numărul de port sursă, pe care îl ține într-o tabelă de translatare"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "35",
+   "title": "Acces din afară, printr-un NAT",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un server aflat în spatele unui NAT trebuie să fie accesibil din Internet pe portul 443. Ce se configurează pe ruter?",
+   "hint": "Conexiunile inițiate din afară nu au o intrare în tabela de translatare.",
+   "solution": "DNAT / port forwarding: o regulă statică trimite ce sosește pe adresa publică, portul 443, la adresa privată a serverului.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "o rută implicită către server",
+     "un VLAN separat",
+     "dezactivarea ARP",
+     "redirecționarea portului 443 către server (port forwarding, NAT static)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "37",
+   "title": "ARP poisoning",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023 · atac Person-In-The-Middle",
+   "statement": "Un atacator conectat la un switch trimite răspunsuri ARP false, ca să se așeze între două stații. Ce mecanism al switch-ului oprește atacul?",
+   "hint": "Switch-ul trebuie să știe ce pereche IP-MAC e legitimă pe fiecare port.",
+   "solution": "DHCP snooping ține perechile IP-MAC-port; DAI aruncă răspunsurile ARP care nu se potrivesc. Port security limitează adresele MAC pe port.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Dynamic ARP Inspection, pe baza tabelei DHCP snooping",
+     "STP",
+     "un VLAN nativ diferit",
+     "dezactivarea portului trunchi"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "38",
+   "title": "TCP și UDP",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Care serviciu este oferit de TCP, dar nu și de UDP?",
+   "hint": "UDP e fără conexiune.",
+   "solution": "TCP numerotează octeții, confirmă și retransmite; UDP doar multiplexează prin porturi.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "livrarea sigură și în ordine a datelor",
+     "adresarea prin porturi",
+     "suma de control",
+     "transportul peste IP"
+    ],
+    "answer": 0
+   }
+  }
+ ]
+}

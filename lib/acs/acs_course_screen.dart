@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../acs_screen.dart' show acsSubject, AcsSubject;
+import '../acs_screen.dart' show acsSubject, acsTrail, AcsSubject;
 import '../app_link.dart';
 import 'acs_data.dart';
 import 'acs_kit.dart';
@@ -56,7 +56,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
         final data = _data;
         if (subject == null || data == null) {
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            AcsNav(ink: ink, trail: [(widget.code, '/acs/${widget.code}')]),
+            AcsNav(ink: ink, trail: acsTrail(widget.code)),
             const SizedBox(height: 24),
             Text(ink.terminal ? 'ls: cannot access \'${widget.code}/\': No such file or directory' : 'Materia nu are încă probleme.', style: ink.mono(15, color: ink.bad)),
           ]);
@@ -156,7 +156,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
           ]),
         ),
         const SizedBox(height: 10),
-        AcsNav(ink: ink, trail: [(s.code, s.route)]),
+        AcsNav(ink: ink, trail: acsTrail(s.code)),
         const SizedBox(height: 18),
         AcsPrompt(ink, 'cat progres', dir: '~/acs/${s.code}'),
         const SizedBox(height: 4),
@@ -191,7 +191,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
         Container(
           padding: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: ink.line, width: 2))),
-          child: AcsNav(ink: ink, trail: [(s.code, s.route)], size: narrow ? 15 : 17),
+          child: AcsNav(ink: ink, trail: acsTrail(s.code), size: narrow ? 15 : 17),
         ),
         const SizedBox(height: 12),
         Text.rich(TextSpan(children: [

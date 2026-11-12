@@ -1,0 +1,804 @@
+{
+ "code": "apd",
+ "chapters": [
+  "1. Curse și întrețeseri",
+  "2. Excludere mutuală",
+  "3. Semafoare și bariere",
+  "4. Blocaje",
+  "5. Paralel și distribuit: teorie"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Două incrementări",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Două fire incrementează aceeași variabilă. `x = x + 1` nu e atomică: firul citește `x`, apoi scrie înapoi valoarea citită plus 1.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "Ce se întâmplă dacă ambele fire citesc `x` înainte ca vreunul să scrie?",
+   "solution": "`2` când un fir termină înainte să înceapă celălalt; `1` când amândouă citesc `0` și amândouă scriu `1` (o actualizare se pierde).",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1",
+    "ask": "x",
+    "values": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "2",
+   "title": "Câte două incrementări",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Fiecare fir incrementează variabila de două ori.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\n  x = x + 1\nthread B:\n  x = x + 1\n  x = x + 1\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "Poate ieși `1`? Fiecare fir scrie de două ori, iar a doua scriere a lui vine după prima lui.",
+   "solution": "`4` fără suprapuneri, `3` cu o actualizare pierdută, `2` cu două. `1` nu se poate: ultimul fir care scrie a citit după prima lui scriere, deci cel puțin `1`, și scrie cel puțin `2`.",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\n  x = x + 1\nthread B:\n  x = x + 1\n  x = x + 1",
+    "ask": "x",
+    "values": [
+     2,
+     3,
+     4
+    ]
+   }
+  },
+  {
+   "id": "3",
+   "title": "Înmulțire și adunare",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un fir dublează variabila, celălalt o incrementează.\n\n```\nshared x = 1\nthread A:\n  x = x * 2\nthread B:\n  x = x + 1\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "Trei cazuri: A întreg înaintea lui B, B întreg înaintea lui A, sau amândouă citesc `1`.",
+   "solution": "`A` apoi `B`: `1·2 + 1 = 3`. `B` apoi `A`: `(1+1)·2 = 4`. Amândouă citesc `1`: și `A`, și `B` vor să scrie `2`, deci `2`.",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 1\nthread A:\n  x = x * 2\nthread B:\n  x = x + 1",
+    "ask": "x",
+    "values": [
+     2,
+     3,
+     4
+    ]
+   }
+  },
+  {
+   "id": "4",
+   "title": "Trei fire, o variabilă",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Două fire scriu constante, al treilea adună 10 la ce găsește.\n\n```\nshared x = 0\nthread A:\n  x = 1\nthread B:\n  x = 2\nthread C:\n  x = x + 10\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "Valoarea finală e cea scrisă ultima. Dacă ultimul scrie `C`, contează ce citise: `0`, `1` sau `2`.",
+   "solution": "Ultimul scrie `A`: `1`. Ultimul scrie `B`: `2`. Ultimul scrie `C`: `10`, `11` sau `12`, după ce a apucat să citească.",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 0\nthread A:\n  x = 1\nthread B:\n  x = 2\nthread C:\n  x = x + 10",
+    "ask": "x",
+    "values": [
+     1,
+     2,
+     10,
+     11,
+     12
+    ]
+   }
+  },
+  {
+   "id": "8",
+   "title": "Actualizarea pierdută",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Arată că incrementarea neprotejată poate pierde o actualizare.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1\n```\n\nRulează firele pas cu pas, în ordinea pe care o alegi, astfel încât programul să se termine cu `x = 1`.",
+   "hint": "Ambele fire trebuie să citească înainte ca vreunul să scrie.",
+   "solution": "O ordine: `A B A B` (A citește 0, B citește 0, A scrie 1, B scrie 1).",
+   "kind": "threads",
+   "spec": {
+    "mode": "schedule",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1",
+    "goal": {
+     "x": 1
+    }
+   }
+  },
+  {
+   "id": "9",
+   "title": "Patru incrementări, rezultat 2",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Fiecare fir incrementează de două ori. Găsește întrețeserea în care se pierd două actualizări.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\n  x = x + 1\nthread B:\n  x = x + 1\n  x = x + 1\n```\n\nRulează firele pas cu pas, în ordinea pe care o alegi, astfel încât programul să se termine cu `x = 2`.",
+   "hint": "Un fir citește `0` și „doarme” cât celălalt face o incrementare întreagă; apoi scrie `1`, celălalt citește `1`...",
+   "solution": "O ordine: `A B B A B A A B`: A citește 0; B incrementează (x = 1); A scrie 1; B citește 1; A incrementează (x = 2); B scrie 2.",
+   "kind": "threads",
+   "spec": {
+    "mode": "schedule",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\n  x = x + 1\nthread B:\n  x = x + 1\n  x = x + 1",
+    "goal": {
+     "x": 2
+    }
+   }
+  },
+  {
+   "id": "10",
+   "title": "Trei fire, rezultat 1",
+   "chapter": "1. Curse și întrețeseri",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Găsește ordinea în care, la sfârșit, `x = 1`.\n\n```\nshared x = 0\nthread A:\n  x = 5\nthread B:\n  x = x + 1\nthread C:\n  x = x * 2\n```\n\nRulează firele pas cu pas, în ordinea pe care o alegi, astfel încât programul să se termine cu `x = 1`.",
+   "hint": "Ultima scriere trebuie să fie a lui `B`, cu valoarea citită la început, când `x` era `0`.",
+   "solution": "O ordine: `B A C C B`: B citește 0; A scrie 5; C citește 5 și scrie 10; B scrie 1.",
+   "kind": "threads",
+   "spec": {
+    "mode": "schedule",
+    "program": "shared x = 0\nthread A:\n  x = 5\nthread B:\n  x = x + 1\nthread C:\n  x = x * 2",
+    "goal": {
+     "x": 1
+    }
+   }
+  },
+  {
+   "id": "5",
+   "title": "Lock-ul nu alege ordinea",
+   "chapter": "2. Excludere mutuală",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Cele două actualizări sunt acum protejate de același lock.\n\n```\nshared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\n  unlock(m)\nthread B:\n  lock(m)\n  x = x * 2\n  unlock(m)\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "Secțiunile critice nu se mai suprapun, dar oricare dintre fire poate intra primul.",
+   "solution": "`A` apoi `B`: `(0+1)·2 = 2`. `B` apoi `A`: `0·2 + 1 = 1`. Excluderea mutuală elimină actualizările pierdute, nu și nedeterminismul ordinii.",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\n  unlock(m)\nthread B:\n  lock(m)\n  x = x * 2\n  unlock(m)",
+    "ask": "x",
+    "values": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "14",
+   "title": "Contor protejat",
+   "chapter": "2. Excludere mutuală",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Cele două fire pierd uneori o incrementare.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 2`. Instrucțiunile date rămân; adaugi doar sincronizare.",
+   "hint": "Declară un lock (`lock m`) și pune fiecare incrementare între `lock(m)` și `unlock(m)`.",
+   "solution": "O rezolvare:\n```\nshared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\n  unlock(m)\nthread B:\n  lock(m)\n  x = x + 1\n  unlock(m)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1",
+    "expect": {
+     "x": 2
+    },
+    "keep": {
+     "A": [
+      "x=x+1"
+     ],
+     "B": [
+      "x=x+1"
+     ]
+    },
+    "reference": "shared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\n  unlock(m)\nthread B:\n  lock(m)\n  x = x + 1\n  unlock(m)"
+   }
+  },
+  {
+   "id": "15",
+   "title": "Trei fire, șase incrementări",
+   "chapter": "2. Excludere mutuală",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Trei fire incrementează de câte două ori același contor.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\n  x = x + 1\nthread B:\n  x = x + 1\n  x = x + 1\nthread C:\n  x = x + 1\n  x = x + 1\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 6`. Instrucțiunile date rămân; adaugi doar sincronizare.",
+   "hint": "Același lock în toate firele. O secțiune critică poate cuprinde ambele incrementări.",
+   "solution": "O rezolvare:\n```\nshared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\n  x = x + 1\n  unlock(m)\nthread B:\n  lock(m)\n  x = x + 1\n  x = x + 1\n  unlock(m)\nthread C:\n  lock(m)\n  x = x + 1\n  x = x + 1\n  unlock(m)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\n  x = x + 1\nthread B:\n  x = x + 1\n  x = x + 1\nthread C:\n  x = x + 1\n  x = x + 1",
+    "expect": {
+     "x": 6
+    },
+    "keep": {
+     "A": [
+      "x=x+1",
+      "x=x+1"
+     ],
+     "B": [
+      "x=x+1",
+      "x=x+1"
+     ],
+     "C": [
+      "x=x+1",
+      "x=x+1"
+     ]
+    },
+    "reference": "shared x = 0\nlock m\nthread A:\n  lock(m)\n  x = x + 1\n  x = x + 1\n  unlock(m)\nthread B:\n  lock(m)\n  x = x + 1\n  x = x + 1\n  unlock(m)\nthread C:\n  lock(m)\n  x = x + 1\n  x = x + 1\n  unlock(m)"
+   }
+  },
+  {
+   "id": "6",
+   "title": "Semaforul impune ordinea",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Semaforul `s` pornește de la 0.\n\n```\nshared x = 0\nsem s = 0\nthread A:\n  P(s)\n  x = x * 2\nthread B:\n  x = x + 3\n  V(s)\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "`A` nu poate trece de `P(s)` până când `B` nu face `V(s)`.",
+   "solution": "`B` rulează întreg înaintea lui `A`: `(0+3)·2 = 6`. E singura valoare: semaforul inițializat cu 0 e folosit pentru sincronizare condiționată (ordonare).",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 0\nsem s = 0\nthread A:\n  P(s)\n  x = x * 2\nthread B:\n  x = x + 3\n  V(s)",
+    "ask": "x",
+    "values": [
+     6
+    ]
+   }
+  },
+  {
+   "id": "7",
+   "title": "După barieră",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "grea",
+   "source": "Examen APD 2020 · „Ce garanții oferă o barieră?”",
+   "statement": "Bariera `b` lasă firele să treacă doar după ce au ajuns amândouă la ea.\n\n```\nshared x = 1\nbarrier b = 2\nthread A:\n  x = x + 1\n  await(b)\n  x = x * 2\nthread B:\n  await(b)\n  x = x + 10\n```\n\nCare sunt **toate** valorile cu care se poate termina `x`?",
+   "hint": "Tot ce e înainte de barieră se termină înainte de orice e după ea. După barieră, cele două actualizări sunt din nou în cursă.",
+   "solution": "La barieră `x = 2`. Apoi: `A`, `B`: `2·2 + 10 = 14`; `B`, `A`: `(2+10)·2 = 24`; amândouă citesc `2`: rămâne ultima scriere, `4` sau `12`.",
+   "kind": "threads",
+   "spec": {
+    "mode": "outcomes",
+    "program": "shared x = 1\nbarrier b = 2\nthread A:\n  x = x + 1\n  await(b)\n  x = x * 2\nthread B:\n  await(b)\n  x = x + 10",
+    "ask": "x",
+    "values": [
+     4,
+     12,
+     14,
+     24
+    ]
+   }
+  },
+  {
+   "id": "11",
+   "title": "Între cele două jumătăți",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "`B` așteaptă semnalul lui `A`.\n\n```\nshared x = 0\nsem s = 0\nthread A:\n  x = x + 1\n  V(s)\n  x = x + 1\nthread B:\n  P(s)\n  x = x * 10\n```\n\nRulează firele pas cu pas, în ordinea pe care o alegi, astfel încât programul să se termine cu `x = 11`.",
+   "hint": "`B` trebuie să ruleze întreg între `V(s)` și a doua incrementare a lui `A`.",
+   "solution": "O ordine: `A A A B B B A A`: A face `x = 1` și `V(s)`; B trece de `P(s)` și face `x = 10`; A face `x = 11`.",
+   "kind": "threads",
+   "spec": {
+    "mode": "schedule",
+    "program": "shared x = 0\nsem s = 0\nthread A:\n  x = x + 1\n  V(s)\n  x = x + 1\nthread B:\n  P(s)\n  x = x * 10",
+    "goal": {
+     "x": 11
+    }
+   }
+  },
+  {
+   "id": "16",
+   "title": "Excludere mutuală cu un semafor",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Protejează contorul folosind un semafor în loc de lock.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 2`. Instrucțiunile date rămân; adaugi doar sincronizare. Fără lock-uri: folosește semafoare.",
+   "hint": "Un semafor inițializat cu 1 (binar) lasă un singur fir între `P` și `V`.",
+   "solution": "O rezolvare:\n```\nshared x = 0\nsem s = 1\nthread A:\n  P(s)\n  x = x + 1\n  V(s)\nthread B:\n  P(s)\n  x = x + 1\n  V(s)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\nthread B:\n  x = x + 1",
+    "expect": {
+     "x": 2
+    },
+    "keep": {
+     "A": [
+      "x=x+1"
+     ],
+     "B": [
+      "x=x+1"
+     ]
+    },
+    "reference": "shared x = 0\nsem s = 1\nthread A:\n  P(s)\n  x = x + 1\n  V(s)\nthread B:\n  P(s)\n  x = x + 1\n  V(s)",
+    "forbid": [
+     "lock"
+    ]
+   }
+  },
+  {
+   "id": "17",
+   "title": "A înaintea lui B",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "`A` trebuie să-și termine calculul înainte ca `B` să-l înceapă pe al lui.\n\n```\nshared x = 1\nthread A:\n  x = x + 4\nthread B:\n  x = x * 3\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 15`. Instrucțiunile date rămân; adaugi doar sincronizare. Fără lock-uri: folosește semafoare.",
+   "hint": "Un semafor inițializat cu 0: `B` îl așteaptă cu `P`, `A` îl eliberează cu `V` când a terminat.",
+   "solution": "O rezolvare:\n```\nshared x = 1\nsem s = 0\nthread A:\n  x = x + 4\n  V(s)\nthread B:\n  P(s)\n  x = x * 3\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 1\nthread A:\n  x = x + 4\nthread B:\n  x = x * 3",
+    "expect": {
+     "x": 15
+    },
+    "keep": {
+     "A": [
+      "x=x+4"
+     ],
+     "B": [
+      "x=x*3"
+     ]
+    },
+    "reference": "shared x = 1\nsem s = 0\nthread A:\n  x = x + 4\n  V(s)\nthread B:\n  P(s)\n  x = x * 3",
+    "forbid": [
+     "lock"
+    ]
+   }
+  },
+  {
+   "id": "18",
+   "title": "Trei fire în ordinea C, A, B",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Fiecare fir adaugă o cifră la sfârșitul lui `x`. Cifrele trebuie să apară în ordinea `3`, `1`, `2`.\n\n```\nshared x = 0\nthread A:\n  x = x * 10 + 1\nthread B:\n  x = x * 10 + 2\nthread C:\n  x = x * 10 + 3\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 312`. Instrucțiunile date rămân; adaugi doar sincronizare. Fără lock-uri: folosește semafoare.",
+   "hint": "Predarea ștafetei: câte un semafor pe 0 pentru fiecare fir care trebuie să aștepte; cel dinainte îi dă `V`.",
+   "solution": "O rezolvare:\n```\nshared x = 0\nsem a = 0, b = 0\nthread A:\n  P(a)\n  x = x * 10 + 1\n  V(b)\nthread B:\n  P(b)\n  x = x * 10 + 2\nthread C:\n  x = x * 10 + 3\n  V(a)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0\nthread A:\n  x = x * 10 + 1\nthread B:\n  x = x * 10 + 2\nthread C:\n  x = x * 10 + 3",
+    "expect": {
+     "x": 312
+    },
+    "keep": {
+     "A": [
+      "x=x*10+1"
+     ],
+     "B": [
+      "x=x*10+2"
+     ],
+     "C": [
+      "x=x*10+3"
+     ]
+    },
+    "reference": "shared x = 0\nsem a = 0, b = 0\nthread A:\n  P(a)\n  x = x * 10 + 1\n  V(b)\nthread B:\n  P(b)\n  x = x * 10 + 2\nthread C:\n  x = x * 10 + 3\n  V(a)",
+    "forbid": [
+     "lock"
+    ]
+   }
+  },
+  {
+   "id": "19",
+   "title": "Producător și consumator, un singur element",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "medie",
+   "source": "Examen APD 2020 · pseudocod Producător-Consumator",
+   "statement": "Producătorul pune o valoare în `buf`; consumatorul o ia în `got` și golește bufferul. Consumatorul nu are voie să citească înainte să existe ceva.\n\n```\nshared buf = 0, got = 0\nthread Prod:\n  buf = 7\nthread Cons:\n  got = buf\n  buf = 0\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `buf = 0`, `got = 7`. Instrucțiunile date rămân; adaugi doar sincronizare. Fără lock-uri: folosește semafoare.",
+   "hint": "Semaforul `plin`, inițializat cu 0, numără elementele din buffer: producătorul face `V(plin)` după ce a pus, consumatorul face `P(plin)` înainte să ia.",
+   "solution": "O rezolvare:\n```\nshared buf = 0, got = 0\nsem plin = 0\nthread Prod:\n  buf = 7\n  V(plin)\nthread Cons:\n  P(plin)\n  got = buf\n  buf = 0\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared buf = 0, got = 0\nthread Prod:\n  buf = 7\nthread Cons:\n  got = buf\n  buf = 0",
+    "expect": {
+     "buf": 0,
+     "got": 7
+    },
+    "keep": {
+     "Prod": [
+      "buf=7"
+     ],
+     "Cons": [
+      "got=buf",
+      "buf=0"
+     ]
+    },
+    "reference": "shared buf = 0, got = 0\nsem plin = 0\nthread Prod:\n  buf = 7\n  V(plin)\nthread Cons:\n  P(plin)\n  got = buf\n  buf = 0",
+    "forbid": [
+     "lock"
+    ]
+   }
+  },
+  {
+   "id": "20",
+   "title": "B între cei doi pași ai lui A",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "`B` trebuie să ruleze exact între cele două instrucțiuni ale lui `A`.\n\n```\nshared x = 0\nthread A:\n  x = x + 1\n  x = x * 2\nthread B:\n  x = x + 3\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 8`. Instrucțiunile date rămân; adaugi doar sincronizare.",
+   "hint": "Două semafoare pe 0: `A` îi dă voie lui `B` și apoi așteaptă să fie anunțat că `B` a terminat.",
+   "solution": "O rezolvare:\n```\nshared x = 0\nsem toB = 0, toA = 0\nthread A:\n  x = x + 1\n  V(toB)\n  P(toA)\n  x = x * 2\nthread B:\n  P(toB)\n  x = x + 3\n  V(toA)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0\nthread A:\n  x = x + 1\n  x = x * 2\nthread B:\n  x = x + 3",
+    "expect": {
+     "x": 8
+    },
+    "keep": {
+     "A": [
+      "x=x+1",
+      "x=x*2"
+     ],
+     "B": [
+      "x=x+3"
+     ]
+    },
+    "reference": "shared x = 0\nsem toB = 0, toA = 0\nthread A:\n  x = x + 1\n  V(toB)\n  P(toA)\n  x = x * 2\nthread B:\n  P(toB)\n  x = x + 3\n  V(toA)"
+   }
+  },
+  {
+   "id": "21",
+   "title": "Faza a doua, după barieră",
+   "chapter": "3. Semafoare și bariere",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Fiecare fir își scrie valoarea (faza 1), apoi calculează suma celor două (faza 2). Suma trebuie calculată abia după ce ambele valori sunt scrise.\n\n```\nshared x = 0, y = 0, ra = 0, rb = 0\nthread A:\n  x = 2\n  ra = x + y\nthread B:\n  y = 3\n  rb = x + y\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 2`, `y = 3`, `ra = 5`, `rb = 5`. Instrucțiunile date rămân; adaugi doar sincronizare.",
+   "hint": "O barieră pentru 2 fire (`barrier b = 2`), cu `await(b)` între cele două faze, în ambele fire.",
+   "solution": "O rezolvare:\n```\nshared x = 0, y = 0, ra = 0, rb = 0\nbarrier b = 2\nthread A:\n  x = 2\n  await(b)\n  ra = x + y\nthread B:\n  y = 3\n  await(b)\n  rb = x + y\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0, y = 0, ra = 0, rb = 0\nthread A:\n  x = 2\n  ra = x + y\nthread B:\n  y = 3\n  rb = x + y",
+    "expect": {
+     "x": 2,
+     "y": 3,
+     "ra": 5,
+     "rb": 5
+    },
+    "keep": {
+     "A": [
+      "x=2",
+      "ra=x+y"
+     ],
+     "B": [
+      "y=3",
+      "rb=x+y"
+     ]
+    },
+    "reference": "shared x = 0, y = 0, ra = 0, rb = 0\nbarrier b = 2\nthread A:\n  x = 2\n  await(b)\n  ra = x + y\nthread B:\n  y = 3\n  await(b)\n  rb = x + y"
+   }
+  },
+  {
+   "id": "12",
+   "title": "Deadlock cu două lock-uri",
+   "chapter": "4. Blocaje",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Cele două fire iau aceleași lock-uri în ordine inversă.\n\n```\nshared x = 0\nlock m, n\nthread A:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\nthread B:\n  lock(n)\n  lock(m)\n  x = x + 1\n  unlock(m)\n  unlock(n)\n```\n\nRulează firele pas cu pas, în ordinea pe care o alegi, astfel încât toate firele rămase să fie blocate (deadlock).",
+   "hint": "Fiecare fir trebuie să apuce primul lui lock înainte ca celălalt să-l ceară.",
+   "solution": "Ordinea `A B`: A ține `m` și așteaptă `n`; B ține `n` și așteaptă `m`. Așteptare circulară: deadlock.",
+   "kind": "threads",
+   "spec": {
+    "mode": "schedule",
+    "program": "shared x = 0\nlock m, n\nthread A:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\nthread B:\n  lock(n)\n  lock(m)\n  x = x + 1\n  unlock(m)\n  unlock(n)",
+    "goalDeadlock": true
+   }
+  },
+  {
+   "id": "13",
+   "title": "Semnalul care nu mai vine",
+   "chapter": "4. Blocaje",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Fiecare fir așteaptă semnalul celuilalt înainte să-l dea pe al lui.\n\n```\nshared x = 0\nsem a = 0, b = 1\nthread A:\n  P(b)\n  P(a)\n  x = x + 1\n  V(b)\nthread B:\n  P(b)\n  x = x + 1\n  V(a)\n  V(b)\n```\n\nRulează firele pas cu pas, în ordinea pe care o alegi, astfel încât toate firele rămase să fie blocate (deadlock).",
+   "hint": "Cine ia primul semaforul `b` hotărăște totul.",
+   "solution": "Dacă `A` face primul `P(b)`, rămâne blocat la `P(a)` ținând `b`, iar `B` se blochează la `P(b)`: nimeni nu mai face `V(a)`. Ordinea: `A`.",
+   "kind": "threads",
+   "spec": {
+    "mode": "schedule",
+    "program": "shared x = 0\nsem a = 0, b = 1\nthread A:\n  P(b)\n  P(a)\n  x = x + 1\n  V(b)\nthread B:\n  P(b)\n  x = x + 1\n  V(a)\n  V(b)",
+    "goalDeadlock": true
+   }
+  },
+  {
+   "id": "22",
+   "title": "Scapă de deadlock",
+   "chapter": "4. Blocaje",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Programul se poate bloca: firele iau lock-urile în ordine inversă. Fă-l să se termine mereu, păstrând ambele lock-uri în jurul incrementării.\n\n```\nshared x = 0\nlock m, n\nthread A:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\nthread B:\n  lock(n)\n  lock(m)\n  x = x + 1\n  unlock(m)\n  unlock(n)\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `x = 2`. Instrucțiunile date rămân; adaugi doar sincronizare.",
+   "hint": "Rupe așteptarea circulară: toate firele iau lock-urile în aceeași ordine.",
+   "solution": "O rezolvare:\n```\nshared x = 0\nlock m, n\nthread A:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\nthread B:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared x = 0\nlock m, n\nthread A:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\nthread B:\n  lock(n)\n  lock(m)\n  x = x + 1\n  unlock(m)\n  unlock(n)",
+    "expect": {
+     "x": 2
+    },
+    "keep": {
+     "A": [
+      "x=x+1"
+     ],
+     "B": [
+      "x=x+1"
+     ]
+    },
+    "reference": "shared x = 0\nlock m, n\nthread A:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)\nthread B:\n  lock(m)\n  lock(n)\n  x = x + 1\n  unlock(n)\n  unlock(m)"
+   }
+  },
+  {
+   "id": "23",
+   "title": "Transfer între două conturi",
+   "chapter": "4. Blocaje",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Două transferuri în sens opus între conturile `a` și `b`. Suma totală trebuie să rămână 100, iar fiecare cont să ajungă la valoarea corectă.\n\n```\nshared a = 60, b = 40\nthread T1:\n  a = a - 10\n  b = b + 10\nthread T2:\n  b = b - 5\n  a = a + 5\n```\n\nSincronizează firele astfel încât, **în orice întrețesere**, programul să se termine (fără blocaj) cu `a = 55`, `b = 45`. Instrucțiunile date rămân; adaugi doar sincronizare.",
+   "hint": "Un lock pe fiecare cont, luate mereu în aceeași ordine (sau un singur lock pentru amândouă).",
+   "solution": "O rezolvare:\n```\nshared a = 60, b = 40\nlock la, lb\nthread T1:\n  lock(la)\n  lock(lb)\n  a = a - 10\n  b = b + 10\n  unlock(lb)\n  unlock(la)\nthread T2:\n  lock(la)\n  lock(lb)\n  b = b - 5\n  a = a + 5\n  unlock(lb)\n  unlock(la)\n```",
+   "kind": "threads",
+   "spec": {
+    "mode": "fix",
+    "program": "shared a = 60, b = 40\nthread T1:\n  a = a - 10\n  b = b + 10\nthread T2:\n  b = b - 5\n  a = a + 5",
+    "expect": {
+     "a": 55,
+     "b": 45
+    },
+    "keep": {
+     "T1": [
+      "a=a-10",
+      "b=b+10"
+     ],
+     "T2": [
+      "b=b-5",
+      "a=a+5"
+     ]
+    },
+    "reference": "shared a = 60, b = 40\nlock la, lb\nthread T1:\n  lock(la)\n  lock(lb)\n  a = a - 10\n  b = b + 10\n  unlock(lb)\n  unlock(la)\nthread T2:\n  lock(la)\n  lock(lb)\n  b = b - 5\n  a = a + 5\n  unlock(lb)\n  unlock(la)"
+   }
+  },
+  {
+   "id": "24",
+   "title": "Amdahl: 90% paralelizabil, 4 procesoare",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "ușoară",
+   "source": "Examen APD 2020",
+   "statement": "Un program a fost paralelizat în proporție de 90%. Ce accelerare (speed-up) prezice legea lui Amdahl pe 4 procesoare?",
+   "hint": "`S = 1 / (f + (1 - f) / P)`, cu `f` partea secvențială.",
+   "solution": "`S = 1 / (0.1 + 0.9 / 4) = 1 / 0.325 ≈ 3.08`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1.82",
+     "3.60",
+     "4.00",
+     "3.08"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "25",
+   "title": "Amdahl: 50% paralelizabil, 8 procesoare",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "ușoară",
+   "source": "Examen APD 2020",
+   "statement": "Cum scalează, după legea lui Amdahl, o soluție paralelizabilă în proporție de 50%, pe 8 procesoare?",
+   "hint": "`S = 2P / (1 + P)` când jumătate din program e secvențial.",
+   "solution": "`S = 1 / (0.5 + 0.5 / 8) = 16 / 9 ≈ 1.78`. Oricâte procesoare ai avea, `S < 2`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "4.00",
+     "1.60",
+     "1.78",
+     "2.00"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "26",
+   "title": "Amdahl: limita",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un program are 5% cod care nu poate fi paralelizat. Care este accelerarea maximă, oricâte procesoare am folosi?",
+   "hint": "Când `P → ∞`, termenul `(1 - f) / P` dispare.",
+   "solution": "`S → 1 / f = 1 / 0.05 = 20`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "20",
+     "5",
+     "95",
+     "nelimitată"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "27",
+   "title": "Taxonomia Flynn",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "ușoară",
+   "source": "Examen APD 2020",
+   "statement": "În ce categorie a taxonomiei Flynn intră un procesor obișnuit cu mai multe nuclee?",
+   "hint": "Mai multe fluxuri de instrucțiuni, fiecare cu datele lui.",
+   "solution": "SISD: calculatorul clasic cu un nucleu; SIMD: plăci video, instrucțiuni vectoriale; MISD: sisteme specializate; MIMD: procesoare multi-core, clustere.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "MIMD",
+     "SISD",
+     "SIMD",
+     "MISD"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "28",
+   "title": "Ce garantează o barieră",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "ușoară",
+   "source": "Examen APD 2020",
+   "statement": "Ce garanție oferă o barieră la care așteaptă toate firele?",
+   "hint": "Bariera desparte două faze.",
+   "solution": "Niciun fir nu trece până nu au ajuns toate; după aceea toate continuă, în paralel, în orice ordine.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un singur fir execută codul de după barieră",
+     "firele trec de barieră în ordinea în care au ajuns",
+     "codul de după barieră se execută secvențial",
+     "tot codul dinaintea barierei, din toate firele, se execută înaintea codului de după ea"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "29",
+   "title": "Ceasul Lamport la recepție",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un proces are ceasul logic (Lamport) egal cu 4 și primește un mesaj cu marca de timp 9. Ce valoare are ceasul lui după evenimentul de recepție?",
+   "hint": "La recepție: `ceas = max(ceas, marca mesajului) + 1`.",
+   "solution": "`max(4, 9) + 1 = 10`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "5",
+     "10",
+     "9",
+     "13"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "30",
+   "title": "Ceasuri vectoriale",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "medie",
+   "source": "Examen APD 2020 · „Diferența dintre ceas vectorial și ceas logic”",
+   "statement": "Două evenimente au ceasurile vectoriale `[2, 1, 0]` și `[1, 2, 0]`. Ce relație este între ele?",
+   "hint": "`V1 < V2` doar dacă toate componentele lui `V1` sunt `≤` și cel puțin una e strict mai mică.",
+   "solution": "`2 > 1` pe prima componentă și `1 < 2` pe a doua: niciunul nu e mai mic decât celălalt, deci evenimentele sunt concurente. Un ceas Lamport (o singură valoare) nu ar putea arăta asta.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "sunt concurente",
+     "primul îl precede cauzal pe al doilea",
+     "al doilea îl precede cauzal pe primul",
+     "sunt același eveniment"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "31",
+   "title": "Algoritmi undă",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "medie",
+   "source": "Examen APD 2020",
+   "statement": "Care dintre următoarele NU este una dintre cele trei condiții pe care le îndeplinește un algoritm undă?",
+   "hint": "Cele trei condiții: terminare, decizie, dependență.",
+   "solution": "Numărul de mesaje diferă de la un algoritm undă la altul (inel, arbore, ecou, faze); condițiile sunt terminarea, decizia și dependența.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "terminare: fiecare calcul e finit",
+     "decizie: fiecare calcul conține cel puțin un eveniment „decide”",
+     "dependență: fiecare „decide” e precedat cauzal de un eveniment din fiecare proces",
+     "fiecare proces trimite exact un mesaj"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "32",
+   "title": "Alegerea liderului pe inel",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "grea",
+   "source": "Examen APD 2015",
+   "statement": "Ce complexitate are, în număr de mesaje, algoritmul Hirschberg-Sinclair de alegere a liderului pe un inel bidirecțional cu `n` procese?",
+   "hint": "În faza `k` un candidat își trimite identificatorul la distanța `2^k` în ambele sensuri.",
+   "solution": "Sunt cel mult `log n` faze și în fiecare se trimit `O(n)` mesaje: `O(n log n)`. LeLann și Chang-Roberts au cazul cel mai defavorabil `O(n²)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(n)",
+     "O(n²)",
+     "O(n log n)",
+     "O(log n)"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "33",
+   "title": "SHA-1 în Chord",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "ușoară",
+   "source": "Examen APD 2020",
+   "statement": "Ce rol are funcția SHA-1 în algoritmul Chord?",
+   "hint": "Chord e o tabelă de dispersie distribuită.",
+   "solution": "Hashing consistent: și nodurile, și cheile primesc identificatori pe același inel, iar o cheie e ținută de succesorul ei.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "criptează mesajele dintre noduri",
+     "distribuie uniform identificatorii nodurilor și ai cheilor pe inel",
+     "semnează tabelele de rutare (finger tables)",
+     "detectează nodurile căzute"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "34",
+   "title": "Eficiența",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un program rulează în 120 s pe un procesor și în 20 s pe 8 procesoare. Care este eficiența paralelizării?",
+   "hint": "Eficiența este accelerarea împărțită la numărul de procesoare.",
+   "solution": "`S = 120 / 20 = 6`, `E = S / P = 6 / 8 = 0.75`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "6",
+     "0.60",
+     "1.33",
+     "0.75"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "35",
+   "title": "Condițiile deadlock-ului",
+   "chapter": "5. Paralel și distribuit: teorie",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Care dintre următoarele nu este o condiție necesară pentru apariția unui deadlock?",
+   "hint": "Condițiile Coffman.",
+   "solution": "Deadlock-ul cere excludere mutuală, hold and wait, lipsa preempțiunii și așteptare circulară. Dacă resursele pot fi luate cu forța, blocajul se poate rupe.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "excluderea mutuală",
+     "preempțiunea resurselor",
+     "reținere și așteptare (hold and wait)",
+     "așteptarea circulară"
+    ],
+    "answer": 1
+   }
+  }
+ ]
+}

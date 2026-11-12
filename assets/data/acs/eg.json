@@ -1,0 +1,1191 @@
+{
+ "code": "eg",
+ "chapters": [
+  "1. Cerere, ofertă, echilibru",
+  "2. Elasticitate",
+  "3. Costuri, productivitate, profit",
+  "4. Bani, dobândă, indicatori macroeconomici",
+  "5. Noțiuni"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Echilibrul pieței",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Cererea și oferta pe o piață sunt `Qc = 100 - 2P`, `Qo = 20 + 2P` (`P` prețul, `Q` cantitatea). Află prețul și cantitatea de echilibru.",
+   "hint": "La echilibru cantitatea cerută e egală cu cea oferită: `Qc = Qo`. Pe grafic, mută prețul până când cele două puncte se întâlnesc.",
+   "solution": "`100 - 2P = 20 + 2P` ⇒ `P = 20`, apoi `Q = 100 - 2·20 = 60`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prețul de echilibru",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "q",
+      "label": "cantitatea de echilibru",
+      "answer": "60",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     100,
+     2,
+     20,
+     2
+    ],
+    "price": 10.0
+   }
+  },
+  {
+   "id": "2",
+   "title": "Echilibru, ofertă care pornește mai târziu",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Cererea și oferta pe o piață sunt `Qc = 120 - 3P`, `Qo = -30 + 2P` (`P` prețul, `Q` cantitatea). Află prețul și cantitatea de echilibru.",
+   "hint": "La echilibru cantitatea cerută e egală cu cea oferită: `Qc = Qo`. Pe grafic, mută prețul până când cele două puncte se întâlnesc.",
+   "solution": "`120 - 3P = -30 + 2P` ⇒ `P = 30`, apoi `Q = 120 - 3·30 = 30`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prețul de echilibru",
+      "answer": "30",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "q",
+      "label": "cantitatea de echilibru",
+      "answer": "30",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     120,
+     3,
+     -30,
+     2
+    ],
+    "price": 15.0
+   }
+  },
+  {
+   "id": "3",
+   "title": "Echilibru cu preț fracționar",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Cererea și oferta pe o piață sunt `Qc = 90 - 4P`, `Qo = 10 + 1P` (`P` prețul, `Q` cantitatea). Află prețul și cantitatea de echilibru.",
+   "hint": "La echilibru cantitatea cerută e egală cu cea oferită: `Qc = Qo`. Pe grafic, mută prețul până când cele două puncte se întâlnesc.",
+   "solution": "`90 - 4P = 10 + 1P` ⇒ `P = 16`, apoi `Q = 90 - 4·16 = 26`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prețul de echilibru",
+      "answer": "16",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "q",
+      "label": "cantitatea de echilibru",
+      "answer": "26",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     90,
+     4,
+     10,
+     1
+    ],
+    "price": 8.0
+   }
+  },
+  {
+   "id": "4",
+   "title": "Preț maxim impus",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Pe piața cu `Qc = 100 - 2P`, `Qo = 20 + 2P`, statul impune un preț maxim (plafon) de 15. Ce se întâmplă?",
+   "hint": "Un plafon sub prețul de echilibru: se cere mai mult decât se oferă.",
+   "solution": "`Qc = 100 - 30 = 70`, `Qo = 20 + 30 = 50`: lipsesc 20 de unități. Prețul de echilibru ar fi fost 20.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "qd",
+      "label": "cantitatea cerută la prețul 15",
+      "answer": "70",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "qs",
+      "label": "cantitatea oferită la prețul 15",
+      "answer": "50",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "gap",
+      "label": "penuria (cererea neacoperită)",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     100,
+     2,
+     20,
+     2
+    ],
+    "price": 15
+   }
+  },
+  {
+   "id": "5",
+   "title": "Preț minim impus",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Pe aceeași piață, `Qc = 100 - 2P`, `Qo = 20 + 2P`, statul impune un preț minim de 25.",
+   "hint": "Un preț minim peste cel de echilibru: se oferă mai mult decât se cere.",
+   "solution": "`Qc = 50`, `Qo = 70`: rămân nevândute 20 de unități.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "qd",
+      "label": "cantitatea cerută la prețul 25",
+      "answer": "50",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "qs",
+      "label": "cantitatea oferită la prețul 25",
+      "answer": "70",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "gap",
+      "label": "surplusul (oferta nevândută)",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     100,
+     2,
+     20,
+     2
+    ],
+    "price": 25
+   }
+  },
+  {
+   "id": "6",
+   "title": "Cererea crește",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Inițial `Qc = 100 - 2P`, `Qo = 20 + 2P`. Veniturile cresc și cererea devine `Qc = 140 - 2P`; oferta nu se schimbă. Graficul arată piața nouă.",
+   "hint": "Curba cererii se mută spre dreapta: cresc și prețul, și cantitatea.",
+   "solution": "Înainte: `P = 20`, `Q = 60`. După: `140 - 2P = 20 + 2P` ⇒ `P = 30`, `Q = 80`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "noul preț de echilibru",
+      "answer": "30",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "q",
+      "label": "noua cantitate de echilibru",
+      "answer": "80",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "dp",
+      "label": "cu cât a crescut prețul",
+      "answer": "10",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     140,
+     2,
+     20,
+     2
+    ],
+    "price": 20.0
+   }
+  },
+  {
+   "id": "7",
+   "title": "Taxă pe unitatea vândută",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "grea",
+   "source": "Seminar Economie generală",
+   "statement": "Pe piața cu `Qc = 100 - 2P`, `Qo = 20 + 2P`, producătorii plătesc statului o taxă de 5 pe fiecare unitate vândută. Oferta devine `Qo = 20 + 2(P - 5)`; graficul arată piața cu taxă.",
+   "hint": "Producătorul primește `P - 5`, deci oferta se scrie în funcție de `P - 5`.",
+   "solution": "`100 - 2P = 10 + 2P` ⇒ `P = 22,5`, `Q = 55`. Producătorilor le rămâne `17,5`; statul încasează `5 · 55 = 275`. Taxa e împărțită: cumpărătorii plătesc cu 2,5 mai mult, producătorii primesc cu 2,5 mai puțin.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prețul plătit de cumpărători",
+      "answer": "22.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "pn",
+      "label": "prețul care le rămâne producătorilor",
+      "answer": "17.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "q",
+      "label": "cantitatea vândută",
+      "answer": "55",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "tax",
+      "label": "încasările statului din taxă",
+      "answer": "275",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     100,
+     2,
+     10,
+     2
+    ],
+    "price": 20.0
+   }
+  },
+  {
+   "id": "8",
+   "title": "Încasările la echilibru",
+   "chapter": "1. Cerere, ofertă, echilibru",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Pe piața cu `Qc = 100 - 2P`, `Qo = 20 + 2P`, cât încasează vânzătorii la echilibru?",
+   "hint": "Găsește întâi echilibrul.",
+   "solution": "`P = 20`, `Q = 60`: încasări `1200`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "v",
+      "label": "încasările totale (preț × cantitate)",
+      "answer": "1200",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     100,
+     2,
+     20,
+     2
+    ],
+    "price": 10
+   }
+  },
+  {
+   "id": "9",
+   "title": "Cerere inelastică",
+   "chapter": "2. Elasticitate",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Prețul unui bun crește de la 10 la 12, iar cantitatea cerută scade de la 100 la 90. Calculează elasticitatea în funcție de preț (față de valorile inițiale).",
+   "hint": "Coeficientul = variația procentuală a cantității împărțită la variația procentuală a prețului.",
+   "solution": "`ΔP% = 20%`, `ΔQ% = -10%`, deci `E = 10 / 20 = 0,5`. Sub 1: cerere inelastică.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "dp",
+      "label": "variația prețului, în %",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "dq",
+      "label": "variația cantității, în %",
+      "answer": "-10",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "e",
+      "label": "coeficientul de elasticitate (în modul)",
+      "answer": "0.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "k",
+      "label": "cererea este: elastică / inelastică / unitară",
+      "answer": "inelastică|inelastica",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "10",
+   "title": "Cerere elastică",
+   "chapter": "2. Elasticitate",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Prețul unui bun scade de la 20 la 18, iar cantitatea cerută crește de la 50 la 60. Calculează elasticitatea în funcție de preț (față de valorile inițiale).",
+   "hint": "Coeficientul = variația procentuală a cantității împărțită la variația procentuală a prețului.",
+   "solution": "`ΔP% = -10%`, `ΔQ% = 20%`, deci `E = 20 / 10 = 2`. Peste 1: cerere elastică.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "dp",
+      "label": "variația prețului, în %",
+      "answer": "-10",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "dq",
+      "label": "variația cantității, în %",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "e",
+      "label": "coeficientul de elasticitate (în modul)",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "k",
+      "label": "cererea este: elastică / inelastică / unitară",
+      "answer": "elastică|elastica",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "11",
+   "title": "Elasticitatea ofertei",
+   "chapter": "2. Elasticitate",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Prețul unui bun crește de la 10 la 11, iar cantitatea oferită crește de la 200 la 230. Calculează elasticitatea în funcție de preț (față de valorile inițiale).",
+   "hint": "Coeficientul = variația procentuală a cantității împărțită la variația procentuală a prețului.",
+   "solution": "`ΔP% = 10%`, `ΔQ% = 15%`, deci `E = 15 / 10 = 1,5`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "dp",
+      "label": "variația prețului, în %",
+      "answer": "10",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "dq",
+      "label": "variația cantității, în %",
+      "answer": "15",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "e",
+      "label": "coeficientul de elasticitate (în modul)",
+      "answer": "1.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "12",
+   "title": "Elasticitate unitară",
+   "chapter": "2. Elasticitate",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Prețul unui bun crește de la 40 la 50, iar cantitatea cerută scade de la 80 la 60. Calculează elasticitatea în funcție de preț (față de valorile inițiale).",
+   "hint": "Coeficientul = variația procentuală a cantității împărțită la variația procentuală a prețului.",
+   "solution": "`ΔP% = 25%`, `ΔQ% = -25%`, deci `E = 25 / 25 = 1`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "dp",
+      "label": "variația prețului, în %",
+      "answer": "25",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "dq",
+      "label": "variația cantității, în %",
+      "answer": "-25",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "e",
+      "label": "coeficientul de elasticitate (în modul)",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "k",
+      "label": "cererea este: elastică / inelastică / unitară",
+      "answer": "unitară|unitara",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "13",
+   "title": "Elasticitatea într-un punct al curbei",
+   "chapter": "2. Elasticitate",
+   "difficulty": "grea",
+   "source": "Seminar Economie generală",
+   "statement": "Cererea este `Qc = 100 - 2P`. Calculează elasticitatea cererii în funcție de preț în punctul `P = 20`.",
+   "hint": "`E = |dQ/dP| · P / Q`. Panta curbei e constantă, dar elasticitatea se schimbă de-a lungul ei.",
+   "solution": "`Q = 60`, `dQ/dP = -2`: `E = 2 · 20 / 60 ≈ 0,67`, cerere inelastică în acest punct.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "q",
+      "label": "cantitatea cerută la P = 20",
+      "answer": "60",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "e",
+      "label": "coeficientul de elasticitate (în modul)",
+      "answer": "0.6667",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ],
+    "curves": [
+     100,
+     2,
+     20,
+     2
+    ],
+    "price": 20
+   }
+  },
+  {
+   "id": "14",
+   "title": "Elasticitatea în funcție de venit",
+   "chapter": "2. Elasticitate",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Venitul consumatorilor crește cu 10%, iar cantitatea cerută dintr-un bun crește cu 15%.",
+   "hint": "Coeficient pozitiv: bun normal; negativ: bun inferior.",
+   "solution": "`E = 15% / 10% = 1,5 > 0`: bun normal (peste 1: cererea crește mai repede decât venitul).",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "e",
+      "label": "coeficientul de elasticitate în funcție de venit",
+      "answer": "1.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "k",
+      "label": "bunul este: normal / inferior",
+      "answer": "normal",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "15",
+   "title": "Costuri totale și medii",
+   "chapter": "3. Costuri, productivitate, profit",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "O firmă produce 200 de bucăți, cu costuri fixe de 1000 și costuri variabile de 3000.",
+   "hint": "`CT = CF + CV`; mediile se obțin împărțind la producție.",
+   "solution": "`CT = 4000`, `CTM = 4000 / 200 = 20`, `CVM = 15`, `CFM = 5` (și `CTM = CVM + CFM`).",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "ct",
+      "label": "costul total",
+      "answer": "4000",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ctm",
+      "label": "costul total mediu (pe bucată)",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "cvm",
+      "label": "costul variabil mediu",
+      "answer": "15",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "cfm",
+      "label": "costul fix mediu",
+      "answer": "5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "16",
+   "title": "Costul marginal",
+   "chapter": "3. Costuri, productivitate, profit",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Producția crește de la 100 la 120 de bucăți, iar costul total de la 5000 la 5600.",
+   "hint": "Costul marginal = sporul costului total împărțit la sporul producției.",
+   "solution": "`Cmg = 600 / 20 = 30`. E sub costul mediu (50), de aceea costul mediu scade la `≈ 46,67`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "cmg",
+      "label": "costul marginal",
+      "answer": "30",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "a",
+      "label": "costul total mediu inițial",
+      "answer": "50",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "costul total mediu final",
+      "answer": "46.6667",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "17",
+   "title": "Productivitatea muncii",
+   "chapter": "3. Costuri, productivitate, profit",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "20 de lucrători produc 400 de bucăți. După angajarea a încă 5 lucrători, producția ajunge la 475.",
+   "hint": "Medie: producția pe lucrător. Marginală: sporul producției pe lucrător în plus.",
+   "solution": "`WM₀ = 400 / 20 = 20`, `WM₁ = 475 / 25 = 19`, `Wmg = 75 / 5 = 15`. Marginala e sub medie, deci media scade.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "w0",
+      "label": "productivitatea medie inițială",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "w1",
+      "label": "productivitatea medie finală",
+      "answer": "19",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "wmg",
+      "label": "productivitatea marginală a muncii",
+      "answer": "15",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "18",
+   "title": "Profit și rate ale profitului",
+   "chapter": "3. Costuri, productivitate, profit",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "O firmă vinde 200 de bucăți la prețul de 50, cu un cost total de 8000.",
+   "hint": "Rata la cost = profit / cost; rata la cifra de afaceri = profit / încasări.",
+   "solution": "`CA = 10000`, `Pr = 2000`, `2000 / 8000 = 25%`, `2000 / 10000 = 20%`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "ca",
+      "label": "cifra de afaceri",
+      "answer": "10000",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "pr",
+      "label": "profitul",
+      "answer": "2000",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "rc",
+      "label": "rata profitului la cost, în %",
+      "answer": "25",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "rca",
+      "label": "rata profitului la cifra de afaceri, în %",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     }
+    ]
+   }
+  },
+  {
+   "id": "19",
+   "title": "Pragul de rentabilitate",
+   "chapter": "3. Costuri, productivitate, profit",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Costurile fixe sunt 6000, costul variabil pe bucată este 30, iar prețul de vânzare este 50.",
+   "hint": "La prag, încasările acoperă exact costurile: `P·Q = CF + CVM·Q`.",
+   "solution": "`Q = CF / (P - CVM) = 6000 / 20 = 300` bucăți, adică încasări de `15000`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "q",
+      "label": "producția la care profitul este zero",
+      "answer": "300",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ca",
+      "label": "cifra de afaceri la prag",
+      "answer": "15000",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "20",
+   "title": "Profit maxim",
+   "chapter": "3. Costuri, productivitate, profit",
+   "difficulty": "grea",
+   "source": "Seminar Economie generală",
+   "statement": "Pe o piață cu concurență perfectă prețul este 40. Costul total al firmei este `CT = 100 + 10Q + 0,5Q²`, deci costul marginal este `Cmg = 10 + Q`.",
+   "hint": "Profitul e maxim când costul marginal ajunge la preț.",
+   "solution": "`10 + Q = 40` ⇒ `Q = 30`. `CA = 1200`, `CT = 100 + 300 + 450 = 850`, profit `350`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "q",
+      "label": "producția care maximizează profitul",
+      "answer": "30",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "pr",
+      "label": "profitul maxim",
+      "answer": "350",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "21",
+   "title": "Dobânda simplă",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Un depozit de 10 000 de lei, cu rata anuală a dobânzii de 8%, este ținut 2 ani, cu dobândă simplă.",
+   "hint": "`D = S · r · n`.",
+   "solution": "`10 000 · 0,08 · 2 = 1600`; suma finală `11 600`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "d",
+      "label": "dobânda totală",
+      "answer": "1600",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "s",
+      "label": "suma finală",
+      "answer": "11600",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "22",
+   "title": "Dobânda compusă",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Un depozit de 10 000 de lei, cu rata anuală de 10%, este ținut 3 ani, cu capitalizarea anuală a dobânzii.",
+   "hint": "`Sn = S · (1 + r)ⁿ`.",
+   "solution": "`10 000 · 1,1³ = 13 310`, din care dobândă `3310` (față de 3000 cu dobândă simplă).",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "suma finală",
+      "answer": "13310",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "d",
+      "label": "dobânda totală",
+      "answer": "3310",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "23",
+   "title": "Ecuația schimbului",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Masa monetară este 200, viteza de rotație a banilor este 5, iar volumul tranzacțiilor este de 500 de unități.",
+   "hint": "`M · V = P · Q`.",
+   "solution": "`P = 200 · 5 / 500 = 2`. Pentru `Q = 600`: `M = 2 · 600 / 5 = 240`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "nivelul mediu al prețurilor",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "m",
+      "label": "masa monetară necesară dacă volumul crește la 600, la aceleași prețuri și viteză",
+      "answer": "240",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "24",
+   "title": "Salariul real",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Salariul nominal crește cu 20%, iar prețurile bunurilor de consum cresc cu 25%.",
+   "hint": "Indicele salariului real = indicele salariului nominal / indicele prețurilor.",
+   "solution": "`120 / 125 = 0,96`: salariul real scade cu 4%, deși cel nominal a crescut.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "i",
+      "label": "indicele salariului real, în %",
+      "answer": "96",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "v",
+      "label": "variația salariului real, în % (cu semn)",
+      "answer": "-4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     }
+    ]
+   }
+  },
+  {
+   "id": "25",
+   "title": "Inflație și puterea de cumpărare",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Indicele prețurilor de consum crește într-un an de la 100 la 108.",
+   "hint": "Puterea de cumpărare e inversul indicelui prețurilor.",
+   "solution": "`Ri = 8%`; `1 / 1,08 ≈ 92,59%`: cu aceiași bani se cumpără cu 7,41% mai puțin.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "r",
+      "label": "rata inflației, în %",
+      "answer": "8",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     },
+     {
+      "id": "p",
+      "label": "indicele puterii de cumpărare a banilor, în %",
+      "answer": "92.5926",
+      "number": true,
+      "tol": 0.05,
+      "hint": "%"
+     }
+    ]
+   }
+  },
+  {
+   "id": "26",
+   "title": "PIB prin metoda cheltuielilor",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Consumul privat este 600, investițiile 200, cheltuielile guvernamentale 150, exportul 120 și importul 70.",
+   "hint": "`PIB = C + I + G + (E - M)`.",
+   "solution": "`600 + 200 + 150 + (120 - 70) = 1000`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "en",
+      "label": "exportul net",
+      "answer": "50",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "pib",
+      "label": "PIB",
+      "answer": "1000",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "27",
+   "title": "Rata șomajului",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Populația activă este de 10 000 de persoane, dintre care 9500 sunt ocupate.",
+   "hint": "Rata șomajului se raportează la populația activă.",
+   "solution": "`500 / 10 000 = 5%`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "numărul șomerilor",
+      "answer": "500",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "r",
+      "label": "rata șomajului, în %",
+      "answer": "5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "%"
+     }
+    ]
+   }
+  },
+  {
+   "id": "28",
+   "title": "Multiplicatorul investițiilor",
+   "chapter": "4. Bani, dobândă, indicatori macroeconomici",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Înclinația marginală spre consum este 0,8. Investițiile cresc cu 100.",
+   "hint": "`k = 1 / (1 - c')`.",
+   "solution": "`k = 1 / 0,2 = 5`, deci `ΔY = 5 · 100 = 500`.",
+   "kind": "market",
+   "spec": {
+    "fields": [
+     {
+      "id": "k",
+      "label": "multiplicatorul investițiilor",
+      "answer": "5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "dy",
+      "label": "creșterea venitului național",
+      "answer": "500",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "29",
+   "title": "Legea cererii",
+   "chapter": "5. Noțiuni",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Ce spune legea generală a cererii?",
+   "hint": "Relație inversă între preț și cantitatea cerută.",
+   "solution": "De aceea curba cererii coboară. Legea ofertei e relația directă dintre preț și cantitatea oferită.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "când prețul unui bun crește, cantitatea cerută scade, celelalte condiții rămânând neschimbate",
+     "când prețul crește, cantitatea cerută crește",
+     "cererea nu depinde de preț",
+     "când venitul crește, prețul scade"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "30",
+   "title": "Costul de oportunitate",
+   "chapter": "5. Noțiuni",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Ce este costul de oportunitate al unei alegeri?",
+   "hint": "Resursele sunt limitate: a alege înseamnă a renunța.",
+   "solution": "Nu se adună toate alternativele, ci doar cea mai bună dintre cele sacrificate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "valoarea celei mai bune alternative la care renunți",
+     "suma tuturor alternativelor la care renunți",
+     "prețul plătit în bani",
+     "costul fix al producției"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "31",
+   "title": "Bunuri substituibile",
+   "chapter": "5. Noțiuni",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Prețul untului crește. Ce se întâmplă, de regulă, cu cererea de margarină?",
+   "hint": "Elasticitatea încrucișată e pozitivă pentru bunuri care se pot înlocui.",
+   "solution": "La bunurile complementare (mașini și benzină) cererea celuilalt scade.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "scade, pentru că sunt bunuri complementare",
+     "crește, pentru că sunt bunuri substituibile",
+     "nu se schimbă",
+     "scade, pentru că legea cererii se aplică și ei"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "32",
+   "title": "Costul fix",
+   "chapter": "5. Noțiuni",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Care dintre următoarele este, pe termen scurt, un cost fix?",
+   "hint": "Costul fix nu se schimbă când se schimbă producția.",
+   "solution": "Chiria se plătește și dacă nu se produce nimic; pe termen lung toate costurile sunt variabile.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "materiile prime",
+     "salariile plătite la bucată",
+     "chiria halei de producție",
+     "energia consumată de utilaje în producție"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "33",
+   "title": "Monopol",
+   "chapter": "5. Noțiuni",
+   "difficulty": "ușoară",
+   "source": "Seminar Economie generală",
+   "statement": "Ce caracterizează piața de monopol?",
+   "hint": "Mono = unul.",
+   "solution": "Câțiva vânzători: oligopol. Un singur cumpărător: monopson. Concurența perfectă: mulți vânzători, preț dat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "mulți vânzători și mulți cumpărători, cu bunuri identice",
+     "câțiva vânzători mari",
+     "un singur vânzător, care poate influența prețul",
+     "un singur cumpărător"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "34",
+   "title": "Inflația și dobânda reală",
+   "chapter": "5. Noțiuni",
+   "difficulty": "medie",
+   "source": "Seminar Economie generală",
+   "statement": "Rata nominală a dobânzii este 6%, iar rata inflației este 8%. Cum este rata reală a dobânzii?",
+   "hint": "Rata reală ≈ rata nominală - rata inflației.",
+   "solution": "`6% - 8% = -2%`: banii din depozit cumpără la sfârșit mai puțin decât la început.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pozitivă, de 6%",
+     "pozitivă, de 14%",
+     "egală cu zero",
+     "negativă: deponentul pierde putere de cumpărare"
+    ],
+    "answer": 3
+   }
+  }
+ ]
+}

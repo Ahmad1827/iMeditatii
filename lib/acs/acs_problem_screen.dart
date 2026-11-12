@@ -9,7 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../acs_screen.dart' show acsSubject;
+import '../acs_screen.dart' show acsSubject, acsTrail;
 import '../app_link.dart';
 import 'acs_data.dart';
 import 'acs_kit.dart';
@@ -77,7 +77,7 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
         final subject = acsSubject(widget.course);
         if (p == null || subject == null) {
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            AcsNav(ink: ink, trail: [(widget.course, '/acs/${widget.course}'), (widget.id, '/acs/${widget.course}/${widget.id}')]),
+            AcsNav(ink: ink, trail: [...acsTrail(widget.course), (widget.id, '/acs/${widget.course}/${widget.id}')]),
             const SizedBox(height: 24),
             Text(ink.terminal ? 'cat: ${widget.id}: No such file or directory' : 'Problema nu există.', style: ink.mono(15, color: ink.bad)),
           ]);
@@ -123,7 +123,7 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
         : const SizedBox.shrink();
     if (ink.terminal) {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        AcsNav(ink: ink, trail: [(code, '/acs/$code'), (p.id, p.route)]),
+        AcsNav(ink: ink, trail: [...acsTrail(code), (p.id, p.route)]),
         const SizedBox(height: 14),
         AcsPrompt(ink, 'cat ${p.id.padLeft(2, '0')}.md', dir: '~/acs/$code'),
         const SizedBox(height: 6),
@@ -139,7 +139,7 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
       Container(
         padding: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: ink.line, width: 2))),
-        child: AcsNav(ink: ink, trail: [(code, '/acs/$code'), (p.id, p.route)], size: narrow ? 15 : 16),
+        child: AcsNav(ink: ink, trail: [...acsTrail(code), (p.id, p.route)], size: narrow ? 15 : 16),
       ),
       const SizedBox(height: 16),
       Text(p.chapter, style: ink.mono(14, color: ink.accent, weight: FontWeight.w700)),

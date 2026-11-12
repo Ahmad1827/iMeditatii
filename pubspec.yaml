@@ -152,7 +152,8 @@ flutter:
       fonts:
         - asset: assets/fonts/Cousine-Bold.ttf
           weight: 700
-    # Iosevka (SIL OFL 1.1), cut down to Latin, Romanian and box drawing: the ACS section
+    # Iosevka 22.1.2 (SIL OFL 1.1), cut down to Latin, Romanian, box drawing, Greek and the maths
+    # symbols of the third-year courses (ε ∪ ∅ ≤ ⁿ ...): the ACS section
     - family: Iosevka
       fonts:
         - asset: assets/fonts/Iosevka-Regular.ttf

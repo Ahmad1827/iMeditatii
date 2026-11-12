@@ -32,3 +32,11 @@ def write_course(code, chapters, problems):
     with open(out, 'w', encoding='utf-8') as f:
         f.write(text + '\n')
     print(f'{code}: {len(problems)} probleme -> {os.path.relpath(out, ROOT)}', file=sys.stderr)
+
+
+def quiz(id, title, chapter, difficulty, statement, right, wrong, hint='', solution='', source=''):
+    """A multiple-choice question: [right] and the [wrong] answers, placed in an order fixed by the id."""
+    assert right not in wrong and len(set(wrong)) == len(wrong), (id, 'options repeat')
+    at = (int(''.join(ch for ch in str(id) if ch.isdigit()) or 0) * 7 + len(title)) % (len(wrong) + 1)
+    options = wrong[:at] + [right] + wrong[at:]
+    return problem(id, title, chapter, difficulty, statement, 'grila', {'options': options, 'answer': at}, hint, solution, source)

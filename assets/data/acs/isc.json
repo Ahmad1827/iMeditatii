@@ -1,0 +1,820 @@
+{
+ "code": "isc",
+ "chapters": [
+  "1. Codificări",
+  "2. Cifruri clasice",
+  "3. XOR și text cunoscut",
+  "4. Mai multe straturi",
+  "5. Teorie: principii, criptografie, sisteme, web"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Hex",
+   "chapter": "1. Codificări",
+   "difficulty": "ușoară",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Un șir de cifre hexazecimale: fiecare pereche e un octet.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Doar cifre `0-9` și litere `a-f`, în număr par: e hex.",
+   "solution": "Un singur pas: din hex. Codificarea nu ascunde nimic, doar schimbă alfabetul.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "4953437b6865785f69735f6e6f745f656e6372797074696f6e7d",
+    "flag": "ISC{hex_is_not_encryption}",
+    "reference": [
+     {
+      "op": "hex",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "2",
+   "title": "Base64",
+   "chapter": "1. Codificări",
+   "difficulty": "ușoară",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Litere mari și mici, cifre, poate `+`, `/` și `=` la sfârșit.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Semnele `=` de la sfârșit sunt completarea (padding) din base64.",
+   "solution": "Un singur pas: din base64. Trei octeți devin patru caractere.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "SVNDe2Jhc2U2NF9lbmRzX3dpdGhfZXF1YWxzfQ==",
+    "flag": "ISC{base64_ends_with_equals}",
+    "reference": [
+     {
+      "op": "b64",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "3",
+   "title": "Binar",
+   "chapter": "1. Codificări",
+   "difficulty": "ușoară",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Doar `0` și `1`, în grupuri de câte opt.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Fiecare grup de 8 biți e codul ASCII al unui caracter.",
+   "solution": "Un singur pas: din binar.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "01001001 01010011 01000011 01111011 00111000 01011111 01100010 01101001 01110100 01110011 01111101",
+    "flag": "ISC{8_bits}",
+    "reference": [
+     {
+      "op": "bin",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "4",
+   "title": "Codificare URL",
+   "chapter": "1. Codificări",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un text în care fiecare caracter a fost scris ca `%xx`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "`%41` e caracterul cu codul hex 41, adică `A`.",
+   "solution": "Un singur pas: din URL.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "%49%53%43%7B%70%65%72%63%65%6E%74%5F%65%6E%63%6F%64%69%6E%67%7D",
+    "flag": "ISC{percent_encoding}",
+    "reference": [
+     {
+      "op": "url",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "5",
+   "title": "Base64 peste hex",
+   "chapter": "1. Codificări",
+   "difficulty": "medie",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Două codificări una peste alta.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "După primul pas, uită-te la ce a rămas: ce alfabet are?",
+   "solution": "Din base64 iese un șir hex; din hex iese flag-ul.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "NDk1MzQzN2I2YzYxNzk2NTcyNzM1ZjZmNjY1ZjY1NmU2MzZmNjQ2OTZlNjc3ZA==",
+    "flag": "ISC{layers_of_encoding}",
+    "reference": [
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "hex",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "6",
+   "title": "Cezar cu 3",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "ușoară",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Cifrul lui Cezar: fiecare literă a fost mutată cu 3 poziții înainte în alfabet.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Mută fiecare literă înapoi cu 3.",
+   "solution": "Cezar, înapoi cu 3. Cifrele, acoladele și `_` rămân neschimbate.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "LVF{yhql_ylgl_ylfl}",
+    "flag": "ISC{veni_vidi_vici}",
+    "reference": [
+     {
+      "op": "rot",
+      "arg": "3"
+     }
+    ]
+   }
+  },
+  {
+   "id": "7",
+   "title": "Cezar, deplasare necunoscută",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "medie",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Tot Cezar, dar nu știi cu cât.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Sunt doar 25 de chei. Adaugă pasul Cezar fără număr și citește lista.",
+   "solution": "Forță brută: deplasarea 17 dă un text care se citește. Știi și că începe cu `ISC`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "ZJT{fecp_knvekpwzmv_bvpj}",
+    "flag": "ISC{only_twentyfive_keys}",
+    "reference": [
+     {
+      "op": "rot",
+      "arg": "17"
+     }
+    ]
+   }
+  },
+  {
+   "id": "8",
+   "title": "ROT13 întors",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Textul a fost cifrat cu ROT13 și apoi scris de la coadă la cap.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Ordinea contează doar ca să înțelegi ce vezi: întâi întoarce textul.",
+   "solution": "Inversează, apoi Cezar înapoi cu 13 (ROT13 e propria lui inversă).",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "}rgngbe_qan_ebeevz{PFV",
+    "flag": "ISC{mirror_and_rotate}",
+    "reference": [
+     {
+      "op": "rev",
+      "arg": ""
+     },
+     {
+      "op": "rot",
+      "arg": "13"
+     }
+    ]
+   }
+  },
+  {
+   "id": "9",
+   "title": "Atbash",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Alfabetul a fost oglindit: `a ↔ z`, `b ↔ y`, ...\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Atbash e propria lui inversă.",
+   "solution": "Un singur pas: Atbash.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "RHX{abc_xyz}",
+    "flag": "ISC{zyx_cba}",
+    "reference": [
+     {
+      "op": "atbash",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "10",
+   "title": "Vigenère cu cheia dată",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "medie",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Vigenère cu cheia `lemon`: litera `i` a cheii spune cu cât e mutată litera `i` a textului.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Pasul Vigenère scade cheia; ce nu e literă nu consumă din cheie.",
+   "solution": "Vigenère cu cheia `lemon`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "TWO{ogeeoy_ne_hmka}",
+    "flag": "ISC{attack_at_dawn}",
+    "reference": [
+     {
+      "op": "vig",
+      "arg": "lemon"
+     }
+    ]
+   }
+  },
+  {
+   "id": "11",
+   "title": "Vigenère, cheie de trei litere",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "grea",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Vigenère cu o cheie de 3 litere, necunoscută. Știi că textul începe cu `ISC`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Litera cheii = litera cifrată minus litera în clar. Fă asta pentru primele trei litere.",
+   "solution": "Primele trei litere cifrate sunt `LGI`: `L - I = d`, `G - S = o`, `I - C = g`. Cheia e `dog`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "LGI{nbuzb_voooqhkah_husgng_ow}",
+    "flag": "ISC{known_plaintext_breaks_it}",
+    "reference": [
+     {
+      "op": "vig",
+      "arg": "dog"
+     }
+    ]
+   }
+  },
+  {
+   "id": "12",
+   "title": "XOR cu un caracter",
+   "chapter": "3. XOR și text cunoscut",
+   "difficulty": "medie",
+   "source": "Laborator ISC · criptografie",
+   "statement": "Fiecare octet a fost combinat prin XOR cu caracterul `K`. Rezultatul e scris în hex.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "XOR cu aceeași cheie încă o dată dă înapoi textul.",
+   "solution": "Din hex, apoi XOR cu `K`: `(m ⊕ k) ⊕ k = m`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "02180830332439143f3c22282e14223814222f2e253f223f3236",
+    "flag": "ISC{xor_twice_is_identity}",
+    "reference": [
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "K"
+     }
+    ]
+   }
+  },
+  {
+   "id": "13",
+   "title": "XOR, cheie de un caracter, necunoscută",
+   "chapter": "3. XOR și text cunoscut",
+   "difficulty": "grea",
+   "source": "Laborator ISC · criptografie",
+   "statement": "XOR cu un singur caracter necunoscut, apoi hex. Textul în clar începe cu `I`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Primul octet cifrat XOR `I` (hex `49`) este chiar cheia.",
+   "solution": "Primul octet e `33`: `0x33 ⊕ 0x49 = 0x7a`, adică `z`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "3329390115141f2518030e1f25111f0307",
+    "flag": "ISC{one_byte_key}",
+    "reference": [
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "z"
+     }
+    ]
+   }
+  },
+  {
+   "id": "14",
+   "title": "XOR cu cheie repetată",
+   "chapter": "3. XOR și text cunoscut",
+   "difficulty": "grea",
+   "source": "Laborator ISC · many time pad",
+   "statement": "XOR cu o cheie de 3 caractere, repetată, apoi hex. Textul în clar începe cu `ISC`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Cheia = primii trei octeți cifrați XOR `I`, `S`, `C` (hex `49 53 43`).",
+   "solution": "Primii octeți sunt `39 32 27`: `39 ⊕ 49 = 70` (`p`), `32 ⊕ 53 = 61` (`a`), `27 ⊕ 43 = 64` (`d`). Cheia e `pad`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "3932270b0c051e183b040809153e1411053b16000d1c1219",
+    "flag": "ISC{many_time_pad_fails}",
+    "reference": [
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "pad"
+     }
+    ]
+   }
+  },
+  {
+   "id": "15",
+   "title": "XOR și base64",
+   "chapter": "3. XOR și text cunoscut",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "XOR cu cheia `iSC`, apoi base64.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Rezultatul unui XOR nu e text, de aceea a fost împachetat în base64.",
+   "solution": "Din base64, apoi XOR cu `iSC`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "IAAAEjF1XQw0GzIzGgwhAD0iGyo+",
+    "flag": "ISC{b64_wraps_binary}",
+    "reference": [
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "iSC"
+     }
+    ]
+   }
+  },
+  {
+   "id": "16",
+   "title": "Trei straturi",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Flag-ul a fost cifrat cu Cezar (cu 5), întors, apoi codificat base64.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Desfaci straturile în ordinea inversă celei în care au fost puse.",
+   "solution": "Din base64, inversează, Cezar înapoi cu 5.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "fXN0bnN0X2pteV9xamp1e0hYTg==",
+    "flag": "ISC{peel_the_onion}",
+    "reference": [
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "rev",
+      "arg": ""
+     },
+     {
+      "op": "rot",
+      "arg": "5"
+     }
+    ]
+   }
+  },
+  {
+   "id": "17",
+   "title": "Ghicește straturile",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Nu știi ce s-a făcut cu flag-ul. Uită-te la alfabetul fiecărui rezultat.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Cifre și `a-f`: hex. Litere mari, mici, cifre: base64. Text cu acolade care nu se citește: un cifru de substituție.",
+   "solution": "Din hex, din base64, apoi ROT13.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "566b5a5165336c69596e6866626d64665a335679583235355933567562334a6e66513d3d",
+    "flag": "ISC{look_at_the_alphabet}",
+    "reference": [
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "rot",
+      "arg": "13"
+     }
+    ]
+   }
+  },
+  {
+   "id": "18",
+   "title": "Binar, apoi Atbash, apoi invers",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Trei transformări, niciuna cu cheie.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Dacă un algoritm nu are cheie, cine îl cunoaște poate desface oricând.",
+   "solution": "Din binar, Atbash, inversează. Principiul lui Kerckhoffs: secretul trebuie să stea în cheie, nu în algoritm.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "01111101 01100111 01110110 01101001 01111000 01110110 01101000 01011111 01101100 01101101 01011111 01100010 01110110 01110000 01011111 01101100 01101101 01111011 01011000 01001000 01010010",
+    "flag": "ISC{no_key_no_secret}",
+    "reference": [
+     {
+      "op": "bin",
+      "arg": ""
+     },
+     {
+      "op": "atbash",
+      "arg": ""
+     },
+     {
+      "op": "rev",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "19",
+   "title": "URL, base64, Vigenère",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Un parametru dintr-o adresă web. Cheia Vigenère e `web`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Întâi scapă de `%xx`.",
+   "solution": "Din URL, din base64, Vigenère cu cheia `web`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "%52%56%64%45%65%33%70%70%5A%47%74%6F%5A%6C%39%77%62%47%5A%66%62%58%6C%6D%62%6D%4E%66%64%48%42%32%61%6D%70%72%66%51%3D%3D",
+    "flag": "ISC{decode_the_query_string}",
+    "reference": [
+     {
+      "op": "url",
+      "arg": ""
+     },
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "vig",
+      "arg": "web"
+     }
+    ]
+   }
+  },
+  {
+   "id": "20",
+   "title": "Patru straturi",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "XOR cu `7`, hex, întors, base64.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Ordinea inversă: base64, apoi întoarce, apoi hex, apoi XOR.",
+   "solution": "Din base64, inversează, din hex, XOR cu `7`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "YTQ3NDI1MjUzNTg2NDQ1NDI1ZTQ2NWI1ODY1NDI0ODUxNWM0NDc0NmU3",
+    "flag": "ISC{four_layers_deep}",
+    "reference": [
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "rev",
+      "arg": ""
+     },
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "7"
+     }
+    ]
+   }
+  },
+  {
+   "id": "21",
+   "title": "Date modificate",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "Test curs ISC",
+   "statement": "Ce proprietate de securitate cere ca orice modificare a datelor să fie autorizată?",
+   "hint": "Triada CIA.",
+   "solution": "Confidențialitate: cine poate citi. Integritate: cine poate modifica. Disponibilitate: datele sunt accesibile celor autorizați.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "confidențialitatea",
+     "disponibilitatea",
+     "integritatea",
+     "anonimatul"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "22",
+   "title": "Revenirea la o stare bună",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "Test curs ISC",
+   "statement": "O companie vrea să poată reveni la starea dinaintea unui incident (rollback). Ce o ajută?",
+   "hint": "Ce păstrează copii ale datelor?",
+   "solution": "Backup-ul permite recuperarea; IDS-ul doar detectează, VPN-ul protejează transportul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un server VPN",
+     "un server de autentificare",
+     "un sistem de detecție a intruziunilor",
+     "un server de backup"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "23",
+   "title": "Diffie-Hellman",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "Test curs ISC",
+   "statement": "Ce problemă rezolvă algoritmul Diffie-Hellman?",
+   "hint": "Cele două părți ajung la același secret fără să-l trimită.",
+   "solution": "DH stabilește o cheie comună; singur nu autentifică părțile, deci e vulnerabil la un om-la-mijloc.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "criptarea datelor",
+     "autentificarea datelor",
+     "garantarea integrității",
+     "schimbul de chei peste un canal nesigur"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "24",
+   "title": "Actualizare nemodificată",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "Test curs ISC",
+   "statement": "Cum verifică un administrator că o actualizare nu a fost modificată de când a publicat-o producătorul?",
+   "hint": "Integritate, nu confidențialitate.",
+   "solution": "Un hash criptografic se schimbă la orice modificare; o semnătură digitală arată în plus și cine a publicat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "compară hash-ul (SHA-2 / SHA-3) al fișierului cu cel publicat",
+     "o descarcă printr-o conexiune criptată cu AES",
+     "o rulează și vede dacă merge",
+     "descarcă o variantă criptată"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "25",
+   "title": "Același utilizator?",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "Test curs ISC",
+   "statement": "Ce proprietate garantează că administratorul unei baze de date nu poate stabili dacă același utilizator a accesat serverul de mai multe ori?",
+   "hint": "Nu e vorba de cine este, ci de legătura dintre două accesări.",
+   "solution": "Cu un pseudonim identitatea e ascunsă, dar accesările se pot lega între ele; unlinkability o împiedică.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "anonimatul",
+     "pseudonimitatea",
+     "imposibilitatea de corelare (unlinkability)",
+     "autenticitatea"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "26",
+   "title": "Rostul sării",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "Test curs ISC",
+   "statement": "De ce se adaugă o sare (salt) la parolă înainte de calculul hash-ului?",
+   "hint": "Sarea nu e secretă, dar e diferită pentru fiecare utilizator.",
+   "solution": "Atacatorul trebuie să refacă munca pentru fiecare sare în parte.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ca parola să poată fi decriptată de administrator",
+     "ca hash-ul să fie mai scurt",
+     "ca aceeași parolă să dea hash-uri diferite și tabelele precalculate (rainbow tables) să nu mai folosească",
+     "ca să nu mai fie nevoie de hash"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "27",
+   "title": "Criptare simetrică și asimetrică",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Care afirmație este corectă?",
+   "hint": "Cheia publică poate fi cunoscută de oricine.",
+   "solution": "AES e simetric (aceeași cheie); RSA e asimetric. În practică, cheia simetrică e schimbată cu ajutorul celei asimetrice.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "la criptarea simetrică fiecare parte are o cheie diferită",
+     "la criptarea asimetrică se criptează cu cheia publică a destinatarului și se decriptează cu cheia lui privată",
+     "RSA este un cifru simetric",
+     "AES folosește o pereche de chei publică/privată"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "28",
+   "title": "Drepturi pe fișier",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un fișier are drepturile `640`. Ce poate face grupul proprietar?",
+   "hint": "`r = 4`, `w = 2`, `x = 1`; cifrele sunt pentru proprietar, grup, ceilalți.",
+   "solution": "`6 = rw-` pentru proprietar, `4 = r--` pentru grup, `0 = ---` pentru ceilalți.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "să citească și să scrie",
+     "nimic",
+     "doar să citească",
+     "să citească și să execute"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "29",
+   "title": "setuid",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce înseamnă bitul setuid pe un executabil deținut de root?",
+   "hint": "Așa poate `passwd` să scrie în `/etc/shadow`.",
+   "solution": "De aceea un executabil setuid cu o vulnerabilitate duce la escaladare de privilegii.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "doar root îl poate lansa",
+     "programul rulează cu drepturile proprietarului (root), oricine l-ar lansa",
+     "programul nu poate fi șters",
+     "programul rulează cu drepturile grupului"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "30",
+   "title": "Canarul de stivă",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce detectează un canar (stack canary)?",
+   "hint": "Valoarea e pusă între variabilele locale și adresa de retur.",
+   "solution": "Canarul e verificat înainte de `ret`. NX oprește executarea datelor, ASLR face adresele imprevizibile.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "executarea de cod de pe stivă",
+     "ghicirea adreselor din memorie",
+     "suprascrierea adresei de retur printr-o depășire de buffer pe stivă",
+     "injecțiile SQL"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "31",
+   "title": "ASLR",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Împotriva cărui lucru protejează ASLR?",
+   "hint": "Address Space Layout Randomization.",
+   "solution": "Stiva, heap-ul și bibliotecile sunt încărcate la adrese aleatoare la fiecare rulare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "împotriva depășirii propriu-zise a bufferului",
+     "împotriva atacurilor care se bazează pe adrese cunoscute dinainte (salt la o funcție, return-to-libc)",
+     "împotriva parolelor slabe",
+     "împotriva interceptării traficului"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "32",
+   "title": "Injecția SQL",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Care este apărarea corectă împotriva injecției SQL?",
+   "hint": "Datele nu trebuie să ajungă niciodată să fie interpretate drept cod SQL.",
+   "solution": "Cu parametri, structura interogării e fixată înainte ca datele utilizatorului să fie adăugate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "interogări parametrizate (prepared statements)",
+     "ascunderea mesajelor de eroare",
+     "validarea datelor doar în browser, cu JavaScript",
+     "folosirea metodei POST în loc de GET"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "33",
+   "title": "XSS",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce face un atac XSS (cross-site scripting)?",
+   "hint": "Scriptul rulează cu drepturile paginii: vede cookie-urile ei.",
+   "solution": "Apărare: codificarea a tot ce vine de la utilizator la afișare și Content-Security-Policy.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "trimite interogări SQL către baza de date",
+     "ghicește parola administratorului",
+     "face browserul victimei să ruleze un script al atacatorului în contextul site-ului",
+     "interceptează traficul dintre client și server"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "34",
+   "title": "CSRF",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "De ce funcționează un atac CSRF?",
+   "hint": "Atacatorul nu vede răspunsul; îi ajunge că cererea se execută.",
+   "solution": "Apărare: un token anti-CSRF pe care alt site nu-l poate afla, și cookie-uri `SameSite`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "serverul nu criptează parolele",
+     "atacatorul citește răspunsul serverului",
+     "browserul atașează automat cookie-urile site-ului la orice cerere către el, chiar pornită de pe alt site",
+     "JavaScript-ul atacatorului rulează pe site-ul țintă"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "35",
+   "title": "Cel mai mic privilegiu",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Ce spune principiul celui mai mic privilegiu?",
+   "hint": "Limitează ce poate strica un cont compromis.",
+   "solution": "Un serviciu compromis poate face doar ce avea voie serviciul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "administratorul are toate drepturile",
+     "drepturile se dau pe grupuri, nu pe utilizatori",
+     "toate fișierele sunt implicit publice",
+     "fiecare utilizator sau program primește doar drepturile de care are nevoie pentru sarcina lui"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "36",
+   "title": "Ce asigură TLS",
+   "chapter": "5. Teorie: principii, criptografie, sisteme, web",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce garantează certificatul serverului într-o conexiune TLS?",
+   "hint": "Certificatul leagă o cheie publică de un nume, sub semnătura unei autorități.",
+   "solution": "TLS dă confidențialitate și integritate pe canal și autentifică serverul; nu spune nimic despre ce face serverul cu datele.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "că serverul nu are vulnerabilități",
+     "că parola ta e puternică",
+     "că vorbești cu serverul al cărui nume e în certificat (autentificarea serverului)",
+     "că site-ul nu colectează date personale"
+    ],
+    "answer": 2
+   }
+  }
+ ]
+}

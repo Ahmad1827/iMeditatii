@@ -1,0 +1,1997 @@
+{
+ "code": "egc",
+ "chapters": [
+  "1. Transformări elementare",
+  "2. Transformări compuse",
+  "3. Fereastră și poartă de vizualizare",
+  "4. Rasterizare",
+  "5. Teorie: transformări, proiecții, iluminare"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "O translație",
+   "chapter": "1. Transformări elementare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Mută forma cu 3 unități la dreapta și 2 în sus.",
+   "hint": "O singură translație `T(tx, ty)`.",
+   "solution": "O rezolvare: `M = T(3, 2)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     1.0,
+     0.0,
+     3.0,
+     0.0,
+     1.0,
+     2.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": 3,
+      "b": 2
+     }
+    ],
+    "maxOps": 1
+   }
+  },
+  {
+   "id": "2",
+   "title": "Scalare față de origine",
+   "chapter": "1. Transformări elementare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Dublează forma față de origine, pe ambele axe.",
+   "hint": "`S(sx, sy)` înmulțește coordonatele: punctele se și depărtează de origine.",
+   "solution": "O rezolvare: `M = S(2, 2)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     0.0,
+     0.0,
+     2.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 2,
+      "b": 2
+     }
+    ],
+    "maxOps": 1
+   }
+  },
+  {
+   "id": "3",
+   "title": "Rotație față de origine",
+   "chapter": "1. Transformări elementare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Rotește forma cu 90° în sens trigonometric în jurul originii.",
+   "hint": "Sensul trigonometric (invers acelor de ceas) e cel pozitiv.",
+   "solution": "O rezolvare: `M = R(90°)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     0.0,
+     -1.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "R",
+      "a": 90,
+      "b": 0
+     }
+    ],
+    "maxOps": 1
+   }
+  },
+  {
+   "id": "4",
+   "title": "Oglindire față de axa OY",
+   "chapter": "1. Transformări elementare",
+   "difficulty": "ușoară",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Oglindește forma față de axa OY, folosind o singură scalare.",
+   "hint": "Oglindirea față de o axă e o scalare cu `-1` pe cealaltă axă.",
+   "solution": "O rezolvare: `M = S(-1, 1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     -1.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": -1,
+      "b": 1
+     }
+    ],
+    "maxOps": 1,
+    "allowed": [
+     "S"
+    ]
+   }
+  },
+  {
+   "id": "5",
+   "title": "Forfecare pe x",
+   "chapter": "1. Transformări elementare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Forfecă forma de-a lungul axei OX cu factorul 1: `x' = x + y`, `y' = y`.",
+   "hint": "`F(fx, fy)`: `x' = x + fx·y`, `y' = y + fy·x`.",
+   "solution": "O rezolvare: `M = F(1, 0)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     1.0,
+     1.0,
+     0.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "F",
+      "a": 1,
+      "b": 0
+     }
+    ],
+    "maxOps": 1
+   }
+  },
+  {
+   "id": "6",
+   "title": "Scalare neuniformă",
+   "chapter": "1. Transformări elementare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Întinde forma de 3 ori pe orizontală și micșoreaz-o la jumătate pe verticală.",
+   "hint": "Factorii pot fi diferiți pe cele două axe și pot fi subunitari.",
+   "solution": "O rezolvare: `M = S(3, 0.5)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     3.0,
+     0.0,
+     0.0,
+     0.0,
+     0.5,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 3,
+      "b": 0.5
+     }
+    ],
+    "maxOps": 1
+   }
+  },
+  {
+   "id": "7",
+   "title": "Rotație în jurul unui punct",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Rotește forma cu 90° în sens trigonometric în jurul punctului `(2, 1)`.",
+   "hint": "Adu punctul în origine, rotește, apoi du-l înapoi.",
+   "solution": "`M = T(2, 1) · R(90°) · T(-2, -1)`: translația care duce `(2, 1)` în origine se aplică prima.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     0.0,
+     -1.0,
+     3.0,
+     1.0,
+     0.0,
+     -1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -2,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": 90,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "8",
+   "title": "Scalare față de un punct",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Dublează forma față de colțul ei din `(1, 1)`: acel colț rămâne pe loc.",
+   "hint": "La fel ca rotația în jurul unui punct: translație, scalare față de origine, translația inversă.",
+   "solution": "O rezolvare: `M = T(1, 1) · S(2, 2) · T(-1, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     -1.0,
+     0.0,
+     2.0,
+     -1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -1,
+      "b": -1
+     },
+     {
+      "op": "S",
+      "a": 2,
+      "b": 2
+     },
+     {
+      "op": "T",
+      "a": 1,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "9",
+   "title": "Rotație cu 180° în jurul centrului",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Rotește triunghiul cu 180° în jurul punctului `(2.5, 1)`.",
+   "hint": "Rotația cu 180° e aceeași cu `S(-1, -1)`.",
+   "solution": "O rezolvare: `M = T(2.5, 1) · R(180°) · T(-2.5, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    "target": [
+     -1.0,
+     0.0,
+     5.0,
+     0.0,
+     -1.0,
+     2.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -2.5,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": 180,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 2.5,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "10",
+   "title": "Oglindire față de dreapta x = 3",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Oglindește forma față de dreapta verticală `x = 3`.",
+   "hint": "Mută dreapta peste axa OY, oglindește, mută înapoi.",
+   "solution": "O rezolvare: `M = T(3, 0) · S(-1, 1) · T(-3, 0)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     -1.0,
+     0.0,
+     6.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -3,
+      "b": 0
+     },
+     {
+      "op": "S",
+      "a": -1,
+      "b": 1
+     },
+     {
+      "op": "T",
+      "a": 3,
+      "b": 0
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "11",
+   "title": "Oglindire față de prima bisectoare",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Oglindește forma față de dreapta `y = x`, folosind doar rotații și scalări.",
+   "hint": "Rotește planul astfel încât dreapta să ajungă peste axa OX, oglindește față de OX, rotește înapoi.",
+   "solution": "`M = R(45°) · S(1, -1) · R(-45°)`. Rezultatul schimbă între ele coordonatele: `(x, y) → (y, x)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     0.0,
+     1.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "R",
+      "a": -45,
+      "b": 0
+     },
+     {
+      "op": "S",
+      "a": 1,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": 45,
+      "b": 0
+     }
+    ],
+    "maxOps": 3,
+    "allowed": [
+     "R",
+     "S"
+    ]
+   }
+  },
+  {
+   "id": "12",
+   "title": "Oglindire față de o dreaptă oarecare",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "grea",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Oglindește forma față de dreapta `y = x + 1`.",
+   "hint": "Dreapta trece prin `(0, 1)` și face 45° cu OX. Cinci pași: translație, rotație, oglindire față de OX și inversele lor.",
+   "solution": "`M = T(0, 1) · R(45°) · S(1, -1) · R(-45°) · T(0, -1)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     0.0,
+     1.0,
+     -1.0,
+     1.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": 0,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": -45,
+      "b": 0
+     },
+     {
+      "op": "S",
+      "a": 1,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": 45,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 0,
+      "b": 1
+     }
+    ],
+    "maxOps": 5
+   }
+  },
+  {
+   "id": "13",
+   "title": "Forfecare față de un punct",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "grea",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Forfecă forma pe orizontală cu factorul 1, astfel încât linia ei de jos (`y = 1`) să rămână pe loc.",
+   "hint": "Forfecarea față de origine lasă pe loc axa OX. Adu linia `y = 1` peste OX.",
+   "solution": "O rezolvare: `M = T(0, 1) · F(1, 0) · T(0, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     1.0,
+     1.0,
+     -1.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": 0,
+      "b": -1
+     },
+     {
+      "op": "F",
+      "a": 1,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 0,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "14",
+   "title": "Ordinea contează",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ținta s-a obținut din două transformări: o scalare cu 2 și o translație cu `(2, 0)`. Găsește ordinea bună.",
+   "hint": "Dacă translatezi întâi, scalarea dublează și deplasarea.",
+   "solution": "`M = T(2, 0) · S(2, 2)`: întâi scalarea. În ordinea inversă, forma ar ajunge cu 4 unități mai la dreapta, nu cu 2.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     2.0,
+     0.0,
+     2.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 2,
+      "b": 2
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 0
+     }
+    ],
+    "maxOps": 2
+   }
+  },
+  {
+   "id": "15",
+   "title": "Transformarea inversă",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Forma dată a fost obținută rotind originalul cu 90° în jurul originii și apoi translatându-l cu `(4, 1)`. Adu-o înapoi unde era.",
+   "hint": "Inversa unui produs: inversele, în ordine inversă.",
+   "solution": "`(T · R)⁻¹ = R⁻¹ · T⁻¹`: întâi `T(-4, -1)`, apoi `R(-90°)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      1,
+      2
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "target": [
+     0.0,
+     1.0,
+     -1.0,
+     -1.0,
+     0.0,
+     4.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -4,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": -90,
+      "b": 0
+     }
+    ],
+    "maxOps": 2
+   }
+  },
+  {
+   "id": "16",
+   "title": "Rotație cu 45° în jurul unui colț",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Rotește forma cu 45° în sens orar în jurul colțului ei din `(1, 1)`.",
+   "hint": "Sensul orar înseamnă unghi negativ.",
+   "solution": "O rezolvare: `M = T(1, 1) · R(-45°) · T(-1, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     0.707106781,
+     0.707106781,
+     -0.414213562,
+     -0.707106781,
+     0.707106781,
+     1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -1,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": -45,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 1,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "17",
+   "title": "Din fereastră în poartă",
+   "chapter": "3. Fereastră și poartă de vizualizare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Fereastra din spațiul utilizator este `[0, 4] × [0, 2]`, iar poarta de vizualizare este `[2, 10] × [1, 5]`. Forma dată e chiar fereastra. Scrie transformarea fereastră-poartă.",
+   "hint": "`sx = (xvmax - xvmin) / (xfmax - xfmin)`, la fel pe y. Colțul ferestrei e deja în origine.",
+   "solution": "`sx = 8 / 4 = 2`, `sy = 4 / 2 = 2`; apoi translația în colțul porții: `M = T(2, 1) · S(2, 2)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      0,
+      2
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     2.0,
+     0.0,
+     2.0,
+     1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 2,
+      "b": 2
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "18",
+   "title": "Fereastră care nu pornește din origine",
+   "chapter": "3. Fereastră și poartă de vizualizare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Fereastra este `[1, 4] × [1, 3]`, poarta este `[0, 6] × [0, 2]`. Forma dată e fereastra. Scrie transformarea fereastră-poartă.",
+   "hint": "Trei pași în general: colțul ferestrei în origine, scalare, translație în colțul porții. Aici poarta începe chiar în origine.",
+   "solution": "`sx = 6 / 3 = 2`, `sy = 2 / 2 = 1`: `M = S(2, 1) · T(-1, -1)`. Scalarea e neuniformă, deci imaginea se deformează.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      1,
+      3
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     -2.0,
+     0.0,
+     1.0,
+     -1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -1,
+      "b": -1
+     },
+     {
+      "op": "S",
+      "a": 2,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "19",
+   "title": "Poartă cu axa y în jos",
+   "chapter": "3. Fereastră și poartă de vizualizare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Fereastra este `[0, 4] × [0, 3]`. Pe ecran axa y crește în jos, așa că poarta `[0, 4] × [0, 3]` trebuie să arate forma răsturnată pe verticală: punctul `(0, 0)` ajunge în `(0, 3)`, iar `(0, 3)` în `(0, 0)`.",
+   "hint": "O oglindire față de OX, apoi o translație pe verticală cu înălțimea porții.",
+   "solution": "O rezolvare: `M = T(0, 3) · S(1, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     -1.0,
+     3.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 1,
+      "b": -1
+     },
+     {
+      "op": "T",
+      "a": 0,
+      "b": 3
+     }
+    ],
+    "maxOps": 2
+   }
+  },
+  {
+   "id": "20",
+   "title": "Segment cu pantă mică",
+   "chapter": "4. Rasterizare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(0, 0)` la `(7, 3)`. Capetele sunt deja aprinse.",
+   "hint": "Panta e sub 1: pe fiecare coloană se aprinde exact un pixel, cel mai apropiat de dreapta ideală.",
+   "solution": "Pixelii, în ordine: `(0, 0)`, `(1, 0)`, `(2, 1)`, `(3, 1)`, `(4, 2)`, `(5, 2)`, `(6, 3)`, `(7, 3)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 9,
+    "h": 5,
+    "pixels": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      5,
+      2
+     ],
+     [
+      6,
+      3
+     ],
+     [
+      7,
+      3
+     ]
+    ],
+    "given": [
+     [
+      0,
+      0
+     ],
+     [
+      7,
+      3
+     ]
+    ],
+    "line": [
+     0,
+     0,
+     7,
+     3
+    ]
+   }
+  },
+  {
+   "id": "21",
+   "title": "Segment cu pantă mare",
+   "chapter": "4. Rasterizare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(1, 0)` la `(4, 8)`. Capetele sunt deja aprinse.",
+   "hint": "Panta e peste 1: rolurile lui x și y se schimbă, câte un pixel pe fiecare linie.",
+   "solution": "Pixelii, în ordine: `(1, 0)`, `(1, 1)`, `(2, 2)`, `(2, 3)`, `(3, 4)`, `(3, 5)`, `(3, 6)`, `(4, 7)`, `(4, 8)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 6,
+    "h": 9,
+    "pixels": [
+     [
+      1,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      3,
+      6
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      4,
+      8
+     ]
+    ],
+    "given": [
+     [
+      1,
+      0
+     ],
+     [
+      4,
+      8
+     ]
+    ],
+    "line": [
+     1,
+     0,
+     4,
+     8
+    ]
+   }
+  },
+  {
+   "id": "22",
+   "title": "Segment care coboară",
+   "chapter": "4. Rasterizare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(0, 5)` la `(9, 1)`. Capetele sunt deja aprinse.",
+   "hint": "La fel ca la pantă mică, dar y scade. Tot câte un pixel pe coloană.",
+   "solution": "Pixelii, în ordine: `(0, 5)`, `(1, 5)`, `(2, 4)`, `(3, 4)`, `(4, 3)`, `(5, 3)`, `(6, 2)`, `(7, 2)`, `(8, 1)`, `(9, 1)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 10,
+    "h": 7,
+    "pixels": [
+     [
+      0,
+      5
+     ],
+     [
+      1,
+      5
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      6,
+      2
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      8,
+      1
+     ],
+     [
+      9,
+      1
+     ]
+    ],
+    "given": [
+     [
+      0,
+      5
+     ],
+     [
+      9,
+      1
+     ]
+    ],
+    "line": [
+     0,
+     5,
+     9,
+     1
+    ]
+   }
+  },
+  {
+   "id": "23",
+   "title": "De la dreapta la stânga",
+   "chapter": "4. Rasterizare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(8, 1)` la `(1, 4)`. Capetele sunt deja aprinse.",
+   "hint": "Sensul de parcurgere nu schimbă ce pixeli sunt cei mai apropiați de dreaptă.",
+   "solution": "Pixelii, în ordine: `(8, 1)`, `(7, 1)`, `(6, 2)`, `(5, 2)`, `(4, 3)`, `(3, 3)`, `(2, 4)`, `(1, 4)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 10,
+    "h": 6,
+    "pixels": [
+     [
+      8,
+      1
+     ],
+     [
+      7,
+      1
+     ],
+     [
+      6,
+      2
+     ],
+     [
+      5,
+      2
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "given": [
+     [
+      8,
+      1
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "line": [
+     8,
+     1,
+     1,
+     4
+    ]
+   }
+  },
+  {
+   "id": "24",
+   "title": "Diagonală aproape",
+   "chapter": "4. Rasterizare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(0, 0)` la `(6, 5)`. Capetele sunt deja aprinse.",
+   "hint": "Aproape diagonală: y crește la aproape fiecare pas, o singură dată rămâne pe loc.",
+   "solution": "Pixelii, în ordine: `(0, 0)`, `(1, 1)`, `(2, 2)`, `(3, 3)`, `(4, 3)`, `(5, 4)`, `(6, 5)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 8,
+    "h": 7,
+    "pixels": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      5,
+      4
+     ],
+     [
+      6,
+      5
+     ]
+    ],
+    "given": [
+     [
+      0,
+      0
+     ],
+     [
+      6,
+      5
+     ]
+    ],
+    "line": [
+     0,
+     0,
+     6,
+     5
+    ]
+   }
+  },
+  {
+   "id": "25",
+   "title": "Cerc cu algoritmul punctului de mijloc",
+   "chapter": "4. Rasterizare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Aprinde pixelii pe care algoritmul punctului de mijloc îi alege pentru cercul cu centrul în `(5, 5)` și raza 4. Cei patru pixeli de pe axe sunt deja aprinși.",
+   "hint": "Algoritmul calculează un singur octant (de la `(0, r)` până la `x = y`) și aprinde simetricele lui în celelalte șapte.",
+   "solution": "În primul octant, față de centru: `(0, 4)`, `(1, 4)`, `(2, 3)`, `(3, 3)` (cu `d` pornind de la `1 - r = -3`). Fiecare se oglindește în celelalte șapte octante.",
+   "kind": "raster",
+   "spec": {
+    "w": 11,
+    "h": 11,
+    "pixels": [
+     [
+      1,
+      4
+     ],
+     [
+      1,
+      5
+     ],
+     [
+      1,
+      6
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      2,
+      7
+     ],
+     [
+      2,
+      8
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      9
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      6,
+      1
+     ],
+     [
+      6,
+      9
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      7,
+      8
+     ],
+     [
+      8,
+      2
+     ],
+     [
+      8,
+      3
+     ],
+     [
+      8,
+      7
+     ],
+     [
+      8,
+      8
+     ],
+     [
+      9,
+      4
+     ],
+     [
+      9,
+      5
+     ],
+     [
+      9,
+      6
+     ]
+    ],
+    "given": [
+     [
+      5,
+      9
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      9,
+      5
+     ],
+     [
+      1,
+      5
+     ]
+    ],
+    "circle": [
+     5,
+     5,
+     4
+    ]
+   }
+  },
+  {
+   "id": "26",
+   "title": "Cerc de rază 3",
+   "chapter": "4. Rasterizare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aprinde pixelii aleși de algoritmul punctului de mijloc pentru cercul cu centrul în `(4, 4)` și raza 3. Pixelii de pe axe sunt deja aprinși.",
+   "hint": "Pornește din `(0, 3)` cu `d = 1 - r = -2`. Cât timp `d < 0`, y rămâne pe loc.",
+   "solution": "Față de centru, primul octant dă `(0, 3)`, `(1, 3)`, `(2, 2)`. Cu simetriile: 16 pixeli.",
+   "kind": "raster",
+   "spec": {
+    "w": 9,
+    "h": 9,
+    "pixels": [
+     [
+      1,
+      3
+     ],
+     [
+      1,
+      4
+     ],
+     [
+      1,
+      5
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      7
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      5,
+      7
+     ],
+     [
+      6,
+      2
+     ],
+     [
+      6,
+      6
+     ],
+     [
+      7,
+      3
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      7,
+      5
+     ]
+    ],
+    "given": [
+     [
+      4,
+      7
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "circle": [
+     4,
+     4,
+     3
+    ]
+   }
+  },
+  {
+   "id": "27",
+   "title": "Transformările 3D, ca matrice",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "ușoară",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Cum se reprezintă transformările geometrice 3D, astfel încât și translația să fie o înmulțire de matrice?",
+   "hint": "În 2D se folosesc matrice 3×3; în 3D mai apare o coordonată.",
+   "solution": "Coordonata omogenă `w` adaugă o linie și o coloană: translația devine liniară, deci 4×4 în 3D.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "prin matrice 3×3 în coordonate omogene",
+     "prin matrice 3×3 în coordonate carteziene",
+     "prin matrice 4×4 în coordonate omogene",
+     "prin înmulțiri de matrice în care ordinea nu contează"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "28",
+   "title": "Raportată la o axă",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "ușoară",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Care dintre următoarele transformări 2D poate fi raportată la o axă?",
+   "hint": "Rotația și scalarea se raportează la un punct.",
+   "solution": "Oglindirea se face față de o dreaptă (o axă); rotația și scalarea, față de un punct; translația nu are un reper.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "translația",
+     "rotația",
+     "oglindirea",
+     "scalarea"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "29",
+   "title": "Scalare urmată de translație",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Ce transformare 2D reprezintă matricea cu liniile `(sx, 0, tx)`, `(0, sy, ty)`, `(0, 0, 1)`?",
+   "hint": "Calculează `T(tx, ty) · S(sx, sy)` și `S(sx, sy) · T(tx, ty)`.",
+   "solution": "`T · S` are ultima coloană `(tx, ty, 1)`; `S · T` ar avea `(sx·tx, sy·ty, 1)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "scalare în jurul originii",
+     "forfecare în jurul originii",
+     "translație urmată de o scalare față de origine",
+     "scalare față de origine urmată de o translație"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "30",
+   "title": "Ce au în comun rotația, scalarea și translația",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Care afirmație despre rotație, scalare și translație este FALSĂ?",
+   "hint": "Înmulțirea matricelor nu e comutativă.",
+   "solution": "Sunt afine și păstrează paralelismul, dar `T · R ≠ R · T` în general.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "conduc la același rezultat indiferent de ordinea în care se aplică",
+     "sunt transformări afine",
+     "păstrează paralelismul dreptelor",
+     "se compun prin înmulțirea matricelor lor"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "31",
+   "title": "Rotația în jurul unei drepte oarecare",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Ce este adevărat despre rotația 3D în jurul unei drepte oarecare?",
+   "hint": "Același tipar ca la rotația 2D în jurul unui punct.",
+   "solution": "Translație (dreapta prin origine), rotații de aliniere, rotația propriu-zisă, apoi inversele în ordine inversă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "este o singură rotație elementară în jurul axei OZ",
+     "nu are nevoie niciodată de translație",
+     "se compune din transformări care aliniază dreapta cu o axă principală, rotația, și inversele alinierilor",
+     "primul plan în care se aduce dreapta este întotdeauna XOZ"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "32",
+   "title": "Forfecarea pe OZ",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "La forfecarea față de origine pe axa OZ, ce se întâmplă cu coordonatele unui vârf?",
+   "hint": "Axa pe care se face forfecarea e cea care „împinge” celelalte două coordonate.",
+   "solution": "`x' = x + a·z`, `y' = y + b·z`, `z' = z`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "x și y se modifică proporțional cu z, iar z rămâne neschimbat",
+     "z se modifică proporțional cu x și y",
+     "toate cele trei coordonate se modifică",
+     "x și y rămân neschimbate, z se dublează"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "33",
+   "title": "Proiecția perspectivă",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Ce deosebește proiecția perspectivă de cea paralelă?",
+   "hint": "Gândește-te la șinele de tren care par să se întâlnească.",
+   "solution": "În proiecția paralelă centrul e la infinit; în cea perspectivă, împărțirea la adâncime micșorează obiectele depărtate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "proiectoarele trec printr-un centru de proiecție, deci obiectele depărtate apar mai mici",
+     "proiectoarele sunt paralele între ele",
+     "păstrează raportul lungimilor pe orice direcție",
+     "nu are nevoie de un plan de proiecție"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "34",
+   "title": "Z-buffer",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce ține minte algoritmul Z-buffer pentru fiecare pixel?",
+   "hint": "Un fragment nou se desenează doar dacă e mai aproape.",
+   "solution": "Pe lângă culoare, fiecare pixel are o valoare de adâncime; poligoanele pot fi desenate în orice ordine.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "lista tuturor poligoanelor care îl acoperă",
+     "normala suprafeței vizibile",
+     "adâncimea celui mai apropiat fragment desenat până atunci",
+     "ordinea în care au fost desenate poligoanele"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "35",
+   "title": "Eliminarea fețelor spate",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O față a unui obiect convex închis are normala exterioară `N`, iar `V` e vectorul de la față spre observator. Când este fața nevizibilă?",
+   "hint": "Produsul scalar e pozitiv când unghiul dintre vectori e sub 90°.",
+   "solution": "Fața „privește” în direcția opusă observatorului când unghiul dintre `N` și `V` depășește 90°.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "când N · V > 0",
+     "când N · V < 0",
+     "când N · V = 1",
+     "când N și V sunt paralele și de același sens"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "36",
+   "title": "Modelul Phong",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Care componentă a modelului de reflexie Phong depinde de poziția observatorului?",
+   "hint": "Pata lucioasă se mută când te miști.",
+   "solution": "Difuza depinde de `N · L`, speculara de `(R · V)ⁿ`, iar ambientala e constantă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "componenta ambientală",
+     "componenta speculară",
+     "componenta difuză",
+     "niciuna"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "37",
+   "title": "Gouraud și Phong",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Prin ce diferă modelul de shading Phong de Gouraud?",
+   "hint": "Unde se evaluează modelul de iluminare: în vârfuri sau în fiecare fragment?",
+   "solution": "De aceea petele speculare din mijlocul unui poligon se pierd la Gouraud și apar la Phong.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Gouraud interpolează normalele, Phong culorile",
+     "Phong folosește o singură culoare pe poligon",
+     "Gouraud nu poate folosi lumini difuze",
+     "Phong interpolează normalele și calculează iluminarea în fiecare pixel; Gouraud interpolează culorile calculate în vârfuri"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "38",
+   "title": "Cohen-Sutherland",
+   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "La decuparea Cohen-Sutherland, capetele unui segment au codurile `c1` și `c2`. Când este segmentul respins fără niciun calcul de intersecție?",
+   "hint": "Un bit comun înseamnă că ambele capete sunt de aceeași parte a ferestrei.",
+   "solution": "Dacă ambele coduri au același bit setat, segmentul e în întregime în afara acelei laturi. `c1 = c2 = 0` înseamnă acceptare trivială.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "când c1 SAU c2 (pe biți) este 0",
+     "când c1 = c2 = 0",
+     "când c1 ȘI c2 (pe biți) este diferit de 0",
+     "când c1 ȘI c2 (pe biți) este 0"
+    ],
+    "answer": 2
+   }
+  }
+ ]
+}

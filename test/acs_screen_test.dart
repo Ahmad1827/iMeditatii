@@ -45,7 +45,11 @@ void main() {
     }
     expect(counts['pclp']!.solved, 2);
     expect(counts['sd']!.solved, 0);
-    expect(acsSubjects.where((s) => s.ready).map((s) => s.semester).toSet(), {-1, 1, 2});
+    // every course is in a folder of the first page, and a folder's name is not a course's
+    expect(acsSubjects.map((s) => s.group).toSet(), acsGroups.map((g) => g.slug).toSet());
+    expect(acsGroups.where((g) => g.slug != 'admitere').every((g) => acsSubject(g.slug) == null), isTrue);
+    expect(acsGroup('an3-sem1')!.subjects.map((s) => s.code), ['lfa', 'apd', 'egc', 'rl', 'isc', 'eg']);
+    expect(acsTrail('rl'), [('an3-sem1', '/acs/an3-sem1'), ('rl', '/acs/rl')]);
   });
 
   for (final style in AcsStyle.values) {
@@ -53,10 +57,20 @@ void main() {
       testWidgets('home, ${style.name} at ${width.toInt()} px', (t) async {
         SharedPreferences.setMockInitialValues({});
         await show(t, const AcsScreen(), width, style);
-        for (final s in acsSubjects) {
-          expect(find.textContaining(s.name), findsWidgets, reason: s.name);
+        // the first page lists the folders, not the courses
+        for (final g in acsGroups) {
+          expect(find.textContaining(g.title), findsWidgets, reason: g.title);
         }
+        expect(find.textContaining('Rețele Locale'), findsNothing);
         expect(t.takeException(), isNull);
+        // and each folder, its courses
+        for (final g in acsGroups) {
+          await show(t, AcsScreen(key: ValueKey(g.slug), group: g.slug), width, style);
+          for (final s in g.subjects) {
+            expect(find.textContaining(s.name), findsWidgets, reason: '${g.slug}: ${s.name}');
+          }
+          expect(t.takeException(), isNull, reason: g.slug);
+        }
       });
     }
   }

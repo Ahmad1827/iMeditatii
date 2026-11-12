@@ -225,7 +225,13 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/acs/:course',
-      builder: (context, state) => AcsCourseScreen(key: ValueKey(state.uri.path), code: state.pathParameters['course']!),
+      // a folder of the section (a semester) or one of its courses
+      builder: (context, state) {
+        final name = state.pathParameters['course']!;
+        return acsGroup(name) != null
+            ? AcsScreen(key: ValueKey(state.uri.path), group: name)
+            : AcsCourseScreen(key: ValueKey(state.uri.path), code: name);
+      },
     ),
     GoRoute(
       path: '/acs/:course/:id',
