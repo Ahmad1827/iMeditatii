@@ -1,8 +1,10 @@
 // =============================================================================
-// ADMITERE: A QUESTION OF THE MULTIPLE-CHOICE TEST
-//   As at the exam: six answers, a) to f), exactly one correct. The student
+// A QUESTION OF A MULTIPLE-CHOICE TEST (Admitere, and the courses' grile)
+//   As at the exam: answers a), b)... and one correct (spec answer). The student
 //   picks one (a click, or the keys a–f) and checks it (Enter); a wrong one is
-//   crossed out and stays so. Solved, a program's question shows what the
+//   crossed out and stays so. With spec answers (a list), several are correct,
+//   as in the Moodle tests "select one or more": the student ticks them and
+//   checks the whole set; a wrong set only says so, nothing is crossed out. Solved, a program's question shows what the
 //   program really prints (run with g++ when the problem was made). A scratch
 //   pad under it keeps the working, like the draft sheet at the exam.
 // =============================================================================
@@ -27,8 +29,14 @@ class GrilaWorkspace extends AcsWorkspace {
 
 class _GrilaWorkspaceState extends State<GrilaWorkspace> {
   late final List<String> _options = [for (final o in widget.problem.spec['options'] as List) '$o'];
-  late final int _answer = (widget.problem.spec['answer'] as num).toInt();
+  late final Set<int> _answers = widget.problem.spec['answers'] is List
+      ? {for (final a in widget.problem.spec['answers'] as List) (a as num).toInt()}
+      : {(widget.problem.spec['answer'] as num).toInt()};
+  late final bool _multi = widget.problem.spec['answers'] is List;
+  late final int _answer = _answers.first;
   int? _picked;
+  final Set<int> _ticked = {};
+  int _misses = 0;
   final Set<int> _wrong = {};
   bool _solved = false;
   final TextEditingController _scratch = TextEditingController();
@@ -45,7 +53,10 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
         setState(() {
           _wrong.addAll([for (final w in j['wrong'] as List? ?? const []) (w as num).toInt()]);
           _solved = j['solved'] == true;
-          if (_solved) _picked = _answer;
+          if (_solved) {
+            _picked = _answer;
+            _ticked.addAll(_answers);
+          }
           _scratch.text = j['scratch'] as String? ?? '';
           _showScratch = _scratch.text.isNotEmpty;
         });
@@ -74,7 +85,7 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
     final ctx = FocusManager.instance.primaryFocus?.context;
     if (ctx != null && (ctx.widget is EditableText || ctx.findAncestorWidgetOfExactType<EditableText>() != null)) return false;
     if (e.logicalKey == LogicalKeyboardKey.enter || e.logicalKey == LogicalKeyboardKey.numpadEnter) {
-      if (_picked == null) return false;
+      if (_multi ? _ticked.isEmpty : _picked == null) return false;
       _verify();
       return true;
     }
@@ -86,10 +97,28 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
 
   void _pick(int i) {
     if (_solved || _wrong.contains(i)) return;
+    if (_multi) {
+      setState(() => _ticked.contains(i) ? _ticked.remove(i) : _ticked.add(i));
+      return;
+    }
     setState(() => _picked = i);
   }
 
   void _verify() {
+    if (_multi) {
+      if (_ticked.isEmpty || _solved) return;
+      final ok = _ticked.length == _answers.length && _ticked.containsAll(_answers);
+      setState(() {
+        if (ok) {
+          _solved = true;
+        } else {
+          _misses++;
+        }
+      });
+      _save();
+      widget.onVerdict(ok);
+      return;
+    }
     final p = _picked;
     if (p == null || _solved) return;
     final ok = p == _answer;
@@ -110,6 +139,8 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
       _solved = false;
       _picked = null;
       _wrong.clear();
+      _ticked.clear();
+      _misses = 0;
     });
     _save();
   }
@@ -121,12 +152,12 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
     Widget option(int i) {
       final letter = grilaLetters[i];
       final wrong = _wrong.contains(i);
-      final right = _solved && i == _answer;
-      final picked = _picked == i && !_solved;
+      final right = _solved && _answers.contains(i);
+      final picked = (_multi ? _ticked.contains(i) : _picked == i) && !_solved;
       final color = right ? ink.good : (wrong ? ink.bad : (picked ? ink.accent : ink.line));
       final mark = ink.terminal
-          ? (right ? '[✓]' : wrong ? '[✗]' : picked ? '[•]' : '[ ]')
-          : (right ? '✓' : wrong ? '✗' : picked ? '●' : '○');
+          ? (right ? '[✓]' : wrong ? '[✗]' : picked ? (_multi ? '[x]' : '[•]') : '[ ]')
+          : (right ? '✓' : wrong ? '✗' : picked ? (_multi ? '☑' : '●') : (_multi ? '☐' : '○'));
       return AcsTap(
         label: '$letter) ${_options[i]}',
         onTap: _solved || wrong ? null : () => _pick(i),
@@ -166,17 +197,29 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(ink.terminal ? '# alege răspunsul corect (unul singur)' : 'Alege răspunsul corect (unul singur):', style: ink.mono(13.5, color: ink.muted)),
+        Text(
+            _multi
+                ? (ink.terminal ? '# bifează toate răspunsurile corecte (unul sau mai multe)' : 'Bifează toate răspunsurile corecte (unul sau mai multe):')
+                : (ink.terminal ? '# alege răspunsul corect (unul singur)' : 'Alege răspunsul corect (unul singur):'),
+            style: ink.mono(13.5, color: ink.muted)),
         const SizedBox(height: 8),
         for (var i = 0; i < _options.length; i++) option(i),
         const SizedBox(height: 4),
         ToolRow([
           if (_solved)
             AcsButton(ink, 'încă o dată', _again)
+          else if (_multi)
+            AcsButton(ink, _ticked.isEmpty ? 'bifează răspunsurile' : 'verifică ${[for (final t in _ticked.toList()..sort()) '${grilaLetters[t]})'].join(' ')}',
+                _ticked.isEmpty ? null : _verify, primary: true, icon: Icons.check)
           else
             AcsButton(ink, _picked == null ? 'alege un răspuns' : 'verifică ${grilaLetters[_picked!]})', _picked == null ? null : _verify, primary: true, icon: Icons.check),
-          acsKeysHint(ink, 'tastele a–${grilaLetters[_options.length - 1]} aleg · Enter verifică'),
+          acsKeysHint(ink, 'tastele a–${grilaLetters[_options.length - 1]} ${_multi ? 'bifează' : 'aleg'} · Enter verifică'),
         ]),
+        if (_multi && _misses > 0 && !_solved) ...[
+          const SizedBox(height: 10),
+          Text('${ink.terminal ? '[✗] ' : ''}Nu e combinația corectă${_misses > 1 ? ' ($_misses încercări)' : ''}. Mai încearcă: poate fi corect unul singur, sau mai multe.',
+              style: ink.mono(14, color: ink.bad, weight: FontWeight.w700)),
+        ],
         if (_wrong.isNotEmpty && !_solved) ...[
           const SizedBox(height: 10),
           Text(

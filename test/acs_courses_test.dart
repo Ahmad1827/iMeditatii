@@ -330,6 +330,25 @@ void main() {
     }
   });
 
+  group('every grilă: distinct options, the correct ones among them, a solution', () {
+    for (final s in acsSubjects.where((s) => s.ready)) {
+      for (final p in course(s.code).problems.where((p) => p.kind == 'grila')) {
+        test('${s.code} ${p.id}. ${p.title}', () {
+          final opts = [for (final o in p.spec['options'] as List) '$o'];
+          expect(opts.length, inInclusiveRange(2, 8));
+          expect(opts.toSet(), hasLength(opts.length), reason: 'two options read the same');
+          expect(opts.every((o) => o.trim().isNotEmpty), isTrue);
+          final answers = p.spec['answers'] is List ? [for (final a in p.spec['answers'] as List) (a as num).toInt()] : [(p.spec['answer'] as num).toInt()];
+          expect(answers, isNotEmpty);
+          expect(answers.toSet(), hasLength(answers.length));
+          expect(answers.every((a) => a >= 0 && a < opts.length), isTrue);
+          if (p.spec['answers'] is List) expect(answers.length, greaterThan(1), reason: 'one correct answer is written as answer');
+          expect(p.title.trim(), isNotEmpty);
+        });
+      }
+    }
+  });
+
   group('LFA: the reference answer describes the language, an empty one does not', () {
     for (final p in course('lfa').problems.where((p) => p.kind == 'lfa')) {
       test('${p.id}. ${p.title}', () {
@@ -456,9 +475,9 @@ void main() {
     });
   });
 
-  group('RL and EG: the answers typed in fields', () {
-    for (final code in ['rl', 'eg']) {
-      for (final p in course(code).problems.where((p) => p.kind == 'net' || p.kind == 'market')) {
+  group('the answers typed in fields (RL, EG and the computations of every course)', () {
+    for (final code in acsSubjects.where((s) => s.ready).map((s) => s.code)) {
+      for (final p in course(code).problems.where((p) => p.kind == 'net' || p.kind == 'market' || p.kind == 'calc')) {
         test('$code ${p.id}. ${p.title}', () {
           final t = FieldsTask.fromSpec(p.spec);
           expect(t.fields, isNotEmpty);

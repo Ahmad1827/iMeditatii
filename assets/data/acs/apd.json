@@ -5,7 +5,11 @@
   "2. Excludere mutuală",
   "3. Semafoare și bariere",
   "4. Blocaje",
-  "5. Paralel și distribuit: teorie"
+  "5. Paralel și distribuit: teorie",
+  "6. Calcule: ceasuri, mesaje, performanță",
+  "7. Grile: fire, Java, pthreads",
+  "8. Grile: algoritmi paraleli și complexitate",
+  "9. Grile: MPI și algoritmi distribuiți"
  ],
  "problems": [
   {
@@ -798,6 +802,1917 @@
      "așteptarea circulară"
     ],
     "answer": 1
+   }
+  },
+  {
+   "id": "60",
+   "title": "Ceasuri Lamport pe un scenariu",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "medie",
+   "source": "Curs APD: ceasuri logice",
+   "statement": "Trei procese, cu evenimentele în ordinea în care apar în fiecare proces (un mesaj e primit după ce a fost trimis):\n\n• `P1`: a (local), b (trimite m1), c (local), d (primește m2)\n• `P2`: e (primește m1), f (trimite m3), g (local)\n• `P3`: h (local), i (primește m3), j (trimite m2)\n\nToate ceasurile pornesc de la 0. Calculează ceasul Lamport al fiecărui eveniment cerut.",
+   "hint": "Eveniment local sau trimitere: `L = L + 1`. Recepție: `L = max(L, marca mesajului) + 1`. Mesajul poartă ceasul trimiterii.",
+   "solution": "Pe rând: `L(a) = 1`, `L(b) = 2`, `L(c) = 3`, `L(d) = 7`, `L(e) = 3`, `L(f) = 4`, `L(g) = 5`, `L(h) = 1`, `L(i) = 5`, `L(j) = 6`. De exemplu `d` primește `m2`, trimis la `j` cu marca 6, deci `L(d) = max(3, 6) + 1 = 7`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "b",
+      "label": "L(b)",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "e",
+      "label": "L(e)",
+      "answer": "3",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "f",
+      "label": "L(f)",
+      "answer": "4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "i",
+      "label": "L(i)",
+      "answer": "5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "j",
+      "label": "L(j)",
+      "answer": "6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "d",
+      "label": "L(d)",
+      "answer": "7",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "61",
+   "title": "Ceasuri vectoriale pe același scenariu",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "grea",
+   "source": "Curs APD: ceasuri logice",
+   "statement": "Același scenariu ca la problema anterioară:\n\n• `P1`: a (local), b (trimite m1), c (local), d (primește m2)\n• `P2`: e (primește m1), f (trimite m3), g (local)\n• `P3`: h (local), i (primește m3), j (trimite m2)\n\nCalculează ceasurile vectoriale `[P1, P2, P3]`. Scrie vectorii ca `[x,y,z]`, fără spații.",
+   "hint": "Fiecare proces crește componenta lui la orice eveniment; la recepție ia maximul pe componente cu vectorul din mesaj, apoi crește componenta proprie.",
+   "solution": "Vectorii: `V(a) = [1, 0, 0]`, `V(b) = [2, 0, 0]`, `V(c) = [3, 0, 0]`, `V(d) = [4, 2, 3]`, `V(e) = [2, 1, 0]`, `V(f) = [2, 2, 0]`, `V(g) = [2, 3, 0]`, `V(h) = [0, 0, 1]`, `V(i) = [2, 2, 2]`, `V(j) = [2, 2, 3]`. `c = [3, 0, 0]` și `h = [0, 0, 1]` nu se compară pe toate componentele, deci sunt concurente.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "b",
+      "label": "V(b)",
+      "answer": "[2,0,0]",
+      "hint": "[x,y,z]"
+     },
+     {
+      "id": "f",
+      "label": "V(f)",
+      "answer": "[2,2,0]",
+      "hint": "[x,y,z]"
+     },
+     {
+      "id": "i",
+      "label": "V(i)",
+      "answer": "[2,2,2]",
+      "hint": "[x,y,z]"
+     },
+     {
+      "id": "d",
+      "label": "V(d)",
+      "answer": "[4,2,3]",
+      "hint": "[x,y,z]"
+     },
+     {
+      "id": "cc",
+      "label": "evenimentele c și h sunt: concurente / c→h / h→c",
+      "answer": "concurente",
+      "hint": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "62",
+   "title": "Un schimb de mesaje: Lamport și vectorial",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Două procese:\n\n• `P1`: a (trimite m1), b (local), c (primește m2)\n• `P2`: d (local), e (primește m1), f (trimite m2)\n\nCalculează ceasurile pentru evenimentele `e` și `c`.",
+   "hint": "La recepție, maximul dintre ceasul propriu și cel din mesaj, plus unu.",
+   "solution": "`a` are 1, `d` are 1; `e = max(1, 1) + 1 = 2`; `f = 3`; `b = 2`, `c = max(2, 3) + 1 = 4`. Vectorial: `V(e) = [1, 2]`, `V(c) = [3, 3]`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "le",
+      "label": "L(e)",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "lc",
+      "label": "L(c)",
+      "answer": "4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ve",
+      "label": "V(e), ca [x,y]",
+      "answer": "[1,2]",
+      "hint": "[x,y]"
+     },
+     {
+      "id": "vc",
+      "label": "V(c), ca [x,y]",
+      "answer": "[3,3]",
+      "hint": "[x,y]"
+     }
+    ]
+   }
+  },
+  {
+   "id": "63",
+   "title": "LeLann-Chang-Roberts pe un inel",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "grea",
+   "source": "Curs APD: alegerea liderului",
+   "statement": "Un inel unidirecțional (fiecare proces trimite doar vecinului din dreapta) are procesele, în ordinea mesajelor, cu identificatorii `3, 7, 2, 8, 5, 1` (după ultimul vine primul). Toate pornesc alegerea în același timp. Un proces trimite mai departe un identificator doar dacă e mai mare decât al lui; liderul e cel care își primește propriul identificator.",
+   "hint": "Urmărește fiecare identificator: merge din vecin în vecin până dă de unul mai mare (acolo e oprit) sau ajunge înapoi la el (liderul).",
+   "solution": "Fiecare identificator merge până dă de unul mai mare: 3 face 1 pas, 7 face 2 pași, 2 face 1 pas, 8 face 6 pași, 5 face 3 pași, 1 face 1 pas. Doar 8 face turul întreg. Total `14` mesaje, plus `6` pentru anunțul liderului.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "l",
+      "label": "identificatorul liderului",
+      "answer": "8",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "m",
+      "label": "câte mesaje de alegere se trimit (fără anunțarea liderului)",
+      "answer": "14",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "t",
+      "label": "câte mesaje în total, cu anunțul liderului (încă un tur)",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "64",
+   "title": "Timpul unui mesaj (modelul Foster)",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "În modelul Foster, timpul de trimitere a unui mesaj de `L` cuvinte este `T = ts + tw · L`. Timpul de pornire (serializare) este `ts = 30` unități, un cuvânt se trimite în `tw = 6` unități. Cât durează un mesaj de 8 cuvinte? Dar trei mesaje de câte 8 cuvinte, trimise unul după altul, față de un singur mesaj de 24 de cuvinte?",
+   "hint": "Costul de pornire se plătește la fiecare mesaj.",
+   "solution": "`30 + 6·8 = 78`; de trei ori: `234`; un mesaj de 24: `30 + 6·24 = 174`. Mesajele mari, puține, sunt mai ieftine: se economisesc `2·ts = 60`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "t8",
+      "label": "un mesaj de 8 cuvinte",
+      "answer": "78",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "t3",
+      "label": "trei mesaje de câte 8",
+      "answer": "234",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "t24",
+      "label": "un mesaj de 24",
+      "answer": "174",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "65",
+   "title": "Accelerare, eficiență, cost",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Cel mai rapid algoritm secvențial rezolvă o problemă în `G = 960` ms. Varianta paralelă rulează pe `P = 16` procesoare în `T = 80` ms.",
+   "hint": "Costul paralel e timpul înmulțit cu numărul de procesoare; un algoritm e optim ca și cost dacă `C` e de ordinul lui `G`.",
+   "solution": "`S = 960 / 80 = 12`, `E = 12 / 16 = 0,75`, `C = 80 · 16 = 1280` ms (față de 960: 25% din timpul procesoarelor se pierde).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "accelerarea S = G / T",
+      "answer": "12",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "e",
+      "label": "eficiența E = G / (T · P)",
+      "answer": "0.75",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "c",
+      "label": "costul C = T · P (ms)",
+      "answer": "1280",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "66",
+   "title": "Replicare cu cvorum",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Un obiect e replicat pe `n = 5` noduri. O scriere trebuie confirmată de `w = 3` noduri, o citire întreabă `r = 3` noduri.",
+   "hint": "O citire și o scriere se intersectează dacă `r + w > n`. Operația merge cât timp sunt măcar `w` (sau `r`) noduri în viață.",
+   "solution": "`3 + 3 = 6 > 5`: cvorumurile se intersectează mereu. Pot lipsi `5 - 3 = 2` noduri.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "ok",
+      "label": "orice citire vede ultima scriere (r + w > n): da / nu",
+      "answer": "da",
+      "hint": ""
+     },
+     {
+      "id": "fw",
+      "label": "câte noduri pot cădea fără ca scrierile să se blocheze",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "fr",
+      "label": "câte noduri pot cădea fără ca citirile să se blocheze",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "67",
+   "title": "Sume prefix paralele: câți pași",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Pe un sistem cu `n = 16` procesoare se calculează sumele prefix ale unui vector de 16 elemente cu algoritmul în care, la pasul `j`, procesul `k` adună valoarea procesului `k - 2^(j-1)` (dacă există).",
+   "hint": "La pasul `j` lucrează procesele cu `k - 2^(j-1) ≥ 1`. Distanța se dublează la fiecare pas.",
+   "solution": "`log₂ 16 = 4` pași; la pasul 1 lucrează procesele 2..16 (15), la pasul 4 procesele 9..16 (8). Pe un sistem MIMD fiecare pas cere bariere: citirea valorilor vechi trebuie să se termine înainte de a le suprascrie.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "câți pași sunt necesari",
+      "answer": "4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "w1",
+      "label": "câte procese lucrează la primul pas",
+      "answer": "15",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "w4",
+      "label": "câte procese lucrează la ultimul pas",
+      "answer": "8",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "68",
+   "title": "Crossover în două puncte",
+   "chapter": "6. Calcule: ceasuri, mesaje, performanță",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Un algoritm genetic face crossover în două puncte, după poziția a 4-a și a 9-a, între cromozomii\n\n`C1 = 1101 00100 110100`\n\n`C2 = 1010 11000 011110`\n\nDescendenții primesc segmentul din mijloc schimbat. Scrie-i fără spații.",
+   "hint": "Capetele rămân, mijlocul (pozițiile 5-9) se schimbă între cromozomi.",
+   "solution": "D1 = `1101 11000 110100`, D2 = `1010 00100 011110`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "d1",
+      "label": "descendentul care păstrează capetele lui C1",
+      "answer": "110111000110100",
+      "hint": "15 biți"
+     },
+     {
+      "id": "d2",
+      "label": "descendentul care păstrează capetele lui C2",
+      "answer": "101000100011110",
+      "hint": "15 biți"
+     }
+    ]
+   }
+  },
+  {
+   "id": "130",
+   "title": "Split binary semaphore",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce înseamnă un „split binary semaphore”?",
+   "hint": "",
+   "solution": "În orice moment cel mult unul dintre semafoarele grupului e 1: fiecare cale de execuție ia unul (P) și eliberează, la final, unul (V), nu neapărat același.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un grup de semafoare a căror sumă a valorilor este cel mult 1",
+     "un semafor binar folosit de exact două fire",
+     "un semafor general împărțit în două semafoare binare cu aceeași valoare",
+     "un mutex care poate fi eliberat de alt fir decât cel care l-a luat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "131",
+   "title": "Mutex față de semafor binar",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este una dintre diferențele dintre un mutex și un semafor binar?",
+   "hint": "",
+   "solution": "Eliberarea unui mutex de alt fir e o eroare; un semafor poate fi incrementat de oricine, de aceea e bun și pentru semnalizare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "mutexul are un proprietar: doar firul care l-a luat îl poate elibera",
+     "semaforul binar poate lua doar valorile 0 și 1, mutexul orice valoare",
+     "mutexul nu poate bloca un fir",
+     "semaforul binar nu poate fi folosit pentru excludere mutuală"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "132",
+   "title": "Bărbierul somnoros",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "De câte semafoare e nevoie, minim, pentru problema bărbierului (bărbierul fără clienți, venirea unui client, frizeria plină)?",
+   "hint": "",
+   "solution": "Unul pentru clienții care așteaptă, unul pentru bărbierul liber și un mutex pentru numărul de scaune ocupate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "2",
+     "3",
+     "4"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "133",
+   "title": "Producători și consumatori",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "M producători, N consumatori și un buffer de dimensiune k: de câte semafoare e nevoie dacă nu se folosește alt mecanism de sincronizare?",
+   "hint": "",
+   "solution": "Locuri libere, locuri ocupate și câte un mutex pentru producători (indicele de scriere) și pentru consumatori (indicele de citire).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "2",
+     "4",
+     "3",
+     "M + N"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "134",
+   "title": "Cititori și scriitori",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este dezavantajul soluției cu prioritate pentru cititori la problema cititorilor și scriitorilor?",
+   "hint": "",
+   "solution": "Cât timp mai e măcar un cititor înăuntru, alți cititori pot intra: scriitorii suferă de înfometare (starvation).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un singur cititor poate citi la un moment dat",
+     "scriitorii pot scrie în timp ce se citește",
+     "cititorii pot ajunge în deadlock între ei",
+     "un flux continuu de cititori poate bloca la nesfârșit scriitorii"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "135",
+   "title": "Cititori și scriitori: ce e fals",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care dintre afirmații este falsă pentru problema cititorilor și scriitorilor?",
+   "hint": "",
+   "solution": "Tocmai citirile simultane sunt rostul problemei.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "mai mulți cititori pot citi simultan",
+     "un singur cititor poate citi la un moment dat",
+     "un scriitor are acces exclusiv",
+     "când scrie cineva, nu poate citi nimeni"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "136",
+   "title": "Lock re-entrant",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce înseamnă că un lock este re-entrant?",
+   "hint": "",
+   "solution": "În Java, `synchronized` și `ReentrantLock` sunt re-entrante: un contor numără de câte ori l-a luat firul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "lock-ul se eliberează singur la sfârșitul metodei",
+     "mai multe fire îl pot deține simultan",
+     "lock-ul poate fi luat din nou după ce a fost eliberat",
+     "un fir care deține deja lock-ul îl poate lua din nou fără să se blocheze"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "137",
+   "title": "Semaphore(-2) în Java",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "grea",
+   "source": "Întrebări APD (examen)",
+   "statement": "În Java, `Semaphore s = new Semaphore(-2)`. De câte apeluri `s.release()` e nevoie pentru ca un fir care face `s.acquire()` să treacă?",
+   "hint": "",
+   "solution": "Un `acquire()` trece doar când există cel puțin un permis: de la -2 trebuie ajuns la 1.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "3",
+     "2",
+     "1",
+     "niciunul: constructorul aruncă excepție"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "138",
+   "title": "static synchronized",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "O metodă `public static synchronized void f()` din clasa `A`: pe ce se face sincronizarea?",
+   "hint": "",
+   "solution": "O metodă statică nu are `this`; monitorul e obiectul `Class` al clasei.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pe `this`",
+     "pe obiectul clasei, `A.class`",
+     "pe fiecare instanță separat",
+     "pe metoda `f`"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "139",
+   "title": "run() față de start()",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce se întâmplă când apelăm metoda `run()` a unui obiect `Thread` în Java, în loc de `start()`?",
+   "hint": "",
+   "solution": "`start()` creează firul, care apoi apelează `run()`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "se creează un fir nou, la fel ca la `start()`",
+     "se aruncă `IllegalThreadStateException`",
+     "conținutul metodei se execută pe firul curent, fără să se creeze un fir nou",
+     "firul pornește abia după ce se termină firul curent"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "140",
+   "title": "IllegalMonitorStateException",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "De ce poate apărea `IllegalMonitorStateException` când apelăm `wait()` pe un obiect?",
+   "hint": "",
+   "solution": "`wait`, `notify` și `notifyAll` se apelează doar dintr-un bloc `synchronized` pe același obiect.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "firul curent nu deține monitorul obiectului",
+     "obiectul a fost deja notificat",
+     "firul a fost întrerupt",
+     "obiectul nu implementează `Runnable`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "141",
+   "title": "Ce nu se poate folosi pentru sincronizare",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce nu se poate folosi în Java ca obiect de sincronizare (`synchronized (x)`)?",
+   "hint": "",
+   "solution": "Monitorul aparține obiectelor; valorile primitive nu au monitor.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "o variabilă de tip primitiv (`int`, `double`...)",
+     "un `String`",
+     "un obiect oarecare `new Object()`",
+     "obiectul `this`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "142",
+   "title": "Runnable",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este avantajul creării unui fir în Java prin implementarea interfeței `Runnable`, față de extinderea clasei `Thread`?",
+   "hint": "",
+   "solution": "Java nu are moștenire multiplă de clase, dar o clasă poate implementa oricâte interfețe.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "firul pornește mai repede",
+     "nu mai e nevoie de `start()`",
+     "clasa noastră poate extinde în continuare o altă clasă",
+     "firul are automat prioritate mai mare"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "143",
+   "title": "Oprirea unui ExecutorService",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce metodă oprește un `ExecutorService` încercând să întrerupă toate task-urile active?",
+   "hint": "",
+   "solution": "`shutdown()` doar nu mai acceptă task-uri noi și le lasă pe cele pornite să se termine.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`shutdown()`",
+     "`shutdownNow()`",
+     "`close()`",
+     "`awaitTermination()`"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "144",
+   "title": "a++ din două fire",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Două fire au variabila partajată `int a = 0`. Fiecare face o dată `a++`, fără sincronizare. Ce valori poate avea `a` la final?",
+   "hint": "",
+   "solution": "`a++` înseamnă citire, adunare, scriere: dacă ambele fire citesc 0 înainte de vreo scriere, una dintre incrementări se pierde.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "doar 2",
+     "1 sau 2",
+     "doar 1",
+     "0, 1 sau 2"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "145",
+   "title": "Condiție de cursă",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care dintre operații creează o condiție de cursă dacă e apelată simultan de mai multe fire, pe aceeași variabilă partajată?",
+   "hint": "",
+   "solution": "`x = x * 3` citește și scrie: două fire pot citi aceeași valoare veche.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "înmulțirea variabilei cu 3",
+     "citirea variabilei",
+     "calculul unei valori într-o variabilă locală",
+     "apelul unei funcții pure cu argumente locale"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "146",
+   "title": "Starvation",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce înseamnă „starvation” (înfometare) la programarea cu fire?",
+   "hint": "",
+   "solution": "La deadlock nu avansează nimeni; la starvation sistemul merge, dar un fir e mereu ocolit.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un fir așteaptă la nesfârșit să primească resursa de care are nevoie, deși altele avansează",
+     "toate firele se blochează reciproc",
+     "un fir consumă toată memoria",
+     "un fir se termină înaintea celorlalte"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "147",
+   "title": "Algoritmul lui Dekker",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Pentru câte procese funcționează algoritmul lui Dekker de excludere mutuală?",
+   "hint": "",
+   "solution": "A fost prima soluție software corectă pentru două procese; pentru N se folosesc Peterson generalizat, Lamport (brutăria) etc.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "oricâte",
+     "cel mult 3",
+     "exact 2",
+     "doar pentru 1"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "148",
+   "title": "Atomicitate",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Succesiunea a două operații atomice este o operație atomică?",
+   "hint": "",
+   "solution": "De aceea `if (x == 0) x = 1;` nu e atomic, deși citirea și scrierea sunt.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da, întotdeauna",
+     "da, dacă sunt pe aceeași variabilă",
+     "da, dacă sunt citiri",
+     "nu: între ele se poate intercala un alt fir"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "149",
+   "title": "Semaforul nu poate...",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Pentru ce NU poate fi folosit un semafor?",
+   "hint": "",
+   "solution": "Semafoarele pot face toate celelalte; folosite greșit, produc chiar ele deadlock.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pentru a garanta lipsa deadlock-ului oricum ar fi folosit",
+     "pentru excludere mutuală",
+     "pentru a ordona execuția a două fire",
+     "pentru a limita numărul de fire dintr-o zonă"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "102",
+   "title": "Un program poate folosi un procesor cu 4 nuclee…",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Un program poate folosi un procesor cu 4 nuclee fizice la maxim daca este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Paralelizat pe cel putin 4 thread-uri”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Paralelizat pe 2 thread-uri",
+     "Paralelizat pe cel putin 4 thread-uri",
+     "Paralelizat pe 3 thread-uri",
+     "Single-threaded"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "105",
+   "title": "Considerand problema filosofilor cu 4 filosofi…",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Considerand problema filosofilor cu 4 filosofi, cate furculite sunt asezate pe masa?",
+   "hint": "",
+   "solution": "Răspunsul corect: „4”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "8",
+     "5",
+     "3",
+     "4"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "115",
+   "title": "Intr-un program care foloseste pthreads, daca un…",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Intr-un program care foloseste pthreads, daca un thread face lock de 2 ori consecutiv pe acelasi mutex (cu setari implicite), se produce un deadlock / Intr-un program multithreaded in Java, daca un thread face lock de 2 ori consecutiv pe acelasi obiect, se produce un deadlock",
+   "hint": "",
+   "solution": "Răspunsul corect: „adevarat / fals”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adevarat / adevarat",
+     "fals / fals",
+     "fals / adevarat",
+     "adevarat / fals"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "116",
+   "title": "Implementarea Java Thread face ca toate…",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Implementarea Java Thread face ca toate thread-urile sa se execute pe un singur CPU indiferent de cate procesoare are masina pe care ruleaza / Folosind Java Threads programatorul poate crea mai multe thread-uri decat numarul de CPU-uri de pe masina",
+   "hint": "",
+   "solution": "Răspunsul corect: „fals / adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adevarat / adevarat",
+     "adevarat / fals",
+     "fals / fals",
+     "fals / adevarat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "117",
+   "title": "Cand avem in Java o metoda de tipul \"public…",
+   "chapter": "7. Grile: fire, Java, pthreads",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Cand avem in Java o metoda de tipul \"public synchronized void f()\" intr-o clasa C, pe monitor lock-ul carui obiect se face sincronizarea?",
+   "hint": "",
+   "solution": "Răspunsul corect: „this”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "this",
+     "f",
+     "Un obiect nou creat special",
+     "C.class"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "160",
+   "title": "Scalabilitate",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce înseamnă o scalabilitate bună în programarea paralelă?",
+   "hint": "",
+   "solution": "Se măsoară empiric: același program cu 1, 2, 4, 8 fire și timpul fiecărei rulări.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "programul rulează la fel pe orice procesor",
+     "pe măsură ce crește numărul de fire, timpul de rulare scade",
+     "memoria folosită nu crește cu datele",
+     "programul poate rula pe un singur fir"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "161",
+   "title": "Paralelism la nivel de bit",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Execuția în paralel a operației `a | b` pe două numere întregi este un exemplu de paralelism la nivel de:",
+   "hint": "",
+   "solution": "Toți biții cuvântului se combină deodată în ALU.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "instrucțiune",
+     "bit",
+     "task",
+     "date (SIMD)"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "162",
+   "title": "Odd-Even Transposition Sort",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Pe ce algoritm secvențial se bazează Odd-Even Transposition Sort?",
+   "hint": "",
+   "solution": "Fazele pare și impare compară perechi de vecini, ca bubble sort, dar toate perechile unei faze în paralel.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Merge sort",
+     "Bubble sort",
+     "Quick sort",
+     "Insertion sort"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "163",
+   "title": "Căutare paralelă",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce complexitate are căutarea unei valori într-un vector cu N elemente, pe un sistem cu N/2 procesoare (CRCW)?",
+   "hint": "",
+   "solution": "Fiecare procesor verifică două poziții; rezultatul se scrie concurent.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(log N)",
+     "O(1)",
+     "O(N)",
+     "O(N / P)"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "164",
+   "title": "Difuzarea unei valori",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este complexitatea difuzării (broadcast) unei valori pe un sistem SIMD-EREW cu P procesoare?",
+   "hint": "",
+   "solution": "Cu citire exclusivă, valoarea se copiază în dublare: la fiecare pas, numărul celor care o au se dublează.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(1)",
+     "O(log P)",
+     "O(P)",
+     "O(P log P)"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "165",
+   "title": "Lungimea până la capătul listei",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "grea",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este complexitatea calculului, în paralel, al distanței din fiecare nod al unei liste cu N elemente până la sfârșitul ei (list ranking, pointer jumping)?",
+   "hint": "",
+   "solution": "La fiecare pas, fiecare nod sare la succesorul succesorului: distanțele se dublează.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(1)",
+     "O(N)",
+     "O(log N)",
+     "O(√N)"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "166",
+   "title": "Înmulțirea de matrice",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este complexitatea înmulțirii a două matrice N×N în paralel, pe P procesoare, cu algoritmul clasic?",
+   "hint": "",
+   "solution": "Munca totală e `N³` operații, împărțită egal.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(N² / P)",
+     "O(N³)",
+     "O(log N)",
+     "O(N³ / P)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "167",
+   "title": "Liniar?",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "În practică, timpul de execuție scade întotdeauna liniar cu numărul de procesoare?",
+   "hint": "",
+   "solution": "Legea lui Amdahl: `S ≤ 1 / f`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu: partea secvențială, comunicarea și sincronizarea limitează accelerarea",
+     "da, pentru orice program",
+     "da, dacă procesoarele sunt identice",
+     "da, dacă se folosește MPI"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "168",
+   "title": "Bariera în SIMD",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Într-un sistem SIMD trebuie să pună programatorul bariere între pașii unui algoritm?",
+   "hint": "",
+   "solution": "Sincronizarea e implicită. Pe MIMD aceleași sume prefix cer două bariere pe pas.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da, după fiecare instrucțiune",
+     "da, dar doar la citiri",
+     "nu, pentru că SIMD are un singur procesor",
+     "nu: toate procesoarele execută aceeași instrucțiune în același timp"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "169",
+   "title": "Selecția de tip turneu",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Cum funcționează selecția de tip turneu într-un algoritm genetic?",
+   "hint": "",
+   "solution": "Varianta proporțională cu fitness-ul e selecția prin ruletă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "se păstrează mereu jumătatea cea mai bună a populației",
+     "se aleg soluții două câte două, iar cea mai bună dintre ele e păstrată",
+     "probabilitatea de selecție e proporțională cu fitness-ul",
+     "se aleg soluții la întâmplare, fără a ține cont de fitness"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "170",
+   "title": "Modelul Master-Slave",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "În modelul genetic Master-Slave:",
+   "hint": "",
+   "solution": "Populațiile separate cu migrare sunt modelul insular (de tip „island”).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "fiecare sclav are propria populație și schimbă din când în când indivizi",
+     "fiecare individ e un proces separat",
+     "fitness-ul se evaluează în paralel, iar selecția și operatorii genetici se aplică pe toată populația",
+     "master-ul nu ține populația"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "171",
+   "title": "Regulile sumelor prefix",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "grea",
+   "source": "Întrebări APD (examen)",
+   "statement": "n procese calculează sumele prefix (procesul k ține elementul k, k de la 1). La pasul j (j de la 1), ce condiție trebuie să îndeplinească un proces ca să lucreze?",
+   "hint": "",
+   "solution": "La pasul j se adună valoarea de la distanța `2^(j-1)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`k - 2^(j-1) ≥ 1`",
+     "`k ≥ 2^j`",
+     "`k mod 2^j = 0`",
+     "`k - j ≥ 1`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "103",
+   "title": "Care este eficienta pentru sortarea Parallel Rank…",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Care este eficienta pentru sortarea Parallel Rank Sort in cazul rularii pe P procesoare? Se considera N dimensiunea vectorului de sortat",
+   "hint": "",
+   "solution": "Răspunsul corect: „logN/N”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "logN/N",
+     "logN",
+     "logP",
+     "logN/P"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "104",
+   "title": "Cum este definita eficienta paralela ( E )",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Cum este definita eficienta paralela ( E )? Se considera T - Timpul total necesar execuției algoritmului paralel; P - Numărul de procesoare utilizate G =Timp execuție cel mai rapid algoritm secvențial",
+   "hint": "",
+   "solution": "Răspunsul corect: „G/(T*P)”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "G/(T*P)",
+     "G*P/T",
+     "T*P",
+     "T*P/G"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "106",
+   "title": "De cate procese este nevoie pentru implementarea…",
+   "chapter": "8. Grile: algoritmi paraleli și complexitate",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "De cate procese este nevoie pentru implementarea calcului polinomial cu Pipeline, considerând ca ultima putere a lui x este 6:",
+   "hint": "",
+   "solution": "Răspunsul corect: „cel mult 7, se vor împarți in mod egal coeficienții”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cel mult 7, se vor împarți in mod egal coeficienții",
+     "1 proces",
+     "cel mult 6, se vor împarți in mod egal coeficienții",
+     "exact 6, fiecare proces poate sa aibă exact un coeficient"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "180",
+   "title": "MPI_Comm_size",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce face `MPI_Comm_size`?",
+   "hint": "",
+   "solution": "`MPI_Comm_rank` dă rangul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "returnează rangul procesului curent",
+     "returnează numărul de procese din comunicator",
+     "setează numărul de procese",
+     "returnează dimensiunea bufferului de trimitere"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "181",
+   "title": "MPI_Send se întoarce",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Când se întoarce apelul `MPI_Send`, ce știm sigur?",
+   "hint": "",
+   "solution": "Se poate întoarce înainte de recepție (dacă mesajul a fost pus într-un buffer de sistem) sau abia după, pentru mesaje mari.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "destinatarul a primit mesajul",
+     "destinatarul a apelat `MPI_Recv`",
+     "mesajul a ajuns în rețea",
+     "datele au fost copiate și bufferul poate fi refolosit"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "182",
+   "title": "Send fără Recv",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce se poate întâmpla dacă un proces MPI face foarte multe `send`-uri, dar destinația nu face `recv`?",
+   "hint": "",
+   "solution": "De aceea doi parteneri care fac întâi `send` unul către altul pot ajunge în deadlock pentru mesaje mari.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`send` poate deveni blocant când se umple bufferul de sistem",
+     "mesajele se pierd",
+     "programul se termină cu eroare imediat",
+     "nimic: `send` nu blochează niciodată"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "183",
+   "title": "Apelul MPI_Send corect",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este apelul corect pentru a trimite variabila `int x = 3` procesului 1, cu tag 0?",
+   "hint": "",
+   "solution": "Ordinea: buffer, număr de elemente, tip, destinație, tag, comunicator.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`MPI_Send(x, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);`",
+     "`MPI_Send(&x, sizeof(int), MPI_INT, 0, 1, MPI_COMM_WORLD);`",
+     "`MPI_Send(&x, 1, MPI_INT, MPI_COMM_WORLD, 1, 0);`",
+     "`MPI_Send(&x, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "184",
+   "title": "Scatter",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce face `MPI_Scatter`?",
+   "hint": "",
+   "solution": "Tot vectorul tuturor: `MPI_Bcast`; adunarea bucăților: `MPI_Gather`; reducerea: `MPI_Reduce`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "trimite tot vectorul tuturor proceselor",
+     "adună bucățile de la toate procesele la unul singur",
+     "reduce valorile tuturor proceselor la una",
+     "împarte un vector în bucăți egale și trimite câte o bucată fiecărui proces din comunicator"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "185",
+   "title": "Primirea unui Bcast",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Cum primesc celelalte procese un mesaj trimis cu `MPI_Bcast`?",
+   "hint": "",
+   "solution": "Operațiile colective se apelează de toate procesele comunicatorului.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "prin `MPI_Recv` cu sursa `MPI_ANY_SOURCE`",
+     "prin `MPI_Recv` de la rădăcină",
+     "tot prin `MPI_Bcast`, cu aceeași rădăcină",
+     "automat, fără niciun apel"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "186",
+   "title": "MPI_Barrier",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce face `MPI_Barrier`?",
+   "hint": "",
+   "solution": "Ca bariera de la fire, dar între procese.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "trimite un mesaj tuturor proceselor",
+     "oprește fiecare proces până când toate procesele comunicatorului ajung la barieră",
+     "termină programul distribuit",
+     "blochează comunicatorul pentru alte mesaje"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "187",
+   "title": "mpirun",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce face `mpirun`?",
+   "hint": "",
+   "solution": "Se compilează cu `mpicc`, se pornește cu `mpirun -np 4 ./prog`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "compilează un program MPI",
+     "afișează procesele MPI care rulează",
+     "leagă biblioteca MPI la program",
+     "pornește un program MPI în mai multe procese"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "188",
+   "title": "Overhead",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "În modelul LogP, ce este overhead-ul (o)?",
+   "hint": "",
+   "solution": "L e latența rețelei, g (gap) intervalul minim dintre două trimiteri sau recepții ale aceluiași modul, P numărul de procesoare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "timpul în care procesorul e ocupat cu trimiterea sau primirea unui mesaj",
+     "întârzierea mesajului prin rețea",
+     "intervalul minim dintre două trimiteri succesive",
+     "numărul de procesoare"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "189",
+   "title": "Gap-ul în LogP",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "În modelul LogP, ce reprezintă gap-ul (g)?",
+   "hint": "",
+   "solution": "`1/g` e lățimea de bandă disponibilă unui procesor.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "timpul cât procesorul e ocupat cu un mesaj",
+     "intervalul minim dintre două trimiteri (sau recepții) succesive ale aceluiași modul",
+     "latența rețelei",
+     "diferența dintre ceasurile a două noduri"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "190",
+   "title": "Timpul total al unui algoritm distribuit",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Cum se definește timpul total de execuție al unui algoritm distribuit?",
+   "hint": "",
+   "solution": "Include și așteptările dintre procese.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "timpul celui mai lent proces",
+     "suma timpilor tuturor proceselor",
+     "de la pornirea primului proces până la terminarea ultimului",
+     "media timpilor proceselor"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "191",
+   "title": "NTP",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care dintre următoarele soluții de sincronizare a ceasurilor fizice este descentralizată?",
+   "hint": "",
+   "solution": "Cristian și Berkeley folosesc un server central (Berkeley face media ceasurilor); NTP e o ierarhie de servere.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Network Time Protocol (NTP)",
+     "algoritmul Berkeley",
+     "algoritmul lui Cristian",
+     "ceasul Lamport"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "192",
+   "title": "Ceasul Lamport la pornire",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Cu ce valoare își inițializează fiecare proces ceasul logic, în soluția lui Lamport?",
+   "hint": "",
+   "solution": "Apoi crește la fiecare eveniment.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "0",
+     "ora sistemului",
+     "rangul procesului"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "193",
+   "title": "Petrecut înainte, între procese",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "P1: `v1 += 7` (ev1), `send(C, v1)` (ev2), `v1 += 8` (ev3). P2: `v2++` (ev4), `receive(C, v2)` (ev5), `v2 += 10` (ev6). Ce se poate garanta pentru orice execuție?",
+   "hint": "",
+   "solution": "ev1 → ev2 (același proces), ev2 → ev5 (trimitere și recepție), deci ev1 → ev5. ev3 și ev6 sunt concurente, la fel ev4 și ev2.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ev4 → ev2",
+     "ev3 → ev6",
+     "ev1 → ev5",
+     "ev3 și ev5 sunt în relația ev3 → ev5"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "194",
+   "title": "Clock drift",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "ușoară",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce este „clock drift” (deriva unui ceas)?",
+   "hint": "",
+   "solution": "Cristalele oscilează puțin diferit: ceasurile trebuie resincronizate periodic.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "diferența dintre două ceasuri logice",
+     "diferența care se acumulează între ceasul local și un ceas de referință",
+     "timpul în care un mesaj traversează rețeaua",
+     "eroarea împărțirii timpului între fire"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "195",
+   "title": "Bully",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "În algoritmul Bully, când devine un proces lider?",
+   "hint": "",
+   "solution": "Apoi anunță celorlalți că e coordonator.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "când primește cele mai multe voturi",
+     "când primește propriul identificator înapoi pe inel",
+     "când trimite mesaje de alegere proceselor cu identificator mai mare și nu îi răspunde niciunul",
+     "când e primul care pornește alegerea"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "196",
+   "title": "Hirschberg-Sinclair",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Prin ce diferă ipoteza algoritmului Hirschberg-Sinclair de cea a algoritmilor LeLann și Chang-Roberts?",
+   "hint": "",
+   "solution": "Bidirecționalitatea permite fazele cu distanțe `2^k` în ambele sensuri, de unde `O(n log n)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "procesele nu au identificatori",
+     "inelul poate avea noduri căzute",
+     "există un proces inițiator unic",
+     "mesajele pot circula în ambele sensuri pe inel"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "197",
+   "title": "Chang-Roberts, cazul cel mai bun",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "grea",
+   "source": "Întrebări APD (examen)",
+   "statement": "Câte mesaje de alegere se trimit în algoritmul Chang-Roberts în cazul cel mai favorabil, dacă toate procesele sunt inițiatoare?",
+   "hint": "",
+   "solution": "Cazul cel mai bun: fiecare identificator, în afară de maxim, e oprit după un pas (N - 1 mesaje), iar maximul face turul (N). În cel mai rău caz: `N(N + 1) / 2`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "N",
+     "N(N + 1) / 2",
+     "N log N",
+     "2N - 1"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "198",
+   "title": "Alegerea liderului pe arbore",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "grea",
+   "source": "Întrebări APD (examen)",
+   "statement": "Câte mesaje se trimit, în total, în algoritmul arbore de alegere a liderului cu N procese (cu mesajele de wake-up)?",
+   "hint": "",
+   "solution": "Pe fiecare din cele `N - 1` muchii trec două mesaje de wake-up și două ale algoritmului undă de tip arbore.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "2N - 2",
+     "N",
+     "4N - 4",
+     "N²"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "199",
+   "title": "Algoritmul fazelor",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Pentru care algoritm undă trebuie cunoscut diametrul rețelei?",
+   "hint": "",
+   "solution": "Fiecare proces trimite pe fiecare canal de D ori, D fiind diametrul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "algoritmul inel",
+     "algoritmul ecou",
+     "algoritmul arbore",
+     "algoritmul fazelor (heartbeat)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "200",
+   "title": "Dijkstra-Scholten",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "grea",
+   "source": "Întrebări APD (examen)",
+   "statement": "În care algoritm de detecție a terminării trebuie confirmate toate mesajele trimise înainte ca un proces să se poată declara terminat?",
+   "hint": "",
+   "solution": "Fiecare mesaj de calcul primește o confirmare; arborele de procese active se strânge de la frunze spre rădăcină.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "algoritmul lui Huang (cu ponderi)",
+     "Dijkstra-Scholten",
+     "algoritmul cu marcaje pe inel",
+     "algoritmul fazelor"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "201",
+   "title": "Defect de omisiune",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care este un exemplu de defect de tip omisiune?",
+   "hint": "",
+   "solution": "Oprire definitivă: crash; valori greșite: defect bizantin; întârziere: defect de timp (performanță).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un proces trimite valori greșite",
+     "un proces nu mai reușește să trimită un mesaj din cauza încărcării",
+     "un proces se oprește definitiv",
+     "un mesaj ajunge cu întârziere mare"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "202",
+   "title": "Disponibil, dar nu fiabil",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Un sistem distribuit cade câte o milisecundă în fiecare oră. Este:",
+   "hint": "",
+   "solution": "Disponibilitatea e fracțiunea de timp în care merge; fiabilitatea, cât de lung merge fără întrerupere.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "fiabil, dar indisponibil",
+     "și disponibil, și fiabil",
+     "nici disponibil, nici fiabil",
+     "foarte disponibil, dar nefiabil"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "203",
+   "title": "Efectul domino",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Ce înseamnă efectul domino la recuperarea din eroare prin puncte de control (checkpoint)?",
+   "hint": "",
+   "solution": "Apare când punctele de control nu sunt coordonate: niciunul nu formează o stare globală consistentă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "o eroare se propagă la toate procesele",
+     "procesele repornesc în ordinea identificatorilor",
+     "un proces căzut le oprește pe celelalte",
+     "procesele se întorc din punct în punct până la starea inițială și pierd tot progresul"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "204",
+   "title": "Tip de consistență",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Întrebări APD (examen)",
+   "statement": "Care dintre următoarele NU este un model de consistență?",
+   "hint": "",
+   "solution": "Cele obișnuite: strictă, liniarizabilă, secvențială, cauzală, FIFO, eventuală.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "consistență secvențială",
+     "consistență cauzală",
+     "consistență distribuită",
+     "consistență eventuală"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "101",
+   "title": "Avem un program cu un deadlock",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Avem un program cu un deadlock. Ce se întâmplă când îl rulăm?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Uneori acesta se va bloca la nesfarsit”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Uneori acesta se va bloca la nesfarsit",
+     "Programul va termina mereu executarea afisand rezultatul corect",
+     "Acesta se va bloca intotdeauna",
+     "Acesta nu va compila"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "107",
+   "title": "In distributie, conform cu modelul Foster, timpul…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "In distributie, conform cu modelul Foster, timpul total se calculeaza ca:",
+   "hint": "",
+   "solution": "Răspunsul corect: „suma timpului de comunicare, de calcul si idle pe fiecare proces”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "suma timpului de comunicare inter-procesor, de calcul si idle pe fiecare proces",
+     "suma timpului de comunicare, de calcul si idle pe fiecare proces",
+     "suma timpului de calcul si de comunicare inter-procesor pe fiecare proces",
+     "suma timpului de comunicare intra-procesor, de calcul si idle pe fiecare proces"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "108",
+   "title": "Considerand relatia de petrecut înainte (->) si…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Considerand relatia de petrecut înainte (->) si doua evenimente a și b:",
+   "hint": "",
+   "solution": "Răspunsul corect: „dacă a -> b și b -> c, atunci a -> c”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "dacă a și b nu sunt din acelasi proces, nu se poate stabili o relatia intre ele",
+     "dacă a reprezintă transmiterea unui mesaj iar b recepția aceluiași mesaj la destinatie, atunci b -> a",
+     "dacă a -> b și b -> c, atunci a -> c",
+     "dacă a și b sunt pe acelasi proces, nu se poate aplica aceasta relatie"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "109",
+   "title": "In cazul algoritmului unda de tip inel cu N noduri…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "In cazul algoritmului unda de tip inel cu N noduri, timpul de execuție este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „O(N)”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(1)",
+     "O(N^2)",
+     "O(N)",
+     "O(logN)"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "110",
+   "title": "In cazul algoritmului unda de tip ecou cu N noduri…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "In cazul algoritmului unda de tip ecou cu N noduri, timpul de execuție este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „O(N)”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(1)",
+     "O(N)",
+     "O(logN)",
+     "O(N^2)"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "111",
+   "title": "Numarul de mesaje pentru algoritmul LeLann este",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Numarul de mesaje pentru algoritmul LeLann este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „O(N^2)”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O(N^3)",
+     "O(N)",
+     "O(N^4)",
+     "O(N^2)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "112",
+   "title": "La algoritmii cu mesaje de sondaj cu ecou, in cazul…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "La algoritmii cu mesaje de sondaj cu ecou, in cazul topologiilor de tip arbore (initiatorul fiind radacina arborelui):",
+   "hint": "",
+   "solution": "Răspunsul corect: „Mesajele de sondaj se propaga de la radacina la frunze / Mesajele de ecou se propaga de la frunze la initiator”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Mesajele de sondaj se propaga de la frunze la initiator / Mesajele de ecou se propaga de la frunze la initiator",
+     "Mesajele de sondaj se propaga de la radacina la frunze / Mesajele de ecou se propaga de la frunze la initiator",
+     "Mesajele de sondaj se propaga de la frunze la initiator / Mesajele de ecou se propaga de la initiator la frunze",
+     "Mesajele de sondaj se propaga de la radacina la frunze / Mesajele de ecou se propaga de la initiator la frunze"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "113",
+   "title": "In algoritmul lui Huang, pentru a detecta terminarea",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "In algoritmul lui Huang, pentru a detecta terminarea:",
+   "hint": "",
+   "solution": "Răspunsul corect: „se folosesc ponderi”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "se folosesc ponderi",
+     "se folosesc mesaje de tip semnal",
+     "se folosesc mesaje de tip marcaj si semnal",
+     "se folosesc mesaje de tip marcaj"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "114",
+   "title": "Ce se întâmplă la defectarea liderului in cazul…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Ce se întâmplă la defectarea liderului in cazul algoritmului Raft?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Daca un nod follower nu mai primeste mesaje heartbeat, presupune ca leaderul s-a defectat si initiaza o alegere”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Daca un nod follower nu mai primeste mesaje heartbeat, acesta ii ia locul și anunță vecinilor noua identitate",
+     "Sunt comise toate intrarile din Log pentru a iniția un proces de votare",
+     "Daca un nod follower nu mai primeste mesaje heartbeat, presupune ca leaderul s-a defectat si initiaza o alegere",
+     "Inregistram toate scrierile acestuia intr-un „indexed log\", pe care il replicam"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "118",
+   "title": "Ce face MPI_Init",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Ce face MPI_Init?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Initializeaza un program distribuit”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Determina numarul de procese",
+     "Initializeaza un program distribuit",
+     "Termina un program distribuit",
+     "Determina rangul procesului curent"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "119",
+   "title": "Care din variantele specificate nu este un tip…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Care din variantele specificate nu este un tip predefinit de date in MPI?",
+   "hint": "",
+   "solution": "Răspunsul corect: „MPI_VECTOR”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "MPI_VECTOR",
+     "MPI_FLOAT",
+     "MPI_LONG_DOUBLE",
+     "MPI_BYTE"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "120",
+   "title": "Într-un sistem e-commerce (e.g., Amazon, e-Bay…",
+   "chapter": "9. Grile: MPI și algoritmi distribuiți",
+   "difficulty": "medie",
+   "source": "Examen APD seria CC (2021)",
+   "statement": "Într-un sistem e-commerce (e.g., Amazon, e-Bay, etc), care sunt opțiunile pe care NU e nevoie să le considerăm când alegem între consistență și disponibilitate?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Specificul organizației care dezvoltă soluția tehnologică”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Tipuri diferite de operații (e.g., query, purchase, etc.)",
+     "Tipuri diferite de servicii (e.g., distributed lock, DNS, etc.)",
+     "Specificul organizației care dezvoltă soluția tehnologică",
+     "Tipuri de date diferite (e.g., shopping cart, billing, product, etc.)"
+    ],
+    "answer": 2
    }
   }
  ]

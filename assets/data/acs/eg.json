@@ -5,7 +5,12 @@
   "2. Elasticitate",
   "3. Costuri, productivitate, profit",
   "4. Bani, dobândă, indicatori macroeconomici",
-  "5. Noțiuni"
+  "5. Noțiuni",
+  "6. Grile: principii, alegere",
+  "7. Grile: cerere și ofertă",
+  "8. Grile: elasticitate",
+  "9. Grile: taxe, prețuri impuse, bunăstare",
+  "10. Grile: costuri și concurență"
  ],
  "problems": [
   {
@@ -1183,6 +1188,1840 @@
      "pozitivă, de 14%",
      "egală cu zero",
      "negativă: deponentul pierde putere de cumpărare"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "102",
+   "title": "Frontiera posibilitatilor de productie va fi o…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Frontiera posibilitatilor de productie va fi o linie dreapta daca:",
+   "hint": "",
+   "solution": "Răspunsul corect: „costul de oportunitate al unui bun intermenii altui bun la care se renunta este constant”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "costul de oportunitate al unui bun in termenii altui bun la care se renunta este zero",
+     "costul de oportunitate al unui bun intermenii altui bun la care se renunta este constant",
+     "rata somajului este zero",
+     "resursele sunt alocate efficient"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "103",
+   "title": "Costul de oportunitate al urmarii cursurilor unei…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Costul de oportunitate al urmarii cursurilor unei universitati este dat de:",
+   "hint": "",
+   "solution": "Răspunsul corect: „valoarea celei mai bune oportunitati la care un student a renuntat pentru a participa la cursurile unei universitati;”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "zero, atata timp cat pregatirea universitara ii va penmite unui student sa castige un venit mai mare dupa terminarea studiilor",
+     "zero, pentru studentii norocosi ale caror cheltuieli sunt suportate de catre parinti",
+     "cheltuielile totale antrenate de hrana, imbracaminte, carti, transport, cazare",
+     "valoarea celei mai bune oportunitati la care un student a renuntat pentru a participa la cursurile unei universitati;"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "104",
+   "title": "Economistii utilizeaza fraza",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Economistii utilizeaza fraza: \"Nu exista pranz gratuit \", pentru a ilustra conceptul de:",
+   "hint": "",
+   "solution": "Răspunsul corect: „renuntare/compromis”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "renuntare/compromis",
+     "eficienta",
+     "productivitate",
+     "raritate"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "105",
+   "title": "Apreciați afirmația următoare",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Apreciați afirmația următoare: „Dacă prețul benzinei crește, atunci companiile aeriene sunt forțate să crească prețul biletelor”:",
+   "hint": "",
+   "solution": "Răspunsul corect: „afirmația nu este corectă din punct de vedere economic”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ține cont de raritatea resurselor",
+     "afirmația nu este corectă din punct de vedere economic",
+     "prețurile trebuie să crească în măsura în care a crescut prețul benzinei",
+     "afirmația este corectă"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "111",
+   "title": "Afirmația",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nAfirmația: \"Salariul minim este o cauză a șomajului\": este o afirmație normativă.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "114",
+   "title": "„Mana invizibila” directioneaza activitatea…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\n„Mana invizibila” directioneaza activitatea economica prin intermediul publicitatii.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "118",
+   "title": "Economia normativa reprezinta o abordare a stiintei…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nEconomia normativa reprezinta o abordare a stiintei economice concentrata pe elaborarea de judecati de valoare in legatura cu politici economice sau in legatura cu conditiile economice.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "121",
+   "title": "Economia pozitivă folosește doar afirmații…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nEconomia pozitivă folosește doar afirmații favorabile în descrierea unei situații.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "122",
+   "title": "Afirmatia „Guvernul ar trebui sa mareasca bursele…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nAfirmatia „Guvernul ar trebui sa mareasca bursele studentilor” este o afirmatie pozitiva.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "128",
+   "title": "Aproximativ 50% din economiile lumii se confrunta…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nAproximativ 50% din economiile lumii se confrunta cu raritatea resurselor.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "129",
+   "title": "Potrivit diagramei fluxului circular, factorii de…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nPotrivit diagramei fluxului circular, factorii de productie se afla in proprietatea firmelor.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "134",
+   "title": "Monica tocmai a absolvit cursurile Facultății de…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Monica tocmai a absolvit cursurile Facultății de Automatica si Calculatoare. Acum ea compară costurile și beneficiile obținerii titlului de Master cu angajarea într-o firmă. Acesta este un exemplu de:",
+   "hint": "",
+   "solution": "Răspunsul corect: „analiză marginală”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pierdere de vreme",
+     "cost real",
+     "analiză marginală",
+     "cost explicit"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "136",
+   "title": "Economia studiaza cat de echitabil sunt distribuite…",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nEconomia studiaza cat de echitabil sunt distribuite bunurile si serviciile intre membrii societatii.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "154",
+   "title": "Cum ați caracteriza următoarea afirmație",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Cum ați caracteriza următoarea afirmație: \"Prețul pâinii s-a mărit în mod nejustificat deoarece prețul materiilor prime a rămas nemodificat.\"",
+   "hint": "",
+   "solution": "Răspunsul corect: „cine consideră că este corectă nu ar merita să ia notă de trecere la examenul de economie”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cine consideră că este corectă nu ar merita să ia notă de trecere la examenul de economie",
+     "ține cont de raritatea resurselor",
+     "corectă",
+     "corectă, deoarece ține cont de raritatea resuselor"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "191",
+   "title": "Care dintre urmatoarele afirmatii este corecta",
+   "chapter": "6. Grile: principii, alegere",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Care dintre urmatoarele afirmatii este corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect: „toate variantele sunt corecte”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "toate variantele sunt corecte",
+     "profitul economic = venit total – costurile totale de oportunitate",
+     "profitul economic = venit total – costuri explicite – costuri implicite",
+     "profit contabil = venit total – costuri explicite"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "101",
+   "title": "Functia principala a preturilor intr-o economie de…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Functia principala a preturilor intr-o economie de piata este de a furniza participantilor:",
+   "hint": "",
+   "solution": "Răspunsul corect: „informatia economica”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "o distributie echitabila a bunurilor",
+     "informatia economica",
+     "capacitatile contabile",
+     "limitele de cheltuieli"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "108",
+   "title": "Ce se va intampla cu pretul de echilibru si cu…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Ce se va intampla cu pretul de echilibru si cu cantitatea de echilibru pe piata masinilor noi in situatia in care pretul benzinei creste, pretul otelului creste, transportul in comun devine mai ieftin si mai confortabil, iar salariatii din fabricile auto negociaza salarii mai mari?",
+   "hint": "",
+   "solution": "Răspunsul corect: „cantitatea de echilibru se va reduce, in timp ce pretul de echilibru poate sa creasca, sa scada sau sa nu se modifice”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cantitatea de echilibru se va reduce, in timp ce pretul de echilibru poate sa creasca, sa scada sau sa nu se modifice",
+     "pretul de echilibru va creste, in timp ce cantitatea de echilibru poate sa creasca, sa scada sau sa nu se modifice",
+     "cantitatea de echilibru va creste, in timp ce pretul de echilibru poate sa creasca, sa scada sau sa nu se modifice",
+     "pretul de echilibru se va reduce, in timp ce cantitatea de echilibru poate sa creasca, sa scada sau sa nu se modifice"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "109",
+   "title": "Pe piata unui produs, cererea este descrisa de…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "grea",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Pe piata unui produs, cererea este descrisa de urmatoarea functie: C(p) = 12 – 2p. Determinati nivelul pretului care maximizeaza venitul total.",
+   "hint": "",
+   "solution": "Răspunsul corect: „3 u.m”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "12 u.m",
+     "6 u.m",
+     "informatia furnizata este insuficienta pentru a raspunde",
+     "3 u.m"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "117",
+   "title": "Reducerea pretului unui produs si cresterea…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nReducerea pretului unui produs si cresterea numarului de cumparatori afecteaza curba cererii in acelasi mod.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "120",
+   "title": "In cazul bunurilor complementare, o crestere a…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nIn cazul bunurilor complementare, o crestere a pretului unui bun, determina o crestere a cererii pentru celalalt bun.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "125",
+   "title": "De învățământ universitar gratuit ar putea să…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDe învățământ universitar gratuit ar putea să beneficieze oricine necondiționat doar dacă guvernul alocă pentru educație banii necesari.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "126",
+   "title": "Dacă prețul unui BMW X5 crește la 100 000 EURO…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Dacă prețul unui BMW X5 crește la 100 000 EURO, atunci cererea de BMW X5:",
+   "hint": "",
+   "solution": "Răspunsul corect: „în acest caz, cererea nu este influențată de evoluția prețului”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "scade incet",
+     "creste",
+     "se reduce foarte mult",
+     "în acest caz, cererea nu este influențată de evoluția prețului"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "130",
+   "title": "Mulți copii se așteaptă să vină Moș Crăciun la ei…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Mulți copii se așteaptă să vină Moș Crăciun la ei (dacă au fost cuminți). Este acesta un semn că cererea de cadouri este mare?",
+   "hint": "",
+   "solution": "Răspunsul corect: „nu, pentru că cererea nu depinde doar de dorințe”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu, pentru că cererea nu depinde doar de dorințe",
+     "da, pentru că acești copii au nevoie de cadouri",
+     "da, pentru că acești copii țin foarte mult la cadouri",
+     "nu, deoarece cadourile nu se exprimă în bani"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "132",
+   "title": "Deoarece untul si painea sunt adesea folosite…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Deoarece untul si painea sunt adesea folosite impreuna, acestea pot fi considerate bunuri complementare. Se observa ca atat pretul de echilibru al untului cat si cantitatea de echilibru a painii au crescut. Aceasta modificare se datoreaza:",
+   "hint": "",
+   "solution": "Răspunsul corect: „unei reduceri a pretului fainii folosite pentru producerea painii”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "unei reduceri a pretului laptelui folosit pentru producerea untului",
+     "unei reduceri a pretului fainii folosite pentru producerea painii",
+     "unei cresteri a pretului laptelui folosit pentru producerea untului",
+     "unei cresteri a pretului fainii folosite pentru producerea painii"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "135",
+   "title": "Intr-o economie de piata",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Intr-o economie de piata:",
+   "hint": "",
+   "solution": "Răspunsul corect: „cantitatea este determinata de pret”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "oferta este determinata de cerere",
+     "cantitatea este determinata de pret",
+     "cererea este determinata de oferta",
+     "pretul este determinat de cantitate"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "137",
+   "title": "La pretul de echilibru, cererea este egala cu oferta",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nLa pretul de echilibru, cererea este egala cu oferta.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "138",
+   "title": "Un program guvernamental care reduce cantitatea de…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nUn program guvernamental care reduce cantitatea de pamant cultivata afecteaza agricultorii dar aduce beneficii consumatorilor.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "140",
+   "title": "Cresterea pretului graului va determina o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nCresterea pretului graului va determina o modificare a cantitatii oferite de paine, dar nu va determina o modificare a ofertei de paine.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "142",
+   "title": "Intr-o economie de piata, interactiunea dintre…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Intr-o economie de piata, interactiunea dintre cerere si oferta detemina:",
+   "hint": "",
+   "solution": "Răspunsul corect: „atat pretul cat si cantitatea tranzacționată”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pretul unui bun, dar nu si cantitatea",
+     "cantitatea tranzactionata, dar nu si pretul",
+     "nici pretul si nici cantitatea, deoarece preturile sunt stabilite de catre producatori",
+     "atat pretul cat si cantitatea tranzacționată"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "143",
+   "title": "Cantitatea dintr-un bun pe care cumparatorii sunt…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Cantitatea dintr-un bun pe care cumparatorii sunt dispusi si pot sa o cumpere se numeste:",
+   "hint": "",
+   "solution": "Răspunsul corect: „cantitate ceruta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "oferta",
+     "cantitate ceruta",
+     "cantitate oferită",
+     "cerere"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "144",
+   "title": "Daca pe piată exista un excedent, prețul va avea o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDaca pe piată exista un excedent, prețul va avea o tendință de creștere.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "145",
+   "title": "Daca pe piata serviciilor stomatologice, cererea…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Daca pe piata serviciilor stomatologice, cererea pentru servicii stomatologice creste iar oferta de servicii stomatologice scade:",
+   "hint": "",
+   "solution": "Răspunsul corect: „pretul de echilibru creste, dar impactul asupra catitatii de echilbru nu poate fi determinat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "atat pretul cat si cantitate de echilibru se vor reduce",
+     "pretul de echilibru se va reduce, dar impactul asupra cantitatii de echilibru nu poate fi determinat",
+     "pretul de echilibru creste, dar impactul asupra catitatii de echilbru nu poate fi determinat",
+     "atat pretul cat si cantitatea de echilibru se vor creste"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "146",
+   "title": "Care dintre urmatorii factori determina curba…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Care dintre urmatorii factori determina curba ofertei pietei dar nu si curba ofertei individuale:",
+   "hint": "",
+   "solution": "Răspunsul corect: „numarul de vanzatori”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "tehnologia de fabricatie",
+     "preturile factorilor de productie",
+     "numarul de vanzatori",
+     "anticipatiile vanzatorilor"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "148",
+   "title": "Modificarea ofertei se reprezintă grafic printr-o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nModificarea ofertei se reprezintă grafic printr-o deplasare de-a lungul curbei ofertei.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "149",
+   "title": "În cazul bunurilor inferioare, cererea scade atunci…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nÎn cazul bunurilor inferioare, cererea scade atunci când venitul consumatorului se reduce.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "151",
+   "title": "Automobilele sunt un bun normal",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Automobilele sunt un bun normal. Cum se va modifica pretul de echilibru al masinilor noi daca pretul benzinei creste, pretul otelului se reduce, transportul in comun devine mai ieftin si mai confortabil, salariatii fabricilor constructoare de masini accepta salarii mai mici, iar asigurarea auto se scumpește?",
+   "hint": "",
+   "solution": "Răspunsul corect: „pretul de echilibru se va reduce”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pretul de echilibru se va reduce",
+     "pretul de echilibru va creste",
+     "nu se poate determina efectul asupra pretului de echilibru d.pretul de echilibru ramane nemodificat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "152",
+   "title": "Care dintre urmatorii factori nu influenteaza…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Care dintre urmatorii factori nu influenteaza cererea:",
+   "hint": "",
+   "solution": "Răspunsul corect: „preturile factorilor de productie”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "preturile celorlalte bunuri",
+     "venitul individului si distributia venitului intr-o colectivitate",
+     "preferintele individului",
+     "preturile factorilor de productie"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "153",
+   "title": "Anticipatiile unui individ cu privire la viitor",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Anticipatiile unui individ cu privire la viitor:",
+   "hint": "",
+   "solution": "Răspunsul corect: „pot sa afecteze cererea prezenta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu pot sa deplaseze curba cererii",
+     "pot sa afecteze cererea viitoare",
+     "pot sa afecteze cererea prezenta",
+     "nu pot să modifice cererea deoarece anticipațiile se schimbă"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "156",
+   "title": "Modificarea cererii se reprezintă grafic printr-o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nModificarea cererii se reprezintă grafic printr-o deplasare (spre stânga sau spre dreapta) a curbei cererii.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "157",
+   "title": "Dacă prețul pietei este mai mare decât prețul de…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDacă prețul pietei este mai mare decât prețul de echilibru, pe piata apare o penurie.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "158",
+   "title": "Modificarea cantității oferite se reprezintă grafic…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nModificarea cantității oferite se reprezintă grafic printr-o deplasare a curbei ofertei.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "159",
+   "title": "Cantitatea oferită dintr-un bun sau serviciu, este…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nCantitatea oferită dintr-un bun sau serviciu, este cantitatea pe care vânzatorii sunt dispusi și pot să o vanda la un anumit preț.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "161",
+   "title": "Imbunătățirea tehnologiei de fabricație a unui…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nImbunătățirea tehnologiei de fabricație a unui produs va determina o deplasare spre stânga a curbei ofertei acelui produs.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "162",
+   "title": "Biletele de autobuz sunt un bun exemplu de bun…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nBiletele de autobuz sunt un bun exemplu de bun inferior.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "163",
+   "title": "În cazul bunurilor complementare, o creștere a…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nÎn cazul bunurilor complementare, o creștere a prețului unui bun, determină o reducere a cererii pentru celălalt bun.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "164",
+   "title": "Cum se modifică prețul de echilibru și cantitatea…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Cum se modifică prețul de echilibru și cantitatea de echilibru pe piața produselor lactate dacă numarul de cumpărători crește și, în acelasi timp are loc o îmbunatatire a tehnologiei de fabricație?",
+   "hint": "",
+   "solution": "Răspunsul corect: „cantitatea de echilibru va creste, dar dar impactul asupra pretului de echilibru nu poate fi determinat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pretul de echilibru va creste, dar impactul asupra cantitatii tranzactionate pe piata nu poate fi determinat",
+     "cantitatea de echilibru va creste, dar dar impactul asupra pretului de echilibru nu poate fi determinat",
+     "atat pretul cat si cantitatea de echilibru vor creste",
+     "pretul de echilibru se va reduce, dar impactul asupra cantitatii tranzactionate pe piata nu poate fi determinat"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "167",
+   "title": "Cantitatea cerută dintr-un bun reprezintă…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nCantitatea cerută dintr-un bun reprezintă cantitatea pe care cumpărătorii sunt dispusi si pot sa o cumpere la un anumit preț.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "168",
+   "title": "Într-o economie de piață, resursele rare sunt…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Într-o economie de piață, resursele rare sunt alocate prin intermediul:",
+   "hint": "",
+   "solution": "Răspunsul corect: „preturilor”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "reglemantarilor guvernamentale cu privire la resursele rare",
+     "planificatorilor economici",
+     "preturilor",
+     "producatorilor care utilizeaza resursele"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "169",
+   "title": "Cantitatea ceruta de Coca Cola a crescut pentru…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Cantitatea ceruta de Coca Cola a crescut pentru fiecare nivel al pretului. Acest lucru se datoreaza:",
+   "hint": "",
+   "solution": "Răspunsul corect: „creșterii prețului bunurilor substituibile”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cresterii venitului, Coca Cola fiind un bun inferior",
+     "creșterii prețului bunurilor substituibile",
+     "consumatorii prefera Pepsi mai mult decat Coca Cola",
+     "reducerii numarului de cumparatori de pe piata"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "171",
+   "title": "Piața reprezintă un grup de cumparatori si…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nPiața reprezintă un grup de cumparatori si vanzatori ai unui bun sau serviciu.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "172",
+   "title": "Este imposibil ca cererea și oferta să se modifice…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nEste imposibil ca cererea și oferta să se modifice în acelasi timp.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "173",
+   "title": "O creștere a prețului pâinii, va determina o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nO creștere a prețului pâinii, va determina o deplasare spre stânga a curbei cererii de pâine.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "175",
+   "title": "In cazul unui bun normal, cresterea venitului",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "In cazul unui bun normal, cresterea venitului:",
+   "hint": "",
+   "solution": "Răspunsul corect: „va determina o crestere a cererii pentru bunul respectiv”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "va determina o crestere a cererii pentru bunul respectiv",
+     "nu va modifica cererea pentru bunul respectiv",
+     "va determina o reducere a prețului pieței d.va determina o reducere a cererii pentru bunul respectiv"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "176",
+   "title": "Dacă o firmă producătoare de ulei anticipează o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDacă o firmă producătoare de ulei anticipează o crestere a prețului uleiului, cantitatea ofertă de ulei în prezent va crește.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "177",
+   "title": "Bunurile de strictă necesitate tind să aiba un…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nBunurile de strictă necesitate tind să aiba un coeficient de elsticitate al cererii în funcție de preț subunitar.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "178",
+   "title": "Cererea de benzină va răspunde mai mult la o…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nCererea de benzină va răspunde mai mult la o schimbare a prețului pe o perioadă de cinci săptămâni decât pe o perioadă de cinci ani.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "196",
+   "title": "Deplasarea de-a lungul curbei ofertei ar putea fi…",
+   "chapter": "7. Grile: cerere și ofertă",
+   "difficulty": "medie",
+   "source": "Aplicații seminar EG",
+   "statement": "Deplasarea de-a lungul curbei ofertei ar putea fi determinata de modificarea:",
+   "hint": "",
+   "solution": "Răspunsul corect: „pretului bunului sau serviciului respectiv”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pretului factorilor de productie",
+     "pretului bunului sau serviciului respectiv",
+     "anticipatiilor cu privire la preturilor viitoare",
+     "tehnologiei de fabricatie"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "107",
+   "title": "Pe piata unui produs, cererea este descrisa de…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "grea",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Pe piata unui produs, cererea este descrisa de urmatoarea functie: C(p) = 8 – 2p. In punctul P=2 u.m. cererea este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „unitara”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "unitara",
+     "elastica",
+     "informatia furnizata este insuficienta pentru a determina coeficientul de elasticitate al cererii in functie de pret",
+     "inelastica"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "110",
+   "title": "Atunci cand cererea este inelastica, cresterea…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nAtunci cand cererea este inelastica, cresterea pretului determina cresterea venitului total al producatorilor.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "112",
+   "title": "Un individ se opreste la o statie de benzina, si…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Un individ se opreste la o statie de benzina, si, inainte de a observa pretul, cumpara 20 de litri de benzina. Cererea de benzina pentru acest individ este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „perfect inelastica”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "perfect elastica",
+     "unitara",
+     "perfect inelastica",
+     "elastica"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "115",
+   "title": "Bunurile de lux tind sa aiba un coeficient de…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nBunurile de lux tind sa aiba un coeficient de elasticitate al cererii in functie de pret subunitar.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "116",
+   "title": "Medicamentele au o cerere inelastica, in timp ce…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Medicamentele au o cerere inelastica, in timp ce calculatoarele au o cerere elastica. Datorita imbunatatirii tehnologiei de fabricatie, oferta pentru ambele produse se dubleaza ( cantitatea oferita pentru fiecare nivel al pretului se dubleaza). Cum se modifica cheltuielile consumatorilor pe piata fiecarui produs?",
+   "hint": "",
+   "solution": "Răspunsul corect: „pe piata medicamentelor cheltuielile consumatorilor scad, in timp ce pe piata calculatoarelor cheltuielile consumatorilor cresc”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pe ambele piete cheltuielile consumatorilor cresc",
+     "pe piata medicamentelor cheltuielile consumatorilor scad, in timp ce pe piata calculatoarelor cheltuielile consumatorilor cresc",
+     "pe ambele piete cheltuielile consumatorilor scad",
+     "pe piata medicamentelor cheltuielile consumatorilor cresc, in timp ce pe piata calculatoarelor cheltuielile consumatorilor scad"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "119",
+   "title": "Mihai a decis sa consume pe imbracaminte o treime…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Mihai a decis sa consume pe imbracaminte o treime din venitul sau lunar. In aceste conditii, elasticitatea cererii (pentru imbracaminte) in functie de pret este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „unitara”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "elastica",
+     "inelastica",
+     "unitara",
+     "informatia furnizata este insuficienta pentru a raspunde"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "123",
+   "title": "Un individ se opreste la o statie de benzina, si…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Un individ se opreste la o statie de benzina, si, inainte de a observa pretul, cumpara benzina in valoare de 200 RON. Coeficientul de elasticitate al cererii in functie de pret pentru acest individ este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „1”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "informatia furnizata este insuficienta pentru a determina coeficientul de elasticitate al cererii in functie de pret",
+     "infinit",
+     "zero",
+     "1"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "127",
+   "title": "Daca cererea este perfect elastica, curba cererii…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDaca cererea este perfect elastica, curba cererii este verticala, iar coeficientul de elastiticitate al cererii in functie de pret este egal cu zero.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "131",
+   "title": "Daca cererea pentru produse agricole este…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Daca cererea pentru produse agricole este inelastica, pentru a-si mari veniturile, producatorii agricoli ar trebui:",
+   "hint": "",
+   "solution": "Răspunsul corect: „sa reduca suprafata de teren cultivata”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "sa reduca suprafata de teren cultivata",
+     "sa cultive mai mult grau, astfel incat sa poata sa vanda mai mult in fiecare an",
+     "sa folosesca o tehnologie mai buna",
+     "sa mareasca cheltielile cu fertilizarea terenului, astfel incat productia de grau aferenta fiecarui hectar de teren cultivat sa creasca"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "133",
+   "title": "Bunurile pentru care exista produse de substitutie…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nBunurile pentru care exista produse de substitutie tind sa aiba o cerere mai elastica decat bunurile pentru care nu exista substituenti.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "139",
+   "title": "Hotelurile de pe plaja au o oferta inelastica, in…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Hotelurile de pe plaja au o oferta inelastica, in timp ce automobilele au o oferta elastica. Presupumen ca o crestere a populatiei dubleaza cererea pentru ambele produse (cantitatea ceruta pentru fiecare nivel al pretului se dubleaza). Cum se modifica cheltuielile consumatorilor pentru fiecare dintre cele doua produse?",
+   "hint": "",
+   "solution": "Răspunsul corect: „cresc”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cresc",
+     "scad",
+     "pentru hoteluri scad in timp ce pentru automobile cresc",
+     "pentru hoteluri cresc in timp ce pentru automobile scad"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "147",
+   "title": "La începutul dezvoltării sale, într-o iarnă…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "La începutul dezvoltării sale, într-o iarnă, compania Uber a decis să micșoreze tariful curselor în orașul Chicago, ceea ce a avut drept consecință creșterea veniturilor șoferilor. In aceste condiții cererea pentru serviciile Uber în Chicago era:",
+   "hint": "",
+   "solution": "Răspunsul corect: „elastică”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu se poate determina",
+     "elastică",
+     "inelastică",
+     "cu elasticitate unitară"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "155",
+   "title": "OPEC nu a reușit să mențină un preț ridicat al…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nOPEC nu a reușit să mențină un preț ridicat al petrolului pe termen lung, deoarece atât oferta de petrol, cât și cererea de petrol sunt mai elastice pe termen lung decât pe termen scurt.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "160",
+   "title": "Atunci când cererea este elastică, creșterea…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nAtunci când cererea este elastică, creșterea prețului determină reducerea venitului total al producătorilor.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "166",
+   "title": "Oferta de benzină tinde să fie elastică pe termen…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nOferta de benzină tinde să fie elastică pe termen scurt și inelastică pe termen lung.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "170",
+   "title": "Daca cererea este perfect inelastică, curba cererii…",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDaca cererea este perfect inelastică, curba cererii este verticală, iar coeficientul de elastiticitate al cererii in functie de pret este egal cu zero.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "174",
+   "title": "Ana și Maria, se opresc la un magazin",
+   "chapter": "8. Grile: elasticitate",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Ana și Maria, se opresc la un magazin. Înainte de a vedea prețul, fiecare face o comandă. Ana spune: \"Aș vrea 200 de grame de caramele.\" Maria spune: \"Aș vrea caramele de 20 de lei\". În raport cu prețul, Maria are o cerere:",
+   "hint": "",
+   "solution": "Răspunsul corect: „cu elasticitate unitară”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "perfect inelastică",
+     "informațiile oferite sunt insuficiente pentru a răspunde",
+     "cu elasticitate unitară",
+     "elastică"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "124",
+   "title": "Faptul că deseori în București se observă…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Faptul că deseori în București se observă taximetriști care \"stau la coadă\" în așteptarea clienților arată că:",
+   "hint": "",
+   "solution": "Răspunsul corect: „prețul perceput de taximetriști este mai mare decât prețul de echilibru al pieței”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "oferta de servicii de taximetrie este mai mare decât cererea de asemenea servicii",
+     "prețul perceput de taximetriști este mai mare decât prețul de echilibru al pieței",
+     "cererea pentru servicii de taximetrie este unitara",
+     "în general, oamenii nu au încredere în taximetriști."
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "179",
+   "title": "Presupunem că cererea și oferta pentru mașini sunt…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Presupunem că cererea și oferta pentru mașini sunt elastice. Dacă guvernul introduce o taxă de 500 EUR asupra cumpărătorilor:",
+   "hint": "",
+   "solution": "Răspunsul corect: „prețul primit de catre vanzatori se va reduce cu mai puțin de 500 EUR”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "prețul de echilibru al unei mașini nu se modifică dacă ambele curbe sunt elastice",
+     "prețul primit de catre vanzatori se va reduce cu mai puțin de 500 EUR",
+     "prețul primit de catre vanzatori se va reduce cu exact 500 EUR",
+     "prețul primit de catre vanzatori se va reduce cu mai mult de 500 EUR"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "180",
+   "title": "In general, povara economica a unei taxe este…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "In general, povara economica a unei taxe este suportata de acea parte a pietei care este:",
+   "hint": "",
+   "solution": "Răspunsul corect: „mai putin elastica”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "mai putin elastica",
+     "perfect elastica",
+     "mai elastica",
+     "cu elasticitate unitara"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "181",
+   "title": "Presupunem ca autoritatile stabilesc un pret maxim…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Presupunem ca autoritatile stabilesc un pret maxim obligatoriu pe piata calculatoarelor. Stabilirea unui pret maxim mai mic decat pretul de echilibru va genera:",
+   "hint": "",
+   "solution": "Răspunsul corect: „O penurie de calculatoare”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O penurie de calculatoare",
+     "O crestere a cererii de calculatoare",
+     "Un excedent de calculatoare",
+     "Cantitatea ceruta de calculatoare va fi egala cu cantitatea oferita de calculatoare"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "182",
+   "title": "Presupunem că cererea de macaroane este inelastică…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Presupunem că cererea de macaroane este inelastică in timp ce oferta de macaroane este elastică și că cererea de țigări este inelastică in timp ce oferta de țigări este elastică. Dacă se introduce un impozit asupra vânzătorilor ambelor bunuri:",
+   "hint": "",
+   "solution": "Răspunsul corect: „cumpărătorii ambelor bunuri plătesc cea mai mare parte a impozitului”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cumpărătorii ambelor bunuri plătesc cea mai mare parte a impozitului",
+     "vânzătorii de țigări și cumpărătorii de macaroane plătesc cea mai mare parte a impozitului",
+     "vânzătorii ambelor bunuri platesc cea mai mare parte a impozitului",
+     "nu se poate determina cu exactitate cine plateste efectiv cea mai mare parte a impozitului"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "183",
+   "title": "Presupunem ca autoritatile introduc o taxa asupra…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Presupunem ca autoritatile introduc o taxa asupra benzinei. Pierderea de bunastare generata de introducerea taxei:",
+   "hint": "",
+   "solution": "Răspunsul corect: „va fi mai mare in cel de-al cincilea an comparativ cu primul an”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "informatia furnizata este insuficienta pentru a raspunde",
+     "va fi mai mare in primul an comparativ cu cel de-al cincilea an",
+     "va avea aceeasi valoare in fiecare an",
+     "va fi mai mare in cel de-al cincilea an comparativ cu primul an"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "184",
+   "title": "Un impozit aplicat vânzătorilor unui bun",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Un impozit aplicat vânzătorilor unui bun:",
+   "hint": "",
+   "solution": "Răspunsul corect: „crește prețul plătit de către cumpărători și scade prețul incasat de către vânzători”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "scade prețul plătit de către cumpărători și mărește prețul incasat de către vânzători",
+     "scade atât prețul plătit de către cumpărători, cât și prețul incasat de către vânzători",
+     "crește prețul plătit de către cumpărători și scade prețul incasat de către vânzători",
+     "crește atât prețul plătit de către cumpărători, cât și prețul incasat de către vânzători"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "185",
+   "title": "Controlul preturilor percepute pentru inchirieirea…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Controlul preturilor percepute pentru inchirieirea locutintelor reprezinta:",
+   "hint": "",
+   "solution": "Răspunsul corect: „un exemplu de pret maxim”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cel mai eficient mod de alocare a locuințelor de inchiriat pe termen lung",
+     "cel mai eficient mod de a oferi locuințe la prețuri accesibile",
+     "un bun exemplu de problemă socială rezolvată prin reglementări guvernamentale",
+     "un exemplu de pret maxim"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "186",
+   "title": "Presupunem ca autoritatile introduc un impozit…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Presupunem ca autoritatile introduc un impozit asupra motorinei. Venitul obtinut de catre autoritati ca urmare a introducerii impozitului:",
+   "hint": "",
+   "solution": "Răspunsul corect: „va fi mai mare in primul an comparativ cu cel de-al cincilea an”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "va fi mai mare in cel de-al cincilea an comparativ cu primul an",
+     "informatia furnizata este insuficienta pentru a raspunde",
+     "va fi mai mare in primul an comparativ cu cel de-al cincilea an",
+     "va avea aceeasi valoare in fiecare an"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "187",
+   "title": "În prezent, prețul legal maxim pentru un bun este…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "În prezent, prețul legal maxim pentru un bun este de 0 (zero) RON. In aceste conditii, prețul de 0 RON maximizează:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Nici surplusul consumatorului, nici surplusul producătorului”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Surplusul producatorului dar nu si surplusul consumatorului",
+     "Atât surplusul consumatorului, cât și surplusul producătorului",
+     "Nici surplusul consumatorului, nici surplusul producătorului",
+     "Surplusul consumatorului, dar nu si surplusul producatorului"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "189",
+   "title": "Pe piata unui produs, cererea este descrisa de…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "grea",
+   "source": "Colocviu EG",
+   "statement": "Pe piata unui produs, cererea este descrisa de urmatoarea functie: p = 50 – 0.5Q (p = pretul; Q = cantitatea ceruta). Cum se modifica surplusul consumatorului atunci cand introducerea unei taxe determina cresterea pretului platit de catre consumatori de la 1 u.m. la 5 u.m.?",
+   "hint": "",
+   "solution": "Răspunsul corect: „surplusul consumatorului se reduce cu 376 u.m.”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "surplusul consumatorului se reduce cu 376 u.m.",
+     "informatia furnizata este insuficienta pentru a putea determina modificarea surplusului consumatorului",
+     "surplusul consumatorului se reduce cu 16 u.m.",
+     "surplusul consumatorului se reduce cu 360 u.m."
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "190",
+   "title": "In situatia in care curba ofertei de muncă este…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "In situatia in care curba ofertei de muncă este aproape verticală, impozitarea salariului:",
+   "hint": "",
+   "solution": "Răspunsul corect: „are un impact redus asupra cantității de muncă oferite de catre lucrători”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "are un impact redus asupra cantității de muncă oferite de catre lucrători",
+     "va genera sume mici de venituri din impozite la bugetul de stat",
+     "va determina o pierdere de bunastare mare",
+     "va genera sume mici de venituri din impozite si nu va afecta cantitatea oferita de munca"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "192",
+   "title": "Pe piata unui produs cererea si oferta sunt…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "grea",
+   "source": "Colocviu EG",
+   "statement": "Pe piata unui produs cererea si oferta sunt descrise de urmatoarele functii: C(p)= 400-2p; O(p) = 100 + 3p. Daca autoritatile introduc un impozit de 15 u.m. pentru fiecare unitate de produs cumparata, cantitatea tranzactionata pe piata dupa introducerea taxei:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Este egala cu 271 buc”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este egala cu 280 buc",
+     "Este egala cu 271 buc",
+     "Se reduce cu 5%",
+     "Se reduce cu 10%"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "193",
+   "title": "Fulgii de porumb si laptele sunt bunuri…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Fulgii de porumb si laptele sunt bunuri complementare. Daca pretul porumbului scade:",
+   "hint": "",
+   "solution": "Răspunsul corect: „pe piata fulgilor de porumb surplusul consumatorului creste, iar pe piata laptelui surplusul producatorului creste”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pe piata fulgilor de porumb surplusul consumatorului creste, iar pe piata laptelui surplusul producatorului creste",
+     "pe piata fulgilor de porumb surplusul consumatorului scade, iar pe piata laptelui surplusul producatorului scade",
+     "pe piata fulgilor de porumb surplusul consumatorului scade, iar pe piata laptelui surplusul producatorului creste",
+     "pe piata fulgilor de porumb surplusul consumatorului creste, dar pe piata laptelui surplusul producatorului scade"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "194",
+   "title": "Pe piata unui produs, cererea si oferta sunt…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "grea",
+   "source": "Colocviu EG",
+   "statement": "Pe piata unui produs, cererea si oferta sunt descrise de urmatoarele functii C(p) = 300 – p; O(p) = 2p. Daca autoritatile introduc o taxa de 150 u.m. pentru fiecare unitate de produs cumparata, venitul incasat de catre autoritati si pierderea de bunastare au valorile:",
+   "hint": "",
+   "solution": "Răspunsul corect: „15.000 u.m. si 7.500 u.m.”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "0 u.m. si 45.000 u.m.",
+     "13.333 u.m. si 13.333 u.m.",
+     "informatia furnizata este insuficienta pentru a raspunde1",
+     "15.000 u.m. si 7.500 u.m."
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "195",
+   "title": "Presupunem ca autoritatile au in vedere…",
+   "chapter": "9. Grile: taxe, prețuri impuse, bunăstare",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Presupunem ca autoritatile au in vedere introducerea unui impozit pe piata medicamentelor si pe piata calculatoarelor. Pe piata medicamentelor, impozitul va avea un efect semnificativ asupra pretului platit de catre consumatori, dar nu va afecta foarte mult cantitatea de echilibru. Pe piata calculatoarelor, acelasi impozit, nu va afecta foarte mult pretul platit de catre consumatori, dar va afecta semnificativ cantitatea de echilibru. Pierderea de bunastare generata de introducerea taxei va fi mai mare:",
+   "hint": "",
+   "solution": "Răspunsul corect: „pe piata calculatoarelor”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pierderea de bunastare va fi aceeasi pe ambele piete",
+     "pe piata medicamentelor",
+     "informatia furnizata nu este suficienta pentru a raspunde",
+     "pe piata calculatoarelor"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "106",
+   "title": "Daca CFR are un cost mediu de transport pe ruta…",
+   "chapter": "10. Grile: costuri și concurență",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nDaca CFR are un cost mediu de transport pe ruta Bucuresti – Campina de 30 RON, ar fi irational ca CFR sa vanda un bilet de tren pe aceasta ruta cu mai putin de 30 RON.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "113",
+   "title": "Industria software este un bun exemplu de piata cu…",
+   "chapter": "10. Grile: costuri și concurență",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nIndustria software este un bun exemplu de piata cu structura de concurenta monopolistica.",
+   "hint": "",
+   "solution": "Afirmația este **adevărată**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "141",
+   "title": "Pe o piata concurentiala, nici un vanzator nu nu…",
+   "chapter": "10. Grile: costuri și concurență",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Pe o piata concurentiala, nici un vanzator nu nu poate sa influenteze pretul produsului sau deoarece:",
+   "hint": "",
+   "solution": "Răspunsul corect: „ceilalti vanzatori ofera produse similare”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "produsele tranzactionate pe pietele concurentiale sunt in general oferite din abundenta",
+     "ceilalti vanzatori ofera produse similare",
+     "pe pietele concurentiale cumparatorii au o influenta mai mare asupra pretului decat vanzatorii",
+     "produsele oferite pe o piata concurentiala difera de la un producator la altul"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "150",
+   "title": "Pe o piață perfect concurențială, vânzătorii…",
+   "chapter": "10. Grile: costuri și concurență",
+   "difficulty": "ușoară",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Adevărat sau fals?\n\nPe o piață perfect concurențială, vânzătorii stabilesc prețul.",
+   "hint": "",
+   "solution": "Afirmația este **falsă**.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "165",
+   "title": "Care dintre urmatoarele nu reprezinta o trasatura a…",
+   "chapter": "10. Grile: costuri și concurență",
+   "difficulty": "medie",
+   "source": "Evaluare pe parcurs EG",
+   "statement": "Care dintre urmatoarele nu reprezinta o trasatura a pietei concurentiale?",
+   "hint": "",
+   "solution": "Răspunsul corect: „putere de piață”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "numar mare de cumparatori",
+     "produse omogene",
+     "numar mare de vanzatori",
+     "putere de piață"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "188",
+   "title": "Atunci cand costul marginal creste, costul variabil…",
+   "chapter": "10. Grile: costuri și concurență",
+   "difficulty": "medie",
+   "source": "Colocviu EG",
+   "statement": "Atunci cand costul marginal creste, costul variabil mediu:",
+   "hint": "",
+   "solution": "Răspunsul corect: „poate sa creasca sau sa scada”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "trebuie a creasca",
+     "trebuie sa scada",
+     "nu se modifica",
+     "poate sa creasca sau sa scada"
     ],
     "answer": 3
    }

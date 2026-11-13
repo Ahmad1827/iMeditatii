@@ -7,14 +7,19 @@ Every answer is computed here from the numbers in the statement.
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import problem, quiz, write_course
+from common import problem, quiz, write_course, load_grile, add_grile, fold
 
 C1 = '1. Cerere, ofertă, echilibru'
 C2 = '2. Elasticitate'
 C3 = '3. Costuri, productivitate, profit'
 C4 = '4. Bani, dobândă, indicatori macroeconomici'
 C5 = '5. Noțiuni'
-CHAPTERS = [C1, C2, C3, C4, C5]
+C6 = '6. Grile: principii, alegere'
+C7 = '7. Grile: cerere și ofertă'
+C8 = '8. Grile: elasticitate'
+C9 = '9. Grile: taxe, prețuri impuse, bunăstare'
+C10 = '10. Grile: costuri și concurență'
+CHAPTERS = [C1, C2, C3, C4, C5, C6, C7, C8, C9, C10]
 SEM = 'Seminar Economie generală'
 P = []
 
@@ -161,5 +166,30 @@ q(33, 'Monopol', 'ușoară', 'Ce caracterizează piața de monopol?', 'un singur
   ['mulți vânzători și mulți cumpărători, cu bunuri identice', 'câțiva vânzători mari', 'un singur cumpărător'], 'Mono = unul.', 'Câțiva vânzători: oligopol. Un singur cumpărător: monopson. Concurența perfectă: mulți vânzători, preț dat.')
 q(34, 'Inflația și dobânda reală', 'medie', 'Rata nominală a dobânzii este 6%, iar rata inflației este 8%. Cum este rata reală a dobânzii?', 'negativă: deponentul pierde putere de cumpărare',
   ['pozitivă, de 6%', 'pozitivă, de 14%', 'egală cu zero'], 'Rata reală ≈ rata nominală - rata inflației.', '`6% - 8% = -2%`: banii din depozit cumpără la sfârșit mai puțin decât la început.')
+
+# ------------------------------------------------- the tests' questions (curs.upb.ro)
+import re
+
+
+def eg_chapter(it):
+    t = fold(it['q'] + ' ' + ' '.join(it.get('options', [])))
+    if re.search(r'tax|impozit|pret(ul)? (maxim|minim)|plafon|surplus|bunastar|pierderea de', t):
+        return C9
+    if 'elastic' in t:
+        return C8
+    if re.search(r'cost(ul)? (marginal|total|variabil|fix|mediu)|concurent|monopol|oligopol', t):
+        return C10
+    if re.search(r'oportunitat|frontiera|normativ|pozitiv|raritat|pranz|invizibil|flux(ului)? circular|analiza marginal|marginala|compromis|stiinta economica|economia studiaza|economistii|rationa', t):
+        return C6
+    return C7
+
+
+def eg_difficulty(it):
+    if 'tf' in it:
+        return 'ușoară'
+    return 'grea' if re.search(r'[CO]\(p\)|p ?= ?\d', it['q']) else 'medie'
+
+
+add_grile(P, load_grile('eg_grile'), 101, eg_chapter, eg_difficulty)
 
 write_course('eg', CHAPTERS, P)

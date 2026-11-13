@@ -5,7 +5,8 @@
   "2. Împărțirea în subrețele (VLSM)",
   "3. Rutare",
   "4. Legătura de date și comutare",
-  "5. Servicii și securitate"
+  "5. Servicii și securitate",
+  "6. Nivelul fizic: codificări, CRC, Hamming"
  ],
  "problems": [
   {
@@ -702,6 +703,443 @@
    }
   },
   {
+   "id": "40",
+   "title": "Clasa A cu masca 255.255.240.0",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "O rețea de clasă A (prefixul implicit `/8`) este împărțită cu masca `255.255.240.0`. Câte subrețele se obțin și câte stații are fiecare?",
+   "hint": "Clasa A fixează primii 8 biți. Biții măștii de după ei numără subrețelele; biții rămași de 0 numără stațiile.",
+   "solution": "Masca are `20` biți de 1: `20 - 8 = 12` biți de subrețea, deci `2^12 = 4096` subrețele; `32 - 20 = 12` biți de stație: `2^12 - 2 = 4094` stații.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul măștii",
+      "answer": "/20|20",
+      "hint": "/n"
+     },
+     {
+      "id": "s",
+      "label": "câți biți sunt împrumutați pentru subrețele",
+      "answer": "12",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "n",
+      "label": "câte subrețele",
+      "answer": "4096",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "h",
+      "label": "câte stații în fiecare subrețea",
+      "answer": "4094",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "10.0.0.0",
+    "prefix": 20
+   }
+  },
+  {
+   "id": "41",
+   "title": "Clasa B cu aceeași mască",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "O rețea de clasă B (prefixul implicit `/16`) este împărțită cu masca `255.255.240.0`. Câte subrețele se obțin și câte stații are fiecare?",
+   "hint": "Clasa B fixează primii 16 biți. Biții măștii de după ei numără subrețelele; biții rămași de 0 numără stațiile.",
+   "solution": "Masca are `20` biți de 1: `20 - 16 = 4` biți de subrețea, deci `2^4 = 16` subrețele; `32 - 20 = 12` biți de stație: `2^12 - 2 = 4094` stații.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul măștii",
+      "answer": "/20|20",
+      "hint": "/n"
+     },
+     {
+      "id": "s",
+      "label": "câți biți sunt împrumutați pentru subrețele",
+      "answer": "4",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "n",
+      "label": "câte subrețele",
+      "answer": "16",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "h",
+      "label": "câte stații în fiecare subrețea",
+      "answer": "4094",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "172.16.0.0",
+    "prefix": 20
+   }
+  },
+  {
+   "id": "42",
+   "title": "Clasa C cu masca 255.255.255.224",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "O rețea de clasă C (prefixul implicit `/24`) este împărțită cu masca `255.255.255.224`. Câte subrețele se obțin și câte stații are fiecare?",
+   "hint": "Clasa C fixează primii 24 biți. Biții măștii de după ei numără subrețelele; biții rămași de 0 numără stațiile.",
+   "solution": "Masca are `27` biți de 1: `27 - 24 = 3` biți de subrețea, deci `2^3 = 8` subrețele; `32 - 27 = 5` biți de stație: `2^5 - 2 = 30` stații.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "prefixul măștii",
+      "answer": "/27|27",
+      "hint": "/n"
+     },
+     {
+      "id": "s",
+      "label": "câți biți sunt împrumutați pentru subrețele",
+      "answer": "3",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "n",
+      "label": "câte subrețele",
+      "answer": "8",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "h",
+      "label": "câte stații în fiecare subrețea",
+      "answer": "30",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.1.0",
+    "prefix": 27
+   }
+  },
+  {
+   "id": "43",
+   "title": "Măștile /23, /24, /25",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Câte adrese de stație are o rețea cu prefixul `/23`? Dar `/24` și `/25`?",
+   "hint": "Fiecare bit în plus în prefix înjumătățește rețeaua.",
+   "solution": "`2^9 - 2 = 510`, `2^8 - 2 = 254`, `2^7 - 2 = 126`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "/23",
+      "answer": "510",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "b",
+      "label": "/24",
+      "answer": "254",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "c",
+      "label": "/25",
+      "answer": "126",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "192.168.0.0",
+    "prefix": 23
+   }
+  },
+  {
+   "id": "44",
+   "title": "O rețea /29",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "O stație are adresa `141.85.37.77/29`. Completează datele rețelei din care face parte.",
+   "hint": "Blocuri de câte 8 adrese: 72 ≤ 77 < 80.",
+   "solution": "`/29` lasă `3` biți de stație: `2^3 - 2 = 6` stații. Masca: `255.255.255.248`. Rețea `141.85.37.72`, difuzare `141.85.37.79`, stații de la `141.85.37.73` la `141.85.37.78`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "141.85.37.72",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "141.85.37.79",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "141.85.37.73",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "141.85.37.78",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.248",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "6",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "141.85.37.77",
+    "prefix": 29
+   }
+  },
+  {
+   "id": "45",
+   "title": "O rețea /21",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O stație are adresa `188.17.42.9/21`. Completează datele rețelei din care face parte.",
+   "hint": "Al treilea octet în blocuri de câte 8: 40 ≤ 42 < 48.",
+   "solution": "`/21` lasă `11` biți de stație: `2^11 - 2 = 2046` stații. Masca: `255.255.248.0`. Rețea `188.17.40.0`, difuzare `188.17.47.255`, stații de la `188.17.40.1` la `188.17.47.254`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "188.17.40.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "188.17.47.255",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "188.17.40.1",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "188.17.47.254",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.248.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "2046",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "188.17.42.9",
+    "prefix": 21
+   }
+  },
+  {
+   "id": "46",
+   "title": "O rețea /18",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "O stație are adresa `10.130.200.17/18`. Completează datele rețelei din care face parte.",
+   "hint": "Al treilea octet în blocuri de 64: 192 ≤ 200.",
+   "solution": "`/18` lasă `14` biți de stație: `2^14 - 2 = 16382` stații. Masca: `255.255.192.0`. Rețea `10.130.192.0`, difuzare `10.130.255.255`, stații de la `10.130.192.1` la `10.130.255.254`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "10.130.192.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "10.130.255.255",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "10.130.192.1",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "10.130.255.254",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.192.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "16382",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "10.130.200.17",
+    "prefix": 18
+   }
+  },
+  {
+   "id": "47",
+   "title": "O rețea /27 din spațiul de examen",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "O stație are adresa `188.17.32.90/27`. Completează datele rețelei din care face parte.",
+   "hint": "Blocuri de 32: 64 ≤ 90 < 96.",
+   "solution": "`/27` lasă `5` biți de stație: `2^5 - 2 = 30` stații. Masca: `255.255.255.224`. Rețea `188.17.32.64`, difuzare `188.17.32.95`, stații de la `188.17.32.65` la `188.17.32.94`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "net",
+      "label": "adresa de rețea",
+      "answer": "188.17.32.64",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "bc",
+      "label": "adresa de difuzare (broadcast)",
+      "answer": "188.17.32.95",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "first",
+      "label": "prima adresă de stație",
+      "answer": "188.17.32.65",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "last",
+      "label": "ultima adresă de stație",
+      "answer": "188.17.32.94",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "mask",
+      "label": "masca, în zecimal",
+      "answer": "255.255.255.224",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "n",
+      "label": "câte stații pot primi adrese",
+      "answer": "30",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "ip": "188.17.32.90",
+    "prefix": 27
+   }
+  },
+  {
+   "id": "48",
+   "title": "Aceeași rețea? (4)",
+   "chapter": "1. Adrese, măști, subrețele",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Stațiile `10.1.31.255` și `10.1.32.1` au amândouă masca `/19`. Găsește rețeaua fiecăreia și spune dacă pot comunica direct, fără ruter.",
+   "hint": "Două stații comunică direct doar dacă au aceeași adresă de rețea.",
+   "solution": "`10.1.31.255` e în `10.1.0.0/19`, `10.1.32.1` e în `10.1.32.0/19`: rețele diferite, e nevoie de un ruter.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "rețeaua lui 10.1.31.255",
+      "answer": "10.1.0.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "b",
+      "label": "rețeaua lui 10.1.32.1",
+      "answer": "10.1.32.0",
+      "hint": "a.b.c.d"
+     },
+     {
+      "id": "same",
+      "label": "sunt în aceeași rețea? (da / nu)",
+      "answer": "nu",
+      "hint": "da sau nu"
+     }
+    ],
+    "ip": "10.1.31.255",
+    "prefix": 19
+   }
+  },
+  {
    "id": "16",
    "title": "Trei rețele dintr-un /24",
    "chapter": "2. Împărțirea în subrețele (VLSM)",
@@ -919,6 +1357,123 @@
    }
   },
   {
+   "id": "49",
+   "title": "Două VLAN-uri dintr-un /19",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "medie",
+   "source": "Model parțial RL",
+   "statement": "Împarte blocul `10.1.0.0/19` între rețelele: VLAN10 cu 300 stații, VLAN20 cu 200 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- VLAN10: `10.1.0.0/23` (510 adrese de stație)\n- VLAN20: `10.1.2.0/24` (254 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "VLAN10",
+      "label": "VLAN10 (300 stații)",
+      "answer": "10.1.0.0/23",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "VLAN20",
+      "label": "VLAN20 (200 stații)",
+      "answer": "10.1.2.0/24",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "10.1.0.0",
+    "prefix": 19
+   }
+  },
+  {
+   "id": "50",
+   "title": "Un /24 public pentru un campus",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "grea",
+   "source": "Examen RL · adresarea de nivel 3",
+   "statement": "Împarte blocul `141.85.37.0/24` între rețelele: Laborator cu 100 stații, Cămin cu 60 stații, Secretariat cu 25 stații, Servere cu 6 stații, R1-R2 cu 2 stații, R1-R3 cu 2 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- Laborator: `141.85.37.0/25` (126 adrese de stație)\n- Cămin: `141.85.37.128/26` (62 adrese de stație)\n- Secretariat: `141.85.37.192/27` (30 adrese de stație)\n- Servere: `141.85.37.224/29` (6 adrese de stație)\n- R1-R2: `141.85.37.232/30` (2 adrese de stație)\n- R1-R3: `141.85.37.236/30` (2 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "Laborator",
+      "label": "Laborator (100 stații)",
+      "answer": "141.85.37.0/25",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Cămin",
+      "label": "Cămin (60 stații)",
+      "answer": "141.85.37.128/26",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Secretariat",
+      "label": "Secretariat (25 stații)",
+      "answer": "141.85.37.192/27",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "Servere",
+      "label": "Servere (6 stații)",
+      "answer": "141.85.37.224/29",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R1-R2",
+      "label": "R1-R2 (2 stații)",
+      "answer": "141.85.37.232/30",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R1-R3",
+      "label": "R1-R3 (2 stații)",
+      "answer": "141.85.37.236/30",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "141.85.37.0",
+    "prefix": 24
+   }
+  },
+  {
+   "id": "51",
+   "title": "Un /27 pentru două VLAN-uri",
+   "chapter": "2. Împărțirea în subrețele (VLSM)",
+   "difficulty": "grea",
+   "source": "Examen RL · adresarea de nivel 3",
+   "statement": "Împarte blocul `188.17.32.64/27` între rețelele: VLAN7 cu 12 stații, VLAN8 cu 5 stații, R1-R2 cu 2 stații. Alocă în ordinea descrescătoare a mărimii, fiecare rețea cât mai mică, una după alta, fără goluri inutile.",
+   "hint": "Sortează rețelele descrescător. Pentru fiecare: câți biți de stație îi trebuie, apoi următoarea adresă liberă care e multiplu al mărimii blocului.",
+   "solution": "Alocarea:\n- VLAN7: `188.17.32.64/28` (14 adrese de stație)\n- VLAN8: `188.17.32.80/29` (6 adrese de stație)\n- R1-R2: `188.17.32.88/30` (2 adrese de stație)",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "VLAN7",
+      "label": "VLAN7 (12 stații)",
+      "answer": "188.17.32.64/28",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "VLAN8",
+      "label": "VLAN8 (5 stații)",
+      "answer": "188.17.32.80/29",
+      "hint": "a.b.c.d/n"
+     },
+     {
+      "id": "R1-R2",
+      "label": "R1-R2 (2 stații)",
+      "answer": "188.17.32.88/30",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "188.17.32.64",
+    "prefix": 27
+   }
+  },
+  {
    "id": "21",
    "title": "Agregarea a patru rețele",
    "chapter": "3. Rutare",
@@ -1131,6 +1686,136 @@
    }
   },
   {
+   "id": "52",
+   "title": "Agregarea a opt rețele",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Un ruter anunță rețelele `10.4.8.0/24`, `10.4.9.0/24`, `10.4.10.0/24`, `10.4.11.0/24`, `10.4.12.0/24`, `10.4.13.0/24`, `10.4.14.0/24`, `10.4.15.0/24`. Scrie cea mai specifică rută agregată (sumarizată) care le acoperă pe toate.",
+   "hint": "Scrie în binar octetul în care rețelele diferă și păstrează biții comuni de la stânga.",
+   "solution": "Biții comuni tuturor adreselor dau prefixul `/21`: `10.4.8.0/21`.",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "s",
+      "label": "ruta agregată",
+      "answer": "10.4.8.0/21",
+      "hint": "a.b.c.d/n"
+     }
+    ],
+    "ip": "10.4.8.0",
+    "prefix": 21
+   }
+  },
+  {
+   "id": "53",
+   "title": "Tabela de rutare a unui ruter de margine",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023 · tunel GRE",
+   "statement": "Un ruter are tabela de rutare:\n\n```\n10.0.24.0/24         gre0\n10.1.0.0/23          eth0\n10.1.2.0/24          eth1\n10.0.0.0/8           eth2\n0.0.0.0/0            ppp0\n```\n\nPe ce interfață trimite fiecare pachet?",
+   "hint": "Dintre rutele care conțin destinația câștigă cea cu prefixul cel mai lung; ruta implicită `0.0.0.0/0` se potrivește cu orice.",
+   "solution": "- `10.1.1.40` se potrivește cel mai lung cu `10.1.0.0/23` → `eth0`\n- `10.1.2.40` se potrivește cel mai lung cu `10.1.2.0/24` → `eth1`\n- `10.0.24.2` se potrivește cel mai lung cu `10.0.24.0/24` → `gre0`\n- `10.9.9.9` se potrivește cel mai lung cu `10.0.0.0/8` → `eth2`\n- `141.85.0.1` se potrivește cel mai lung cu `0.0.0.0/0` → `ppp0`",
+   "kind": "net",
+   "spec": {
+    "fields": [
+     {
+      "id": "d0",
+      "label": "pachet către 10.1.1.40",
+      "answer": "eth0",
+      "hint": "interfața"
+     },
+     {
+      "id": "d1",
+      "label": "pachet către 10.1.2.40",
+      "answer": "eth1",
+      "hint": "interfața"
+     },
+     {
+      "id": "d2",
+      "label": "pachet către 10.0.24.2",
+      "answer": "gre0",
+      "hint": "interfața"
+     },
+     {
+      "id": "d3",
+      "label": "pachet către 10.9.9.9",
+      "answer": "eth2",
+      "hint": "interfața"
+     },
+     {
+      "id": "d4",
+      "label": "pachet către 141.85.0.1",
+      "answer": "ppp0",
+      "hint": "interfața"
+     }
+    ],
+    "ip": "10.1.1.40",
+    "prefix": 24
+   }
+  },
+  {
+   "id": "76",
+   "title": "Tunel GRE",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023",
+   "statement": "Ce face un tunel GRE între două rutere?",
+   "hint": "Un pachet în pachet.",
+   "solution": "Antetul exterior are adresele publice ale ruterelor; cel interior, adresele private. GRE nu criptează: pentru asta se pune peste el IPsec.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "criptează traficul dintre rutere",
+     "încapsulează pachetele IP în alte pachete IP, ca rețelele de la capete să pară direct legate",
+     "înlocuiește NAT-ul",
+     "leagă două VLAN-uri pe același switch"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "77",
+   "title": "BGP: alegerea drumului",
+   "chapter": "3. Rutare",
+   "difficulty": "grea",
+   "source": "Examen RL 2022-2023",
+   "statement": "Un AS vrea ca traficul care **intră** spre rețelele lui să vină pe o anumită legătură, nu pe cealaltă. Ce atribut BGP folosește, de obicei?",
+   "hint": "LOCAL_PREF influențează traficul care iese, nu cel care intră.",
+   "solution": "Celelalte AS-uri preferă drumul cu AS_PATH mai scurt; repetând propriul număr de AS pe legătura nedorită, o faci mai puțin atractivă. Se folosește și MED, între doi vecini.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "LOCAL_PREF pe ruterele proprii",
+     "AS_PATH prepend (lungește drumul anunțat pe legătura nedorită)",
+     "costul OSPF",
+     "TTL-ul pachetelor"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "78",
+   "title": "Distance vector și link state",
+   "chapter": "3. Rutare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Ce deosebește un protocol de rutare de tip „link state” (OSPF) de unul „distance vector” (RIP)?",
+   "hint": "RIP îi crede pe vecini pe cuvânt.",
+   "solution": "La distance vector fiecare ruter știe doar distanțele anunțate de vecini (Bellman-Ford), de unde convergența lentă și „count to infinity”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "folosește numărul de salturi ca metrică",
+     "trimite periodic întreaga tabelă de rutare vecinilor",
+     "nu are nevoie de vecini",
+     "fiecare ruter cunoaște toată topologia și calculează singur drumurile (Dijkstra)"
+    ],
+    "answer": 3
+   }
+  },
+  {
    "id": "27",
    "title": "Ce face ARP",
    "chapter": "4. Legătura de date și comutare",
@@ -1271,6 +1956,121 @@
    }
   },
   {
+   "id": "62",
+   "title": "STP: rădăcina și porturile",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "grea",
+   "source": "Examen RL · adresarea de nivel 2, STP",
+   "statement": "Patru switch-uri sunt legate în inel: Sw1–Sw2, Sw2–Sw3, Sw3–Sw4 și Sw4–Sw1. Legătura Sw1–Sw4 e de 10 Mb/s (cost STP 100), restul sunt FastEthernet (cost 19). Prioritățile sunt egale și `MAC(Sw1) < MAC(Sw2) < MAC(Sw3) < MAC(Sw4)`.",
+   "hint": "Rădăcina are cel mai mic Bridge ID. Fiecare alt switch își alege portul cu costul total minim spre ea; pe fiecare segment, un port desemnat; ce rămâne se blochează.",
+   "solution": "Rădăcina e Sw1. Sw2: 19 direct. Sw3: prin Sw2, 38 (prin Sw4 ar fi 119). Sw4: direct 100 sau prin Sw3 `19 · 3 = 57`: portul rădăcină e spre Sw3. Pe legătura Sw1–Sw4, portul lui Sw1 e desemnat (rădăcina are toate porturile desemnate), iar cel al lui Sw4 se blochează.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "root",
+      "label": "switch-ul rădăcină",
+      "answer": "Sw1|1",
+      "hint": "SwX"
+     },
+     {
+      "id": "c4",
+      "label": "costul drumului de la Sw4 la rădăcină",
+      "answer": "57",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rp4",
+      "label": "portul rădăcină al lui Sw4 duce spre",
+      "answer": "Sw3|3",
+      "hint": "SwX"
+     },
+     {
+      "id": "c3",
+      "label": "costul de la Sw3 la rădăcină",
+      "answer": "38",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "bl",
+      "label": "portul blocat este pe switch-ul",
+      "answer": "Sw4|4",
+      "hint": "SwX"
+     },
+     {
+      "id": "blto",
+      "label": "…pe legătura spre",
+      "answer": "Sw1|1",
+      "hint": "SwX"
+     }
+    ]
+   }
+  },
+  {
+   "id": "70",
+   "title": "CSMA/CD și CSMA/CA",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Unde se folosește CSMA/CA în loc de CSMA/CD și de ce?",
+   "hint": "CD = detectare, CA = evitare.",
+   "solution": "Un radio nu poate asculta cât emite (semnalul propriu acoperă tot), iar o stație ascunsă nu se aude deloc; de aceea se evită coliziunile (așteptare aleatoare, RTS/CTS, confirmări). Ethernet-ul full-duplex nu mai are coliziuni deloc.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "în rețelele fără fir, unde emițătorul nu poate detecta coliziunile în timp ce transmite",
+     "în rețelele cu fibră optică, pentru viteză",
+     "în Ethernet-ul full-duplex",
+     "în rețelele token ring"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "74",
+   "title": "VLAN",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "ușoară",
+   "source": "Examen RL 2022-2023",
+   "statement": "Ce realizează un VLAN?",
+   "hint": "Difuzările nu trec dintr-un VLAN în altul.",
+   "solution": "Între VLAN-uri e nevoie de rutare (router-on-a-stick sau un switch de nivel 3).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "crește viteza porturilor",
+     "criptează traficul dintre porturi",
+     "împarte un switch (sau mai multe) în domenii de difuzare separate",
+     "unește mai multe rețele IP într-una"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "75",
+   "title": "Proxy ARP",
+   "chapter": "4. Legătura de date și comutare",
+   "difficulty": "medie",
+   "source": "Examen RL 2022-2023",
+   "statement": "Ce face un ruter care rulează Proxy ARP?",
+   "hint": "Stația crede că destinația e în rețeaua ei.",
+   "solution": "Cadrele ajung la ruter, care le rutează mai departe; așa pot comunica stații fără ruter implicit configurat (sau cu o mască greșită).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ține tabela ARP a tuturor stațiilor din Internet",
+     "transformă cererile ARP în cereri DNS",
+     "răspunde la cereri ARP pentru adrese din altă rețea cu propria lui adresă MAC",
+     "blochează cererile ARP"
+    ],
+    "answer": 2
+   }
+  },
+  {
    "id": "34",
    "title": "NAT cu supraîncărcare",
    "chapter": "5. Servicii și securitate",
@@ -1348,6 +2148,356 @@
      "transportul peste IP"
     ],
     "answer": 0
+   }
+  },
+  {
+   "id": "71",
+   "title": "NAT: avantaje",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Care este principalul avantaj al NAT?",
+   "hint": "Adresele IPv4 publice sunt puține.",
+   "solution": "Bonus: stațiile din spate nu sunt accesibile direct din afară. Dezavantaj: aplicațiile care pun adresa IP în date (FTP activ, SIP) au nevoie de ajutor.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "crește viteza legăturii",
+     "criptează traficul",
+     "mai multe stații cu adrese private pot ieși în Internet printr-o singură adresă publică",
+     "elimină nevoia de rutare"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "79",
+   "title": "Atacul VLAN hopping",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Cum se apără o rețea de VLAN hopping prin dublă etichetare?",
+   "hint": "Atacul pune două etichete: prima, a VLAN-ului nativ, e scoasă de primul switch.",
+   "solution": "Dacă VLAN-ul nativ nu are stații (sau e etichetat și el) și DTP e oprit pe porturile de acces, cadrul cu două etichete nu mai trece.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "VLAN-ul nativ al trunchiurilor nu e folosit de nicio stație, iar porturile de acces nu negociază trunchiuri",
+     "se activează STP",
+     "se dezactivează ARP",
+     "se folosesc adrese IP publice"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "80",
+   "title": "Port security",
+   "chapter": "5. Servicii și securitate",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Ce face „port security” pe un switch?",
+   "hint": "Sticky MAC învață prima adresă și o păstrează.",
+   "solution": "Previne atacurile de umplere a tabelei CAM și conectarea unui calculator străin în priză.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "criptează traficul de pe port",
+     "limitează adresele MAC care pot folosi un port și reacționează la cele străine",
+     "blochează porturile neutilizate prin STP",
+     "autentifică utilizatorii cu parolă"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "54",
+   "title": "Manchester pentru 00001111",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Codifică șirul `00001111` în **Manchester** (convenția IEEE 802.3: `0` = tranziție de la nivel înalt la jos, `HL`; `1` = de la jos la înalt, `LH`). Scrie nivelurile, câte două pe bit, cu `H` și `L` (spațiile nu contează).",
+   "hint": "Fiecare bit are o tranziție la mijloc: sensul ei e bitul.",
+   "solution": "`HL HL HL HL LH LH LH LH`. Atenție: unele cărți folosesc convenția inversă (G. E. Thomas); la examen se precizează.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "m",
+      "label": "semnalul Manchester",
+      "answer": "HL HL HL HL LH LH LH LH",
+      "hint": "HL LH ..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "55",
+   "title": "Manchester diferențial",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "medie",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Codifică `01010101` în **Manchester diferențial**: la mijlocul fiecărui bit e mereu o tranziție; la începutul bitului, `0` are o tranziție, `1` nu. Linia era la nivelul `H` înainte de primul bit. Scrie nivelurile, câte două pe bit.",
+   "hint": "Pornește de la nivelul de dinainte: un `0` îl schimbă la început, un `1` îl păstrează; apoi schimbă-l la mijloc.",
+   "solution": "`LH HL HL LH LH HL HL LH`. Informația e în prezența tranziției de la început, nu în nivel: inversarea firelor nu strică nimic.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "m",
+      "label": "semnalul",
+      "answer": "LH HL HL LH LH HL HL LH",
+      "hint": "HL LH ..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "56",
+   "title": "NRZ-I",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Codifică `10110010` în **NRZ-I**: un `1` schimbă nivelul la începutul bitului, un `0` îl lasă. Linia era la `L` înainte. Scrie câte un nivel pe bit (`H`/`L`).",
+   "hint": "Urmărește doar biții de 1: fiecare comută.",
+   "solution": "`HHLHHHLL`. Un șir lung de 0 rămâne fără tranziții: receptorul pierde sincronizarea.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "m",
+      "label": "semnalul NRZ-I",
+      "answer": "HHLHHHLL",
+      "hint": "opt litere H/L"
+     }
+    ]
+   }
+  },
+  {
+   "id": "57",
+   "title": "AMI (Alternate Mark Inversion)",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Codifică `00001111` în **AMI** (bipolar): `0` = nivel zero, fiecare `1` alternează între `+` și `-`, primul `1` fiind `+`. Scrie câte un simbol pe bit (`0`, `+`, `-`).",
+   "hint": "Doar biții de 1 contează pentru alternanță.",
+   "solution": "`0000+-+-`. Media semnalului e zero (fără componentă continuă), iar doi `+` la rând ar arăta o eroare.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "m",
+      "label": "semnalul AMI",
+      "answer": "0000+-+-",
+      "hint": "ex.: 00+-"
+     }
+    ]
+   }
+  },
+  {
+   "id": "58",
+   "title": "CRC cu generatorul 10011",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "medie",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Mesajul `1101011011` se trimite cu CRC, polinomul generator fiind `G(x) = x^4 + x + 1` (biții `10011`). Care este restul (CRC-ul) și ce cadru se transmite?",
+   "hint": "Adaugă `4` zerouri la mesaj și împarte (XOR, fără transport) la `10011`; restul are `4` biți.",
+   "solution": "`11010110110000` împărțit la `10011` dă restul `1110`. Se trimite `11010110111110`; receptorul împarte tot cadrul la `10011` și trebuie să obțină restul 0.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "r",
+      "label": "restul (4 biți)",
+      "answer": "1110",
+      "hint": "4 biți"
+     },
+     {
+      "id": "t",
+      "label": "cadrul transmis (mesaj + rest)",
+      "answer": "11010110111110",
+      "hint": "biți"
+     }
+    ]
+   }
+  },
+  {
+   "id": "59",
+   "title": "CRC cu generatorul 1011",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Mesajul `11010110` se trimite cu CRC, polinomul generator fiind `G(x) = x^3 + x + 1` (biții `1011`). Care este restul (CRC-ul) și ce cadru se transmite?",
+   "hint": "Adaugă `3` zerouri la mesaj și împarte (XOR, fără transport) la `1011`; restul are `3` biți.",
+   "solution": "`11010110000` împărțit la `1011` dă restul `111`. Se trimite `11010110111`; receptorul împarte tot cadrul la `1011` și trebuie să obțină restul 0.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "r",
+      "label": "restul (3 biți)",
+      "answer": "111",
+      "hint": "3 biți"
+     },
+     {
+      "id": "t",
+      "label": "cadrul transmis (mesaj + rest)",
+      "answer": "11010110111",
+      "hint": "biți"
+     }
+    ]
+   }
+  },
+  {
+   "id": "60",
+   "title": "Hamming (7, 4): codificare",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Codifică datele `1011` cu codul Hamming (7, 4). Pozițiile sunt numerotate de la 1; biții de paritate (pară) stau pe pozițiile 1, 2, 4, iar datele pe 3, 5, 6, 7.",
+   "hint": "Paritatea de pe poziția `2^k` acoperă pozițiile care au bitul `k` setat: p1 → 1, 3, 5, 7; p2 → 2, 3, 6, 7; p4 → 4, 5, 6, 7.",
+   "solution": "d3 = 1, d5 = 0, d6 = 1, d7 = 1. p1 = d3⊕d5⊕d7 = 0, p2 = d3⊕d6⊕d7 = 1, p4 = d5⊕d6⊕d7 = 0: `0110011`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "c",
+      "label": "cuvântul de cod (7 biți, poziția 1 prima)",
+      "answer": "0110011",
+      "hint": "7 biți"
+     }
+    ]
+   }
+  },
+  {
+   "id": "61",
+   "title": "Hamming (7, 4): un bit greșit",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Se primește cuvântul Hamming (7, 4) `0110001` (poziția 1 prima, paritate pară pe pozițiile 1, 2, 4). Un singur bit s-a schimbat pe drum. Pe ce poziție, și ce date s-au trimis?",
+   "hint": "Recalculează cele trei parități: sindromul, citit în binar (p4 p2 p1), e chiar poziția greșită.",
+   "solution": "Sindromul dă `6`: bitul de pe poziția 6 se inversează și obții `0110011`, cu datele `1011`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "poziția bitului greșit",
+      "answer": "6",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d",
+      "label": "datele corecte (pozițiile 3, 5, 6, 7)",
+      "answer": "1011",
+      "hint": "4 biți"
+     }
+    ]
+   }
+  },
+  {
+   "id": "63",
+   "title": "Cât durează un cadru",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un cadru Ethernet de 1500 de octeți se trimite pe o legătură de 100 Mb/s, pe un cablu de 200 m (semnalul se propagă cu `2·10⁸` m/s).",
+   "hint": "Transmisie: biți / debit. Propagare: distanță / viteză.",
+   "solution": "`1500 · 8 / 10⁸ s = 120 μs`; `200 / 2·10⁸ s = 1 μs`. Pe o rețea locală, transmisia domină.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "tt",
+      "label": "timpul de transmisie (μs)",
+      "answer": "120",
+      "hint": "μs",
+      "number": true,
+      "tol": 0.01
+     },
+     {
+      "id": "tp",
+      "label": "timpul de propagare (μs)",
+      "answer": "1",
+      "hint": "μs",
+      "number": true,
+      "tol": 0.01
+     }
+    ]
+   }
+  },
+  {
+   "id": "64",
+   "title": "Lungimea minimă a cadrului (CSMA/CD)",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "medie",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "Într-o rețea cu CSMA/CD de 10 Mb/s, timpul dus-întors maxim al semnalului (round trip) este de 51,2 μs. Ca o coliziune să fie detectată înainte de sfârșitul trimiterii, cât de lung trebuie să fie cel mai scurt cadru?",
+   "hint": "Emițătorul trebuie să mai transmită când se întoarce vestea coliziunii: durata cadrului ≥ round trip.",
+   "solution": "`10⁷ b/s · 51,2·10⁻⁶ s = 512` biți = 64 de octeți: lungimea minimă a cadrului Ethernet.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "b",
+      "label": "în biți",
+      "answer": "512",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "o",
+      "label": "în octeți",
+      "answer": "64",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "72",
+   "title": "Sateliții geostaționari",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "medie",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "La ce altitudine sunt sateliții geostaționari?",
+   "hint": "Perioada orbitei e egală cu o zi.",
+   "solution": "Se rotesc odată cu Pământul, deci par ficși pe cer: antena nu trebuie urmărită. Întârzierea dus-întors e de peste 0,5 s.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "aproximativ 1 000 km",
+     "aproximativ 20 200 km, ca sateliții GPS",
+     "la orice altitudine, pe orbite polare",
+     "aproximativ 35 786 km, deasupra ecuatorului"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "73",
+   "title": "Cablul torsadat",
+   "chapter": "6. Nivelul fizic: codificări, CRC, Hamming",
+   "difficulty": "ușoară",
+   "source": "Examen RL (N. Țăpuș, 2012-2017)",
+   "statement": "De ce sunt răsucite firele dintr-un cablu UTP?",
+   "hint": "Fiecare fir al perechii prinde același zgomot.",
+   "solution": "Transmisia diferențială scade cele două semnale: zgomotul comun dispare. Cu cât pasul răsucirii e mai mic, cu atât categoria e mai bună.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pentru a crește rezistența mecanică",
+     "pentru a putea transmite curent mai mare",
+     "pentru a reduce interferențele (diafonia) dintre perechi și din exterior",
+     "pentru a reduce costul"
+    ],
+    "answer": 2
    }
   }
  ]

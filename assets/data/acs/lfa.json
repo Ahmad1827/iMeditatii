@@ -5,7 +5,8 @@
   "2. Automate nedeterministe",
   "3. Expresii regulate",
   "4. Gramatici independente de context",
-  "5. Clase de limbaje"
+  "5. Clase de limbaje",
+  "6. Grile: modelul de test"
  ],
  "problems": [
   {
@@ -526,6 +527,617 @@
    }
   },
   {
+   "id": "50",
+   "title": "Conține aba, determinist",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele ce conțin subcuvântul `aba`.",
+   "hint": "Ține minte cel mai lung sufix care e și început de `aba`: nimic, `a`, `ab`; plus starea „găsit”.",
+   "solution": "Patru stări: `q0` (nimic), `q1` (`a`), `q2` (`ab`), `q3` (găsit, finală, cu bucle). Atenție la `q2` cu `b`: `abb` nu mai păstrează nimic, deci înapoi în `q0`; `q1` cu `a` rămâne în `q1`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ],
+       "b": [
+        0
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*aba(a∪b)*"
+   }
+  },
+  {
+   "id": "51",
+   "title": "Fără bb",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele în care nu apar doi `b` consecutivi.",
+   "hint": "O stare pentru „ultimul a fost `b`”, una pentru „altfel” și o groapă.",
+   "solution": "`q0` (finală): ultimul nu e `b`; `q1` (finală): ultimul e `b`; `q2`: am văzut `bb` (groapa, nefinală).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 3,
+     "final": [
+      0,
+      1
+     ],
+     "t": {
+      "0": {
+       "a": [
+        0
+       ],
+       "b": [
+        1
+       ]
+      },
+      "1": {
+       "a": [
+        0
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        2
+       ],
+       "b": [
+        2
+       ]
+      }
+     }
+    },
+    "regex": "(a∪ba)*(b∪ε)"
+   }
+  },
+  {
+   "id": "52",
+   "title": "Orice a e urmat de b",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele în care fiecare `a` este urmat imediat de un `b`.",
+   "hint": "După un `a` ești „în datorie”: doar `b` te scoate de acolo.",
+   "solution": "`q0` (finală), `q1`: tocmai am citit `a` (nefinală), `q2`: groapa (`aa`). Limbajul e `(b ∪ ab)*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 3,
+     "final": [
+      0
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ],
+       "b": [
+        0
+       ]
+      },
+      "2": {
+       "a": [
+        2
+       ],
+       "b": [
+        2
+       ]
+      }
+     }
+    },
+    "regex": "(b∪ab)*"
+   }
+  },
+  {
+   "id": "53",
+   "title": "Număr par de a și impar de b",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele cu număr par de `a` și număr impar de `b`.",
+   "hint": "Patru stări: perechea de parități (`#a % 2`, `#b % 2`).",
+   "solution": "Stările sunt (par, par), (par, impar), (impar, par), (impar, impar); `a` schimbă prima paritate, `b` pe a doua. Finală: (par, impar).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      2
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ],
+       "b": [
+        0
+       ]
+      },
+      "3": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 4,
+     "final": [
+      2
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ],
+       "b": [
+        0
+       ]
+      },
+      "3": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      }
+     }
+    },
+    "maxStates": 4
+   }
+  },
+  {
+   "id": "54",
+   "title": "Lungimea dă restul 1 la 3",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele cu lungimea `≡ 1 (mod 3)`.",
+   "hint": "Doar lungimea contează: trei stări în cerc, orice simbol trece la următoarea.",
+   "solution": "`q0 → q1 → q2 → q0` pe orice simbol; finală `q1`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 3,
+     "final": [
+      1
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        1
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        0
+       ],
+       "b": [
+        0
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)((a∪b)(a∪b)(a∪b))*",
+    "maxStates": 3
+   }
+  },
+  {
+   "id": "55",
+   "title": "Numere binare divizibile cu 5",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "grea",
+   "source": "Seminar LFA",
+   "statement": "Un cuvânt peste `{0, 1}` e citit ca număr în baza 2 (cuvântul vid are valoarea 0). Construiește un AFD cu cel mult 5 stări care acceptă numerele divizibile cu 5.",
+   "hint": "Starea e restul la 5; bitul `c` duce din `r` în `(2r + c) mod 5`.",
+   "solution": "Din `r`: `0` → `2r mod 5`, `1` → `(2r+1) mod 5`. De exemplu din `q3`: `0` → `q1`, `1` → `q2`. Finală `q0`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "01",
+    "reference": {
+     "states": 5,
+     "final": [
+      0
+     ],
+     "t": {
+      "0": {
+       "0": [
+        0
+       ],
+       "1": [
+        1
+       ]
+      },
+      "1": {
+       "0": [
+        2
+       ],
+       "1": [
+        3
+       ]
+      },
+      "2": {
+       "0": [
+        4
+       ],
+       "1": [
+        0
+       ]
+      },
+      "3": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ]
+      },
+      "4": {
+       "0": [
+        3
+       ],
+       "1": [
+        4
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 5,
+     "final": [
+      0
+     ],
+     "t": {
+      "0": {
+       "0": [
+        0
+       ],
+       "1": [
+        1
+       ]
+      },
+      "1": {
+       "0": [
+        2
+       ],
+       "1": [
+        3
+       ]
+      },
+      "2": {
+       "0": [
+        4
+       ],
+       "1": [
+        0
+       ]
+      },
+      "3": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ]
+      },
+      "4": {
+       "0": [
+        3
+       ],
+       "1": [
+        4
+       ]
+      }
+     }
+    },
+    "maxStates": 5
+   }
+  },
+  {
+   "id": "56",
+   "title": "Se termină cu abb",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele ce se termină cu `abb`.",
+   "hint": "Cel mai lung sufix care e început de `abb`: nimic, `a`, `ab`, `abb`.",
+   "solution": "`q0`, `q1` (`a`), `q2` (`ab`), `q3` (`abb`, finală). Din orice stare `a` duce în `q1`; `b` avansează `q1 → q2 → q3`, iar din `q0` și `q3` duce în `q0`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        1
+       ],
+       "b": [
+        3
+       ]
+      },
+      "3": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*abb"
+   }
+  },
+  {
+   "id": "57",
+   "title": "Cel puțin două a și cel mult un b",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "grea",
+   "source": "Seminar LFA",
+   "statement": "Construiește un AFD peste `{a, b}` care acceptă cuvintele cu cel puțin doi `a` și cel mult un `b`.",
+   "hint": "Produsul a două automate mici: unul numără `a` până la 2, altul `b` până la 1 (plus groapa).",
+   "solution": "Stările sunt perechi (`min(#a, 2)`, `#b` ∈ {0, 1}) plus o groapă pentru `#b ≥ 2`: 7 stări. Finale: (2, 0) și (2, 1).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 7,
+     "final": [
+      3,
+      6
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ],
+       "b": [
+        4
+       ]
+      },
+      "2": {
+       "a": [
+        4
+       ],
+       "b": [
+        5
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        6
+       ]
+      },
+      "4": {
+       "a": [
+        6
+       ],
+       "b": [
+        5
+       ]
+      },
+      "5": {
+       "a": [
+        5
+       ],
+       "b": [
+        5
+       ]
+      },
+      "6": {
+       "a": [
+        6
+       ],
+       "b": [
+        5
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 7,
+     "final": [
+      3,
+      6
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ],
+       "b": [
+        4
+       ]
+      },
+      "2": {
+       "a": [
+        4
+       ],
+       "b": [
+        5
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        6
+       ]
+      },
+      "4": {
+       "a": [
+        6
+       ],
+       "b": [
+        5
+       ]
+      },
+      "5": {
+       "a": [
+        5
+       ],
+       "b": [
+        5
+       ]
+      },
+      "6": {
+       "a": [
+        6
+       ],
+       "b": [
+        5
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
    "id": "10",
    "title": "Al treilea simbol de la sfârșit",
    "chapter": "2. Automate nedeterministe",
@@ -776,6 +1388,153 @@
    }
   },
   {
+   "id": "58",
+   "title": "Al treilea simbol de la coadă e a",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un automat nedeterminist cu cel mult 4 stări peste `{a, b}` care acceptă cuvintele în care al treilea simbol de la sfârșit este `a`.",
+   "hint": "Ghicește momentul în care citești acel `a`, apoi numără exact încă două simboluri.",
+   "solution": "Starea 0 are buclă pe `a` și `b` și, pe `a`, poate „ghici” trecerea în 1; de acolo orice simbol în 2, apoi în 3 (finală). Un AFD pentru același limbaj are nevoie de 8 stări.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "nfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        0,
+        1
+       ],
+       "b": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*a(a∪b)(a∪b)",
+    "maxStates": 4
+   }
+  },
+  {
+   "id": "59",
+   "title": "Conține aa sau bb",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Construiește un automat nedeterminist peste `{a, b}` care acceptă cuvintele ce conțin `aa` sau `bb`.",
+   "hint": "Ramifică: o ramură caută `aa`, alta `bb`; ajung în aceeași stare finală.",
+   "solution": "Patru stări: 0 (buclă, ghicește începutul perechii), 1 (`a` citit), 2 (`b` citit), 3 (finală, buclă).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "nfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        0,
+        1
+       ],
+       "b": [
+        0,
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ]
+      },
+      "2": {
+       "b": [
+        3
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*(aa∪bb)(a∪b)*"
+   }
+  },
+  {
+   "id": "60",
+   "title": "Se termină cu ab sau ba",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un automat nedeterminist cu cel mult 4 stări peste `{a, b}` care acceptă cuvintele ce se termină cu `ab` sau `ba`.",
+   "hint": "Altfel spus: ultimele două simboluri sunt diferite.",
+   "solution": "Din 0 (buclă) ghicești penultimul simbol: `a` în 1, `b` în 2; de acolo simbolul celălalt duce în 3, finală, fără ieșiri.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "nfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        0,
+        1
+       ],
+       "b": [
+        0,
+        2
+       ]
+      },
+      "1": {
+       "b": [
+        3
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*(ab∪ba)",
+    "maxStates": 4
+   }
+  },
+  {
    "id": "15",
    "title": "Fiecare a e urmat de b, la sfârșit c",
    "chapter": "3. Expresii regulate",
@@ -927,6 +1686,142 @@
     "alphabet": "ab",
     "regex": "a*b(a∪b)*",
     "reference": "a*b(a∪b)*"
+   }
+  },
+  {
+   "id": "61",
+   "title": "Lungime pară",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o expresie regulată pentru cuvintele de lungime pară peste `{a, b}`.",
+   "hint": "Cuvântul se împarte în perechi de simboluri.",
+   "solution": "O expresie care merge: `((a∪b)(a∪b))*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "((a∪b)(a∪b))*",
+    "reference": "((a∪b)(a∪b))*"
+   }
+  },
+  {
+   "id": "62",
+   "title": "Cel mult un a",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o expresie regulată pentru cuvintele peste `{a, b}` care conțin cel mult un `a`.",
+   "hint": "Oricâți `b`, poate un `a`, oricâți `b`.",
+   "solution": "O expresie care merge: `b*(a∪ε)b*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "b*(a∪ε)b*",
+    "reference": "b*(a∪ε)b*"
+   }
+  },
+  {
+   "id": "63",
+   "title": "Fără doi a consecutivi",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Scrie o expresie regulată pentru cuvintele peste `{a, b}` în care nu apar doi `a` consecutivi.",
+   "hint": "Orice `a` e urmat de `b`, cu excepția, poate, ultimului simbol.",
+   "solution": "O expresie care merge: `(b∪ab)*(a∪ε)`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "(b∪ab)*(a∪ε)",
+    "reference": "(b∪ab)*(a∪ε)"
+   }
+  },
+  {
+   "id": "64",
+   "title": "Exact doi de 1",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o expresie regulată pentru cuvintele peste `{0, 1}` care conțin exact doi de `1`.",
+   "hint": "Zerouri oriunde între ei.",
+   "solution": "O expresie care merge: `0*10*10*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "01",
+    "regex": "0*10*10*",
+    "reference": "0*10*10*"
+   }
+  },
+  {
+   "id": "65",
+   "title": "Expresie: numărul de a, multiplu de 3",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Scrie o expresie regulată pentru cuvintele peste `{a, b}` în care numărul de `a` este multiplu de 3.",
+   "hint": "Grupează `a`-urile câte trei, cu `b`-uri oriunde între ele.",
+   "solution": "O expresie care merge: `b*(ab*ab*ab*)*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "b*(ab*ab*ab*)*",
+    "reference": "b*(ab*ab*ab*)*"
+   }
+  },
+  {
+   "id": "66",
+   "title": "Din gramatica de la examen",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "Examen LFA (18 ianuarie 2025)",
+   "statement": "Gramatica `G: S → aS | Sb | ab`. Scrie o expresie regulată pentru limbajul generat de `G`.",
+   "hint": "Derivă câteva cuvinte: `ab`, `aab`, `abb`, `aabbb`...",
+   "solution": "`S` adaugă `a`-uri la stânga și `b`-uri la dreapta lui `ab`: `L(G) = { aⁱbʲ | i, j ≥ 1 }`, adică `aa*bb*`. Gramatica e ambiguă: `aabb` are două derivări stânga (`S ⇒ aS ⇒ aSb ⇒ aabb` și `S ⇒ Sb ⇒ aSb ⇒ aabb`).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "aa*bb*",
+    "reference": "aa*bb*"
+   }
+  },
+  {
+   "id": "67",
+   "title": "Fără ab",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "ușoară",
+   "source": "După examenul LFA (1 februarie 2025)",
+   "statement": "Scrie o expresie regulată pentru cuvintele peste `{a, b}` care nu conțin subcuvântul `ab` (`#ab(w) = 0`).",
+   "hint": "După primul `a` nu mai poate veni niciun `b`.",
+   "solution": "O expresie care merge: `b*a*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "b*a*",
+    "reference": "b*a*"
+   }
+  },
+  {
+   "id": "68",
+   "title": "Ce limbaj generează gramatica",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "Examen LFA (1 februarie 2025)",
+   "statement": "Gramatica de la examen, cu neterminalii redenumiți (`X1 = X`, `X2 = Y`, `Y1 = Z`, `Y2 = W`):\n\n`S → X | Y | Z | W`\n\n`X → 01Y | 0 | ε`\n\n`Y → 00X | 0 | ε`\n\n`Z → 10W | 1 | ε`\n\n`W → 11Z | 1 | ε`\n\nScrie o expresie regulată pentru limbajul generat.",
+   "hint": "Rezolvă întâi `X`: înlocuiește `Y` în regula lui `X` și obții `X = 0100 X | 010 | 01 | 0 | ε`.",
+   "solution": "`X = (0100)*(ε ∪ 0 ∪ 01 ∪ 010)`, `Y = 00X ∪ 0 ∪ ε`, iar `Z` și `W` la fel, cu `0` și `1` schimbate între ele (`Z = (1011)*(ε ∪ 1 ∪ 10 ∪ 101)`). `L(G)` e reuniunea celor patru.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "01",
+    "regex": "(0100)*(ε∪0∪01∪010)∪00(0100)*(ε∪0∪01∪010)∪(1011)*(ε∪1∪10∪101)∪11(1011)*(ε∪1∪10∪101)",
+    "reference": "(0100)*(ε∪0∪01∪010)∪00(0100)*(ε∪0∪01∪010)∪(1011)*(ε∪1∪10∪101)∪11(1011)*(ε∪1∪10∪101)"
    }
   },
   {
@@ -1090,6 +1985,96 @@
     "grammar": "S -> aSbS | ε",
     "upTo": 10,
     "reference": "S -> aSbS | ε"
+   }
+  },
+  {
+   "id": "69",
+   "title": "aⁿb²ⁿ",
+   "chapter": "4. Gramatici independente de context",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o gramatică independentă de context pentru `{ aⁿb²ⁿ | n ≥ 0 }`.",
+   "hint": "Fiecare `a` pus la stânga aduce doi `b` la dreapta.",
+   "solution": "O gramatică care merge:\n`S -> aSbb|ε`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "ab",
+    "grammar": "S -> aSbb|ε",
+    "upTo": 8,
+    "reference": "S -> aSbb|ε"
+   }
+  },
+  {
+   "id": "71",
+   "title": "Tot atâția a cât b",
+   "chapter": "4. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Scrie o gramatică pentru cuvintele peste `{a, b}` cu același număr de `a` și `b`, în orice ordine.",
+   "hint": "Uită-te la primul simbol și la locul unde „se închide” prima dată diferența dintre `#a` și `#b`.",
+   "solution": "O gramatică care merge:\n`S -> aSbS|bSaS|ε`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "ab",
+    "grammar": "S -> aSbS|bSaS|ε",
+    "upTo": 8,
+    "reference": "S -> aSbS|bSaS|ε"
+   }
+  },
+  {
+   "id": "72",
+   "title": "Mai mulți a decât b, în ordine",
+   "chapter": "4. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Scrie o gramatică pentru `{ aⁱbʲ | i > j ≥ 0 }`.",
+   "hint": "Pune perechile `a…b`, apoi cel puțin un `a` în plus.",
+   "solution": "O gramatică care merge:\n`S -> aSb|aS|a`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "ab",
+    "grammar": "S -> aSb|aS|a",
+    "upTo": 8,
+    "reference": "S -> aSb|aS|a"
+   }
+  },
+  {
+   "id": "73",
+   "title": "Paranteze unghiulare oglindite",
+   "chapter": "4. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "Examen LFA (18 ianuarie 2025)",
+   "statement": "Pentru `x ∈ {<, >}*`, `mirror(x)` e imaginea în oglindă a lui `x`: întors și cu fiecare paranteză schimbată (`mirror(<<>) = <>>`). Scrie o gramatică pentru `L = { x | x = mirror(x) }`.",
+   "hint": "Simbolul de pe poziția `i` trebuie să fie „opusul” celui de pe poziția `n + 1 - i`. Un simbol de mijloc ar trebui să fie propriul opus: imposibil.",
+   "solution": "`S → <S> | >S< | ε`. Toate cuvintele din `L` au lungime pară; `mirror(x) ≠ reverse(x)` pentru orice `x` nevid, pentru că primul simbol al lui `mirror(x)` e opusul ultimului simbol al lui `x`, iar al lui `reverse(x)` e chiar acela.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "<>",
+    "grammar": "S -> <S>|>S<|ε",
+    "upTo": 8,
+    "reference": "S -> <S>|>S<|ε"
+   }
+  },
+  {
+   "id": "74",
+   "title": "aⁱbʲcᵏ cu i = j sau j = k",
+   "chapter": "4. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Scrie o gramatică pentru `{ aⁱbʲcᵏ | i = j sau j = k }`.",
+   "hint": "Reuniunea a două limbaje independente de context e independentă de context: o ramură pentru `i = j`, una pentru `j = k`.",
+   "solution": "`S → XC | AY`, `X → aXb | ε`, `C → cC | ε`, `A → aA | ε`, `Y → bYc | ε`. Limbajul e inerent ambiguu: `aⁿbⁿcⁿ` are mereu două arbori.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "abc",
+    "grammar": "S -> XC|AY\nX -> aXb|ε\nC -> cC|ε\nA -> aA|ε\nY -> bYc|ε",
+    "upTo": 7,
+    "reference": "S -> XC|AY\nX -> aXb|ε\nC -> cC|ε\nA -> aA|ε\nY -> bYc|ε"
    }
   },
   {
@@ -1348,6 +2333,306 @@
      "da",
      "doar dacă aflăm răspunsul",
      "este Turing acceptat, dar nu decidabil"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "80",
+   "title": "Mulțimea expresiilor regulate",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `X` mulțimea expresiilor regulate peste un alfabet nevid (văzute ca șiruri de simboluri). Care afirmație este adevărată?",
+   "hint": "",
+   "solution": "Sintaxa expresiilor regulate (cu paranteze echilibrate) e independentă de context, nu regulată. Reverse strică parantezele: `(a)` devine `)a(`. `X` e numărabilă infinită, deci `|X| = |N|`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`X ∈ LIC`",
+     "`X` e închisă în raport cu operația reverse",
+     "niciuna dintre celelalte variante",
+     "`|X| ≠ |N|`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "81",
+   "title": "Care sunt regulate",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "grea",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `L1 = { 0ⁿ1ⁿ | 1 ≤ n ≤ 1000 }`, `L2 = { aⁿ | n prim sau n impar }`, `L3 = { w ∈ {0,1}* | int(w) ≥ int(wᴿ) }`, unde `int` e valoarea în baza 2. Care sunt regulate?",
+   "hint": "",
+   "solution": "`L1` e finit, deci regulat. `L2` = numerele impare plus 2 (singurul prim par): regulat. `L3 ∩ 0*10* = { 0ᵃ10ᵇ | b ≥ a }` nu e regulat, deci nici `L3`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "L1 și L2",
+     "L1, L2 și L3",
+     "L1 și L3",
+     "L2 și L3"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "82",
+   "title": "Pushdown și o expresie echivalentă",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "ușoară",
+   "source": "Model test grilă LFA",
+   "statement": "Valorile de adevăr: (1) Se poate scrie cel puțin un automat pushdown pentru orice limbaj regulat. (2) Nu se poate scrie o altă expresie regulată echivalentă cu `a(a∪b)*b`.",
+   "hint": "",
+   "solution": "(1) Un AFD e un automat pushdown care nu folosește stiva. (2) De exemplu `a(a*b*)*b` sau `a(a∪b)*b ∪ ∅` sunt echivalente.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adevărat, fals",
+     "adevărat, adevărat",
+     "fals, adevărat",
+     "fals, fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "83",
+   "title": "Complementul nu e regulat",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "ușoară",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `L ⊆ Σ*` astfel încât `Σ* \\ L` nu este regulat. Atunci `L`:",
+   "hint": "",
+   "solution": "Dacă `L` ar fi regulat, complementul lui ar fi regulat (închidere la complement).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu este niciodată regulat",
+     "poate fi regulat, dar nu întotdeauna",
+     "conține șiruri de lungime infinită",
+     "este întotdeauna regulat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "84",
+   "title": "Reuniunea regulată",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `L1, L2 ⊆ Σ*` cu `L1` și `L1 ∪ L2` regulate. Atunci:",
+   "hint": "",
+   "solution": "Cu `L1 = Σ*`, `L1 ∪ L2 = Σ*` pentru orice `L2`, chiar neregulat. Egalitatea din (d) e falsă când `L1 ∩ L2 ≠ ∅`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "niciuna dintre celelalte variante",
+     "`L2` poate să nu fie regulat",
+     "`L2` este întotdeauna regulat",
+     "`L2 = (L1 ∪ L2) \\ L1`"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "85",
+   "title": "O gramatică amestecată",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Gramatica `S → 0S | A`, `A → A1 | B`, `B → ε | 1` (în original `S1`, `S2`). Ce este adevărat?",
+   "hint": "",
+   "solution": "`S → 0S` e liniară la dreapta, `A → A1` liniară la stânga: amestecul nu e o gramatică regulată. Limbajul e `0*1*`, regulat. Are 3 neterminali.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "gramatica nu e regulată, dar generează un limbaj regulat",
+     "limbajul generat nu e regulat",
+     "gramatica e regulată și generează un limbaj regulat",
+     "gramatica are 2 neterminali"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "86",
+   "title": "AFD cu un singur cuvânt",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `M` un AFD cu `L(M) = {w}` și `Y = { f | (s, w) ⊢* (f, ε) }`. Ce este întotdeauna adevărat?",
+   "hint": "",
+   "solution": "Determinismul: citind `w` din `s` ajungi într-o singură stare. `F` poate avea și stări finale inaccesibile, iar `w` poate fi `ε`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`|F| = 1`",
+     "`M` are mai multe stări inițiale",
+     "`|w| > 0`",
+     "`|Y| = 1`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "87",
+   "title": "L = L·L? Infinitate de tranziții?",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Valorile de adevăr: (1) Pentru orice limbaj regulat `L`, `L = L·L`, pentru că limbajele regulate sunt închise la concatenare. (2) Un automat finit nedeterminist poate avea o infinitate de tranziții.",
+   "hint": "",
+   "solution": "(1) `L = {a}`: `L·L = {aa} ≠ L`; închiderea spune doar că `L·L` e regulat. (2) Relația de tranziție e o submulțime a unei mulțimi finite.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "fals, fals",
+     "fals, adevărat",
+     "adevărat, adevărat",
+     "adevărat, fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "88",
+   "title": "Un cuvânt în (ab*a ∪ b*)*",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "ușoară",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `r = (ab*a ∪ b*)*`. Ce este adevărat despre `L(r)`?",
+   "hint": "",
+   "solution": "`aa = a b⁰ a`. Orice cuvânt are un număr par de `a`, deci `a ∉ L(r)`; `ε` și `aa` nu au niciun `b`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`a ∈ L(r)`",
+     "niciuna dintre celelalte variante",
+     "fiecare șir din `L(r)` conține cel puțin un `b`",
+     "`aa ∈ L(r)`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "89",
+   "title": "Limbajele peste alfabetul vid",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `Σ = ∅` și `Z = 2^(Σ*)`, mulțimea tuturor limbajelor peste `Σ`. Ce este adevărat?",
+   "hint": "",
+   "solution": "`Σ* = {ε}` (cuvântul vid există și peste alfabetul vid), deci `Z = {∅, {ε}}`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`Z` este nenumărabilă",
+     "`Z` este infinit numărabilă",
+     "`|Z| = 2`",
+     "`|Z| = 0`"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "90",
+   "title": "Limbajele care conțin abba",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `Σ = {a, b, c}` și `L_abba = { L ⊆ Σ* | abba ∈ L }`. În raport cu ce operație e închisă `L_abba`?",
+   "hint": "",
+   "solution": "Dacă ambele conțin `abba`, și intersecția îl conține. Diferența îl scoate; `{abba}·{abba} = {abbaabba}` nu îl mai conține.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "diferență",
+     "intersecție",
+     "produs cartezian",
+     "concatenare"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "91",
+   "title": "Derivări",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie gramatica `U → XUX | S`, `S → aTb | bTS`, `T → XTX | X | ε`, `X → a | b`. Ce este adevărat?",
+   "hint": "",
+   "solution": "`T ⇒ XTX ⇒ XX` (cu `T → ε`). `T` nu ajunge la `aba` într-un pas, `X` dă doar un simbol, iar `S` produce mereu cel puțin `ab`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`T ⇒ aba`",
+     "`X ⇒* aba`",
+     "`S ⇒* ε`",
+     "`T ⇒* XX`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "92",
+   "title": "aⁱbʲcᵏ cu i < j < k",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `L = { aⁱbʲcᵏ | 0 < i < j < k }`. Ce este adevărat?",
+   "hint": "",
+   "solution": "Trebuie comparate două perechi de exponenți deodată: lema de pompare pentru limbaje independente de context îl scoate, ca pe `aⁿbⁿcⁿ`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu se poate afirma nimic despre `L`",
+     "`L` este regulat",
+     "`L` nu este independent de context",
+     "`L` este independent de context, dar nu regulat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "93",
+   "title": "Fiecare cuvânt, acceptat de un AFD",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "medie",
+   "source": "Model test grilă LFA",
+   "statement": "Fie `L` un limbaj infinit astfel încât pentru fiecare cuvânt din `L` există un AFD care îl acceptă. Ce este adevărat?",
+   "hint": "",
+   "solution": "Orice cuvânt e acceptat de un AFD (limbajul `{w}` e finit): condiția e adevărată pentru orice limbaj, deci nu spune nimic.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`L` este strict independent de context",
+     "nu se poate afirma nimic despre clasa lui `L`",
+     "`L` este regulat",
+     "`L` este strict dependent de context"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "94",
+   "title": "Limbajul vid",
+   "chapter": "6. Grile: modelul de test",
+   "difficulty": "ușoară",
+   "source": "Model test grilă LFA",
+   "statement": "Care expresie regulată generează limbajul vid?",
+   "hint": "",
+   "solution": "Concatenarea cu `∅` dă `∅`. Atenție: `∅* = {ε}`, nu vid; `∅*(∅ ∪ 0*) = 0*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`1*`",
+     "`1*∅`",
+     "`∅*(∅ ∪ 0*)`",
+     "`∅*`"
     ],
     "answer": 1
    }

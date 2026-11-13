@@ -5,7 +5,12 @@
   "2. Transformări compuse",
   "3. Fereastră și poartă de vizualizare",
   "4. Rasterizare",
-  "5. Teorie: transformări, proiecții, iluminare"
+  "5. Decupare, proiecții, iluminare: calcule",
+  "6. Teorie: transformări, proiecții, iluminare",
+  "7. Grile: transformări 2D și 3D",
+  "8. Grile: proiecții, vizualizare, OpenGL",
+  "9. Grile: eliminarea părților nevizibile",
+  "10. Grile: iluminare, umbre, culoare"
  ],
  "problems": [
   {
@@ -1008,6 +1013,425 @@
    }
   },
   {
+   "id": "40",
+   "title": "Rotație cu 90° în jurul unui colț",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Rotește forma cu 90° în sens orar în jurul punctului `(1, 1)`.",
+   "hint": "Sensul orar: unghi negativ. Punctul fix trece prin origine pe durata rotației.",
+   "solution": "O rezolvare: `M = T(1, 1) · R(-90°) · T(-1, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     0.0,
+     1.0,
+     0.0,
+     -1.0,
+     0.0,
+     2.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -1,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": -90,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 1,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "41",
+   "title": "Oglindire față de a doua bisectoare",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Oglindește forma față de dreapta `y = -x`, folosind doar rotații și scalări.",
+   "hint": "Dreapta `y = -x` face -45° cu OX: rotește-o peste OX, oglindește, rotește înapoi.",
+   "solution": "`M = R(-45°) · S(1, -1) · R(45°)`, adică `(x, y) → (-y, -x)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      0,
+      3
+     ]
+    ],
+    "target": [
+     0.0,
+     -1.0,
+     0.0,
+     -1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "R",
+      "a": 45,
+      "b": 0
+     },
+     {
+      "op": "S",
+      "a": 1,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": -45,
+      "b": 0
+     }
+    ],
+    "maxOps": 3,
+    "allowed": [
+     "R",
+     "S"
+    ]
+   }
+  },
+  {
+   "id": "42",
+   "title": "Scalare neuniformă față de un punct",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Întinde forma de 2 ori pe orizontală față de punctul `(1, 0)`; pe verticală nu se schimbă.",
+   "hint": "Punctul fix e `(1, 0)`: adu-l în origine, scalează, du-l înapoi.",
+   "solution": "O rezolvare: `M = T(1, 0) · S(2, 1) · T(-1, 0)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     -1.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -1,
+      "b": 0
+     },
+     {
+      "op": "S",
+      "a": 2,
+      "b": 1
+     },
+     {
+      "op": "T",
+      "a": 1,
+      "b": 0
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "43",
+   "title": "Oglindire față de dreapta y = 2",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Oglindește forma față de dreapta orizontală `y = 2`.",
+   "hint": "Mută dreapta peste OX, oglindește față de OX, mută înapoi.",
+   "solution": "O rezolvare: `M = T(0, 2) · S(1, -1) · T(0, -2)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     -1.0,
+     4.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": 0,
+      "b": -2
+     },
+     {
+      "op": "S",
+      "a": 1,
+      "b": -1
+     },
+     {
+      "op": "T",
+      "a": 0,
+      "b": 2
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "44",
+   "title": "Forfecare verticală față de o dreaptă",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "grea",
+   "source": "Test EGC · Transformări 2D și 3D",
+   "statement": "Forfecă forma pe verticală cu factorul 0.5, astfel încât dreapta `x = 1` să rămână pe loc: `y' = y + 0.5·(x - 1)`.",
+   "hint": "Forfecarea pe y față de origine lasă pe loc axa OY. Adu dreapta `x = 1` peste OY.",
+   "solution": "O rezolvare: `M = T(1, 0) · F(0, 0.5) · T(-1, 0)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      1,
+      4
+     ]
+    ],
+    "target": [
+     1.0,
+     0.0,
+     0.0,
+     0.5,
+     1.0,
+     -0.5,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -1,
+      "b": 0
+     },
+     {
+      "op": "F",
+      "a": 0,
+      "b": 0.5
+     },
+     {
+      "op": "T",
+      "a": 1,
+      "b": 0
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "45",
+   "title": "Rotație cu 60° în jurul centrului",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Rotește triunghiul cu 60° în sens trigonometric în jurul punctului `(2, 1)`.",
+   "hint": "Același tipar ca la orice rotație în jurul unui punct; unghiul nu schimbă rețeta.",
+   "solution": "O rezolvare: `M = T(2, 1) · R(60°) · T(-2, -1)` (se aplică de la dreapta la stânga).",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      1,
+      0
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    "target": [
+     0.5,
+     -0.866025404,
+     1.866025404,
+     0.866025404,
+     0.5,
+     -1.232050808,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -2,
+      "b": -1
+     },
+     {
+      "op": "R",
+      "a": 60,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "72",
+   "title": "Un punct, rotit în jurul altui punct",
+   "chapter": "2. Transformări compuse",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Punctul `P(3, 1)` se rotește cu 90° în sens trigonometric în jurul punctului `C(1, 1)`, adică `M = T(1, 1) · R(90°) · T(-1, -1)`. Unde ajunge?",
+   "hint": "Lucrează în trei pași: `P - C`, rotit cu 90° (`(x, y) → (-y, x)`), plus `C`.",
+   "solution": "`P - C = (2, 0)`, rotit: `(0, 2)`, plus `C`: `(1, 3)`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x'",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y'",
+      "answer": "3",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
    "id": "17",
    "title": "Din fereastră în poartă",
    "chapter": "3. Fereastră și poartă de vizualizare",
@@ -1178,6 +1602,61 @@
      }
     ],
     "maxOps": 2
+   }
+  },
+  {
+   "id": "46",
+   "title": "Poartă centrată, scalare uniformă",
+   "chapter": "3. Fereastră și poartă de vizualizare",
+   "difficulty": "grea",
+   "source": "Test EGC, transformări 2D (2021)",
+   "statement": "Fereastra este `[0, 2] × [0, 2]`, poarta este `[0, 8] × [0, 4]`. Ca desenul să nu se deformeze, se folosește o scalare uniformă (factorul mai mic dintre `sx` și `sy`), iar imaginea se centrează în poartă. Forma dată e fereastra.",
+   "hint": "`sx = 4`, `sy = 2`: se ia `s = 2`. Imaginea are lățimea 4 într-o poartă de lățime 8: rămân 4 unități, câte 2 de fiecare parte.",
+   "solution": "`M = T(2, 0) · S(2, 2)`. Pe verticală imaginea umple poarta; pe orizontală e centrată, cu 2 unități libere în stânga și 2 în dreapta.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      0,
+      2
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     2.0,
+     0.0,
+     2.0,
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 2,
+      "b": 2
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 0
+     }
+    ],
+    "maxOps": 3
    }
   },
   {
@@ -1754,9 +2233,1277 @@
    }
   },
   {
+   "id": "47",
+   "title": "Segment orizontal aproape",
+   "chapter": "4. Rasterizare",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(0, 1)` la `(8, 3)`. Capetele sunt deja aprinse.",
+   "hint": "Panta 1/4: y crește de două ori în opt pași.",
+   "solution": "Pixelii, în ordine: `(0, 1)`, `(1, 1)`, `(2, 2)`, `(3, 2)`, `(4, 2)`, `(5, 2)`, `(6, 3)`, `(7, 3)`, `(8, 3)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 10,
+    "h": 5,
+    "pixels": [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      5,
+      2
+     ],
+     [
+      6,
+      3
+     ],
+     [
+      7,
+      3
+     ],
+     [
+      8,
+      3
+     ]
+    ],
+    "given": [
+     [
+      0,
+      1
+     ],
+     [
+      8,
+      3
+     ]
+    ],
+    "line": [
+     0,
+     1,
+     8,
+     3
+    ]
+   }
+  },
+  {
+   "id": "48",
+   "title": "Segment abrupt care coboară",
+   "chapter": "4. Rasterizare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(2, 9)` la `(5, 0)`. Capetele sunt deja aprinse.",
+   "hint": "Panta e mai mare decât 1 în modul: câte un pixel pe fiecare linie, x crește rar.",
+   "solution": "Pixelii, în ordine: `(2, 9)`, `(2, 8)`, `(3, 7)`, `(3, 6)`, `(3, 5)`, `(4, 4)`, `(4, 3)`, `(4, 2)`, `(5, 1)`, `(5, 0)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 7,
+    "h": 10,
+    "pixels": [
+     [
+      2,
+      9
+     ],
+     [
+      2,
+      8
+     ],
+     [
+      3,
+      7
+     ],
+     [
+      3,
+      6
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      4
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      5,
+      0
+     ]
+    ],
+    "given": [
+     [
+      2,
+      9
+     ],
+     [
+      5,
+      0
+     ]
+    ],
+    "line": [
+     2,
+     9,
+     5,
+     0
+    ]
+   }
+  },
+  {
+   "id": "49",
+   "title": "Pantă exact 1/2",
+   "chapter": "4. Rasterizare",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(0, 0)` la `(8, 4)`. Capetele sunt deja aprinse.",
+   "hint": "La mijlocul dintre doi pixeli algoritmul alege mereu la fel: urmărește semnul variabilei de test când e 0.",
+   "solution": "Pixelii, în ordine: `(0, 0)`, `(1, 1)`, `(2, 1)`, `(3, 2)`, `(4, 2)`, `(5, 3)`, `(6, 3)`, `(7, 4)`, `(8, 4)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 10,
+    "h": 6,
+    "pixels": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      6,
+      3
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      8,
+      4
+     ]
+    ],
+    "given": [
+     [
+      0,
+      0
+     ],
+     [
+      8,
+      4
+     ]
+    ],
+    "line": [
+     0,
+     0,
+     8,
+     4
+    ]
+   }
+  },
+  {
+   "id": "50",
+   "title": "Segment spre stânga-jos",
+   "chapter": "4. Rasterizare",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Aprinde pixelii pe care îi alege algoritmul Bresenham pentru segmentul de la `(9, 6)` la `(1, 1)`. Capetele sunt deja aprinse.",
+   "hint": "Și x, și y scad. Panta e sub 1: câte un pixel pe coloană.",
+   "solution": "Pixelii, în ordine: `(9, 6)`, `(8, 5)`, `(7, 5)`, `(6, 4)`, `(5, 3)`, `(4, 3)`, `(3, 2)`, `(2, 2)`, `(1, 1)`.",
+   "kind": "raster",
+   "spec": {
+    "w": 11,
+    "h": 8,
+    "pixels": [
+     [
+      9,
+      6
+     ],
+     [
+      8,
+      5
+     ],
+     [
+      7,
+      5
+     ],
+     [
+      6,
+      4
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "given": [
+     [
+      9,
+      6
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "line": [
+     9,
+     6,
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "51",
+   "title": "Cerc de rază 5",
+   "chapter": "4. Rasterizare",
+   "difficulty": "grea",
+   "source": "Examen EGC",
+   "statement": "Aprinde pixelii aleși de algoritmul punctului de mijloc pentru cercul cu centrul în `(6, 6)` și raza 5. Pixelii de pe axe sunt deja aprinși.",
+   "hint": "Pornește din `(0, 5)` cu `d = 1 - r = -4`; dacă `d < 0`: `d += 2x + 3`, altfel `d += 2(x - y) + 5` și y scade.",
+   "solution": "Primul octant, față de centru: `(0, 5)`, `(1, 5)`, `(2, 5)`, `(3, 4)`; apoi simetricele în celelalte șapte octante.",
+   "kind": "raster",
+   "spec": {
+    "w": 13,
+    "h": 13,
+    "pixels": [
+     [
+      1,
+      4
+     ],
+     [
+      1,
+      5
+     ],
+     [
+      1,
+      6
+     ],
+     [
+      1,
+      7
+     ],
+     [
+      1,
+      8
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      2,
+      9
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      3,
+      10
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      11
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      5,
+      11
+     ],
+     [
+      6,
+      1
+     ],
+     [
+      6,
+      11
+     ],
+     [
+      7,
+      1
+     ],
+     [
+      7,
+      11
+     ],
+     [
+      8,
+      1
+     ],
+     [
+      8,
+      11
+     ],
+     [
+      9,
+      2
+     ],
+     [
+      9,
+      10
+     ],
+     [
+      10,
+      3
+     ],
+     [
+      10,
+      9
+     ],
+     [
+      11,
+      4
+     ],
+     [
+      11,
+      5
+     ],
+     [
+      11,
+      6
+     ],
+     [
+      11,
+      7
+     ],
+     [
+      11,
+      8
+     ]
+    ],
+    "given": [
+     [
+      6,
+      11
+     ],
+     [
+      6,
+      1
+     ],
+     [
+      11,
+      6
+     ],
+     [
+      1,
+      6
+     ]
+    ],
+    "circle": [
+     6,
+     6,
+     5
+    ]
+   }
+  },
+  {
+   "id": "52",
+   "title": "Cohen-Sutherland: acceptare trivială",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "ușoară",
+   "source": "Examen EGC",
+   "statement": "Fereastra de decupare este `[1, 8] × [1, 6]`. Codurile Cohen-Sutherland au 4 biți, în ordinea **sus, jos, dreapta, stânga** (de exemplu `1001` = deasupra și la stânga). Segmentul are capetele `A(2, 3)` și `B(7, 5)`.",
+   "hint": "Un bit e 1 când punctul e de acea parte a ferestrei. Ambele coduri 0000: acceptat trivial. `codA AND codB ≠ 0`: ambele sunt de aceeași parte, respins trivial. Altfel trebuie decupat.",
+   "solution": "`A` → `0000`, `B` → `0000`; `OR = 0000`, `AND = 0000`: segmentul e **acceptat**.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "ca",
+      "label": "codul lui A (4 biți)",
+      "answer": "0000",
+      "hint": "ex.: 0000"
+     },
+     {
+      "id": "cb",
+      "label": "codul lui B (4 biți)",
+      "answer": "0000",
+      "hint": "ex.: 1010"
+     },
+     {
+      "id": "v",
+      "label": "segmentul este: acceptat / respins / decupat",
+      "answer": "acceptat",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "53",
+   "title": "Cohen-Sutherland: respingere trivială",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "ușoară",
+   "source": "Examen EGC",
+   "statement": "Fereastra de decupare este `[0, 10] × [0, 6]`. Codurile Cohen-Sutherland au 4 biți, în ordinea **sus, jos, dreapta, stânga** (de exemplu `1001` = deasupra și la stânga). Segmentul are capetele `A(-3, 7)` și `B(2, 9)`.",
+   "hint": "Un bit e 1 când punctul e de acea parte a ferestrei. Ambele coduri 0000: acceptat trivial. `codA AND codB ≠ 0`: ambele sunt de aceeași parte, respins trivial. Altfel trebuie decupat.",
+   "solution": "`A` → `1001`, `B` → `1000`; `OR = 1001`, `AND = 1000`: segmentul e **respins**.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "ca",
+      "label": "codul lui A (4 biți)",
+      "answer": "1001",
+      "hint": "ex.: 0000"
+     },
+     {
+      "id": "cb",
+      "label": "codul lui B (4 biți)",
+      "answer": "1000",
+      "hint": "ex.: 1010"
+     },
+     {
+      "id": "v",
+      "label": "segmentul este: acceptat / respins / decupat",
+      "answer": "respins",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "54",
+   "title": "Cohen-Sutherland: intersecția cu marginea stângă",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Fereastra de decupare este `[0, 10] × [0, 8]`. Codurile Cohen-Sutherland au 4 biți, în ordinea **sus, jos, dreapta, stânga** (de exemplu `1001` = deasupra și la stânga). Segmentul are capetele `A(-4, 2)` și `B(6, 7)`.",
+   "hint": "Un bit e 1 când punctul e de acea parte a ferestrei. Ambele coduri 0000: acceptat trivial. `codA AND codB ≠ 0`: ambele sunt de aceeași parte, respins trivial. Altfel trebuie decupat.",
+   "solution": "`A` → `0001`, `B` → `0000`; `OR = 0001`, `AND = 0000`: segmentul e **decupat**. Capătul `A` e la stânga: se taie cu dreapta `x = 0`: `y = 2 + (7 - 2) · (0 - (-4)) / (6 - (-4)) = 4`. Noul capăt `(0, 4)` are codul `0000`, deci restul segmentului e acceptat.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "ca",
+      "label": "codul lui A (4 biți)",
+      "answer": "0001",
+      "hint": "ex.: 0000"
+     },
+     {
+      "id": "cb",
+      "label": "codul lui B (4 biți)",
+      "answer": "0000",
+      "hint": "ex.: 1010"
+     },
+     {
+      "id": "v",
+      "label": "segmentul este: acceptat / respins / decupat",
+      "answer": "decupat",
+      "hint": "un cuvânt"
+     },
+     {
+      "id": "y",
+      "label": "y-ul punctului în care segmentul intră în fereastră (pe x = 0)",
+      "answer": "4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "55",
+   "title": "Cohen-Sutherland: decupat la ambele capete",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "grea",
+   "source": "Examen EGC",
+   "statement": "Fereastra de decupare este `[0, 10] × [0, 10]`. Codurile Cohen-Sutherland au 4 biți, în ordinea **sus, jos, dreapta, stânga** (de exemplu `1001` = deasupra și la stânga). Segmentul are capetele `A(2, -4)` și `B(14, 8)`.",
+   "hint": "Un bit e 1 când punctul e de acea parte a ferestrei. Ambele coduri 0000: acceptat trivial. `codA AND codB ≠ 0`: ambele sunt de aceeași parte, respins trivial. Altfel trebuie decupat.",
+   "solution": "`A` → `0100`, `B` → `0010`; `OR = 0110`, `AND = 0000`: segmentul e **decupat**. `A` e sub fereastră: tăiat cu `y = 0` dă `x = 6`. `B` e la dreapta: tăiat cu `x = 10` dă `y = 4`. Segmentul vizibil: `(6, 0)` – `(10, 4)`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "ca",
+      "label": "codul lui A (4 biți)",
+      "answer": "0100",
+      "hint": "ex.: 0000"
+     },
+     {
+      "id": "cb",
+      "label": "codul lui B (4 biți)",
+      "answer": "0010",
+      "hint": "ex.: 1010"
+     },
+     {
+      "id": "v",
+      "label": "segmentul este: acceptat / respins / decupat",
+      "answer": "decupat",
+      "hint": "un cuvânt"
+     },
+     {
+      "id": "x1",
+      "label": "x-ul punctului de pe marginea de jos (y = 0)",
+      "answer": "6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y2",
+      "label": "y-ul punctului de pe marginea dreaptă (x = 10)",
+      "answer": "4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "56",
+   "title": "Cohen-Sutherland: nici acceptat, nici respins, dar invizibil",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "grea",
+   "source": "Examen EGC",
+   "statement": "Fereastra de decupare este `[0, 8] × [0, 8]`. Codurile Cohen-Sutherland au 4 biți, în ordinea **sus, jos, dreapta, stânga** (de exemplu `1001` = deasupra și la stânga). Segmentul are capetele `A(-3, 6)` și `B(3, 12)`.",
+   "hint": "Un bit e 1 când punctul e de acea parte a ferestrei. Ambele coduri 0000: acceptat trivial. `codA AND codB ≠ 0`: ambele sunt de aceeași parte, respins trivial. Altfel trebuie decupat.",
+   "solution": "`A` → `0001`, `B` → `1000`; `OR = 1001`, `AND = 0000`: segmentul e **decupat**. Codurile nu au niciun bit comun, deci testul trivial nu îl respinge, deși segmentul trece pe lângă colțul ferestrei: după decupări succesive nu rămâne nimic din el. De aceea algoritmul repetă testele după fiecare tăiere.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "ca",
+      "label": "codul lui A (4 biți)",
+      "answer": "0001",
+      "hint": "ex.: 0000"
+     },
+     {
+      "id": "cb",
+      "label": "codul lui B (4 biți)",
+      "answer": "1000",
+      "hint": "ex.: 1010"
+     },
+     {
+      "id": "v",
+      "label": "segmentul este: acceptat / respins / decupat",
+      "answer": "decupat",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "57",
+   "title": "Proiecție perspectivă: punctul (4, 6, 8)",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "ușoară",
+   "source": "Examen EGC",
+   "statement": "Centrul de proiecție este în origine, iar planul de proiecție este `z = 2`. Unde se proiectează punctul `P(4, 6, 8)`?",
+   "hint": "Asemănarea triunghiurilor: `x' = x · d / z`, `y' = y · d / z`.",
+   "solution": "`x' = 4 · 2 / 8 = 1`, `y' = 6 · 2 / 8 = 1,5`. Obiectele mai depărtate (z mare) ies mai mici.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x'",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y'",
+      "answer": "1.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "58",
+   "title": "Proiecție perspectivă: punctul (-3, 9, 12)",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Centrul de proiecție este în origine, iar planul de proiecție este `z = 4`. Unde se proiectează punctul `P(-3, 9, 12)`?",
+   "hint": "Asemănarea triunghiurilor: `x' = x · d / z`, `y' = y · d / z`.",
+   "solution": "`x' = -3 · 4 / 12 = -1`, `y' = 9 · 4 / 12 = 3`. Obiectele mai depărtate (z mare) ies mai mici.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x'",
+      "answer": "-1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y'",
+      "answer": "3",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "59",
+   "title": "Față auto-obturată?",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Un triunghi are vârfurile, în ordinea dată (sens trigonometric privit din afara obiectului), `A(0, 0, 0)`, `B(4, 0, 0)`, `C(0, 3, 0)`. Observatorul este în `O(1, 1, 5)`. Normala exterioară este `N = AB × AC`.",
+   "hint": "O față e vizibilă dacă observatorul e de partea normalei exterioare: produsul scalar dintre normală și vectorul spre observator e pozitiv.",
+   "solution": "`AB = (4, 0, 0)`, `AC = (0, 3, 0)`, `N = (0, 0, 12)`; `O - A = (1, 1, 5)`, `N · (O - A) = 60` ⇒ fața e **vizibilă**.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "nx",
+      "label": "Nx",
+      "answer": "0",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ny",
+      "label": "Ny",
+      "answer": "0",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "nz",
+      "label": "Nz",
+      "answer": "12",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "d",
+      "label": "N · (O - A)",
+      "answer": "60",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "v",
+      "label": "fața este: vizibilă / ascunsă",
+      "answer": "vizibilă|vizibila",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "60",
+   "title": "Față auto-obturată, vârfuri în altă ordine",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Un triunghi are vârfurile, în ordinea dată (sens trigonometric privit din afara obiectului), `A(1, 0, 2)`, `B(1, 4, 2)`, `C(5, 0, 2)`. Observatorul este în `O(2, 1, 9)`. Normala exterioară este `N = AB × AC`.",
+   "hint": "O față e vizibilă dacă observatorul e de partea normalei exterioare: produsul scalar dintre normală și vectorul spre observator e pozitiv.",
+   "solution": "`AB = (0, 4, 0)`, `AC = (4, 0, 0)`, `N = (0, 0, -16)`; `O - A = (1, 1, 7)`, `N · (O - A) = -112` ⇒ fața e **ascunsă**.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "nx",
+      "label": "Nx",
+      "answer": "0",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ny",
+      "label": "Ny",
+      "answer": "0",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "nz",
+      "label": "Nz",
+      "answer": "-16",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "d",
+      "label": "N · (O - A)",
+      "answer": "-112",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "v",
+      "label": "fața este: vizibilă / ascunsă",
+      "answer": "ascunsă|ascunsa",
+      "hint": "un cuvânt"
+     }
+    ]
+   }
+  },
+  {
+   "id": "61",
+   "title": "Reflexia difuză (legea lui Lambert)",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Un punct `P(0, 0, 0)` al unei suprafețe are normala `N = (0, 0, 1)`. O sursă punctiformă se află în `(3, 0, 4)` și are intensitatea `Ip = 200`; coeficientul de reflexie difuză este `kd = 0.6`.",
+   "hint": "`Id = Ip · kd · cos θ`, cu `cos θ = N · L` pentru vectori unitari. Nu depinde de poziția observatorului.",
+   "solution": "`L = (3, 0, 4) / 5 = (0,6, 0, 0,8)`, `cos θ = N · L = 0,8`, `Id = 200 · 0.6 · 0,8 = 96`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "c",
+      "label": "cos θ (θ: unghiul dintre N și direcția spre sursă)",
+      "answer": "0.8",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "i",
+      "label": "intensitatea difuză Id",
+      "answer": "96",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "62",
+   "title": "Reflexia speculară (modelul Phong)",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "grea",
+   "source": "Examen EGC",
+   "statement": "Normala într-un punct este `N = (0, 0, 1)`. Direcția spre sursă este `L = (1, 0, 1)/√2`, iar direcția spre observator este `V = (-1, 0, 1)/√2`. Sursa are `Ip = 100`, `ks = 0.5`, exponentul de strălucire `n = 4`.",
+   "hint": "`Is = Ip · ks · (R · V)ⁿ`; `R` e simetricul lui `L` față de normală.",
+   "solution": "`N · L = 1/√2 ≈ 0,707`, `R = 2 · 0,707 · (0, 0, 1) - (0,707, 0, 0,707) = (-0,707, 0, 0,707)`. `R · V = 1`: observatorul e exact pe direcția reflectată, deci `Is = 100 · 0.5 · 1 = 50`, maximul posibil.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rx",
+      "label": "Rx (vectorul reflectat R = 2(N·L)N - L)",
+      "answer": "-0.7071",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "rz",
+      "label": "Rz",
+      "answer": "0.7071",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "rv",
+      "label": "R · V",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "i",
+      "label": "intensitatea speculară Is",
+      "answer": "50",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "63",
+   "title": "Specular, observator deasupra",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "grea",
+   "source": "Examen EGC",
+   "statement": "Aceleași date ca la problema anterioară (`N = (0, 0, 1)`, `L = (1, 0, 1)/√2`, `Ip = 100`, `ks = 0.5`, `n = 4`), dar observatorul privește din `V = (0, 0, 1)`.",
+   "hint": "Vectorul reflectat nu se schimbă (nu depinde de observator); doar unghiul dintre R și V.",
+   "solution": "`R = (-0,707, 0, 0,707)`, `R · V = 0,707`, `Is = 100 · 0.5 · 0,707⁴ = 12,5`: exponentul face lobul îngust, iar la 45° de el lumina speculară scade deja la un sfert.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rv",
+      "label": "R · V",
+      "answer": "0.7071",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "i",
+      "label": "intensitatea speculară Is",
+      "answer": "12.5",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "64",
+   "title": "Vectorul median H (Blinn-Phong)",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Direcția spre sursă este `L = (1, 0, 1)/√2`, direcția spre observator `V = (0, 0, 1)`, normala `N = (0, 0, 1)`. Modelul Blinn-Phong folosește vectorul median `H = (L + V) / |L + V|` în loc de `R`.",
+   "hint": "`H` e la jumătatea drumului dintre L și V. Lumina speculară e maximă când `H` coincide cu normala.",
+   "solution": "`L + V = (0,707, 0, 1,707)`, `|L + V| ≈ 1,848`, `N · H = 0,924` (unghi de 22,5°, jumătate din unghiul de 45° dintre L și V).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "nh",
+      "label": "N · H (cosinusul unghiului dintre N și H)",
+      "answer": "0.9239",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "65",
+   "title": "Ceața liniară, calculată",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "ușoară",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Ceața liniară începe la distanța 10 și acoperă totul de la distanța 50. Un fragment se află la distanța 30 de observator; culoarea lui este `(200, 100, 0)`, culoarea ceții este `(128, 128, 128)`.",
+   "hint": "`f = (end - z) / (end - start)`, culoarea finală `= f · Cfragment + (1 - f) · Cceață`.",
+   "solution": "`f = (50 - 30) / (50 - 10) = 0,5`; `R = 0,5 · 200 + 0,5 · 128 = 164`, `G = 0,5 · 100 + 0,5 · 128 = 114`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "f",
+      "label": "factorul f (1 = fără ceață, 0 = doar ceață)",
+      "answer": "0.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "r",
+      "label": "componenta R a culorii finale",
+      "answer": "164",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "g",
+      "label": "componenta G a culorii finale",
+      "answer": "114",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "66",
+   "title": "Gouraud: culoarea de pe o latură",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "În modelul Gouraud, culorile se calculează doar în vârfuri și apoi se interpolează. O latură merge de la vârful `A` (pe linia de scanare 10, intensitate 40) la `B` (linia 30, intensitate 200). Ce intensitate primește latura pe linia de scanare 15? Dar pe linia 25?",
+   "hint": "Interpolare liniară: `I = IA + (IB - IA) · (y - yA) / (yB - yA)`.",
+   "solution": "`I(15) = 40 + 160 · 5/20 = 80`, `I(25) = 40 + 160 · 15/20 = 160`. Pe linie, între cele două laturi, se interpolează la fel pe x. De aceea un reflex specular din mijlocul poligonului se pierde (îl prinde doar Phong).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "i15",
+      "label": "intensitatea pe linia 15",
+      "answer": "80",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "i25",
+      "label": "intensitatea pe linia 25",
+      "answer": "160",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "67",
+   "title": "Z-buffer pe un pixel",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Examen EGC",
+   "statement": "Pe același pixel ajung, în ordinea rasterizării, trei fragmente: roșu cu `z = 0,7`, verde cu `z = 0,4`, albastru cu `z = 0,55` (z mai mic = mai aproape). Buffer-ul z pornește cu 1, testul este `GL_LESS`.",
+   "hint": "Fiecare fragment se compară cu valoarea din buffer; dacă e mai aproape, se scrie (și culoarea, și z).",
+   "solution": "Roșu: `0,7 < 1`, scris. Verde: `0,4 < 0,7`, scris. Albastru: `0,55 < 0,4` e fals, aruncat. Pixelul rămâne verde, cu z = 0,4, după 2 scrieri; ordinea nu contează pentru rezultat, doar pentru numărul de scrieri.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "c",
+      "label": "culoarea pixelului la sfârșit",
+      "answer": "verde",
+      "hint": ""
+     },
+     {
+      "id": "z",
+      "label": "valoarea din buffer-ul z la sfârșit",
+      "answer": "0.4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "w",
+      "label": "de câte ori se scrie în buffer-ul de culoare",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "68",
+   "title": "Din RGB în CMY",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "ușoară",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Culoarea `(R, G, B) = (0,2, 0,7, 1)` (componente între 0 și 1) se tipărește. Care sunt componentele ei în modelul CMY?",
+   "hint": "Modelul substractiv: `C = 1 - R`, `M = 1 - G`, `Y = 1 - B`.",
+   "solution": "`(C, M, Y) = (0,8, 0,3, 0)`: cerneala cyan absoarbe roșul.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "c",
+      "label": "C",
+      "answer": "0.8",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "m",
+      "label": "M",
+      "answer": "0.3",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "Y",
+      "answer": "0",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "69",
+   "title": "Din RGB în HSV",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care sunt componentele HSV ale culorii `(R, G, B) = (1, 0,5, 0)`? Nuanța (H) în grade, S și V între 0 și 1.",
+   "hint": "`V = max`, `S = (max - min) / max`; nuanța: pe hexagon, roșu la 0°, galben la 60°, verde la 120°.",
+   "solution": "`max = 1`, `min = 0`: `V = 1`, `S = 1`. Culoarea e între roșu (0°) și galben (60°), la jumătate: `H = 30°` (portocaliu).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "h",
+      "label": "H (grade)",
+      "answer": "30",
+      "number": true,
+      "tol": 0.5,
+      "hint": "un număr"
+     },
+     {
+      "id": "s",
+      "label": "S",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "v",
+      "label": "V",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "70",
+   "title": "Variabila de test din Bresenham",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "grea",
+   "source": "Examen EGC",
+   "statement": "Segmentul merge de la `(0, 0)` la `(8, 3)`. Algoritmul Bresenham folosește variabila de test `d`, cu `d₀ = 2Δy - Δx`; la fiecare pas, dacă `d < 0` se alege pixelul din dreapta (E) și `d += 2Δy`, altfel cel din dreapta-sus (NE) și `d += 2(Δy - Δx)`.",
+   "hint": "Toate valorile sunt întregi: de aceea algoritmul e rapid. Urmărește semnul la fiecare pas.",
+   "solution": "`Δx = 8`, `Δy = 3`: `d₀ = -2` (< 0: E), `d₁ = 4` (≥ 0: NE), `d₂ = -6`. Incremente: `+6` pentru E, `-10` pentru NE.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "d0",
+      "label": "d₀",
+      "answer": "-2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ie",
+      "label": "incrementul pentru E",
+      "answer": "6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ine",
+      "label": "incrementul pentru NE",
+      "answer": "-10",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "d2",
+      "label": "d după doi pași (d₂)",
+      "answer": "-6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "71",
+   "title": "Un punct, din fereastră în poartă",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D (2021)",
+   "statement": "Fereastra este `[1, 5] × [0, 4]`, poarta de afișare este `[100, 400] × [0, 300]`. În ce punct al porții ajunge punctul `(3, 2)` din fereastră?",
+   "hint": "`xp = xpmin + (x - xfmin) · sx`, cu `sx = (xpmax - xpmin) / (xfmax - xfmin)`.",
+   "solution": "`sx = 300 / 4 = 75`, `sy = 300 / 4 = 75`: `xp = 100 + 2 · 75 = 250`, `yp = 0 + 2 · 75 = 150`. Mijlocul ferestrei ajunge în mijlocul porții.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x în poartă",
+      "answer": "250",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y în poartă",
+      "answer": "150",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "73",
+   "title": "Transparență: amestecul alfa",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "ușoară",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Peste un pixel de culoare `(0, 0, 255)` se desenează un fragment `(255, 0, 0)` cu opacitatea `α = 0,25`, cu amestecul obișnuit `C = α · Csursă + (1 - α) · Cdestinație`.",
+   "hint": "Fragmentul nou e sursa, ce era deja în pixel e destinația.",
+   "solution": "`R = 0,25 · 255 = 63,75`, `G = 0`, `B = 0,75 · 255 = 191,25`. Ordinea de desenare contează: obiectele transparente se desenează după cele opace, din spate în față.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "r",
+      "label": "R",
+      "answer": "63.75",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "g",
+      "label": "G",
+      "answer": "0",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "B",
+      "answer": "191.25",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "74",
+   "title": "Volumul vizual canonic",
+   "chapter": "5. Decupare, proiecții, iluminare: calcule",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "În OpenGL, după proiecție și împărțirea perspectivă, coordonatele vizibile sunt cele din cubul `[-1, 1]³`. Un vârf are coordonatele de decupare `(x, y, z, w) = (2, -3, 1, 4)`.",
+   "hint": "Împărțirea perspectivă împarte la `w`. Decuparea se face înainte de ea, comparând fiecare coordonată cu `±w`.",
+   "solution": "`(2/4, -3/4, 1/4) = (0,5, -0,75, 0,25)`: toate sunt în `[-1, 1]`, deci vârful e vizibil (echivalent: `|x|, |y|, |z| ≤ w`).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x după împărțirea perspectivă",
+      "answer": "0.5",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y",
+      "answer": "-0.75",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "z",
+      "label": "z",
+      "answer": "0.25",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "v",
+      "label": "vârful este în volumul vizual: da / nu",
+      "answer": "da",
+      "hint": ""
+     }
+    ]
+   }
+  },
+  {
    "id": "27",
    "title": "Transformările 3D, ca matrice",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "ușoară",
    "source": "Test EGC · Transformări 2D și 3D",
    "statement": "Cum se reprezintă transformările geometrice 3D, astfel încât și translația să fie o înmulțire de matrice?",
@@ -1776,7 +3523,7 @@
   {
    "id": "28",
    "title": "Raportată la o axă",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "ușoară",
    "source": "Test EGC · Transformări 2D și 3D",
    "statement": "Care dintre următoarele transformări 2D poate fi raportată la o axă?",
@@ -1796,7 +3543,7 @@
   {
    "id": "29",
    "title": "Scalare urmată de translație",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "Test EGC · Transformări 2D și 3D",
    "statement": "Ce transformare 2D reprezintă matricea cu liniile `(sx, 0, tx)`, `(0, sy, ty)`, `(0, 0, 1)`?",
@@ -1816,7 +3563,7 @@
   {
    "id": "30",
    "title": "Ce au în comun rotația, scalarea și translația",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "Test EGC · Transformări 2D și 3D",
    "statement": "Care afirmație despre rotație, scalare și translație este FALSĂ?",
@@ -1836,7 +3583,7 @@
   {
    "id": "31",
    "title": "Rotația în jurul unei drepte oarecare",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "Test EGC · Transformări 2D și 3D",
    "statement": "Ce este adevărat despre rotația 3D în jurul unei drepte oarecare?",
@@ -1856,7 +3603,7 @@
   {
    "id": "32",
    "title": "Forfecarea pe OZ",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "Test EGC · Transformări 2D și 3D",
    "statement": "La forfecarea față de origine pe axa OZ, ce se întâmplă cu coordonatele unui vârf?",
@@ -1876,7 +3623,7 @@
   {
    "id": "33",
    "title": "Proiecția perspectivă",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "ușoară",
    "source": "",
    "statement": "Ce deosebește proiecția perspectivă de cea paralelă?",
@@ -1896,7 +3643,7 @@
   {
    "id": "34",
    "title": "Z-buffer",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "",
    "statement": "Ce ține minte algoritmul Z-buffer pentru fiecare pixel?",
@@ -1916,7 +3663,7 @@
   {
    "id": "35",
    "title": "Eliminarea fețelor spate",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "",
    "statement": "O față a unui obiect convex închis are normala exterioară `N`, iar `V` e vectorul de la față spre observator. Când este fața nevizibilă?",
@@ -1936,7 +3683,7 @@
   {
    "id": "36",
    "title": "Modelul Phong",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "ușoară",
    "source": "",
    "statement": "Care componentă a modelului de reflexie Phong depinde de poziția observatorului?",
@@ -1956,7 +3703,7 @@
   {
    "id": "37",
    "title": "Gouraud și Phong",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "",
    "statement": "Prin ce diferă modelul de shading Phong de Gouraud?",
@@ -1976,7 +3723,7 @@
   {
    "id": "38",
    "title": "Cohen-Sutherland",
-   "chapter": "5. Teorie: transformări, proiecții, iluminare",
+   "chapter": "6. Teorie: transformări, proiecții, iluminare",
    "difficulty": "medie",
    "source": "",
    "statement": "La decuparea Cohen-Sutherland, capetele unui segment au codurile `c1` și `c2`. Când este segmentul respins fără niciun calcul de intersecție?",
@@ -1991,6 +3738,1449 @@
      "când c1 ȘI c2 (pe biți) este 0"
     ],
     "answer": 2
+   }
+  },
+  {
+   "id": "101",
+   "title": "Care dintre următoarele transformări 2D poate fi…",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Care dintre următoarele transformări 2D poate fi raportată la o axă?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Oglindirea”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Translația",
+     "Rotația",
+     "Oglindirea",
+     "Scalarea"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "102",
+   "title": "Rotatia in jurul unei drepte oarecare",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Rotatia in jurul unei drepte oarecare:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Secvența de transformări elementare necesare pentru obținerea transformării cerute include și transformările inverse celor de aliniere\n• Necesita compunerea de transformari elementare pentru alinierea dreptei cu una dintre axele principale.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Secvența de transformări elementare necesare pentru obținerea transformării cerute include și transformările inverse celor de aliniere",
+     "Necesita compunerea de transformari elementare pentru alinierea dreptei cu una dintre axele principale.",
+     "Daca dreapta se afla intr-unul dintre cele 3 planuri principale, nu este necesara translatia pentru ca dreapta sa treaca prin origine",
+     "Intotdeauna, primul plan intermediar in care se aduce dreapta aleasa este XOZ"
+    ],
+    "answers": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "103",
+   "title": "Transformările geometrice 3D",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Transformările geometrice 3D:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Se pot reprezenta prin matrici 4x4 în coordonate omogene”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se pot reprezenta prin matrici 3x3 în coordonate omogene",
+     "Se pot reprezenta prin înmulțiri de matrici în care ordinea de aplicare nu contează",
+     "Se pot reprezenta prin matrici 4x4 în coordonate omogene",
+     "Se pot reprezenta prin matrici 3x3 în coodonate carteziene"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "104",
+   "title": "Rotația, scalarea și translația",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Rotația, scalarea și translația",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Sunt transformări afine\n• Păstrează intotdeauna paralelismul liniilor",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Sunt transformări afine",
+     "Păstrează intotdeauna paralelismul liniilor",
+     "Pot fi reprezentate prin matrici de 3x3 in coordonate carteziere",
+     "Conduc la același rezultat indiferent de ordinea în care se aplică"
+    ],
+    "answers": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "105",
+   "title": "Forfecarea fata de origine pe axa OZ",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Forfecarea fata de origine pe axa OZ:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Factorii de forfecare modifică coordonatele x și y ale vârfurilor proporțional cu z\n• Coordonata z a vârfurilor nu se modifica",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate compune cu forfecarea pe OX sau OY",
+     "Matricea de forfecare este simetrica fata de diagonala principala",
+     "Factorii de forfecare modifică coordonatele x și y ale vârfurilor proporțional cu z",
+     "Coordonata z a vârfurilor nu se modifica"
+    ],
+    "answers": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "106",
+   "title": "Transformarea de forfecare fata de o dreapta…",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Transformarea de forfecare fata de o dreapta oarecare din plan, data printr-un punct (xd, yd) si directia D[a,b], poate fi exprimata prin urmatoarea secventa de transformari, considerand punctele din plan reprezentate prin vectori coloana, R(0,0,-u) o rotatie care suprapune dreapta peste axa OX iar F(0,0,fx,fy) matricea transformarii de forfecare fata de origine:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Nici una dintre celelalte variante nu este corecta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "T(-xd,-yd)*R(0,0,u)*F(0,0,fx,fy)*R(0,0,-u)*T(xd,yd)",
+     "T(xd,yd)*R(0,0,u)*F(0,0,fx,1)*R(0,0,-u)*T(-xd,-yd)",
+     "T(xd,yd)*F(0,0,fx,fy)*T(-xd,-yd)",
+     "Nici una dintre celelalte variante nu este corecta"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "107",
+   "title": "Transformarea de rotatie in jurul axei OZ",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Transformarea de rotatie in jurul axei OZ:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Poate fi reprezentată printr-o matrice de 3x3 în coordonate carteziene\n• Conservă coordonata z a punctelor transformate",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Poate fi reprezentată printr-o matrice de 3x3 în coordonate carteziene",
+     "Conservă coordonata z a punctelor transformate",
+     "In urma aplicarii transformarii, obiectul se poate deforma",
+     "Matricea de rotatie NU poate contine valoarea 0 pe diagonala principala"
+    ],
+    "answers": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "108",
+   "title": "Transformarile geometrice sunt exprimate in…",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D și 3D (2022)",
+   "statement": "Transformarile geometrice sunt exprimate in coordonate omogene deoarece:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Translatia nu poate fi reprezentata matricial in coordonate carteziene\n• Nu se poate exprima printr-un produs de matrici, in coordonate carteziene, o transformare de scalare fata de un punct oarecare din plan.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Translatia nu poate fi reprezentata matricial in coordonate carteziene",
+     "Forfecarea nu poate fi reprezentata matricial in coordonate carteziene",
+     "Nu se poate exprima printr-un produs de matrici, in coordonate carteziene, o transformare de scalare fata de un punct oarecare din plan.",
+     "Oglindirea nu poate fi reprezentata matricial in coordonate carteziene"
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "111",
+   "title": "Transformarea definită prin următoarele formule",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D (2021)",
+   "statement": "Transformarea definită prin următoarele formule: x’ = x*s + t y’ = y*f + r în care s și f sunt două numere reale, pozitive > 1 iar t și r sunt două numere reale diferite de zero, reprezintă:",
+   "hint": "",
+   "solution": "Răspunsul corect: „O transformare compusă dintr-o scalare față de origine urmată de o translație.”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O transformare compusă dintr-o translație urmată de o scalare față de origine.",
+     "O transformare compusă dintr-o scalare față de origine urmată de oglindire față de axa OX.",
+     "O transformare compusă dintr-o scalare față de origine urmată de o translație.",
+     "Oglindirea față de origine."
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "141",
+   "title": "Care dintre următoarele transformări poate modifica…",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D (2021)",
+   "statement": "Care dintre următoarele transformări poate modifica forma unui obiect?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Forfecarea\n• Scalarea",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Translația",
+     "Rotația",
+     "Forfecarea",
+     "Scalarea"
+    ],
+    "answers": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "146",
+   "title": "Care este transformarea de modelare care trebuie sa…",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care este transformarea de modelare care trebuie sa fie aplicata unui cub cu latura de 1, centrat in sistemul coordonatelor obiect si cu fetele paralele cu planele principale, astfel incat sa se obtina in sistemul coordonatelor globale un paraleliped cu latimea de 20 unitati, inaltimea de 40 unitati si adancimea de 30 unitati, pozitionat cu centrul in (xc,yc,zc) si rotit cu unghiul u fata de axa OZ?",
+   "hint": "",
+   "solution": "Răspunsul corect: „T(xc,yc,zc) *Roz(u)*S(0,0,20,40,30)”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "T(xc,yc,zc) * S(0,0,20,40,30)* Roz(u)",
+     "T(xc,yc,zc) * S(20,40,30)* Roz(u)",
+     "T(xc,yc,zc) *Roz(u)*S(0,0,20,40,30)",
+     "T(xc,yc,zc) *Roz(u)*S(0,0,20,40,30)*T(-xc,-yc,-zc)"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "156",
+   "title": "Rotatia unui punct 3D (x,y,z) fata de un punct…",
+   "chapter": "7. Grile: transformări 2D și 3D",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Rotatia unui punct 3D (x,y,z) fata de un punct oarecare din spatiu (xf, yf, zf), cu un unghi u, se poate implementa prin urmatorul produs de matrici, stiind ca punctul (x,y,z) se reprezinta printr-un vector coloana in coordonate omogene:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Nici unul dintre celelalte raspunsuri nu este corect”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nici unul dintre celelalte raspunsuri nu este corect",
+     "T(xf, yf, zf)*R(0,0,u)*T(-xf,-yf,-zf)",
+     "(xf, yf,zf)* Oox*R(0,0,teta)*T(-xf,-yf,-zf), unde R(0,0,teta) suprapune dreapta pe care se afla punctul pe axa OX iar Oox este matricea de oglindire fata de OX",
+     "T(xf, yf,zf)*Rox(u)*T(-xf,-yf,-zf)"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "109",
+   "title": "Se consideră un spațiu logic definit în (0, 0) -…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D (2021)",
+   "statement": "Se consideră un spațiu logic definit în (0, 0) - (1, 1) și o poartă de afișare definită în (0, 0) - (400, 200). Să se calculeze poziția în poarta de afișare a punctului de coordonate (0.5, 1) din spațiul logic pentru o scalare uniformă afișată centrat în poartă.",
+   "hint": "",
+   "solution": "Răspunsul corect: „(200, 200)”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "(100, 200)",
+     "(200, 100)",
+     "(200, 200)",
+     "(400, 200)"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "110",
+   "title": "Transformarea fereastra-poarta produce o scalare a…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 2D (2021)",
+   "statement": "Transformarea fereastra-poarta produce o scalare a desenului executat în poarta care depinde de:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Marimea laturilor ferestrei si ale portii”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Pozitionarea portii in spatiul fizic",
+     "Forma ferestrei si a portii",
+     "Pozitionarea ferestrei in spatiul logic",
+     "Marimea laturilor ferestrei si ale portii"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "131",
+   "title": "Afirmații: transformarea de proiecție din lanțul de…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte privind transformarea de proiecție din lanțul de transformare a vârfurilor în banda grafică?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Transformă coordonatele din sistemul de coordonate observator în sistemul coordonatelor de decupare\n• Depinde de volumul vizual definit de programator",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este o proiectie din 3D în 2D",
+     "Transformă coordonatele din sistemul de coordonate observator în sistemul coordonatelor de decupare",
+     "Depinde de volumul vizual definit de programator",
+     "Transformă coordonatele din sistemul de coordonate observator în sistemul de coordonate dispozitiv normalizate Ați selectat prea multe opțiuni."
+    ],
+    "answers": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "132",
+   "title": "Coordonatele de decupare sunt transformate in…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Coordonatele de decupare sunt transformate in coordonate ecran prin:",
+   "hint": "",
+   "solution": "Răspunsul corect: „Împărțirea perspectivă urmată de transformarea în viewport”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Împărțirea perspectivă",
+     "Împărțirea perspectivă urmată de transformarea în viewport",
+     "Proiectie ortografica",
+     "Transformarea in viewport"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "133",
+   "title": "Cum poate fi implementata proiectia axonometrica a…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Cum poate fi implementata proiectia axonometrica a unui obiect intr-o aplicatie OpenGl?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Se aplica obiectului o transformare de modelare, urmata de o transformare de proiectie ortografica”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se aplica obiectului o transformare de modelare, urmata de o transformare de proiectie ortografica",
+     "Se defineste o transformare de vizualizare care aduce obiectul in pozitia dorita fata de planul de vizualizare",
+     "Se defineste un volum de vizualizare care produce transformarea de proiectie axonometrica"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "134",
+   "title": "Matricea transformarii de vizualizare (din…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "grea",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Matricea transformarii de vizualizare (din coordonate globale in coordonate observator) este definita de:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Rotatia camerei\n• Pozitia camerei\n• Directia in care priveste observatorul",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Rotatia camerei",
+     "Pozitia camerei",
+     "Directia in care priveste observatorul",
+     "Deschiderea camerei (Field of View)"
+    ],
+    "answers": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "135",
+   "title": "Care dintre următoarele afirmații despre…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "grea",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele afirmații despre proiectiile oblice sunt corecte?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Nu pot fi definite prin transformarea de proiectie OpenGL\n• Conserva lungimile laturilor paralele cu planul de proiectie si unghiurile dintre aceste laturi\n• Conserva lungimea laturilor perpendiculare pe planul de proiectie daca unghiul dintre proiectori si plan este de 45 grade",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Sunt proiectii intr-un plan care nu este perpendicular pe o axa principala",
+     "Nu pot fi definite prin transformarea de proiectie OpenGL",
+     "Conserva lungimile laturilor paralele cu planul de proiectie si unghiurile dintre aceste laturi",
+     "Conserva lungimea laturilor perpendiculare pe planul de proiectie daca unghiul dintre proiectori si plan este de 45 grade"
+    ],
+    "answers": [
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "136",
+   "title": "Exista mai multe tipuri de proiectii ortogonale",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "grea",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Exista mai multe tipuri de proiectii ortogonale. Printre acestea se numara:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Ortografice\n• Izometrice\n• Axonometrice",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Oblice",
+     "Ortografice",
+     "Izometrice",
+     "Axonometrice"
+    ],
+    "answers": [
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "137",
+   "title": "Parametrii care definesc transformarea de…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Parametrii care definesc transformarea de vizualizare in OpenGL:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Determina sistemul de coordonate observator (atasat camerei virtuale)\n• Se folosesc in calculul matricei de transformare a varfurilor din sistemul coordonatelor globale in sistemul coordonatelor observator",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Determina tipul proiectiei efectuate asupra primitivelor",
+     "Determina sistemul de coordonate observator (atasat camerei virtuale)",
+     "Definesc un volum virtual care delimiteaza partea din scena care va fi redata in imagine",
+     "Se folosesc in calculul matricei de transformare a varfurilor din sistemul coordonatelor globale in sistemul coordonatelor observator"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "142",
+   "title": "Care dintre următoarele proiecții conservă lungimea…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele proiecții conservă lungimea laturilor perpendiculare pe planul de proiecție?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Cavalier”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Cavalier",
+     "Perspectivă",
+     "Axonometrică",
+     "Cabinet"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "143",
+   "title": "Afirmații: transformarea în poarta de afișare",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte privind transformarea în poarta de afișare?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Depinde numai de poziția porții de afișare în fereastra aplicației, lățimea și înălțimea sa măsurate în pixeli\n• Transforma varfurile din coordonate dispozitiv normalizate în coordonate ecran",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Transformă coordonate 3D în coordonate 2D",
+     "Depinde numai de poziția porții de afișare în spațiul ecran, lățimea și înălțimea sa măsurate în pixeli",
+     "Depinde numai de poziția porții de afișare în fereastra aplicației, lățimea și înălțimea sa măsurate în pixeli",
+     "Transforma varfurile din coordonate dispozitiv normalizate în coordonate ecran"
+    ],
+    "answers": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "144",
+   "title": "Transformarea in viewport",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "grea",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Transformarea in viewport:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este o transformare fereastra-poarta\n• Transforma coordonatele dispozitiv normalizate ale unui varf in coordonate ecran\n• Conserva coordonata z a varfurilor",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este o transformare fereastra-poarta",
+     "Transforma coordonatele dispozitiv normalizate ale unui varf in coordonate ecran",
+     "Transforma coordonatele de decupare ale unui varf in coordonate ecran",
+     "Conserva coordonata z a varfurilor"
+    ],
+    "answers": [
+     0,
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "145",
+   "title": "Printre particularitatile proiectiei perspectiva se…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "grea",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Printre particularitatile proiectiei perspectiva se numara:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Micsoreaza proiectiile obiectelor proportional cu distanta lor fata de centrul de proiecte\n• Nu conserva paralelismul liniilor care nu sunt paralele cu planul de proiectie\n• Rezulta imagini similare cu cele de la un aparat foto",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Micsoreaza proiectiile obiectelor proportional cu distanta lor fata de centrul de proiecte",
+     "Este o transformare afina",
+     "Nu conserva paralelismul liniilor care nu sunt paralele cu planul de proiectie",
+     "Rezulta imagini similare cu cele de la un aparat foto"
+    ],
+    "answers": [
+     0,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "154",
+   "title": "Care dintre următoarele afirmații despre…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele afirmații despre proiectiile izometrice sunt corecte?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Sunt proiectii axonometrice intr-un plan care intersecteaza axele principale ale sistemului de coordonate cu unghiuri egale\n• Sunt proiectii axonometrice care produc scalarea laturilor cu factori de scalare egali pe axele x, y, z",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Sunt proiectii axonometrice in planul XOY",
+     "Sunt proiectii axonometrice intr-un plan care intersecteaza axele principale ale sistemului de coordonate cu unghiuri egale",
+     "Sunt proiectii axonometrice care produc scalarea laturilor cu factori de scalare egali pe axele x, y, z"
+    ],
+    "answers": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "155",
+   "title": "Afirmații: volumul vizual canonic",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte privind volumul vizual canonic?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este folosit pentru optimizarea calculelor de decupare a primitivelor 3D\n• Este un cub cu latura de 2 unități, raportat la sistemul coordonatelor de decupare",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este definit în sistemul coordonatelor observator",
+     "Este folosit pentru optimizarea calculelor de decupare a primitivelor 3D",
+     "Depinde de tipul de proiecție definit prin transformarea de proiecție",
+     "Este un cub cu latura de 2 unități, raportat la sistemul coordonatelor de decupare"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "157",
+   "title": "Transformarea de proiectie in OpenGL",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Transformarea de proiectie in OpenGL:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este definita printr-un volum vizual\n• Transforma coordonatele varfurilor din spatiul observator in spatiul coordonatelor de decupare",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este definita printr-un volum vizual",
+     "Este o transformare afina",
+     "Transforma coordonatele varfurilor din spatiul observator in spatiul ecran",
+     "Transforma coordonatele varfurilor din spatiul observator in spatiul coordonatelor de decupare"
+    ],
+    "answers": [
+     0,
+     3
+    ]
+   }
+  },
+  {
+   "id": "163",
+   "title": "Care dintre următoarele proiecții nu poate reda mai…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2020)",
+   "statement": "Care dintre următoarele proiecții nu poate reda mai multe fețe ale obiectului proiectat, dacă fețele sunt paralele cu planele principale?",
+   "hint": "",
+   "solution": "Răspunsul corect: „Ortografică”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Oblică",
+     "Izometrică",
+     "Ortografică",
+     "Perspectivă"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "164",
+   "title": "Care dintre următoarele afirmații despre proiectia…",
+   "chapter": "8. Grile: proiecții, vizualizare, OpenGL",
+   "difficulty": "medie",
+   "source": "Test EGC, transformări 3D, proiecții (2021)",
+   "statement": "Care dintre următoarele afirmații despre proiectia perspectiva sunt corecte?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Modifica unghiurile dintre laturile care nu sunt paralele cu planul de proiectie\n• Modifica lungimile laturilor in functie de distanta lor fata de centrul de proiectie",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Produce coordonate omogene in care coordonata w este egala cu 1",
+     "Este o transformare afina",
+     "Modifica unghiurile dintre laturile care nu sunt paralele cu planul de proiectie",
+     "Modifica lungimile laturilor in functie de distanta lor fata de centrul de proiectie"
+    ],
+    "answers": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "121",
+   "title": "Afirmații: arborele BVH (Bounding Volume Hierarchy)…",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la arborele BVH (Bounding Volume Hierarchy) al unei scene 3D:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Se elimină din banda grafică poligoanele dintr-un subarbore al cărui volum încadrator este în afara volumului vizual.\n• Arborele BVH este afectat de transformarile geometrice aplicate obiectelor din scenă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se elimină din banda grafică poligoanele dintr-un subarbore al cărui volum încadrator este în afara volumului vizual.",
+     "Permite efectuarea operației de „Frustum culling” pe GPU.",
+     "Permite decuparea primitivelor care intersecteaza volumul vizual.",
+     "Arborele BVH este afectat de transformarile geometrice aplicate obiectelor din scenă."
+    ],
+    "answers": [
+     0,
+     3
+    ]
+   }
+  },
+  {
+   "id": "122",
+   "title": "Eliminarea fețelor auto-obturate ale obiectelor",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Eliminarea fețelor auto-obturate ale obiectelor:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este efectuata pe GPU\n• Tine cont de pozitia observatorului",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este efectuata pe GPU",
+     "Este efectuata in sistemul coordonatelor globale.",
+     "Tine cont de pozitia observatorului",
+     "Nu este necesara, datorita eliminarii fragmentelor nevizibile."
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "123",
+   "title": "Afirmații: algoritmul Z-buffer",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la algoritmul Z-buffer:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Realizează eliminarea din imagine a fragmentelor nevizibile\n• Este integrat în procesul de rasterizare a primitivelor grafice",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Realizează eliminarea din imagine a fragmentelor nevizibile",
+     "Se bazează pe o ordonare a primitivelor în ordinea descrescătoare a distanței lor față de observator",
+     "Realizează eliminarea din imagine a fețelor nevizibile",
+     "Este integrat în procesul de rasterizare a primitivelor grafice"
+    ],
+    "answers": [
+     0,
+     3
+    ]
+   }
+  },
+  {
+   "id": "124",
+   "title": "Afirmații: arborele BSP",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "grea",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la arborele BSP:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• La afișarea „din spate în față” poate fi dezactivat testul de adancime\n• La afișarea „din față în spate” nu sunt suprascrise părțile poligoanelor aflate mai departe de observator\n• Este eficient pentru afișarea scenelor care contin obiecte mari statice",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "La afișarea „din spate în față” poate fi dezactivat testul de adancime",
+     "La afișarea „din față în spate” nu sunt suprascrise părțile poligoanelor aflate mai departe de observator",
+     "Este eficient pentru afișarea scenelor care contin obiecte mari statice",
+     "Trebuie reconstruit pentru fiecare cadru imagine"
+    ],
+    "answers": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "125",
+   "title": "Care dintre urmatoarele operații sunt implementate…",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre urmatoarele operații sunt implementate intr-un motor grafic:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Algoritmul BSP\n• Eliminare obiecte sau grupuri de obiecte care nu sunt incluse în volumul vizual (Frustum culling)",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Decuparea primitivelor la marginile volumului vizual.",
+     "Algoritmul BSP",
+     "Algoritmul Z-buffer",
+     "Eliminare obiecte sau grupuri de obiecte care nu sunt incluse în volumul vizual (Frustum culling)"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "126",
+   "title": "Care dintre urmatoarele operatii tin cont de…",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "grea",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre urmatoarele operatii tin cont de pozitia observatorului:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Afisarea folosind BSP\n• Testul de vizibilitate z-buffer\n• Eliminarea fetelor auto-obturate ale obiectelor",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Afisarea folosind BSP",
+     "Construirea arborelui AA-BSP al scenei",
+     "Testul de vizibilitate z-buffer",
+     "Eliminarea fetelor auto-obturate ale obiectelor"
+    ],
+    "answers": [
+     0,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "127",
+   "title": "Afirmații: Buffer-ul Z",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la Buffer-ul Z:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este actualizat pentru fiecare cadru imagine.\n• Memoreaza coordonatele z ale fragmentelor vizibile într-un cadru imagine.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este actualizat pentru fiecare cadru imagine.",
+     "Este actualizat pentru fiecare fragment rezultat din resterizarea unei primitive.",
+     "Memoreaza coordonatele z ale fragmentelor vizibile într-un cadru imagine.",
+     "Memoreaza coordonatele z ale fragmentelor care nu trec testul de vizibilitate"
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "128",
+   "title": "Care dintre urmatoarele operatii sunt efectuate pe…",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "grea",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre urmatoarele operatii sunt efectuate pe GPU:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Decuparea primitivelor care intersecteaza volumul vizual.\n• Testul de vizibilitate la nivel de fragment (z-buffer).\n• Eliminarea fetelor auto-obturate ale obiectelor.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Determinarea partilor suprafetelor 3D obturate de alte suprafete.",
+     "Decuparea primitivelor care intersecteaza volumul vizual.",
+     "Testul de vizibilitate la nivel de fragment (z-buffer).",
+     "Eliminarea fetelor auto-obturate ale obiectelor."
+    ],
+    "answers": [
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "129",
+   "title": "Arborele octal al unei scene 3D",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Arborele octal al unei scene 3D:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Se obtine divizand recursiv cubul incadrator al scenei in 8 subvolume egale pana cand fiecare subvolum contine o primitiva sau un numar prestabilit de primitive.\n• Nu este eficient atunci cand primitivele apartin mai multor subvolume adiacente.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se obtine divizand recursiv cubul incadrator al scenei in 8 subvolume egale pana cand fiecare subvolum contine o primitiva sau un numar prestabilit de primitive.",
+     "Este construit pe GPU dupa asamblarea primitivelor.",
+     "Nu este eficient atunci cand primitivele apartin mai multor subvolume adiacente.",
+     "Este folosit pentru eliminarea suprafetelor obturate."
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "130",
+   "title": "Afirmații: arborele BSP (PA-BSP) al unei scene",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la arborele BSP (PA-BSP) al unei scene:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Se obține partiționând recursiv spațiul 3D în semispații, folosind planele poligoanelor scenei 3D\n• Permite eliminarea din imagine a suprafețelor obturate și efectuarea operatiei de „Frustum culling”",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se obține partiționând recursiv spațiul 3D în semispații, folosind planele poligoanelor scenei 3D",
+     "Permite eliminarea din imagine a suprafețelor obturate și efectuarea operatiei de „Frustum culling”",
+     "Depinde de poziția observatorului"
+    ],
+    "answers": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "138",
+   "title": "Afirmații: structura BVH (Bounding Volume Hierarchy)",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la structura BVH (Bounding Volume Hierarchy):",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Permite efectuarea eficientă a operației de „frustum culling” folosind volumele încadratoare ale nodurilor.\n• Este un arbore care are în fiecare nod un volum încadrator pentru o primitivă grafică sau un grup de primitive.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Permite efectuarea eficientă a operației de „frustum culling” folosind volumele încadratoare ale nodurilor.",
+     "La construirea sa se ține cont de poziția observatorului în scena 3D.",
+     "Este un arbore care are în fiecare nod un volum încadrator pentru o primitivă grafică sau un grup de primitive.",
+     "Este independent de transformarile aplicate obiectelordin scena3D."
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "139",
+   "title": "Testul de vizibilitate a fragmentelor",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "grea",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Testul de vizibilitate a fragmentelor:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este efectuat in procesul de rasterizare\n• Tine cont de pozitia observatorului\n• Este efectuat pe GPU",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este efectuat in procesul de rasterizare",
+     "Tine cont de pozitia observatorului",
+     "Este efectuat pe GPU",
+     "Este efectuat prin algoritmi implementati in motorul grafic"
+    ],
+    "answers": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "140",
+   "title": "Afirmații: \"Algoritmul pictorului\"",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "grea",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la \"Algoritmul pictorului\":",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• In cazul unor scene dinamice, lista ordonată a poligoanelor trebuie modificată pentru fiecare cadru imagine.\n• Rezolva eliminarea suprafetelor nevizibile printr-o afișare „din spate în față” a poligoanelor scenei.\n• Este eficient pentru aplicatii in care poligoanele scenei sunt disjuncte pe axa Z.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "In cazul unor scene dinamice, lista ordonată a poligoanelor trebuie modificată pentru fiecare cadru imagine.",
+     "Nu trimite în banda grafică poligoanele aflate în afara volumului vizual.",
+     "Rezolva eliminarea suprafetelor nevizibile printr-o afișare „din spate în față” a poligoanelor scenei.",
+     "Este eficient pentru aplicatii in care poligoanele scenei sunt disjuncte pe axa Z."
+    ],
+    "answers": [
+     0,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "153",
+   "title": "Care dintre urmatoarele metode tin cont de…",
+   "chapter": "9. Grile: eliminarea părților nevizibile",
+   "difficulty": "medie",
+   "source": "Test EGC, părți nevizibile (2021)",
+   "statement": "Care dintre urmatoarele metode tin cont de normalele la planele poligoanelor:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Eliminarea fetelor auto-obturate ale obiectelor\n• Algoritmul BSP",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Algoritmul BVH",
+     "Eliminarea fetelor auto-obturate ale obiectelor",
+     "Algoritmul z-buffer",
+     "Algoritmul BSP"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "112",
+   "title": "Care dintre următoarele efecte nu se pot reda…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care dintre următoarele efecte nu se pot reda corect în fragmentele interioare primitivelor rasterizate, dacă se aplică modelul de shading Gouraud:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Reflexia speculară\n• Reflexia difuză",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Factorul de atenuare a luminii de la sursă",
+     "Reflexia luminii ambientale",
+     "Reflexia speculară",
+     "Reflexia difuză"
+    ],
+    "answers": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "113",
+   "title": "Factorul de ceață liniar",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Factorul de ceață liniar",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Depinde de distanța dintre observator și punctul în care se calculează culoarea afectată de ceață\n• Acționează între două distanțe definite în sistemul de coordonate observator, măsurate pe direcția în care privește observatorul",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Afectează întreaga scena 3D",
+     "Scade pe măsură ce crește distanța de la observator la punctul în care se calculează culoarea afectată de ceață",
+     "Depinde de distanța dintre observator și punctul în care se calculează culoarea afectată de ceață",
+     "Acționează între două distanțe definite în sistemul de coordonate observator, măsurate pe direcția în care privește observatorul"
+    ],
+    "answers": [
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "114",
+   "title": "Umbrele planare purtate",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Umbrele planare purtate:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Sunt poligoane coplanare cu fețele umbrite ale obiectelor din scenă\n• Sunt umbre produse de obiectele scenei pe alte obiecte ale scenei",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Calculele pentru determinarea lor sunt simple, deoarece fiecare obiect vizibil din poziția sursei produce umbră numai pe obiectul aflat în spatele său din poziția sursei",
+     "Sunt poligoane coplanare cu fețele umbrite ale obiectelor din scenă",
+     "Sunt umbre produse de obiectele scenei pe alte obiecte ale scenei",
+     "Nu se modifică dacă unghiul dintre vectorul orientat către sursă și vectorul orientat către observator nu se modifică"
+    ],
+    "answers": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "115",
+   "title": "Umbrele planare proprii",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Umbrele planare proprii:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Sunt umbre produse de un obiect pe fețele sale nevizibile din poziția sursei\n• Sunt produse de părțile obiectului care primesc lumina de la sursă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Sunt umbre produse de un obiect pe fețele sale nevizibile din poziția sursei",
+     "Sunt produse de părțile obiectului care primesc lumina de la sursă.",
+     "Forma lor depinde de poziția observatorului.",
+     "Se modifică atunci când se schimbă poziția observatorului."
+    ],
+    "answers": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "116",
+   "title": "În modelul de iluminare locală, reflexia speculară…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "În modelul de iluminare locală, reflexia speculară într-un punct al unei suprafețe 3D",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Are valoarea 0 dacă unghiul dintre normala la suprafață și vectorul de la punct la sursa de lumină este mai mare de 90 de grade\n• Are valoarea cu atât mai mare cu cât unghiul dintre raza reflectată și vectorul orientat către observator este mai mic",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Are valoarea 0 dacă unghiul dintre normala la suprafață și vectorul de la punct la sursa de lumină este mai mare de 90 de grade",
+     "Are valoarea cu atât mai mare cu cât unghiul dintre raza reflectată și vectorul orientat către observator este mai mic",
+     "Are valoarea 0 dacă produsul scalar dintre normala la suprafață și vectorul orientat către observatoreste mai mic decât 0",
+     "Nu depinde de pozițiile surselor de lumină"
+    ],
+    "answers": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "117",
+   "title": "Care dintre următoarele propoziții sunt adevărate",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care dintre următoarele propoziții sunt adevărate?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Dacă observatorul este de aceeași parte cu o sursă de lumină față de o oglindă, acesta vede reflexia speculară a luminii dintr-un singur punct al oglinzii\n• Pentru materialele imperfect reflectante, cantitatea de lumină care ajunge la observator depinde de exponentul de strălucire al materialului",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Un observator poate vedea reflexia speculara a unei suprafete daca unghiul dintre normala la suprafață si vectorul orientat către observator este <=90 grade",
+     "Dacă observatorul este de aceeași parte cu o sursă de lumină față de o oglindă, acesta vede reflexia speculară a luminii dintr-un singur punct al oglinzii",
+     "Pentru materialele imperfect reflectante, cantitatea de lumină care ajunge la observator depinde de exponentul de strălucire al materialului",
+     "Cu cât exponentul de strălucire al materialului este mai mare, cu atât mai dispersată este lumina reflectată specular"
+    ],
+    "answers": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "118",
+   "title": "În modelul de shading Gouraud aplicat pe o…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "În modelul de shading Gouraud aplicat pe o suprafață poligonală",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Culoarea unui varf al unui poligon se calculează în vertex shader aplicând modelul de iluminare locală\n• Culoarea unui fragment al unui poligon este calculată de procesorul de rasterizare",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Culoarea unui varf al unui poligon se calculează în vertex shader aplicând modelul de iluminare locală",
+     "Culoarea unui fragment al unui poligon se calculează în fragment shader aplicând modelul de iluminare locală",
+     "Culoarea unui fragment al unui poligon este calculată de procesorul de rasterizare",
+     "Culoarea unui fragment al unui poligon se determină în funcție de poziția și normala la suprafață asociate acelui fragment"
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "119",
+   "title": "În modelul de iluminare locală, reflexia difuză…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "În modelul de iluminare locală, reflexia difuză într-un punct al unei suprafețe 3D depinde de următoarele componente",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Normala la suprafață în acel punct\n• Poziția sursei de lumina",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Exponentul de strălucire al materialului suprafeței",
+     "Normala la suprafață în acel punct",
+     "Poziția observatorului",
+     "Poziția sursei de lumina"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "120",
+   "title": "Afirmații: modelul RGB",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte referitor la modelul RGB:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Permite conversia unei imagini color într-o reprezentare adecvată imprimantelor color printr-o transformare liniară\n• Permite definirea culorilor prin adunarea în proporții diferite a culorilor roșu, verde, albastru",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Corespunde modului în care sunt formate culorile de un artist",
+     "Permite conversia unei imagini color într-o reprezentare adecvată imprimantelor color printr-o transformare liniară",
+     "Corespunde definiției psiho-fiziologice a unei culori",
+     "Permite definirea culorilor prin adunarea în proporții diferite a culorilor roșu, verde, albastru"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "147",
+   "title": "Afirmații: modelul de shading Phong",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte dacă se aplică modelul de shading Phong?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Se poate calcula componenta speculară a reflexiei luminii într-un fragment al unei primitive\n• Culoarea unui fragment se calculează în fragment shader folosind normala fragmentului",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se poate calcula componenta speculară a reflexiei luminii într-un fragment al unei primitive",
+     "Normala unui fragment se poate calcula în fragment shader prin interpolarea normalelor vârfurilor",
+     "Culorile fragmentelor sunt calculate automat de GPU",
+     "Culoarea unui fragment se calculează în fragment shader folosind normala fragmentului"
+    ],
+    "answers": [
+     0,
+     3
+    ]
+   }
+  },
+  {
+   "id": "148",
+   "title": "Conform legii lui Lambert, reflexia difuză a…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Conform legii lui Lambert, reflexia difuză a luminii într-un punct al unei suprafețe:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este dispersată regulat în toate direcțiile\n• Este cu atât mai mare cu cât unghiul dintre normala la suprafață în punct și vectorul din punct către sursa de lumină este mai mic.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este dispersată regulat în toate direcțiile",
+     "Este cu atât mai mică cu cât unghiul dintre normala la suprafață în punct și vectorul din punct către observator este mai mare.",
+     "Nu depinde de intensitatea luminii de la sursă",
+     "Este cu atât mai mare cu cât unghiul dintre normala la suprafață în punct și vectorul din punct către sursa de lumină este mai mic."
+    ],
+    "answers": [
+     0,
+     3
+    ]
+   }
+  },
+  {
+   "id": "149",
+   "title": "Un punct al unei suprafețe din scena 3D se află…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Un punct al unei suprafețe din scena 3D se află într-un volum de umbră dacă:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Numărul de poligoane PUV intersectate de vectorul dus din poziția observatorului pâna în acel punct - numărul de poligoane PUN intersectate + numarul de volume de umbră care conțin poziția observatorului > 0\n• Vectorul dus din poziția observatorului pâna în acel punct intersectează mai multe poligoane de umbra PUV decât poligoane PUN, atunci când observatorul nu se află în volumul de umbra",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Volumul de umbră nu intersectează volumul vizual",
+     "Numărul de poligoane PUV intersectate de vectorul dus din poziția observatorului pâna în acel punct - numărul de poligoane PUN intersectate + numarul de volume de umbră care conțin poziția observatorului > 0",
+     "Observatorul privește scena din poziția sursei care produce volumul de umbre.",
+     "Vectorul dus din poziția observatorului pâna în acel punct intersectează mai multe poligoane de umbra PUV decât poligoane PUN, atunci când observatorul nu se află în volumul de umbra"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "150",
+   "title": "In modelul de culoare HSV",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "In modelul de culoare HSV",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Culorile complementare se află la 180 de grade pe baza hexaconului\n• Culorile pure sunt reprezentate prin valoarea V = 1 și saturația S = 1",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Culoarea Alb corespunde combinației S = 0, V = 0",
+     "Culorile complementare se află la 180 de grade pe baza hexaconului",
+     "Spatiul culorilor este reprezentat de un hexacon; punctele de pe baza hexaconului au saturația S = 0",
+     "Culorile pure sunt reprezentate prin valoarea V = 1 și saturația S = 1"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "151",
+   "title": "Afirmații: modelul de shading Gouraud",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte dacă se aplică modelul de shading Gouraud?",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Culoarea fiecărui fragment este calculată de GPU\n• Culorile fragmentelor unei primitive sunt calculate prin interpolarea culorilor din vârfurile primitivei",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Culoarea fiecărui fragment este calculată de GPU",
+     "Poate fi redată reflexia speculară pe suprafața unei primitive",
+     "Culorile fragmentelor unei primitive sunt calculate prin interpolarea culorilor din vârfurile primitivei",
+     "Culoarea unui fragment se calculează în fragment shader folosind un model de iluminare locală"
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "152",
+   "title": "În OpenGL, transparența se simulează prin…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "În OpenGL, transparența se simulează prin combinarea culorii fragmentului curent cu cea a pixelului în care se afișează:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Combinarea este realizată de procesorul de rasterizare\n• Folosind modelul de culoare (R,G,B,A)",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Combinarea este realizată de procesorul de rasterizare",
+     "Combinarea este realizată în fragment shader",
+     "Trimițând primitivele grafice în banda grafică în oridinea din față în spate",
+     "Folosind modelul de culoare (R,G,B,A)"
+    ],
+    "answers": [
+     0,
+     3
+    ]
+   }
+  },
+  {
+   "id": "158",
+   "title": "Umbrele",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Umbrele:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Sunt produse de obiectele scenei 3D vizibile din poziția unei surse de lumină\n• Sunt văzute de un observator aflat într-o poziție diferită de aceea a sursei de lumina",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Sunt produse de obiectele scenei 3D vizibile din poziția unei surse de lumină",
+     "Sunt văzute de un observator aflat exact în poziția sursei de lumina",
+     "Sunt văzute de un observator aflat într-o poziție diferită de aceea a sursei de lumina",
+     "Sunt cu atat mai dense cu cat observatorul se afla la distanta mai mare de obiectul umbrit"
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "159",
+   "title": "Care dintre următoarele afirmații sunt corecte",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Care dintre următoarele afirmații sunt corecte? In modelul HSV:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Este un model de culoare orientat catre utilizator\n• Nuanțele de gri se reprezintă prin combinații S=0, 0<=V<=1",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Culoarea rosu se reprezintă prin (0, 0, 1)",
+     "Este un model de culoare orientat catre utilizator",
+     "Culorile pure sunt situate pe suprafața bazei hexaconului",
+     "Nuanțele de gri se reprezintă prin combinații S=0, 0<=V<=1"
+    ],
+    "answers": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "id": "160",
+   "title": "Pentru modelul de iluminare locală, care dintre…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Pentru modelul de iluminare locală, care dintre urmatoarele afirmații sunt adevărate:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• O suprafață poate avea componentă speculară numai dacă poate avea și componentă difuză\n• Calculele pentru vectorul median H sunt mai simple decât cele pentru vectorul simetric R",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "O suprafață poate avea componentă speculară numai dacă poate avea și componentă difuză",
+     "Calculul componentei speculare nu depinde de normala la suprafață",
+     "Calculele pentru vectorul median H sunt mai simple decât cele pentru vectorul simetric R",
+     "Coeficientul de reflexie speculară al materialului pentru o suprafață mată este 1"
+    ],
+    "answers": [
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": "161",
+   "title": "Simularea transparenței ținând cont de legea lui…",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "Simularea transparenței ținând cont de legea lui Snell.",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Trebuie să producă o distorsionare a formei obiectelor, asemănătoare cu aceea produsă de o proiecție perspectivă\n• Culoarea fragmentului vizibil într-un pixel depinde de culoarea fragmentului unei suprafețe aflate în spatele celei vizibile pe direcția razei refractate",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este folosită în metodele practice pentru obținerea de efecte fororealiste",
+     "Trebuie să producă o distorsionare a formei obiectelor, asemănătoare cu aceea produsă de o proiecție perspectivă",
+     "Culoarea fragmentului vizibil într-un pixel depinde de culoarea fragmentului unei suprafețe aflate în spatele celei vizibile pe direcția razei refractate",
+     "Culoarea fragmentului vizibil într-un pixel depinde de culoarea fragmentului din spatele său pe acelasi proiector"
+    ],
+    "answers": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "162",
+   "title": "In modelul de culoare RGB",
+   "chapter": "10. Grile: iluminare, umbre, culoare",
+   "difficulty": "medie",
+   "source": "Test EGC, cursurile 9–12 (2021)",
+   "statement": "In modelul de culoare RGB:",
+   "hint": "",
+   "solution": "Răspunsurile corecte:\n• Spatiul culorilor este reprezentat de un cub cu coordonatele cuprinse între [0,0,0] și [1,1,1]\n• Culorile complementare culorilor R, G, B se află în vârfuri diagonal opuse ale cubului culorilor",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Punctul corespunzător culorii Alb se află în centrul cubului ce reprezintă spațiul culorilor",
+     "Spatiul culorilor este reprezentat de un cub cu coordonatele cuprinse între [0,0,0] și [1,1,1]",
+     "Culorile complementare culorilor R, G, B se află în vârfuri diagonal opuse ale cubului culorilor",
+     "Culoarea rosu are coordonatele (0,1,0)"
+    ],
+    "answers": [
+     1,
+     2
+    ]
    }
   }
  ]

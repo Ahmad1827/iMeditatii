@@ -55,6 +55,7 @@ Widget buildWorkspace(AcsProblem p, AcsInk ink, bool narrow, Verdict onVerdict) 
     case 'net':
       return NetWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'market':
+    case 'calc':
       return MarketWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'crypto':
       return CryptoWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);

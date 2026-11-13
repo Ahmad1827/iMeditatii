@@ -5,7 +5,10 @@
   "2. Cifruri clasice",
   "3. XOR și text cunoscut",
   "4. Mai multe straturi",
-  "5. Teorie: principii, criptografie, sisteme, web"
+  "5. Teorie: principii, criptografie, sisteme, web",
+  "6. Grile: proprietăți, criptografie, hardware de încredere",
+  "7. Grile: control acces, autentificare, sisteme",
+  "8. Grile: aplicații, web, rețea, forensics"
  ],
  "problems": [
   {
@@ -108,6 +111,31 @@
     "reference": [
      {
       "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "hex",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "46",
+   "title": "URL peste hex",
+   "chapter": "1. Codificări",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Un text hex care a trecut printr-un formular web.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Întâi `%xx`, apoi hex.",
+   "solution": "Din URL, apoi din hex.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "%34%39%35%33%34%33%37%62%37%35%37%32%36%63%35%66%37%34%36%38%36%35%36%65%35%66%36%38%36%35%37%38%37%64",
+    "flag": "ISC{url_then_hex}",
+    "reference": [
+     {
+      "op": "url",
       "arg": ""
      },
      {
@@ -248,6 +276,52 @@
    }
   },
   {
+   "id": "43",
+   "title": "Vigenère cu cheie lungă",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Vigenère cu cheia `security`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Cheia se repetă peste literele textului; acoladele și `_` nu consumă din ea.",
+   "solution": "Vigenère cu cheia `security`. O cheie mai lungă rezistă mai mult la analiza frecvențelor, dar repetarea ei o trădează (testul Kasiski).",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "AWE{ffvzcj_ogsj_pxjh_e_nckbec}",
+    "flag": "ISC{longer_keys_help_a_little}",
+    "reference": [
+     {
+      "op": "vig",
+      "arg": "security"
+     }
+    ]
+   }
+  },
+  {
+   "id": "44",
+   "title": "Atbash și Cezar",
+   "chapter": "2. Cifruri clasice",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Atbash, apoi Cezar cu 4.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Desface întâi ultimul pas aplicat.",
+   "solution": "Cezar înapoi cu 4, apoi Atbash. Două substituții monoalfabetice compuse sunt tot o substituție monoalfabetică: nu e mai sigur.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "VLB{khp_ljclkvkjkvpql_dmz_pqz}",
+    "flag": "ISC{two_substitutions_are_one}",
+    "reference": [
+     {
+      "op": "rot",
+      "arg": "4"
+     },
+     {
+      "op": "atbash",
+      "arg": ""
+     }
+    ]
+   }
+  },
+  {
    "id": "12",
    "title": "XOR cu un caracter",
    "chapter": "3. XOR și text cunoscut",
@@ -343,6 +417,31 @@
      {
       "op": "xor",
       "arg": "iSC"
+     }
+    ]
+   }
+  },
+  {
+   "id": "45",
+   "title": "XOR cu cheie de 4, text cunoscut",
+   "chapter": "3. XOR și text cunoscut",
+   "difficulty": "grea",
+   "source": "Laborator ISC · many time pad",
+   "statement": "XOR cu o cheie de 4 caractere, repetată, apoi hex. Textul în clar începe cu `ISC{`.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Patru octeți cunoscuți dau patru octeți de cheie.",
+   "solution": "Primii patru octeți cifrați XOR `49 53 43 7b` dau cheia `w1fi`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "3e622512115e131b285a0806005f390b0e45031a0a",
+    "flag": "ISC{four_known_bytes}",
+    "reference": [
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "w1fi"
      }
     ]
    }
@@ -491,6 +590,60 @@
      },
      {
       "op": "xor",
+      "arg": "7"
+     }
+    ]
+   }
+  },
+  {
+   "id": "41",
+   "title": "Hex, XOR, base64",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "XOR cu cheia `key`, apoi hex, apoi base64.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Base64 dă un șir care arată ca hex: încă un strat.",
+   "solution": "Din base64, din hex, XOR cu `key`.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "MjIzNjNhMTAwZDFjMTMzYTEwMDUxNjEwMGYwMDI2MDkwNDBhMGU1MzRkMTY=",
+    "flag": "ISC{hex_inside_base64}",
+    "reference": [
+     {
+      "op": "b64",
+      "arg": ""
+     },
+     {
+      "op": "hex",
+      "arg": ""
+     },
+     {
+      "op": "xor",
+      "arg": "key"
+     }
+    ]
+   }
+  },
+  {
+   "id": "42",
+   "title": "Cezar peste binar",
+   "chapter": "4. Mai multe straturi",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Flag-ul a fost cifrat cu Cezar (cu 7) și apoi scris în binar.\n\nFlag-ul are forma `ISC{...}`.",
+   "hint": "Din binar iese un text cu acolade care nu se citește încă.",
+   "solution": "Din binar, apoi Cezar înapoi cu 7.",
+   "kind": "crypto",
+   "spec": {
+    "cipher": "01010000 01011010 01001010 01111011 01101001 01110000 01100001 01111010 01011111 01100001 01101111 01101100 01110101 01011111 01110011 01101100 01100001 01100001 01101100 01111001 01111010 01111101",
+    "flag": "ISC{bits_then_letters}",
+    "reference": [
+     {
+      "op": "bin",
+      "arg": ""
+     },
+     {
+      "op": "rot",
       "arg": "7"
      }
     ]
@@ -814,6 +967,829 @@
      "că site-ul nu colectează date personale"
     ],
     "answer": 2
+   }
+  },
+  {
+   "id": "101",
+   "title": "Date stocate, nemodificate",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "ușoară",
+   "source": "Test curs TSSC",
+   "statement": "Ce proprietate de securitate protejează datele stocate (at rest) împotriva modificării?",
+   "hint": "",
+   "solution": "Integritate: orice modificare a datelor trebuie să fie autorizată (și detectabilă).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "disponibilitatea",
+     "integritatea",
+     "confidențialitatea",
+     "autenticitatea"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "102",
+   "title": "Cine a trimis e-mailul",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Test curs TSSC",
+   "statement": "Ce concept se asigură certificând că un e-mail a fost trimis chiar de cel care apare ca expeditor, astfel încât acesta să nu poată nega?",
+   "hint": "",
+   "solution": "Semnătura digitală leagă mesajul de cheia privată a expeditorului: el nu mai poate spune că nu l-a trimis.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "non-repudierea",
+     "integritatea",
+     "auditul",
+     "confidențialitatea"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "105",
+   "title": "Rainbow tables",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Test curs TSSC",
+   "statement": "Ce tip de atac se face împotriva funcțiilor hash folosind un rainbow table?",
+   "hint": "",
+   "solution": "Tabelele precalculează lanțuri de hash-uri pentru parole posibile: forță brută cu un compromis timp-memorie. Sarea (salt) le face inutile.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un atac cu text cifrat ales",
+     "un atac de tip forță brută (precalculat)",
+     "un atac de coliziune",
+     "un atac cu text clar ales"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "106",
+   "title": "Ce vrea atacatorul",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "ușoară",
+   "source": "Test curs TSSC",
+   "statement": "Ești atacator și vrei să compromiți date criptate. Ce ți-ar fi cel mai util?",
+   "hint": "",
+   "solution": "Cu un algoritm bun, secretul e în cheie (principiul lui Kerckhoffs): o cheie scurtă sau previzibilă se ghicește.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "o cheie slabă",
+     "un cifru bloc",
+     "traficul capturat",
+     "un algoritm public"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "109",
+   "title": "Criptarea discului",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "ușoară",
+   "source": "Test curs TSSC",
+   "statement": "Ce tip de criptare se folosește pentru criptarea unui hard disk?",
+   "hint": "",
+   "solution": "Volume mari, criptate și decriptate des: AES. Cheia simetrică poate fi apoi protejată de TPM sau de o parolă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "asimetrică",
+     "simetrică",
+     "hashing",
+     "WPA2"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "110",
+   "title": "Root of Trust",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Test curs TSSC",
+   "statement": "Ce poate fi folosit ca Root of Trust? (unul sau mai multe)",
+   "hint": "",
+   "solution": "Rădăcina de încredere e hardware, greu de modificat: HSM și TPM. Sistemul de operare și hypervisorul sunt software, verificate pornind de la ea.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un sistem de operare",
+     "un HSM",
+     "un modul TPM",
+     "un hypervisor"
+    ],
+    "answers": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "111",
+   "title": "Stocare securizată în hardware",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Test curs TSSC",
+   "statement": "Un administrator vrea stocare securizată, în hardware. Ce platformă poate folosi?",
+   "hint": "",
+   "solution": "Toate trei pot sigila date (sealed storage): datele se decriptează doar pe aceeași platformă, în aceeași stare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "doar TPM",
+     "doar TrustZone",
+     "doar SGX",
+     "oricare dintre TPM, TrustZone și SGX"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "112",
+   "title": "Atestare la distanță cu SGX",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "grea",
+   "source": "Test curs TSSC",
+   "statement": "Un verificator vrea să ateste de la distanță că un program rulează într-o enclavă SGX la un furnizor de cloud. Ce poate servi drept dovadă?",
+   "hint": "",
+   "solution": "Sistemul de operare și hypervisorul nu sunt de încredere în modelul SGX; doar procesorul (cu cheile lui) garantează ce rulează în enclavă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un certificat semnat de sistemul de operare",
+     "un certificat semnat de programul din enclavă",
+     "un certificat semnat de hypervisor",
+     "un certificat (o cotă) semnat de procesorul cu SGX"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "113",
+   "title": "Câte medii izolate oferă TrustZone",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Test curs TSSC",
+   "statement": "Câte medii de execuție izolate, asistate de hardware, oferă TrustZone?",
+   "hint": "",
+   "solution": "TrustZone împarte procesorul în două lumi, normală și securizată: există o singură lume securizată. SGX, în schimb, permite oricâte enclave.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "oricâte",
+     "1",
+     "2",
+     "0"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "114",
+   "title": "TEE: TrustZone și SGX",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Examen TSSC (2019)",
+   "statement": "Câte TEE-uri (medii de execuție de încredere) pot fi create cu TrustZone? Dar cu SGX?",
+   "hint": "",
+   "solution": "O singură lume securizată la TrustZone; enclave câte vrei la SGX.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "oricâte / 1",
+     "oricâte / oricâte",
+     "1 / 1",
+     "1 / oricâte"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "115",
+   "title": "Cheie simetrică și hash",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Care dintre următorii algoritmi folosește o cheie simetrică și o funcție hash?",
+   "hint": "",
+   "solution": "HMAC = un hash calculat peste mesaj și cheia secretă: integritate și autentificare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "HMAC",
+     "SHA2",
+     "RSA",
+     "3DES"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "116",
+   "title": "Trusted timestamp",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Care dintre următoarele scheme poate fi folosită pentru un „trusted timestamp” (marcă de timp de încredere)?",
+   "hint": "",
+   "solution": "Autoritatea semnează hash-ul documentului împreună cu momentul: e nevoie de o semnătură, nu doar de un hash sau de criptare simetrică.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "SHA256",
+     "RSA (o semnătură)",
+     "AES256",
+     "SCA"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "117",
+   "title": "TCB",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "medie",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Ce conține trusted computing base (TCB)?",
+   "hint": "",
+   "solution": "TCB-ul e tot ce, dacă e compromis, compromite securitatea sistemului; se vrea cât mai mic.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "toate politicile de securitate",
+     "toate aplicațiile instalate",
+     "toate componentele hardware și software de încredere",
+     "toate procesele care rulează ca root"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "118",
+   "title": "Root of Trust la criptarea discului",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Care este „Root of Trust” folosit de sistemul de operare la criptarea hard disk-ului (de exemplu BitLocker)?",
+   "hint": "",
+   "solution": "TPM-ul eliberează cheia doar dacă măsurătorile pornirii sunt cele așteptate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "kernelul",
+     "TPM",
+     "UEFI",
+     "MBR"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "119",
+   "title": "Protecția datelor în tranzit",
+   "chapter": "6. Grile: proprietăți, criptografie, hardware de încredere",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Ce tehnologie protejează datele în tranzit?",
+   "hint": "",
+   "solution": "Celelalte protejează chei și date pe dispozitiv; IPsec criptează pachetele în rețea.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "TPM",
+     "IPsec",
+     "HSM",
+     "TEE"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "130",
+   "title": "Monitorul de referință",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "medie",
+   "source": "Test curs TSSC",
+   "statement": "Ce tip de control al accesului cere un monitor de referință care decide la ce obiecte au acces subiecții, după etichete impuse de sistem?",
+   "hint": "",
+   "solution": "La MAC politica e a sistemului (etichete, niveluri), nu a proprietarului; exemple: SELinux, Bell-LaPadula.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Mandatory Access Control (MAC)",
+     "Discretionary Access Control (DAC)",
+     "Non-Discretionary Access Control",
+     "controlul bazat pe reguli"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "131",
+   "title": "Modelul din Linux",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "ușoară",
+   "source": "Test curs TSSC",
+   "statement": "Linux folosește un model de control al accesului definit de proprietarul (creatorul) informației. Cum se numește?",
+   "hint": "",
+   "solution": "Proprietarul fișierului își alege permisiunile (`chmod`).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "MAC",
+     "RBAC",
+     "DAC",
+     "UCON"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "132",
+   "title": "Chinese Wall",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "grea",
+   "source": "Test curs TSSC",
+   "statement": "Clase de conflict: `{Tesla, Dacia, BMW}`, `{ING, BCR, BRD}`, `{Microsoft, UIPath, Bitdefender}`. Bob a accesat un obiect de la Tesla și cinci de la BCR. Ce NU mai are voie să acceseze, după politica Chinese Wall?",
+   "hint": "",
+   "solution": "Odată ales Tesla, celelalte firme din aceeași clasă de conflict îi sunt interzise. Tesla și BCR rămân permise, iar din a treia clasă poate încă alege una.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un obiect de la Dacia",
+     "un obiect de la UIPath",
+     "un obiect de la Tesla",
+     "un obiect de la BCR"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "133",
+   "title": "Autentificare cu mai mulți factori",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "ușoară",
+   "source": "Test curs TSSC",
+   "statement": "Care dintre următoarele este o autentificare cu mai mulți factori?",
+   "hint": "",
+   "solution": "Factorii trebuie să fie de tipuri diferite: ceva ce știi (PIN), ceva ce ai (card), ceva ce ești (biometrie). Doi factori de același tip nu se pun.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "parolă și PIN",
+     "PIN și smart card",
+     "amprentă și scanarea irisului",
+     "smart card și ecuson"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "134",
+   "title": "cat cu setuid",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "grea",
+   "source": "Test curs TSSC",
+   "statement": "`super-secret.txt` are drepturile `-rw-rw---- root root`, iar `/bin/cat` are `-rwsr-xr-x root root`. Utilizatorul `mihai` rulează `cat super-secret.txt`. Se afișează conținutul?",
+   "hint": "",
+   "solution": "`cat` rulează cu utilizatorul efectiv `root`, care citește orice. Un setuid pe un utilitar ca acesta e o gaură de securitate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu, mihai nu are drept de citire",
+     "da, din cauza permisiunilor DAC ale fișierului",
+     "da, din cauza bitului setuid de pe fișier",
+     "da, din cauza bitului setuid de pe `/bin/cat`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "135",
+   "title": "Ce nu e factor de autentificare",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Care dintre următoarele NU este un model (factor) de autentificare?",
+   "hint": "",
+   "solution": "Cele trei categorii: cunoaștere, posesie, inerență.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ceva ce există",
+     "ceva ce știi",
+     "ceva ce ești",
+     "ceva ce ai"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "136",
+   "title": "Bypass la KMCI",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "grea",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Cum poate un atacator ocoli „Kernel Mode Code Integrity” (KMCI), care permite doar cod de kernel semnat?",
+   "hint": "",
+   "solution": "ROP nu introduce cod nou: înlănțuie bucăți din codul deja semnat, deci verificarea semnăturii nu îl oprește. Un modul modificat nu mai are semnătura validă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu se poate ocoli o protecție din kernel",
+     "cu cheia publică a unui driver recunoscut",
+     "cu un atac de tip return-oriented programming",
+     "modificând un modul de kernel valid și reinstalându-l"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "137",
+   "title": "Sandboxing pe mobil",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "La ce folosește sandboxing-ul în sistemele de operare mobile?",
+   "hint": "",
+   "solution": "Fiecare aplicație are directorul ei și doar permisiunile cerute.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "la verificarea identității dezvoltatorului",
+     "la prevenirea oricărui atac asupra sistemului",
+     "la limitarea accesului aplicațiilor la resurse (fișiere, rețea...)",
+     "la limitarea numărului de aplicații care rulează simultan"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "138",
+   "title": "Semnarea aplicațiilor mobile",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "ușoară",
+   "source": "Examen TSSC (2019)",
+   "statement": "Semnarea unei aplicații mobile este folosită pentru a...",
+   "hint": "",
+   "solution": "Semnătura spune cine a publicat aplicația și că nu a fost modificată; nu spune că aplicația e sigură.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "activa mecanismul DEP",
+     "oferi un nivel ridicat de securitate la execuție",
+     "identifica dezvoltatorul",
+     "plasa aplicația într-un sandbox dedicat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "139",
+   "title": "JIT și DEP",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "grea",
+   "source": "Examen TSSC (2019)",
+   "statement": "Ce mecanism de protecție devine inutil (trebuie relaxat) când se folosește un compilator „just in time”?",
+   "hint": "",
+   "solution": "JIT-ul scrie cod în memorie și apoi îl execută: are nevoie de pagini care sunt și scriabile, și executabile, exact ce interzice DEP (W^X).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "firewall-ul",
+     "ACE",
+     "BitLocker",
+     "DEP"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "140",
+   "title": "Atac asupra Secure World",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "medie",
+   "source": "Examen TSSC (2019)",
+   "statement": "Ce tip de atac se poate realiza împotriva unei aplicații care rulează în TrustZone Secure World?",
+   "hint": "",
+   "solution": "Izolarea nu face codul corect: o aplicație vulnerabilă din lumea securizată poate fi exploatată la fel.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "toate variantele",
+     "return to libc",
+     "buffer overflow",
+     "return oriented programming"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "141",
+   "title": "Driverul care ține minte tastele",
+   "chapter": "7. Grile: control acces, autentificare, sisteme",
+   "difficulty": "ușoară",
+   "source": "Examen TSSC (2019)",
+   "statement": "Un driver de sunet compromis salvează toate tastele apăsate într-un fișier accesibil tuturor programelor. Ce tip de atac este?",
+   "hint": "",
+   "solution": "Un program care pare legitim și face pe ascuns altceva.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "buffer overflow",
+     "DAC",
+     "XSS",
+     "cal troian (Trojan horse)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "150",
+   "title": "Ciocanul",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Ce componentă a securității e afectată când cineva distruge un calculator cu un ciocan?",
+   "hint": "",
+   "solution": "Datele nu sunt citite sau modificate de nimeni; doar nu mai pot fi folosite.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "confidențialitatea",
+     "integritatea",
+     "disponibilitatea",
+     "toate variantele"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "151",
+   "title": "Florin și e-mailul",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Florin trimite un e-mail, iar compania vrea să poată dovedi asta. Ce concept trebuie implementat?",
+   "hint": "",
+   "solution": "Dovada că el l-a trimis, pe care nu o poate nega: semnătură digitală.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "integritatea",
+     "confidențialitatea",
+     "autentificarea",
+     "non-repudierea"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "152",
+   "title": "Poza cu informații clasificate",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "O investigație descoperă o poză care conține informații clasificate. Ce metodă a folosit atacatorul ca să exfiltreze datele prin rețea?",
+   "hint": "",
+   "solution": "Datele sunt ascunse în pixelii unei imagini aparent banale.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "încapsularea datelor",
+     "deschiderea de socketuri",
+     "steganografia",
+     "criptarea"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "153",
+   "title": "Certificat emis fără să-l ceri",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "medie",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Un server web descoperă că există un certificat TLS valid emis pentru domeniul lui, deși nu l-a cerut. Ce tehnologie i-a permis să afle?",
+   "hint": "",
+   "solution": "Autoritățile publică fiecare certificat emis în jurnale publice, verificabile: proprietarul domeniului poate vedea orice certificat emis pe numele lui.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "certificate enforcement",
+     "certificate transparency",
+     "certificate revocation list",
+     "certificate privacy"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "154",
+   "title": "Unde se validează datele",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen final TSSC (2022)",
+   "statement": "O aplicație web are un singur server și în spate o bază de date în cluster. Unde trebuie validate datele primite de la utilizator?",
+   "hint": "",
+   "solution": "Validarea din client se ocolește ușor; serverul e ultimul punct pe care îl controlezi înainte de baza de date.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nicăieri, dacă se folosește HTTPS",
+     "cu o extensie de browser",
+     "pe serverul web",
+     "doar în JavaScript, pe client"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "155",
+   "title": "tar și backup-ul",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "medie",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Comanda `tar czvf backup.tar.gz .` arhivează directorul curent. Poate duce la compromiterea serverului?",
+   "hint": "",
+   "solution": "Arhiva ajunge chiar în directorul arhivat: dacă e public pe web, oricine descarcă tot codul și configurațiile (parole, chei).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da, dacă unul dintre fișiere conține viruși",
+     "da, dacă directorul e servit pe web și drepturile lui sunt greșite",
+     "nu, tar nu are vulnerabilități cunoscute",
+     "nu, un atacator nu poate rula tar pe server"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "156",
+   "title": "TOR: intrări și ieșiri",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "grea",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Ce poate afla un atacator care observă toate intrările și ieșirile unei rețele TOR?",
+   "hint": "",
+   "solution": "TOR nu rezistă unui adversar global: momentele și volumele pachetelor de la intrare și de la ieșire se pot corela.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "doar cine accesează, nu și ce",
+     "nimic, totul e anonim",
+     "tot: cine cu cine vorbește (corelând traficul)",
+     "doar ce se accesează, nu și cine"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "157",
+   "title": "Ce vede serverul prin TOR",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "medie",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Ce află un server web accesat prin rețeaua TOR de calculatorul lui Mihai?",
+   "hint": "",
+   "solution": "Serverul vede conexiunea venind de la nodul de ieșire.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adresa IP a ultimului nod din circuit (nodul de ieșire)",
+     "adresele IP ale tuturor nodurilor",
+     "nimic",
+     "adresa IP a lui Mihai"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "158",
+   "title": "YouTube care te trimite în altă parte",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "medie",
+   "source": "Examen final TSSC (2022)",
+   "statement": "Florin accesează YouTube, dar ajunge pe un site de „tech support”. Ce atac poate explica asta?",
+   "hint": "",
+   "solution": "Numele de domeniu corect e rezolvat la o adresă greșită.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "CSRF",
+     "phishing",
+     "adware",
+     "DNS poisoning"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "159",
+   "title": "Atacuri STP",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "medie",
+   "source": "Examen TSSC (2019)",
+   "statement": "Ce metodă protejează împotriva atacurilor asupra protocolului STP?",
+   "hint": "",
+   "solution": "Pe porturile spre stații nu trebuie să apară BPDU-uri; dacă apar (un atacator care vrea să devină root bridge), portul se închide.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "BPDU guard",
+     "MITM",
+     "sticky MAC",
+     "VLAN hopping"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "160",
+   "title": "Raportul de forensics pentru CEO",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen TSSC (2019)",
+   "statement": "Care e cea mai importantă componentă a unui raport de forensics pentru un CEO?",
+   "hint": "",
+   "solution": "Un rezumat pe înțelesul conducerii: ce s-a întâmplat, ce impact are, ce e de făcut.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "sumarul",
+     "detalierea informațiilor identificate",
+     "numele investigatorului",
+     "procedura folosită"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "161",
+   "title": "Procesele active",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen TSSC (2019)",
+   "statement": "În ce etapă a unei investigații se salvează informațiile despre procesele active pe calculatorul analizat?",
+   "hint": "",
+   "solution": "Datele volatile (memorie, procese, conexiuni) se colectează primele, înainte de a opri mașina.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "analiză",
+     "pregătire",
+     "raportare",
+     "colectare"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "162",
+   "title": "Certificat expirat pe un singur PC",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "medie",
+   "source": "Examen TSSC (2019)",
+   "statement": "Într-o companie mare, un singur PC afișează „SSL certificate has expired”. Care e cauza probabilă?",
+   "hint": "",
+   "solution": "Dacă certificatul ar fi expirat cu adevărat, l-ar vedea toate calculatoarele.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "data sistemului pe acel PC este greșită",
+     "certificatul nu a fost reînnoit",
+     "are loc un atac man-in-the-middle",
+     "browserul nu e actualizat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "163",
+   "title": "Cookie-uri",
+   "chapter": "8. Grile: aplicații, web, rețea, forensics",
+   "difficulty": "ușoară",
+   "source": "Examen TSSC (2019)",
+   "statement": "Care afirmație despre cookie-urile HTTP este adevărată?",
+   "hint": "",
+   "solution": "Sesiunea după login e de obicei un cookie; marcat `HttpOnly`, `Secure`, `SameSite`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu trebuie folosite niciodată, pentru că utilizatorul le poate modifica",
+     "cookie-urile criptate sunt perfect sigure",
+     "sunt cea mai bună formă de urmărire a utilizatorului",
+     "sunt folosite pentru a implementa autentificarea pe web"
+    ],
+    "answer": 3
    }
   }
  ]

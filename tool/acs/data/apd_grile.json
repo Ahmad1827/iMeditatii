@@ -1,0 +1,282 @@
+[
+ {
+  "q": "Avem un program cu un deadlock. Ce se întâmplă când îl rulăm?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "Uneori acesta se va bloca la nesfarsit",
+   "Programul va termina mereu executarea afisand rezultatul corect",
+   "Acesta se va bloca intotdeauna",
+   "Acesta nu va compila"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Un program poate folosi un procesor cu 4 nuclee fizice la maxim daca este:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "Paralelizat pe 2 thread-uri",
+   "Paralelizat pe cel putin 4 thread-uri",
+   "Paralelizat pe 3 thread-uri",
+   "Single-threaded"
+  ],
+  "right": [
+   1
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Care este eficienta pentru sortarea Parallel Rank Sort in cazul rularii pe P procesoare? Se considera N dimensiunea vectorului de sortat",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "logN/N",
+   "logN",
+   "logP",
+   "logN/P"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Cum este definita eficienta paralela ( E )? Se considera T - Timpul total necesar execuției algoritmului paralel; P - Numărul de procesoare utilizate G =Timp execuție cel mai rapid algoritm secvențial",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "G/(T*P)",
+   "G*P/T",
+   "T*P",
+   "T*P/G"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Considerand problema filosofilor cu 4 filosofi, cate furculite sunt asezate pe masa?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "8",
+   "5",
+   "3",
+   "4"
+  ],
+  "right": [
+   3
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "De cate procese este nevoie pentru implementarea calcului polinomial cu Pipeline, considerând ca ultima putere a lui x este 6:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "cel mult 7, se vor împarți in mod egal coeficienții",
+   "1 proces",
+   "cel mult 6, se vor împarți in mod egal coeficienții",
+   "exact 6, fiecare proces poate sa aibă exact un coeficient"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "In distributie, conform cu modelul Foster, timpul total se calculeaza ca:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "suma timpului de comunicare inter-procesor, de calcul si idle pe fiecare proces",
+   "suma timpului de comunicare, de calcul si idle pe fiecare proces",
+   "suma timpului de calcul si de comunicare inter-procesor pe fiecare proces",
+   "suma timpului de comunicare intra-procesor, de calcul si idle pe fiecare proces"
+  ],
+  "right": [
+   1
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Considerand relatia de petrecut înainte (->) si doua evenimente a și b:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "dacă a și b nu sunt din acelasi proces, nu se poate stabili o relatia intre ele",
+   "dacă a reprezintă transmiterea unui mesaj iar b recepția aceluiași mesaj la destinatie, atunci b -> a",
+   "dacă a -> b și b -> c, atunci a -> c",
+   "dacă a și b sunt pe acelasi proces, nu se poate aplica aceasta relatie"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "In cazul algoritmului unda de tip inel cu N noduri, timpul de execuție este:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "O(1)",
+   "O(N^2)",
+   "O(N)",
+   "O(logN)"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "In cazul algoritmului unda de tip ecou cu N noduri, timpul de execuție este:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "O(1)",
+   "O(N)",
+   "O(logN)",
+   "O(N^2)"
+  ],
+  "right": [
+   1
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Numarul de mesaje pentru algoritmul LeLann este:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "O(N^3)",
+   "O(N)",
+   "O(N^4)",
+   "O(N^2)"
+  ],
+  "right": [
+   3
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "La algoritmii cu mesaje de sondaj cu ecou, in cazul topologiilor de tip arbore (initiatorul fiind radacina arborelui):",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "Mesajele de sondaj se propaga de la frunze la initiator / Mesajele de ecou se propaga de la frunze la initiator",
+   "Mesajele de sondaj se propaga de la radacina la frunze / Mesajele de ecou se propaga de la frunze la initiator",
+   "Mesajele de sondaj se propaga de la frunze la initiator / Mesajele de ecou se propaga de la initiator la frunze",
+   "Mesajele de sondaj se propaga de la radacina la frunze / Mesajele de ecou se propaga de la initiator la frunze"
+  ],
+  "right": [
+   1
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "In algoritmul lui Huang, pentru a detecta terminarea:",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "se folosesc ponderi",
+   "se folosesc mesaje de tip semnal",
+   "se folosesc mesaje de tip marcaj si semnal",
+   "se folosesc mesaje de tip marcaj"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Ce se întâmplă la defectarea liderului in cazul algoritmului Raft?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "Daca un nod follower nu mai primeste mesaje heartbeat, acesta ii ia locul și anunță vecinilor noua identitate",
+   "Sunt comise toate intrarile din Log pentru a iniția un proces de votare",
+   "Daca un nod follower nu mai primeste mesaje heartbeat, presupune ca leaderul s-a defectat si initiaza o alegere",
+   "Inregistram toate scrierile acestuia intr-un „indexed log\", pe care il replicam"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Intr-un program care foloseste pthreads, daca un thread face lock de 2 ori consecutiv pe acelasi mutex (cu setari implicite), se produce un deadlock / Intr-un program multithreaded in Java, daca un thread face lock de 2 ori consecutiv pe acelasi obiect, se produce un deadlock",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "adevarat / adevarat",
+   "fals / fals",
+   "fals / adevarat",
+   "adevarat / fals"
+  ],
+  "right": [
+   3
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Implementarea Java Thread face ca toate thread-urile sa se execute pe un singur CPU indiferent de cate procesoare are masina pe care ruleaza / Folosind Java Threads programatorul poate crea mai multe thread-uri decat numarul de CPU-uri de pe masina",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "adevarat / adevarat",
+   "adevarat / fals",
+   "fals / fals",
+   "fals / adevarat"
+  ],
+  "right": [
+   3
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Cand avem in Java o metoda de tipul \"public synchronized void f()\" intr-o clasa C, pe monitor lock-ul carui obiect se face sincronizarea?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "this",
+   "f",
+   "Un obiect nou creat special",
+   "C.class"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Ce face MPI_Init?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "Determina numarul de procese",
+   "Initializeaza un program distribuit",
+   "Termina un program distribuit",
+   "Determina rangul procesului curent"
+  ],
+  "right": [
+   1
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Care din variantele specificate nu este un tip predefinit de date in MPI?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "MPI_VECTOR",
+   "MPI_FLOAT",
+   "MPI_LONG_DOUBLE",
+   "MPI_BYTE"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Examen seria CC"
+ },
+ {
+  "q": "Într-un sistem e-commerce (e.g., Amazon, e-Bay, etc), care sunt opțiunile pe care NU e nevoie să le considerăm când alegem între consistență și disponibilitate?",
+  "source": "Examen APD seria CC (2021)",
+  "options": [
+   "Tipuri diferite de operații (e.g., query, purchase, etc.)",
+   "Tipuri diferite de servicii (e.g., distributed lock, DNS, etc.)",
+   "Specificul organizației care dezvoltă soluția tehnologică",
+   "Tipuri de date diferite (e.g., shopping cart, billing, product, etc.)"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Examen seria CC"
+ }
+]

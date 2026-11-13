@@ -1,0 +1,957 @@
+[
+ {
+  "q": "Care dintre următoarele transformări 2D poate fi raportată la o axă?",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Translația",
+   "Rotația",
+   "Oglindirea",
+   "Scalarea"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Rotatia in jurul unei drepte oarecare:",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Secvența de transformări elementare necesare pentru obținerea transformării cerute include și transformările inverse celor de aliniere",
+   "Necesita compunerea de transformari elementare pentru alinierea dreptei cu una dintre axele principale.",
+   "Daca dreapta se afla intr-unul dintre cele 3 planuri principale, nu este necesara translatia pentru ca dreapta sa treaca prin origine",
+   "Intotdeauna, primul plan intermediar in care se aduce dreapta aleasa este XOZ"
+  ],
+  "right": [
+   0,
+   1
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Transformările geometrice 3D:",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Se pot reprezenta prin matrici 3x3 în coordonate omogene",
+   "Se pot reprezenta prin înmulțiri de matrici în care ordinea de aplicare nu contează",
+   "Se pot reprezenta prin matrici 4x4 în coordonate omogene",
+   "Se pot reprezenta prin matrici 3x3 în coodonate carteziene"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Rotația, scalarea și translația",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Sunt transformări afine",
+   "Păstrează intotdeauna paralelismul liniilor",
+   "Pot fi reprezentate prin matrici de 3x3 in coordonate carteziere",
+   "Conduc la același rezultat indiferent de ordinea în care se aplică"
+  ],
+  "right": [
+   0,
+   1
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Forfecarea fata de origine pe axa OZ:",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Nu se poate compune cu forfecarea pe OX sau OY",
+   "Matricea de forfecare este simetrica fata de diagonala principala",
+   "Factorii de forfecare modifică coordonatele x și y ale vârfurilor proporțional cu z",
+   "Coordonata z a vârfurilor nu se modifica"
+  ],
+  "right": [
+   2,
+   3
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Transformarea de forfecare fata de o dreapta oarecare din plan, data printr-un punct (xd, yd) si directia D[a,b], poate fi exprimata prin urmatoarea secventa de transformari, considerand punctele din plan reprezentate prin vectori coloana, R(0,0,-u) o rotatie care suprapune dreapta peste axa OX iar F(0,0,fx,fy) matricea transformarii de forfecare fata de origine:",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "T(-xd,-yd)*R(0,0,u)*F(0,0,fx,fy)*R(0,0,-u)*T(xd,yd)",
+   "T(xd,yd)*R(0,0,u)*F(0,0,fx,1)*R(0,0,-u)*T(-xd,-yd)",
+   "T(xd,yd)*F(0,0,fx,fy)*T(-xd,-yd)",
+   "Nici una dintre celelalte variante nu este corecta"
+  ],
+  "right": [
+   3
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Transformarea de rotatie in jurul axei OZ:",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Poate fi reprezentată printr-o matrice de 3x3 în coordonate carteziene",
+   "Conservă coordonata z a punctelor transformate",
+   "In urma aplicarii transformarii, obiectul se poate deforma",
+   "Matricea de rotatie NU poate contine valoarea 0 pe diagonala principala"
+  ],
+  "right": [
+   0,
+   1
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Transformarile geometrice sunt exprimate in coordonate omogene deoarece:",
+  "source": "Test EGC: Transformari 2D si 3D (2022)",
+  "options": [
+   "Translatia nu poate fi reprezentata matricial in coordonate carteziene",
+   "Forfecarea nu poate fi reprezentata matricial in coordonate carteziene",
+   "Nu se poate exprima printr-un produs de matrici, in coordonate carteziene, o transformare de scalare fata de un punct oarecare din plan.",
+   "Oglindirea nu poate fi reprezentata matricial in coordonate carteziene"
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - Transformari 2D si 3D"
+ },
+ {
+  "q": "Se consideră un spațiu logic definit în (0, 0) - (1, 1) și o poartă de afișare definită în (0, 0) - (400, 200). Să se calculeze poziția în poarta de afișare a punctului de coordonate (0.5, 1) din spațiul logic pentru o scalare uniformă afișată centrat în poartă.",
+  "source": "Test EGC: Transformari 2D (2021)",
+  "options": [
+   "(100, 200)",
+   "(200, 100)",
+   "(200, 200)",
+   "(400, 200)"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Test - Transformari 2D"
+ },
+ {
+  "q": "Transformarea fereastra-poarta produce o scalare a desenului executat în poarta care depinde de:",
+  "source": "Test EGC: Transformari 2D (2021)",
+  "options": [
+   "Pozitionarea portii in spatiul fizic",
+   "Forma ferestrei si a portii",
+   "Pozitionarea ferestrei in spatiul logic",
+   "Marimea laturilor ferestrei si ale portii"
+  ],
+  "right": [
+   3
+  ],
+  "test": "Test - Transformari 2D"
+ },
+ {
+  "q": "Transformarea definită prin următoarele formule: x’ = x*s + t y’ = y*f + r în care s și f sunt două numere reale, pozitive > 1 iar t și r sunt două numere reale diferite de zero, reprezintă:",
+  "source": "Test EGC: Transformari 2D (2021)",
+  "options": [
+   "O transformare compusă dintr-o translație urmată de o scalare față de origine.",
+   "O transformare compusă dintr-o scalare față de origine urmată de oglindire față de axa OX.",
+   "O transformare compusă dintr-o scalare față de origine urmată de o translație.",
+   "Oglindirea față de origine."
+  ],
+  "right": [
+   2
+  ],
+  "test": "Test - Transformari 2D"
+ },
+ {
+  "q": "Care dintre următoarele efecte nu se pot reda corect în fragmentele interioare primitivelor rasterizate, dacă se aplică modelul de shading Gouraud:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Factorul de atenuare a luminii de la sursă",
+   "Reflexia luminii ambientale",
+   "Reflexia speculară",
+   "Reflexia difuză"
+  ],
+  "right": [
+   2,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Factorul de ceață liniar",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Afectează întreaga scena 3D",
+   "Scade pe măsură ce crește distanța de la observator la punctul în care se calculează culoarea afectată de ceață",
+   "Depinde de distanța dintre observator și punctul în care se calculează culoarea afectată de ceață",
+   "Acționează între două distanțe definite în sistemul de coordonate observator, măsurate pe direcția în care privește observatorul"
+  ],
+  "right": [
+   2,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Umbrele planare purtate:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Calculele pentru determinarea lor sunt simple, deoarece fiecare obiect vizibil din poziția sursei produce umbră numai pe obiectul aflat în spatele său din poziția sursei",
+   "Sunt poligoane coplanare cu fețele umbrite ale obiectelor din scenă",
+   "Sunt umbre produse de obiectele scenei pe alte obiecte ale scenei",
+   "Nu se modifică dacă unghiul dintre vectorul orientat către sursă și vectorul orientat către observator nu se modifică"
+  ],
+  "right": [
+   1,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Umbrele planare proprii:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Sunt umbre produse de un obiect pe fețele sale nevizibile din poziția sursei",
+   "Sunt produse de părțile obiectului care primesc lumina de la sursă.",
+   "Forma lor depinde de poziția observatorului.",
+   "Se modifică atunci când se schimbă poziția observatorului."
+  ],
+  "right": [
+   0,
+   1
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "În modelul de iluminare locală, reflexia speculară într-un punct al unei suprafețe 3D",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Are valoarea 0 dacă unghiul dintre normala la suprafață și vectorul de la punct la sursa de lumină este mai mare de 90 de grade",
+   "Are valoarea cu atât mai mare cu cât unghiul dintre raza reflectată și vectorul orientat către observator este mai mic",
+   "Are valoarea 0 dacă produsul scalar dintre normala la suprafață și vectorul orientat către observatoreste mai mic decât 0",
+   "Nu depinde de pozițiile surselor de lumină"
+  ],
+  "right": [
+   0,
+   1
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre următoarele propoziții sunt adevărate?",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Un observator poate vedea reflexia speculara a unei suprafete daca unghiul dintre normala la suprafață si vectorul orientat către observator este <=90 grade",
+   "Dacă observatorul este de aceeași parte cu o sursă de lumină față de o oglindă, acesta vede reflexia speculară a luminii dintr-un singur punct al oglinzii",
+   "Pentru materialele imperfect reflectante, cantitatea de lumină care ajunge la observator depinde de exponentul de strălucire al materialului",
+   "Cu cât exponentul de strălucire al materialului este mai mare, cu atât mai dispersată este lumina reflectată specular"
+  ],
+  "right": [
+   1,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "În modelul de shading Gouraud aplicat pe o suprafață poligonală",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Culoarea unui varf al unui poligon se calculează în vertex shader aplicând modelul de iluminare locală",
+   "Culoarea unui fragment al unui poligon se calculează în fragment shader aplicând modelul de iluminare locală",
+   "Culoarea unui fragment al unui poligon este calculată de procesorul de rasterizare",
+   "Culoarea unui fragment al unui poligon se determină în funcție de poziția și normala la suprafață asociate acelui fragment"
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "În modelul de iluminare locală, reflexia difuză într-un punct al unei suprafețe 3D depinde de următoarele componente",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Exponentul de strălucire al materialului suprafeței",
+   "Normala la suprafață în acel punct",
+   "Poziția observatorului",
+   "Poziția sursei de lumina"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la modelul RGB:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Corespunde modului în care sunt formate culorile de un artist",
+   "Permite conversia unei imagini color într-o reprezentare adecvată imprimantelor color printr-o transformare liniară",
+   "Corespunde definiției psiho-fiziologice a unei culori",
+   "Permite definirea culorilor prin adunarea în proporții diferite a culorilor roșu, verde, albastru"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la arborele BVH (Bounding Volume Hierarchy) al unei scene 3D:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Se elimină din banda grafică poligoanele dintr-un subarbore al cărui volum încadrator este în afara volumului vizual.",
+   "Permite efectuarea operației de „Frustum culling” pe GPU.",
+   "Permite decuparea primitivelor care intersecteaza volumul vizual.",
+   "Arborele BVH este afectat de transformarile geometrice aplicate obiectelor din scenă."
+  ],
+  "right": [
+   0,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Eliminarea fețelor auto-obturate ale obiectelor:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Este efectuata pe GPU",
+   "Este efectuata in sistemul coordonatelor globale.",
+   "Tine cont de pozitia observatorului",
+   "Nu este necesara, datorita eliminarii fragmentelor nevizibile."
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la algoritmul Z-buffer:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Realizează eliminarea din imagine a fragmentelor nevizibile",
+   "Se bazează pe o ordonare a primitivelor în ordinea descrescătoare a distanței lor față de observator",
+   "Realizează eliminarea din imagine a fețelor nevizibile",
+   "Este integrat în procesul de rasterizare a primitivelor grafice"
+  ],
+  "right": [
+   0,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la arborele BSP:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "La afișarea „din spate în față” poate fi dezactivat testul de adancime",
+   "La afișarea „din față în spate” nu sunt suprascrise părțile poligoanelor aflate mai departe de observator",
+   "Este eficient pentru afișarea scenelor care contin obiecte mari statice",
+   "Trebuie reconstruit pentru fiecare cadru imagine"
+  ],
+  "right": [
+   0,
+   1,
+   2
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre urmatoarele operații sunt implementate intr-un motor grafic:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Decuparea primitivelor la marginile volumului vizual.",
+   "Algoritmul BSP",
+   "Algoritmul Z-buffer",
+   "Eliminare obiecte sau grupuri de obiecte care nu sunt incluse în volumul vizual (Frustum culling)"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre urmatoarele operatii tin cont de pozitia observatorului:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Afisarea folosind BSP",
+   "Construirea arborelui AA-BSP al scenei",
+   "Testul de vizibilitate z-buffer",
+   "Eliminarea fetelor auto-obturate ale obiectelor"
+  ],
+  "right": [
+   0,
+   2,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la Buffer-ul Z:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Este actualizat pentru fiecare cadru imagine.",
+   "Este actualizat pentru fiecare fragment rezultat din resterizarea unei primitive.",
+   "Memoreaza coordonatele z ale fragmentelor vizibile într-un cadru imagine.",
+   "Memoreaza coordonatele z ale fragmentelor care nu trec testul de vizibilitate"
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre urmatoarele operatii sunt efectuate pe GPU:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Determinarea partilor suprafetelor 3D obturate de alte suprafete.",
+   "Decuparea primitivelor care intersecteaza volumul vizual.",
+   "Testul de vizibilitate la nivel de fragment (z-buffer).",
+   "Eliminarea fetelor auto-obturate ale obiectelor."
+  ],
+  "right": [
+   1,
+   2,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Arborele octal al unei scene 3D:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Se obtine divizand recursiv cubul incadrator al scenei in 8 subvolume egale pana cand fiecare subvolum contine o primitiva sau un numar prestabilit de primitive.",
+   "Este construit pe GPU dupa asamblarea primitivelor.",
+   "Nu este eficient atunci cand primitivele apartin mai multor subvolume adiacente.",
+   "Este folosit pentru eliminarea suprafetelor obturate."
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la arborele BSP (PA-BSP) al unei scene:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Se obține partiționând recursiv spațiul 3D în semispații, folosind planele poligoanelor scenei 3D",
+   "Permite eliminarea din imagine a suprafețelor obturate și efectuarea operatiei de „Frustum culling”",
+   "Depinde de poziția observatorului"
+  ],
+  "right": [
+   0,
+   1
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte privind transformarea de proiecție din lanțul de transformare a vârfurilor în banda grafică?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Este o proiectie din 3D în 2D",
+   "Transformă coordonatele din sistemul de coordonate observator în sistemul coordonatelor de decupare",
+   "Depinde de volumul vizual definit de programator",
+   "Transformă coordonatele din sistemul de coordonate observator în sistemul de coordonate dispozitiv normalizate Ați selectat prea multe opțiuni."
+  ],
+  "right": [
+   1,
+   2
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Coordonatele de decupare sunt transformate in coordonate ecran prin:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Împărțirea perspectivă",
+   "Împărțirea perspectivă urmată de transformarea în viewport",
+   "Proiectie ortografica",
+   "Transformarea in viewport"
+  ],
+  "right": [
+   1
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Cum poate fi implementata proiectia axonometrica a unui obiect intr-o aplicatie OpenGl?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Se aplica obiectului o transformare de modelare, urmata de o transformare de proiectie ortografica",
+   "Se defineste o transformare de vizualizare care aduce obiectul in pozitia dorita fata de planul de vizualizare",
+   "Se defineste un volum de vizualizare care produce transformarea de proiectie axonometrica"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Matricea transformarii de vizualizare (din coordonate globale in coordonate observator) este definita de:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Rotatia camerei",
+   "Pozitia camerei",
+   "Directia in care priveste observatorul",
+   "Deschiderea camerei (Field of View)"
+  ],
+  "right": [
+   0,
+   1,
+   2
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care dintre următoarele afirmații despre proiectiile oblice sunt corecte?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Sunt proiectii intr-un plan care nu este perpendicular pe o axa principala",
+   "Nu pot fi definite prin transformarea de proiectie OpenGL",
+   "Conserva lungimile laturilor paralele cu planul de proiectie si unghiurile dintre aceste laturi",
+   "Conserva lungimea laturilor perpendiculare pe planul de proiectie daca unghiul dintre proiectori si plan este de 45 grade"
+  ],
+  "right": [
+   1,
+   2,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Exista mai multe tipuri de proiectii ortogonale. Printre acestea se numara:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Oblice",
+   "Ortografice",
+   "Izometrice",
+   "Axonometrice"
+  ],
+  "right": [
+   1,
+   2,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Parametrii care definesc transformarea de vizualizare in OpenGL:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Determina tipul proiectiei efectuate asupra primitivelor",
+   "Determina sistemul de coordonate observator (atasat camerei virtuale)",
+   "Definesc un volum virtual care delimiteaza partea din scena care va fi redata in imagine",
+   "Se folosesc in calculul matricei de transformare a varfurilor din sistemul coordonatelor globale in sistemul coordonatelor observator"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la structura BVH (Bounding Volume Hierarchy):",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Permite efectuarea eficientă a operației de „frustum culling” folosind volumele încadratoare ale nodurilor.",
+   "La construirea sa se ține cont de poziția observatorului în scena 3D.",
+   "Este un arbore care are în fiecare nod un volum încadrator pentru o primitivă grafică sau un grup de primitive.",
+   "Este independent de transformarile aplicate obiectelordin scena3D."
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Testul de vizibilitate a fragmentelor:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Este efectuat in procesul de rasterizare",
+   "Tine cont de pozitia observatorului",
+   "Este efectuat pe GPU",
+   "Este efectuat prin algoritmi implementati in motorul grafic"
+  ],
+  "right": [
+   0,
+   1,
+   2
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte referitor la \"Algoritmul pictorului\":",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "In cazul unor scene dinamice, lista ordonată a poligoanelor trebuie modificată pentru fiecare cadru imagine.",
+   "Nu trimite în banda grafică poligoanele aflate în afara volumului vizual.",
+   "Rezolva eliminarea suprafetelor nevizibile printr-o afișare „din spate în față” a poligoanelor scenei.",
+   "Este eficient pentru aplicatii in care poligoanele scenei sunt disjuncte pe axa Z."
+  ],
+  "right": [
+   0,
+   2,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele transformări poate modifica forma unui obiect?",
+  "source": "Test EGC: Transformari 2D (2021)",
+  "options": [
+   "Translația",
+   "Rotația",
+   "Forfecarea",
+   "Scalarea"
+  ],
+  "right": [
+   2,
+   3
+  ],
+  "test": "Test - Transformari 2D"
+ },
+ {
+  "q": "Care dintre următoarele proiecții conservă lungimea laturilor perpendiculare pe planul de proiecție?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Cavalier",
+   "Perspectivă",
+   "Axonometrică",
+   "Cabinet"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte privind transformarea în poarta de afișare?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Transformă coordonate 3D în coordonate 2D",
+   "Depinde numai de poziția porții de afișare în spațiul ecran, lățimea și înălțimea sa măsurate în pixeli",
+   "Depinde numai de poziția porții de afișare în fereastra aplicației, lățimea și înălțimea sa măsurate în pixeli",
+   "Transforma varfurile din coordonate dispozitiv normalizate în coordonate ecran"
+  ],
+  "right": [
+   2,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Transformarea in viewport:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Este o transformare fereastra-poarta",
+   "Transforma coordonatele dispozitiv normalizate ale unui varf in coordonate ecran",
+   "Transforma coordonatele de decupare ale unui varf in coordonate ecran",
+   "Conserva coordonata z a varfurilor"
+  ],
+  "right": [
+   0,
+   1,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Printre particularitatile proiectiei perspectiva se numara:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Micsoreaza proiectiile obiectelor proportional cu distanta lor fata de centrul de proiecte",
+   "Este o transformare afina",
+   "Nu conserva paralelismul liniilor care nu sunt paralele cu planul de proiectie",
+   "Rezulta imagini similare cu cele de la un aparat foto"
+  ],
+  "right": [
+   0,
+   2,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care este transformarea de modelare care trebuie sa fie aplicata unui cub cu latura de 1, centrat in sistemul coordonatelor obiect si cu fetele paralele cu planele principale, astfel incat sa se obtina in sistemul coordonatelor globale un paraleliped cu latimea de 20 unitati, inaltimea de 40 unitati si adancimea de 30 unitati, pozitionat cu centrul in (xc,yc,zc) si rotit cu unghiul u fata de axa OZ?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "T(xc,yc,zc) * S(0,0,20,40,30)* Roz(u)",
+   "T(xc,yc,zc) * S(20,40,30)* Roz(u)",
+   "T(xc,yc,zc) *Roz(u)*S(0,0,20,40,30)",
+   "T(xc,yc,zc) *Roz(u)*S(0,0,20,40,30)*T(-xc,-yc,-zc)"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte dacă se aplică modelul de shading Phong?",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Se poate calcula componenta speculară a reflexiei luminii într-un fragment al unei primitive",
+   "Normala unui fragment se poate calcula în fragment shader prin interpolarea normalelor vârfurilor",
+   "Culorile fragmentelor sunt calculate automat de GPU",
+   "Culoarea unui fragment se calculează în fragment shader folosind normala fragmentului"
+  ],
+  "right": [
+   0,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Conform legii lui Lambert, reflexia difuză a luminii într-un punct al unei suprafețe:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Este dispersată regulat în toate direcțiile",
+   "Este cu atât mai mică cu cât unghiul dintre normala la suprafață în punct și vectorul din punct către observator este mai mare.",
+   "Nu depinde de intensitatea luminii de la sursă",
+   "Este cu atât mai mare cu cât unghiul dintre normala la suprafață în punct și vectorul din punct către sursa de lumină este mai mic."
+  ],
+  "right": [
+   0,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Un punct al unei suprafețe din scena 3D se află într-un volum de umbră dacă:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Volumul de umbră nu intersectează volumul vizual",
+   "Numărul de poligoane PUV intersectate de vectorul dus din poziția observatorului pâna în acel punct - numărul de poligoane PUN intersectate + numarul de volume de umbră care conțin poziția observatorului > 0",
+   "Observatorul privește scena din poziția sursei care produce volumul de umbre.",
+   "Vectorul dus din poziția observatorului pâna în acel punct intersectează mai multe poligoane de umbra PUV decât poligoane PUN, atunci când observatorul nu se află în volumul de umbra"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "In modelul de culoare HSV",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Culoarea Alb corespunde combinației S = 0, V = 0",
+   "Culorile complementare se află la 180 de grade pe baza hexaconului",
+   "Spatiul culorilor este reprezentat de un hexacon; punctele de pe baza hexaconului au saturația S = 0",
+   "Culorile pure sunt reprezentate prin valoarea V = 1 și saturația S = 1"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte dacă se aplică modelul de shading Gouraud?",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Culoarea fiecărui fragment este calculată de GPU",
+   "Poate fi redată reflexia speculară pe suprafața unei primitive",
+   "Culorile fragmentelor unei primitive sunt calculate prin interpolarea culorilor din vârfurile primitivei",
+   "Culoarea unui fragment se calculează în fragment shader folosind un model de iluminare locală"
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "În OpenGL, transparența se simulează prin combinarea culorii fragmentului curent cu cea a pixelului în care se afișează:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Combinarea este realizată de procesorul de rasterizare",
+   "Combinarea este realizată în fragment shader",
+   "Trimițând primitivele grafice în banda grafică în oridinea din față în spate",
+   "Folosind modelul de culoare (R,G,B,A)"
+  ],
+  "right": [
+   0,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre urmatoarele metode tin cont de normalele la planele poligoanelor:",
+  "source": "Test EGC: Eliminarea partilor nevizibile ale scenelor 3D din imagini (2021)",
+  "options": [
+   "Algoritmul BVH",
+   "Eliminarea fetelor auto-obturate ale obiectelor",
+   "Algoritmul z-buffer",
+   "Algoritmul BSP"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - Eliminarea partilor nevizibile ale scenelor 3D din imagini"
+ },
+ {
+  "q": "Care dintre următoarele afirmații despre proiectiile izometrice sunt corecte?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Sunt proiectii axonometrice in planul XOY",
+   "Sunt proiectii axonometrice intr-un plan care intersecteaza axele principale ale sistemului de coordonate cu unghiuri egale",
+   "Sunt proiectii axonometrice care produc scalarea laturilor cu factori de scalare egali pe axele x, y, z"
+  ],
+  "right": [
+   1,
+   2
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte privind volumul vizual canonic?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Este definit în sistemul coordonatelor observator",
+   "Este folosit pentru optimizarea calculelor de decupare a primitivelor 3D",
+   "Depinde de tipul de proiecție definit prin transformarea de proiecție",
+   "Este un cub cu latura de 2 unități, raportat la sistemul coordonatelor de decupare"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Rotatia unui punct 3D (x,y,z) fata de un punct oarecare din spatiu (xf, yf, zf), cu un unghi u, se poate implementa prin urmatorul produs de matrici, stiind ca punctul (x,y,z) se reprezinta printr-un vector coloana in coordonate omogene:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Nici unul dintre celelalte raspunsuri nu este corect",
+   "T(xf, yf, zf)*R(0,0,u)*T(-xf,-yf,-zf)",
+   "(xf, yf,zf)* Oox*R(0,0,teta)*T(-xf,-yf,-zf), unde R(0,0,teta) suprapune dreapta pe care se afla punctul pe axa OX iar Oox este matricea de oglindire fata de OX",
+   "T(xf, yf,zf)*Rox(u)*T(-xf,-yf,-zf)"
+  ],
+  "right": [
+   0
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Transformarea de proiectie in OpenGL:",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Este definita printr-un volum vizual",
+   "Este o transformare afina",
+   "Transforma coordonatele varfurilor din spatiul observator in spatiul ecran",
+   "Transforma coordonatele varfurilor din spatiul observator in spatiul coordonatelor de decupare"
+  ],
+  "right": [
+   0,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Umbrele:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Sunt produse de obiectele scenei 3D vizibile din poziția unei surse de lumină",
+   "Sunt văzute de un observator aflat exact în poziția sursei de lumina",
+   "Sunt văzute de un observator aflat într-o poziție diferită de aceea a sursei de lumina",
+   "Sunt cu atat mai dense cu cat observatorul se afla la distanta mai mare de obiectul umbrit"
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre următoarele afirmații sunt corecte? In modelul HSV:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Culoarea rosu se reprezintă prin (0, 0, 1)",
+   "Este un model de culoare orientat catre utilizator",
+   "Culorile pure sunt situate pe suprafața bazei hexaconului",
+   "Nuanțele de gri se reprezintă prin combinații S=0, 0<=V<=1"
+  ],
+  "right": [
+   1,
+   3
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Pentru modelul de iluminare locală, care dintre urmatoarele afirmații sunt adevărate:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "O suprafață poate avea componentă speculară numai dacă poate avea și componentă difuză",
+   "Calculul componentei speculare nu depinde de normala la suprafață",
+   "Calculele pentru vectorul median H sunt mai simple decât cele pentru vectorul simetric R",
+   "Coeficientul de reflexie speculară al materialului pentru o suprafață mată este 1"
+  ],
+  "right": [
+   0,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Simularea transparenței ținând cont de legea lui Snell.",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Este folosită în metodele practice pentru obținerea de efecte fororealiste",
+   "Trebuie să producă o distorsionare a formei obiectelor, asemănătoare cu aceea produsă de o proiecție perspectivă",
+   "Culoarea fragmentului vizibil într-un pixel depinde de culoarea fragmentului unei suprafețe aflate în spatele celei vizibile pe direcția razei refractate",
+   "Culoarea fragmentului vizibil într-un pixel depinde de culoarea fragmentului din spatele său pe acelasi proiector"
+  ],
+  "right": [
+   1,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "In modelul de culoare RGB:",
+  "source": "Test EGC: cursuri 9,10,11,12 (2021)",
+  "options": [
+   "Punctul corespunzător culorii Alb se află în centrul cubului ce reprezintă spațiul culorilor",
+   "Spatiul culorilor este reprezentat de un cub cu coordonatele cuprinse între [0,0,0] și [1,1,1]",
+   "Culorile complementare culorilor R, G, B se află în vârfuri diagonal opuse ale cubului culorilor",
+   "Culoarea rosu are coordonatele (0,1,0)"
+  ],
+  "right": [
+   1,
+   2
+  ],
+  "test": "Test - cursuri 9,10,11,12"
+ },
+ {
+  "q": "Care dintre următoarele proiecții nu poate reda mai multe fețe ale obiectului proiectat, dacă fețele sunt paralele cu planele principale?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2020)",
+  "options": [
+   "Oblică",
+   "Izometrică",
+   "Ortografică",
+   "Perspectivă"
+  ],
+  "right": [
+   2
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ },
+ {
+  "q": "Care dintre următoarele afirmații despre proiectia perspectiva sunt corecte?",
+  "source": "Test EGC: Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL (2021)",
+  "options": [
+   "Produce coordonate omogene in care coordonata w este egala cu 1",
+   "Este o transformare afina",
+   "Modifica unghiurile dintre laturile care nu sunt paralele cu planul de proiectie",
+   "Modifica lungimile laturilor in functie de distanta lor fata de centrul de proiectie"
+  ],
+  "right": [
+   2,
+   3
+  ],
+  "test": "Test - Transformari 3D, Proiectii, Transformarea varfurilor in OpenGL"
+ }
+]

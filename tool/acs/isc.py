@@ -10,14 +10,17 @@ reference steps; the app's test decodes it again with the app's own steps.
 """
 import base64, os, sys, urllib.parse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import problem, quiz, write_course
+from common import problem, quiz, quiz_multi, write_course
 
 C1 = '1. Codificări'
 C2 = '2. Cifruri clasice'
 C3 = '3. XOR și text cunoscut'
 C4 = '4. Mai multe straturi'
 C5 = '5. Teorie: principii, criptografie, sisteme, web'
-CHAPTERS = [C1, C2, C3, C4, C5]
+C6 = '6. Grile: proprietăți, criptografie, hardware de încredere'
+C7 = '7. Grile: control acces, autentificare, sisteme'
+C8 = '8. Grile: aplicații, web, rețea, forensics'
+CHAPTERS = [C1, C2, C3, C4, C5, C6, C7, C8]
 LAB = 'Laborator ISC · criptografie'
 P = []
 
@@ -165,5 +168,121 @@ q(35, 'Cel mai mic privilegiu', 'ușoară', 'Ce spune principiul celui mai mic p
   'fiecare utilizator sau program primește doar drepturile de care are nevoie pentru sarcina lui', ['administratorul are toate drepturile', 'drepturile se dau pe grupuri, nu pe utilizatori', 'toate fișierele sunt implicit publice'], 'Limitează ce poate strica un cont compromis.', 'Un serviciu compromis poate face doar ce avea voie serviciul.')
 q(36, 'Ce asigură TLS', 'medie', 'Ce garantează certificatul serverului într-o conexiune TLS?',
   'că vorbești cu serverul al cărui nume e în certificat (autentificarea serverului)', ['că serverul nu are vulnerabilități', 'că parola ta e puternică', 'că site-ul nu colectează date personale'], 'Certificatul leagă o cheie publică de un nume, sub semnătura unei autorități.', 'TLS dă confidențialitate și integritate pe canal și autentifică serverul; nu spune nimic despre ce face serverul cu datele.')
+
+# ---------------------------------------------------------------- more benches
+bench(41, 'Hex, XOR, base64', C4, 'grea', 'XOR cu cheia `key`, apoi hex, apoi base64.', 'ISC{hex_inside_base64}', [('b64', ''), ('hex', ''), ('xor', 'key')],
+      'Base64 dă un șir care arată ca hex: încă un strat.', 'Din base64, din hex, XOR cu `key`.')
+bench(42, 'Cezar peste binar', C4, 'medie', 'Flag-ul a fost cifrat cu Cezar (cu 7) și apoi scris în binar.', 'ISC{bits_then_letters}', [('bin', ''), ('rot', 7)],
+      'Din binar iese un text cu acolade care nu se citește încă.', 'Din binar, apoi Cezar înapoi cu 7.')
+bench(43, 'Vigenère cu cheie lungă', C2, 'grea', 'Vigenère cu cheia `security`.', 'ISC{longer_keys_help_a_little}', [('vig', 'security')],
+      'Cheia se repetă peste literele textului; acoladele și `_` nu consumă din ea.', 'Vigenère cu cheia `security`. O cheie mai lungă rezistă mai mult la analiza frecvențelor, dar repetarea ei o trădează (testul Kasiski).')
+bench(44, 'Atbash și Cezar', C2, 'medie', 'Atbash, apoi Cezar cu 4.', 'ISC{two_substitutions_are_one}', [('rot', 4), ('atbash', '')],
+      'Desface întâi ultimul pas aplicat.', 'Cezar înapoi cu 4, apoi Atbash. Două substituții monoalfabetice compuse sunt tot o substituție monoalfabetică: nu e mai sigur.')
+bench(45, 'XOR cu cheie de 4, text cunoscut', C3, 'grea', 'XOR cu o cheie de 4 caractere, repetată, apoi hex. Textul în clar începe cu `ISC{`.', 'ISC{four_known_bytes}', [('hex', ''), ('xor', 'w1fi')],
+      'Patru octeți cunoscuți dau patru octeți de cheie.', 'Primii patru octeți cifrați XOR `49 53 43 7b` dau cheia `w1fi`.', 'Laborator ISC · many time pad')
+bench(46, 'URL peste hex', C1, 'ușoară', 'Un text hex care a trecut printr-un formular web.', 'ISC{url_then_hex}', [('url', ''), ('hex', '')],
+      'Întâi `%xx`, apoi hex.', 'Din URL, apoi din hex.')
+
+
+# ---------------------------------------------------------------- the TSSC tests
+TC = 'Test curs TSSC'
+EF = 'Examen final TSSC (2022)'
+E19 = 'Examen TSSC (2019)'
+
+
+def g(id, ch, title, diff, st, right, wrong, sol, src, hint=''):
+    P.append(quiz(id, title, ch, diff, st, right, wrong, hint, sol, src))
+
+
+g(101, C6, 'Date stocate, nemodificate', 'ușoară', 'Ce proprietate de securitate protejează datele stocate (at rest) împotriva modificării?',
+  'integritatea', ['disponibilitatea', 'confidențialitatea', 'autenticitatea'], 'Integritate: orice modificare a datelor trebuie să fie autorizată (și detectabilă).', TC)
+g(102, C6, 'Cine a trimis e-mailul', 'medie', 'Ce concept se asigură certificând că un e-mail a fost trimis chiar de cel care apare ca expeditor, astfel încât acesta să nu poată nega?',
+  'non-repudierea', ['integritatea', 'auditul', 'confidențialitatea'], 'Semnătura digitală leagă mesajul de cheia privată a expeditorului: el nu mai poate spune că nu l-a trimis.', TC)
+g(105, C6, 'Rainbow tables', 'medie', 'Ce tip de atac se face împotriva funcțiilor hash folosind un rainbow table?',
+  'un atac de tip forță brută (precalculat)', ['un atac cu text cifrat ales', 'un atac de coliziune', 'un atac cu text clar ales'],
+  'Tabelele precalculează lanțuri de hash-uri pentru parole posibile: forță brută cu un compromis timp-memorie. Sarea (salt) le face inutile.', TC)
+g(106, C6, 'Ce vrea atacatorul', 'ușoară', 'Ești atacator și vrei să compromiți date criptate. Ce ți-ar fi cel mai util?',
+  'o cheie slabă', ['un cifru bloc', 'traficul capturat', 'un algoritm public'], 'Cu un algoritm bun, secretul e în cheie (principiul lui Kerckhoffs): o cheie scurtă sau previzibilă se ghicește.', TC)
+g(109, C6, 'Criptarea discului', 'ușoară', 'Ce tip de criptare se folosește pentru criptarea unui hard disk?', 'simetrică', ['asimetrică', 'hashing', 'WPA2'],
+  'Volume mari, criptate și decriptate des: AES. Cheia simetrică poate fi apoi protejată de TPM sau de o parolă.', TC)
+P.append(quiz_multi(110, 'Root of Trust', C6, 'medie', 'Ce poate fi folosit ca Root of Trust? (unul sau mai multe)',
+                    ['un sistem de operare', 'un HSM', 'un modul TPM', 'un hypervisor'], [1, 2],
+                    solution='Rădăcina de încredere e hardware, greu de modificat: HSM și TPM. Sistemul de operare și hypervisorul sunt software, verificate pornind de la ea.', source=TC))
+g(111, C6, 'Stocare securizată în hardware', 'medie', 'Un administrator vrea stocare securizată, în hardware. Ce platformă poate folosi?',
+  'oricare dintre TPM, TrustZone și SGX', ['doar TPM', 'doar TrustZone', 'doar SGX'], 'Toate trei pot sigila date (sealed storage): datele se decriptează doar pe aceeași platformă, în aceeași stare.', TC)
+g(112, C6, 'Atestare la distanță cu SGX', 'grea', 'Un verificator vrea să ateste de la distanță că un program rulează într-o enclavă SGX la un furnizor de cloud. Ce poate servi drept dovadă?',
+  'un certificat (o cotă) semnat de procesorul cu SGX', ['un certificat semnat de sistemul de operare', 'un certificat semnat de programul din enclavă', 'un certificat semnat de hypervisor'],
+  'Sistemul de operare și hypervisorul nu sunt de încredere în modelul SGX; doar procesorul (cu cheile lui) garantează ce rulează în enclavă.', TC)
+g(113, C6, 'Câte medii izolate oferă TrustZone', 'medie', 'Câte medii de execuție izolate, asistate de hardware, oferă TrustZone?', '1', ['oricâte', '2', '0'],
+  'TrustZone împarte procesorul în două lumi, normală și securizată: există o singură lume securizată. SGX, în schimb, permite oricâte enclave.', TC)
+g(114, C6, 'TEE: TrustZone și SGX', 'medie', 'Câte TEE-uri (medii de execuție de încredere) pot fi create cu TrustZone? Dar cu SGX?', '1 / oricâte', ['oricâte / 1', 'oricâte / oricâte', '1 / 1'],
+  'O singură lume securizată la TrustZone; enclave câte vrei la SGX.', E19)
+g(115, C6, 'Cheie simetrică și hash', 'ușoară', 'Care dintre următorii algoritmi folosește o cheie simetrică și o funcție hash?', 'HMAC', ['SHA2', 'RSA', '3DES'],
+  'HMAC = un hash calculat peste mesaj și cheia secretă: integritate și autentificare.', EF)
+g(116, C6, 'Trusted timestamp', 'medie', 'Care dintre următoarele scheme poate fi folosită pentru un „trusted timestamp” (marcă de timp de încredere)?', 'RSA (o semnătură)', ['SHA256', 'AES256', 'SCA'],
+  'Autoritatea semnează hash-ul documentului împreună cu momentul: e nevoie de o semnătură, nu doar de un hash sau de criptare simetrică.', EF)
+g(117, C6, 'TCB', 'medie', 'Ce conține trusted computing base (TCB)?', 'toate componentele hardware și software de încredere',
+  ['toate politicile de securitate', 'toate aplicațiile instalate', 'toate procesele care rulează ca root'], 'TCB-ul e tot ce, dacă e compromis, compromite securitatea sistemului; se vrea cât mai mic.', EF)
+g(118, C6, 'Root of Trust la criptarea discului', 'ușoară', 'Care este „Root of Trust” folosit de sistemul de operare la criptarea hard disk-ului (de exemplu BitLocker)?', 'TPM', ['kernelul', 'UEFI', 'MBR'],
+  'TPM-ul eliberează cheia doar dacă măsurătorile pornirii sunt cele așteptate.', EF)
+g(119, C6, 'Protecția datelor în tranzit', 'ușoară', 'Ce tehnologie protejează datele în tranzit?', 'IPsec', ['TPM', 'HSM', 'TEE'], 'Celelalte protejează chei și date pe dispozitiv; IPsec criptează pachetele în rețea.', EF)
+
+g(130, C7, 'Monitorul de referință', 'medie', 'Ce tip de control al accesului cere un monitor de referință care decide la ce obiecte au acces subiecții, după etichete impuse de sistem?',
+  'Mandatory Access Control (MAC)', ['Discretionary Access Control (DAC)', 'Non-Discretionary Access Control', 'controlul bazat pe reguli'], 'La MAC politica e a sistemului (etichete, niveluri), nu a proprietarului; exemple: SELinux, Bell-LaPadula.', TC)
+g(131, C7, 'Modelul din Linux', 'ușoară', 'Linux folosește un model de control al accesului definit de proprietarul (creatorul) informației. Cum se numește?', 'DAC', ['MAC', 'RBAC', 'UCON'],
+  'Proprietarul fișierului își alege permisiunile (`chmod`).', TC)
+g(132, C7, 'Chinese Wall', 'grea', 'Clase de conflict: `{Tesla, Dacia, BMW}`, `{ING, BCR, BRD}`, `{Microsoft, UIPath, Bitdefender}`. Bob a accesat un obiect de la Tesla și cinci de la BCR. Ce NU mai are voie să acceseze, după politica Chinese Wall?',
+  'un obiect de la Dacia', ['un obiect de la UIPath', 'un obiect de la Tesla', 'un obiect de la BCR'],
+  'Odată ales Tesla, celelalte firme din aceeași clasă de conflict îi sunt interzise. Tesla și BCR rămân permise, iar din a treia clasă poate încă alege una.', TC)
+g(133, C7, 'Autentificare cu mai mulți factori', 'ușoară', 'Care dintre următoarele este o autentificare cu mai mulți factori?', 'PIN și smart card', ['parolă și PIN', 'amprentă și scanarea irisului', 'smart card și ecuson'],
+  'Factorii trebuie să fie de tipuri diferite: ceva ce știi (PIN), ceva ce ai (card), ceva ce ești (biometrie). Doi factori de același tip nu se pun.', TC)
+g(134, C7, 'cat cu setuid', 'grea', '`super-secret.txt` are drepturile `-rw-rw---- root root`, iar `/bin/cat` are `-rwsr-xr-x root root`. Utilizatorul `mihai` rulează `cat super-secret.txt`. Se afișează conținutul?',
+  'da, din cauza bitului setuid de pe `/bin/cat`', ['nu, mihai nu are drept de citire', 'da, din cauza permisiunilor DAC ale fișierului', 'da, din cauza bitului setuid de pe fișier'],
+  '`cat` rulează cu utilizatorul efectiv `root`, care citește orice. Un setuid pe un utilitar ca acesta e o gaură de securitate.', TC)
+g(135, C7, 'Ce nu e factor de autentificare', 'ușoară', 'Care dintre următoarele NU este un model (factor) de autentificare?', 'ceva ce există', ['ceva ce știi', 'ceva ce ești', 'ceva ce ai'],
+  'Cele trei categorii: cunoaștere, posesie, inerență.', EF)
+g(136, C7, 'Bypass la KMCI', 'grea', 'Cum poate un atacator ocoli „Kernel Mode Code Integrity” (KMCI), care permite doar cod de kernel semnat?',
+  'cu un atac de tip return-oriented programming', ['nu se poate ocoli o protecție din kernel', 'cu cheia publică a unui driver recunoscut', 'modificând un modul de kernel valid și reinstalându-l'],
+  'ROP nu introduce cod nou: înlănțuie bucăți din codul deja semnat, deci verificarea semnăturii nu îl oprește. Un modul modificat nu mai are semnătura validă.', EF)
+g(137, C7, 'Sandboxing pe mobil', 'ușoară', 'La ce folosește sandboxing-ul în sistemele de operare mobile?', 'la limitarea accesului aplicațiilor la resurse (fișiere, rețea...)',
+  ['la verificarea identității dezvoltatorului', 'la prevenirea oricărui atac asupra sistemului', 'la limitarea numărului de aplicații care rulează simultan'], 'Fiecare aplicație are directorul ei și doar permisiunile cerute.', EF)
+g(138, C7, 'Semnarea aplicațiilor mobile', 'ușoară', 'Semnarea unei aplicații mobile este folosită pentru a...', 'identifica dezvoltatorul',
+  ['activa mecanismul DEP', 'oferi un nivel ridicat de securitate la execuție', 'plasa aplicația într-un sandbox dedicat'], 'Semnătura spune cine a publicat aplicația și că nu a fost modificată; nu spune că aplicația e sigură.', E19)
+g(139, C7, 'JIT și DEP', 'grea', 'Ce mecanism de protecție devine inutil (trebuie relaxat) când se folosește un compilator „just in time”?', 'DEP', ['firewall-ul', 'ACE', 'BitLocker'],
+  'JIT-ul scrie cod în memorie și apoi îl execută: are nevoie de pagini care sunt și scriabile, și executabile, exact ce interzice DEP (W^X).', E19)
+g(140, C7, 'Atac asupra Secure World', 'medie', 'Ce tip de atac se poate realiza împotriva unei aplicații care rulează în TrustZone Secure World?', 'toate variantele',
+  ['return to libc', 'buffer overflow', 'return oriented programming'], 'Izolarea nu face codul corect: o aplicație vulnerabilă din lumea securizată poate fi exploatată la fel.', E19)
+g(141, C7, 'Driverul care ține minte tastele', 'ușoară', 'Un driver de sunet compromis salvează toate tastele apăsate într-un fișier accesibil tuturor programelor. Ce tip de atac este?', 'cal troian (Trojan horse)',
+  ['buffer overflow', 'DAC', 'XSS'], 'Un program care pare legitim și face pe ascuns altceva.', E19)
+
+g(150, C8, 'Ciocanul', 'ușoară', 'Ce componentă a securității e afectată când cineva distruge un calculator cu un ciocan?', 'disponibilitatea', ['confidențialitatea', 'integritatea', 'toate variantele'],
+  'Datele nu sunt citite sau modificate de nimeni; doar nu mai pot fi folosite.', EF)
+g(151, C8, 'Florin și e-mailul', 'ușoară', 'Florin trimite un e-mail, iar compania vrea să poată dovedi asta. Ce concept trebuie implementat?', 'non-repudierea', ['integritatea', 'confidențialitatea', 'autentificarea'],
+  'Dovada că el l-a trimis, pe care nu o poate nega: semnătură digitală.', EF)
+g(152, C8, 'Poza cu informații clasificate', 'ușoară', 'O investigație descoperă o poză care conține informații clasificate. Ce metodă a folosit atacatorul ca să exfiltreze datele prin rețea?', 'steganografia',
+  ['încapsularea datelor', 'deschiderea de socketuri', 'criptarea'], 'Datele sunt ascunse în pixelii unei imagini aparent banale.', EF)
+g(153, C8, 'Certificat emis fără să-l ceri', 'medie', 'Un server web descoperă că există un certificat TLS valid emis pentru domeniul lui, deși nu l-a cerut. Ce tehnologie i-a permis să afle?', 'certificate transparency',
+  ['certificate enforcement', 'certificate revocation list', 'certificate privacy'], 'Autoritățile publică fiecare certificat emis în jurnale publice, verificabile: proprietarul domeniului poate vedea orice certificat emis pe numele lui.', EF)
+g(154, C8, 'Unde se validează datele', 'ușoară', 'O aplicație web are un singur server și în spate o bază de date în cluster. Unde trebuie validate datele primite de la utilizator?', 'pe serverul web',
+  ['nicăieri, dacă se folosește HTTPS', 'cu o extensie de browser', 'doar în JavaScript, pe client'], 'Validarea din client se ocolește ușor; serverul e ultimul punct pe care îl controlezi înainte de baza de date.', EF)
+g(155, C8, 'tar și backup-ul', 'medie', 'Comanda `tar czvf backup.tar.gz .` arhivează directorul curent. Poate duce la compromiterea serverului?',
+  'da, dacă directorul e servit pe web și drepturile lui sunt greșite', ['da, dacă unul dintre fișiere conține viruși', 'nu, tar nu are vulnerabilități cunoscute', 'nu, un atacator nu poate rula tar pe server'],
+  'Arhiva ajunge chiar în directorul arhivat: dacă e public pe web, oricine descarcă tot codul și configurațiile (parole, chei).', EF)
+g(156, C8, 'TOR: intrări și ieșiri', 'grea', 'Ce poate afla un atacator care observă toate intrările și ieșirile unei rețele TOR?', 'tot: cine cu cine vorbește (corelând traficul)',
+  ['doar cine accesează, nu și ce', 'nimic, totul e anonim', 'doar ce se accesează, nu și cine'], 'TOR nu rezistă unui adversar global: momentele și volumele pachetelor de la intrare și de la ieșire se pot corela.', EF)
+g(157, C8, 'Ce vede serverul prin TOR', 'medie', 'Ce află un server web accesat prin rețeaua TOR de calculatorul lui Mihai?', 'adresa IP a ultimului nod din circuit (nodul de ieșire)',
+  ['adresele IP ale tuturor nodurilor', 'nimic', 'adresa IP a lui Mihai'], 'Serverul vede conexiunea venind de la nodul de ieșire.', EF)
+g(158, C8, 'YouTube care te trimite în altă parte', 'medie', 'Florin accesează YouTube, dar ajunge pe un site de „tech support”. Ce atac poate explica asta?', 'DNS poisoning',
+  ['CSRF', 'phishing', 'adware'], 'Numele de domeniu corect e rezolvat la o adresă greșită.', EF)
+g(159, C8, 'Atacuri STP', 'medie', 'Ce metodă protejează împotriva atacurilor asupra protocolului STP?', 'BPDU guard', ['MITM', 'sticky MAC', 'VLAN hopping'],
+  'Pe porturile spre stații nu trebuie să apară BPDU-uri; dacă apar (un atacator care vrea să devină root bridge), portul se închide.', E19)
+g(160, C8, 'Raportul de forensics pentru CEO', 'ușoară', 'Care e cea mai importantă componentă a unui raport de forensics pentru un CEO?', 'sumarul',
+  ['detalierea informațiilor identificate', 'numele investigatorului', 'procedura folosită'], 'Un rezumat pe înțelesul conducerii: ce s-a întâmplat, ce impact are, ce e de făcut.', E19)
+g(161, C8, 'Procesele active', 'ușoară', 'În ce etapă a unei investigații se salvează informațiile despre procesele active pe calculatorul analizat?', 'colectare',
+  ['analiză', 'pregătire', 'raportare'], 'Datele volatile (memorie, procese, conexiuni) se colectează primele, înainte de a opri mașina.', E19)
+g(162, C8, 'Certificat expirat pe un singur PC', 'medie', 'Într-o companie mare, un singur PC afișează „SSL certificate has expired”. Care e cauza probabilă?', 'data sistemului pe acel PC este greșită',
+  ['certificatul nu a fost reînnoit', 'are loc un atac man-in-the-middle', 'browserul nu e actualizat'], 'Dacă certificatul ar fi expirat cu adevărat, l-ar vedea toate calculatoarele.', E19)
+g(163, C8, 'Cookie-uri', 'ușoară', 'Care afirmație despre cookie-urile HTTP este adevărată?', 'sunt folosite pentru a implementa autentificarea pe web',
+  ['nu trebuie folosite niciodată, pentru că utilizatorul le poate modifica', 'cookie-urile criptate sunt perfect sigure', 'sunt cea mai bună formă de urmărire a utilizatorului'], 'Sesiunea după login e de obicei un cookie; marcat `HttpOnly`, `Secure`, `SameSite`.', E19)
 
 write_course('isc', CHAPTERS, P)
