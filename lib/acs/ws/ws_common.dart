@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../code_keys.dart';
 import '../acs_data.dart';
 import '../acs_kit.dart';
 
@@ -136,8 +137,9 @@ class AcsField extends StatelessWidget {
   }
 }
 
-/// A multi-line code editor in the section's look: line numbers, Tab indents,
-/// a colour for comments, strings and keywords of [keywords].
+/// A multi-line code editor in the section's look: line numbers, a colour for
+/// comments, strings and keywords of [keywords], and the IDE's keys
+/// ([CodeKeys]) in [language].
 class AcsCodeEditor extends StatefulWidget {
   final AcsInk ink;
   final TextEditingController controller;
@@ -148,8 +150,11 @@ class AcsCodeEditor extends StatefulWidget {
   final VoidCallback? onSave; // Ctrl/Cmd+S
   final int? markLine; // 1-based: the line being run (the emulator's step)
   final FocusNode? focusNode;
+  final String? lang; // for the keys: 'cpp', 'asm', 'octave', 'shell', 'apd', 'text' (by [comment] when null)
   const AcsCodeEditor(this.ink, this.controller,
-      {super.key, this.minHeight = 320, this.keywords = const {}, this.comment = '//', this.onRun, this.onSave, this.markLine, this.focusNode});
+      {super.key, this.minHeight = 320, this.keywords = const {}, this.comment = '//', this.onRun, this.onSave, this.markLine, this.focusNode, this.lang});
+
+  String get language => lang ?? switch (comment) { '//' => 'cpp', ';' => 'asm', '%' => 'octave', _ => 'text' };
 
   @override
   State<AcsCodeEditor> createState() => _AcsCodeEditorState();
@@ -220,37 +225,15 @@ class _AcsCodeEditorState extends State<AcsCodeEditor> {
       widget.onSave!();
       return KeyEventResult.handled;
     }
-    if (e.logicalKey == LogicalKeyboardKey.tab) {
-      final sel = c.selection;
-      if (!sel.isValid) return KeyEventResult.handled;
-      final shift = HardwareKeyboard.instance.isShiftPressed;
-      if (!shift && sel.isCollapsed) {
-        c.value = c.value.replaced(sel, '    ');
-        return KeyEventResult.handled;
-      }
-      // indent or dedent the selected lines
-      final text = c.text;
-      final start = text.lastIndexOf('\n', sel.start - 1) + 1;
-      final endNl = text.indexOf('\n', sel.end);
-      final end = endNl < 0 ? text.length : endNl;
-      final block = text.substring(start, end).split('\n');
-      final changed = [for (final l in block) shift ? l.replaceFirst(RegExp(r'^ {1,4}|^\t'), '') : '    $l'].join('\n');
-      c.value = TextEditingValue(text: text.replaceRange(start, end, changed), selection: TextSelection(baseOffset: start, extentOffset: start + changed.length));
-      return KeyEventResult.handled;
-    }
-    if (e.logicalKey == LogicalKeyboardKey.enter && !ctrl) {
-      // keep the indentation of the line
-      final sel = c.selection;
-      if (!sel.isValid) return KeyEventResult.ignored;
-      final text = c.text;
-      final ls = text.lastIndexOf('\n', sel.start - 1) + 1;
-      final indent = RegExp(r'^[ \t]*').stringMatch(text.substring(ls, sel.start)) ?? '';
-      final before = text.substring(ls, sel.start).trimRight();
-      final extra = before.endsWith('{') ? '    ' : '';
-      c.value = c.value.replaced(sel, '\n$indent$extra');
-      return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
+    // the rest as in the IDE: brackets and quotes that close themselves,
+    // Enter keeping the indent (one more after {, :, then, a label…), } and
+    // end under their opener, Tab / Shift+Tab, Ctrl+/, Alt+↑↓, Shift+Alt+F
+    final kb = HardwareKeyboard.instance;
+    final next = CodeKeys.apply(c.value,
+        key: e.logicalKey, character: e.character, ctrl: ctrl, shift: kb.isShiftPressed, alt: kb.isAltPressed, lang: widget.language);
+    if (next == null) return KeyEventResult.ignored;
+    c.value = next;
+    return KeyEventResult.handled;
   }
 
   @override

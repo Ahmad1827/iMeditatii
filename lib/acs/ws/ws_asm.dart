@@ -207,7 +207,7 @@ class _AsmWorkspaceState extends State<AsmWorkspace> {
       children: [
         Text('; ${spec['signature'] ?? _call.entry}', style: ink.mono(13.5, color: ink.muted)),
         const SizedBox(height: 6),
-        AcsCodeEditor(ink, _code, minHeight: widget.narrow ? 300 : 380, keywords: _asmKeywords, comment: ';', onRun: _runTests, markLine: _cpu == null || _cpu!.halted ? null : _cpu!.line),
+        AcsCodeEditor(ink, _code, minHeight: widget.narrow ? 300 : 380, keywords: _asmKeywords, comment: ';', onRun: _runTests, lang: 'asm', markLine: _cpu == null || _cpu!.halted ? null : _cpu!.line),
         const SizedBox(height: 10),
         ToolRow([
           AcsButton(ink, 'rulează testele', _runTests, primary: true, icon: Icons.play_arrow),

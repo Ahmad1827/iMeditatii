@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../code_keys.dart';
 import '../acs_data.dart';
 import '../acs_kit.dart';
 import '../engine/shell.dart';
@@ -281,7 +282,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
       return;
     }
     _editor?.dispose();
-    _editor = acsCodeController(n?.data ?? '', const {'if', 'then', 'else', 'elif', 'fi', 'for', 'in', 'do', 'done', 'while', 'until', 'case', 'esac', 'function', 'return', 'echo', 'read', 'local', 'exit', 'shift'}, comment: '#');
+    _editor = acsCodeController(n?.data ?? '', const {'if', 'then', 'else', 'elif', 'fi', 'for', 'in', 'do', 'done', 'while', 'until', 'case', 'esac', 'function', 'return', 'echo', 'read', 'local', 'exit', 'shift'}, comment: CodeLang.forFile(path) == 'cpp' ? '//' : '#');
     _editing = path;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _editing != null) _editorFocus.requestFocus();
@@ -463,7 +464,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
               ),
               CallbackShortcuts(
                 bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => _closeEditor(save: true)},
-                child: AcsCodeEditor(ink, _editor!, minHeight: h - 80, comment: '#', onSave: _saveEditor, focusNode: _editorFocus),
+                child: AcsCodeEditor(ink, _editor!, minHeight: h - 80, comment: CodeLang.forFile(_editing!) == 'cpp' ? '//' : '#', onSave: _saveEditor, focusNode: _editorFocus, lang: CodeLang.forFile(_editing!)),
               ),
               const SizedBox(height: 8),
               ToolRow([

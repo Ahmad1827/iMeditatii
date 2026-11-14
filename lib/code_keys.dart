@@ -5,14 +5,20 @@ import 'package:flutter/services.dart';
 // =============================================================================
 // EDITING KEYS, AS IN VS CODE
 //   One place for what a key does to the code, shared by every editor in the
-//   app (the problem page, the workbench). Pure: text and selection in, text
-//   and selection out, so it is tested without a widget.
+//   app (the problem page, the workbench, the ACS workspaces). Pure: text and
+//   selection in, text and selection out, so it is tested without a widget.
+//   [CodeLang] says what a language changes: its comment mark, what opens a
+//   block (C's {, Python's and APD's :, Octave's if … end, the shell's
+//   then … fi, an assembly label) and how Shift+Alt+F aligns it.
 //
 //   ( [ { " '        close themselves; around a selection they wrap it
 //   ) ] } " '        typed before the same closer step over it
 //   Backspace        deletes an empty pair, or one indent level of spaces
 //   Enter            keeps the indent, one more after { ( [ or "else"/"if (…)"
+//                    (Octave: if/for/function…, shell: then/do/case, asm: "loop:")
 //   }                on an empty line lines up with its {
+//   end, else, fi…   go under their block's opener on Enter (Octave, shell)
+//   :                after a word alone on its line, the label goes to the margin (asm)
 //   Tab / Shift+Tab  indent / outdent (the selected lines, or the caret's line)
 //   Ctrl+/           comments or uncomments the lines
 //   Alt+↑ / Alt+↓    moves the lines up / down
@@ -20,8 +26,56 @@ import 'package:flutter/services.dart';
 //   Ctrl+Shift+K     deletes the lines
 //   Ctrl+] / Ctrl+[  indent / outdent the lines
 //   Home             to the first character of the line, then to column 0
-//   Shift+Alt+F      aligns the whole file (see [CodeKeys.format])
+//   Shift+Alt+F      aligns the whole file (see [CodeKeys.formatAs])
 // =============================================================================
+
+/// What the keys know of a language: its line comment, how its blocks open
+/// and close, and whether Shift+Alt+F can align it.
+class CodeLang {
+  final String id;
+  final String comment; // the line comment mark
+  final bool braces; // C: lone bodies after if (…), #include <>, Shift+Alt+F by braces
+  final bool colon; // Python, APD: a line ending in ':' opens a block
+  final bool transpose; // Octave: ' after a name or a closer is the transpose, not a quote
+  final bool detectIndent; // the indent step is read from the file (2 or 4 spaces)
+  const CodeLang(this.id, this.comment, {this.braces = false, this.colon = false, this.transpose = false, this.detectIndent = false});
+
+  static const c = CodeLang('cpp', '//', braces: true);
+  static const python = CodeLang('python', '#', colon: true);
+  static const apd = CodeLang('apd', '#', colon: true, detectIndent: true);
+  static const asm = CodeLang('asm', ';');
+  static const octave = CodeLang('octave', '%', transpose: true);
+  static const shell = CodeLang('shell', '#', detectIndent: true);
+  static const text = CodeLang('text', '#', detectIndent: true);
+
+  static CodeLang of(String lang) => switch (lang) {
+        'python' => python,
+        'apd' => apd,
+        'asm' => asm,
+        'octave' || 'matlab' => octave,
+        'shell' || 'bash' || 'sh' => shell,
+        'text' || 'cfg' => text,
+        _ => c,
+      };
+
+  /// The language of a file by its name (the shell's editor).
+  static String forFile(String path) {
+    final name = path.split('/').last.toLowerCase();
+    final dot = name.lastIndexOf('.');
+    final ext = dot < 0 ? '' : name.substring(dot + 1);
+    return switch (ext) {
+      'c' || 'h' || 'cpp' || 'cc' || 'hpp' || 'java' || 'js' => 'cpp',
+      'py' => 'python',
+      'asm' || 's' || 'nasm' => 'asm',
+      'm' => 'octave',
+      'sh' || 'bash' || '' => name == 'makefile' ? 'text' : 'shell',
+      _ => 'text',
+    };
+  }
+
+  bool get keywords => this == octave || this == shell;
+  bool get formats => braces || keywords || this == asm;
+}
 
 class CodeKeys {
   static const String tab = '    ';
@@ -41,12 +95,13 @@ class CodeKeys {
     final sel = v.selection;
     if (!sel.isValid) return null;
     final text = v.text;
-    final e = _Edit(text, sel);
+    final L = CodeLang.of(lang);
+    final e = _Edit(text, sel, L, L.detectIndent ? indentOf(text) : tab);
 
     if (shift && alt && key == LogicalKeyboardKey.keyF) {
-      return lang == 'python' ? null : formatValue(v);
+      return L.formats ? formatValue(v, lang: lang) : null;
     }
-    if (ctrl && key == LogicalKeyboardKey.slash) return e.toggleComment(lang == 'python' ? '#' : '//');
+    if (ctrl && key == LogicalKeyboardKey.slash) return e.toggleComment(L.comment);
     if (ctrl && shift && key == LogicalKeyboardKey.keyK) return e.deleteLines();
     if (ctrl && key == LogicalKeyboardKey.bracketRight) return e.indentLines(outdent: false);
     if (ctrl && key == LogicalKeyboardKey.bracketLeft) return e.indentLines(outdent: true);
@@ -59,13 +114,13 @@ class CodeKeys {
     if (key == LogicalKeyboardKey.home && !shift) return e.smartHome();
 
     if (key == LogicalKeyboardKey.tab) {
-      if (sel.isCollapsed && !shift) return e.replace(sel.start, sel.end, tab);
+      if (sel.isCollapsed && !shift) return e.replace(sel.start, sel.end, e.tab);
       return e.indentLines(outdent: shift);
     }
 
     if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
       if (shift) return null;
-      return e.newline(lang);
+      return e.newline();
     }
 
     if (key == LogicalKeyboardKey.backspace && sel.isCollapsed && sel.start > 0) {
@@ -75,7 +130,8 @@ class CodeKeys {
       if (next.isNotEmpty && pairs[prev] == next) return e.replace(pos - 1, pos + 1, '');
       final before = text.substring(e.lineStart(pos), pos);
       if (before.isNotEmpty && before.trim().isEmpty && !before.contains('\t')) {
-        final drop = before.length % tab.length == 0 ? tab.length : before.length % tab.length;
+        final step = e.tab.length;
+        final drop = before.length % step == 0 ? step : before.length % step;
         return e.replace(pos - drop, pos, '');
       }
       return null;
@@ -86,6 +142,22 @@ class CodeKeys {
     final next = sel.end < text.length ? text[sel.end] : '';
     final prev = sel.start > 0 ? text[sel.start - 1] : '';
     final isQuote = ch == '"' || ch == "'";
+
+    // asm: a label ("loop:") goes back to the margin
+    if (L == CodeLang.asm && ch == ':' && sel.isCollapsed) {
+      final ls = e.lineStart(sel.start);
+      final before = text.substring(ls, sel.start);
+      final after = text.substring(sel.end, e.lineEnd(sel.end));
+      if (RegExp(r'^[ \t]+[A-Za-z_.$][\w.$]*$').hasMatch(before) && after.trim().isEmpty) {
+        final label = before.trimLeft();
+        return TextEditingValue(text: text.replaceRange(ls, sel.end, '$label:'), selection: TextSelection.collapsed(offset: ls + label.length + 1));
+      }
+    }
+    // Octave: A' is A transposed
+    if (L.transpose && ch == "'" && sel.isCollapsed && RegExp(r"[A-Za-z0-9_)\]}'.]").hasMatch(prev)) {
+      if (next == "'") return TextEditingValue(text: text, selection: TextSelection.collapsed(offset: sel.start + 1));
+      return null;
+    }
 
     // a closing brace on an empty line goes under its opening brace
     if (ch == '}' && sel.isCollapsed) {
@@ -119,7 +191,7 @@ class CodeKeys {
     }
 
     // #include <|>
-    if (ch == '<' && sel.isCollapsed && RegExp(r'^\s*#\s*include\s*$').hasMatch(text.substring(e.lineStart(sel.start), sel.start)) && next != '>') {
+    if (L.braces && ch == '<' && sel.isCollapsed && RegExp(r'^\s*#\s*include\s*$').hasMatch(text.substring(e.lineStart(sel.start), sel.start)) && next != '>') {
       return e.replace(sel.start, sel.end, '<>', caret: sel.start + 1);
     }
 
@@ -130,7 +202,7 @@ class CodeKeys {
       if (inner.contains('\n') && isQuote) return null;
       return e.replace(sel.start, sel.end, '$ch$inner$close', caret: sel.start + 1, selectTo: sel.end + 1);
     }
-    if (_inCommentOrString(text, sel.start) && (isQuote || ch == '(' || ch == '[')) return null;
+    if (_inCommentOrString(text, sel.start, L.comment) && (isQuote || ch == '(' || ch == '[')) return null;
     final roomAfter = next.isEmpty || RegExp(r'[\s)\]};,]').hasMatch(next);
     final wordBefore = RegExp(r'[A-Za-z0-9_\\]').hasMatch(prev);
     if (roomAfter && !(isQuote && wordBefore)) return e.replace(sel.start, sel.end, '$ch$close', caret: sel.start + 1);
@@ -159,26 +231,32 @@ class CodeKeys {
   /// only real braces and parentheses are counted.
   /// [text] with comments and the inside of strings blanked out (same
   /// length, newlines kept), so a brace or an operator in them doesn't count.
-  static String mask(String text) => _code(text);
+  static String mask(String text, {String comment = '//', bool transpose = false}) => _code(text, comment: comment, transpose: transpose);
 
-  static String _code(String text) {
+  static String _code(String text, {String comment = '//', bool transpose = false}) {
     final b = StringBuffer();
     var i = 0;
+    final block = comment == '//';
     while (i < text.length) {
       final c = text[i];
-      if (c == '/' && i + 1 < text.length && text[i + 1] == '/') {
+      if (text.startsWith(comment, i)) {
         while (i < text.length && text[i] != '\n') {
           b.write(' ');
           i++;
         }
         continue;
       }
-      if (c == '/' && i + 1 < text.length && text[i + 1] == '*') {
+      if (block && c == '/' && i + 1 < text.length && text[i + 1] == '*') {
         final end = text.indexOf('*/', i + 2);
         final stop = end < 0 ? text.length : end + 2;
         for (; i < stop; i++) {
           b.write(text[i] == '\n' ? '\n' : ' ');
         }
+        continue;
+      }
+      if (c == "'" && transpose && i > 0 && RegExp(r"[A-Za-z0-9_)\]}'.]").hasMatch(text[i - 1])) {
+        b.write(c);
+        i++;
         continue;
       }
       if (c == '"' || c == "'") {
@@ -206,7 +284,7 @@ class CodeKeys {
   }
 
   /// Whether [pos] is inside a string, a character literal or a // comment on its line.
-  static bool _inCommentOrString(String text, int pos) {
+  static bool _inCommentOrString(String text, int pos, [String comment = '//']) {
     final ls = pos == 0 ? 0 : text.lastIndexOf('\n', pos - 1) + 1;
     String? quote;
     for (var i = ls; i < pos; i++) {
@@ -219,7 +297,7 @@ class CodeKeys {
         }
       } else if (c == '"' || c == "'") {
         quote = c;
-      } else if (c == '/' && i + 1 < pos && text[i + 1] == '/') {
+      } else if (text.startsWith(comment, i) && i + comment.length <= pos) {
         return true;
       }
     }
@@ -228,9 +306,9 @@ class CodeKeys {
 
   // ---------------------------------------------------------------- format
   /// [v] with the whole text aligned; the caret stays on its line and token.
-  static TextEditingValue formatValue(TextEditingValue v) {
+  static TextEditingValue formatValue(TextEditingValue v, {String lang = 'cpp'}) {
     final before = v.text.split('\n');
-    final after = format(v.text).split('\n');
+    final after = formatAs(v.text, lang).split('\n');
     if (after.length != before.length) return TextEditingValue(text: after.join('\n'), selection: TextSelection.collapsed(offset: after.join('\n').length));
     int map(int offset) {
       offset = offset.clamp(0, v.text.length);
@@ -251,6 +329,72 @@ class CodeKeys {
       text: after.join('\n'),
       selection: TextSelection(baseOffset: map(sel.baseOffset), extentOffset: map(sel.extentOffset)),
     );
+  }
+
+  /// The indent step [text] is written with: two spaces when its smallest
+  /// indent is two, four otherwise.
+  static String indentOf(String text) {
+    var least = 0;
+    for (final m in RegExp(r'^( +)\S', multiLine: true).allMatches(text)) {
+      final n = m[1]!.length;
+      if (least == 0 || n < least) least = n;
+    }
+    return least == 2 ? '  ' : tab;
+  }
+
+  /// [code] aligned as [lang] is written: C by its braces, Octave and the shell
+  /// by their keywords, assembly with labels and directives at the margin.
+  static String formatAs(String code, String lang) {
+    final L = CodeLang.of(lang);
+    if (L.braces) return format(code);
+    if (L.keywords) return KeywordBlocks.of(L).format(code, L.detectIndent ? indentOf(code) : tab);
+    if (L == CodeLang.asm) return formatAsm(code);
+    return code;
+  }
+
+  /// Assembly: labels, sections and directives at the margin, data
+  /// definitions too, every instruction one step in; a comment line goes
+  /// where the line of code after it goes; "mov eax,1" gets its space after the comma.
+  static String formatAsm(String code) {
+    final lines = code.replaceAll('\t', tab).split('\n');
+    final margin = RegExp(
+        r'^([A-Za-z_.$?@][\w.$?@]*:|(section|segment|global|extern|bits|default|org|%\w+|\.\w+)\b|[A-Za-z_.$][\w.$]*\s+(db|dw|dd|dq|dt|resb|resw|resd|resq|equ|times)\b)',
+        caseSensitive: false);
+    final out = List<String>.filled(lines.length, '');
+    var next = ''; // the indent of the next line of code, for the comments above it
+    for (var i = lines.length - 1; i >= 0; i--) {
+      final t = lines[i].trim();
+      if (t.isEmpty) continue;
+      if (t.startsWith(';')) {
+        out[i] = '$next$t';
+        continue;
+      }
+      next = margin.hasMatch(t) ? '' : tab;
+      out[i] = '$next${_asmCommas(t)}';
+    }
+    return out.join('\n');
+  }
+
+  /// One space after each comma of the operands (not in strings or the comment).
+  static String _asmCommas(String t) {
+    final b = StringBuffer();
+    String? q;
+    for (var i = 0; i < t.length; i++) {
+      final c = t[i];
+      if (q != null) {
+        if (c == q) q = null;
+        b.write(c);
+        continue;
+      }
+      if (c == ';') {
+        b.write(t.substring(i));
+        break;
+      }
+      if (c == '"' || c == "'" || c == '`') q = c;
+      b.write(c);
+      if (c == ',' && i + 1 < t.length && t[i + 1] != ' ') b.write(' ');
+    }
+    return b.toString();
   }
 
   /// C/C++ [code] re-indented by its braces, 4 spaces a level: the body of a
@@ -320,7 +464,9 @@ class CodeKeys {
 class _Edit {
   final String text;
   final TextSelection sel;
-  _Edit(this.text, this.sel);
+  final CodeLang lang;
+  final String tab; // one indent step
+  _Edit(this.text, this.sel, [this.lang = CodeLang.c, this.tab = CodeKeys.tab]);
 
   int lineStart(int pos) => pos <= 0 ? 0 : text.lastIndexOf('\n', pos - 1) + 1;
 
@@ -356,25 +502,44 @@ class _Edit {
     return forward ? TextSelection(baseOffset: ns, extentOffset: ne) : TextSelection(baseOffset: ne, extentOffset: ns);
   }
 
-  TextEditingValue newline(String lang) {
+  TextEditingValue newline() {
     final pos = sel.start;
-    final line = text.substring(lineStart(pos), pos);
-    final base = RegExp(r'^[ \t]*').stringMatch(line) ?? '';
-    final trimmed = CodeKeys._code(line).trimRight();
-    final opens = trimmed.endsWith('{') || trimmed.endsWith('(') || trimmed.endsWith('[') || (lang == 'python' && trimmed.endsWith(':'));
-    final lone = lang != 'python' &&
+    final ls = lineStart(pos);
+    final line = text.substring(ls, pos);
+    var base = RegExp(r'^[ \t]*').stringMatch(line) ?? '';
+    final L = lang;
+    final trimmed = CodeKeys._code(line, comment: L.comment, transpose: L.transpose).trimRight();
+    var opens = trimmed.endsWith('{') || trimmed.endsWith('(') || trimmed.endsWith('[') || (L.colon && trimmed.endsWith(':'));
+    if (L == CodeLang.asm && RegExp(r'^\s*[A-Za-z_.$][\w.$]*:$').hasMatch(trimmed)) opens = true;
+    if (L.keywords) {
+      final blocks = KeywordBlocks.of(L);
+      final t = trimmed.trim();
+      // "end", "else", "fi"… go under the opener of their block, then the new
+      // line starts at the indent the line leads to
+      if (blocks.dedents(t)) {
+        final want = blocks.indentFor(text, ls, t, tab);
+        if (want != null && want != base) {
+          final fixed = text.replaceRange(ls, ls + base.length, want);
+          final d = want.length - base.length;
+          return _Edit(fixed, TextSelection(baseOffset: sel.baseOffset + d, extentOffset: sel.extentOffset + d), L, tab).newline();
+        }
+      }
+      if (blocks.opens(t)) opens = true;
+      if (blocks.endsItem(t) && base.length >= tab.length) base = base.substring(tab.length);
+    }
+    final lone = L.braces &&
         (RegExp(r'^\s*(\}\s*)?(else\s+)?(if|for|while)\b.*\)$').hasMatch(trimmed) || RegExp(r'^\s*(\}\s*)?else$').hasMatch(trimmed));
     final next = sel.end < text.length ? text[sel.end] : '';
     if (opens && (next == '}' || next == ')' || next == ']')) {
       // "{|}": the body on its own indented line, the closer back on the base indent
-      return replace(pos, sel.end, '\n$base${CodeKeys.tab}\n$base', caret: pos + 1 + base.length + CodeKeys.tab.length);
+      return replace(pos, sel.end, '\n$base$tab\n$base', caret: pos + 1 + base.length + tab.length);
     }
     // the spaces after the caret go: the new line starts at the indent
     var end = sel.end;
     while (end < text.length && text[end] == ' ') {
       end++;
     }
-    return replace(pos, end, '\n$base${opens || lone ? CodeKeys.tab : ''}');
+    return replace(pos, end, '\n$base${opens || lone ? tab : ''}');
   }
 
   TextEditingValue indentLines({required bool outdent}) {
@@ -384,12 +549,12 @@ class _Edit {
     for (var i = 0; i < lines.length; i++) {
       var d = 0;
       if (outdent) {
-        final lead = RegExp(r'^ {1,4}|^\t').stringMatch(lines[i]) ?? '';
+        final lead = RegExp('^ {1,${tab.length}}|^\t').stringMatch(lines[i]) ?? '';
         lines[i] = lines[i].substring(lead.length);
         d = -lead.length;
       } else if (lines[i].isNotEmpty || lines.length == 1) {
-        lines[i] = '${CodeKeys.tab}${lines[i]}';
-        d = CodeKeys.tab.length;
+        lines[i] = '$tab${lines[i]}';
+        d = tab.length;
       }
       if (i == 0) firstDelta = d;
       total += d;
@@ -470,5 +635,175 @@ class _Edit {
     final ls = lineStart(sel.extentOffset);
     final first = ls + (RegExp(r'^[ \t]*').stringMatch(text.substring(ls, lineEnd(ls))) ?? '').length;
     return TextEditingValue(text: text, selection: TextSelection.collapsed(offset: sel.extentOffset == first ? ls : first));
+  }
+}
+
+// =============================================================================
+// BLOCKS OPENED AND CLOSED BY WORDS (Octave, the shell)
+//   if … end / endif, for … end, switch / case … end, function … end;
+//   if … then … elif … else … fi, for/while … do … done, case … in … ;; … esac.
+//   One walk over the lines keeps the open blocks; from it come where a line
+//   that closes or continues a block goes, and the whole file aligned.
+// =============================================================================
+
+class _Frame {
+  final String kind; // the opening word, "{" or "item" (a case's branch)
+  final int level; // in the aligned file
+  final String indent; // as written
+  const _Frame(this.kind, this.level, this.indent);
+}
+
+class KeywordBlocks {
+  final bool shell;
+  const KeywordBlocks._(this.shell);
+  static const _octave = KeywordBlocks._(false);
+  static const _shell = KeywordBlocks._(true);
+  static KeywordBlocks of(CodeLang l) => l == CodeLang.shell ? _shell : _octave;
+
+  static const _oOpen = {'if', 'for', 'parfor', 'while', 'switch', 'function', 'try', 'do', 'unwind_protect'};
+  static const _oClose = {'end', 'endif', 'endfor', 'endparfor', 'endwhile', 'endswitch', 'endfunction', 'end_try_catch', 'end_unwind_protect', 'until'};
+  static const _oMiddle = {'else', 'elseif', 'catch', 'unwind_protect_cleanup'};
+  static const _oItem = {'case', 'otherwise'};
+  static const _sOpen = {'if', 'for', 'while', 'until', 'select', 'case'};
+  static const _sClose = {'fi', 'done', 'esac'};
+  static const _sMiddle = {'then', 'do', 'else', 'elif'};
+
+  static String _word(String t) => RegExp(r'^[A-Za-z_]\w*').stringMatch(t) ?? '';
+
+  Set<String> get _open => shell ? _sOpen : _oOpen;
+  Set<String> get _close => shell ? _sClose : _oClose;
+  Set<String> get _middle => shell ? _sMiddle : _oMiddle;
+
+  /// The block is opened and closed on the same line: "if x, y = 1; end", "for f in *; do echo $f; done".
+  bool _closedInline(String t) => shell ? RegExp(r'[;&|]\s*(fi|done|esac)\b').hasMatch(t) : RegExp(r'[,;]\s*(end\w*|until)\b').hasMatch(t);
+
+  /// A shell case branch: "a|b)", "*)", "(x)".
+  static bool _pattern(String t) => RegExp(r'^\(?[^\s;()][^;()]*\)').hasMatch(t) && !t.startsWith(';;');
+
+  bool _isItem(String t, _Frame? top) {
+    if (shell) {
+      if (top == null || (top.kind != 'case' && top.kind != 'item')) return false;
+      return _word(t) != 'esac' && _pattern(t);
+    }
+    return _oItem.contains(_word(t));
+  }
+
+  /// A line that goes back to its block's opener: end, else, fi, done, case…
+  bool dedents(String t) {
+    final w = _word(t);
+    if (_close.contains(w) || _middle.contains(w)) return true;
+    if (!shell && _oItem.contains(w)) return true;
+    return shell && t.startsWith('}');
+  }
+
+  /// The line opens a block (or continues one: else, case…): the next line goes one step in.
+  bool opens(String t) {
+    final w = _word(t);
+    if (_closedInline(t)) return false;
+    if (!shell) return _oOpen.contains(w) || _oMiddle.contains(w) || _oItem.contains(w);
+    if (w == 'case' || w == 'then' || w == 'do' || w == 'else') return true;
+    if (RegExp(r'\b(then|do)$').hasMatch(t) || t.endsWith('{')) return true;
+    return _pattern(t) && !t.endsWith(';;');
+  }
+
+  /// A case branch ends on this line (";;"): the next line goes one step out.
+  bool endsItem(String t) => shell && t.endsWith(';;') && !_pattern(t);
+
+  /// One line [t] (masked, trimmed) against the open blocks: its level and the
+  /// indent its block asks for, the blocks updated.
+  (int, String) _step(List<_Frame> st, String t, String raw, String tab) {
+    final w = _word(t);
+    final actual = RegExp(r'^[ \t]*').stringMatch(raw) ?? '';
+    _Frame? top() => st.isEmpty ? null : st.last;
+    (int, String) body() => st.isEmpty ? (0, '') : (st.last.level + 1, '${st.last.indent}$tab');
+
+    if (_close.contains(w) || (shell && t.startsWith('}'))) {
+      if (top()?.kind == 'item') st.removeLast();
+      if (st.isEmpty) return (0, '');
+      final f = st.removeLast();
+      return (f.level, f.indent);
+    }
+    if (_isItem(t, top())) {
+      if (top()?.kind == 'item') st.removeLast();
+      final at = body();
+      if (!(shell && t.endsWith(';;'))) st.add(_Frame('item', at.$1, at.$2));
+      return at;
+    }
+    if (_middle.contains(w)) {
+      final f = top();
+      if (f == null) return (0, '');
+      return (f.level, f.indent);
+    }
+    final at = body();
+    if (shell && t.endsWith(';;') && top()?.kind == 'item') {
+      st.removeLast();
+      return at;
+    }
+    if (!_closedInline(t) && (_open.contains(w) || (shell && t.endsWith('{')))) {
+      st.add(_Frame(_open.contains(w) ? w : '{', at.$1, actual));
+    }
+    return at;
+  }
+
+  List<String> _masked(String code) {
+    final L = shell ? CodeLang.shell : CodeLang.octave;
+    return CodeKeys.mask(code, comment: L.comment, transpose: L.transpose).split('\n');
+  }
+
+  /// The indent the line at [lineStart], reading [t], should have; null when
+  /// no block is open there.
+  String? indentFor(String text, int lineStart, String t, String tab) {
+    final before = text.substring(0, lineStart);
+    final raw = before.split('\n')..removeLast(); // the empty piece after the last \n
+    final masked = _masked(before);
+    final st = <_Frame>[];
+    for (var i = 0; i < raw.length; i++) {
+      final m = masked[i].trim();
+      if (m.isEmpty) continue;
+      _step(st, m, raw[i], tab);
+    }
+    if (st.isEmpty) return null;
+    return _step(st, t, '', tab).$2;
+  }
+
+  /// [code] with every line at its block's level.
+  String format(String code, String tab) {
+    code = code.replaceAll('\t', tab);
+    final lines = code.split('\n');
+    final masked = _masked(code);
+    final out = <String>[];
+    final st = <_Frame>[];
+    String? heredoc; // the shell's << WORD: its lines are kept as written
+    var blockComment = false; // Octave's %{ … %}
+    var cont = false; // the line before ended in ... or \
+    for (var i = 0; i < lines.length; i++) {
+      final raw = lines[i];
+      final t = raw.trim();
+      if (heredoc != null) {
+        out.add(raw);
+        if (t == heredoc) heredoc = null;
+        continue;
+      }
+      if (!shell && (t == '%{' || blockComment)) {
+        blockComment = t != '%}';
+        out.add(raw.trimRight());
+        continue;
+      }
+      if (t.isEmpty) {
+        out.add('');
+        continue;
+      }
+      final m = masked[i].trim();
+      final mm = m.isEmpty ? t : m;
+      var (level, _) = _step(st, mm, tab * (st.isEmpty ? 0 : st.last.level + 1), tab);
+      if (cont) level++;
+      out.add('${tab * level}$t');
+      cont = shell ? mm.endsWith('\\') : mm.endsWith('...');
+      if (shell) {
+        final h = RegExp(r'''<<-?\s*['"]?(\w+)''').firstMatch(raw);
+        if (h != null) heredoc = h[1];
+      }
+    }
+    return out.join('\n');
   }
 }

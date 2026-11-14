@@ -161,7 +161,7 @@ class _ApdWorkspaceState extends State<ApdWorkspace> {
                   : 'Adaugă lock(m)/unlock(m), P(s)/V(s) sau await(b). Declară-le sus: lock m · sem s = 1 · barrier b = 2.',
               style: ink.mono(13.5, color: ink.muted)),
           const SizedBox(height: 8),
-          AcsCodeEditor(ink, _code, minHeight: 220, keywords: _apdWords, comment: '#', onRun: _verify),
+          AcsCodeEditor(ink, _code, minHeight: 220, keywords: _apdWords, comment: '#', onRun: _verify, lang: 'apd'),
           if (_error != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_error!, style: ink.mono(13.5, color: ink.bad))),
           const SizedBox(height: 8),
           ToolRow([

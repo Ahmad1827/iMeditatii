@@ -155,7 +155,7 @@ class _CWorkspaceState extends State<CWorkspace> {
       children: [
         Text(ink.terminal ? '// main.c — C11' : 'main.c (C11)', style: ink.mono(13.5, color: ink.muted)),
         const SizedBox(height: 6),
-        AcsCodeEditor(ink, _code, minHeight: widget.narrow ? 320 : 420, keywords: _cKeywords, onRun: _runTests),
+        AcsCodeEditor(ink, _code, minHeight: widget.narrow ? 320 : 420, keywords: _cKeywords, onRun: _runTests, lang: 'cpp'),
         const SizedBox(height: 10),
         ToolRow([
           AcsButton(ink, 'rulează testele', _busy ? null : _runTests, primary: true, icon: Icons.play_arrow),

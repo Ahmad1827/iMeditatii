@@ -131,7 +131,7 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
       children: [
         Text('% ${spec['function']}.m${forbid.isEmpty ? '' : ' · interzis: ${forbid.map((f) => f == '\\' ? '\\ (backslash)' : f).join(', ')}'}', style: ink.mono(13.5, color: ink.muted)),
         const SizedBox(height: 6),
-        AcsCodeEditor(ink, _code, minHeight: widget.narrow ? 280 : 340, keywords: _octKeywords, comment: '%', onRun: _runTests),
+        AcsCodeEditor(ink, _code, minHeight: widget.narrow ? 280 : 340, keywords: _octKeywords, comment: '%', onRun: _runTests, lang: 'octave'),
         const SizedBox(height: 10),
         ToolRow([
           AcsButton(ink, 'rulează testele', _runTests, primary: true, icon: Icons.play_arrow),
