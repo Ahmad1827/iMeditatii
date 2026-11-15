@@ -58,7 +58,7 @@ class _DsWorkspaceState extends State<DsWorkspace> {
       widget.onVerdict(true);
     } else if (_task.failed && !_reported) {
       _reported = true;
-      widget.onVerdict(false);
+      widget.onVerdict(false, Attempt('pașii făcuți:\n${_task.log.join('\n')}', 'greșeli: ${_task.mistakes}; ultima: ${f.message}'));
     }
   }
 

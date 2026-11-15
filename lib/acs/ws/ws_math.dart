@@ -100,7 +100,15 @@ class _MathWorkspaceState extends State<MathWorkspace> {
   void _verify() {
     final r = _task.verify(_answers());
     setState(() => _checks = [for (final c in r) Check(c.label, c.ok, c.detail)]);
-    widget.onVerdict(r.isNotEmpty && r.every((c) => c.ok));
+    final answer = [
+      for (final f in _task.fields)
+        switch (f.type) {
+          'matrix' => '${f.name}:\n${[for (final row in _cells[f.name]!) row.map((c) => c.text).join('  ')].join('\n')}',
+          'points' => '${f.name}: ${[for (final (a, b, _) in _points[f.name]!) '(${a.text}, ${b.text})'].join(' ')}',
+          _ => '${f.name} = ${_text[f.name]!.text}',
+        },
+    ].join('\n');
+    widget.onVerdict(r.isNotEmpty && r.every((c) => c.ok), Attempt(answer, reportOf([for (final c in r) Check(c.label, c.ok, c.detail)])));
   }
 
   String? _liveError(MathField f) {

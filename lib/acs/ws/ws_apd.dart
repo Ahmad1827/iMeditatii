@@ -85,7 +85,7 @@ class _ApdWorkspaceState extends State<ApdWorkspace> {
     });
     if (_task.mode == 'schedule' && !_reachedSaid && _task.reached(p, _run.last)) {
       _reachedSaid = true;
-      widget.onVerdict(true);
+      widget.onVerdict(true, Attempt('ordinea: ${_order.join(' ')}'));
     }
   }
 
@@ -144,7 +144,12 @@ class _ApdWorkspaceState extends State<ApdWorkspace> {
       ];
     }
     setState(() => _checks = [for (final (l, ok, d) in r) Check(l, ok, d)]);
-    widget.onVerdict(r.every((c) => c.$2));
+    final answer = _task.mode == 'outcomes'
+        ? 'valorile finale posibile scrise:\n${_values.text}'
+        : _fix
+            ? '${_code.text}${_breaking == null ? '' : '\n\n// o ordine care o strică: ${_breaking!.join(' ')}'}'
+            : 'ordinea în care am rulat firele: ${_order.join(' ')}';
+    widget.onVerdict(r.every((c) => c.$2), Attempt(answer, reportOfTriples(r)));
   }
 
   @override

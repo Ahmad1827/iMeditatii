@@ -80,7 +80,7 @@ class _AsmWorkspaceState extends State<AsmWorkspace> {
   void _runTests() {
     final prog = _assemble();
     if (prog == null) {
-      widget.onVerdict(false);
+      widget.onVerdict(false, Attempt(_code.text, _error ?? 'nu se asamblează'));
       return;
     }
     final r = [for (final c in _cases) _call.run(prog, c)];
@@ -88,7 +88,10 @@ class _AsmWorkspaceState extends State<AsmWorkspace> {
       _results = r;
       _cpu = null;
     });
-    widget.onVerdict(r.every((x) => x.ok));
+    widget.onVerdict(
+        r.every((x) => x.ok),
+        Attempt(_code.text,
+            reportOf([for (final x in r) Check(_call.describe(x.c) + (x.c.ret == null ? '' : ' = ${x.c.ret}'), x.ok, x.message)])));
   }
 
   void _startStep() {

@@ -76,7 +76,12 @@ class _CryptoWorkspaceState extends State<CryptoWorkspace> {
   void _verify() {
     final ok = _task.solvedBy([for (final r in _rows) r.op]);
     setState(() => _verdict = ok);
-    widget.onVerdict(ok);
+    final ops = [for (final r in _rows) r.op];
+    final run = CryptoRun.of(_task.cipher, ops);
+    widget.onVerdict(
+        ok,
+        Attempt([for (final (i, o) in ops.indexed) '${i + 1}. ${o.kind}${o.arg.isEmpty ? '' : ' (${o.arg})'}'].join('\n'),
+            run.error != null ? 'eroare: ${run.error}' : (run.outputs.isEmpty ? 'niciun pas' : 'ieșirea ultimului pas: ${showBytes(run.outputs.last)}')));
   }
 
   @override

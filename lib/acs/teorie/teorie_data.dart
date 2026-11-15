@@ -1,9 +1,13 @@
 // =============================================================================
 // A COURSE'S THEORY: lessons to read before (or beside) the problems
 //   assets/data/acs/teorie/<code>.json, made by tool/acs/<code>_teorie.py:
-//   {"code", "title", "intro", "parts": [{title, about, lessons: [id]}],
-//    "lessons": [{id, title, summary, curs, minutes, practice: [problem id],
-//                 sections: [{id, title, blocks: [{t: ..., ...}]}]}]}
+//   {"code", "title", "intro", "parts": [{title, about, test, lessons: [id]}],
+//    "chapters": {problem chapter: lesson id},
+//    "lessons": [{id, title, summary, curs, minutes, goals: [...],
+//                 practice: [problem id],
+//                 sections: [{id, title, key: [...], blocks: [{t: ..., ...}]}]}]}
+//   goals say what the lesson teaches and key is a section's takeaway: the
+//   short layer read first (and alone, in the "esențial" mode).
 //   A block is prose (p), a definition (def), a theorem (thm, maybe with a
 //   proof), an example (ex, maybe with a solution), a note (note: tip, warn,
 //   info), a table, an algorithm's steps (steps), a question to check
@@ -18,8 +22,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TeorieSection {
   final String id, title;
+  final List<String> key;
   final List<Map<String, dynamic>> blocks;
-  const TeorieSection(this.id, this.title, this.blocks);
+  const TeorieSection(this.id, this.title, this.blocks, {this.key = const []});
 }
 
 class TeorieLesson {
@@ -27,22 +32,34 @@ class TeorieLesson {
   final int minutes;
   final List<String> practice;
   final List<TeorieSection> sections;
-  const TeorieLesson(this.id, this.title, this.summary, this.curs, this.minutes, this.practice, this.sections);
+  final List<String> goals;
+  const TeorieLesson(this.id, this.title, this.summary, this.curs, this.minutes, this.practice, this.sections, {this.goals = const []});
 
   int get vizCount => sections.fold(0, (a, s) => a + s.blocks.where((b) => b['t'] == 'viz').length);
 }
 
 class TeoriePart {
-  final String title, about;
+  final String title, about, test;
   final List<String> lessons;
-  const TeoriePart(this.title, this.about, this.lessons);
+  const TeoriePart(this.title, this.about, this.lessons, {this.test = ''});
 }
 
 class TeorieCourse {
   final String code, title, intro;
   final List<TeoriePart> parts;
   final List<TeorieLesson> lessons;
-  const TeorieCourse(this.code, this.title, this.intro, this.parts, this.lessons);
+  final Map<String, String> chapters; // a problem chapter -> the lesson to read for it
+  const TeorieCourse(this.code, this.title, this.intro, this.parts, this.lessons, {this.chapters = const {}});
+
+  TeoriePart? partOf(TeorieLesson l) {
+    for (final p in parts) {
+      if (p.lessons.contains(l.id)) return p;
+    }
+    return null;
+  }
+
+  /// The lesson for a problem's chapter, if there is one.
+  TeorieLesson? forChapter(String chapter) => chapters[chapter] == null ? null : byId(chapters[chapter]!);
 
   TeorieLesson? byId(String id) {
     for (final l in lessons) {
@@ -61,7 +78,7 @@ class TeorieCourse {
       '${j['intro'] ?? ''}',
       [
         for (final p in j['parts'] as List? ?? const [])
-          TeoriePart('${p['title']}', '${p['about'] ?? ''}', [for (final l in p['lessons'] as List) '$l']),
+          TeoriePart('${p['title']}', '${p['about'] ?? ''}', [for (final l in p['lessons'] as List) '$l'], test: '${p['test'] ?? ''}'),
       ],
       [
         for (final l in j['lessons'] as List)
@@ -74,10 +91,13 @@ class TeorieCourse {
             [for (final p in l['practice'] as List? ?? const []) '$p'],
             [
               for (final s in l['sections'] as List)
-                TeorieSection('${s['id']}', '${s['title']}', [for (final b in s['blocks'] as List) (b as Map).cast<String, dynamic>()]),
+                TeorieSection('${s['id']}', '${s['title']}', [for (final b in s['blocks'] as List) (b as Map).cast<String, dynamic>()],
+                    key: [for (final k in s['key'] as List? ?? const []) '$k']),
             ],
+            goals: [for (final g in l['goals'] as List? ?? const []) '$g'],
           ),
       ],
+      chapters: {for (final e in (j['chapters'] as Map? ?? const {}).entries) '${e.key}': '${e.value}'},
     );
   }
 }
@@ -116,6 +136,17 @@ class TeorieProgress {
       await prefs.remove(_key(code, id));
     }
   }
+
+  /// Esențial (false) or complet (true), as last chosen.
+  static Future<bool> full() async {
+    try {
+      return (await SharedPreferences.getInstance()).getBool('acs-teorie-complet') ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<void> setFull(bool v) async => (await SharedPreferences.getInstance()).setBool('acs-teorie-complet', v);
 
   static Future<String?> last(String code) async => (await SharedPreferences.getInstance()).getString('acs-teorie-ultima:$code');
   static Future<void> setLast(String code, String id) async => (await SharedPreferences.getInstance()).setString('acs-teorie-ultima:$code', id);

@@ -106,10 +106,61 @@ class _RevealState extends State<Reveal> {
           ),
         ),
       ),
-      if (_open) Padding(padding: const EdgeInsets.only(top: 6), child: widget.child),
+      AnimatedSize(
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.topCenter,
+        child: _open ? Padding(padding: const EdgeInsets.only(top: 6), child: widget.child) : const SizedBox(width: double.infinity),
+      ),
     ]);
   }
 }
+
+/// Fades and slides in, once, after [delay] (a list coming in one by one).
+class Stagger extends StatelessWidget {
+  final int index;
+  final Widget child;
+  const Stagger(this.index, {super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final ms = 260 + 45 * index.clamp(0, 14);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: ms),
+      curve: Interval(1 - 260 / ms, 1, curve: Curves.easeOutCubic),
+      builder: (context, t, c) => Opacity(opacity: t, child: Transform.translate(offset: Offset(0, 14 * (1 - t)), child: c)),
+      child: child,
+    );
+  }
+}
+
+/// A bar that fills to [value], moving there.
+class GrowBar extends StatelessWidget {
+  final double value, height;
+  final Color color, track;
+  const GrowBar({super.key, required this.value, required this.color, required this.track, this.height = 6});
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+        tween: Tween(end: value.clamp(0, 1).toDouble()),
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+        builder: (context, v, _) => ClipRRect(
+          borderRadius: BorderRadius.circular(height),
+          child: SizedBox(
+            height: height,
+            child: Stack(fit: StackFit.expand, children: [
+              ColoredBox(color: track),
+              FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: v, child: ColoredBox(color: color)),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// "1 problemă", "5 probleme"; from 20 on Romanian says "20 de probleme".
+String plural(int n, String one, String many) => n == 1 ? '1 $one' : (n % 100 >= 20 || (n >= 100 && n % 100 == 0) ? '$n de $many' : '$n $many');
 
 /// A small rounded label.
 Widget teorieTag(AcsInk ink, String text, Color c) => Container(

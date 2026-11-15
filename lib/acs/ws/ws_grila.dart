@@ -116,7 +116,10 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
         }
       });
       _save();
-      widget.onVerdict(ok);
+      widget.onVerdict(
+          ok,
+          Attempt('am bifat: ${[for (final i in _ticked.toList()..sort()) _say(i)].join('; ')}',
+              'răspunsurile corecte: ${[for (final i in _answers.toList()..sort()) _say(i)].join('; ')}'));
       return;
     }
     final p = _picked;
@@ -131,8 +134,10 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
       }
     });
     _save();
-    widget.onVerdict(ok);
+    widget.onVerdict(ok, Attempt('am ales: ${_say(p)}', 'răspunsul corect: ${_say(_answer)}'));
   }
+
+  String _say(int i) => '${String.fromCharCode(97 + i)}) ${i < _options.length ? _options[i] : ''}';
 
   void _again() {
     setState(() {

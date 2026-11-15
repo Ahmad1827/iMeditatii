@@ -174,6 +174,10 @@ PARTS = [
      'lessons': ['turing', 'calculabilitate']},
     {'title': 'Recapitulare', 'about': 'Înainte de examen.', 'lessons': ['recapitulare']},
 ]
+exec(open(os.path.join(HERE, 'lfa_teorie_keys.py'), encoding='utf-8').read())
+for p_ in PARTS:
+    if p_['title'] in TESTS:
+        p_['test'] = TESTS[p_['title']]
 assert sorted(i for p_ in PARTS for i in p_['lessons']) == sorted(l['id'] for l in LESSONS), 'a lesson is in no part'
 order = [i for p_ in PARTS for i in p_['lessons']]
 LESSONS.sort(key=lambda l: order.index(l['id']))
@@ -190,6 +194,23 @@ for l in LESSONS:
                 if 'pos' in b and 'a' in b:
                     assert len(b['pos']) == b['a']['states'], (l['id'], b['title'])
 
+# the problem list's chapters, each with the lesson to read for it
+CHAPTERS = {
+    '1. Automate finite deterministe': 'afd',
+    '2. Automate nedeterministe': 'afn',
+    '3. Expresii regulate': 'expresii-regulate',
+    '4. Proprietăți ale limbajelor regulate': 'inchidere-lr',
+    '5. Gramatici independente de context': 'gic',
+    '6. Automate cu stivă': 'apd',
+    '7. Mașini Turing': 'turing',
+    '8. Clase de limbaje': 'calculabilitate',
+    '9. Grile: modelul de test': 'recapitulare',
+    '10. Grile din teste și examene': 'recapitulare',
+}
+_problem_chapters = {c for c in json.load(open(os.path.join(ROOT, 'assets', 'data', 'acs', 'lfa.json'), encoding='utf-8'))['chapters']}
+assert set(CHAPTERS) == _problem_chapters, set(CHAPTERS) ^ _problem_chapters
+assert all(v in order for v in CHAPTERS.values())
+
 out = os.path.join(ROOT, 'assets', 'data', 'acs', 'teorie', 'lfa.json')
 os.makedirs(os.path.dirname(out), exist_ok=True)
 data = {
@@ -197,6 +218,7 @@ data = {
     'title': 'Limbaje Formale și Automate',
     'intro': 'Teoria cursului, lecție cu lecție, în ordinea cursurilor: definițiile cu notațiile din curs, teoremele cu demonstrațiile lor, exemple rezolvate, probleme de examen din anii trecuți cu rezolvarea, întrebări de verificare și algoritmi pe care îi rulezi pas cu pas (automate care citesc un cuvânt, construcția submulțimilor, eliminarea stărilor, minimizarea, lema de pompare ca joc, arbori de derivare, CYK, automate cu stivă, mașini Turing). La sfârșitul fiecărei lecții, problemele pe care se aplică.',
     'parts': PARTS,
+    'chapters': CHAPTERS,
     'lessons': LESSONS,
 }
 text = json.dumps(data, ensure_ascii=False, indent=1).replace('\u2212', '-')

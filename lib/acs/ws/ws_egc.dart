@@ -91,13 +91,15 @@ class _TransformWorkspaceState extends State<TransformWorkspace> {
   void _verify() {
     if (_rows.any((r) => !r.ok)) {
       setState(() => _checks = const [Check('fiecare transformare are numerele completate', false, 'completează câmpurile goale sau șterge rândul')]);
-      widget.onVerdict(false);
+      widget.onVerdict(false, Attempt(_rowsText(), reportOf(_checks)));
       return;
     }
     final r = _task.check(_ops);
     setState(() => _checks = [for (final (l, ok, d) in r) Check(l, ok, d)]);
-    widget.onVerdict(r.every((c) => c.$2));
+    widget.onVerdict(r.every((c) => c.$2), Attempt(_rowsText(), reportOfTriples(r)));
   }
+
+  String _rowsText() => [for (final (i, r) in _rows.indexed) '${i + 1}. ${r.kind}(${r.a.text}${r.b.text.isEmpty ? '' : ', ${r.b.text}'})'].join('\n');
 
   @override
   Widget build(BuildContext context) {
@@ -321,7 +323,7 @@ class _RasterWorkspaceState extends State<RasterWorkspace> {
   void _verify() {
     final r = _task.check(_lit);
     setState(() => _checks = [for (final (l, ok, d) in r) Check(l, ok, d)]);
-    widget.onVerdict(r.every((c) => c.$2));
+    widget.onVerdict(r.every((c) => c.$2), Attempt('pixelii aprinși (x, y): ${[for (final (x, y) in _lit) '($x, $y)'].join(' ')}', reportOfTriples(r)));
   }
 
   @override

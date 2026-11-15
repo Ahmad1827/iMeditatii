@@ -108,7 +108,7 @@ class _CircuitWorkspaceState extends State<CircuitWorkspace> {
       _checks = out;
       if (ok) _solved = true;
     });
-    widget.onVerdict(ok);
+    widget.onVerdict(ok, Attempt([for (final e in _in.entries) '${e.key} = ${e.value.text}'].join('\n'), reportOf(out)));
   }
 
   String _sign(double got, double want) {

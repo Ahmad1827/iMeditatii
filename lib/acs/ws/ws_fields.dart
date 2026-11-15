@@ -56,7 +56,10 @@ mixin _Fields<T extends AcsWorkspace> on State<T> {
   void verify() {
     final r = task.check({for (final e in typed.entries) e.key: e.value.text});
     setState(() => marks = r);
-    widget.onVerdict(r.values.every((ok) => ok));
+    widget.onVerdict(
+        r.values.every((ok) => ok),
+        Attempt([for (final e in typed.entries) '${e.key}: ${e.value.text}'].join('\n'),
+            [for (final e in r.entries) '${e.value ? '[✓]' : '[✗]'} ${e.key}'].join('\n')));
   }
 
   Widget fieldsView() {

@@ -106,6 +106,13 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
         for (var s = 0; s < _n; s++) s: {for (final c in _cols) c: _targets(_cell(s, c).text)},
       });
 
+  /// The automaton as the student filled it in, one state a line.
+  String _tableText() => [
+        'stări: ${[for (var s = 0; s < _n; s++) 'q$s'].join(', ')}; inițială q0; finale: ${[for (final f in _final.where((f) => f < _n).toList()..sort()) 'q$f'].join(', ')}',
+        for (var s = 0; s < _n; s++)
+          for (final c in _cols) 'δ(q$s, $c) = ${_cell(s, c).text.trim().isEmpty ? (_task.mode == 'nfa' ? '∅' : '(gol)') : _cell(s, c).text.trim()}',
+      ].join('\n');
+
   void _verify() {
     final r = _auto
         ? _task.checkAutomaton(_automaton())
@@ -116,7 +123,7 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
             _ => _task.checkGrammar(_text.text),
           };
     setState(() => _checks = [for (final (l, ok, d) in r) Check(l, ok, d)]);
-    widget.onVerdict(r.every((c) => c.$2));
+    widget.onVerdict(r.every((c) => c.$2), Attempt(_auto ? _tableText() : _text.text, reportOfTriples(r)));
   }
 
   void _resize(int d) {

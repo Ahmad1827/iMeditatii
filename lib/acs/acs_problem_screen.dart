@@ -13,6 +13,10 @@ import '../acs_screen.dart' show acsSubject, acsTrail;
 import '../app_link.dart';
 import 'acs_data.dart';
 import 'acs_kit.dart';
+import 'explain.dart';
+import 'teorie/teorie_data.dart';
+import 'teorie/teorie_screen.dart' show teorieRoute;
+import 'ws/ws_common.dart' show Attempt;
 import 'ws/workspaces.dart';
 
 class AcsProblemScreen extends StatefulWidget {
@@ -27,12 +31,16 @@ class AcsProblemScreen extends StatefulWidget {
 class _AcsProblemScreenState extends State<AcsProblemScreen> {
   AcsCourseData? _data;
   AcsProblem? _p;
+  TeorieLesson? _lesson; // the theory for the problem's chapter
+  int _lessonNo = 0;
   bool _loaded = false;
   bool _solved = false;
   bool _justSolved = false;
   int _fails = 0;
   bool _hint = false;
   bool _solution = false;
+  Attempt? _attempt; // the last answer the checks refused, for "De ce nu merge așa?"
+  int _attempts = 0;
 
   @override
   void initState() {
@@ -44,8 +52,11 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
     final d = await loadAcsCourse(widget.course);
     final p = d?.byId(widget.id);
     final s = p == null ? false : await AcsProgress.solved(p);
+    final te = p != null && acsTeorieCourses.contains(widget.course) ? await loadTeorie(widget.course) : null;
     if (!mounted) return;
     setState(() {
+      _lesson = p == null ? null : te?.forChapter(p.chapter);
+      _lessonNo = _lesson == null ? 0 : te!.indexOf(_lesson!) + 1;
       _data = d;
       _p = p;
       _solved = s;
@@ -53,8 +64,12 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
     });
   }
 
-  void _verdict(bool ok) {
+  void _verdict(bool ok, [Attempt? attempt]) {
     final p = _p!;
+    setState(() {
+      _attempt = ok ? null : attempt;
+      if (!ok && attempt != null) _attempts++;
+    });
     if (ok) {
       AcsProgress.markSolved(p);
       setState(() {
@@ -84,10 +99,17 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
         }
         final wide = MediaQuery.of(context).size.width >= 1100;
         final statement = _statement(context, ink, narrow, p);
-        final workspace = KeyedSubtree(
-          key: ValueKey(p.key),
-          child: buildWorkspace(p, ink, narrow, _verdict),
-        );
+        final attempt = _attempt;
+        final workspace = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          KeyedSubtree(
+            key: ValueKey(p.key),
+            child: buildWorkspace(p, ink, narrow, _verdict),
+          ),
+          if (attempt != null) ...[
+            const SizedBox(height: 16),
+            ExplainPanel(key: ValueKey('explain-${p.key}-$_attempts'), problem: p, attempt: attempt, ink: ink, course: subject.name),
+          ],
+        ]);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -184,7 +206,35 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
               ),
             if (canSee && _solution) Padding(padding: const EdgeInsets.only(top: 4, left: 4), child: AcsText(p.solution, ink, size: 14.5)),
           ],
+          if (_lesson != null) ...[
+            const SizedBox(height: 8),
+            SelectionContainer.disabled(child: _theoryLink(context, ink, _lesson!)),
+          ],
         ],
+      ),
+    );
+  }
+
+  Widget _theoryLink(BuildContext context, AcsInk ink, TeorieLesson l) {
+    final route = teorieRoute(widget.course, l.id);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: AppLink(
+        to: route,
+        child: AcsTap(
+          label: 'teoria: ${l.title}',
+          onTap: () => context.go(route),
+          builder: (h) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (!ink.terminal) ...[Icon(Icons.menu_book_outlined, size: 16, color: h ? ink.strong : ink.accent), const SizedBox(width: 6)],
+              Flexible(
+                child: Text(ink.terminal ? '[>] teoria: $_lessonNo. ${l.title}' : 'teoria: $_lessonNo. ${l.title} →',
+                    style: ink.mono(14, weight: FontWeight.w700, color: h ? ink.strong : ink.accent)),
+              ),
+            ]),
+          ),
+        ),
       ),
     );
   }

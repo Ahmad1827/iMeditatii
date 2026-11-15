@@ -19,6 +19,7 @@ import '../app_link.dart';
 import 'acs_data.dart';
 import 'acs_kit.dart';
 import 'teorie/teorie_data.dart';
+import 'teorie/teorie_kit.dart' show Stagger;
 import 'teorie/teorie_screen.dart' show teorieRoute;
 
 class AcsCourseScreen extends StatefulWidget {
@@ -38,6 +39,7 @@ int _diffRank(String d) => _diffs.contains(d) ? _diffs.indexOf(d) : 1;
 
 class _AcsCourseScreenState extends State<AcsCourseScreen> {
   AcsCourseData? _data;
+  TeorieCourse? _teorie; // the lessons, for the link from a chapter to its theory
   bool _loaded = false;
   Set<String> _solved = const {};
   Set<String> _tried = const {};
@@ -69,6 +71,8 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
     final d = await loadAcsCourse(widget.code);
     final s = await AcsProgress.solvedIds(widget.code);
     final t = await AcsProgress.triedIds(widget.code);
+    final te = acsTeorieCourses.contains(widget.code) ? await loadTeorie(widget.code) : null;
+    _teorie = te;
     String? saved;
     var chosen = false;
     try {
@@ -180,7 +184,19 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
           const SizedBox(height: 18),
           _filterBar(ink, narrow, data),
           const SizedBox(height: 14),
-          ..._list(context, ink, narrow, data),
+          // a new choice of filters fades the list in again
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 260),
+            switchInCurve: Curves.easeOutCubic,
+            transitionBuilder: (c, a) => FadeTransition(
+                opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, 0.01), end: Offset.zero).animate(a), child: c)),
+            layoutBuilder: (current, previous) => Stack(alignment: Alignment.topCenter, children: [...previous.map((w) => Positioned(top: 0, left: 0, right: 0, child: w)), if (current != null) current]),
+            child: Column(
+              key: ValueKey('$_chapter|$_status|$_diff|$_type|$_examOnly|$_query'),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: _list(context, ink, narrow, data),
+            ),
+          ),
         ]);
       },
     );
@@ -261,14 +277,19 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
   }
 
   /// A rounded bar for the notebook.
-  Widget _bar(AcsInk ink, double f, double h) => ClipRRect(
-        borderRadius: BorderRadius.circular(h),
-        child: SizedBox(
-          height: h,
-          child: Stack(fit: StackFit.expand, children: [
-            ColoredBox(color: ink.line.withValues(alpha: 0.5)),
-            FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: f.clamp(0, 1).toDouble(), child: ColoredBox(color: ink.good)),
-          ]),
+  Widget _bar(AcsInk ink, double f, double h) => TweenAnimationBuilder<double>(
+        tween: Tween(end: f.clamp(0, 1).toDouble()),
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeOutCubic,
+        builder: (context, v, _) => ClipRRect(
+          borderRadius: BorderRadius.circular(h),
+          child: SizedBox(
+            height: h,
+            child: Stack(fit: StackFit.expand, children: [
+              ColoredBox(color: ink.line.withValues(alpha: 0.5)),
+              FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: v, child: ColoredBox(color: ink.good)),
+            ]),
+          ),
         ),
       );
 
@@ -360,7 +381,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       const gap = 10.0;
       final w = (c.maxWidth - gap * (cols - 1)) / cols;
       return Wrap(spacing: gap, runSpacing: gap, children: [
-        for (final (i, ch) in data.chapters.indexed) SizedBox(width: w, child: _tile(ink, narrow, data, ch, i + 1)),
+        for (final (i, ch) in data.chapters.indexed) SizedBox(width: w, child: Stagger(i, child: _tile(ink, narrow, data, ch, i + 1))),
       ]);
     });
   }
@@ -529,13 +550,17 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
             ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 AcsPrompt(ink, 'ls ${_slug(ch)}/', dir: '~/acs/${widget.code}'),
                 Text('# $ch  ($done/${all.length})', style: ink.mono(13.5, color: ink.muted)),
+                if (_teorie?.forChapter(ch) != null) _theoryLink(context, ink, _teorie!.forChapter(ch)!),
               ])
             : Container(
                 padding: const EdgeInsets.only(bottom: 6),
                 decoration: BoxDecoration(border: Border(bottom: BorderSide(color: ink.line))),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Expanded(child: Text(ch, style: ink.mono(narrow ? 18 : 20, weight: FontWeight.w700, color: ink.strong))),
-                  Text('$done/${all.length}', style: ink.mono(13, color: ink.muted)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    Expanded(child: Text(ch, style: ink.mono(narrow ? 18 : 20, weight: FontWeight.w700, color: ink.strong))),
+                    Text('$done/${all.length}', style: ink.mono(13, color: ink.muted)),
+                  ]),
+                  if (_teorie?.forChapter(ch) != null) _theoryLink(context, ink, _teorie!.forChapter(ch)!),
                 ]),
               ),
       ));
@@ -578,6 +603,32 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       out.add(Row(children: [Flexible(child: AcsPrompt(ink, '', dir: '~/acs/${widget.code}')), AcsCursor(color: ink.accent)]));
     }
     return out;
+  }
+
+  /// "teoria: lecția 3 →" under a chapter's title.
+  Widget _theoryLink(BuildContext context, AcsInk ink, TeorieLesson l) {
+    final route = teorieRoute(widget.code, l.id);
+    final n = _teorie!.indexOf(l) + 1;
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: AppLink(
+          to: route,
+          child: AcsTap(
+            label: 'teoria: ${l.title}',
+            onTap: () => context.go(route),
+            builder: (h) => Row(mainAxisSize: MainAxisSize.min, children: [
+              if (!ink.terminal) ...[Icon(Icons.menu_book_outlined, size: 15, color: h ? ink.strong : ink.accent), const SizedBox(width: 6)],
+              Flexible(
+                child: Text(ink.terminal ? '>> teorie: $n. ${l.title}' : 'teoria: $n. ${l.title} →',
+                    style: ink.mono(13, weight: FontWeight.w700, color: h ? ink.strong : ink.accent)),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _subhead(AcsInk ink, String label, int n) => Padding(

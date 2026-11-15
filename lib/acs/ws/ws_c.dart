@@ -97,7 +97,7 @@ class _CWorkspaceState extends State<CWorkspace> {
           _status = '';
           _compileError = r.error.trim();
         });
-        widget.onVerdict(false);
+        widget.onVerdict(false, Attempt(_code.text, 'nu se compilează:\n${r.error.trim()}'));
         return;
       }
       final want = '${t['output']}';
@@ -121,7 +121,7 @@ class _CWorkspaceState extends State<CWorkspace> {
       _busy = false;
       _status = '';
     });
-    widget.onVerdict(allOk);
+    widget.onVerdict(allOk, Attempt(_code.text, reportOf(out)));
   }
 
   Future<void> _runOwn() async {

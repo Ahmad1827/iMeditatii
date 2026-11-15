@@ -63,7 +63,7 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
   void _runTests() {
     final r = _task.run(_code.text);
     setState(() => _results = r);
-    widget.onVerdict(r.every((x) => x.ok));
+    widget.onVerdict(r.every((x) => x.ok), Attempt(_code.text, reportOf([for (final x in r) Check(_task.describe(x.c), x.ok, x.message)])));
   }
 
   /// The console keeps its variables; the file is loaded again when it changed.

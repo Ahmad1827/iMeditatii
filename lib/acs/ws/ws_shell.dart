@@ -317,7 +317,9 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
   void _verify() {
     final r = _task.verify(_sh);
     setState(() => _checks = r);
-    widget.onVerdict(ShellTask.passed(r));
+    widget.onVerdict(
+        ShellTask.passed(r),
+        Attempt('comenzile scrise, în ordine:\n${_sh.history.join('\n')}', reportOf([for (final c in r) Check(c.label, c.ok, c.detail)])));
     focusConsole();
   }
 

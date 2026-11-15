@@ -23,6 +23,8 @@ import 'package:iMeditatii/theme_manager.dart';
 TeorieCourse teorie() => TeorieCourse.parse('lfa', File('assets/data/acs/teorie/lfa.json').readAsStringSync());
 AcsCourseData problems() => AcsCourseData.parse('lfa', File('assets/data/acs/lfa.json').readAsStringSync());
 
+bool ink(AcsStyle s) => s == AcsStyle.notebook; // the takeaway's label is in capitals in the notebook
+
 Iterable<Map<String, dynamic>> vizBlocks(TeorieCourse t) sync* {
   for (final l in t.lessons) {
     for (final s in l.sections) {
@@ -101,6 +103,21 @@ void main() {
     }
   });
 
+  test('each lesson says what it teaches, each section its takeaway, each chapter its lesson', () {
+    final t = teorie();
+    final p = problems();
+    for (final l in t.lessons) {
+      expect(l.goals, isNotEmpty, reason: l.id);
+      for (final s in l.sections) {
+        expect(s.key, isNotEmpty, reason: '${l.id}/${s.id}');
+      }
+    }
+    for (final ch in p.chapters) {
+      expect(t.forChapter(ch), isNotNull, reason: ch);
+    }
+    expect(t.parts.where((x) => x.test.isNotEmpty).map((x) => x.test), ['Testul 1 (LR)', 'Testul 2 (LIC)', 'Testul 3 (MT)']);
+  });
+
   test('the theory course is listed for its course page', () async {
     TestWidgetsFlutterBinding.ensureInitialized();
     expect(File('assets/data/acs/teorie/lfa.json').existsSync(), isTrue);
@@ -170,6 +187,42 @@ void main() {
           expect(t.takeException(), isNull);
         });
       }
+
+      testWidgets('esențial hides the explanations until asked, complet shows them, ${style.name} at ${width.toInt()} px', (t) async {
+        SharedPreferences.setMockInitialValues({});
+        ThemeManager.acsStyleNotifier.value = style;
+        t.view.physicalSize = Size(width, 2600);
+        t.view.devicePixelRatio = 1;
+        addTearDown(t.view.reset);
+        await t.pumpWidget(const MaterialApp(home: AcsLessonScreen(code: 'lfa', lesson: 'afn')));
+        await settle(t, find.textContaining('Construcția submulțimilor'));
+        // the first section's paragraph (a "p" block) is behind "arată tot"
+        final prose = teorie().byId('afn')!.sections.first.blocks.firstWhere((b) => b['t'] == 'p')['text'] as String;
+        final probe = prose.substring(0, 11); // "Față de AFD"
+        expect(find.textContaining(probe), findsNothing);
+        expect(find.textContaining(ink(style) ? 'PE SCURT' : 'pe scurt'), findsWidgets);
+        final more = find.textContaining(RegExp(r'^arată tot')).first;
+        // in the middle of the screen: on a phone the top bar covers the top
+        // to the middle of the screen: on a phone the bar covers the top
+        Scrollable.ensureVisible(t.element(more), alignment: 0.5);
+        for (var i = 0; i < 6; i++) {
+          await t.pump(const Duration(milliseconds: 200));
+        }
+        await t.tap(more);
+        await t.pump(const Duration(milliseconds: 400));
+        expect(find.textContaining(probe), findsOneWidget);
+        // complet: everything, and no "arată tot" left
+        final complet = find.text('complet').first;
+        Scrollable.ensureVisible(t.element(complet), alignment: 0.5);
+        for (var i = 0; i < 6; i++) {
+          await t.pump(const Duration(milliseconds: 200));
+        }
+        await t.tap(complet);
+        await t.pump(const Duration(milliseconds: 400));
+        expect(find.textContaining(RegExp(r'^arată tot')), findsNothing);
+        expect(t.takeException(), isNull);
+        await t.pumpWidget(const SizedBox());
+      });
 
       testWidgets('a lesson page with its contents and links, ${style.name} at ${width.toInt()} px', (t) async {
         SharedPreferences.setMockInitialValues({});

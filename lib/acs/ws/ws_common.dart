@@ -2,7 +2,9 @@
 // WHAT EVERY ACS WORKSPACE SHARES
 //   A workspace gets its problem, the colours, and [Verdict]: it calls it with
 //   true when the problem is solved (the page marks it and says so), false
-//   when a check failed. [ChecksView] lists what was checked, ✓ or ✗.
+//   when a check failed, with the [Attempt]: what was sent and what the
+//   checks found (for "De ce nu merge așa?"). [ChecksView] lists what was
+//   checked, ✓ or ✗.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -13,7 +15,22 @@ import '../../code_keys.dart';
 import '../acs_data.dart';
 import '../acs_kit.dart';
 
-typedef Verdict = void Function(bool solved);
+/// What the student sent and what the checks said of it, as text for a tutor.
+class Attempt {
+  final String answer;
+  final String report;
+  const Attempt(this.answer, [this.report = '']);
+}
+
+typedef Verdict = void Function(bool solved, [Attempt? attempt]);
+
+/// The checks as lines: `[✓] label` or `[✗] label: what was found`.
+String reportOf(Iterable<Check> checks) => [
+      for (final c in checks) '${c.ok ? '[✓]' : '[✗]'} ${c.label}${!c.ok && c.detail.isNotEmpty ? '\n    ${c.detail.replaceAll('\n', '\n    ')}' : ''}',
+    ].join('\n');
+
+/// The same for checks kept as (label, ok, detail).
+String reportOfTriples(Iterable<(String, bool, String)> r) => reportOf([for (final (l, ok, d) in r) Check(l, ok, d)]);
 
 abstract class AcsWorkspace extends StatefulWidget {
   final AcsProblem problem;

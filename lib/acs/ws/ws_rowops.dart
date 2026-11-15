@@ -84,7 +84,7 @@ class _RowOpsWorkspaceState extends State<RowOpsWorkspace> {
       }
     }
     setState(() => _checks = out);
-    widget.onVerdict(out.every((c) => c.ok));
+    widget.onVerdict(out.every((c) => c.ok), Attempt([for (final (k, a) in _answerSpecs.indexed) '${a['label']}: ${_answers[k].text}'].join('\n'), reportOf(out)));
   }
 
   String _goalLabel() => switch (_t.goal) {

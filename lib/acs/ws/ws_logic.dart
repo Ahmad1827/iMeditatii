@@ -122,7 +122,12 @@ class _LogicWorkspaceState extends State<LogicWorkspace> {
       }
     }
     setState(() => _checks = out);
-    widget.onVerdict(out.isNotEmpty && out.every((c) => c.ok));
+    final answer = _expr != null
+        ? [for (final e in _fields.entries) '${e.key} = ${e.value.text}'].join('\n')
+        : _mux != null
+            ? 'selecții: ${_sel.join(', ')}\nintrări de date: ${_data.join(', ')}'
+            : [for (var i = 0; i < _names.length; i++) 'starea ${_names[i].text}: următoarea ${_next[i].join(' / ')}, ieșirea ${_out[i].join(' / ')}'].join('\n');
+    widget.onVerdict(out.isNotEmpty && out.every((c) => c.ok), Attempt(answer, reportOf(out)));
   }
 
   Mealy? _machine() {

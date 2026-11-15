@@ -90,7 +90,7 @@ class _SimWorkspaceState extends State<SimWorkspace> with SingleTickerProviderSt
       out.add(Check('${f['label']}', ok, got == null ? 'scrie un număr' : (ok ? '' : 'nu e ${_fmt(got)}')));
     }
     setState(() => _checks = out);
-    widget.onVerdict(out.every((c) => c.ok));
+    widget.onVerdict(out.every((c) => c.ok), Attempt([for (final e in _in.entries) '${e.key} = ${e.value.text}'].join('\n'), reportOf(out)));
   }
 
   static String _fmt(double v) => v.abs() >= 100 ? v.toStringAsFixed(1) : v.toStringAsFixed(3);
