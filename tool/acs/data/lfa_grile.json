@@ -1,0 +1,1198 @@
+[
+ {
+  "q": "Care este numarul minim de stari al unui APD pentru $L=\\{a\\}$?",
+  "options": [
+   "0",
+   "2",
+   "1",
+   "3"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L = \\{\\rho (M) \\mid M$ accepta cel putin un palindrom$\\}$. L este in cel mai strict sens:",
+  "options": [
+   "nu este Turing Acceptat",
+   "Turing Decidabil",
+   "nu se poate afirma nimic",
+   "Turing Acceptat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie o MT care genereaza sirurile din limbajul $L$ in ordinea descrescatoare a lungimii lor. $L$ este in cel mai strict sens:",
+  "options": [
+   "LIC",
+   "Regulat",
+   "Turing Decidabil",
+   "Turing Acceptat"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L = \\{a^nb^na^mb^m \\mid n,m \\geq 0\\}$. Alegeti afirmatia care este intotdeauna adevarata.",
+  "options": [
+   "Se poate construi un APD cu 2 stari care accepta $L$",
+   "Orice APD care accepta $L$ are minim 4 stari",
+   "Nicio afirmatie nu este adevarata",
+   "Nu se poate construi niciun APD care accepta $L$"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $J = \\{L$ limbaj peste $\\Sigma = \\{a, b, c\\} \\mid L \\cdot L^* = L^*\\}$. Care este cardinalul multimii $P = \\{w \\in \\{a, b, c\\}^* \\mid \\forall L \\in J, w \\in L\\}$?",
+  "options": [
+   "0",
+   "2",
+   "1",
+   "3"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{0^n1^n1^n \\mid n \\geq 0\\}$. Cum este $L$ in cel mai strict sens?",
+  "options": [
+   "Nu este Independent de context",
+   "Regulat",
+   "Independent de context",
+   "Finit"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{w\\in \\{a,b\\}^* \\mid \\#_a(w)\\%4 = 3\\}$. Cum este $L$ in cel mai strict sens?",
+  "options": [
+   "Finit",
+   "Independent de context",
+   "Nu este independent de context",
+   "Regulat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ un limbaj regulat. Definim $PREFIX(L)$ multimea prefixelor cuvintelor din $L$ si $SUFIX(L)$ multimea sufixelor cuvintelor din $L$. Alegeti afirmatia FALSA.",
+  "options": [
+   "$PREFIX(L)$ este regulat",
+   "$SUFIX(L)$ este regulat",
+   "$L = PREFIX(L)\\cdot SUFIX(L)$",
+   "$L \\cap PREFIX(L)$ este regulat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{\\rho (M) \\rho (w) \\mid |w|=2$ si M se opreste cu $w$ la intrare $\\}$. Alegeti afirmatia care este intotdeauna adevarata.",
+  "options": [
+   "Exista o infinitate de MT cu 2 benzi care accepta $L$",
+   "Orice MT accepta $L$",
+   "Nu exista nicio MT care accepta $L$",
+   "$L$ este acceptat doar de MT cu o banda"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a afirmatiilor:\n- Daca $L \\in TD$, atunci $L^R$ poate sa nu fie $TD$.\n- Daca $L \\subseteq \\Sigma ^*, |\\Sigma |=2$, atunci $L$ este intotdeauna $TD$.",
+  "options": [
+   "Adevarat, Fals",
+   "Adevarat, Adevarat",
+   "Fals, Fals",
+   "Fals, Adevarat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a afirmatiilor:\n- Daca $L$ este un limbaj NP complet, atunci $L \\notin TD$\n- Daca $L \\in LIC$, atunci $\\overline {L} \\in TD$",
+  "options": [
+   "Adevarat, Fals",
+   "Adevarat, Adevarat",
+   "Fals, Fals",
+   "Fals, Adevarat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1$ si $L_2$ doua limbaje independente de context. Cum este $(\\overline {(\\overline {L_1} \\cup \\overline {L_2})} \\setminus (L_1 \\cap L_2))^*$ in cel mai strict sens?",
+  "options": [
+   "nicio varianta",
+   "limbaj finit",
+   "limbaj regulat",
+   "limbaj independent de context"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $J = \\{ L \\subseteq \\{a, b\\}^* \\mid |L^*| < \\infty \\}$. Valoarea $\\sum \\limits _{L \\in J}|L|$ este:",
+  "options": [
+   "1",
+   "0",
+   "$\\infty $",
+   "2"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1 \\in LIC$ si $L_2 \\in LR$. Alegeti afirmatia care este intotdeauna adevarata.",
+  "options": [
+   "$L_1 \\backslash L_2 \\in LR$",
+   "$L_1 \\backslash L_2 \\notin LR$",
+   "$L_1 \\backslash L_2 \\in LIC$",
+   "$L_1 \\backslash L_2 \\notin LIC$"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1$ si $L_2$ limbaje neregulate. Alegeti varianta care este intotdeauna adevarata.",
+  "options": [
+   "Exista limbajele regulate $R_1$ si $R_2$ ai $R_1 \\subseteq L_1 \\subseteq R_2$",
+   "$L_1 \\cap L_2$ nu este regulat",
+   "$L_1 \\cup L_2$ nu este regulat",
+   "Nicio varianta"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Care este numarul minim de stari al unui AFN pentru $L=\\{e\\}$?",
+  "options": [
+   "3",
+   "2",
+   "0",
+   "1"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $M = (K, \\{0,1\\}, \\delta , s_0, F )$ un AFD ai $\\mathcal {L}(M) = \\{0, 1\\}^*$. Alegeti varianta care este intotdeauna adevarata.",
+  "options": [
+   "Nicio varianta",
+   "$|\\delta | = 2$",
+   "$F = \\emptyset $",
+   "$F = K $"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{0^n1^n0^n \\mid n \\geq 0\\}$. Cum este $L$ in cel mai strict sens?",
+  "options": [
+   "Regulat",
+   "Nu este Independent de context",
+   "Independent de context",
+   "Finit"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1 \\cup L_2 \\in TD$ si $L_1 \\cap L_2 \\in TD$. Alegeti afirmatia care este intotdeauna adevarata.",
+  "options": [
+   "$L_1,L_2 \\in TD$",
+   "Nu exista doua limbaje care sa satisfaca simultan cerintele.",
+   "$\\exists L_1 \\in TA$ a.i cerintele sunt satisfacute",
+   "$L_1 \\in TD \\vee L_2 \\in TD$"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ reuniunea unui numar infinit numarabil de limbaje regulate. Alegeti varianta care este intotdeauna adevarata.",
+  "options": [
+   "$L$ este Turing Acceptat",
+   "$L$ este Turing Decidabil",
+   "nu se poate afirma nimic",
+   "$L$ poate sa nu fie Turing Acceptat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1, L_2 \\in LIC$ si $L_3$ oarecare. Alegeti valoarea de adevar a afirmatiilor:\n- $L_1L_3=L_2 \\Rightarrow L_3 \\in LIC$\n- $L_1L_2=L_3 \\Rightarrow L_3 \\in LIC$",
+  "options": [
+   "Adevarat, Adevarat",
+   "Fals, Adevarat",
+   "Fals, Fals",
+   "Adevarat, Fals"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L = \\{a^ib^ja^ib^j \\mid i,j \\geq 0\\}$. $L$ este in cel mai strict sens:",
+  "options": [
+   "nu este Independent de context",
+   "Regulat",
+   "nu se poate afirma nimic",
+   "Independent de context"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L\\in LR$ si $|L|>0$. Care este numarul minim de tranzitii al unui AFD care accepta L?",
+  "options": [
+   "1",
+   "0",
+   "3",
+   "2"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ un limbaj si $L’ = \\{ww \\mid w \\in L\\}$. Alegeti varianta care este intotdeauna adevarata.",
+  "options": [
+   "$L’$ nu este regulat",
+   "$L’ = LL$",
+   "Nicio varianta",
+   "$L’$ este regulat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\emptyset $ si un APD $D$ ce accepta L. Alegeti varianta care este intotdeauna adevarata.",
+  "options": [
+   "$D$ poate avea doar o stare",
+   "$D$ are cel putin o stare finala",
+   "$D$ nu poate avea nicio stare finala",
+   "$D$ poate avea toate starile finale"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L = \\{\\rho (M) \\mid M$ accepta cel putin $5673929$ siruri$\\}$. $L$ este in cel mai strict sens:",
+  "options": [
+   "nu se poate afirma nimic",
+   "nu este Turing Acceptat",
+   "Turing Acceptat",
+   "Turing Decidabil"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $G = \\{ G_i \\mid G_i$ gramatica regulata$ \\}$. Un limbaj $L$ cu proprietatea ca $\\forall w \\in L, \\exists G_i \\in G, w \\in \\mathcal {L} (G_i)$ este, in cel mai strict sens",
+  "options": [
+   "Limbaj independent de context",
+   "Nicio varianta",
+   "Limbaj regulat, dar nu finit",
+   "Limbaj finit"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a afirmatiilor:\n- Este posibil ca anumite limbaje nedecidabile sa fie NP complete\n- Exista $L \\in TA\\backslash TD$ a.i. $\\overline {L} \\notin TA$",
+  "options": [
+   "Fals, Fals",
+   "Fals, Adevarat",
+   "Adevarat, Adevarat",
+   "Adevarat, Fals"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $A$ si $B$ limbaje Turing acceptate ai $A \\cap B = \\emptyset $. Daca $\\overline {A \\cup B}$ este Turing decidabil, ce se poate spune intotdeauna despre $A$ si $B$:",
+  "options": [
+   "cel mult unul este decidabil",
+   "niciunul nu este decidabil",
+   "ambele sunt decidabile",
+   "nicio varianta"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L = \\{ u \\in \\{a,b,c\\}^* \\mid u=wcw^Rcw, w\\in \\{a,b\\}^*\\}$. Cum este $L$ in cel mai strict sens?",
+  "options": [
+   "Independent de context",
+   "Turing decidabil",
+   "Regulat",
+   "Finit"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $G$ avand $S$ simbol de start. $S \\rightarrow S_1S_2 $ $S_1 \\rightarrow aS_1b | e$ $S_2 \\rightarrow bS_2a | e$ Alegeti afirmatia care este intotdeauna adevarata.",
+  "options": [
+   "Cuvintele din $L(G)$ se termina in a",
+   "Cuvintele din $L(G)$ contin mai multe a-uri decat b-uri",
+   "$L(G)=\\{a^nb^{2n}a^n \\mid n \\geq 0\\}$",
+   "Cuvintele din $L(G)$ au lungime para"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1\\cap L_2 \\in LR$ si $L_1 \\cup L_2 \\in LR$. Alegeti varianta care este intotdeauna adevarata.",
+  "options": [
+   "Nicio varianta",
+   "Cel putin un limbaj este finit.",
+   "$L_1\\in LR \\vee L_2 \\in LR$",
+   "$L_1,L_2 \\in LR$"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma = \\{0,1\\}$. Definim $K$ multimea tuturor limbajelor peste $\\Sigma $ care contin sirul $101$ ($K=\\{L \\subseteq \\Sigma ^* \\mid 101 \\in L\\}$). In raport cu care dintre urmatoarele operatii $K$ este inchisa?",
+  "options": [
+   "Diferenta",
+   "Concatenare",
+   "Reuniune",
+   "Complement"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma =\\{a,b\\}, L = \\{w \\in \\Sigma ^* \\mid \\#_a(w)=\\#_b(w) \\wedge \\#_{aaaa}(w) = 0 \\wedge \\#_{bbbb}(w) = 0\\}$. Alegeti afirmatia corecta:",
+  "options": [
+   "$L \\notin LR$ si L satisface lema de pompare",
+   "$L \\in LR$ si L satisface lema de pompare",
+   "$L \\in LR$ si L nu satisface lema de pompare",
+   "$L \\notin LR$ si L nu satisface lema de pompare"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ un limbaj independent de context si Turing acceptat. Alegeti afirmatia adevarata:",
+  "options": [
+   "Nu se poate afirma nimic",
+   "$L$ este finit",
+   "$L$ este Turing decidabil",
+   "$L$ nu este Turing decidabil"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1,L_2$ doua limbaje a.i $L_1L_2 \\in LR$. Daca $L_1 \\in LR$, ce se poate afirma intotdeauna despre $L_2$?",
+  "options": [
+   "Nu se poate afirma nimic",
+   "$L_2$ nu este regulat",
+   "$L_2$ este finit",
+   "$L_2$ este regulat"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Grilă de examen LFA (Moodle)"
+ },
+ {
+  "q": "Care este ER pentru $\\mathcal {L}(a(a\\cup b)^*) \\cup \\mathcal {L}(b(a\\cup b)^*)$?",
+  "options": [
+   "$\\phi $",
+   "$(a\\cup b)^*$",
+   "$(a\\cup b)$",
+   "$(a\\cup b)(a\\cup b)^*$"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1 = \\{a^nb^na^n \\mid n \\geq 0\\}$ si $L_2 = \\{a^n \\mid n \\geq 0\\}$. care dintre urmatoarele variante este adevarata?",
+  "options": [
+   "$L_1 \\in LIC, L_2 \\in LR, L_1 \\cup L_2 \\in LIC$",
+   "$L_1 \\notin LIC, L_2 \\in LR, L_1 \\cup L_2 \\in LR$",
+   "$L_1 \\notin LIC, L_2 \\in LR, L_1 \\setminus L_2 \\notin LIC $",
+   "$L_1 \\in LIC, L_2 \\in LR, L_1 \\setminus L_2 \\in LR$"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $r = a(a^*a \\cup b^*)^*$. Alegeti varianta corecta:",
+  "options": [
+   "$b$ este in orice sir generat de $r$",
+   "niciuna dintre variante",
+   "$b\\in \\mathcal {L}(r)$",
+   "$aa\\in \\mathcal {L}(r)$"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma =\\{a\\}$, $L=\\{ww \\mid w \\in \\Sigma ^* \\}$. Cum este L?:",
+  "options": [
+   "$L$ este regulat, dar nu finit",
+   "$L$ este independent de context, dar nu regulat",
+   "$L$ nu este independent de context",
+   "$L$ este finit"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cate AFD pentru $L = \\phi , |\\Sigma | = 4 $ se pot construi?",
+  "options": [
+   "nicio varianta",
+   "niciunul",
+   "unul",
+   "o infinitate"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1, L_2$ peste $\\Sigma =\\{a,b\\}$ a.i. $L_1L_2=L_2L_1$. Doua dintre limbajele care respecta aceasta proprietate sunt:",
+  "options": [
+   "Nu exista doua limbaje care sa satisfaca proprietatea de mai sus",
+   "$L_1=\\mathcal {L}(a^*), L_2=\\mathcal {L}(b^*)$",
+   "$L_1=\\mathcal {L}(a^*b^*), L_2=\\mathcal {L}(b^*a^*)$",
+   "$L_1=\\{w\\in \\Sigma ^* \\mid |w|=2k, k \\geq 0\\}, L_2=\\{w\\in \\Sigma ^* \\mid |w|=2k+1, k \\geq 0\\}$"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Care este expresia regulata care genereaza $L=\\{w \\in \\{0,1\\}^* \\mid \\#_{00}(w) \\leq 1\\}$ 1. $((e \\cup 0)11^*)^*(e \\cup 0 \\cup 00)(11^*(e \\cup 0))^*$ 2. $(0 \\cup e)(e \\cup 1 \\cup 10)^*(e \\cup 00)(e \\cup 1 \\cup 10)^*$ 3. $(e \\cup 0)(e \\cup 1 \\cup 10)^*(e \\cup 1 \\cup 01)^*(e \\cup 0)$",
+  "options": [
+   "a doua si a treia",
+   "a doua",
+   "prima",
+   "prima si a treia"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1$ cu AFN-ul asociat $M_1 = (K_1, \\Sigma _1, \\Delta _1, s_1, F_1)$ si $L_2$ cu AFN-ul asociat $M_2 = (K_2, \\Sigma _2, \\Delta _2, s_2, F_2)$. Stiind ca $L_1 \\subseteq L_2$, $K_1 = K_2$, $\\Sigma _1 = \\Sigma _2$ si $|\\Sigma _1| > 1$, care dintre urmatoarele variante este adevarata:",
+  "options": [
+   "$\\Delta _1 \\subseteq \\Delta _2$",
+   "$F_1 = F_2$",
+   "Nu exista o relatie intre $\\Delta _1$ si $\\Delta _2$",
+   "Nu exista $L_1, L_2$ care sa satisfaca cerintele date"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{a^pb^ka^p \\mid p \\leq 100<k\\}$. Cum este $L$?",
+  "options": [
+   "limbaj independent de context, dar nu regulat",
+   "limbaj regulat, dar nu finit",
+   "finit",
+   "nu este limbaj independent de context si nici regulat"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ un limbaj independent de context finit. Selectati varianta adevarata.",
+  "options": [
+   "Exista cel putin un AFD ce accepta acest limbaj",
+   "Exista cel mult o gramatica care genereaza acest limbaj",
+   "Nu se poate scrie o expresie regulata pentru acest limbaj",
+   "Nu se poate construi niciun automat pentru acest limbaj"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie expresia regulata $E = 0e^* \\cup 1\\phi ^*$:",
+  "options": [
+   "$E = 0^* \\cup 1$",
+   "$E = 0 \\cup 1$",
+   "$E = 0^*$",
+   "$E = 0$"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{w\\in \\{0,1\\}^*\\mid w$ de forma $uu^R\\}$. Alegeti varianta corecta:",
+  "options": [
+   "Nu se poate construi un APD pentru L",
+   "$L$ este finit",
+   "Nicio varianta",
+   "Se poate construi un APD pentru L"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ este un limbaj Turing acceptat. Alegeti varianta corecta:",
+  "options": [
+   "$\\overline {L}$ este Turing acceptat, dar nu Turing decidabil",
+   "$\\overline {L}$ nu este Turing acceptat",
+   "Niciuna dintre celelalte variante",
+   "$\\overline {L}$ este Turing decidabil"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Un limbaj decis de o masina Turing cu $k = 100$ benzi si $h=10$ capete de citire:",
+  "options": [
+   "nu poate fi decis de o masina Turing cu $k=2$ si $h=2$",
+   "niciuna dintre variante",
+   "poate fi decis de o masina Turing cu $k=3$ si $h=1$",
+   "nu poate fi acceptat de o masina Turing cu $k=1$ si $h=3$"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L$ un limbaj Turing decidabil. Atunci $L^R=\\{w\\in \\Sigma ^*\\mid w^R \\in L\\}$ (multimea sirurilor care au rasturnatul in $L$):",
+  "options": [
+   "este Turing decidabil",
+   "nu este Turing acceptat",
+   "este Turing acceptat, dar nu decidabil",
+   "nu se poate preciza"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Limbajul $L = \\{\\rho (D) \\mid D \\in AFD \\wedge \\exists M \\in MT $ ai $L(M) = L(D)\\}$ este:",
+  "options": [
+   "Nu se poate preciza",
+   "Turing decidabil",
+   "Turing acceptat, dar nu Turing decidabil",
+   "Nu este Turing acceptat"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- $\\overline {(L^*)} = (\\overline {L})^*$\n- $(L^*)^* = L^*$",
+  "options": [
+   "Adevarat, Fals",
+   "Fals, Adevarat",
+   "Adevarat, Adevarat",
+   "Fals, Fals"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $ L_1 \\in LR, L_2 \\in LIC, L_3 \\notin LIC $. Daca $ L_4 = L_1 \\cap \\{a^nb^n | n=2k, k \\geq 0 \\} $, atunci $ L_5 = (L_1 \\cap L_2) \\cup (L_3 \\cap \\emptyset ) \\cup (L_4 \\cap \\Sigma ^*)$. Cum este $L_5$ in cel mai strict sens?",
+  "options": [
+   "LIC",
+   "$L_5 = \\emptyset $",
+   "LR",
+   "Nu e LIC"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Care este numarul minim de tranzitii ale automatului finit determinist pentru urmatorul limbaj $ L=\\{w\\in \\{a,b\\}^* \\mid w $ incepe cu a $\\}$:",
+  "options": [
+   "4",
+   "2",
+   "3",
+   "6"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie L = {$\\rho (A_1) \\rho (A_2) \\mid A_1, A_2 \\in APD \\wedge \\mathcal {L}(A_1)=\\mathcal {L}(A_2)\\}$. Cum este L in cel mai strict sens?",
+  "options": [
+   "Turing Decidabil",
+   "Turing Acceptat",
+   "Nu se poate afirma nimic",
+   "Nu este Turing Acceptat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie L = {$\\rho (M) \\mid \\mathcal {L}(M) = \\emptyset \\}$. Cum este L in cel mai strict sens?",
+  "options": [
+   "Nu este Turing Acceptat",
+   "Turing Decidabil",
+   "Nu se poate afirma nimic",
+   "Turing Acceptat"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie L = {$\\rho (M)\\rho (w_1)\\rho (w_2) \\mid M$ accepta $w_1$ in mai mult de 10 tranzitii si accepta $w_2$ in mai putin de 10 tranzitii}. Cum este L in cel mai strict sens?",
+  "options": [
+   "Nu exista un astfel de limbaj",
+   "Turing Decidabil",
+   "Turing Acceptat",
+   "Nu e Turing Acceptat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Din ce clasa de limbaje face parte urmatorul limbaj (in sensul cel mai strict): $ L = \\{ w \\in \\{1\\}^* \\mid w = x^ny^nz^n, x, y, z \\in \\{1\\}^*, n \\geq 0 \\}$",
+  "options": [
+   "Limbaj finit",
+   "LR",
+   "LIC",
+   "Nu se poate specifica"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cate automate finite deterministe se pot scrie pentru $L=\\{a\\}$?",
+  "options": [
+   "1",
+   "Niciunul",
+   "8",
+   "O infinitate"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma = \\{a,b,c\\}$ si $L = \\{ w \\in \\Sigma ^* \\mid w=xcycz, x,y,z\\in \\{a,b\\} ^*, z-$palindrom, $ |z| \\geq 300\\}$. Cum este $L$ in cel mai strict sens?",
+  "options": [
+   "Nu se poate spune",
+   "LIC",
+   "Limbaj finit",
+   "LR"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- Este posibil ca un automat finit nedeterminist cu 2 stari sa accepte urmatorul limbaj $ L=\\{e\\}$?\n- Este posibil ca un automat finit nedeterminist cu 3 stari sa accepte urmatorul limbaj $ L=\\emptyset $?",
+  "options": [
+   "Adevarat, Adevarat",
+   "Fals, Adevarat",
+   "Adevarat, Fals",
+   "Fals, Fals"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma $ un alfabet, cate automate finite deterministe se pot scrie pentru $L=\\Sigma ^*$?",
+  "options": [
+   "1",
+   "Niciunul",
+   "O infinitate",
+   "5"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $G_1 = (V_1, \\Sigma , R_1, S_1)$ si $G_2 = (V_2, \\Sigma , R_2, S_2)$ doua gramatici independente de context. Ce regula putem adauga astfel incat sa obtinem gramatica ce genereaza $\\mathcal {L}(G_1) \\cap \\mathcal {L}(G_2)$?",
+  "options": [
+   "$S \\rightarrow S_1S_2 \\mid S_2S_1 \\mid SS$",
+   "$S \\rightarrow S_1S_2$",
+   "niciuna dintre variante",
+   "$S \\rightarrow S_1 \\mid S_2 \\mid SS$"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- Daca $L$ este un limbaj astfel incat pentru fiecare sir din $L$ exista un AFD care-l accepta, atunci $L$ este regulat.\n- Daca $L_1$ este un limbaj regulat si $L_2$ este un limbaj neregulat astfel incat $L_1 \\cap L_2=\\emptyset $, atunci $L_1 \\cup L_2$ nu\n- este regulat.",
+  "options": [
+   "Fals, Fals",
+   "Adevarat, Adevarat",
+   "Adevarat, Fals",
+   "Fals, Adevarat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- Multimea limbajelor generate de toate expresiile regulate este echivalenta cu multimea limbajelor regulate acceptate de toate\n- automatele push-down.\n- $\\forall L\\in LR $ infinit, se poate scrie o expresie regulata pentru orice submultime a lui $L$.",
+  "options": [
+   "Fals, Adevarat",
+   "Fals, Fals",
+   "Adevarat, Fals",
+   "Adevarat, Adevarat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma = \\{a,b\\}$ si $L = \\{ w \\in \\Sigma ^* \\mid w=ua^p, u\\in \\Sigma ^*, p-$nr prim, $ p \\leq 200\\}$. Cum este $L$ in cel mai strict sens?",
+  "options": [
+   "LR",
+   "Nu se poate spune",
+   "Limbaj finit",
+   "LIC"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{w \\in \\{0,1\\}^* \\mid $ numarul de 1 din w este prim$\\}$. Cum este L in cel mai strict sens?",
+  "options": [
+   "Nicio varianta",
+   "Limbaj finit",
+   "Limbaj independent de context",
+   "Limbaj regulat"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie gramatica $G=(V, \\Sigma , R, S)$ cu urmatoarele reguli: $S \\rightarrow SS | aAB | BB$\n$A \\rightarrow a | A | AAB | e$\n$B \\rightarrow bB | AS | SAA$ Ce limbaj genereaza gramatica G?",
+  "options": [
+   "$\\mathcal {L}(G) = \\{w \\in \\{a, b\\}^* \\mid \\#_a(w) > \\#_b(w)\\}$",
+   "$\\mathcal {L}(G) = \\mathcal {L}((a \\cup b)^*)$",
+   "$\\mathcal {L}(G) = \\emptyset $",
+   "$\\mathcal {L}(G) = \\{e\\}$"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cum este urmatorul limbaj $L=\\{\\rho (G_1) \\mid G_1 \\in GIC$ $\\wedge $ $\\mathcal {L}(G_1) $ este infinit$\\} ?$",
+  "options": [
+   "$L$ nu este Turing acceptat",
+   "$L$ este finit",
+   "$L$ este Turing acceptat, dar nu Turing decidabil",
+   "$L$ este Turing decidabil"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cum este urmatorul limbaj $L=\\{\\rho (M) \\mid $ M are 3 stari si 10 tranzitii$\\} ?$",
+  "options": [
+   "$L$ este finit",
+   "$L$ este Turing acceptat, dar nu Turing decidabil",
+   "$L$ este Turing decidabil",
+   "$L$ nu este Turing acceptat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Un limbaj decis de o masina Turing cu $k > 100$ benzi:",
+  "options": [
+   "nu poate fi acceptat de o masina Turing cu $k+10$ benzi",
+   "niciuna dintre variante",
+   "nu poate fi decis de o masina Turing cu $k - 20$ benzi",
+   "poate fi decis de o masina Turing cu $k+7$ benzi"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cum este urmatorul limbaj $L=\\{\\rho (M_1)\\rho (M_2)\\rho (M_3) \\mid $ $M_1,M_2,M_3 \\in AFD$ $\\wedge $ $\\mathcal {L}(M_1) = \\mathcal {L}(M_2) = \\mathcal {L}(M_3)\\}$?",
+  "options": [
+   "$L$ nu este Turing acceptat",
+   "$L$ este finit",
+   "$L$ este Turing decidabil",
+   "$L$ este Turing acceptat, dar nu Turing decidabil"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{w\\in \\{a,b,c\\}^*\\mid \\#_a(w)=\\#_b(w)=\\#_c(w)\\}$. Alegeti varianta corecta:",
+  "options": [
+   "Nu se poate construi un APD determinist pentru L",
+   "$L$ este finit",
+   "Nicio varianta",
+   "Se poate construi un APD determinist pentru L"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Un limbaj decis de o masina Turing cu $k = 20$ benzi si $h=20$ capete de citire:",
+  "options": [
+   "nu poate fi decis de o masina Turing cu $2$ benzi si $2$ capete de citire",
+   "nu poate fi acceptat de o masina Turing cu o banda si $3$ capete de citire",
+   "poate fi decis de o masina Turing cu $3$ benzi limitate atat la stanga cat si la dreapta si $h - 1 + 2$ capete de citire",
+   "niciuna dintre variante"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cum este urmatorul limbaj $L=\\{\\rho (M)\\rho (w) \\mid M \\in APD \\wedge M $ accepta $w\\} ?$",
+  "options": [
+   "$L$ este Turing acceptat, dar nu Turing decidabil",
+   "$L$ este finit",
+   "$L$ este Turing decidabil",
+   "$L$ nu este Turing acceptat"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $M=(K,\\Sigma ,\\Gamma ,\\Delta ,s,F)$. Alegeti varianta corecta:",
+  "options": [
+   "$|\\Sigma |=|\\Gamma |$",
+   "Niciuna dintre celelalte variante",
+   "$\\Sigma =\\Gamma $",
+   "$|\\Sigma | \\geq |\\Gamma |$"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie limbajul $L_1 = \\mathcal {L}(a^*b^*)$ si un limbaj $L_2$ astfel incat $L_2 \\subseteq L_1$. Care dintre urmatoarele afirmatii este intotdeauna adevarata?",
+  "options": [
+   "Nu se poate spune nimic",
+   "$L_2 \\in LR$",
+   "$L_2 \\in LIC$",
+   "$L_2 = L_1$"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Care este expresia regulata care genereaza $L=\\{w \\in \\{0,1\\}^* \\mid \\#_{00}(w) \\leq 1\\}$ 1. $(e \\cup 1 \\cup 01)^*(e \\cup 00 \\cup 0)(e \\cup 1 \\cup 10)^*$ 2. $(e \\cup 0)(e \\cup 1 \\cup 10)^*(e \\cup 1 \\cup 10)^*(e \\cup 0)$ 3. $((e \\cup 0)11^*)^*(e \\cup 0 \\cup 00)(11^*(e \\cup 0))^*$",
+  "options": [
+   "prima si a doua",
+   "prima si a treia",
+   "a doua si a treia",
+   "prima"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $M_1=\\{L \\mid L\\in LR \\wedge \\textit {0} \\in L\\}$ si $M_2=\\{L \\mid L\\in LR \\wedge \\textit {1} \\in L\\}$. Cu cine este egal $M_1 \\cap M_2$?",
+  "options": [
+   "$M_3=\\phi $",
+   "nicio varianta",
+   "$M_3 =\\{L \\mid L\\in LR\\}$",
+   "$M_3 =\\{L \\mid L\\in LR \\wedge \\textit {01} \\in L\\}$"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cate AFD pentru $L = \\mathcal {L}(0^*), \\Sigma = \\{0,1\\} $ se pot construi?",
+  "options": [
+   "niciunul",
+   "unul",
+   "doua",
+   "nicio varianta"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{0^n1^m0^n \\mid m<12<n\\}$. Cum este $L$?",
+  "options": [
+   "limbaj independent de context, dar nu regulat",
+   "nu este limbaj independent de context si nici regulat",
+   "limbaj regulat, dar nu finit",
+   "finit"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $r = a(aa^* \\cup b^*)^*$. Alegeti varianta corecta:",
+  "options": [
+   "$aa\\in \\mathcal {L}(r)$",
+   "$e\\in \\mathcal {L}(r)$",
+   "niciuna dintre variante",
+   "$b$ este in orice sir generat de $r$"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L = \\{0^n1^n0^m1^m \\mid m,n\\geq 0\\}$. $L$ este un:",
+  "options": [
+   "limbaj regulat",
+   "nu se poate preciza",
+   "limbaj dependent de context",
+   "limbaj independent de context"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $T =\\{L $ $\\mid $ $L \\in LR$} si un limbaj oarecare $L\\in T$, astfel incat $M_1 = (K_1, \\Sigma _1, \\delta _1, s_1, F_1)$ un AFD pentru $L$ si $M_2 = (K_2, \\Sigma _2, \\Delta _2, s_2, F_2)$ un AFN pentru $L$. care dintre urmatoarele afirmatii este adevarata:",
+  "options": [
+   "$|K_2| <= |K_1|$ daca $L$ este un limbaj infinit",
+   "$|\\Delta _2| = |\\Sigma _2| * |K_2|$",
+   "$0 < |\\Delta _2| < \\infty $",
+   "Numarul de tranzitii din $M_1 \\geq |K_1|$"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L_1 \\in LIC, L_2 \\in LR, L_3$ un limbaj finit. Cum este $L_4 = ((L_1 \\cap L_3) \\setminus L_2 ) \\cap L_1$?",
+  "options": [
+   "$L_4 \\notin LIC$",
+   "$L_4 \\in LR$",
+   "Nu se poate preciza cu exactitate tipul lui $L_4$",
+   "$L_4 \\in LIC \\setminus LR$"
+  ],
+  "right": [
+   1
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Care este ER pentru $\\mathcal {L}(0(0\\cup 1)^*) \\cup \\mathcal {L}(1(1\\cup 0)^*)$?",
+  "options": [
+   "$(0\\cup 1)(0\\cup 1)^*$",
+   "$(0\\cup 1)$",
+   "$(0\\cup 1)^*$",
+   "$\\phi $"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Un limbaj decis de o masina Turing cu $k = 100$ benzi si $h=7$ capete de citire:",
+  "options": [
+   "nu poate fi acceptat de o masina Turing cu o banda bidimensionala infinita si $3$ capete de citire",
+   "nu poate fi decis de o masina Turing cu $2$ benzi si $2$ capete de citire",
+   "poate fi decis de o masina Turing cu $3$ benzi limitate la stanga si $h - 1 + 2$ capete de citire",
+   "niciuna dintre variante"
+  ],
+  "right": [
+   2
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $L=\\{\\rho (M) \\mid $ M accepta $\\rho (M)\\} $. Ce se poate spune despre $\\overline {L}$?",
+  "options": [
+   "Este Turing decidabil",
+   "Este Turing acceptat, dar nu Turing decidabil",
+   "Este finit",
+   "Nu este Turing acceptat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Cum este urmatorul limbaj $L=\\{\\rho (G_1)\\rho (G_2) \\mid $ $G_1,G_2\\in GIC$ $\\wedge $ $|\\mathcal {L}(G_1)| =|\\mathcal {L}(G_2)| = 0 $ $ \\} ?$",
+  "options": [
+   "$L$ este Turing decidabil",
+   "$L$ este finit",
+   "$L$ este Turing acceptat, dar nu Turing decidabil",
+   "$L$ nu este Turing acceptat"
+  ],
+  "right": [
+   0
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma = \\{0, 1\\}$ si $L = \\{w \\in \\Sigma ^* \\mid \\forall u, v, x \\in \\Sigma ^*, w = uvx, \\#_0(x) - \\#_1(x) \\leq 1\\}$. Alegeti varianta adevarata:",
+  "options": [
+   "$L$ este regulat, dar nu finit",
+   "$L$ este finit",
+   "$L$ nu este independent de context",
+   "$L$ este independent de context, dar nu regulat"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ },
+ {
+  "q": "Fie $\\Sigma =\\{a,b\\}$, $L=\\{ww \\mid w \\in \\Sigma ^* \\}$. Cum este L?:",
+  "options": [
+   "$L$ este independent de context, dar nu regulat",
+   "$L$ este finit",
+   "$L$ este regulat, dar nu finit",
+   "$L$ nu este independent de context"
+  ],
+  "right": [
+   3
+  ],
+  "source": "Test grilă LFA (Moodle)"
+ }
+]

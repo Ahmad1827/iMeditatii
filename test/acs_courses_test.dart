@@ -359,6 +359,8 @@ void main() {
         final empty = switch (t.mode) {
           'regex' => t.checkRegex('∅'),
           'cfg' => t.checkGrammar('S -> SS'),
+          'pda' => t.checkPda('start q\nfinal q\nq, x, ε -> q, ε'),
+          'tm' || 'tmf' => t.checkTm('q, # -> n, #, S'),
           _ => t.checkAutomaton(const Nfa(1, {}, {})),
         };
         expect(empty.every((c) => c.$2), isFalse);

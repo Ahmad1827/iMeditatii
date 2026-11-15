@@ -118,6 +118,7 @@ flutter:
     - assets/data/details/
     - assets/data/details/tests/
     - assets/data/acs/
+    - assets/data/acs/teorie/
     - assets/data/problem_quizzes.json
     - assets/icons/
     - .env

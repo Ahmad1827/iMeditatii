@@ -1,6 +1,7 @@
 """LFA — Limbaje Formale și Automate: automata, regular expressions and grammars, checked as languages.
 
-Topics and several statements from the LFA exams and tests (seria CA/CD, 2021-2022).
+Topics and statements from the LFA exams and tests (seria CA/CD, 2017-2025), the
+seminars' revision sheet (lfa-problems-1.pdf) and the course (Ștefania Ghiță).
 Every language is also written here as a Python predicate; the regular
 expression (or automaton, or grammar) the app compares against is checked
 against that predicate on every word up to a length, so the reference is the
@@ -13,10 +14,14 @@ from common import problem, quiz, quiz_multi, write_course
 C1 = '1. Automate finite deterministe'
 C2 = '2. Automate nedeterministe'
 C3 = '3. Expresii regulate'
-C4 = '4. Gramatici independente de context'
-C5 = '5. Clase de limbaje'
-C6 = '6. Grile: modelul de test'
-CHAPTERS = [C1, C2, C3, C4, C5, C6]
+CP = '4. Proprietăți ale limbajelor regulate'
+C4 = '5. Gramatici independente de context'
+CA = '6. Automate cu stivă'
+CT = '7. Mașini Turing'
+C5 = '8. Clase de limbaje'
+C6 = '9. Grile: modelul de test'
+CG = '10. Grile din teste și examene'
+CHAPTERS = [C1, C2, C3, CP, C4, CA, CT, C5, C6, CG]
 MODEL = 'Model test grilă LFA'
 EX = 'Examen LFA'
 P = []
@@ -565,5 +570,7 @@ m(93, 'Fiecare cuvânt, acceptat de un AFD', 'medie', 'Fie `L` un limbaj infinit
   'Orice cuvânt e acceptat de un AFD (limbajul `{w}` e finit): condiția e adevărată pentru orice limbaj, deci nu spune nimic.')
 m(94, 'Limbajul vid', 'ușoară', 'Care expresie regulată generează limbajul vid?', ['`1*`', '`1*∅`', '`∅*(∅ ∪ 0*)`', '`∅*`'], 1,
   'Concatenarea cu `∅` dă `∅`. Atenție: `∅* = {ε}`, nu vid; `∅*(∅ ∪ 0*) = 0*`.')
+
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_more.py'), encoding='utf-8').read())
 
 write_course('lfa', CHAPTERS, P)

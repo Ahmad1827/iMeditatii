@@ -14,6 +14,9 @@ import 'package:flutter/material.dart';
 import '../acs_data.dart';
 import '../acs_kit.dart';
 import '../engine/lfa.dart';
+import '../engine/lfa_algo.dart' show Diagram;
+import '../engine/lfa_machines.dart';
+import '../teorie/diagram_view.dart';
 import 'ws_common.dart';
 
 class LfaWorkspace extends AcsWorkspace {
@@ -33,7 +36,9 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
   final Set<int> _final = {};
   final Map<String, TextEditingController> _cells = {};
   // a regular expression, or a grammar
-  late final TextEditingController _text = _task.mode == 'cfg' ? acsCodeController('', const {}, comment: '#') : TextEditingController();
+  late final TextEditingController _text = _task.mode == 'cfg'
+      ? acsCodeController('', const {}, comment: '#')
+      : (_task.machine ? acsCodeController('', const {'start', 'final'}, comment: '//') : TextEditingController());
   final TextEditingController _word = TextEditingController();
   int _at = 0; // how much of the word has been read
   List<Check> _checks = const [];
@@ -104,7 +109,12 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
   void _verify() {
     final r = _auto
         ? _task.checkAutomaton(_automaton())
-        : (_task.mode == 'regex' ? _task.checkRegex(_text.text) : _task.checkGrammar(_text.text));
+        : switch (_task.mode) {
+            'regex' => _task.checkRegex(_text.text),
+            'pda' => _task.checkPda(_text.text),
+            'tm' || 'tmf' => _task.checkTm(_text.text),
+            _ => _task.checkGrammar(_text.text),
+          };
     setState(() => _checks = [for (final (l, ok, d) in r) Check(l, ok, d)]);
     widget.onVerdict(r.every((c) => c.$2));
   }
@@ -122,6 +132,8 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
     try {
       if (_auto) return _automaton().accepts(w);
       if (_task.mode == 'regex') return Regex.parse(_text.text, _task.alphabet).accepts(w);
+      if (_task.mode == 'pda') return Pda.parse(_text.text).accepts(w);
+      if (_task.mode == 'tm') return Tm.parse(_text.text).accepts(w);
       return w.length <= _task.upTo ? Grammar.parse(_text.text).words(_task.upTo).contains(w) : null;
     } on LfaError {
       return null;
@@ -134,7 +146,7 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (_auto) ..._automatonParts(ink) else ..._textParts(ink),
+        if (_auto) ..._automatonParts(ink) else if (_task.machine) ..._machineParts(ink) else ..._textParts(ink),
         const SizedBox(height: 12),
         _tester(ink),
         const SizedBox(height: 12),
@@ -264,12 +276,81 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
     ];
   }
 
+  // ---------------------------------------------------------------- a machine
+  List<Widget> _machineParts(AcsInk ink) {
+    final pda = _task.mode == 'pda';
+    String? error;
+    Diagram? d;
+    try {
+      if (pda) {
+        final p = Pda.parse(_text.text);
+        final si = p.states.indexOf(p.start);
+        final order = [si, for (var i = 0; i < p.states.length; i++) if (i != si) i];
+        d = Diagram([for (final i in order) p.states[i]], const [], {for (final (j, i) in order.indexed) if (p.finals.contains(p.states[i])) j}, 0,
+            [for (final (f, t, l) in p.arrows()) (order.indexOf(f), order.indexOf(t), l)]).layered();
+      } else {
+        final m = Tm.parse(_text.text);
+        final si = m.states.indexOf(m.start);
+        final order = [si, for (var i = 0; i < m.states.length; i++) if (i != si) i];
+        d = Diagram([for (final i in order) m.states[i]], const [], {for (final (j, i) in order.indexed) if (Tm.accepting.contains(m.states[i])) j}, 0,
+            [for (final (f, t, l) in m.arrows()) (order.indexOf(f), order.indexOf(t), l)]).layered();
+      }
+    } on LfaError catch (e) {
+      error = _text.text.trim().isEmpty ? null : e.message;
+    }
+    final help = pda
+        ? 'O tranziție pe linie: p, a, β -> q, γ (citește a, scoate β din vârf, pune γ; ε sau e = nimic). Liniile „start q0” și „final q1 q2” numesc stările. Acceptă: tot cuvântul citit, stare finală, stivă goală.'
+        : 'O tranziție pe linie: q, a -> p, b, R (citește a, scrie b, mută L, R sau S). # e blancul; capul pornește pe primul simbol al intrării. Starea h (sau y) acceptă și oprește, n respinge; o tranziție care lipsește respinge.';
+    return [
+      Text(ink.terminal ? '# $help' : help, style: ink.mono(13.5, color: ink.muted)),
+      const SizedBox(height: 8),
+      AcsCodeEditor(ink, _text, minHeight: 170, comment: '//', onRun: _verify),
+      if (error != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(error, style: ink.mono(13.5, color: ink.bad))),
+      if (d != null) ...[
+        const SizedBox(height: 10),
+        AcsBox(ink, title: ink.terminal ? 'desenat din tranziții' : 'Desenat din tranziții', color: ink.bg, child: DiagramView(ink, d, maxHeight: 320)),
+      ],
+    ];
+  }
+
+  Widget _functionTester(AcsInk ink, String w, bool valid) {
+    String? got;
+    String? err;
+    if (valid) {
+      try {
+        got = Tm.parse(_text.text).compute(w);
+      } on LfaError catch (e) {
+        err = e.message;
+      }
+    }
+    final want = valid ? _task.wantsOutput(w) : null;
+    String show(String? x) => x == null ? 'nu se oprește' : (x.isEmpty ? lfaEps : x);
+    return AcsBox(
+      ink,
+      title: ink.terminal ? 'încearcă o intrare peste {${_task.alphabet.join(', ')}}' : 'Încearcă o intrare peste {${_task.alphabet.join(', ')}}',
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        AcsField(ink, _word, width: 200, hint: 'gol = ε'),
+        const SizedBox(height: 8),
+        if (!valid)
+          Text('Intrarea are simboluri din afara alfabetului.', style: ink.mono(13.5, color: ink.bad))
+        else
+          Text.rich(TextSpan(children: [
+            TextSpan(text: 'mașina ta lasă pe bandă: ', style: TextStyle(color: ink.muted)),
+            TextSpan(text: err != null ? '?' : show(got), style: TextStyle(color: err == null && got == want ? ink.good : ink.bad, fontWeight: FontWeight.w700)),
+            TextSpan(text: '   ·   trebuie: ', style: TextStyle(color: ink.muted)),
+            TextSpan(text: show(want), style: TextStyle(color: ink.strong, fontWeight: FontWeight.w700)),
+          ]), style: ink.mono(14)),
+      ]),
+    );
+  }
+
   // ---------------------------------------------------------------- a word
   Widget _tester(AcsInk ink) {
     final w = _word.text;
     final valid = w.split('').every(_task.alphabet.contains);
+    if (_task.mode == 'tmf') return _functionTester(ink, w, valid);
     final mine = valid ? _mine(w) : null;
-    final should = valid && (_task.exact || w.length <= _task.upTo) ? _task.wants(w) : null;
+    final should = valid && (_task.exact || _task.machine || w.length <= _task.upTo) ? _task.wants(w) : null;
     String yn(bool? b) => b == null ? '?' : (b ? 'da' : 'nu');
     return AcsBox(
       ink,

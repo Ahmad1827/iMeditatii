@@ -113,17 +113,19 @@ class AcsCourseData {
   }
 }
 
-final Map<String, Future<AcsCourseData?>> _cache = {};
+final Map<String, AcsCourseData> _cache = {};
 
-/// The course's problems, or null if it has none yet.
-Future<AcsCourseData?> loadAcsCourse(String code) => _cache[code] ??= () async {
-      try {
-        return AcsCourseData.parse(code, await rootBundle.loadString('assets/data/acs/$code.json'));
-      } catch (_) {
-        _cache.remove(code);
-        return null;
-      }
-    }();
+/// The course's problems, or null if it has none yet. What is read once is
+/// kept (the value, not the future, so each caller gets a future of its own).
+Future<AcsCourseData?> loadAcsCourse(String code) async {
+  final had = _cache[code];
+  if (had != null) return had;
+  try {
+    return _cache[code] = AcsCourseData.parse(code, await rootBundle.loadString('assets/data/acs/$code.json'));
+  } catch (_) {
+    return null;
+  }
+}
 
 /// What is solved or tried on this device.
 class AcsProgress {

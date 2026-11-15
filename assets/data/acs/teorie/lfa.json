@@ -1,0 +1,3512 @@
+{
+ "code": "lfa",
+ "title": "Limbaje Formale și Automate",
+ "intro": "Teoria cursului, lecție cu lecție, în ordinea cursurilor: definițiile cu notațiile din curs, teoremele cu demonstrațiile lor, exemple rezolvate, probleme de examen din anii trecuți cu rezolvarea, întrebări de verificare și algoritmi pe care îi rulezi pas cu pas (automate care citesc un cuvânt, construcția submulțimilor, eliminarea stărilor, minimizarea, lema de pompare ca joc, arbori de derivare, CYK, automate cu stivă, mașini Turing). La sfârșitul fiecărei lecții, problemele pe care se aplică.",
+ "parts": [
+  {
+   "title": "Partea I · Limbaje regulate",
+   "about": "Automate finite, expresii regulate și tot ce se poate face cu ele; cum arăți că un limbaj nu e regulat.",
+   "lessons": [
+    "limbaje",
+    "expresii-regulate",
+    "afd",
+    "afn",
+    "inchidere-lr",
+    "af-er",
+    "algoritmice-lr",
+    "pompare-lr",
+    "minimizare"
+   ]
+  },
+  {
+   "title": "Partea II · Limbaje independente de context",
+   "about": "Gramatici și automate cu stivă: un pas de memorie mai sus.",
+   "lessons": [
+    "gic",
+    "arbori-fnc",
+    "apd",
+    "proprietati-lic"
+   ]
+  },
+  {
+   "title": "Partea III · Mașini Turing și calculabilitate",
+   "about": "Ce se poate calcula, ce se poate doar căuta, și ce nu se poate deloc.",
+   "lessons": [
+    "turing",
+    "calculabilitate"
+   ]
+  },
+  {
+   "title": "Recapitulare",
+   "about": "Înainte de examen.",
+   "lessons": [
+    "recapitulare"
+   ]
+  }
+ ],
+ "lessons": [
+  {
+   "id": "limbaje",
+   "title": "Alfabete, cuvinte și limbaje",
+   "summary": "Vocabularul întregului curs: alfabet, cuvânt, cuvântul vid, concatenare, prefix și sufix, limbaj, operațiile cu limbaje și steaua lui Kleene; de ce există limbaje pe care nicio mașină nu le poate descrie.",
+   "curs": "Curs 1–2",
+   "minutes": 20,
+   "practice": [
+    "40",
+    "191"
+   ],
+   "sections": [
+    {
+     "id": "de-ce",
+     "title": "Ce studiază cursul",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Teoria automatelor întreabă **ce se poate calcula** și **cu câtă memorie**. Ca să putem răspunde riguros, orice problemă e transformată într-o întrebare despre cuvinte: „cuvântul `w` aparține mulțimii `L`?” Un program care răspunde la întrebare **recunoaște** limbajul `L`."
+      },
+      {
+       "t": "p",
+       "text": "Cursul urcă pe o scară de modele de calcul, fiecare cu mai multă memorie decât precedentul:"
+      },
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "model",
+        "memorie",
+        "limbaje recunoscute",
+        "descriere echivalentă"
+       ],
+       "rows": [
+        [
+         "automat finit (AFD, AFN)",
+         "un număr fix de stări",
+         "regulate (LR)",
+         "expresii regulate, gramatici regulate"
+        ],
+        [
+         "automat cu stivă (APD)",
+         "stări + o stivă nemărginită",
+         "independente de context (LIC)",
+         "gramatici independente de context"
+        ],
+        [
+         "mașina Turing",
+         "o bandă nemărginită, citire și scriere",
+         "Turing acceptate / decidabile",
+         "gramatici fără restricții"
+        ]
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Pentru fiecare clasă cursul cere aceleași patru lucruri: **definiția** modelului, **echivalențele** (automat ↔ expresie/gramatică), **proprietățile de închidere** (ce operații păstrează clasa) și **proprietățile algoritmice** (ce întrebări au algoritm). Plus o unealtă pentru a arăta că un limbaj **nu** e în clasă: lemele de pompare, respectiv nedecidabilitatea."
+      }
+     ]
+    },
+    {
+     "id": "cuvinte",
+     "title": "Alfabet și cuvinte",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Alfabet",
+       "text": "Un **alfabet** `Σ` este o mulțime finită și nevidă de simboluri. Exemple: `{0, 1}`, `{a, b, c}`, caracterele ASCII."
+      },
+      {
+       "t": "def",
+       "title": "Cuvânt (șir)",
+       "text": "Un **cuvânt** peste `Σ` este o secvență finită de simboluri din `Σ`. Lungimea lui, `|w|`, este numărul de simboluri. **Cuvântul vid**, notat `e` în curs (`ε` în multe cărți și în aplicație), are lungimea 0. `Σ*` este mulțimea tuturor cuvintelor peste `Σ`, iar `Σ⁺ = Σ* \\ {e}`."
+      },
+      {
+       "t": "p",
+       "text": "Notații pe care le folosesc grilele: `|w|ₐ` sau `#a(w)` este numărul de apariții ale lui `a` în `w`; `w(i)` este al `i`-lea simbol; `#ab(w)` numărul de apariții ale subcuvântului `ab`."
+      },
+      {
+       "t": "def",
+       "title": "Concatenare și puteri",
+       "text": "Concatenarea `x · y` (sau `xy`) pune cuvintele unul după altul: `|xy| = |x| + |y|`. E asociativă, are elementul neutru `e` (`ew = we = w`) și **nu** e comutativă (`ab ≠ ba`). Puterile: `w⁰ = e`, `wⁱ⁺¹ = wⁱw`; de exemplu `(ab)³ = ababab`."
+      },
+      {
+       "t": "def",
+       "title": "Prefix, sufix, subcuvânt, oglindire",
+       "text": "`x` e **prefix** al lui `w` dacă `w = xy`, **sufix** dacă `w = yx`, **subcuvânt** (subsecvență contiguă) dacă `w = uxv`. `e` și `w` sunt prefixe (și sufixe) ale lui `w`. **Oglinditul** (răsturnatul) `wᴿ` se citește de la coadă: `(abb)ᴿ = bba`; `(xy)ᴿ = yᴿxᴿ`. Un **palindrom** are `w = wᴿ`."
+      },
+      {
+       "t": "ex",
+       "title": "Câte prefixe are un cuvânt?",
+       "text": "Câte prefixe are `w = abba`? Dar câte subcuvinte distincte?",
+       "solution": "Prefixele sunt `e, a, ab, abb, abba`: în general `|w| + 1`. Subcuvintele distincte: `e`, `a`, `b`, `ab`, `bb`, `ba`, `abb`, `bba`, `abba`: 9 (se numără o singură dată fiecare șir, chiar dacă apare de mai multe ori)."
+      }
+     ]
+    },
+    {
+     "id": "limbaje",
+     "title": "Limbaje și operațiile lor",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Limbaj",
+       "text": "Un **limbaj** peste `Σ` este orice submulțime `L ⊆ Σ*`, finită sau infinită. `∅` (limbajul vid, fără niciun cuvânt) și `{e}` (doar cuvântul vid) sunt limbaje **diferite**."
+      },
+      {
+       "t": "p",
+       "text": "Fiind mulțimi, limbajele au operațiile obișnuite: reuniune `L1 ∪ L2`, intersecție `L1 ∩ L2`, diferență `L1 \\ L2`, complement `∁L = Σ* \\ L` (în curs, `L` cu o bară deasupra). În plus, cele care folosesc structura cuvintelor:"
+      },
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "operație",
+        "definiție",
+        "exemplu"
+       ],
+       "rows": [
+        [
+         "concatenare",
+         "`L1L2 = {xy | x ∈ L1, y ∈ L2}`",
+         "`{a, ab}{b, e} = {ab, a, abb}`"
+        ],
+        [
+         "putere",
+         "`L⁰ = {e}`, `Lⁱ⁺¹ = LⁱL`",
+         "`{a, b}² = {aa, ab, ba, bb}`"
+        ],
+        [
+         "steaua lui Kleene",
+         "`L* = L⁰ ∪ L¹ ∪ L² ∪ …`",
+         "`{ab}* = {e, ab, abab, …}`"
+        ],
+        [
+         "plus",
+         "`L⁺ = LL* = L¹ ∪ L² ∪ …`",
+         "`{a}⁺ = {a, aa, …}`"
+        ],
+        [
+         "oglindire",
+         "`Lᴿ = {wᴿ | w ∈ L}`",
+         "`{ab, abb}ᴿ = {ba, bba}`"
+        ],
+        [
+         "prefixe",
+         "`prefix(L) = {x | ∃y, xy ∈ L}`",
+         "`prefix({ab}) = {e, a, ab}`"
+        ]
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "warn",
+       "title": "",
+       "text": "`∅* = {e}` (puterea 0 e întotdeauna `{e}`), `L∅ = ∅L = ∅`, `L{e} = L`. Iar `e ∈ L*` pentru **orice** `L`. Aceste trei reguli rezolvă o grămadă de grile de tipul „ce limbaj este …”."
+      },
+      {
+       "t": "quiz",
+       "q": "Ce este `∅*`?",
+       "options": [
+        "`∅`",
+        "`{e}`",
+        "`Σ*`",
+        "nu e definit"
+       ],
+       "answer": 1,
+       "why": "Steaua conține mereu `L⁰ = {e}`; celelalte puteri ale lui `∅` sunt vide."
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `L = {a, ab}`. Este `L* = {a, b}*`?",
+       "options": [
+        "da",
+        "nu: `b ∈ {a, b}*`, dar `b ∉ L*`",
+        "nu: `e ∉ L*`"
+       ],
+       "answer": 1,
+       "why": "Orice cuvânt din `L*` e concatenare de `a` și `ab`, deci începe cu `a` (sau e vid) și nu are `bb`. `b` nu se obține."
+      }
+     ]
+    },
+    {
+     "id": "numarare",
+     "title": "Câte limbaje există? (de ce unele nu se pot calcula)",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Propoziție",
+       "title": "Cardinalități",
+       "text": "`Σ*` este **infinit numărabilă**: cuvintele se pot lista în ordinea lungimii, apoi lexicografic (`e, a, b, aa, ab, …`). Mulțimea tuturor limbajelor, `2^(Σ*)`, este **nenumărabilă**.",
+       "proof": "Prin diagonalizare (Cantor): presupunem că limbajele se pot lista `L0, L1, L2, …` și fie `w0, w1, …` lista cuvintelor. Limbajul `D = {wᵢ | wᵢ ∉ Lᵢ}` diferă de fiecare `Lᵢ` prin cuvântul `wᵢ`, deci nu e în listă: contradicție."
+      },
+      {
+       "t": "p",
+       "text": "Consecința e fundamentală: orice automat, expresie, gramatică sau program este un **text finit**, deci există doar numărabil de multe descrieri. Cum limbajele sunt nenumărabile, **majoritatea limbajelor nu au nicio descriere finită**: nicio mașină nu le poate recunoaște."
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Grile frecvente: „Mulțimea limbajelor regulate / LIC / Turing acceptate este …” → **infinit numărabilă** (sunt infinit de multe, dar fiecare are o descriere finită). „Mulțimea tuturor limbajelor peste Σ este …” → **nenumărabilă**."
+      },
+      {
+       "t": "quiz",
+       "q": "Cum este mulțimea limbajelor independente de context peste un alfabet `Σ = {i}`?",
+       "options": [
+        "finită",
+        "infinit numărabilă",
+        "nenumărabilă",
+        "nu se poate afirma nimic"
+       ],
+       "answer": 1,
+       "why": "Fiecare LIC are o gramatică (text finit), deci sunt numărabile; și sunt infinit de multe, de exemplu `{iⁿ}` pentru fiecare `n`."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "expresii-regulate",
+   "title": "Expresii regulate",
+   "summary": "Cum se descrie un limbaj regulat printr-o formulă: definiția inductivă, ce limbaj denotă o expresie, precedența operatorilor, identitățile care simplifică, și tehnici concrete pentru a scrie expresia unui limbaj dat în cuvinte.",
+   "curs": "Curs 2",
+   "minutes": 30,
+   "practice": [
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "61",
+    "62",
+    "63",
+    "64",
+    "65",
+    "148",
+    "151",
+    "172",
+    "183"
+   ],
+   "sections": [
+    {
+     "id": "definitie",
+     "title": "Definiția",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Expresie regulată",
+       "text": "Expresiile regulate peste `Σ` se definesc inductiv:\n- `∅` și `e` sunt expresii regulate; pentru fiecare `a ∈ Σ`, `a` este o expresie regulată;\n- dacă `α` și `β` sunt expresii regulate, atunci și `(αβ)`, `(α ∪ β)` și `α*` sunt;\n- nimic altceva nu este expresie regulată.\n\nLimbajul denotat: `L(∅) = ∅`, `L(e) = {e}`, `L(a) = {a}`, `L(αβ) = L(α)L(β)`, `L(α ∪ β) = L(α) ∪ L(β)`, `L(α*) = L(α)*`."
+      },
+      {
+       "t": "p",
+       "text": "Precedența, de la cea mai puternică: **steaua**, apoi **concatenarea**, apoi **reuniunea**. Deci `ab* ∪ c` se citește `(a(b*)) ∪ c`. Prescurtări uzuale: `α⁺ = αα*`, `α? = α ∪ e`, `Σ = a ∪ b ∪ …` (orice simbol)."
+      },
+      {
+       "t": "note",
+       "tone": "warn",
+       "title": "",
+       "text": "Intersecția (`∩`), complementul și diferența **nu** sunt operatori ai expresiilor regulate. O „expresie” care le conține nu e validă, chiar dacă limbajul ei e regulat (o grilă din test cere exact asta: `(a ∪ b)* ∩ a*b*` nu e o expresie regulată validă)."
+      },
+      {
+       "t": "quiz",
+       "q": "Care este limbajul lui `(0* ∪ 1 ∪ 1*)*`?",
+       "options": [
+        "`0*1*`",
+        "`(0 ∪ 1)*`",
+        "`0* ∪ 1*`",
+        "`(01)*`"
+       ],
+       "answer": 1,
+       "why": "Sub stea se află `0` (din `0*`) și `1`, deci steaua generează orice cuvânt. Examen 6 septembrie 2022."
+      }
+     ]
+    },
+    {
+     "id": "identitati",
+     "title": "Identități utile",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "identitate",
+        "de ce"
+       ],
+       "rows": [
+        [
+         "`α ∪ β = β ∪ α`, `α ∪ α = α`",
+         "reuniunea de mulțimi e comutativă și idempotentă"
+        ],
+        [
+         "`α∅ = ∅α = ∅`",
+         "nu se poate alege un cuvânt din `∅`"
+        ],
+        [
+         "`αe = eα = α`",
+         "`e` e neutru la concatenare"
+        ],
+        [
+         "`∅* = e`, `e* = e`",
+         "doar puterea 0"
+        ],
+        [
+         "`(α*)* = α*`, `α*α* = α*`",
+         "o stea de stele nu aduce nimic nou"
+        ],
+        [
+         "`(α ∪ β)* = (α*β*)* = (α* ∪ β*)*`",
+         "toate generează orice amestec de cuvinte din α și β"
+        ],
+        [
+         "`α(βα)* = (αβ)*α`",
+         "regula de „alunecare”"
+        ],
+        [
+         "`(α ∪ e)* = α*`",
+         "`e` sub stea nu schimbă nimic"
+        ],
+        [
+         "`α*` = `e ∪ αα*`",
+         "definiția stelei"
+        ]
+       ]
+      },
+      {
+       "t": "thm",
+       "label": "Lemă",
+       "title": "Lema lui Arden",
+       "text": "Dacă `e ∉ L(β)`, ecuația `X = βX ∪ γ` are soluția unică `X = β*γ`.",
+       "proof": "`β*γ` este soluție: `β(β*γ) ∪ γ = β⁺γ ∪ γ = β*γ`. Unicitatea: dacă `X` e soluție, prin substituiri repetate `X = βⁿ⁺¹X ∪ (βⁿ ∪ … ∪ e)γ`; un cuvânt `w ∈ X` de lungime `n` nu poate fi în `βⁿ⁺¹X` (fiecare bucată din `β` are cel puțin un simbol), deci e în `β*γ`."
+      },
+      {
+       "t": "p",
+       "text": "Arden transformă o gramatică regulată (sau un automat) direct într-o expresie: din `X1 → 01X2 | 0 | e` și `X2 → 00X1 | 0 | e`, înlocuind, `X1 = (0100)X1 ∪ (010 ∪ 01 ∪ 0 ∪ e)`, deci `X1 = (0100)*(010 ∪ 01 ∪ 0 ∪ e)`."
+      }
+     ]
+    },
+    {
+     "id": "tehnici",
+     "title": "Cum scrii o expresie pentru un limbaj dat",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Nu există un algoritm „din cuvinte”, dar câteva tipare rezolvă aproape toate exercițiile de examen:"
+      },
+      {
+       "t": "steps",
+       "title": "Tipare",
+       "items": [
+        "**Conține un subcuvânt** `u`: `Σ*uΣ*`. Exemplu: conține `aa` → `(a ∪ b)*aa(a ∪ b)*`.",
+        "**Se termină / începe cu** `u`: `Σ*u`, respectiv `uΣ*`.",
+        "**Exact / cel mult k apariții** ale unui simbol: fixează aparițiile și pune între ele „orice altceva”. Exact doi `b`: `a*ba*ba*`. Cel mult un `a`: `b*(a ∪ e)b*`.",
+        "**Număr de simboluri modulo k**: un bloc care conține exact k simboluri numărate, repetat: `#a` par → `(b*ab*a)*b*`; `|w|` multiplu de 3 → `(ΣΣΣ)*`.",
+        "**Fiecare `a` e urmat de `b`**: „lipește” perechea și tratează `ab` ca pe un singur simbol: `(b ∪ c ∪ ab)*`.",
+        "**Nu conține** `u`: gândește ce poate urma după fiecare simbol. Fără `aa`: după un `a` vine obligatoriu `b` (sau sfârșitul): `(b ∪ ab)*(a ∪ e)`.",
+        "**Reuniune de cazuri**: când condiția e „sau”, scrie câte o expresie pentru fiecare caz. `#ab(w) = 0` sau `|w|` par: `b*a* ∪ (ΣΣ)*`.",
+        "**Când nu iese**: construiește întâi un automat (mai ușor de gândit), apoi aplică eliminarea stărilor (lecția 6)."
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Examen 9 iunie 2022",
+       "text": "Scrie o expresie regulată pentru `{x ∈ {a, b, c}* | fiecare simbol a din x este urmat de un simbol b, și x se termină cu c}`.",
+       "solution": "Bucățile din care se construiește cuvântul sunt `b`, `c` și `ab` (un `a` nu apare niciodată singur), iar ultimul simbol e `c`: `(b ∪ c ∪ ab)*c`. Verificare: `abc` ✓, `ac` ✗ (`a` urmat de `c`), `cab` ✗ (nu se termină cu `c`)."
+      },
+      {
+       "t": "ex",
+       "title": "Blocuri de 1 de lungime impară (Test 1, 2023)",
+       "text": "Peste `{0, 1}`: între oricare două zerouri consecutive se află un număr impar de `1`.",
+       "solution": "Între doi `0` consecutivi stă `1(11)*`. Înainte de primul `0` și după ultimul pot fi oricâți `1`: `1*(e ∪ 0(1(11)*0)*1*)`."
+      },
+      {
+       "t": "viz",
+       "kind": "regexlab",
+       "title": "Laborator: scrie o expresie, vezi limbajul",
+       "text": "Schimbă expresia: aplicația construiește automatul (prin construcția lui Thompson și cea a submulțimilor), îl minimizează și listează cele mai scurte cuvinte. Bun pentru a-ți verifica o expresie înainte s-o predai.",
+       "alphabet": "ab",
+       "regex": "(b∪ab)*(a∪ε)"
+      },
+      {
+       "t": "quiz",
+       "q": "Care expresie descrie cuvintele peste `{a, b}` care conțin cel puțin un `a` și cel puțin un `b`?",
+       "options": [
+        "`a⁺b⁺ ∪ b⁺a⁺`",
+        "`(a ∪ b)*(ab ∪ ba)(a ∪ b)*`",
+        "`(ab)*`",
+        "`a*b*a*`"
+       ],
+       "answer": 1,
+       "why": "Dacă un cuvânt are ambele simboluri, undeva un `a` stă lângă un `b`. `a⁺b⁺ ∪ b⁺a⁺` ratează `aba`."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "afd",
+   "title": "Automate finite deterministe",
+   "summary": "Primul model de calcul: o mașină cu un număr finit de stări care citește cuvântul o singură dată, de la stânga la dreapta. Definiția formală, configurații și calcul, diagrame, și metoda de construcție „ce trebuie să țină minte starea?”.",
+   "curs": "Curs 2",
+   "minutes": 30,
+   "practice": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "50",
+    "51",
+    "52",
+    "53",
+    "54",
+    "159",
+    "160",
+    "163",
+    "177"
+   ],
+   "sections": [
+    {
+     "id": "definitie",
+     "title": "Definiția",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "AFD",
+       "text": "Un **automat finit determinist** este un tuplu `M = (K, Σ, δ, s, F)`:\n- `K` – mulțimea finită a stărilor;\n- `Σ` – alfabetul de intrare;\n- `δ : K × Σ → K` – funcția de tranziție, **totală**: pentru fiecare stare și fiecare simbol există exact o stare următoare;\n- `s ∈ K` – starea inițială;\n- `F ⊆ K` – mulțimea stărilor finale (de acceptare)."
+      },
+      {
+       "t": "def",
+       "title": "Configurație și pas de calcul",
+       "text": "O **configurație** e o pereche `(q, w) ∈ K × Σ*`: starea curentă și ce a mai rămas de citit. Un pas: `(q, aw) ⊢ (δ(q, a), w)`. `⊢*` e închiderea reflexivă și tranzitivă (zero sau mai mulți pași)."
+      },
+      {
+       "t": "def",
+       "title": "Acceptare",
+       "text": "`M` **acceptă** `w` dacă `(s, w) ⊢* (f, e)` pentru o stare `f ∈ F`. Limbajul `L(M)` e mulțimea cuvintelor acceptate. Un limbaj e **regulat** dacă e acceptat de un automat finit."
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "`δ` totală înseamnă că un AFD are **exact** `|K| · |Σ|` tranziții (o grilă întreabă minimul și maximul: amândouă sunt `|K| · |Σ|`). Când într-o diagramă „lipsesc” tranziții, ele duc implicit într-o **groapă** (o stare nefinală din care nu mai ieși)."
+      }
+     ]
+    },
+    {
+     "id": "exemplu",
+     "title": "Un automat la lucru",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Automatul de mai jos acceptă cuvintele peste `{a, b}` care **se termină cu** `ab`. Starea ține minte cât din sufixul `ab` s-a văzut: `q0` nimic, `q1` un `a` la coadă, `q2` exact `ab` la coadă (finală)."
+      },
+      {
+       "t": "viz",
+       "kind": "automaton",
+       "title": "Citește un cuvânt pas cu pas",
+       "text": "Alege un cuvânt și apasă ▶ (sau „redă”). Starea aprinsă e cea curentă, săgeata aprinsă e tranziția folosită; dedesubt, șirul de configurații scris ca în curs.",
+       "alphabet": "ab",
+       "a": {
+        "states": 3,
+        "final": [
+         2
+        ],
+        "t": {
+         "0": {
+          "a": [
+           1
+          ],
+          "b": [
+           0
+          ]
+         },
+         "1": {
+          "a": [
+           1
+          ],
+          "b": [
+           2
+          ]
+         },
+         "2": {
+          "a": [
+           1
+          ],
+          "b": [
+           0
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         3.2,
+         0
+        ]
+       ],
+       "words": [
+        "aab",
+        "abab",
+        "aba",
+        "b",
+        ""
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Configurațiile pentru `aab`",
+       "text": "Scrie calculul automatului de mai sus pe `aab`.",
+       "solution": "`(q0, aab) ⊢ (q1, ab) ⊢ (q1, b) ⊢ (q2, e)`, iar `q2 ∈ F`, deci `aab ∈ L(M)`.",
+       "open": true
+      }
+     ]
+    },
+    {
+     "id": "constructie",
+     "title": "Cum construiești un AFD",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Întrebarea-cheie: **ce informație despre prefixul citit trebuie păstrată** ca să poți decide la final? Fiecare valoare posibilă a acestei informații devine o stare. Informația trebuie să aibă un număr **finit** de valori și să se poată actualiza simbol cu simbol."
+      },
+      {
+       "t": "steps",
+       "title": "Metoda",
+       "items": [
+        "Descrie în cuvinte ce ține minte fiecare stare („numărul de `a` e impar”, „ultimele două simboluri sunt `ab`”).",
+        "Starea inițială = informația pentru `e`.",
+        "Pentru fiecare stare și fiecare simbol, calculează noua informație: aceasta e tranziția.",
+        "Finale = stările a căror informație spune „cuvântul e în limbaj”.",
+        "Verifică pe câteva cuvinte, inclusiv `e` și cuvinte care **nu** sunt în limbaj."
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Numere binare divizibile cu 3",
+       "text": "Un cuvânt peste `{0, 1}` este un număr în baza 2. Construiește un AFD pentru numerele divizibile cu 3.",
+       "solution": "Ține minte restul `r` al valorii citite până acum. Dacă valoarea e `v` și vine bitul `c`, noua valoare e `2v + c`, deci noul rest e `(2r + c) mod 3`. Trei stări `q0, q1, q2`; `q0` inițială și finală."
+      },
+      {
+       "t": "viz",
+       "kind": "automaton",
+       "title": "Restul împărțirii la 3",
+       "text": "",
+       "alphabet": "01",
+       "a": {
+        "states": 3,
+        "final": [
+         0
+        ],
+        "t": {
+         "0": {
+          "0": [
+           0
+          ],
+          "1": [
+           1
+          ]
+         },
+         "1": {
+          "0": [
+           2
+          ],
+          "1": [
+           0
+          ]
+         },
+         "2": {
+          "0": [
+           1
+          ],
+          "1": [
+           2
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         3.2,
+         0
+        ]
+       ],
+       "words": [
+        "110",
+        "1001",
+        "111",
+        "0"
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Număr par de a și impar de b",
+       "text": "Peste `{a, b}`.",
+       "solution": "Patru stări: perechea (paritatea lui `#a`, paritatea lui `#b`). `a` schimbă prima componentă, `b` pe a doua. Finală: (par, impar). Aceasta e ideea **automatului produs**, pe care o vom formaliza la proprietățile de închidere."
+      },
+      {
+       "t": "note",
+       "tone": "tip",
+       "title": "",
+       "text": "Complementul: într-un AFD **complet**, schimbând stările finale cu cele nefinale obții automatul pentru `Σ* \\ L`. Dacă automatul nu e complet, adaugă întâi groapa; altfel cuvintele care „se blochează” rămân respinse și în complement."
+      }
+     ]
+    },
+    {
+     "id": "verifica",
+     "title": "Verifică-te",
+     "blocks": [
+      {
+       "t": "quiz",
+       "q": "Fie `M` un AFD peste `|Σ| = 2` cu `k > 2` stări care acceptă orice șir cu `|w| ≤ k`. Atunci:",
+       "options": [
+        "`|L(M)| ≤ 2ᵏ`",
+        "`|L(M)| = 2ᵏ⁺¹ - 1`",
+        "`L(M)` e infinit",
+        "`L(M) = Σ*`"
+       ],
+       "answer": 2,
+       "why": "Un cuvânt acceptat de lungime `k` trece prin `k + 1` stări, deci repetă una: există un ciclu pe un drum de acceptare, care se poate parcurge oricât. (Nu neapărat `Σ*`.)"
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `M1` un AFD care nu acceptă niciun șir. Atunci `M1`:",
+       "options": [
+        "nu are stări finale",
+        "poate avea stări finale",
+        "are o singură stare",
+        "nu are cicluri"
+       ],
+       "answer": 1,
+       "why": "Ajunge ca nicio stare finală să nu fie accesibilă din starea inițială."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "afn",
+   "title": "Automate nedeterministe și echivalența cu AFD",
+   "summary": "Nedeterminismul: mai multe tranziții posibile, tranziții pe e, tranziții lipsă. De ce nu aduce putere în plus: ε-închiderea și construcția submulțimilor, rulată rând cu rând, plus costul ei (exponențial în cel mai rău caz).",
+   "curs": "Curs 3",
+   "minutes": 35,
+   "practice": [
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "58",
+    "59",
+    "60",
+    "101",
+    "102",
+    "103",
+    "100",
+    "110",
+    "111",
+    "165",
+    "173",
+    "184",
+    "185"
+   ],
+   "sections": [
+    {
+     "id": "definitie",
+     "title": "Definiția din curs",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "AFN",
+       "text": "Un **automat finit nedeterminist** este `M = (K, Σ, Δ, s, F)`, unde `Δ ⊆ K × Σ* × K` este o **relație** finită: tuplul `(q, u, p)` spune că din `q`, citind șirul `u`, automatul **poate** trece în `p`. Configurațiile sunt ca la AFD; `(q, uw) ⊢ (p, w)` dacă `(q, u, p) ∈ Δ`. `M` acceptă `w` dacă **există** un calcul `(s, w) ⊢* (f, e)` cu `f ∈ F`."
+      },
+      {
+       "t": "p",
+       "text": "Față de AFD, un AFN poate avea: mai multe tranziții pe același simbol, **tranziții pe `e`** (fără să citească nimic), **tranziții lipsă** (calculul se blochează și ramura respinge), și **tranziții pe șiruri** (`(q, ab, p)`). Un cuvânt e acceptat dacă **cel puțin o** ramură de calcul îl duce într-o stare finală cu tot cuvântul citit."
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Grile clasice: `Δ` e **finită**, dar pentru `K` și `Σ` date nu are o margine superioară (etichetele pot fi oricât de lungi); poate fi vidă. Un AFN poate avea **0 stări finale** (atunci acceptă `∅`). Un AFN care acceptă `e` **nu** trebuie să aibă starea inițială finală (poate ajunge într-o finală pe tranziții `e`)."
+      },
+      {
+       "t": "viz",
+       "kind": "automaton",
+       "title": "Un AFN citește: mulțimea stărilor posibile",
+       "text": "Al treilea simbol de la sfârșit este `a`. Din `q0`, la fiecare `a`, automatul „ghicește” dacă acesta e al treilea de la coadă. Toate stările aprinse sunt locuri în care automatul poate fi.",
+       "alphabet": "ab",
+       "a": {
+        "states": 4,
+        "final": [
+         3
+        ],
+        "t": {
+         "0": {
+          "a": [
+           0,
+           1
+          ],
+          "b": [
+           0
+          ]
+         },
+         "1": {
+          "a": [
+           2
+          ],
+          "b": [
+           2
+          ]
+         },
+         "2": {
+          "a": [
+           3
+          ],
+          "b": [
+           3
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         3.2,
+         0
+        ],
+        [
+         4.8,
+         0
+        ]
+       ],
+       "words": [
+        "abb",
+        "aaba",
+        "babab",
+        "ab"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "inchidere",
+     "title": "Tranzițiile pe e și ε-închiderea",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "ε-închiderea",
+       "text": "Pentru o stare `q`, `E(q)` = mulțimea stărilor în care se poate ajunge din `q` folosind doar tranziții pe `e` (inclusiv `q`). Pentru o mulțime, `E(Q) = ∪ E(q)`."
+      },
+      {
+       "t": "viz",
+       "kind": "automaton",
+       "title": "a*b*c* cu tranziții pe e",
+       "text": "Observă că în pornire automatul e deja în toate cele patru stări: `E(q0) = {q0, q1, q2, q3}`.",
+       "alphabet": "abc",
+       "a": {
+        "states": 4,
+        "final": [
+         3
+        ],
+        "t": {
+         "0": {
+          "a": [
+           0
+          ],
+          "ε": [
+           1
+          ]
+         },
+         "1": {
+          "b": [
+           1
+          ],
+          "ε": [
+           2
+          ]
+         },
+         "2": {
+          "c": [
+           2
+          ],
+          "ε": [
+           3
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         3.2,
+         0
+        ],
+        [
+         4.8,
+         0
+        ]
+       ],
+       "words": [
+        "abc",
+        "ac",
+        "ba",
+        ""
+       ]
+      },
+      {
+       "t": "p",
+       "text": "Înainte de construcția submulțimilor, cursul elimină tranzițiile pe șiruri: `(q, a1a2…an, p)` devine un drum `q —a1→ r1 —a2→ … —an→ p` prin stări noi."
+      }
+     ]
+    },
+    {
+     "id": "submultimi",
+     "title": "Construcția submulțimilor (AFN → AFD)",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Echivalența AFN ↔ AFD",
+       "text": "Pentru orice AFN `M` există un AFD `M′` cu `L(M′) = L(M)`.",
+       "proof": "Fie `M = (K, Σ, Δ, s, F)` fără tranziții pe șiruri de lungime > 1. Construim `M′ = (2^K, Σ, δ′, E(s), F′)` cu `δ′(Q, a) = ∪{E(p) | ∃q ∈ Q, (q, a, p) ∈ Δ}` și `F′ = {Q | Q ∩ F ≠ ∅}`. Prin inducție pe `|w|`: `(E(s), w) ⊢*_M′ (Q, e)` ⇔ `Q` este exact mulțimea stărilor `p` cu `(s, w) ⊢*_M (p, e)`. Deci `M′` acceptă ⇔ una dintre stările în care poate fi `M` e finală ⇔ `M` acceptă."
+      },
+      {
+       "t": "steps",
+       "title": "Algoritmul (ca în seminar)",
+       "items": [
+        "Starea inițială a AFD-ului: `E(s)`.",
+        "Pentru o stare nouă `Q` și fiecare simbol `a`: reunește stările în care duce `a` din fiecare `q ∈ Q`, apoi aplică `E`. Rezultatul e `δ′(Q, a)`.",
+        "Orice mulțime care apare pentru prima dată devine o stare nouă și primește și ea un rând.",
+        "Te oprești când nu mai apar mulțimi noi. Finale: mulțimile care conțin o stare finală. Mulțimea vidă `∅`, dacă apare, e groapa."
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "subset",
+       "title": "Construcția submulțimilor, rând cu rând",
+       "text": "AFN-ul de la examen: `N = ({0, 1}, {a, b}, {(0, a, 0), (0, b, 0), (0, b, 1), (1, a, 1), (1, a, 0)}, 0, {1})`. Apasă ▶: fiecare pas adaugă un rând tabelului și o stare AFD-ului.",
+       "alphabet": "ab",
+       "a": {
+        "states": 2,
+        "final": [
+         1
+        ],
+        "t": {
+         "0": {
+          "a": [
+           0
+          ],
+          "b": [
+           0,
+           1
+          ]
+         },
+         "1": {
+          "a": [
+           0,
+           1
+          ]
+         }
+        }
+       },
+       "names": [
+        "0",
+        "1"
+       ],
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         2,
+         0
+        ]
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "subset",
+       "title": "Cu tranziții pe e",
+       "text": "Aici coloana arată și mulțimea „înainte de închidere” → „după închidere”.",
+       "alphabet": "abc",
+       "a": {
+        "states": 4,
+        "final": [
+         3
+        ],
+        "t": {
+         "0": {
+          "a": [
+           0
+          ],
+          "ε": [
+           1
+          ]
+         },
+         "1": {
+          "b": [
+           1
+          ],
+          "ε": [
+           2
+          ]
+         },
+         "2": {
+          "c": [
+           2
+          ],
+          "ε": [
+           3
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         3.2,
+         0
+        ],
+        [
+         4.8,
+         0
+        ]
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "subset",
+       "title": "Explozia: se termină cu abb, apoi al treilea de la coadă",
+       "text": "Un AFN cu `n + 1` stări pentru „al `n`-lea simbol de la sfârșit e `a`” dă un AFD cu `2ⁿ` stări, iar acesta e și minimul.",
+       "alphabet": "ab",
+       "a": {
+        "states": 4,
+        "final": [
+         3
+        ],
+        "t": {
+         "0": {
+          "a": [
+           0,
+           1
+          ],
+          "b": [
+           0
+          ]
+         },
+         "1": {
+          "a": [
+           2
+          ],
+          "b": [
+           2
+          ]
+         },
+         "2": {
+          "a": [
+           3
+          ],
+          "b": [
+           3
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         3.2,
+         0
+        ],
+        [
+         4.8,
+         0
+        ]
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Construcția poate produce până la `2^|K|` stări, dar în practică doar cele **accesibile** din `E(s)`. AFN-urile sunt utile tocmai pentru că pot fi exponențial mai mici. O grilă: „`M′` are cel puțin la fel de multe stări ca `M`?” – **fals** (AFN-ul poate avea stări inutile), dar „`M` poate avea mai multe stări decât `M′`” – **adevărat**."
+      },
+      {
+       "t": "exam",
+       "source": "Examen LFA · set de probleme",
+       "title": "",
+       "text": "Fie `N = ({0, 1}, {a, b}, Δ, 0, {1})` cu `Δ = {(0, a, 0), (0, b, 0), (0, b, 1), (1, a, 1), (1, a, 0)}`. Scrieți un automat determinist `A` astfel încât `L(N) = L(A)`, și o expresie regulată pentru limbaj.",
+       "solution": "`E(0) = {0}`. `δ′({0}, a) = {0}`, `δ′({0}, b) = {0, 1}`; `δ′({0, 1}, a) = {0, 1}`, `δ′({0, 1}, b) = {0, 1}`. Două stări, `{0, 1}` finală. Limbajul: cuvintele care conțin un `b`, `a*b(a ∪ b)*`."
+      }
+     ]
+    },
+    {
+     "id": "verifica",
+     "title": "Verifică-te",
+     "blocks": [
+      {
+       "t": "quiz",
+       "q": "Câte tupluri poate conține relația `Δ` a unui AFN (definiția din curs)?",
+       "options": [
+        "cel mult `|K|²(|Σ| + 1)`",
+        "un număr finit, fără margine superioară",
+        "o infinitate",
+        "exact `|K||Σ|`"
+       ],
+       "answer": 1,
+       "why": "Recapitularea seminarelor 1–4, problema 1. Etichetele sunt șiruri din `Σ*`, deci pot fi oricâte (dar finit). Bornă există doar dacă etichetele sunt simboluri sau `e`."
+      },
+      {
+       "t": "quiz",
+       "q": "Poate orice limbaj regulat să fie recunoscut de un AFD cu o singură stare finală?",
+       "options": [
+        "da",
+        "nu",
+        "doar limbajele finite"
+       ],
+       "answer": 1,
+       "why": "`{e, a}` peste `{a}`: starea inițială trebuie să fie finală (pentru `e`), apoi `δ(s, a)` e tot finală, deci aceeași stare, și se acceptă și `aa`. Un AFN, în schimb, poate avea mereu o singură stare finală (cu tranziții pe `e` spre ea)."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inchidere-lr",
+   "title": "Proprietăți de închidere ale limbajelor regulate",
+   "summary": "Ce operații transformă limbaje regulate tot în limbaje regulate, cu construcția de automat pentru fiecare: reuniune, concatenare, stea, complement, intersecție (automatul produs), diferență, oglindire, prefixe, sufixe, câtul. Și cum se folosesc ca să demonstrezi că un limbaj e regulat.",
+   "curs": "Curs 4",
+   "minutes": 35,
+   "practice": [
+    "106",
+    "107",
+    "114",
+    "115",
+    "116",
+    "128",
+    "182"
+   ],
+   "sections": [
+    {
+     "id": "constructii",
+     "title": "Construcțiile pentru reuniune, concatenare și stea",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Fie `M1 = (K1, Σ, Δ1, s1, F1)` și `M2 = (K2, Σ, Δ2, s2, F2)` două AFN cu stări disjuncte. Construcțiile din curs:"
+      },
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "operație",
+        "automatul",
+        "ideea"
+       ],
+       "rows": [
+        [
+         "`L1 ∪ L2`",
+         "stare nouă `s`; `Δ = Δ1 ∪ Δ2 ∪ {(s, e, s1), (s, e, s2)}`; `F = F1 ∪ F2`",
+         "ghicește de la început care automat"
+        ],
+        [
+         "`L1L2`",
+         "`s = s1`; `Δ = Δ1 ∪ Δ2 ∪ {(f, e, s2) | f ∈ F1}`; `F = F2`",
+         "după un cuvânt din `L1`, sari în `M2`"
+        ],
+        [
+         "`L1*`",
+         "stare nouă `s′`, inițială și **finală**; `Δ = Δ1 ∪ {(s′, e, s1)} ∪ {(f, e, s1) | f ∈ F1}`; `F = F1 ∪ {s′}`",
+         "reia `M1` de oricâte ori; `e` acceptat"
+        ],
+        [
+         "`Σ* \\ L1`",
+         "AFD **complet**, `F = K \\ F1`",
+         "inversează verdictul"
+        ],
+        [
+         "`L1 ∩ L2`",
+         "automatul produs (mai jos) sau De Morgan: `∁L1 ∪ ∁L2` complementat",
+         "rulează ambele în paralel"
+        ]
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "warn",
+       "title": "",
+       "text": "La stea, starea nouă `s′` e necesară: dacă ai face pur și simplu `s1` finală, ai putea accepta cuvinte care nu sunt în `L1*` (când există tranziții care intră înapoi în `s1`)."
+      }
+     ]
+    },
+    {
+     "id": "produs",
+     "title": "Automatul produs: intersecție, reuniune, diferență, diferență simetrică",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Produsul",
+       "text": "Pentru două AFD complete `M1`, `M2` peste același `Σ`, automatul `M = (K1 × K2, Σ, δ, (s1, s2), F)` cu `δ((p, q), a) = (δ1(p, a), δ2(q, a))` acceptă:\n- `L1 ∩ L2` pentru `F = F1 × F2`;\n- `L1 ∪ L2` pentru `F = (F1 × K2) ∪ (K1 × F2)`;\n- `L1 \\ L2` pentru `F = F1 × (K2 \\ F2)`;\n- `L1 △ L2` pentru perechile cu **exact una** dintre componente finală.",
+       "proof": "Prin inducție pe `|w|`: `δ*((s1, s2), w) = (δ1*(s1, w), δ2*(s2, w))`. Deci perechea la care se ajunge spune, simultan, dacă `w ∈ L1` și dacă `w ∈ L2`; mulțimea `F` alege combinația dorită."
+      },
+      {
+       "t": "viz",
+       "kind": "product",
+       "title": "Produsul a două automate",
+       "text": "A: numărul de `a` e par. B: cuvântul se termină cu `b`. Schimbă operația: perechile rămân aceleași, se schimbă doar care sunt finale. Aceasta e și problema 5 din recapitularea seminarelor (diferența simetrică).",
+       "alphabet": "ab",
+       "a": {
+        "states": 2,
+        "final": [
+         0
+        ],
+        "t": {
+         "0": {
+          "a": [
+           1
+          ],
+          "b": [
+           0
+          ]
+         },
+         "1": {
+          "a": [
+           0
+          ],
+          "b": [
+           1
+          ]
+         }
+        }
+       },
+       "b": {
+        "states": 2,
+        "final": [
+         1
+        ],
+        "t": {
+         "0": {
+          "a": [
+           0
+          ],
+          "b": [
+           1
+          ]
+         },
+         "1": {
+          "a": [
+           0
+          ],
+          "b": [
+           1
+          ]
+         }
+        }
+       },
+       "op": "△",
+       "la": "#a par",
+       "lb": "se termină cu b",
+       "posA": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ]
+       ],
+       "posB": [
+        [
+         0,
+         0
+        ],
+        [
+         1.6,
+         0
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "altele",
+     "title": "Oglindire, prefixe, sufixe, cât",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "limbaj",
+        "construcția"
+       ],
+       "rows": [
+        [
+         "`Lᴿ`",
+         "întoarce toate săgețile; stare inițială nouă cu `e` spre fostele finale; finală devine fosta inițială"
+        ],
+        [
+         "`prefix(L)`",
+         "în AFD-ul lui `L`, fă finală orice stare din care se poate ajunge într-o stare finală"
+        ],
+        [
+         "`Suf(L)`",
+         "stare inițială nouă, cu `e` spre orice stare accesibilă din `s`"
+        ],
+        [
+         "`L1/L2 = {w | ∃x ∈ L2, wx ∈ L1}`",
+         "același automat ca pentru `L1`; finale devin stările `q` din care un cuvânt din `L2` duce în `F1`"
+        ],
+        [
+         "`{w ∈ L | w nu conține b}`",
+         "`L ∩ (Σ \\ {b})*`"
+        ]
+       ]
+      },
+      {
+       "t": "exam",
+       "source": "Examen 9 iunie 2022",
+       "title": "",
+       "text": "Fie `L1`, `L2` limbaje peste `Σ` și `L1 \\ L2 = {w ∈ Σ* | ∃x ∈ L2 a.î. wx ∈ L1}`. Demonstrați că dacă `L1` e regulat, atunci `L1 \\ L2` e regulat (`L2` oarecare!).",
+       "solution": "Fie `M = (K, Σ, δ, s, F)` un AFD pentru `L1`. Definim `F′ = {q ∈ K | ∃x ∈ L2, δ*(q, x) ∈ F}` și `M′ = (K, Σ, δ, s, F′)`. Atunci `w ∈ L(M′)` ⇔ `δ*(s, w) ∈ F′` ⇔ `∃x ∈ L2` cu `δ*(δ*(s, w), x) ∈ F` ⇔ `∃x ∈ L2`, `wx ∈ L1`. `M′` are tot `|K|` stări, deci limbajul e regulat. (Nu știm neapărat să **calculăm** `F′` dacă `L2` e complicat, dar automatul există: demonstrația e de existență.)"
+      }
+     ]
+    },
+    {
+     "id": "folosire",
+     "title": "Cum demonstrezi că un limbaj e regulat",
+     "blocks": [
+      {
+       "t": "steps",
+       "title": "Rețeta pentru „Demonstrați că L e regulat”",
+       "items": [
+        "Scrie `L` ca o combinație de limbaje despre care știi că sunt regulate (finite, `Σ*`, `Σ*uΣ*`, „lungime pară”, limbajul unui automat dat), folosind operații la care LR sunt închise.",
+        "Citează proprietatea de închidere la fiecare pas.",
+        "Alternativ: construiește direct un AF (sau o ER) și explică de ce acceptă exact `L`."
+       ]
+      },
+      {
+       "t": "exam",
+       "source": "Recapitulare seminarele 1–4, problema 4",
+       "title": "",
+       "text": "Fie `Σ` un alfabet și `F ⊆ Σ*` finit. Arătați că `L = {w ∈ Σ* | w nu are subsecvențe în F}` e regulat.",
+       "solution": "`L = Σ* \\ (Σ*FΣ*)`. `F` e finit, deci regulat; `Σ*` e regulat; concatenarea `Σ*FΣ*` e regulată; complementul ei e regulat. Același argument merge pentru orice `F` regulat (examenul din 2025 întreabă exact asta)."
+      },
+      {
+       "t": "exam",
+       "source": "Examen 18 ianuarie 2025",
+       "title": "",
+       "text": "Fie `L` regulat peste `{a, b, c}`. Arătați că `L′ = {w | w ∈ L ∧ #a(w) = 0}` e regulat.",
+       "solution": "`L′ = L ∩ {b, c}*`. `{b, c}*` e regulat (expresia `(b ∪ c)*`), iar intersecția a două limbaje regulate e regulată."
+      },
+      {
+       "t": "exam",
+       "source": "Recapitulare seminarele 1–4, problema 8",
+       "title": "",
+       "text": "Demonstrați că `Suf(L) = {w | ∃w′ ∈ L cu w sufix al lui w′}` e regulat atunci când `L` e regulat.",
+       "solution": "Fie `M` un AFN pentru `L`. Construim `M′`: stările lui `M`, plus `s′` nouă inițială, cu `(s′, e, q)` pentru fiecare `q` accesibilă din `s`. Dacă `w ∈ Suf(L)`, `w′ = uw ∈ L`; calculul lui `M` pe `uw` trece după `u` printr-o stare `q`, deci `M′` sare în `q` și citește `w` până la o finală. Invers, un calcul acceptat de `M′` pornește dintr-un `q` accesibil, cu un `u` care duce în `q`, deci `uw ∈ L`."
+      },
+      {
+       "t": "note",
+       "tone": "warn",
+       "title": "",
+       "text": "Capcana: închiderea merge într-un singur sens. `L1L2` regulat **nu** implică `L1`, `L2` regulate (`{0ⁿ1ᵐ | n > m} · 1* = 0⁺1*`); `L*` regulat nu implică `L` regulat (`{aᵖ | p prim}* = e ∪ aaa*`); `L1 ∪ L2` regulat nu implică nimic despre `L1` (`{0ⁱ1ʲ | i ≠ j} ∪ {0ⁱ1ⁱ} = 0*1*`). Și o submulțime a unui limbaj regulat poate fi oricât de complicată (`aⁿbⁿ ⊆ Σ*`)."
+      },
+      {
+       "t": "quiz",
+       "q": "`L1`, `L2` regulate. Care listă conține doar limbaje regulate?",
+       "options": [
+        "`L1L2`, `L1 ∪ {0,1}*`, `L1 × L2`",
+        "`L1*`, `2^(L1L2)`, `L2L1`",
+        "`L1 ∪ L2`, `(L1 \\ L2) ∪ (L2 \\ L1)`, `L1 ∩ L2∅`",
+        "`L2 × L1`, `L1 \\ L2`, `L2 \\ L1`"
+       ],
+       "answer": 2,
+       "why": "`×` și `2^X` nu sunt limbaje (perechi de cuvinte, respectiv mulțimi de limbaje). Test 1, 2023."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "af-er",
+   "title": "Echivalența automate ↔ expresii regulate",
+   "summary": "Teorema lui Kleene în ambele sensuri: de la o expresie la un automat (construcția lui Thompson, bucată cu bucată) și de la un automat la o expresie (eliminarea stărilor, după ghidul CS103 de la Stanford, cu starea de eliminat aleasă de tine).",
+   "curs": "Curs 4",
+   "minutes": 40,
+   "practice": [
+    "23",
+    "101",
+    "102",
+    "103",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20"
+   ],
+   "sections": [
+    {
+     "id": "kleene",
+     "title": "Teorema",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Kleene",
+       "text": "Un limbaj este acceptat de un automat finit **dacă și numai dacă** este limbajul unei expresii regulate.",
+       "proof": "(⇐) Prin inducție pe structura expresiei: `∅`, `e`, `a` au automate cu două stări; pentru `αβ`, `α ∪ β`, `α*` se aplică construcțiile de închidere la concatenare, reuniune și stea (construcția lui Thompson). (⇒) Prin eliminarea stărilor: se transformă automatul într-unul cu expresii pe săgeți și se elimină pe rând stările, păstrând limbajul, până rămâne o singură săgeată."
+      }
+     ]
+    },
+    {
+     "id": "thompson",
+     "title": "De la expresie la automat: construcția lui Thompson",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Fiecare bucată a expresiei primește un automat cu **o singură stare de intrare și o singură stare de ieșire**:"
+      },
+      {
+       "t": "steps",
+       "title": "Bucățile",
+       "items": [
+        "`a`: două stări, o săgeată `a`. `e`: o săgeată `e`. `∅`: două stări, nicio săgeată.",
+        "`αβ`: ieșirea lui `α` se leagă cu `e` de intrarea lui `β`.",
+        "`α ∪ β`: o intrare nouă cu `e` spre ambele, și o ieșire nouă în care intră `e` din ambele.",
+        "`α*`: intrare și ieșire noi; `e` de la intrare la `α` și direct la ieșire (zero repetări); `e` de la ieșirea lui `α` înapoi la intrarea lui `α` (încă o repetare) și spre ieșire."
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "thompson",
+       "title": "Construcția lui Thompson, bucată cu bucată",
+       "text": "Apasă ▶: se construiesc întâi bucățile cele mai mici, apoi cele care le conțin. Stările aprinse sunt intrarea și ieșirea bucății curente. Scrie altă expresie ca s-o vezi construită.",
+       "alphabet": "ab",
+       "regex": "(a∪b)*abb"
+      },
+      {
+       "t": "note",
+       "tone": "tip",
+       "title": "",
+       "text": "Automatul lui Thompson are cel mult `2 · |expresie|` stări și cel mult două săgeți care ies din fiecare stare. Nu e minimal, dar e mecanic: exact ce cere un exercițiu „construiți un AF pentru expresia …” (recapitularea seminarelor, problema 2)."
+      }
+     ]
+    },
+    {
+     "id": "eliminare",
+     "title": "De la automat la expresie: eliminarea stărilor",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Ghidul CS103 (Stanford) descrie algoritmul în trei pași. Lucrăm cu un automat ale cărui săgeți poartă **expresii regulate**, nu doar simboluri."
+      },
+      {
+       "t": "steps",
+       "title": "Algoritmul",
+       "items": [
+        "**Pregătirea.** Adaugă o stare de start nouă `qs` cu `e` spre vechea stare inițială și o stare finală nouă `qf` cu `e` din fiecare veche stare finală; doar `qf` mai e finală. Săgețile paralele dintre aceleași două stări se unesc cu `∪`.",
+        "**Eliminarea.** Cât timp mai există alte stări decât `qs` și `qf`, alege una, `q_gone`. Pentru fiecare pereche `(q_in, q_out)` cu o săgeată `q_in → q_gone` și una `q_gone → q_out` (ambele diferite de `q_gone`), adaugă săgeata `q_in → q_out` cu eticheta `R_in (R_buclă)* R_out`, unde `R_buclă` e bucla lui `q_gone` (fără buclă, doar `R_in R_out`). Dacă exista deja o săgeată `q_in → q_out` cu `R`, noua etichetă e `R ∪ R_in (R_buclă)* R_out`. Apoi șterge `q_gone`.",
+        "**Citirea.** Au rămas `qs` și `qf`: expresia e eticheta săgeții `qs → qf` (sau `∅`, dacă nu există)."
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "elim",
+       "title": "Elimină stările, în ordinea aleasă de tine",
+       "text": "„Conține `aa`” (exercițiul din ghid). Atinge o stare ca s-o elimini, sau apasă butonul sugerat (cel care face expresiile cele mai scurte). Tabelul arată, pentru fiecare pereche, `R_in`, bucla, `R_out` și eticheta nouă.",
+       "alphabet": "ab",
+       "a": {
+        "states": 3,
+        "final": [
+         2
+        ],
+        "t": {
+         "0": {
+          "a": [
+           1
+          ],
+          "b": [
+           0
+          ]
+         },
+         "1": {
+          "a": [
+           2
+          ],
+          "b": [
+           0
+          ]
+         },
+         "2": {
+          "a": [
+           2
+          ],
+          "b": [
+           2
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.8,
+         0
+        ],
+        [
+         3.6,
+         0
+        ]
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Ordinea contează (pentru formă, nu pentru limbaj)",
+       "text": "Elimină stările automatului de mai sus în ordinea `q2, q1, q0`, apoi în ordinea `q0, q1, q2`.",
+       "solution": "Ordinea `q2, q1, q0` dă `(b ∪ ab)*aaΣ*` (ghidul scrie `(a?b)*aaΣ*`). Ordinea `q0, q1, q2` dă `b*a(b⁺a)*aΣ*`. Sunt expresii diferite pentru același limbaj, și niciuna nu e cea mai simplă: `Σ*aaΣ*`. Eliminarea stărilor garantează **o** expresie corectă, nu una frumoasă."
+      },
+      {
+       "t": "viz",
+       "kind": "elim",
+       "title": "Exemplul mare din ghid: paritatea adunării",
+       "text": "Limbajul `{aᵐ + aⁿ = aᵖ | m + n ≡ p (mod 2)}` peste `{a, +, =}` (în ghid, `≡` în loc de `=`; aici `+` e un **simbol**, nu operatorul). Rândul de sus: paritate pară până acum, cel de jos: impară. Ghidul elimină în ordinea `q3, q5, q4, q1, q2, q0`: încearcă și altă ordine.",
+       "alphabet": "a+=",
+       "a": {
+        "states": 6,
+        "final": [
+         2
+        ],
+        "t": {
+         "0": {
+          "a": [
+           3
+          ],
+          "+": [
+           1
+          ]
+         },
+         "3": {
+          "a": [
+           0
+          ],
+          "+": [
+           4
+          ]
+         },
+         "1": {
+          "a": [
+           4
+          ],
+          "=": [
+           2
+          ]
+         },
+         "4": {
+          "a": [
+           1
+          ],
+          "=": [
+           5
+          ]
+         },
+         "2": {
+          "a": [
+           5
+          ]
+         },
+         "5": {
+          "a": [
+           2
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         2,
+         0
+        ],
+        [
+         4,
+         0
+        ],
+        [
+         0,
+         1.6
+        ],
+        [
+         2,
+         1.6
+        ],
+        [
+         4,
+         1.6
+        ]
+       ],
+       "order": [
+        3,
+        5,
+        4,
+        1,
+        2,
+        0
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "tip",
+       "title": "",
+       "text": "Cum alegi ordinea: elimină întâi stările cu puține săgeți care intră și ies (produc puține perechi). Stările „de trecere”, cu o intrare și o ieșire, se elimină fără să crească expresia. Lasă la urmă stările cu bucle mari."
+      }
+     ]
+    },
+    {
+     "id": "verifica",
+     "title": "Verifică-te",
+     "blocks": [
+      {
+       "t": "quiz",
+       "q": "La eliminarea lui `q`, cu `q_in —x→ q`, buclă `y` pe `q`, `q —z→ q_out` și deja `q_in —w→ q_out`, noua etichetă `q_in → q_out` este:",
+       "options": [
+        "`xyz`",
+        "`w ∪ xy*z`",
+        "`(w ∪ x)y*z`",
+        "`w(xy*z)*`"
+       ],
+       "answer": 1,
+       "why": "Drumurile vechi (`w`) rămân, iar cele prin `q` sunt intrare, oricâte bucle, ieșire."
+      },
+      {
+       "t": "quiz",
+       "q": "Ce expresie generează limbajul vid?",
+       "options": [
+        "`1*`",
+        "`1*∅`",
+        "`∅*(∅ ∪ 0*)`",
+        "`∅*`"
+       ],
+       "answer": 1,
+       "why": "`x∅ = ∅`; `∅* = e`, deci `∅*` și `∅*(∅ ∪ 0*) = 0*` nu sunt vide."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "algoritmice-lr",
+   "title": "Proprietăți algoritmice ale limbajelor regulate",
+   "summary": "Ce întrebări despre automate au algoritm: apartenența, limbajul vid, limbajul infinit, egalitatea și incluziunea a două limbaje, „acceptă tot”. Cum le compui ca să răspunzi la întrebările de examen de tipul „cum se poate determina dacă …”.",
+   "curs": "Curs 4",
+   "minutes": 25,
+   "practice": [
+    "114",
+    "128"
+   ],
+   "sections": [
+    {
+     "id": "lista",
+     "title": "Întrebările decidabile",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Pentru limbaje regulate date prin automate (sau expresii, care se transformă în automate), **toate** întrebările naturale au algoritm. Iată cele de bază, din care se construiesc celelalte:"
+      },
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "întrebarea",
+        "algoritmul"
+       ],
+       "rows": [
+        [
+         "`w ∈ L(M)`?",
+         "rulează AFD-ul pe `w`: `|w|` pași"
+        ],
+        [
+         "`L(M) = ∅`?",
+         "o parcurgere (BFS/DFS) din `s`: e vid ⇔ nicio stare finală nu e accesibilă"
+        ],
+        [
+         "`L(M)` e infinit?",
+         "păstrează doar stările accesibile din `s` **și** din care se ajunge la o stare finală; e infinit ⇔ printre ele există un ciclu. Echivalent: există `w ∈ L` cu `n ≤ |w| < 2n` (`n = |K|`)"
+        ],
+        [
+         "`L(M) = Σ*`?",
+         "complementează (AFD complet, inversezi finalele) și testează vid"
+        ],
+        [
+         "`L(M1) ⊆ L(M2)`?",
+         "`L(M1) ∩ ∁L(M2) = ∅`: produs + test de vid"
+        ],
+        [
+         "`L(M1) = L(M2)`?",
+         "`L(M1) △ L(M2) = ∅`, sau incluziune în ambele sensuri, sau compari AFD-urile minime"
+        ]
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Toate „rețetele” de examen au aceeași formă: **construiești un automat** pentru un limbaj care e vid exact când răspunsul e da (cu proprietățile de închidere), apoi aplici **testul de vid**. Scrie explicit fiecare construcție și de ce e regulat ce construiești."
+      }
+     ]
+    },
+    {
+     "id": "examen",
+     "title": "Probleme de examen",
+     "blocks": [
+      {
+       "t": "exam",
+       "source": "Examen 2022 și 18 ianuarie 2025",
+       "title": "",
+       "text": "Fie două AFD `M1`, `M2` peste același alfabet. Folosind proprietățile algoritmice, scrieți cum se poate determina dacă există un șir care nu este în niciunul dintre limbajele acceptate de automate.",
+       "solution": "`∃w ∉ L(M1) ∪ L(M2)` ⇔ `Σ* \\ (L(M1) ∪ L(M2)) ≠ ∅`. Construim `M` = produsul lui `M1` cu `M2` pentru reuniune, apoi `∁M` (inversăm stările finale; produsul e complet). Testăm dacă `L(∁M)` e vid printr-o parcurgere: dacă o stare finală a lui `∁M` e accesibilă, șirul există (și drumul găsit îl dă). Mai direct: căutăm o pereche accesibilă `(p, q)` cu `p ∉ F1` și `q ∉ F2`."
+      },
+      {
+       "t": "exam",
+       "source": "Examen 1 februarie 2025",
+       "title": "",
+       "text": "Fie `M1`, `M2` două AFD peste `Σ`. Cum se poate determina dacă `prefix(L(M1)) ⊆ L(M2)`, unde `prefix(L) = {x ∈ Σ* | ∃y ∈ Σ*, xy ∈ L}`?",
+       "solution": "1. `M1′` pentru `prefix(L(M1))`: aceleași stări și tranziții, dar finală devine orice stare din care se poate ajunge într-o stare finală a lui `M1` (o parcurgere inversă din `F1`). 2. `∁M2` pentru complementul lui `L(M2)`: inversăm finalele. 3. Produsul `M3` pentru `L(M1′) ∩ L(∁M2)`. 4. Test de vid pe `M3`: dacă e vid, `prefix(L(M1)) ⊆ L(M2)`; altfel nu, iar un drum până la o stare finală dă un contraexemplu."
+      },
+      {
+       "t": "exam",
+       "source": "Recapitulare seminarele 1–4, problema 7",
+       "title": "",
+       "text": "Cum putem verifica: (a) `L(M)` este finit; (b) `M` acceptă un unic cel mai lung șir nevid?",
+       "solution": "(a) Eliminăm stările inaccesibile din `s` și pe cele din care nu se ajunge în `F`; `L(M)` e finit ⇔ graful rămas nu are cicluri (DFS cu detecția muchiilor înapoi). (b) Cerem întâi ca `L(M)` să fie finit și nevid. Pe graful fără cicluri al stărilor utile calculăm, prin programare dinamică pe ordinea topologică, lungimea maximă a unui drum din `s` la o stare finală și **numărul** de drumuri de lungime maximă (la un AFD, drumuri diferite înseamnă cuvinte diferite). Răspunsul e da dacă lungimea maximă e cel puțin 1 și există exact un astfel de drum."
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `M1, M2 ∈ AFD`. (1) Există un algoritm pentru a decide dacă `L(M1) ⊂ L(M2)`. (2) Nu există un algoritm pentru a decide dacă `L(M2) = (L(M1)L(M2))*`.",
+       "options": [
+        "Adevărat, Fals",
+        "Fals, Fals",
+        "Fals, Adevărat",
+        "Adevărat, Adevărat"
+       ],
+       "answer": 0,
+       "why": "Pentru limbaje regulate totul e decidabil: `(L(M1)L(M2))*` e regulat (se construiește automatul), iar egalitatea a două limbaje regulate se decide. Grilă de examen, 2021."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pompare-lr",
+   "title": "Limbaje care nu sunt regulate: lema de pompare",
+   "summary": "De ce un automat finit nu poate număra oricât: principiul cutiei, enunțul lemei, cum se folosește ca un joc cu un adversar, exemplele clasice, metoda proprietăților de închidere, și greșelile care costă puncte la examen.",
+   "curs": "Curs 5",
+   "minutes": 40,
+   "practice": [
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "42",
+    "122",
+    "124",
+    "127",
+    "147"
+   ],
+   "sections": [
+    {
+     "id": "intuitie",
+     "title": "Intuiția",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Un AFD cu `p` stări care citește un cuvânt de lungime cel puțin `p` trece prin `p + 1` configurații, deci **repetă o stare** (principiul cutiei). Bucata citită între cele două vizite e un ciclu: o poți repeta de oricâte ori, sau sări peste ea, și automatul ajunge în aceeași stare la sfârșit. Deci cuvintele lungi dintr-un limbaj regulat au o bucată „pompabilă” aproape de început."
+      }
+     ]
+    },
+    {
+     "id": "enunt",
+     "title": "Enunțul",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Lemă",
+       "title": "Lema de pompare pentru limbaje regulate",
+       "text": "Dacă `L` e regulat, atunci există `p ≥ 1` astfel încât orice `w ∈ L` cu `|w| ≥ p` se poate scrie `w = xyz` cu:\n- `|xy| ≤ p`;\n- `|y| ≥ 1`;\n- `xyⁱz ∈ L` pentru **orice** `i ≥ 0`.",
+       "proof": "Fie `M` un AFD cu `p` stări pentru `L` și `w = a1…an ∈ L`, `n ≥ p`. Fie `q0, q1, …, qp` stările după `0, 1, …, p` simboluri. Sunt `p + 1` stări, deci `qj = qk` pentru niște `j < k ≤ p`. Luăm `x = a1…aj`, `y = aj+1…ak`, `z` restul. `|xy| = k ≤ p`, `|y| = k - j ≥ 1`, iar `y` duce din `qj` înapoi în `qj`, deci `xyⁱz` ajunge în aceeași stare finală ca `w`, pentru orice `i`."
+      },
+      {
+       "t": "note",
+       "tone": "warn",
+       "title": "",
+       "text": "Lema e o condiție **necesară**, nu suficientă: există limbaje neregulate care respectă lema. Deci o poți folosi doar ca să demonstrezi că un limbaj **nu** e regulat, niciodată că **este**."
+      }
+     ]
+    },
+    {
+     "id": "joc",
+     "title": "Lema ca joc",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Ca să arăți că `L` nu e regulat, negi lema. Negația ei se joacă împotriva unui adversar care încearcă să salveze regularitatea:"
+      },
+      {
+       "t": "steps",
+       "title": "Jocul",
+       "items": [
+        "Adversarul alege `p` (nu știi cât e: lucrezi cu un `p` oarecare).",
+        "**Tu** alegi un cuvânt `w ∈ L` cu `|w| ≥ p`, care depinde de `p`.",
+        "Adversarul alege **orice** împărțire `w = xyz` cu `|xy| ≤ p`, `|y| ≥ 1`. Tu trebuie să tratezi **toate** împărțirile posibile.",
+        "**Tu** alegi un `i ≥ 0` cu `xyⁱz ∉ L`. Dacă reușești pentru orice împărțire, `L` nu e regulat."
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "pump",
+       "title": "Joacă jocul",
+       "text": "Pentru `aⁿbⁿ`, cuvântul `aᵖbᵖ` câștigă: orice `y` e făcut doar din `a` (pentru că `|xy| ≤ p`), deci pomparea strică egalitatea. Încearcă și un cuvânt prost (de exemplu `ab` pentru `p = 1`, sau un cuvânt al cărui `y` poate cădea pe ambele simboluri) și vezi împărțirile care scapă. Ultimul limbaj e regulat: acolo nu vei putea câștiga niciodată.",
+       "lang": "anbn",
+       "langs": [
+        "anbn",
+        "eqab",
+        "pal",
+        "asq",
+        "aprime",
+        "anbmlt",
+        "astar"
+       ],
+       "p": 3,
+       "mode": "reg"
+      }
+     ]
+    },
+    {
+     "id": "exemple",
+     "title": "Exemplele clasice",
+     "blocks": [
+      {
+       "t": "ex",
+       "title": "aⁿbⁿ",
+       "text": "Arătați că `L = {aⁿbⁿ | n ≥ 0}` nu e regulat.",
+       "solution": "Presupunem că e regulat și fie `p` constanta. Alegem `w = aᵖbᵖ ∈ L`. Pentru orice `w = xyz` cu `|xy| ≤ p`, `|y| ≥ 1`: `xy` e format doar din `a`, deci `y = aᵏ`, `k ≥ 1`. Atunci `xy⁰z = aᵖ⁻ᵏbᵖ ∉ L`. Contradicție."
+      },
+      {
+       "t": "ex",
+       "title": "Pătratele perfecte",
+       "text": "`L = {a^(n²) | n ≥ 0}` nu e regulat.",
+       "solution": "`w = a^(p²)`, `y = aᵏ` cu `1 ≤ k ≤ p`. `xy²z` are lungimea `p² + k`, iar `p² < p² + k ≤ p² + p < (p + 1)²`: nu e pătrat perfect."
+      },
+      {
+       "t": "ex",
+       "title": "Palindroamele",
+       "text": "`L = {w ∈ {a, b}* | w = wᴿ}` nu e regulat.",
+       "solution": "`w = aᵖbaᵖ`. `y` cade în primul bloc de `a`: `xy⁰z = aᵖ⁻ᵏbaᵖ` nu e palindrom."
+      },
+      {
+       "t": "ex",
+       "title": "Set de probleme (examen)",
+       "text": "`L = {w1w2 ∈ {0, 1}⁺ | #1(w1) = 2·#0(w1) și #1(w2) = 2·#0(w2)}` nu e regulat.",
+       "solution": "`w = 0ᵖ1²ᵖ011` (cu `w1 = 0ᵖ1²ᵖ`, `w2 = 011`). `y = 0ᵏ`, `i = 0`: `0ᵖ⁻ᵏ1²ᵖ011` are cel mult `p - k + 1` zerouri și `2p + 2` unu; o împărțire în `w1w2` cu raportul 2 în ambele părți ar cere `#1 = 2·#0` pe tot cuvântul, adică `2p + 2 = 2(p - k + 1)`, imposibil pentru `k ≥ 1`."
+      }
+     ]
+    },
+    {
+     "id": "inchidere",
+     "title": "Metoda proprietăților de închidere",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Adesea e mai simplu: presupui că `L` e regulat, îl combini cu limbaje regulate prin operații care păstrează regularitatea și obții un limbaj despre care **știi** că nu e regulat. Contradicție."
+      },
+      {
+       "t": "ex",
+       "title": "La fel de mulți a și b",
+       "text": "`L = {w | #a(w) = #b(w)}`.",
+       "solution": "`L ∩ a*b* = {aⁿbⁿ}`. Dacă `L` ar fi regulat, intersecția cu `a*b*` ar fi regulată, dar `aⁿbⁿ` nu e."
+      },
+      {
+       "t": "ex",
+       "title": "k = |m - n|",
+       "text": "`L = {aⁿbᵐcᵏ | k = |m - n|}` (examen 9 iunie 2022).",
+       "solution": "`L ∩ a*b*` (adică `k = 0`) `= {aⁿbⁿ}`. Deci nu e regulat; e însă LIC (lecția 10)."
+      },
+      {
+       "t": "note",
+       "tone": "warn",
+       "title": "",
+       "text": "Greșeli frecvente: (1) alegi tu împărțirea `xyz` – nu, o alege adversarul, tu le tratezi pe toate; (2) alegi `p` concret (`p = 3`) – nu, `p` e oarecare; (3) uiți `|xy| ≤ p`, care e exact ce îți spune unde poate fi `y`; (4) dovedești „regulat” cu lema. (5) Un limbaj **finit** e mereu regulat: lema e respectată trivial, pentru că `p` poate fi ales mai mare decât cel mai lung cuvânt."
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `L` limbaj infinit astfel încât pentru fiecare `w ∈ L` există un AFD care îl acceptă doar pe `w`. Atunci:",
+       "options": [
+        "`L` e regulat",
+        "`L` e LIC",
+        "nu se poate spune nimic",
+        "`L` e finit"
+       ],
+       "answer": 2,
+       "why": "Orice cuvânt are un AFD care îl acceptă doar pe el, deci condiția e adevărată pentru orice limbaj. Model de test grilă."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "minimizare",
+   "title": "Minimizarea automatelor finite deterministe",
+   "summary": "Stări care nu se pot deosebi prin niciun cuvânt, algoritmul de marcare a perechilor (rundă cu rundă), unirea claselor, unicitatea AFD-ului minim și teorema Myhill–Nerode, care dă și o a doua metodă de a arăta că un limbaj nu e regulat.",
+   "curs": "Curs 5",
+   "minutes": 30,
+   "practice": [
+    "5",
+    "7",
+    "42",
+    "55"
+   ],
+   "sections": [
+    {
+     "id": "echivalenta",
+     "title": "Stări echivalente",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Echivalență",
+       "text": "Două stări `p`, `q` ale unui AFD sunt **echivalente** (`p ≡ q`) dacă pentru orice cuvânt `w`, `δ*(p, w) ∈ F ⇔ δ*(q, w) ∈ F`. Dacă un cuvânt le deosebește, ele sunt **distinse**, iar cel mai scurt astfel de cuvânt e **martorul**."
+      },
+      {
+       "t": "p",
+       "text": "Stările echivalente se pot uni fără să schimbe limbajul. Stările **inaccesibile** din starea inițială se pot șterge. Ce rămâne e AFD-ul minim."
+      }
+     ]
+    },
+    {
+     "id": "algoritm",
+     "title": "Algoritmul de marcare",
+     "blocks": [
+      {
+       "t": "steps",
+       "title": "Pașii",
+       "items": [
+        "Șterge stările inaccesibile; completează automatul cu o groapă, dacă lipsesc tranziții.",
+        "Desenează tabelul tuturor perechilor `{p, q}` de stări.",
+        "**Runda 0:** marchează perechile cu o stare finală și una nefinală (le deosebește cuvântul `e`).",
+        "**Runda k:** marchează `{p, q}` dacă există un simbol `a` cu `{δ(p, a), δ(q, a)}` deja marcată (martorul e `a` urmat de martorul acelei perechi).",
+        "Repetă până când o rundă nu mai marchează nimic. Perechile rămase nemarcate sunt stări echivalente: unește-le în clase."
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "minimize",
+       "title": "Minimizare, rundă cu rundă",
+       "text": "Un AFD cu 6 stări pentru „se termină cu `a`”. Căsuța arată runda în care s-a marcat perechea și simbolul care a deosebit-o. La final, perechile `≡` se unesc.",
+       "alphabet": "ab",
+       "a": {
+        "states": 6,
+        "final": [
+         1,
+         3,
+         5
+        ],
+        "t": {
+         "0": {
+          "a": [
+           1
+          ],
+          "b": [
+           2
+          ]
+         },
+         "1": {
+          "a": [
+           3
+          ],
+          "b": [
+           4
+          ]
+         },
+         "2": {
+          "a": [
+           5
+          ],
+          "b": [
+           0
+          ]
+         },
+         "3": {
+          "a": [
+           1
+          ],
+          "b": [
+           2
+          ]
+         },
+         "4": {
+          "a": [
+           3
+          ],
+          "b": [
+           0
+          ]
+         },
+         "5": {
+          "a": [
+           5
+          ],
+          "b": [
+           4
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0.8
+        ],
+        [
+         1.6,
+         0
+        ],
+        [
+         1.6,
+         1.6
+        ],
+        [
+         3.2,
+         0
+        ],
+        [
+         3.2,
+         1.6
+        ],
+        [
+         4.8,
+         0.8
+        ]
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "minimize",
+       "title": "Cu o stare inaccesibilă",
+       "text": "`#b` par, scris cu stări care țin minte și paritatea lui `#a` (inutil), plus o stare `q4` la care nu se ajunge.",
+       "alphabet": "ab",
+       "a": {
+        "states": 5,
+        "final": [
+         0,
+         1
+        ],
+        "t": {
+         "0": {
+          "a": [
+           1
+          ],
+          "b": [
+           2
+          ]
+         },
+         "1": {
+          "a": [
+           0
+          ],
+          "b": [
+           3
+          ]
+         },
+         "2": {
+          "a": [
+           3
+          ],
+          "b": [
+           0
+          ]
+         },
+         "3": {
+          "a": [
+           2
+          ],
+          "b": [
+           1
+          ]
+         },
+         "4": {
+          "a": [
+           0
+          ],
+          "b": [
+           4
+          ]
+         }
+        }
+       },
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         1.8,
+         0
+        ],
+        [
+         0,
+         1.6
+        ],
+        [
+         1.8,
+         1.6
+        ],
+        [
+         3.4,
+         0.8
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "myhill",
+     "title": "Teorema Myhill–Nerode",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Relația lui L",
+       "text": "Pentru un limbaj `L`, cuvintele `x`, `y` sunt **indistinctibile** (`x ≡_L y`) dacă pentru orice `z`, `xz ∈ L ⇔ yz ∈ L`."
+      },
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Myhill–Nerode",
+       "text": "`L` e regulat ⇔ `≡_L` are un număr finit de clase. Numărul claselor este numărul de stări al AFD-ului minim (complet), care e **unic** până la redenumirea stărilor.",
+       "proof": "(⇒) Cuvintele care duc în aceeași stare a unui AFD sunt indistinctibile, deci clasele sunt cel mult câte stări. (⇐) Clasele însele formează un AFD: `δ([x], a) = [xa]` e bine definită (dacă `x ≡_L y`, atunci `xa ≡_L ya`), starea inițială `[e]`, finale clasele cuvintelor din `L`. Orice AFD pentru `L` are cel puțin atâtea stări câte clase, deci acesta e minim; iar algoritmul de marcare calculează exact aceste clase."
+      },
+      {
+       "t": "ex",
+       "title": "Al treilea simbol de la sfârșit",
+       "text": "De ce orice AFD pentru „al treilea simbol de la sfârșit e `a`” are cel puțin 8 stări?",
+       "solution": "Cele 8 cuvinte de lungime 3 sunt distincte două câte două: dacă `x` și `y` diferă pe poziția `i` (din 3), atunci `z = b^(i-1)` le deosebește (pune poziția `i` pe locul trei de la coadă). 8 clase ⇒ cel puțin 8 stări. Un AFN are nevoie doar de 4."
+      },
+      {
+       "t": "ex",
+       "title": "aⁿbⁿ, prin Myhill–Nerode",
+       "text": "Arătați că `{aⁿbⁿ}` nu e regulat.",
+       "solution": "Cuvintele `aⁱ` și `aʲ` (`i ≠ j`) sunt distinse de `z = bⁱ`: `aⁱbⁱ ∈ L`, `aʲbⁱ ∉ L`. Deci `≡_L` are o infinitate de clase."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "gic",
+   "title": "Gramatici independente de context",
+   "summary": "Cum generează o gramatică un limbaj: definiția, derivări, limbajul generat. Tehnici de construcție pentru limbajele de examen (perechi imbricate, reuniuni, concatenări, inegalități, „de două ori mai mulți”), demonstrarea corectitudinii, gramaticile regulate și ierarhia Chomsky.",
+   "curs": "Curs 6, 10",
+   "minutes": 40,
+   "practice": [
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "31",
+    "32",
+    "69",
+    "71",
+    "72",
+    "73",
+    "74",
+    "120",
+    "126",
+    "131",
+    "134",
+    "135",
+    "136"
+   ],
+   "sections": [
+    {
+     "id": "definitie",
+     "title": "Definiția",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "GIC",
+       "text": "O **gramatică independentă de context** este `G = (V, Σ, R, S)`:\n- `V` – alfabetul total (neterminale și terminale), `Σ ⊆ V` – terminalele;\n- `R ⊆ (V \\ Σ) × V*` – regulile `A → α`, finite;\n- `S ∈ V \\ Σ` – simbolul de start.\n\nO **derivare într-un pas**: `uAv ⇒ uαv` dacă `A → α ∈ R`. `⇒*` – zero sau mai mulți pași. `L(G) = {w ∈ Σ* | S ⇒* w}`."
+      },
+      {
+       "t": "p",
+       "text": "„Independent de context” înseamnă că `A` se rescrie la fel oriunde ar apărea, indiferent de ce e în jurul lui. Un limbaj e **independent de context** (LIC) dacă e generat de o GIC."
+      },
+      {
+       "t": "viz",
+       "kind": "derive",
+       "title": "O derivare, pas cu pas, cu arborele ei",
+       "text": "Fiecare pas rescrie neterminalul cel mai din stânga (derivare stânga). Arborele crește cu el.",
+       "grammar": "S -> aSb | ε",
+       "words": [
+        "aabb",
+        "ab",
+        ""
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tehnici",
+     "title": "Tehnici de construcție (cursul 10)",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "limbaj",
+        "gramatica",
+        "ideea"
+       ],
+       "rows": [
+        [
+         "`a*`",
+         "`A → aA | e`",
+         "un simbol la fiecare pas"
+        ],
+        [
+         "`aⁿbⁿ`",
+         "`X → aXb | e`",
+         "perechile se adaugă din exterior spre interior"
+        ],
+        [
+         "`aⁿb³ⁿ`",
+         "`Y → aYbbb | e`",
+         "fiecare `a` aduce trei `b`"
+        ],
+        [
+         "`aⁿbᵐ`, `n < m`",
+         "`S → AB`, `A → aAb | e`, `B → bB | b`",
+         "`aⁿbⁿ` urmat de cel puțin un `b`"
+        ],
+        [
+         "`aⁿbᵐ`, `n ≠ m`",
+         "`S → aSb | A | B`, `A → aA | a`, `B → bB | b`",
+         "potrivește, apoi „în plus” pe o singură parte"
+        ],
+        [
+         "`L1 ∪ L2`",
+         "`S → S1 | S2`",
+         "reuniune"
+        ],
+        [
+         "`L1L2`",
+         "`S → S1S2`",
+         "concatenare"
+        ],
+        [
+         "`L*`",
+         "`S → S1S | e`",
+         "stea"
+        ],
+        [
+         "palindroame",
+         "`S → aSa | bSb | a | b | e`",
+         "capetele egale"
+        ],
+        [
+         "`#a = #b`",
+         "`S → aSbS | bSaS | e`",
+         "primul simbol își are perechea undeva"
+        ],
+        [
+         "paranteze",
+         "`S → (S)S | e`",
+         "prima paranteză se închide undeva"
+        ]
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Examen 6 septembrie 2022",
+       "text": "Fie `L = {0ⁱ1ʲ2ᵏ | i + j ≤ 2k}`. Scrieți gramatica și arborii de derivare pentru `000022` și `00122`.",
+       "solution": "Fiecare `2` din dreapta „plătește” între 0 și 2 simboluri din stânga. `S` produce zerourile, `T` unu-urile: `S → 0S2 | 00S2 | 01T2 | T`, `T → 1T2 | 11T2 | T2 | e`. `000022`: `S ⇒ 00S2 ⇒ 0000S22 ⇒ 0000T22 ⇒ 000022`."
+      },
+      {
+       "t": "viz",
+       "kind": "derive",
+       "title": "Arborii de la examen",
+       "text": "",
+       "grammar": "S -> 0S2 | 00S2 | 01T2 | T\nT -> 1T2 | 11T2 | T2 | ε",
+       "words": [
+        "000022",
+        "00122"
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "Examen 15 iunie 2022",
+       "text": "Construiți o GIC pentru cuvintele peste `{0, 1}` cu de două ori mai mulți `0` decât `1`.",
+       "solution": "Un `1` vine cu doi `0`, în ordinea `001`, `010` sau `100`, cu alte cuvinte din limbaj intercalate: `S → SS | 0S0S1 | 0S1S0 | 1S0S0 | e`."
+      },
+      {
+       "t": "ex",
+       "title": "Examen 2025",
+       "text": "`S → abSc | A`, `A → cAd | cd`. O derivare stânga pentru `ababccddcc` și limbajul generat.",
+       "solution": "`S ⇒ abSc ⇒ ababScc ⇒ ababAcc ⇒ ababcAdcc ⇒ ababccddcc`. `L(G) = {(ab)ⁿcᵐdᵐcⁿ | n ≥ 0, m ≥ 1}`."
+      },
+      {
+       "t": "viz",
+       "kind": "derive",
+       "title": "Derivarea de la examenul din 2025",
+       "text": "",
+       "grammar": "S -> abSc | A\nA -> cAd | cd",
+       "words": [
+        "ababccddcc",
+        "abcdc"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "corectitudine",
+     "title": "Demonstrarea corectitudinii",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Ca să arăți că `L(G) = L`, demonstrezi două incluziuni:"
+      },
+      {
+       "t": "steps",
+       "title": "Cele două direcții",
+       "items": [
+        "`L(G) ⊆ L`: prin **inducție pe lungimea derivării** arăți că orice formă propozițională derivată din `S` are o proprietate (de exemplu „are forma `aⁿSbⁿ` sau `aⁿbⁿ`”).",
+        "`L ⊆ L(G)`: prin **inducție pe lungimea cuvântului** arăți că orice `w ∈ L` se poate deriva: descompui `w` după prima regulă care l-ar produce și aplici ipoteza de inducție pe bucăți mai scurte."
+       ]
+      },
+      {
+       "t": "ex",
+       "title": "S → aSbS | bSaS | e generează exact #a = #b",
+       "text": "Schița demonstrației.",
+       "solution": "(⊆) Fiecare regulă adaugă câte un `a` și un `b`, deci orice cuvânt derivat are `#a = #b`. (⊇) Fie `w ≠ e` cu `#a = #b`, să zicem că începe cu `a`. Fie `f(i) = #a - #b` pe prefixul de lungime `i`: `f(1) = 1`, `f(|w|) = 0`, și `f` se schimbă cu 1 la fiecare pas, deci există un prim `i` cu `f(i) = 0`, iar acolo e un `b`. Atunci `w = a u b v` cu `u` și `v` echilibrate (mai scurte), derivabile din `S` prin ipoteza de inducție: `S ⇒ aSbS ⇒* aubv`."
+      }
+     ]
+    },
+    {
+     "id": "chomsky",
+     "title": "Gramatici regulate și ierarhia Chomsky",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Gramatică regulată",
+       "text": "Toate regulile au forma `A → wB` sau `A → w`, cu `w ∈ Σ*` (un singur neterminal, la dreapta)."
+      },
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Gramaticile regulate generează exact limbajele regulate",
+       "text": "Un limbaj e regulat ⇔ e generat de o gramatică regulată.",
+       "proof": "(⇐) Construim un AFN cu stările = neterminalele plus o stare finală `f`: `(A, w, B) ∈ Δ` pentru `A → wB`, `(A, w, f)` pentru `A → w`. O derivare `S ⇒ w1A1 ⇒ w1w2A2 ⇒ …` e exact un calcul al automatului. (⇒) Pentru un AFN, neterminalele sunt stările: `q → ap` pentru `(q, a, p) ∈ Δ` și `q → e` pentru `q ∈ F`."
+      },
+      {
+       "t": "viz",
+       "kind": "hierarchy",
+       "title": "Ierarhia Chomsky",
+       "text": "Atinge o clasă: ce o descrie, ce o recunoaște, exemple tipice și la ce e închisă."
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `G`: `S → SS | aS | bS`. Este limbajul regulat? Dar gramatica?",
+       "options": [
+        "Nu, Nu",
+        "Da, Da",
+        "Da, Nu",
+        "Nu, Da"
+       ],
+       "answer": 2,
+       "why": "Nicio regulă nu scapă de `S`: `L(G) = ∅`, regulat. Gramatica nu e regulată (`S → SS` are doi neterminali). Test 2, 2023."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "arbori-fnc",
+   "title": "Arbori de derivare, ambiguitate, forma normală Chomsky",
+   "summary": "Arborele unei derivări și derivările stânga, gramatici ambigue și cum se arată ambiguitatea, eliminarea ei, forma normală Chomsky construită pas cu pas și algoritmul CYK, care decide apartenența în timp cubic.",
+   "curs": "Curs 8",
+   "minutes": 40,
+   "practice": [
+    "25",
+    "134",
+    "135",
+    "136",
+    "144",
+    "145",
+    "174",
+    "189"
+   ],
+   "sections": [
+    {
+     "id": "arbori",
+     "title": "Arbori de derivare",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Arbore de derivare",
+       "text": "Rădăcina e `S`; fiecare nod interior e un neterminal `A` ai cărui fii, de la stânga la dreapta, sunt simbolurile unei reguli `A → X1…Xk` (sau o frunză `e` pentru `A → e`); frunzele, citite de la stânga la dreapta, formează cuvântul (**frontiera**)."
+      },
+      {
+       "t": "p",
+       "text": "Un arbore corespunde mai multor derivări (ordinea în care rescrii neterminalele), dar exact **unei derivări stânga** (rescrii mereu cel mai din stânga neterminal) și unei derivări dreapta."
+      }
+     ]
+    },
+    {
+     "id": "ambiguitate",
+     "title": "Ambiguitate",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Gramatică ambiguă",
+       "text": "O gramatică e **ambiguă** dacă un cuvânt are **două arbori de derivare diferiți** (echivalent: două derivări stânga diferite). Un limbaj e **inerent ambiguu** dacă orice gramatică a lui e ambiguă (de exemplu `{aⁱbʲcᵏ | i = j sau j = k}`)."
+      },
+      {
+       "t": "viz",
+       "kind": "derive",
+       "title": "Examen 18 ianuarie 2025: două derivări stânga pentru aabb",
+       "text": "`S → aS | Sb | ab`. Comută între cei doi arbori.",
+       "grammar": "S -> aS | Sb | ab",
+       "words": [
+        "aabb",
+        "aab"
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "derive",
+       "title": "Set de probleme: gramatica ambiguă",
+       "text": "Arătați că `S → AS | S1 | 0S1 | e`, `A → 0A | 0` e ambiguă: `S ⇒ AS ⇒ 0S ⇒ 0S1 ⇒ 01` și `S ⇒ 0S1 ⇒ 01`.",
+       "grammar": "S -> AS | S1 | 0S1 | ε\nA -> 0A | 0",
+       "words": [
+        "01",
+        "001"
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "derive",
+       "title": "Ambiguitatea clasică: expresii aritmetice",
+       "text": "`a+a*a` are doi arbori: unul face întâi adunarea, celălalt înmulțirea.",
+       "grammar": "E -> E+E | E*E | (E) | a",
+       "words": [
+        "a+a*a",
+        "a+a+a"
+       ]
+      },
+      {
+       "t": "p",
+       "text": "O gramatică ambiguă se poate adesea rescrie neambiguu, separând „rolurile” simbolurilor: pentru expresii, câte un neterminal pe nivel de prioritate (`E → E+T | T`, `T → T*F | F`, `F → (E) | a`); pentru `(01)ⁿ(10)ᵐ, n ≥ m > 0`, întâi `01`-urile în plus, apoi perechile potrivite."
+      }
+     ]
+    },
+    {
+     "id": "fnc",
+     "title": "Forma normală Chomsky",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "FNC",
+       "text": "O gramatică e în **forma normală Chomsky** dacă toate regulile sunt `A → BC` (`B`, `C` neterminale, diferite de start) sau `A → a` (`a` terminal); în plus, e permisă `S → e` dacă `e ∈ L`."
+      },
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Orice LIC are o gramatică în FNC",
+       "text": "Pentru orice GIC `G` există o gramatică `G′` în FNC cu `L(G′) = L(G)`.",
+       "proof": "Se aplică, în ordine, transformări care păstrează limbajul: (1) simbol de start nou; (2) eliminarea regulilor `A → e`: pentru fiecare regulă, adaugi variantele fără neterminalele care pot genera `e`; (3) eliminarea redenumirilor `A → B`: `A` primește direct regulile lui `B`; (4) eliminarea simbolurilor inutile; (5) terminalele din regulile lungi primesc neterminale proprii (`Ta → a`); (6) regulile cu `k ≥ 3` simboluri se taie într-un lanț de reguli cu două."
+      },
+      {
+       "t": "viz",
+       "kind": "cnf",
+       "title": "FNC pas cu pas",
+       "text": "Exemplul clasic (Sipser). Liniile noi după fiecare pas sunt colorate. Scrie orice gramatică ca s-o transformi.",
+       "grammar": "S -> ASA | aB\nA -> B | S\nB -> b | ε"
+      },
+      {
+       "t": "exam",
+       "source": "Examen LFA · set de probleme",
+       "title": "",
+       "text": "Scrieți o gramatică în FNC pentru `{aⁿbⁿ | n ≥ 1}`.",
+       "solution": "`S → ZA | ZU`, `A → SU`, `Z → a`, `U → b` (soluția din set scrie `S → ZA`, `A → SU | 1` cu `1` în loc de `b`). Pornești de la `S → aSb | ab`, înlocuiești terminalele și tai regula lungă `S → ZSU` în `S → ZA`, `A → SU`."
+      }
+     ]
+    },
+    {
+     "id": "cyk",
+     "title": "Algoritmul CYK",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Pentru o gramatică în FNC și un cuvânt `w = w1…wn`, CYK completează un tabel triunghiular: căsuța `X[i, j]` conține neterminalele care generează `wi…wj`. Rândul de jos: `A` cu `A → wi`. O căsuță mai sus: pentru fiecare tăietură `wi…wk | wk+1…wj`, adaugi `A` dacă `A → BC` cu `B ∈ X[i, k]` și `C ∈ X[k + 1, j]`. `w ∈ L(G)` ⇔ `S ∈ X[1, n]`. Timpul: `O(n³ · |R|)`."
+      },
+      {
+       "t": "viz",
+       "kind": "cyk",
+       "title": "CYK, căsuță cu căsuță",
+       "text": "Exemplul din manuale (`baaba`). Căsuțele galbene sunt perechile care se combină pentru căsuța curentă.",
+       "grammar": "S -> AB | BC\nA -> BA | a\nB -> CC | b\nC -> AB | a",
+       "word": "baaba"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apd",
+   "title": "Automate cu stivă",
+   "summary": "Un automat finit plus o stivă nemărginită: definiția din curs, configurații, acceptarea cu stare finală și stivă goală, exemplele de bază (aⁿbⁿ, wcwᴿ, wwᴿ, #a = #b), construcția APD-ului dintr-o gramatică și ideea invers, determinism vs nedeterminism.",
+   "curs": "Curs 7",
+   "minutes": 40,
+   "practice": [
+    "149",
+    "155",
+    "176",
+    "188",
+    "200",
+    "201",
+    "202",
+    "203",
+    "204",
+    "205",
+    "206",
+    "207",
+    "208",
+    "209",
+    "210",
+    "211"
+   ],
+   "sections": [
+    {
+     "id": "definitie",
+     "title": "Definiția din curs",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "APD",
+       "text": "Un **automat cu stivă** (push-down) este `M = (K, Σ, Γ, Δ, s, F)`:\n- `K`, `Σ`, `s`, `F` ca la automatele finite;\n- `Γ` – alfabetul stivei;\n- `Δ ⊆ (K × Σ* × Γ*) × (K × Γ*)` – relația de tranziție, finită.\n\nTranziția `((p, u, β), (q, γ))`: din starea `p`, cu `β` în vârful stivei, citește `u`, înlocuiește `β` cu `γ` și trece în `q`. `β = e` înseamnă „nu scoate nimic”, `γ = e` „nu pune nimic”."
+      },
+      {
+       "t": "def",
+       "title": "Configurații și acceptare",
+       "text": "O configurație e `(q, w, γ) ∈ K × Σ* × Γ*`: starea, ce a rămas de citit, conținutul stivei de sus în jos. `(p, uw, βη) ⊢ (q, w, γη)` pentru tranziția de mai sus. `M` acceptă `w` dacă `(s, w, e) ⊢* (f, e, e)` pentru un `f ∈ F`: **tot cuvântul citit, o stare finală, stiva goală**."
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Alte cărți (și unii asistenți) folosesc un simbol de fund `Z0` și acceptă doar prin stare finală sau doar prin stivă goală. Toate variantele recunosc aceeași clasă, dar când scrii un APD la examen, respectă convenția cursului și spune explicit cum accepți. Diagrama: o săgeată `p → q` etichetată `u, β/γ`."
+      }
+     ]
+    },
+    {
+     "id": "exemple",
+     "title": "Exemple de bază",
+     "blocks": [
+      {
+       "t": "viz",
+       "kind": "pda",
+       "title": "aⁿbⁿ",
+       "text": "Fiecare `a` pune un `A`, fiecare `b` scoate unul. Trecerea de la „pun” la „scot” se face pe `e`. Urmărește stiva.",
+       "pda": "start p\nfinal q\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε",
+       "words": [
+        "aaabbb",
+        "aabbb",
+        "ab",
+        ""
+       ],
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         2,
+         0
+        ]
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "pda",
+       "title": "wcwᴿ (exemplul din curs)",
+       "text": "Până la `c`, pune pe stivă ce citește; după `c`, scoate doar dacă simbolul citit e egal cu vârful.",
+       "pda": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, c, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
+       "words": [
+        "abcba",
+        "abcab",
+        "c"
+       ],
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         2,
+         0
+        ]
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "pda",
+       "title": "La fel de mulți a și b",
+       "text": "O singură stare. Stiva ține ce e „în plus”: `A`-uri sau `B`-uri. Automatul e nedeterminist: pentru `ab`, poate pune și un `B` peste un `A`, dar acel drum nu se golește; e de ajuns să existe **un** drum bun.",
+       "pda": "start q\nfinal q\nq, a, ε -> q, A\nq, b, A -> q, ε\nq, b, ε -> q, B\nq, a, B -> q, ε",
+       "words": [
+        "abba",
+        "aabbab",
+        "aab"
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "pda",
+       "title": "aⁿbᵐ cu n ≠ m (set de probleme)",
+       "text": "Un simbol de fund `Z` permite automatului să „vadă” că stiva s-a golit. Fără el, un `b` citit în plus nu s-ar deosebi de unul care potrivește un `a`.",
+       "pda": "start i\nfinal f\ni, ε, ε -> p, Z\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, A -> r, ε\nr, ε, A -> r, ε\nr, ε, Z -> f, ε\nq, b, Z -> s, Z\ns, b, Z -> s, Z\ns, ε, Z -> f, ε",
+       "words": [
+        "aab",
+        "abb",
+        "ab",
+        "a"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "gic-apd",
+     "title": "De la gramatică la automat",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "GIC ↔ APD",
+       "text": "Un limbaj e generat de o GIC ⇔ e acceptat de un automat cu stivă.",
+       "proof": "(⇒) Construcția de mai jos simulează derivările stânga. (⇐) Pentru un APD (adus la o formă în care fiecare tranziție pune sau scoate un singur simbol și stiva se golește la final), neterminalele `A_pq` generează exact cuvintele care duc automatul din `p` cu stiva goală în `q` cu stiva goală; regulile urmăresc perechea „pun simbolul `X` / scot simbolul `X`” sau o oprire intermediară cu stiva goală."
+      },
+      {
+       "t": "steps",
+       "title": "Construcția GIC → APD (ca în curs)",
+       "items": [
+        "Două stări: `p` (inițială) și `q` (finală).",
+        "`((p, e, e), (q, S))`: pune simbolul de start.",
+        "Pentru fiecare regulă `A → α`: `((q, e, A), (q, α))` – înlocuiește în vârf neterminalul cu partea dreaptă.",
+        "Pentru fiecare terminal `a`: `((q, a, a), (q, e))` – un terminal din vârf se potrivește cu intrarea."
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "pda",
+       "title": "Examen 6 septembrie 2022: APD pentru S → aAA, A → aS | bS | a",
+       "text": "Pe stivă stă mereu restul formei propoziționale dintr-o derivare stânga. Urmărește cum `S` devine `aAA`, apoi `a` se potrivește cu intrarea.",
+       "pda": "start p\nfinal q\np, ε, ε -> q, S\nq, ε, S -> q, aAA\nq, ε, A -> q, aS\nq, ε, A -> q, bS\nq, ε, A -> q, a\nq, a, a -> q, ε\nq, b, b -> q, ε",
+       "words": [
+        "aaa",
+        "abaaa",
+        "aab"
+       ],
+       "pos": [
+        [
+         0,
+         0
+        ],
+        [
+         2,
+         0
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "determinism",
+     "title": "Determinism",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Spre deosebire de automatele finite, la APD nedeterminismul **aduce putere**: `wwᴿ` (palindroamele pare) nu poate fi acceptat de niciun APD determinist, pentru că automatul nu are cum să știe unde e mijlocul. Limbajele acceptate de APD deterministe (`wcwᴿ`, `aⁿbⁿ`) sunt o subclasă strictă a LIC, închisă la complement."
+      },
+      {
+       "t": "quiz",
+       "q": "Un APD nedeterminist cu stiva limitată la o dimensiune constantă acceptă, în cel mai strict sens:",
+       "options": [
+        "orice limbaj",
+        "limbaje independente de context",
+        "limbaje regulate",
+        "nu se poate spune"
+       ],
+       "answer": 2,
+       "why": "Conținutul stivei are finit de multe valori, care se pot pune în stare: un automat finit."
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `L` acceptat de un APD cu `|Γ| = 1`. `L` poate fi acceptat și de:",
+       "options": [
+        "un AFN",
+        "un AFD",
+        "un APD",
+        "un APD fără cicluri"
+       ],
+       "answer": 2,
+       "why": "Un contor tot poate recunoaște `aⁿbⁿ`, care nu e regulat."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "proprietati-lic",
+   "title": "Proprietățile limbajelor independente de context",
+   "summary": "La ce operații sunt închise LIC (și la ce nu), intersecția cu un limbaj regulat, lema de pompare pentru LIC ca joc, metoda prin proprietăți de închidere, și ce întrebări au algoritm (apartenența, vidul) și ce nu (egalitatea, universalitatea).",
+   "curs": "Curs 9",
+   "minutes": 40,
+   "practice": [
+    "38",
+    "41",
+    "43",
+    "121",
+    "122",
+    "127",
+    "140",
+    "146",
+    "150",
+    "152",
+    "153",
+    "161"
+   ],
+   "sections": [
+    {
+     "id": "inchidere",
+     "title": "Proprietăți de închidere",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "operația",
+        "LIC închise?",
+        "de ce"
+       ],
+       "rows": [
+        [
+         "reuniune",
+         "da",
+         "`S → S1 | S2`"
+        ],
+        [
+         "concatenare",
+         "da",
+         "`S → S1S2`"
+        ],
+        [
+         "stea",
+         "da",
+         "`S → S1S | e`"
+        ],
+        [
+         "oglindire",
+         "da",
+         "răstorni partea dreaptă a fiecărei regule"
+        ],
+        [
+         "morfism, substituție",
+         "da",
+         "înlocuiești terminalele cu gramatici"
+        ],
+        [
+         "**intersecție cu un regulat**",
+         "da",
+         "produsul unui APD cu un AFD: stările perechi, stiva a APD-ului"
+        ],
+        [
+         "intersecție",
+         "**nu**",
+         "`{aⁿbⁿcᵐ} ∩ {aᵐbⁿcⁿ} = {aⁿbⁿcⁿ}`"
+        ],
+        [
+         "complement",
+         "**nu**",
+         "altfel `L1 ∩ L2 = complement(∁L1 ∪ ∁L2)` ar fi LIC"
+        ],
+        [
+         "diferență",
+         "**nu**",
+         "`Σ* \\ L` e complementul"
+        ],
+        [
+         "diferență cu un regulat (`L \\ R`)",
+         "da",
+         "`L ∩ ∁R`, iar `∁R` e regulat"
+        ]
+       ]
+      },
+      {
+       "t": "exam",
+       "source": "Examen 9 iunie și 6 septembrie 2022",
+       "title": "",
+       "text": "`R` regulat, `L` independent de context. Cum este `L \\ R`? Demonstrați.",
+       "solution": "`L \\ R = L ∩ (Σ* \\ R)`. Complementul unui limbaj regulat e regulat (inversezi finalele unui AFD complet). Intersecția unui LIC cu un regulat e LIC: dacă `M1` e un APD pentru `L` și `M2` un AFD pentru `∁R`, APD-ul cu stări `K1 × K2`, aceeași stivă, care la fiecare tranziție a lui `M1` mută și `M2` pe simbolul citit (și nu-l mută pe `e`), acceptă `L ∩ ∁R`. Deci `L \\ R` e LIC."
+      },
+      {
+       "t": "exam",
+       "source": "Examen 1 februarie 2025",
+       "title": "",
+       "text": "`L1` LIC, `L2` regulat. Cum este `L = {xy | x ∈ L1, y ∉ L2, |x| e par}`?",
+       "solution": "`L1′ = L1 ∩ {cuvinte de lungime pară}` e LIC (LIC ∩ LR). `L2′ = Σ* \\ L2` e regulat. `L = L1′L2′`, concatenarea a două LIC, e LIC."
+      }
+     ]
+    },
+    {
+     "id": "pompare",
+     "title": "Lema de pompare pentru LIC",
+     "blocks": [
+      {
+       "t": "thm",
+       "label": "Lemă",
+       "title": "Lema de pompare (LIC)",
+       "text": "Dacă `L` e independent de context, există `p ≥ 1` astfel încât orice `w ∈ L` cu `|w| ≥ p` se scrie `w = uvxyz` cu:\n- `|vxy| ≤ p`;\n- `|vy| ≥ 1`;\n- `uvⁱxyⁱz ∈ L` pentru orice `i ≥ 0`.",
+       "proof": "Fie `G` în FNC cu `k` neterminale și `p = 2ᵏ`. Un arbore de derivare al lui `w` cu `|w| ≥ p` are înălțimea mai mare decât `k`, deci un drum de la rădăcină la o frunză are mai mult de `k` neterminale, iar unul se repetă: `A` apare de două ori pe drum (alegem cele mai de jos două apariții). Subarborele `A` de sus generează `vxy`, cel de jos `x`. Înlocuind subarborele de jos cu cel de sus (sau invers) obținem `uvⁱxyⁱz`. Alegerea aparițiilor celor mai de jos dă `|vxy| ≤ p`, iar FNC dă `|vy| ≥ 1`."
+      },
+      {
+       "t": "viz",
+       "kind": "pump",
+       "title": "Jocul pentru LIC",
+       "text": "Acum adversarul taie în cinci bucăți, iar `v` și `y` (colorate) se pompează **simultan**. Pentru `aⁿbⁿcⁿ`, `vxy` are cel mult `p` simboluri, deci atinge cel mult două blocuri: al treilea rămâne neschimbat. `aⁿbⁿ` este LIC: aici nu poți câștiga.",
+       "lang": "anbncn",
+       "langs": [
+        "anbncn",
+        "0n1n0n",
+        "ww",
+        "asq",
+        "anbn"
+       ],
+       "p": 2,
+       "mode": "cfl"
+      },
+      {
+       "t": "ex",
+       "title": "aⁿbⁿcⁿ",
+       "text": "Arătați că `{aⁿbⁿcⁿ}` nu e LIC.",
+       "solution": "`w = aᵖbᵖcᵖ`. Cum `|vxy| ≤ p`, `vxy` nu poate conține și `a`, și `c`. Cazul 1: `v` sau `y` conține două tipuri de simboluri: `uv²xy²z` nu mai are forma `a*b*c*`. Cazul 2: `v`, `y` conțin fiecare un singur tip: cel mult două dintre cele trei numere cresc la `i = 2`, al treilea rămâne `p`. În ambele cazuri `uv²xy²z ∉ L`."
+      },
+      {
+       "t": "ex",
+       "title": "Prin închidere: #a = #b și #c = #d (examen 8 septembrie 2022)",
+       "text": "`L` = cuvintele peste `{a, b, c, d}` cu `#a = #b` și `#c = #d`.",
+       "solution": "`L ∩ a*c*b*d* = {aⁿcᵐbⁿdᵐ}`. Pentru acesta, cu `w = aᵖcᵖbᵖdᵖ`: `vxy` atinge cel mult două blocuri **vecine**, deci nu poate schimba și `a`, și `b` (sau și `c`, și `d`) la fel; pomparea strică o egalitate. Dacă `L` ar fi LIC, intersecția cu un regulat ar fi LIC."
+      },
+      {
+       "t": "ex",
+       "title": "Examen 15 iunie 2022",
+       "text": "`L = {aⁿbⁿw | w ∈ {c, d}*, |w| = n}` nu e LIC.",
+       "solution": "`L ∩ a*b*c* = {aⁿbⁿcⁿ}`."
+      }
+     ]
+    },
+    {
+     "id": "algoritmice",
+     "title": "Proprietăți algoritmice",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "întrebarea",
+        "pentru LIC"
+       ],
+       "rows": [
+        [
+         "`w ∈ L(G)`?",
+         "decidabilă: CYK, `O(n³)`"
+        ],
+        [
+         "`L(G) = ∅`?",
+         "decidabilă: neterminalele care generează ceva (punct fix); vid ⇔ `S` nu generează"
+        ],
+        [
+         "`L(G)` infinit?",
+         "decidabilă: în FNC fără simboluri inutile, un ciclu în graful „`A` produce `B`”"
+        ],
+        [
+         "`L(G) = Σ*`?",
+         "**nedecidabilă**"
+        ],
+        [
+         "`L(G1) = L(G2)`? `L(G1) ⊆ L(G2)`?",
+         "**nedecidabile**"
+        ],
+        [
+         "`G` e ambiguă?",
+         "**nedecidabilă**"
+        ],
+        [
+         "`L(G) ∩ R = ∅` (`R` regulat)?",
+         "decidabilă: `L(G) ∩ R` e LIC, se construiește, apoi test de vid"
+        ],
+        [
+         "`L(G1) ∩ L(G2) = ∅`?",
+         "**nedecidabilă**"
+        ]
+       ]
+      },
+      {
+       "t": "exam",
+       "source": "Examen 2025 (CD)",
+       "title": "",
+       "text": "Fie `E` o expresie regulată și `M` un APD. Cum verificăm că niciun șir nu este în ambele limbaje?",
+       "solution": "`L(E) ∩ L(M) = ∅`? Transformăm `E` în AFN, apoi în AFD; construim APD-ul produs pentru intersecție; îl transformăm într-o gramatică și testăm dacă limbajul ei e vid. Atenție: pentru un APD nu ajunge o parcurgere a grafului stărilor, din cauza stivei (o stare finală poate fi atinsă doar cu stiva nevidă)."
+      }
+     ]
+    },
+    {
+     "id": "verifica",
+     "title": "Verifică-te",
+     "blocks": [
+      {
+       "t": "quiz",
+       "q": "Fie `L1` LIC, `L2` care nu e LIC, cu `L1 ∩ L2 = ∅`. `L1 ∪ L2` este:",
+       "options": [
+        "întotdeauna LIC",
+        "niciodată LIC",
+        "nu se poate afirma nimic"
+       ],
+       "answer": 2,
+       "why": "`L1 = ∅` dă `L2` (nu e LIC); `L2 = {aⁿbⁿcⁿ}` cu `L1` = complementul lui (care e LIC) dă `Σ*`."
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `L` un LIC și `S ⊆ L`. Este `S` un LIC?",
+       "options": [
+        "da",
+        "nu neapărat",
+        "da, chiar regulat"
+       ],
+       "answer": 1,
+       "why": "Orice limbaj e submulțime a lui `Σ*`."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "turing",
+   "title": "Mașina Turing",
+   "summary": "Modelul cel mai general: o bandă nemărginită pe care mașina poate citi, scrie și se poate mișca. Definiția din curs, configurații, mașini care acceptă și mașini care calculează funcții, exemplele rulate pas cu pas, compunerea mașinilor și extensiile (k benzi, bandă dublu infinită, nedeterminism), toate echivalente.",
+   "curs": "Curs 12, 14",
+   "minutes": 40,
+   "practice": [
+    "220",
+    "221",
+    "223",
+    "224",
+    "225",
+    "226",
+    "227",
+    "228"
+   ],
+   "sections": [
+    {
+     "id": "definitie",
+     "title": "Definiția",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "Mașina Turing (cursul)",
+       "text": "`M = (K, Σ, δ, s, H)`: `K` stări, `Σ` alfabetul benzii (cu blancul `#` și marcajul de capăt `⊳`), `s` starea inițială, `H ⊆ K` stările de oprire, iar `δ : (K \\ H) × Σ → K × (Σ ∪ {L, R})` – la fiecare pas mașina **fie scrie** un simbol, **fie mută** capul la stânga sau la dreapta. Configurația inițială pentru intrarea `w` e `(s, ⊳#w)`, cu capul pe `#` dinaintea cuvântului."
+      },
+      {
+       "t": "p",
+       "text": "Mașinile **acceptoare** au două stări de oprire, `y` (acceptă) și `n` (respinge). `M` **decide** `L` dacă se oprește pe orice intrare, în `y` pentru `w ∈ L` și în `n` altfel. `M` **acceptă** (semidecide) `L` dacă se oprește exact pe cuvintele din `L` (pe celelalte poate rula la nesfârșit)."
+      },
+      {
+       "t": "note",
+       "tone": "tip",
+       "title": "",
+       "text": "În aplicație (vizualizări și probleme) o tranziție se scrie `q, a -> p, b, R` (scrie `b` **și** mută: forma lui Sipser) sau, ca în curs, `q, a -> p, b` (doar scrie) și `q, a -> p, L` (doar mută). Capul pornește pe **primul simbol** al intrării, banda e plină de `#` în ambele părți, `h`/`y` acceptă, `n` respinge, o tranziție lipsă respinge. Toate aceste convenții recunosc aceleași limbaje."
+      }
+     ]
+    },
+    {
+     "id": "exemple",
+     "title": "Exemple rulate",
+     "blocks": [
+      {
+       "t": "viz",
+       "kind": "tm",
+       "title": "Exemplul 1.1 din note: înlocuiește a cu # spre stânga",
+       "text": "Capul pornește, ca în note, pe ultimul `a` din dreapta: `q0` scrie `#`, `q1` mută la stânga; mașina se oprește pe primul `#` din stânga șirului. Tranzițiile sunt scrise în stilul cursului: fie scriu, fie mută.",
+       "tm": "q0, a -> q1, #\nq0, # -> h, #\nq1, # -> q0, L\nq1, a -> q0, a",
+       "words": [
+        "aaa",
+        "a",
+        ""
+       ],
+       "head": "last"
+      },
+      {
+       "t": "viz",
+       "kind": "tm",
+       "title": "aⁿbⁿ (set de probleme)",
+       "text": "Marchează un `a` cu `A`, caută primul `b` și îl face `B`, se întoarce. Când nu mai sunt `a`, verifică să fi rămas doar `B`.",
+       "tm": "q0, a -> q1, A, R\nq0, B -> q3, B, R\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, b -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, A, R\nq3, B -> q3, B, R\nq3, # -> h, #, S",
+       "words": [
+        "aabb",
+        "aab",
+        "abab"
+       ]
+      },
+      {
+       "t": "viz",
+       "kind": "tm",
+       "title": "Adună 1 în baza 2",
+       "text": "O mașină care **calculează**: la oprire, pe bandă e rezultatul.",
+       "tm": "q0, 0 -> q0, 0, R\nq0, 1 -> q0, 1, R\nq0, # -> q1, #, L\nq1, 1 -> q1, 0, L\nq1, 0 -> h, 1, S\nq1, # -> h, 1, S",
+       "words": [
+        "1011",
+        "111",
+        "0"
+       ]
+      },
+      {
+       "t": "def",
+       "title": "Funcție calculabilă Turing",
+       "text": "`f : Σ0* → Σ0*` e **calculabilă Turing** dacă există o mașină `M` care, pornită pe `w`, se oprește cu `f(w)` pe bandă (`(s, ⊳#w) ⊢* (h, ⊳#f(w))`), pentru orice `w`."
+      }
+     ]
+    },
+    {
+     "id": "compunere",
+     "title": "Compunerea și extensiile",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "Cursul construiește mașini mari din mașini mici, desenate ca o diagramă: `R` (un pas la dreapta), `L`, `a` (scrie `a`), `R#` (mergi la dreapta până la primul `#`), `L#`, mașina de copiere `C`, mașina de deplasare `S→`. Săgețile etichetate cu un simbol spun ce mașină urmează în funcție de simbolul de sub cap."
+      },
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "extensia",
+        "echivalentă cu mașina standard?",
+        "cum se simulează"
+       ],
+       "rows": [
+        [
+         "bandă infinită la ambele capete",
+         "da",
+         "banda se „pliază” în două piste"
+        ],
+        [
+         "k benzi",
+         "da",
+         "o bandă cu `2k` piste: conținutul fiecărei benzi și poziția capului ei; un pas costă o trecere prin bandă"
+        ],
+        [
+         "mai multe capete pe o bandă",
+         "da",
+         "ca la k benzi"
+        ],
+        [
+         "bandă bidimensională",
+         "da",
+         "celulele se enumeră pe diagonale"
+        ],
+        [
+         "nedeterminism",
+         "da",
+         "parcurgere în lățime a arborelui de calcul (dovetailing)"
+        ]
+       ]
+      },
+      {
+       "t": "note",
+       "tone": "info",
+       "title": "",
+       "text": "Teza Church–Turing: orice algoritm (în sensul intuitiv) se poate implementa pe o mașină Turing. Toate extensiile rezonabile calculează aceleași funcții, doar mai repede sau mai lent."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "calculabilitate",
+   "title": "Calculabilitate: limbaje decidabile și Turing acceptate",
+   "summary": "TD și TA, legătura dintre ele (L și complementul lui), închiderile, codificarea mașinilor ρ(M), mașina universală, problema opririi și demonstrația prin diagonalizare, reduceri, teorema lui Rice, dovetailing, și cum se rezolvă întrebările de examen „ce fel de limbaj este …”.",
+   "curs": "Curs 13",
+   "minutes": 45,
+   "practice": [
+    "44",
+    "45",
+    "129",
+    "196",
+    "197",
+    "198"
+   ],
+   "sections": [
+    {
+     "id": "clase",
+     "title": "Cele două clase",
+     "blocks": [
+      {
+       "t": "def",
+       "title": "TD și TA",
+       "text": "Un limbaj e **Turing decidabil** (recursiv, TD) dacă o mașină Turing îl **decide** (se oprește mereu, cu răspunsul corect). E **Turing acceptat** (recursiv enumerabil, TA) dacă o mașină îl **acceptă** (se oprește exact pe cuvintele lui)."
+      },
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "L și complementul",
+       "text": "`L` e decidabil ⇔ atât `L`, cât și `∁L` sunt Turing acceptate.",
+       "proof": "(⇒) Mașina care decide `L` acceptă `L`; cu `y` și `n` schimbate decide `∁L`. (⇐) Rulăm în paralel (câte un pas din fiecare) mașina `M1` pentru `L` și `M2` pentru `∁L`. Exact una se oprește, pentru că orice cuvânt e în `L` sau în `∁L`. Dacă se oprește `M1`, răspundem `y`, altfel `n`."
+      },
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "operația",
+        "TD",
+        "TA"
+       ],
+       "rows": [
+        [
+         "reuniune, intersecție",
+         "da",
+         "da (pentru reuniune, rulare în paralel)"
+        ],
+        [
+         "concatenare, stea",
+         "da",
+         "da (încercăm toate împărțirile în paralel)"
+        ],
+        [
+         "complement",
+         "da",
+         "**nu** (altfel orice TA ar fi TD)"
+        ],
+        [
+         "oglindire, prefixe",
+         "da",
+         "da (prefixe: dovetailing pe continuări)"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "oprire",
+     "title": "Problema opririi",
+     "blocks": [
+      {
+       "t": "p",
+       "text": "O mașină Turing se poate scrie ca un cuvânt `ρ(M)` (stări, simboluri și tranziții codificate binar). Există o **mașină universală** `U` care, pe intrarea `ρ(M)ρ(w)`, simulează `M` pe `w`."
+      },
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Problema opririi e nedecidabilă",
+       "text": "`H = {ρ(M)ρ(w) | M se oprește pe w}` este Turing acceptat, dar nu decidabil. Deci `∁H` nu este Turing acceptat.",
+       "proof": "Acceptat: `U` simulează `M` pe `w` și se oprește dacă `M` se oprește. Nedecidabil: presupunem că `D` decide `H`. Construim `X` care pe `ρ(M)`: rulează `D` pe `ρ(M)ρ(M)`; dacă `D` spune „se oprește”, `X` intră într-o buclă infinită; altfel `X` se oprește. Pe `ρ(X)`: `X` se oprește ⇔ `D` spune că `X` nu se oprește pe `ρ(X)` ⇔ `X` nu se oprește. Contradicție."
+      },
+      {
+       "t": "p",
+       "text": "**Reducere**: dacă un algoritm pentru `L2` ar da un algoritm pentru `H`, atunci `L2` e nedecidabil. Așa se arată că sunt nedecidabile: dacă `M` acceptă `e`, dacă `L(M) = ∅`, dacă `L(M)` e regulat, dacă `L(M1) = L(M2)`."
+      },
+      {
+       "t": "thm",
+       "label": "Teoremă",
+       "title": "Rice",
+       "text": "Orice proprietate **netrivială** a **limbajului** acceptat de o mașină Turing este nedecidabilă: `{ρ(M) | L(M) are proprietatea P}` nu e decidabil dacă unele limbaje TA au `P` și altele nu."
+      },
+      {
+       "t": "note",
+       "tone": "exam",
+       "title": "",
+       "text": "Rice se aplică doar proprietăților **limbajului**, nu ale mașinii: „`M` are 5 stări”, „`M` face exact 5 tranziții pe `w` cu `|w| < 100`” sunt **decidabile** (se verifică direct sau prin simulare limitată). „`M` acceptă cel puțin 65536 de șiruri” e TA (dovetailing până găsești 65536), dar nu TD. „`M` acceptă orice `w` cu `|w| > 10`” nu e nici măcar TA."
+      }
+     ]
+    },
+    {
+     "id": "examen",
+     "title": "Probleme de examen rezolvate",
+     "blocks": [
+      {
+       "t": "exam",
+       "source": "Examen 18 ianuarie 2025",
+       "title": "",
+       "text": "Fie `L1`, `L2` limbaje recursiv enumerabile, cu `L1 ∩ L2 = ∅`, iar complementul lui `L1 ∪ L2` e recursiv enumerabil. Sunt `L1`, `L2` recursive? (Aceeași întrebare apare în grile: „A și B Turing acceptate, disjuncte, cu complementul reuniunii Turing acceptat”.)",
+       "solution": "Atunci `Σ*` e împărțit în trei limbaje TA disjuncte: `L1`, `L2` și `R = complement(L1 ∪ L2)`. Pentru `L1`: complementul lui e `L2 ∪ R`, TA (reuniune de TA). Deci `L1` și `∁L1` sunt TA ⇒ `L1` decidabil; la fel `L2`. **Ambele sunt decidabile.**"
+      },
+      {
+       "t": "exam",
+       "source": "Examen 1 februarie 2025",
+       "title": "",
+       "text": "Fie `L1`, `L2` TA cu `L1 ∪ L2 = Σ*` și `(L1 ∩ ∁L2) ∪ (∁L1 ∩ L2)` recursiv. Sunt `L1`, `L2` recursive?",
+       "solution": "Fie `M3` mașina care decide diferența simetrică. Pentru `L1`: rulăm `M1` și `M2` în paralel; una se oprește (reuniunea e `Σ*`). Dacă se oprește `M1`, acceptăm. Dacă se oprește `M2`, cuvântul e în `L2`: rulăm `M3`; dacă e în diferența simetrică, e în `L2 \\ L1`, respingem; altfel e în `L1 ∩ L2`, acceptăm. Mașina se oprește mereu, deci `L1` e recursiv; analog `L2`."
+      },
+      {
+       "t": "exam",
+       "source": "Examen 2025 (CD)",
+       "title": "",
+       "text": "Fie `L` recursiv enumerabil. Cum e `L′ = {y | ∃x ∈ L, y e o permutare a lui x}`?",
+       "solution": "TA: pe `y`, generăm toate permutările lui `y` (sunt finit multe) și rulăm `M` pe ele în paralel; acceptăm când una e acceptată. Dacă `y ∉ L′`, nicio permutare nu e în `L`, iar mașina poate rula la nesfârșit, ceea ce e voie."
+      },
+      {
+       "t": "exam",
+       "source": "Examen 15 iunie 2022",
+       "title": "",
+       "text": "`L = {ρ(w)ρ(M1)…ρ(Mk) | k > 2 impar, majoritatea Mi acceptă w}`. Ce fel de limbaj este?",
+       "solution": "Turing acceptat: rulăm toate `Mi` pe `w` în paralel (câte un pas din fiecare) și acceptăm când `(k + 1)/2` dintre ele au acceptat. Nu e decidabil: pentru `k = 3`, cu `M2` o mașină care acceptă tot și `M3` una care nu acceptă nimic, majoritatea acceptă `w` ⇔ `M1` acceptă `w`; un algoritm pentru `L` ar decide deci problema acceptării."
+      },
+      {
+       "t": "exam",
+       "source": "Examen 9 iunie 2022",
+       "title": "",
+       "text": "Fie `L` limbajul care conține doar șirul `s = 1` dacă există extratereștri, `s = 0` altfel. Este `L` decidabil?",
+       "solution": "Da. `L` e `{0}` sau `{1}`; ambele sunt finite, deci decidabile. Există o mașină care îl decide, chiar dacă nu știm care dintre cele două."
+      },
+      {
+       "t": "exam",
+       "source": "Test de recuperare 2017-2018",
+       "title": "",
+       "text": "Este limbajul `{ρ(M)ρ(w) | M nu acceptă w}` Turing acceptat?",
+       "solution": "Nu. Complementul lui (între codificările valide) e limbajul acceptării, `{ρ(M)ρ(w) | M acceptă w}`, care e TA. Dacă și acesta ar fi TA, acceptarea ar fi decidabilă."
+      }
+     ]
+    },
+    {
+     "id": "metoda",
+     "title": "Cum răspunzi la „ce fel de limbaj este …”",
+     "blocks": [
+      {
+       "t": "steps",
+       "title": "Ordinea întrebărilor",
+       "items": [
+        "E finit? Atunci e regulat (și decidabil).",
+        "Se poate recunoaște cu memorie finită? Scrie un AF/ER: e **regulat**. Dacă nu, demonstrează cu lema de pompare sau prin închidere.",
+        "Se poate recunoaște cu o stivă (perechi imbricate, o singură numărătoare)? Scrie o GIC/APD: e **LIC**. Altfel, lema de pompare pentru LIC sau închidere.",
+        "Are un algoritm care se oprește mereu (orice verificare cu numărare, simulare limitată)? E **decidabil**.",
+        "Se poate verifica „găsind un martor” prin căutare nemărginită (simulare fără limită, dovetailing)? E **Turing acceptat**. Dacă și complementul e TA, e decidabil.",
+        "Dacă e o proprietate netrivială a lui `L(M)`: nedecidabil (Rice); dacă complementul e TA și nedecidabil, nu e nici TA."
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "recapitulare",
+   "title": "Fișă de recapitulare și capcane de examen",
+   "summary": "Tot cursul pe o pagină: tabelele de închidere și decidabilitate pentru fiecare clasă, cum demonstrezi fiecare tip de afirmație, și lista capcanelor din grilele din anii trecuți.",
+   "curs": "Curs 11",
+   "minutes": 25,
+   "practice": [
+    "80",
+    "81",
+    "82",
+    "83",
+    "84",
+    "86",
+    "87",
+    "89",
+    "93",
+    "94"
+   ],
+   "sections": [
+    {
+     "id": "tabele",
+     "title": "Tabelele",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "Închiderea",
+       "head": [
+        "operația",
+        "LR",
+        "LIC",
+        "TD",
+        "TA"
+       ],
+       "rows": [
+        [
+         "reuniune",
+         "✓",
+         "✓",
+         "✓",
+         "✓"
+        ],
+        [
+         "intersecție",
+         "✓",
+         "✗",
+         "✓",
+         "✓"
+        ],
+        [
+         "complement",
+         "✓",
+         "✗",
+         "✓",
+         "✗"
+        ],
+        [
+         "concatenare",
+         "✓",
+         "✓",
+         "✓",
+         "✓"
+        ],
+        [
+         "stea",
+         "✓",
+         "✓",
+         "✓",
+         "✓"
+        ],
+        [
+         "oglindire",
+         "✓",
+         "✓",
+         "✓",
+         "✓"
+        ],
+        [
+         "∩ cu un LR",
+         "✓",
+         "✓",
+         "✓",
+         "✓"
+        ],
+        [
+         "diferență",
+         "✓",
+         "✗",
+         "✓",
+         "✗"
+        ]
+       ]
+      },
+      {
+       "t": "table",
+       "title": "Decidabilitatea (limbajele date prin automat, gramatică sau mașină)",
+       "head": [
+        "întrebarea",
+        "LR",
+        "LIC",
+        "TD",
+        "TA"
+       ],
+       "rows": [
+        [
+         "`w ∈ L`",
+         "✓",
+         "✓",
+         "✓",
+         "✗ (doar semidecidabil)"
+        ],
+        [
+         "`L = ∅`",
+         "✓",
+         "✓",
+         "✗",
+         "✗"
+        ],
+        [
+         "`L` finit",
+         "✓",
+         "✓",
+         "✗",
+         "✗"
+        ],
+        [
+         "`L = Σ*`",
+         "✓",
+         "✗",
+         "✗",
+         "✗"
+        ],
+        [
+         "`L1 = L2`",
+         "✓",
+         "✗",
+         "✗",
+         "✗"
+        ],
+        [
+         "`L1 ⊆ L2`",
+         "✓",
+         "✗",
+         "✗",
+         "✗"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "demonstratii",
+     "title": "Cum demonstrezi",
+     "blocks": [
+      {
+       "t": "table",
+       "title": "",
+       "head": [
+        "afirmația",
+        "metoda"
+       ],
+       "rows": [
+        [
+         "`L` e regulat",
+         "AF sau ER care îl descrie, sau combinație de LR prin operații de închidere"
+        ],
+        [
+         "`L` nu e regulat",
+         "lema de pompare (cuvânt dependent de `p`, toate împărțirile); `L ∩ R` cunoscut neregulat; Myhill–Nerode (o infinitate de cuvinte distincte)"
+        ],
+        [
+         "`L` e LIC",
+         "GIC sau APD; combinație de LIC prin reuniune / concatenare / stea / ∩ LR"
+        ],
+        [
+         "`L` nu e LIC",
+         "lema de pompare pentru LIC; `L ∩ R` e un ne-LIC cunoscut (`aⁿbⁿcⁿ`)"
+        ],
+        [
+         "`L` e decidabil",
+         "algoritm care se oprește mereu; `L` și `∁L` TA"
+        ],
+        [
+         "`L` e TA",
+         "mașină care se oprește exact pe `L` (simulare, dovetailing)"
+        ],
+        [
+         "`L` nu e decidabil / nu e TA",
+         "reducere de la problema opririi; Rice; `∁L` TA și nedecidabil ⇒ `L` nu e TA"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "capcane",
+     "title": "Capcane din grile",
+     "blocks": [
+      {
+       "t": "steps",
+       "title": "De reținut",
+       "items": [
+        "`∅* = {e}`; `L∅ = ∅`; `e ∈ L*` mereu; `{e} ≠ ∅`.",
+        "Orice limbaj finit e regulat. `{aᵏbᵏ | k ≤ 8}` e regulat.",
+        "O submulțime sau un superlimbaj al unui limbaj regulat poate fi orice. `Σ*` e regulat și le conține pe toate.",
+        "`L1L2` regulat, `L*` regulat, `L1 ∪ L2` regulat **nu** spun nimic despre `L1`, `L2`, `L`.",
+        "`L = {vwv | |v| = 2}` e regulat (`v` are 4 valori), dar `{wwᴿ}` sau `{uvwvᴿ | |u| = |w| = 2}` sunt LIC, nu LR.",
+        "`aⁿbᵏcⁿ⁺ᵖ` cu `p ≥ -n` e doar `a*b*c*`: citește atent condițiile pe exponenți.",
+        "Pe un alfabet unar, orice LIC e regulat.",
+        "Un AFD are exact `|K||Σ|` tranziții; `|Δ|` la un AFN e finit, dar nemărginit; un AFN poate avea 0 stări finale și 0 tranziții (acceptă `{e}` dacă `s ∈ F`).",
+        "Expresiile regulate nu au `∩` sau complement.",
+        "APD-ul cursului acceptă cu stare finală **și** stivă goală.",
+        "Intersecția și complementul nu păstrează LIC, dar intersecția cu un **regulat** da.",
+        "TA nu e închisă la complement; dacă `L` și `∁L` sunt TA, `L` e decidabil.",
+        "Rice e despre **limbajul** mașinii. Proprietățile sintactice (numărul de stări) sau limitate în timp sunt decidabile.",
+        "Mulțimea limbajelor regulate / LIC / TA e infinit numărabilă; mulțimea tuturor limbajelor e nenumărabilă."
+       ]
+      },
+      {
+       "t": "quiz",
+       "q": "Fie `L1`, `L2` regulate și `L3 ⊆ L1 ∩ L2`. `L1 ∪ (Σ* \\ L3)` este:",
+       "options": [
+        "regulat",
+        "poate să nu fie LIC",
+        "LIC dar nu regulat"
+       ],
+       "answer": 0,
+       "why": "`L3 ⊆ L1` ⇒ `Σ* \\ L1 ⊆ Σ* \\ L3`, deci reuniunea conține `L1 ∪ (Σ* \\ L1) = Σ*`."
+      },
+      {
+       "t": "quiz",
+       "q": "Care este valoarea de adevăr: (1) Pentru orice limbaj regulat `L`, `L = L · L`. (2) Un AFN poate avea o infinitate de tranziții.",
+       "options": [
+        "Adevărat, Adevărat",
+        "Fals, Adevărat",
+        "Fals, Fals",
+        "Adevărat, Fals"
+       ],
+       "answer": 2,
+       "why": "`L = {a}`: `LL = {aa} ≠ L`. `Δ` e finită prin definiție. Exemplul din cursul 11."
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

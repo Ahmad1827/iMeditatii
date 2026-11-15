@@ -6,6 +6,9 @@
 //   the other does not. A grammar is compared on every word up to a length.
 // =============================================================================
 
+import 'lfa_cfg.dart' show Cfg, parseTrees;
+import 'lfa_machines.dart';
+
 /// The empty word, as the course writes it.
 const String lfaEps = 'ε';
 
@@ -366,7 +369,7 @@ List<String> allWords(List<String> alphabet, int max) {
 // ---------------------------------------------------------------- the task
 /// What a problem asks for and how an answer is judged.
 class LfaTask {
-  final String mode; // dfa, nfa, regex, cfg
+  final String mode; // dfa, nfa, regex, cfg, pda, tm (accepts a language), tmf (computes a function)
   final List<String> alphabet;
   final String? refRegex;
   final String? refGrammar;
@@ -375,9 +378,11 @@ class LfaTask {
   final int upTo; // grammars: words compared up to this length
   final int? maxStates;
   final bool chomsky;
+  final bool unambiguous; // grammars: every word must have one derivation tree
   final Object reference; // an answer that solves it: text, or an automaton's json
 
-  LfaTask(this.mode, this.alphabet, this.refRegex, this.refGrammar, this.refAutomaton, this.maxLen, this.upTo, this.maxStates, this.chomsky, this.reference);
+  LfaTask(this.mode, this.alphabet, this.refRegex, this.refGrammar, this.refAutomaton, this.maxLen, this.upTo, this.maxStates, this.chomsky, this.reference,
+      {this.unambiguous = false});
 
   factory LfaTask.fromSpec(Map<String, dynamic> spec) => LfaTask(
         spec['mode'] as String,
@@ -390,7 +395,13 @@ class LfaTask {
         (spec['maxStates'] as num?)?.toInt(),
         spec['chomsky'] == true,
         spec['reference'] as Object,
+        unambiguous: spec['unambiguous'] == true,
       );
+
+  /// A pushdown automaton or a Turing machine given as the answer that works.
+  late final Pda? _refPda = mode == 'pda' ? Pda.parse(reference as String) : null;
+  late final Tm? _refTm = mode == 'tm' || mode == 'tmf' ? Tm.parse(reference as String) : null;
+  bool get machine => mode == 'pda' || mode == 'tm' || mode == 'tmf';
 
   late final Dfa? _ref = refRegex != null
       ? Regex.parse(refRegex!, alphabet).toDfa(alphabet)
@@ -401,7 +412,10 @@ class LfaTask {
   late final Set<String>? _refWords = refGrammar == null ? null : Grammar.parse(refGrammar!).words(upTo);
 
   /// Is [word] in the language asked for? (Grammars: only up to [upTo].)
-  bool wants(String word) => _ref?.accepts(word) ?? _refWords!.contains(word);
+  bool wants(String word) => _ref?.accepts(word) ?? _refPda?.accepts(word) ?? _refTm?.accepts(word) ?? _refWords!.contains(word);
+
+  /// What the machine asked for leaves on the tape for [word] (mode tmf).
+  String? wantsOutput(String word) => _refTm?.compute(word);
 
   String _say(String w) => w.isEmpty ? 'cuvântul vid ε' : '„$w”';
 
@@ -463,16 +477,72 @@ class LfaTask {
       return [('gramatica se poate citi', false, e.message)];
     }
     final words = g.words(upTo);
+    final lang = _language(words.contains, null);
+    (String, bool, String)? ambiguity;
+    if (unambiguous && lang.every((c) => c.$2)) {
+      final cfg = Cfg.parse(text);
+      final sorted = words.toList()..sort((a, b) => a.length - b.length);
+      String? two;
+      for (final w in sorted) {
+        if (parseTrees(cfg, w).length > 1) {
+          two = w;
+          break;
+        }
+      }
+      ambiguity = ('este neambiguă (un singur arbore de derivare pentru fiecare cuvânt de cel mult $upTo simboluri)', two == null, two == null ? '' : '${_say(two)} are doi arbori de derivare');
+    }
     return [
       if (chomsky) ('este în forma normală Chomsky (A -> BC sau A -> a)', g.isChomsky, 'o regulă are altă formă'),
-      ..._language(words.contains, null),
+      ...lang,
+      if (ambiguity != null) ambiguity,
     ];
+  }
+
+  List<(String, bool, String)> checkPda(String text) {
+    final Pda p;
+    try {
+      p = Pda.parse(text);
+    } on LfaError catch (e) {
+      return [('automatul se poate citi', false, e.message)];
+    }
+    if (p.finals.isEmpty) return [('are cel puțin o stare finală (scrie „final q”)', false, 'nicio stare finală')];
+    return [
+      if (maxStates != null) ('are cel mult $maxStates stări', p.states.length <= maxStates!, 'are ${p.states.length}'),
+      ..._language(p.accepts, null),
+    ];
+  }
+
+  List<(String, bool, String)> checkTm(String text) {
+    final Tm m;
+    try {
+      m = Tm.parse(text);
+    } on LfaError catch (e) {
+      return [('mașina se poate citi', false, e.message)];
+    }
+    if (mode == 'tmf') {
+      for (final w in allWords(alphabet, upTo)) {
+        final want = wantsOutput(w), got = m.compute(w);
+        if (want != got) {
+          return [
+            (
+              'calculează funcția cerută (toate intrările de cel mult $upTo simboluri)',
+              false,
+              got == null ? 'pe ${_say(w)} mașina nu se oprește într-o stare de oprire (h)' : 'pe ${_say(w)} lasă pe bandă „${got.isEmpty ? lfaEps : got}”, trebuia „${want == null || want.isEmpty ? lfaEps : want}”',
+            ),
+          ];
+        }
+      }
+      return [('calculează funcția cerută (toate intrările de cel mult $upTo simboluri)', true, '')];
+    }
+    return _language(m.accepts, null);
   }
 
   /// The reference answer, judged the same way.
   List<(String, bool, String)> checkReference() => switch (mode) {
         'regex' => checkRegex(reference as String),
         'cfg' => checkGrammar(reference as String),
+        'pda' => checkPda(reference as String),
+        'tm' || 'tmf' => checkTm(reference as String),
         _ => checkAutomaton(Nfa.fromJson(reference as Map)),
       };
 }

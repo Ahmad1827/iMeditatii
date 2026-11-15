@@ -1,0 +1,242 @@
+# Lessons 12-16 (exec'd by lfa_teorie.py): pushdown automata, properties of CFL,
+# Turing machines, computability, the revision sheet.
+
+PDA_ANBN = 'start p\nfinal q\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε'
+PDA_WCW = 'start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, c, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε'
+PDA_EQ = 'start q\nfinal q\nq, a, ε -> q, A\nq, b, A -> q, ε\nq, b, ε -> q, B\nq, a, B -> q, ε'
+PDA_GIC = 'start p\nfinal q\np, ε, ε -> q, S\nq, ε, S -> q, aAA\nq, ε, A -> q, aS\nq, ε, A -> q, bS\nq, ε, A -> q, a\nq, a, a -> q, ε\nq, b, b -> q, ε'
+PDA_NEQ = 'start i\nfinal f\ni, ε, ε -> p, Z\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, A -> r, ε\nr, ε, A -> r, ε\nr, ε, Z -> f, ε\nq, b, Z -> s, Z\ns, b, Z -> s, Z\ns, ε, Z -> f, ε'
+
+# =============================================================================
+# 12. Pushdown automata
+# =============================================================================
+lesson('apd', 'Automate cu stivă',
+       'Un automat finit plus o stivă nemărginită: definiția din curs, configurații, acceptarea cu stare finală și stivă goală, exemplele de bază (aⁿbⁿ, wcwᴿ, wwᴿ, #a = #b), construcția APD-ului dintr-o gramatică și ideea invers, determinism vs nedeterminism.',
+       'Curs 7', 40, [
+    sec('definitie', 'Definiția din curs',
+        d('APD', 'Un **automat cu stivă** (push-down) este `M = (K, Σ, Γ, Δ, s, F)`:\n- `K`, `Σ`, `s`, `F` ca la automatele finite;\n- `Γ` – alfabetul stivei;\n- `Δ ⊆ (K × Σ* × Γ*) × (K × Γ*)` – relația de tranziție, finită.\n\nTranziția `((p, u, β), (q, γ))`: din starea `p`, cu `β` în vârful stivei, citește `u`, înlocuiește `β` cu `γ` și trece în `q`. `β = e` înseamnă „nu scoate nimic”, `γ = e` „nu pune nimic”.'),
+        d('Configurații și acceptare', 'O configurație e `(q, w, γ) ∈ K × Σ* × Γ*`: starea, ce a rămas de citit, conținutul stivei de sus în jos. `(p, uw, βη) ⊢ (q, w, γη)` pentru tranziția de mai sus. `M` acceptă `w` dacă `(s, w, e) ⊢* (f, e, e)` pentru un `f ∈ F`: **tot cuvântul citit, o stare finală, stiva goală**.'),
+        note('Alte cărți (și unii asistenți) folosesc un simbol de fund `Z0` și acceptă doar prin stare finală sau doar prin stivă goală. Toate variantele recunosc aceeași clasă, dar când scrii un APD la examen, respectă convenția cursului și spune explicit cum accepți. Diagrama: o săgeată `p → q` etichetată `u, β/γ`.', 'exam'),
+        ),
+    sec('exemple', 'Exemple de bază',
+        viz('pda', 'aⁿbⁿ', 'Fiecare `a` pune un `A`, fiecare `b` scoate unul. Trecerea de la „pun” la „scot” se face pe `e`. Urmărește stiva.', pda=PDA_ANBN, words=['aaabbb', 'aabbb', 'ab', ''], pos=[[0, 0], [2, 0]]),
+        viz('pda', 'wcwᴿ (exemplul din curs)', 'Până la `c`, pune pe stivă ce citește; după `c`, scoate doar dacă simbolul citit e egal cu vârful.', pda=PDA_WCW, words=['abcba', 'abcab', 'c'], pos=[[0, 0], [2, 0]]),
+        viz('pda', 'La fel de mulți a și b', 'O singură stare. Stiva ține ce e „în plus”: `A`-uri sau `B`-uri. Automatul e nedeterminist: pentru `ab`, poate pune și un `B` peste un `A`, dar acel drum nu se golește; e de ajuns să existe **un** drum bun.', pda=PDA_EQ, words=['abba', 'aabbab', 'aab']),
+        viz('pda', 'aⁿbᵐ cu n ≠ m (set de probleme)', 'Un simbol de fund `Z` permite automatului să „vadă” că stiva s-a golit. Fără el, un `b` citit în plus nu s-ar deosebi de unul care potrivește un `a`.', pda=PDA_NEQ, words=['aab', 'abb', 'ab', 'a']),
+        ),
+    sec('gic-apd', 'De la gramatică la automat',
+        thm('GIC ↔ APD', 'Un limbaj e generat de o GIC ⇔ e acceptat de un automat cu stivă.',
+            '(⇒) Construcția de mai jos simulează derivările stânga. (⇐) Pentru un APD (adus la o formă în care fiecare tranziție pune sau scoate un singur simbol și stiva se golește la final), neterminalele `A_pq` generează exact cuvintele care duc automatul din `p` cu stiva goală în `q` cu stiva goală; regulile urmăresc perechea „pun simbolul `X` / scot simbolul `X`” sau o oprire intermediară cu stiva goală.'),
+        steps('Construcția GIC → APD (ca în curs)',
+              'Două stări: `p` (inițială) și `q` (finală).',
+              '`((p, e, e), (q, S))`: pune simbolul de start.',
+              'Pentru fiecare regulă `A → α`: `((q, e, A), (q, α))` – înlocuiește în vârf neterminalul cu partea dreaptă.',
+              'Pentru fiecare terminal `a`: `((q, a, a), (q, e))` – un terminal din vârf se potrivește cu intrarea.'),
+        viz('pda', 'Examen 6 septembrie 2022: APD pentru S → aAA, A → aS | bS | a', 'Pe stivă stă mereu restul formei propoziționale dintr-o derivare stânga. Urmărește cum `S` devine `aAA`, apoi `a` se potrivește cu intrarea.', pda=PDA_GIC, words=['aaa', 'abaaa', 'aab'], pos=[[0, 0], [2, 0]]),
+        ),
+    sec('determinism', 'Determinism',
+        p('Spre deosebire de automatele finite, la APD nedeterminismul **aduce putere**: `wwᴿ` (palindroamele pare) nu poate fi acceptat de niciun APD determinist, pentru că automatul nu are cum să știe unde e mijlocul. Limbajele acceptate de APD deterministe (`wcwᴿ`, `aⁿbⁿ`) sunt o subclasă strictă a LIC, închisă la complement.'),
+        quiz('Un APD nedeterminist cu stiva limitată la o dimensiune constantă acceptă, în cel mai strict sens:', ['orice limbaj', 'limbaje independente de context', 'limbaje regulate', 'nu se poate spune'], 2,
+             'Conținutul stivei are finit de multe valori, care se pot pune în stare: un automat finit.'),
+        quiz('Fie `L` acceptat de un APD cu `|Γ| = 1`. `L` poate fi acceptat și de:', ['un AFN', 'un AFD', 'un APD', 'un APD fără cicluri'], 2, 'Un contor tot poate recunoaște `aⁿbⁿ`, care nu e regulat.'),
+        ),
+], practice=ids('6.', limit=20))
+
+# =============================================================================
+# 13. Properties of CFL
+# =============================================================================
+lesson('proprietati-lic', 'Proprietățile limbajelor independente de context',
+       'La ce operații sunt închise LIC (și la ce nu), intersecția cu un limbaj regulat, lema de pompare pentru LIC ca joc, metoda prin proprietăți de închidere, și ce întrebări au algoritm (apartenența, vidul) și ce nu (egalitatea, universalitatea).',
+       'Curs 9', 40, [
+    sec('inchidere', 'Proprietăți de închidere',
+        tab(['operația', 'LIC închise?', 'de ce'], [
+            ['reuniune', 'da', '`S → S1 | S2`'],
+            ['concatenare', 'da', '`S → S1S2`'],
+            ['stea', 'da', '`S → S1S | e`'],
+            ['oglindire', 'da', 'răstorni partea dreaptă a fiecărei regule'],
+            ['morfism, substituție', 'da', 'înlocuiești terminalele cu gramatici'],
+            ['**intersecție cu un regulat**', 'da', 'produsul unui APD cu un AFD: stările perechi, stiva a APD-ului'],
+            ['intersecție', '**nu**', '`{aⁿbⁿcᵐ} ∩ {aᵐbⁿcⁿ} = {aⁿbⁿcⁿ}`'],
+            ['complement', '**nu**', 'altfel `L1 ∩ L2 = complement(∁L1 ∪ ∁L2)` ar fi LIC'],
+            ['diferență', '**nu**', '`Σ* \\ L` e complementul'],
+            ['diferență cu un regulat (`L \\ R`)', 'da', '`L ∩ ∁R`, iar `∁R` e regulat'],
+        ]),
+        exam('Examen 9 iunie și 6 septembrie 2022', '`R` regulat, `L` independent de context. Cum este `L \\ R`? Demonstrați.',
+             '`L \\ R = L ∩ (Σ* \\ R)`. Complementul unui limbaj regulat e regulat (inversezi finalele unui AFD complet). Intersecția unui LIC cu un regulat e LIC: dacă `M1` e un APD pentru `L` și `M2` un AFD pentru `∁R`, APD-ul cu stări `K1 × K2`, aceeași stivă, care la fiecare tranziție a lui `M1` mută și `M2` pe simbolul citit (și nu-l mută pe `e`), acceptă `L ∩ ∁R`. Deci `L \\ R` e LIC.'),
+        exam('Examen 1 februarie 2025', '`L1` LIC, `L2` regulat. Cum este `L = {xy | x ∈ L1, y ∉ L2, |x| e par}`?',
+             '`L1′ = L1 ∩ {cuvinte de lungime pară}` e LIC (LIC ∩ LR). `L2′ = Σ* \\ L2` e regulat. `L = L1′L2′`, concatenarea a două LIC, e LIC.'),
+        ),
+    sec('pompare', 'Lema de pompare pentru LIC',
+        thm('Lema de pompare (LIC)', 'Dacă `L` e independent de context, există `p ≥ 1` astfel încât orice `w ∈ L` cu `|w| ≥ p` se scrie `w = uvxyz` cu:\n- `|vxy| ≤ p`;\n- `|vy| ≥ 1`;\n- `uvⁱxyⁱz ∈ L` pentru orice `i ≥ 0`.',
+            'Fie `G` în FNC cu `k` neterminale și `p = 2ᵏ`. Un arbore de derivare al lui `w` cu `|w| ≥ p` are înălțimea mai mare decât `k`, deci un drum de la rădăcină la o frunză are mai mult de `k` neterminale, iar unul se repetă: `A` apare de două ori pe drum (alegem cele mai de jos două apariții). Subarborele `A` de sus generează `vxy`, cel de jos `x`. Înlocuind subarborele de jos cu cel de sus (sau invers) obținem `uvⁱxyⁱz`. Alegerea aparițiilor celor mai de jos dă `|vxy| ≤ p`, iar FNC dă `|vy| ≥ 1`.', label='Lemă'),
+        viz('pump', 'Jocul pentru LIC', 'Acum adversarul taie în cinci bucăți, iar `v` și `y` (colorate) se pompează **simultan**. Pentru `aⁿbⁿcⁿ`, `vxy` are cel mult `p` simboluri, deci atinge cel mult două blocuri: al treilea rămâne neschimbat. `aⁿbⁿ` este LIC: aici nu poți câștiga.',
+            lang='anbncn', langs=['anbncn', '0n1n0n', 'ww', 'asq', 'anbn'], p=2, mode='cfl'),
+        ex('aⁿbⁿcⁿ', 'Arătați că `{aⁿbⁿcⁿ}` nu e LIC.',
+           '`w = aᵖbᵖcᵖ`. Cum `|vxy| ≤ p`, `vxy` nu poate conține și `a`, și `c`. Cazul 1: `v` sau `y` conține două tipuri de simboluri: `uv²xy²z` nu mai are forma `a*b*c*`. Cazul 2: `v`, `y` conțin fiecare un singur tip: cel mult două dintre cele trei numere cresc la `i = 2`, al treilea rămâne `p`. În ambele cazuri `uv²xy²z ∉ L`.'),
+        ex('Prin închidere: #a = #b și #c = #d (examen 8 septembrie 2022)', '`L` = cuvintele peste `{a, b, c, d}` cu `#a = #b` și `#c = #d`.',
+           '`L ∩ a*c*b*d* = {aⁿcᵐbⁿdᵐ}`. Pentru acesta, cu `w = aᵖcᵖbᵖdᵖ`: `vxy` atinge cel mult două blocuri **vecine**, deci nu poate schimba și `a`, și `b` (sau și `c`, și `d`) la fel; pomparea strică o egalitate. Dacă `L` ar fi LIC, intersecția cu un regulat ar fi LIC.'),
+        ex('Examen 15 iunie 2022', '`L = {aⁿbⁿw | w ∈ {c, d}*, |w| = n}` nu e LIC.', '`L ∩ a*b*c* = {aⁿbⁿcⁿ}`.'),
+        ),
+    sec('algoritmice', 'Proprietăți algoritmice',
+        tab(['întrebarea', 'pentru LIC'], [
+            ['`w ∈ L(G)`?', 'decidabilă: CYK, `O(n³)`'],
+            ['`L(G) = ∅`?', 'decidabilă: neterminalele care generează ceva (punct fix); vid ⇔ `S` nu generează'],
+            ['`L(G)` infinit?', 'decidabilă: în FNC fără simboluri inutile, un ciclu în graful „`A` produce `B`”'],
+            ['`L(G) = Σ*`?', '**nedecidabilă**'],
+            ['`L(G1) = L(G2)`? `L(G1) ⊆ L(G2)`?', '**nedecidabile**'],
+            ['`G` e ambiguă?', '**nedecidabilă**'],
+            ['`L(G) ∩ R = ∅` (`R` regulat)?', 'decidabilă: `L(G) ∩ R` e LIC, se construiește, apoi test de vid'],
+            ['`L(G1) ∩ L(G2) = ∅`?', '**nedecidabilă**'],
+        ]),
+        exam('Examen 2025 (CD)', 'Fie `E` o expresie regulată și `M` un APD. Cum verificăm că niciun șir nu este în ambele limbaje?',
+             '`L(E) ∩ L(M) = ∅`? Transformăm `E` în AFN, apoi în AFD; construim APD-ul produs pentru intersecție; îl transformăm într-o gramatică și testăm dacă limbajul ei e vid. Atenție: pentru un APD nu ajunge o parcurgere a grafului stărilor, din cauza stivei (o stare finală poate fi atinsă doar cu stiva nevidă).'),
+        ),
+    sec('verifica', 'Verifică-te',
+        quiz('Fie `L1` LIC, `L2` care nu e LIC, cu `L1 ∩ L2 = ∅`. `L1 ∪ L2` este:', ['întotdeauna LIC', 'niciodată LIC', 'nu se poate afirma nimic'], 2,
+             '`L1 = ∅` dă `L2` (nu e LIC); `L2 = {aⁿbⁿcⁿ}` cu `L1` = complementul lui (care e LIC) dă `Σ*`.'),
+        quiz('Fie `L` un LIC și `S ⊆ L`. Este `S` un LIC?', ['da', 'nu neapărat', 'da, chiar regulat'], 1, 'Orice limbaj e submulțime a lui `Σ*`.'),
+        ),
+], practice=['38', '41', '43', '121', '122', '127', '140', '146', '150', '152', '153', '161'])
+
+# =============================================================================
+# 14. Turing machines
+# =============================================================================
+TM_ANBN = 'q0, a -> q1, A, R\nq0, B -> q3, B, R\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, b -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, A, R\nq3, B -> q3, B, R\nq3, # -> h, #, S'
+TM_INC = 'q0, 0 -> q0, 0, R\nq0, 1 -> q0, 1, R\nq0, # -> q1, #, L\nq1, 1 -> q1, 0, L\nq1, 0 -> h, 1, S\nq1, # -> h, 1, S'
+TM_COURSE = 'q0, a -> q1, #\nq0, # -> h, #\nq1, # -> q0, L\nq1, a -> q0, a'
+lesson('turing', 'Mașina Turing',
+       'Modelul cel mai general: o bandă nemărginită pe care mașina poate citi, scrie și se poate mișca. Definiția din curs, configurații, mașini care acceptă și mașini care calculează funcții, exemplele rulate pas cu pas, compunerea mașinilor și extensiile (k benzi, bandă dublu infinită, nedeterminism), toate echivalente.',
+       'Curs 12, 14', 40, [
+    sec('definitie', 'Definiția',
+        d('Mașina Turing (cursul)', '`M = (K, Σ, δ, s, H)`: `K` stări, `Σ` alfabetul benzii (cu blancul `#` și marcajul de capăt `⊳`), `s` starea inițială, `H ⊆ K` stările de oprire, iar `δ : (K \\ H) × Σ → K × (Σ ∪ {L, R})` – la fiecare pas mașina **fie scrie** un simbol, **fie mută** capul la stânga sau la dreapta. Configurația inițială pentru intrarea `w` e `(s, ⊳#w)`, cu capul pe `#` dinaintea cuvântului.'),
+        p('Mașinile **acceptoare** au două stări de oprire, `y` (acceptă) și `n` (respinge). `M` **decide** `L` dacă se oprește pe orice intrare, în `y` pentru `w ∈ L` și în `n` altfel. `M` **acceptă** (semidecide) `L` dacă se oprește exact pe cuvintele din `L` (pe celelalte poate rula la nesfârșit).'),
+        note('În aplicație (vizualizări și probleme) o tranziție se scrie `q, a -> p, b, R` (scrie `b` **și** mută: forma lui Sipser) sau, ca în curs, `q, a -> p, b` (doar scrie) și `q, a -> p, L` (doar mută). Capul pornește pe **primul simbol** al intrării, banda e plină de `#` în ambele părți, `h`/`y` acceptă, `n` respinge, o tranziție lipsă respinge. Toate aceste convenții recunosc aceleași limbaje.', 'tip'),
+        ),
+    sec('exemple', 'Exemple rulate',
+        viz('tm', 'Exemplul 1.1 din note: înlocuiește a cu # spre stânga', 'Capul pornește, ca în note, pe ultimul `a` din dreapta: `q0` scrie `#`, `q1` mută la stânga; mașina se oprește pe primul `#` din stânga șirului. Tranzițiile sunt scrise în stilul cursului: fie scriu, fie mută.', tm=TM_COURSE, words=['aaa', 'a', ''], head='last'),
+        viz('tm', 'aⁿbⁿ (set de probleme)', 'Marchează un `a` cu `A`, caută primul `b` și îl face `B`, se întoarce. Când nu mai sunt `a`, verifică să fi rămas doar `B`.', tm=TM_ANBN, words=['aabb', 'aab', 'abab']),
+        viz('tm', 'Adună 1 în baza 2', 'O mașină care **calculează**: la oprire, pe bandă e rezultatul.', tm=TM_INC, words=['1011', '111', '0']),
+        d('Funcție calculabilă Turing', '`f : Σ0* → Σ0*` e **calculabilă Turing** dacă există o mașină `M` care, pornită pe `w`, se oprește cu `f(w)` pe bandă (`(s, ⊳#w) ⊢* (h, ⊳#f(w))`), pentru orice `w`.'),
+        ),
+    sec('compunere', 'Compunerea și extensiile',
+        p('Cursul construiește mașini mari din mașini mici, desenate ca o diagramă: `R` (un pas la dreapta), `L`, `a` (scrie `a`), `R#` (mergi la dreapta până la primul `#`), `L#`, mașina de copiere `C`, mașina de deplasare `S→`. Săgețile etichetate cu un simbol spun ce mașină urmează în funcție de simbolul de sub cap.'),
+        tab(['extensia', 'echivalentă cu mașina standard?', 'cum se simulează'], [
+            ['bandă infinită la ambele capete', 'da', 'banda se „pliază” în două piste'],
+            ['k benzi', 'da', 'o bandă cu `2k` piste: conținutul fiecărei benzi și poziția capului ei; un pas costă o trecere prin bandă'],
+            ['mai multe capete pe o bandă', 'da', 'ca la k benzi'],
+            ['bandă bidimensională', 'da', 'celulele se enumeră pe diagonale'],
+            ['nedeterminism', 'da', 'parcurgere în lățime a arborelui de calcul (dovetailing)'],
+        ]),
+        note('Teza Church–Turing: orice algoritm (în sensul intuitiv) se poate implementa pe o mașină Turing. Toate extensiile rezonabile calculează aceleași funcții, doar mai repede sau mai lent.', 'info'),
+        ),
+], practice=ids('7.', limit=20))
+
+# =============================================================================
+# 15. Computability
+# =============================================================================
+lesson('calculabilitate', 'Calculabilitate: limbaje decidabile și Turing acceptate',
+       'TD și TA, legătura dintre ele (L și complementul lui), închiderile, codificarea mașinilor ρ(M), mașina universală, problema opririi și demonstrația prin diagonalizare, reduceri, teorema lui Rice, dovetailing, și cum se rezolvă întrebările de examen „ce fel de limbaj este …”.',
+       'Curs 13', 45, [
+    sec('clase', 'Cele două clase',
+        d('TD și TA', 'Un limbaj e **Turing decidabil** (recursiv, TD) dacă o mașină Turing îl **decide** (se oprește mereu, cu răspunsul corect). E **Turing acceptat** (recursiv enumerabil, TA) dacă o mașină îl **acceptă** (se oprește exact pe cuvintele lui).'),
+        thm('L și complementul', '`L` e decidabil ⇔ atât `L`, cât și `∁L` sunt Turing acceptate.',
+            '(⇒) Mașina care decide `L` acceptă `L`; cu `y` și `n` schimbate decide `∁L`. (⇐) Rulăm în paralel (câte un pas din fiecare) mașina `M1` pentru `L` și `M2` pentru `∁L`. Exact una se oprește, pentru că orice cuvânt e în `L` sau în `∁L`. Dacă se oprește `M1`, răspundem `y`, altfel `n`.'),
+        tab(['operația', 'TD', 'TA'], [
+            ['reuniune, intersecție', 'da', 'da (pentru reuniune, rulare în paralel)'],
+            ['concatenare, stea', 'da', 'da (încercăm toate împărțirile în paralel)'],
+            ['complement', 'da', '**nu** (altfel orice TA ar fi TD)'],
+            ['oglindire, prefixe', 'da', 'da (prefixe: dovetailing pe continuări)'],
+        ]),
+        ),
+    sec('oprire', 'Problema opririi',
+        p('O mașină Turing se poate scrie ca un cuvânt `ρ(M)` (stări, simboluri și tranziții codificate binar). Există o **mașină universală** `U` care, pe intrarea `ρ(M)ρ(w)`, simulează `M` pe `w`.'),
+        thm('Problema opririi e nedecidabilă', '`H = {ρ(M)ρ(w) | M se oprește pe w}` este Turing acceptat, dar nu decidabil. Deci `∁H` nu este Turing acceptat.',
+            'Acceptat: `U` simulează `M` pe `w` și se oprește dacă `M` se oprește. Nedecidabil: presupunem că `D` decide `H`. Construim `X` care pe `ρ(M)`: rulează `D` pe `ρ(M)ρ(M)`; dacă `D` spune „se oprește”, `X` intră într-o buclă infinită; altfel `X` se oprește. Pe `ρ(X)`: `X` se oprește ⇔ `D` spune că `X` nu se oprește pe `ρ(X)` ⇔ `X` nu se oprește. Contradicție.'),
+        p('**Reducere**: dacă un algoritm pentru `L2` ar da un algoritm pentru `H`, atunci `L2` e nedecidabil. Așa se arată că sunt nedecidabile: dacă `M` acceptă `e`, dacă `L(M) = ∅`, dacă `L(M)` e regulat, dacă `L(M1) = L(M2)`.'),
+        thm('Rice', 'Orice proprietate **netrivială** a **limbajului** acceptat de o mașină Turing este nedecidabilă: `{ρ(M) | L(M) are proprietatea P}` nu e decidabil dacă unele limbaje TA au `P` și altele nu.', label='Teoremă'),
+        note('Rice se aplică doar proprietăților **limbajului**, nu ale mașinii: „`M` are 5 stări”, „`M` face exact 5 tranziții pe `w` cu `|w| < 100`” sunt **decidabile** (se verifică direct sau prin simulare limitată). „`M` acceptă cel puțin 65536 de șiruri” e TA (dovetailing până găsești 65536), dar nu TD. „`M` acceptă orice `w` cu `|w| > 10`” nu e nici măcar TA.', 'exam'),
+        ),
+    sec('examen', 'Probleme de examen rezolvate',
+        exam('Examen 18 ianuarie 2025', 'Fie `L1`, `L2` limbaje recursiv enumerabile, cu `L1 ∩ L2 = ∅`, iar complementul lui `L1 ∪ L2` e recursiv enumerabil. Sunt `L1`, `L2` recursive? (Aceeași întrebare apare în grile: „A și B Turing acceptate, disjuncte, cu complementul reuniunii Turing acceptat”.)',
+             'Atunci `Σ*` e împărțit în trei limbaje TA disjuncte: `L1`, `L2` și `R = complement(L1 ∪ L2)`. Pentru `L1`: complementul lui e `L2 ∪ R`, TA (reuniune de TA). Deci `L1` și `∁L1` sunt TA ⇒ `L1` decidabil; la fel `L2`. **Ambele sunt decidabile.**'),
+        exam('Examen 1 februarie 2025', 'Fie `L1`, `L2` TA cu `L1 ∪ L2 = Σ*` și `(L1 ∩ ∁L2) ∪ (∁L1 ∩ L2)` recursiv. Sunt `L1`, `L2` recursive?',
+             'Fie `M3` mașina care decide diferența simetrică. Pentru `L1`: rulăm `M1` și `M2` în paralel; una se oprește (reuniunea e `Σ*`). Dacă se oprește `M1`, acceptăm. Dacă se oprește `M2`, cuvântul e în `L2`: rulăm `M3`; dacă e în diferența simetrică, e în `L2 \\ L1`, respingem; altfel e în `L1 ∩ L2`, acceptăm. Mașina se oprește mereu, deci `L1` e recursiv; analog `L2`.'),
+        exam('Examen 2025 (CD)', 'Fie `L` recursiv enumerabil. Cum e `L′ = {y | ∃x ∈ L, y e o permutare a lui x}`?',
+             'TA: pe `y`, generăm toate permutările lui `y` (sunt finit multe) și rulăm `M` pe ele în paralel; acceptăm când una e acceptată. Dacă `y ∉ L′`, nicio permutare nu e în `L`, iar mașina poate rula la nesfârșit, ceea ce e voie.'),
+        exam('Examen 15 iunie 2022', '`L = {ρ(w)ρ(M1)…ρ(Mk) | k > 2 impar, majoritatea Mi acceptă w}`. Ce fel de limbaj este?',
+             'Turing acceptat: rulăm toate `Mi` pe `w` în paralel (câte un pas din fiecare) și acceptăm când `(k + 1)/2` dintre ele au acceptat. Nu e decidabil: pentru `k = 3`, cu `M2` o mașină care acceptă tot și `M3` una care nu acceptă nimic, majoritatea acceptă `w` ⇔ `M1` acceptă `w`; un algoritm pentru `L` ar decide deci problema acceptării.'),
+        exam('Examen 9 iunie 2022', 'Fie `L` limbajul care conține doar șirul `s = 1` dacă există extratereștri, `s = 0` altfel. Este `L` decidabil?',
+             'Da. `L` e `{0}` sau `{1}`; ambele sunt finite, deci decidabile. Există o mașină care îl decide, chiar dacă nu știm care dintre cele două.'),
+        exam('Test de recuperare 2017-2018', 'Este limbajul `{ρ(M)ρ(w) | M nu acceptă w}` Turing acceptat?',
+             'Nu. Complementul lui (între codificările valide) e limbajul acceptării, `{ρ(M)ρ(w) | M acceptă w}`, care e TA. Dacă și acesta ar fi TA, acceptarea ar fi decidabilă.'),
+        ),
+    sec('metoda', 'Cum răspunzi la „ce fel de limbaj este …”',
+        steps('Ordinea întrebărilor',
+              'E finit? Atunci e regulat (și decidabil).',
+              'Se poate recunoaște cu memorie finită? Scrie un AF/ER: e **regulat**. Dacă nu, demonstrează cu lema de pompare sau prin închidere.',
+              'Se poate recunoaște cu o stivă (perechi imbricate, o singură numărătoare)? Scrie o GIC/APD: e **LIC**. Altfel, lema de pompare pentru LIC sau închidere.',
+              'Are un algoritm care se oprește mereu (orice verificare cu numărare, simulare limitată)? E **decidabil**.',
+              'Se poate verifica „găsind un martor” prin căutare nemărginită (simulare fără limită, dovetailing)? E **Turing acceptat**. Dacă și complementul e TA, e decidabil.',
+              'Dacă e o proprietate netrivială a lui `L(M)`: nedecidabil (Rice); dacă complementul e TA și nedecidabil, nu e nici TA.'),
+        ),
+], practice=['44', '45', '129', '196', '197', '198'])
+
+# =============================================================================
+# 16. Revision sheet
+# =============================================================================
+lesson('recapitulare', 'Fișă de recapitulare și capcane de examen',
+       'Tot cursul pe o pagină: tabelele de închidere și decidabilitate pentru fiecare clasă, cum demonstrezi fiecare tip de afirmație, și lista capcanelor din grilele din anii trecuți.',
+       'Curs 11', 25, [
+    sec('tabele', 'Tabelele',
+        tab(['operația', 'LR', 'LIC', 'TD', 'TA'], [
+            ['reuniune', '✓', '✓', '✓', '✓'],
+            ['intersecție', '✓', '✗', '✓', '✓'],
+            ['complement', '✓', '✗', '✓', '✗'],
+            ['concatenare', '✓', '✓', '✓', '✓'],
+            ['stea', '✓', '✓', '✓', '✓'],
+            ['oglindire', '✓', '✓', '✓', '✓'],
+            ['∩ cu un LR', '✓', '✓', '✓', '✓'],
+            ['diferență', '✓', '✗', '✓', '✗'],
+        ], title='Închiderea'),
+        tab(['întrebarea', 'LR', 'LIC', 'TD', 'TA'], [
+            ['`w ∈ L`', '✓', '✓', '✓', '✗ (doar semidecidabil)'],
+            ['`L = ∅`', '✓', '✓', '✗', '✗'],
+            ['`L` finit', '✓', '✓', '✗', '✗'],
+            ['`L = Σ*`', '✓', '✗', '✗', '✗'],
+            ['`L1 = L2`', '✓', '✗', '✗', '✗'],
+            ['`L1 ⊆ L2`', '✓', '✗', '✗', '✗'],
+        ], title='Decidabilitatea (limbajele date prin automat, gramatică sau mașină)'),
+        ),
+    sec('demonstratii', 'Cum demonstrezi',
+        tab(['afirmația', 'metoda'], [
+            ['`L` e regulat', 'AF sau ER care îl descrie, sau combinație de LR prin operații de închidere'],
+            ['`L` nu e regulat', 'lema de pompare (cuvânt dependent de `p`, toate împărțirile); `L ∩ R` cunoscut neregulat; Myhill–Nerode (o infinitate de cuvinte distincte)'],
+            ['`L` e LIC', 'GIC sau APD; combinație de LIC prin reuniune / concatenare / stea / ∩ LR'],
+            ['`L` nu e LIC', 'lema de pompare pentru LIC; `L ∩ R` e un ne-LIC cunoscut (`aⁿbⁿcⁿ`)'],
+            ['`L` e decidabil', 'algoritm care se oprește mereu; `L` și `∁L` TA'],
+            ['`L` e TA', 'mașină care se oprește exact pe `L` (simulare, dovetailing)'],
+            ['`L` nu e decidabil / nu e TA', 'reducere de la problema opririi; Rice; `∁L` TA și nedecidabil ⇒ `L` nu e TA'],
+        ]),
+        ),
+    sec('capcane', 'Capcane din grile',
+        steps('De reținut',
+              '`∅* = {e}`; `L∅ = ∅`; `e ∈ L*` mereu; `{e} ≠ ∅`.',
+              'Orice limbaj finit e regulat. `{aᵏbᵏ | k ≤ 8}` e regulat.',
+              'O submulțime sau un superlimbaj al unui limbaj regulat poate fi orice. `Σ*` e regulat și le conține pe toate.',
+              '`L1L2` regulat, `L*` regulat, `L1 ∪ L2` regulat **nu** spun nimic despre `L1`, `L2`, `L`.',
+              '`L = {vwv | |v| = 2}` e regulat (`v` are 4 valori), dar `{wwᴿ}` sau `{uvwvᴿ | |u| = |w| = 2}` sunt LIC, nu LR.',
+              '`aⁿbᵏcⁿ⁺ᵖ` cu `p ≥ −n` e doar `a*b*c*`: citește atent condițiile pe exponenți.',
+              'Pe un alfabet unar, orice LIC e regulat.',
+              'Un AFD are exact `|K||Σ|` tranziții; `|Δ|` la un AFN e finit, dar nemărginit; un AFN poate avea 0 stări finale și 0 tranziții (acceptă `{e}` dacă `s ∈ F`).',
+              'Expresiile regulate nu au `∩` sau complement.',
+              'APD-ul cursului acceptă cu stare finală **și** stivă goală.',
+              'Intersecția și complementul nu păstrează LIC, dar intersecția cu un **regulat** da.',
+              'TA nu e închisă la complement; dacă `L` și `∁L` sunt TA, `L` e decidabil.',
+              'Rice e despre **limbajul** mașinii. Proprietățile sintactice (numărul de stări) sau limitate în timp sunt decidabile.',
+              'Mulțimea limbajelor regulate / LIC / TA e infinit numărabilă; mulțimea tuturor limbajelor e nenumărabilă.'),
+        quiz('Fie `L1`, `L2` regulate și `L3 ⊆ L1 ∩ L2`. `L1 ∪ (Σ* \\ L3)` este:', ['regulat', 'poate să nu fie LIC', 'LIC dar nu regulat'], 0,
+             '`L3 ⊆ L1` ⇒ `Σ* \\ L1 ⊆ Σ* \\ L3`, deci reuniunea conține `L1 ∪ (Σ* \\ L1) = Σ*`.'),
+        quiz('Care este valoarea de adevăr: (1) Pentru orice limbaj regulat `L`, `L = L · L`. (2) Un AFN poate avea o infinitate de tranziții.', ['Adevărat, Adevărat', 'Fals, Adevărat', 'Fals, Fals', 'Adevărat, Fals'], 2,
+             '`L = {a}`: `LL = {aa} ≠ L`. `Δ` e finită prin definiție. Exemplul din cursul 11.'),
+        ),
+], practice=['80', '81', '82', '83', '84', '86', '87', '89', '93', '94'])

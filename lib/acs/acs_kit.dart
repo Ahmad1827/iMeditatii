@@ -459,10 +459,14 @@ class AcsText extends StatelessWidget {
     );
   }
 
-  Widget _tex(String tex, {bool display = false}) => Math.tex(
-        tex,
-        mathStyle: display ? MathStyle.display : MathStyle.text,
-        textStyle: TextStyle(fontSize: size * 1.1, color: color ?? ink.strong, height: 1),
-        onErrorFallback: (_) => Text(tex, style: ink.mono(size * 0.95, color: color ?? ink.fg)),
-      );
+  Widget _tex(String tex, {bool display = false}) {
+    final m = Math.tex(
+      tex,
+      mathStyle: display ? MathStyle.display : MathStyle.text,
+      textStyle: TextStyle(fontSize: size * 1.1, color: color ?? ink.strong, height: 1),
+      onErrorFallback: (_) => Text(tex, style: ink.mono(size * 0.95, color: color ?? ink.fg)),
+    );
+    // a formula in a line can't break: one wider than the line is drawn smaller instead
+    return display ? m : FittedBox(fit: BoxFit.scaleDown, child: m);
+  }
 }

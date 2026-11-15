@@ -69,7 +69,7 @@ const List<AcsSubject> acsSubjects = [
   AcsSubject('sd', 'SD', 'Structuri de Date', 'C cu teste și structuri construite pas cu pas', group: 'an1-sem2'),
   AcsSubject('poo', 'POO', 'Programare Orientată pe Obiecte', 'Clase, moștenire, polimorfism', group: 'an2', ready: false),
   AcsSubject('pa', 'PA', 'Proiectarea Algoritmilor', 'Divide et impera, programare dinamică, greedy', group: 'an2', ready: false),
-  AcsSubject('lfa', 'LFA', 'Limbaje Formale și Automate', 'Automate, expresii regulate și gramatici verificate cu un contraexemplu', group: 'an3-sem1'),
+  AcsSubject('lfa', 'LFA', 'Limbaje Formale și Automate', 'Teorie cu algoritmi pas cu pas; automate, expresii, gramatici, APD și mașini Turing verificate', group: 'an3-sem1'),
   AcsSubject('apd', 'APD', 'Algoritmi Paraleli și Distribuiți', 'Fire rulate pas cu pas; toate întrețeserile căutate după curse și blocaje', group: 'an3-sem1'),
   AcsSubject('egc', 'EGC', 'Elemente de Grafică pe Calculator', 'Transformări compuse pe desen, rasterizare pixel cu pixel', group: 'an3-sem1'),
   AcsSubject('rl', 'RL', 'Rețele Locale', 'Adrese IP pe biți: subrețele, VLSM, tabele de rutare', group: 'an3-sem1'),

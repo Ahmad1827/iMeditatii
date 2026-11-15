@@ -18,6 +18,8 @@ import '../acs_screen.dart' show acsSubject, acsTrail, AcsSubject;
 import '../app_link.dart';
 import 'acs_data.dart';
 import 'acs_kit.dart';
+import 'teorie/teorie_data.dart';
+import 'teorie/teorie_screen.dart' show teorieRoute;
 
 class AcsCourseScreen extends StatefulWidget {
   final String code;
@@ -169,6 +171,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           _header(ink, narrow, subject, data),
           const SizedBox(height: 18),
+          if (acsTeorieCourses.contains(widget.code)) ...[_teorieCard(context, ink, narrow), const SizedBox(height: 12)],
           _continueCard(context, ink, narrow, data),
           const SizedBox(height: 22),
           _sectionTitle(ink, 'capitole', 'Capitole'),
@@ -268,6 +271,38 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
           ]),
         ),
       );
+
+  // ------------------------------------------------------------ theory card
+
+  Widget _teorieCard(BuildContext context, AcsInk ink, bool narrow) {
+    final route = teorieRoute(widget.code);
+    final open = AcsButton(ink, 'deschide teoria', () => context.go(route), icon: Icons.menu_book_outlined);
+    final body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(ink.terminal ? '>> teorie' : 'TEORIE', style: ink.mono(12.5, weight: FontWeight.w700, color: ink.accent).copyWith(letterSpacing: ink.terminal ? 0 : 1.2)),
+      const SizedBox(height: 4),
+      Text('Învață înainte să rezolvi', style: ink.mono(narrow ? 17 : 19, weight: FontWeight.w700, color: ink.strong, height: 1.25)),
+      const SizedBox(height: 4),
+      Text('Lecțiile cursului, cu definiții, teoreme, exemple rezolvate și algoritmi pe care îi poți rula pas cu pas.', style: ink.mono(13.5, color: ink.muted)),
+    ]);
+    return AppLink(
+      to: route,
+      child: AcsTap(
+        label: 'teoria materiei',
+        onTap: () => context.go(route),
+        builder: (h) => Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: h ? ink.hover : ink.panel,
+            border: Border.all(color: ink.line),
+            borderRadius: ink.terminal ? null : BorderRadius.circular(10),
+          ),
+          child: narrow
+              ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [body, const SizedBox(height: 12), open])
+              : Row(children: [Expanded(child: body), const SizedBox(width: 16), open]),
+        ),
+      ),
+    );
+  }
 
   // ---------------------------------------------------------- continue card
 

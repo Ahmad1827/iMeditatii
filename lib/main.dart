@@ -39,6 +39,7 @@ import 'all_reviews_screen.dart';
 import 'exercise_list_screen.dart';
 import 'acs/acs_course_screen.dart';
 import 'acs/acs_problem_screen.dart';
+import 'acs/teorie/teorie_screen.dart';
 import 'acs_screen.dart';
 import 'exercise_detail_screen.dart';
 import 'ide_screen.dart';
@@ -232,6 +233,15 @@ final GoRouter _router = GoRouter(
             ? AcsScreen(key: ValueKey(state.uri.path), group: name)
             : AcsCourseScreen(key: ValueKey(state.uri.path), code: name);
       },
+    ),
+    GoRoute(
+      path: '/acs/:course/teorie',
+      builder: (context, state) => AcsTeorieScreen(key: ValueKey(state.uri.path), code: state.pathParameters['course']!),
+    ),
+    GoRoute(
+      path: '/acs/:course/teorie/:lesson',
+      builder: (context, state) =>
+          AcsLessonScreen(key: ValueKey(state.uri.path), code: state.pathParameters['course']!, lesson: state.pathParameters['lesson']!),
     ),
     GoRoute(
       path: '/acs/:course/:id',

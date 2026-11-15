@@ -6,5 +6,6 @@ set -e
 cd "$(dirname "$0")/../.."
 PY=${PY:-python3}
 for c in uso iocla pclp sd pl math_courses fizica lfa apd egc rl isc eg; do python3 -I tool/acs/$c.py; done
+python3 -I tool/acs/lfa_teorie.py  # the LFA theory pages (needs lfa.json for the problems they link)
 $PY -I tool/acs/admitere.py
 for c in mn elth; do $PY -I tool/acs/$c.py; done

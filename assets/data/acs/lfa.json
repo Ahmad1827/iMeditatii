@@ -4,9 +4,13 @@
   "1. Automate finite deterministe",
   "2. Automate nedeterministe",
   "3. Expresii regulate",
-  "4. Gramatici independente de context",
-  "5. Clase de limbaje",
-  "6. Grile: modelul de test"
+  "4. Proprietăți ale limbajelor regulate",
+  "5. Gramatici independente de context",
+  "6. Automate cu stivă",
+  "7. Mașini Turing",
+  "8. Clase de limbaje",
+  "9. Grile: modelul de test",
+  "10. Grile din teste și examene"
  ],
  "problems": [
   {
@@ -1138,6 +1142,549 @@
    }
   },
   {
+   "id": "104",
+   "title": "Fiecare dintre 0, 1, 2 apare",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Construiește un AFD peste `{0, 1, 2}` pentru `L = {w | |w|₀ ≥ 1 ∧ |w|₁ ≥ 1 ∧ |w|₂ ≥ 1}` (fiecare simbol apare măcar o dată).",
+   "hint": "Starea ține minte mulțimea simbolurilor văzute până acum: o submulțime a lui `{0, 1, 2}`.",
+   "solution": "8 stări, câte una pentru fiecare submulțime de simboluri văzute; `∅` e inițială, `{0, 1, 2}` e singura finală (și are buclă pe toate). Din mulțimea `S`, simbolul `x` duce în `S ∪ {x}`. E și produsul a trei automate „`x` a apărut”.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "012",
+    "reference": {
+     "states": 8,
+     "final": [
+      7
+     ],
+     "t": {
+      "0": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        3
+       ]
+      },
+      "1": {
+       "0": [
+        1
+       ],
+       "1": [
+        4
+       ],
+       "2": [
+        5
+       ]
+      },
+      "2": {
+       "0": [
+        4
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        6
+       ]
+      },
+      "3": {
+       "0": [
+        5
+       ],
+       "1": [
+        6
+       ],
+       "2": [
+        3
+       ]
+      },
+      "4": {
+       "0": [
+        4
+       ],
+       "1": [
+        4
+       ],
+       "2": [
+        7
+       ]
+      },
+      "5": {
+       "0": [
+        5
+       ],
+       "1": [
+        7
+       ],
+       "2": [
+        5
+       ]
+      },
+      "6": {
+       "0": [
+        7
+       ],
+       "1": [
+        6
+       ],
+       "2": [
+        6
+       ]
+      },
+      "7": {
+       "0": [
+        7
+       ],
+       "1": [
+        7
+       ],
+       "2": [
+        7
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 8,
+     "final": [
+      7
+     ],
+     "t": {
+      "0": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        3
+       ]
+      },
+      "1": {
+       "0": [
+        1
+       ],
+       "1": [
+        4
+       ],
+       "2": [
+        5
+       ]
+      },
+      "2": {
+       "0": [
+        4
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        6
+       ]
+      },
+      "3": {
+       "0": [
+        5
+       ],
+       "1": [
+        6
+       ],
+       "2": [
+        3
+       ]
+      },
+      "4": {
+       "0": [
+        4
+       ],
+       "1": [
+        4
+       ],
+       "2": [
+        7
+       ]
+      },
+      "5": {
+       "0": [
+        5
+       ],
+       "1": [
+        7
+       ],
+       "2": [
+        5
+       ]
+      },
+      "6": {
+       "0": [
+        7
+       ],
+       "1": [
+        6
+       ],
+       "2": [
+        6
+       ]
+      },
+      "7": {
+       "0": [
+        7
+       ],
+       "1": [
+        7
+       ],
+       "2": [
+        7
+       ]
+      }
+     }
+    },
+    "maxStates": 8
+   }
+  },
+  {
+   "id": "105",
+   "title": "Lungime pară și niciun 1",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Construiește un AFD peste `{0, 1, 2}` pentru `L = {w | |w| este par ∧ |w|₁ = 0}`.",
+   "hint": "Paritatea lungimii, plus o groapă pentru primul `1`.",
+   "solution": "`q0` (lungime pară, finală) și `q1` (impară), cu `0` și `2` trecând de la una la alta; `1` duce din amândouă în groapa `q2`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "012",
+    "reference": {
+     "states": 3,
+     "final": [
+      0
+     ],
+     "t": {
+      "0": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        1
+       ]
+      },
+      "1": {
+       "0": [
+        0
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        0
+       ]
+      },
+      "2": {
+       "0": [
+        2
+       ],
+       "1": [
+        2
+       ],
+       "2": [
+        2
+       ]
+      }
+     }
+    },
+    "regex": "((0∪2)(0∪2))*",
+    "maxStates": 3
+   }
+  },
+  {
+   "id": "108",
+   "title": "Toate stările finale: AFD și e",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Adevărat sau fals?\n\nFie `M` un **AFD** cu `|F| = |K|` (toate stările sunt finale). Atunci `e ∈ L(M)`.",
+   "hint": "",
+   "solution": "Starea inițială e finală, iar `(s, e) ⊢* (s, e)` în zero pași, deci `e` e acceptat. La un AFD (complet) se acceptă de fapt orice cuvânt: `L(M) = Σ*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "109",
+   "title": "Toate stările finale: AFD și prefixele",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Adevărat sau fals?\n\nFie `M` un **AFD** cu `|F| = |K|`. Dacă `w` e acceptat de `M`, atunci orice prefix al lui `w` este în `L(M)`.",
+   "hint": "",
+   "solution": "Un AFD e complet: orice cuvânt duce într-o stare, care e finală. Deci `L(M) = Σ*` și conține orice prefix.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "113",
+   "title": "Limbaje închise la prefixe și AFD-uri cu toate stările finale",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Adevărat sau fals?\n\nOrice limbaj regulat care conține toate prefixele șirurilor sale admite un **AFD** acceptor `M` cu `|F| = |K|`.",
+   "hint": "",
+   "solution": "Un AFD complet cu toate stările finale acceptă `Σ*`. Limbajul `L(a*)` peste `{a, b}` e închis la prefixe, dar nu e `Σ*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "117",
+   "title": "δ(q, a) = δ(p, a) ⇔ q = p",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "grea",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Cum arată un AFD `M` pentru care `δ(q, a) = δ(p, a) ⇔ q = p`, pentru orice `a ∈ Σ` și `p, q ∈ K`?",
+   "hint": "O funcție injectivă de la o mulțime finită în ea însăși e și surjectivă.",
+   "solution": "Pentru un `a` fixat, `q ↦ δ(q, a)` e o funcție injectivă pe mulțimea finită `K`, deci o bijecție (o permutare a stărilor). În fiecare stare intră exact o săgeată etichetată `a`: dacă întoarcem săgețile, obținem tot un automat determinist și complet (un automat „reversibil”); fiecare stare e pe un ciclu pentru fiecare simbol. La AFN, `(q, a, x), (p, a, x) ∈ Δ ⇔ q = p` spune doar că în fiecare stare intră cel mult o tranziție pe fiecare simbol: automatul întors e determinist, dar poate fi incomplet.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "fiecare simbol permută stările: în fiecare stare intră exact o tranziție pe fiecare simbol, deci automatul oglindit e tot determinist",
+     "are o singură stare",
+     "nu are cicluri",
+     "are exact o stare finală"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "159",
+   "title": "AFD care acceptă tot ce are |w| ≤ k",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Un AFD peste un alfabet cu `|Σ| = 2` are `k > 2` stări și acceptă orice șir cu `|w| ≤ k`. Ce se poate spune despre `|L(M)|`?",
+   "hint": "",
+   "solution": "Un cuvânt de lungime `k` trece prin `k + 1` stări, deci repetă una: e un ciclu pe un drum de acceptare, iar limbajul e infinit. Doar varianta care nu fixează o margine poate fi adevărată.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "|L(M)| > 2ᵏ⁺²",
+     "|L(M)| ≤ 2ᵏ",
+     "|L(M)| = 2ᵏ⁺¹ - 1",
+     "|L(M)| = 2ᵏ⁺¹"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "160",
+   "title": "Câte stări finale pentru 3 șiruri",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `M` un AFD care acceptă minim 3 șiruri. Numărul minim de stări finale ale automatului este:",
+   "hint": "",
+   "solution": "O singură stare, inițială și finală, cu buclă pe fiecare simbol, acceptă `Σ*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "2",
+     "1",
+     "3",
+     "niciuna dintre celelalte variante"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "163",
+   "title": "Nimic acceptat, totul acceptat",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `M1` un AFD care nu acceptă niciun șir și `M2` un AFD care acceptă orice șir din `Σ*`. Ce e întotdeauna adevărat?",
+   "hint": "",
+   "solution": "`M1` poate avea stări finale la care nu se ajunge din start. `M2` acceptă `e`, deci starea inițială e finală, și cuvinte oricât de lungi, deci are cicluri.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "M1 nu are stări finale și M2 are cel puțin o stare finală",
+     "M1 poate avea stări finale și M2 nu are cicluri",
+     "M1 nu poate avea stări finale și M2 are cel puțin un ciclu",
+     "atât M1 cât și M2 pot avea stări finale"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "177",
+   "title": "Câte tranziții are un AFD",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "ușoară",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Care este numărul minim de tranziții pe care le poate avea un AFD `(K, Σ, δ, s, F)`? Dar maxim?",
+   "hint": "",
+   "solution": "`δ : K × Σ → K` e o funcție totală: exact o tranziție pentru fiecare pereche (stare, simbol).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "minim = maxim = |K| · |Σ|",
+     "minim 0, maxim |K| · |Σ|",
+     "minim |K|, maxim |K|²",
+     "minim 1, maxim |K|² · |Σ|"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "181",
+   "title": "Nu se termină cu aba",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Test 1 LFA · 1 noiembrie 2023",
+   "statement": "Fie `Σ = {a, b, c}`. Scrie un AFD pentru `L = Σ* \\ (Σ* ∘ {aba})`.",
+   "hint": "Construiește AFD-ul pentru „se termină cu `aba`” (stările: cât din `aba` e la coadă), apoi inversează stările finale.",
+   "solution": "4 stări (`ε`, `a`, `ab`, `aba` la coadă); finale toate în afară de `aba`. Atenție la `c`: duce mereu în starea `ε`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "abc",
+    "reference": {
+     "states": 4,
+     "final": [
+      0,
+      1,
+      2
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ],
+       "c": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ],
+       "c": [
+        0
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ],
+       "b": [
+        0
+       ],
+       "c": [
+        0
+       ]
+      },
+      "3": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ],
+       "c": [
+        0
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 4,
+     "final": [
+      0,
+      1,
+      2
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ],
+       "c": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ],
+       "c": [
+        0
+       ]
+      },
+      "2": {
+       "a": [
+        3
+       ],
+       "b": [
+        0
+       ],
+       "c": [
+        0
+       ]
+      },
+      "3": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ],
+       "c": [
+        0
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
    "id": "10",
    "title": "Al treilea simbol de la sfârșit",
    "chapter": "2. Automate nedeterministe",
@@ -1535,6 +2082,316 @@
    }
   },
   {
+   "id": "100",
+   "title": "Câte tupluri are relația Δ",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Câte tupluri poate conține relația de tranziție `Δ` a unui automat finit nedeterminist `M = (K, Σ, Δ, s, F)`?\n\n(În curs `Δ ⊆ K × Σ* × K`: o tranziție poate citi un șir, nu doar un simbol.)",
+   "hint": "Ce poate fi la mijlocul unui tuplu `(q, u, p)`? Este `Δ` voie să fie infinită?",
+   "solution": "`Δ` e o mulțime **finită** de tupluri `(q, u, p)`, dar etichetele `u ∈ Σ*` pot fi oricât de lungi, deci pentru `K` și `Σ` fixate nu există o margine: oricâte tranziții, dar un număr finit. Doar dacă etichetele sunt simboluri sau `e` (ca la Sipser), `|Δ| ≤ |K| · (|Σ| + 1) · |K|`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cel mult |K|² · (|Σ| + 1)",
+     "exact |K| · |Σ|",
+     "un număr finit oricât de mare: nu există o margine superioară",
+     "o infinitate"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "101",
+   "title": "Automat pentru a*(ab ∪ ba ∪ e) ∪ b*",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Construiește un automat finit care acceptă `L(a*(ab ∪ ba ∪ e) ∪ b*)` peste `{a, b}` (`e` este cuvântul vid, scris în aplicație `ε`).",
+   "hint": "Reuniunea: din starea inițială, câte o ε-tranziție spre automatul fiecărei părți.",
+   "solution": "`q0` —ε→ `q1` și —ε→ `q4`. `q1` are buclă pe `a` și e finală (`a*` urmat de `e`); din `q1`, `a` duce în `q2`, apoi `b` în `q3`, iar `b` duce în `q5`, apoi `a` în `q3` (finală). `q4` are buclă pe `b` și e finală.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "nfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 6,
+     "final": [
+      1,
+      3,
+      4
+     ],
+     "t": {
+      "0": {
+       "ε": [
+        1,
+        4
+       ]
+      },
+      "1": {
+       "a": [
+        1,
+        2
+       ],
+       "b": [
+        5
+       ]
+      },
+      "2": {
+       "b": [
+        3
+       ]
+      },
+      "5": {
+       "a": [
+        3
+       ]
+      },
+      "4": {
+       "b": [
+        4
+       ]
+      }
+     }
+    },
+    "regex": "a*(ab∪ba∪ε)∪b*"
+   }
+  },
+  {
+   "id": "102",
+   "title": "Automat pentru ((a ∪ b)*(e ∪ c)*)*",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Construiește un automat finit cu **cât mai puține stări** care acceptă `L(((a ∪ b)*(e ∪ c)*)*)` peste `{a, b, c}`.",
+   "hint": "Ce cuvinte de un singur simbol sunt în paranteza de sub stea? Atunci ce dă steaua?",
+   "solution": "`(a ∪ b)*` conține `a` și `b`, `(e ∪ c)*` conține `c`, deci sub stea sunt toate simbolurile: limbajul e `Σ*`. Ajunge o stare, inițială și finală, cu buclă pe `a`, `b`, `c`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "abc",
+    "reference": {
+     "states": 1,
+     "final": [
+      0
+     ],
+     "t": {
+      "0": {
+       "a": [
+        0
+       ],
+       "b": [
+        0
+       ],
+       "c": [
+        0
+       ]
+      }
+     }
+    },
+    "regex": "((a∪b)*(ε∪c)*)*",
+    "maxStates": 1
+   }
+  },
+  {
+   "id": "103",
+   "title": "Automat pentru ((ab)* ∪ (bc)*)ab",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Construiește un automat finit care acceptă `L(((ab)* ∪ (bc)*)ab)` peste `{a, b, c}`.",
+   "hint": "Două cicluri (`ab` și `bc`), fiecare cu o ε-tranziție spre drumul final `a`, `b`.",
+   "solution": "`q0` —ε→ `q1` (ciclul `q1 —a→ q3 —b→ q1`) și —ε→ `q2` (ciclul `q2 —b→ q4 —c→ q2`). Din `q1` și din `q2`, ε spre `q5`, apoi `q5 —a→ q6 —b→ q7` (finală).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "nfa",
+    "alphabet": "abc",
+    "reference": {
+     "states": 8,
+     "final": [
+      7
+     ],
+     "t": {
+      "0": {
+       "ε": [
+        1,
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ],
+       "ε": [
+        5
+       ]
+      },
+      "3": {
+       "b": [
+        1
+       ]
+      },
+      "2": {
+       "b": [
+        4
+       ],
+       "ε": [
+        5
+       ]
+      },
+      "4": {
+       "c": [
+        2
+       ]
+      },
+      "5": {
+       "a": [
+        6
+       ]
+      },
+      "6": {
+       "b": [
+        7
+       ]
+      }
+     }
+    },
+    "regex": "((ab)*∪(bc)*)ab"
+   }
+  },
+  {
+   "id": "110",
+   "title": "Toate stările finale: AFN și e",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Adevărat sau fals?\n\nFie `M` un **AFN** cu `|F| = |K|`. Atunci `e ∈ L(M)`.",
+   "hint": "",
+   "solution": "Starea inițială e finală, iar configurația `(s, e)` e de acceptare din pornire.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "111",
+   "title": "Toate stările finale: AFN și prefixele",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Adevărat sau fals?\n\nFie `M` un **AFN** (ca în curs, `Δ ⊆ K × Σ* × K`) cu `|F| = |K|`. Dacă `w` e acceptat de `M`, atunci orice prefix al lui `w` este în `L(M)`.",
+   "hint": "",
+   "solution": "O tranziție poate citi un șir întreg: cu `Δ = {(s, ab, f)}`, `ab` e acceptat, dar prefixul `a` nu, pentru că nicio tranziție nu citește doar `a`. (Dacă tranzițiile citesc câte un simbol sau `e`, afirmația devine adevărată: prefixul se oprește pe drum, într-o stare finală.)",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "112",
+   "title": "Limbaje închise la prefixe și AFN-uri cu toate stările finale",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "grea",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Adevărat sau fals?\n\nOrice limbaj regulat care conține toate prefixele șirurilor sale admite un **AFN** acceptor `M` cu `|F| = |K|`.",
+   "hint": "",
+   "solution": "Capcana e limbajul vid: `∅` conține (vid) toate prefixele șirurilor sale, dar orice automat cu toate stările finale acceptă măcar `e`. Pentru `L ≠ ∅` închis la prefixe afirmația e adevărată: în AFD-ul minim, o stare nefinală atinsă are doar continuări în afara lui `L` (altfel cuvântul ar fi prefix al unui cuvânt din `L`), deci e groapa; o scoatem și rămân doar stări finale.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "165",
+   "title": "AFN cu un singur șir: tranziții",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `M` un AFN care acceptă un singur șir. Numărul minim de tranziții pe care le poate avea automatul este:",
+   "hint": "",
+   "solution": "O stare, inițială și finală, fără tranziții: acceptă doar `e`. Zero tranziții.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "2",
+     "niciuna dintre celelalte variante (0)",
+     "4"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "173",
+   "title": "AFD-ul echivalent are mai multe stări",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Adevărat sau fals?\n\nFie `M` un AFN și `M′` un AFD echivalent. `M′` are cel puțin la fel de multe stări ca `M`.",
+   "hint": "",
+   "solution": "Adăugăm în `M` oricâte stări inutile (inaccesibile): `M′` nu trebuie să le aibă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "184",
+   "title": "AFD ⊆ AFN",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Test 1 LFA · 1 noiembrie 2023",
+   "statement": "Sunt adevărate: (1) ∀M1 ∈ AFD, ∃M2 ∈ AFN, L(M2) = L(M1); (2) ∀M2 ∈ AFN, ∃M1 ∈ AFN, L(M1) = L(M2)?",
+   "hint": "",
+   "solution": "Orice AFD e un AFN; și orice AFN e echivalent cu el însuși.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu, Nu",
+     "Da, Da",
+     "Da, Nu",
+     "Nu, Da"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "185",
+   "title": "Cum e |Δ|",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "ușoară",
+   "source": "Test 1 LFA · 1 noiembrie 2023",
+   "statement": "Fie `M = (K, Σ, Δ, s, F)` un automat finit nedeterminist. Cum e `|Δ|`?",
+   "hint": "",
+   "solution": "`Δ` e finită prin definiție, dar `Δ ⊆ K × Σ* × K`, iar etichetele pot fi oricât de lungi: nicio margine. Și poate fi vidă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "finit și nemărginit superior",
+     "nu poate fi 0",
+     "poate fi infinit",
+     "finit și mărginit superior"
+    ],
+    "answer": 0
+   }
+  },
+  {
    "id": "15",
    "title": "Fiecare a e urmat de b, la sfârșit c",
    "chapter": "3. Expresii regulate",
@@ -1825,9 +2682,513 @@
    }
   },
   {
+   "id": "125",
+   "title": "Ce generează S → SS | Sa | b",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "Examen LFA · 8 septembrie 2022",
+   "statement": "Gramatica `G` peste `{a, b}`: `S -> SS | Sa | b`. Ce șiruri generează? Scrie o expresie regulată pentru `L(G)`.",
+   "hint": "Primul simbol al oricărui cuvânt generat: `S ⇒ SS ⇒ …`, cel mai din stânga `S` ajunge la `b`.",
+   "solution": "Cuvintele care încep cu `b`: `b(a ∪ b)*`. Orice derivare începe cu `b` (cel mai din stânga `S` devine în final `b`), și orice `bu` se obține: `S ⇒ Sx ⇒ …` adaugă la dreapta `a` (cu `Sa`) sau `b` (cu `SS`, `S ⇒ b`).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "b(a∪b)*",
+    "reference": "b(a∪b)*"
+   }
+  },
+  {
+   "id": "130",
+   "title": "#ab = 0 sau lungime pară",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "Examen LFA (1 februarie 2025)",
+   "statement": "Fie `L = {w ∈ {a, b}* | #ab(w) = 0 ∨ |w| e par}` (`#ab(w)` = de câte ori apare `ab` în `w`). Scrie o expresie regulată pentru `L`.",
+   "hint": "Un cuvânt fără `ab` are toți `b`-ii înaintea tuturor `a`-ilor.",
+   "solution": "`b*a* ∪ (ΣΣ)*`: fără niciun `ab`, cuvântul e `bⁱaʲ`; altfel trebuie să aibă lungime pară. O gramatică: `S -> A | B`, `A -> bA | Aa | ε`, `B -> aaB | abB | baB | bbB | ε`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "b*a*∪((a∪b)(a∪b))*",
+    "reference": "b*a*∪((a∪b)(a∪b))*"
+   }
+  },
+  {
+   "id": "132",
+   "title": "Ce generează X1, X2, Y1, Y2",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "Examen LFA (1 februarie 2025)",
+   "statement": "Fie gramatica peste `{0, 1}`:\n```\nS  -> X1 | X2 | Y1 | Y2\nX1 -> 01X2 | 0 | e\nX2 -> 00X1 | 0 | e\nY1 -> 10Y2 | 1 | e\nY2 -> 11Y1 | 1 | e\n```\nCe limbaj generează? Scrie o expresie regulată pentru el.",
+   "hint": "Scrie ce generează `X1`: `01 00 01 00 …`, oprit oricând cu `0` sau nimic. Restul e la fel.",
+   "solution": "`X1 = 01X2 ∪ 0 ∪ e` și `X2 = 00X1 ∪ 0 ∪ e`; înlocuind, `X1 = (0100)X1 ∪ 010 ∪ 01 ∪ 0 ∪ e`, deci (lema lui Arden) `X1 = (0100)*(e ∪ 0 ∪ 01 ∪ 010)`; analog `X2 = (0001)*(e ∪ 0 ∪ 00 ∪ 000)`, `Y1 = (1011)*(e ∪ 1 ∪ 10 ∪ 101)`, `Y2 = (1110)*(e ∪ 1 ∪ 11 ∪ 111)`. Pe pozițiile impare cuvântul repetă primul simbol, iar pe cele pare alternează.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "01",
+    "regex": "(0100)*(ε∪0∪01∪010)∪(0001)*(ε∪0∪00∪000)∪(1011)*(ε∪1∪10∪101)∪(1110)*(ε∪1∪11∪111)",
+    "reference": "(0100)*(ε∪0∪01∪010)∪(0001)*(ε∪0∪00∪000)∪(1011)*(ε∪1∪10∪101)∪(1110)*(ε∪1∪11∪111)"
+   }
+  },
+  {
+   "id": "133",
+   "title": "x fără 01, apoi y fără 110",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "Examen LFA · 2025 (seria CD)",
+   "statement": "Scrie o expresie regulată pentru `L = {xy | x ∈ {0, 1}* nu conține 01, y ∈ {0, 1}* nu conține 110}`.",
+   "hint": "Fără `01`: `1*0*`. Fără `110`: după doi `1` consecutivi nu mai poate veni `0`, deci `(0 ∪ 10)*1*`.",
+   "solution": "`Ex = 1*0*`, `Ey = (0 ∪ 10)*1*` (varianta din rezolvare: `0*(100*)*1*`), `E = ExEy = 1*0*(0 ∪ 10)*1*`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "01",
+    "regex": "1*0*(0∪10)*1*",
+    "reference": "1*0*(0∪10)*1*"
+   }
+  },
+  {
+   "id": "148",
+   "title": "Expresii echivalente cu a*b*",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Fie `E = a*b*`. Care dintre următoarele este o expresie regulată validă și echivalentă cu `E`?",
+   "hint": "",
+   "solution": "`∅* = e` și `x∅ = ∅`: `(a ∪ ∅)* = a*`, `b∅* ∪ a∅ = b`, deci `a*b*`. `(a ∪ b)*∅*b* = (a ∪ b)*`; `(…)∅(…) = ∅`; `∩` nu e un operator al expresiilor regulate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "(a ∪ ∅)*(b∅* ∪ a∅)*",
+     "(a ∪ b)*∅*b*",
+     "((a ∪ b)*∅)a*b*∅*",
+     "(a ∪ b)* ∩ a*b*"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "151",
+   "title": "Trei expresii pentru Σ*",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "ușoară",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Care dintre expresiile `(a*b*)*`, `(a* ∪ b*)*`, `(a ∪ b)*` sunt echivalente?",
+   "hint": "",
+   "solution": "Fiecare are sub stea și `a`, și `b`, deci descrie `Σ*` pentru `Σ = {a, b}`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "toate trei",
+     "prima cu a doua",
+     "prima cu a treia",
+     "a doua cu a treia"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "172",
+   "title": "Câte stele se pot scoate",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Fie expresia `(a*b*c* ∪ b ∪ c ∪ ab*)*a*` peste `{a, b, c}`. Care este numărul maxim de steluțe ce pot fi eliminate astfel încât limbajul să rămână același?",
+   "hint": "",
+   "solution": "Limbajul e `Σ*`. Ultimele două stele trebuie păstrate (fără ele lipsesc `cb`, respectiv cuvintele care nu se termină cu `a`). Sub steaua mare trebuie să apară `a`, `b`, `c`: `(abc ∪ b ∪ c ∪ ab*)*a*` mai acceptă `a` prin `ab*`, deci se pot scoate cele trei stele din `a*b*c*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "3",
+     "1",
+     "2",
+     "4"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "180",
+   "title": "Blocuri de 1 de lungime impară între zerouri",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "Test 1 LFA · 1 noiembrie 2023",
+   "statement": "Fie `Σ = {0, 1}`. Scrie o expresie regulată pentru `L = {w | ∀w1, w3 ∈ Σ*, w2 ∈ {1}*: w = w1 0 w2 0 w3 → |w2| e impar}` (între oricare două zerouri consecutive e un număr impar de `1`).",
+   "hint": "Între doi `0` consecutivi stă `1(11)*`; înainte de primul `0` și după ultimul, oricâți `1`.",
+   "solution": "O expresie care merge: `1*(ε∪0(1(11)*0)*1*)`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "01",
+    "regex": "1*(ε∪0(1(11)*0)*1*)",
+    "reference": "1*(ε∪0(1(11)*0)*1*)"
+   }
+  },
+  {
+   "id": "183",
+   "title": "Expresie mai lungă, limbaj mai mare?",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "ușoară",
+   "source": "Test 1 LFA · 1 noiembrie 2023",
+   "statement": "Fie `E1, E2` expresii regulate cu lungimile `l1 > l2`. Ce relație e între `|L(E1)|` și `|L(E2)|`?",
+   "hint": "",
+   "solution": "`(a ∪ b)*` e scurtă și infinită, `aaaaaaa` e lungă și are un cuvânt; `∅∅∅∅∅` e lungă și vidă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "|L1| = |L2|",
+     "nu avem suficiente informații",
+     "|L1| < |L2|",
+     "|L1| > |L2|"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "106",
+   "title": "Fără subcuvinte interzise",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Fie `Σ` un alfabet și `F ⊆ Σ*` un limbaj finit. Limbajul `L = {w ∈ Σ* | w nu are subsecvențe în F}` este regulat (folosind proprietățile de închidere).\n\nAplică ideea pentru `Σ = {a, b}` și `F = {aa, bab}`: construiește un AFD pentru `L`.",
+   "hint": "`L = Σ* \\ (Σ* F Σ*)`. Pentru automat, ține minte cel mai lung sfârșit al cuvântului care e începutul unui cuvânt interzis.",
+   "solution": "În general: `F` e finit, deci regulat; `Σ*FΣ*` e o concatenare de limbaje regulate, deci regulat; `L` e complementul lui, deci regulat. Merge la fel pentru orice `F` regulat.\n\nAutomatul ține minte ce sfârșit al cuvântului citit poate începe `aa` sau `bab`: nimic, `a`, `b`, `ba`; plus groapa. 5 stări.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 5,
+     "final": [
+      0,
+      1,
+      2,
+      4
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        4
+       ],
+       "b": [
+        2
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      },
+      "4": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 5,
+     "final": [
+      0,
+      1,
+      2,
+      4
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        4
+       ],
+       "b": [
+        2
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      },
+      "4": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "107",
+   "title": "Diferența simetrică a două AFD",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Se dau AFD-urile peste `{a, b}`:\n- `M1`: `q0` (finală) și `q1`; `a` trece de la una la alta, `b` rămâne pe loc (numărul de `a` e par);\n- `M2`: `p0` și `p1` (finală); `a` duce în `p0`, `b` în `p1` (cuvântul se termină cu `b`).\n\nConstruiește un automat `M` cu `L(M) = L(M1) △ L(M2)`, unde `A △ B = (A ∪ B) \\ (A ∩ B)`.",
+   "hint": "Ca la intersecție: automatul produs, cu stări perechi `(qi, pj)`. Ce perechi sunt finale acum?",
+   "solution": "Starea `(qi, pj)` (numerotată `2i + j`) urmărește ambele automate: `a` schimbă `i` și duce `j` în 0, `b` lasă `i` și duce `j` în 1. Finale sunt perechile în care **exact unul** dintre automate e într-o stare finală: `(q0, p0)` (număr par de `a`, nu se termină cu `b`) și `(q1, p1)` (impar, se termină cu `b`), adică `q0` și `q3` în tabelă. Față de intersecție (amândouă finale) și reuniune (măcar una), se schimbă doar mulțimea stărilor finale.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      0,
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      },
+      "2": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      },
+      "3": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 4,
+     "final": [
+      0,
+      3
+     ],
+     "t": {
+      "0": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      },
+      "2": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      },
+      "3": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "maxStates": 4
+   }
+  },
+  {
+   "id": "114",
+   "title": "Când e L(M) finit",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Cum putem verifica dacă limbajul unui AFD `M` este **finit**?",
+   "hint": "`M` poate avea cicluri care nu ajută niciun cuvânt acceptat: în groapă, de exemplu.",
+   "solution": "Un cuvânt mai lung decât `|K|` repetă o stare, deci parcurge un ciclu; ciclul se poate repeta oricât (asta e lema de pompare). Deci `L(M)` e infinit exact când un ciclu e accesibil din start și din el se ajunge într-o stare finală. Algoritm: scoatem stările inaccesibile și pe cele din care nu se ajunge la o stare finală, apoi căutăm un ciclu (DFS). Echivalent: `L(M)` e infinit ⇔ conține un cuvânt cu `|K| ≤ |w| < 2|K|`. Pentru „un unic cel mai lung șir nevid”: `L(M)` trebuie să fie finit și nevid, apoi pe graful fără cicluri al stărilor utile calculăm lungimea maximă a unui drum și numărăm drumurile de lungime maximă (la un AFD, drumuri diferite = cuvinte diferite); trebuie să fie exact unul, nevid.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "M nu are niciun ciclu",
+     "M are cel mult |K| stări finale",
+     "nicio stare finală nu are buclă",
+     "pe niciun drum de la starea inițială la o stare finală nu există un ciclu"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "115",
+   "title": "Sufixele lui ab*a",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Dacă `L` e regulat, atunci `Suf(L) = {w ∈ Σ* | ∃w′ ∈ L cu w sufix pentru w′}` este regulat.\n\nAplică demonstrația: pentru `L = L(ab*a)` peste `{a, b}`, construiește un automat pentru `Suf(L)`.",
+   "hint": "Din AFN-ul lui `L`, un sufix începe dintr-o stare la care se poate ajunge din start: adaugă o stare inițială nouă cu ε-tranziții spre toate acestea.",
+   "solution": "Demonstrația: fie `M` un AF pentru `L`. Păstrăm stările accesibile din `s`; adăugăm `s′` nouă, inițială, cu `(s′, e, q)` pentru fiecare `q` accesibilă. Un drum din `s′` citește exact un sufix al unui cuvânt care trece prin `q`. Aici: `q1 —a→ q2` (buclă `b`) `—a→ q4` finală; `q0` nou, cu ε spre `q1`, `q2`, `q4`. `Suf(L) = e ∪ b*a ∪ ab*a`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "nfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 5,
+     "final": [
+      4
+     ],
+     "t": {
+      "0": {
+       "ε": [
+        1,
+        2,
+        4
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ]
+      },
+      "2": {
+       "b": [
+        2
+       ],
+       "a": [
+        4
+       ]
+      }
+     }
+    },
+    "regex": "ε∪b*a∪ab*a"
+   }
+  },
+  {
+   "id": "116",
+   "title": "O singură stare finală la AFD?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Recapitulare LFA: seminarele 1–4",
+   "statement": "Poate orice limbaj regulat să fie recunoscut de un automat finit **determinist** cu o singură stare acceptoare?",
+   "hint": "Încearcă un limbaj cu `e` și încă un cuvânt.",
+   "solution": "Fie `L = {e, a}` peste `{a}`. Un AFD cu o stare finală `f` care acceptă `e` are `s = f`; acceptă și `a`, deci `δ(s, a) = f = s`, și atunci acceptă și `aa ∉ L`. La AFN (cu tranziții pe `e`) adăugăm o stare finală nouă `f` și `(q, e, f)` din fiecare stare finală veche, care devine nefinală. ε-tranzițiile nu sunt voie la un AFD, iar „unirea” stărilor finale schimbă limbajul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da, se unesc toate stările finale într-una",
+     "da, cu ε-tranziții spre o stare finală nouă",
+     "nu: {e, a} peste {a} nu poate; dar orice limbaj regulat are un AFN cu o singură stare finală",
+     "nu, niciun limbaj infinit nu poate"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "128",
+   "title": "Un șir în niciunul dintre două AFD",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Examen LFA (18 ianuarie 2025)",
+   "statement": "Fie `M1`, `M2` două AFD peste același alfabet. Cum determinăm dacă există un șir care **nu** este în niciunul dintre `L(M1)`, `L(M2)`?",
+   "hint": "",
+   "solution": "`∃w ∉ L(M1) ∪ L(M2)` ⇔ `Σ* \\ (L(M1) ∪ L(M2)) ≠ ∅`. Construim produsul (reuniunea), inversăm stările finale (complementul; AFD-ul e complet) și căutăm, prin parcurgere din starea inițială, o stare finală accesibilă. Echivalent: în produs există o pereche `(p, q)` accesibilă cu `p ∉ F1` și `q ∉ F2`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "verificăm dacă L(M1) ∩ L(M2) = ∅",
+     "verificăm dacă L(M1) = L(M2)",
+     "construim un AFD pentru complementul lui L(M1) ∪ L(M2) și verificăm dacă limbajul lui e nevid",
+     "nu se poate decide"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "182",
+   "title": "Liste de limbaje regulate",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Test 1 LFA · 1 noiembrie 2023",
+   "statement": "Fie `L1, L2` două limbaje regulate. Care listă conține doar limbaje regulate?",
+   "hint": "",
+   "solution": "`×` dă perechi de cuvinte, iar `2^X` o mulțime de limbaje: nu sunt limbaje. Reuniunea, diferența simetrică și `X ∘ ∅ = ∅` sunt regulate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "L1 ∘ L2, L1 ∪ {0, 1}*, L1 × L2",
+     "L1*, 2^(L1∘L2), L2 ∘ L1",
+     "L2 × L1, L1 \\ L2, L2 \\ L1",
+     "L1 ∪ L2, (L1 \\ L2) ∪ (L2 \\ L1), L1 ∩ L2 ∘ ∅"
+    ],
+    "answer": 3
+   }
+  },
+  {
    "id": "24",
    "title": "a^n b^n",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "ușoară",
    "source": "",
    "statement": "Scrie o gramatică independentă de context pentru `{aⁿbⁿ | n ≥ 0}`.",
@@ -1845,7 +3206,7 @@
   {
    "id": "25",
    "title": "a^n b^n în forma normală Chomsky",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "medie",
    "source": "Examen LFA",
    "statement": "Scrie o gramatică în **Forma Normală Chomsky** pentru `{aⁿbⁿ | n ≥ 1}`. (Reguli doar de forma `A -> BC` sau `A -> a`.)",
@@ -1864,7 +3225,7 @@
   {
    "id": "26",
    "title": "Palindroame",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "ușoară",
    "source": "",
    "statement": "Scrie o gramatică pentru palindroamele peste `{a, b}` (cuvintele egale cu oglinditul lor, cuvântul vid inclus).",
@@ -1882,7 +3243,7 @@
   {
    "id": "27",
    "title": "La fel de mulți a și b",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "medie",
    "source": "",
    "statement": "Scrie o gramatică pentru cuvintele peste `{a, b}` cu același număr de `a` și de `b`, în orice ordine.",
@@ -1900,7 +3261,7 @@
   {
    "id": "28",
    "title": "i + j ≤ 2k",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "grea",
    "source": "Examen LFA · 6 septembrie 2022",
    "statement": "Fie `L = {0ⁱ1ʲ2ᵏ | i, j, k ∈ N, i + j ≤ 2k}`. Scrie o gramatică care generează `L`.",
@@ -1918,7 +3279,7 @@
   {
    "id": "29",
    "title": "De două ori mai mulți 0 decât 1",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "grea",
    "source": "Examen LFA · 15 iunie 2022",
    "statement": "Fie limbajul cuvintelor peste `{0, 1}` care conțin de două ori mai multe simboluri `0` decât `1`. Construiește o gramatică independentă de context pentru el.",
@@ -1936,7 +3297,7 @@
   {
    "id": "30",
    "title": "a^n b^m cu n diferit de m",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "medie",
    "source": "Examen LFA",
    "statement": "Scrie o gramatică pentru `{aⁿbᵐ | n, m ≥ 0, n ≠ m}`. (La examen s-a cerut un automat push-down pentru el.)",
@@ -1954,7 +3315,7 @@
   {
    "id": "31",
    "title": "i = j sau j = k",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "grea",
    "source": "",
    "statement": "Scrie o gramatică pentru `{aⁱbʲcᵏ | i = j sau j = k}`.",
@@ -1972,7 +3333,7 @@
   {
    "id": "32",
    "title": "Paranteze bine închise",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "ușoară",
    "source": "",
    "statement": "Notăm paranteza deschisă cu `a` și cea închisă cu `b`. Scrie o gramatică pentru șirurile de paranteze bine închise (`ab`, `aabb`, `abab`, cuvântul vid...).",
@@ -1990,7 +3351,7 @@
   {
    "id": "69",
    "title": "aⁿb²ⁿ",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "ușoară",
    "source": "",
    "statement": "Scrie o gramatică independentă de context pentru `{ aⁿb²ⁿ | n ≥ 0 }`.",
@@ -2008,7 +3369,7 @@
   {
    "id": "71",
    "title": "Tot atâția a cât b",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "medie",
    "source": "",
    "statement": "Scrie o gramatică pentru cuvintele peste `{a, b}` cu același număr de `a` și `b`, în orice ordine.",
@@ -2026,7 +3387,7 @@
   {
    "id": "72",
    "title": "Mai mulți a decât b, în ordine",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "medie",
    "source": "",
    "statement": "Scrie o gramatică pentru `{ aⁱbʲ | i > j ≥ 0 }`.",
@@ -2044,7 +3405,7 @@
   {
    "id": "73",
    "title": "Paranteze unghiulare oglindite",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "grea",
    "source": "Examen LFA (18 ianuarie 2025)",
    "statement": "Pentru `x ∈ {<, >}*`, `mirror(x)` e imaginea în oglindă a lui `x`: întors și cu fiecare paranteză schimbată (`mirror(<<>) = <>>`). Scrie o gramatică pentru `L = { x | x = mirror(x) }`.",
@@ -2062,7 +3423,7 @@
   {
    "id": "74",
    "title": "aⁱbʲcᵏ cu i = j sau j = k",
-   "chapter": "4. Gramatici independente de context",
+   "chapter": "5. Gramatici independente de context",
    "difficulty": "grea",
    "source": "",
    "statement": "Scrie o gramatică pentru `{ aⁱbʲcᵏ | i = j sau j = k }`.",
@@ -2078,9 +3439,752 @@
    }
   },
   {
+   "id": "120",
+   "title": "aⁿ b^(n mod 3) cⁿ",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Examen LFA · 15 iunie 2022",
+   "statement": "Fie `L = {aⁿ b^f(n) cⁿ | f(n) = n mod 3, n ≥ 0}`. Arată că `L` este LIC: scrie o gramatică pentru el.",
+   "hint": "Scrie `n = 3k + r`: `aⁿ b^r cⁿ = a³ᵏ (aʳ bʳ cʳ) c³ᵏ`, cu `r ∈ {0, 1, 2}`.",
+   "solution": "`S -> aaaSccc | ε | abc | aabbcc`: `S` pune câte trei `a` și trei `c` deodată, iar la mijloc restul `r`: nimic, `abc` sau `aabbcc`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "abc",
+    "grammar": "S -> aaaSccc | ε | abc | aabbcc",
+    "upTo": 12,
+    "reference": "S -> aaaSccc | ε | abc | aabbcc"
+   }
+  },
+  {
+   "id": "126",
+   "title": "Răsturnatul lui L(S → SS | Sa | b)",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Examen LFA · 8 septembrie 2022",
+   "statement": "Fie `G: S -> SS | Sa | b` și `L′ = {w | wᴿ ∈ L(G)}`. Modifică gramatica `G` ca să obții `G′` care generează `L′`. (Cum transformi în general o GIC pentru `L` într-una pentru răsturnatul lui `L`?)",
+   "hint": "Răstoarnă partea dreaptă a fiecărei reguli.",
+   "solution": "`S -> SS | aS | b`. În general: `G′ = (V, Σ, R′, S)` cu `R′ = {A → αᴿ | A → α ∈ R}`; prin inducție pe lungimea derivării, `A ⇒* w` în `G` ⇔ `A ⇒* wᴿ` în `G′`. Aici `L′` = cuvintele care se termină cu `b`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "ab",
+    "grammar": "S -> SS | aS | b",
+    "upTo": 9,
+    "reference": "S -> SS | aS | b"
+   }
+  },
+  {
+   "id": "131",
+   "title": "#ab = 0 sau lungime pară: gramatica",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "ușoară",
+   "source": "Examen LFA (1 februarie 2025)",
+   "statement": "Fie `L = {w ∈ {a, b}* | #ab(w) = 0 ∨ |w| e par}`. Scrie o gramatică care generează `L`.",
+   "hint": "Reuniune: `S -> A | B`, cu `A` pentru `b*a*` și `B` pentru lungime pară.",
+   "solution": "O gramatică care merge:\n`S -> A | B`\n`A -> bA | Aa | ε`\n`B -> aaB | abB | baB | bbB | ε`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "ab",
+    "grammar": "S -> A | B\nA -> bA | Aa | ε\nB -> aaB | abB | baB | bbB | ε",
+    "upTo": 8,
+    "reference": "S -> A | B\nA -> bA | Aa | ε\nB -> aaB | abB | baB | bbB | ε"
+   }
+  },
+  {
+   "id": "134",
+   "title": "O gramatică neambiguă pentru (01)ⁿ(10)ᵐ",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "Examen LFA · 2025 (seria CD)",
+   "statement": "Gramatica `S -> 01A | 01S`, `A -> B10`, `B -> S | e` este ambiguă (`0101011010` are două derivări stânga) și generează `L = {(01)ⁿ(10)ᵐ | n ≥ m > 0}`.\n\nScrie o gramatică **neambiguă** pentru `L`. (Se verifică și că fiecare cuvânt are un singur arbore de derivare.)",
+   "hint": "Separă cele două roluri: întâi `01`-urile în plus (`n - m` bucăți), apoi perechile potrivite `01 … 10`, cel puțin una.",
+   "solution": "`S -> 01S | T` pune `01`-urile în plus, `T -> 01T10 | 0110` pune `m ≥ 1` perechi potrivite. Fiecare cuvânt are o singură împărțire `(01)ⁿ⁻ᵐ · (01)ᵐ(10)ᵐ`, deci un singur arbore. Gramatica dată e ambiguă pentru că `S -> 01S` și `B -> S` pot pune același `01` în două locuri.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "01",
+    "grammar": "S -> 01S | T\nT -> 01T10 | 0110",
+    "upTo": 10,
+    "reference": "S -> 01S | T\nT -> 01T10 | 0110",
+    "unambiguous": true
+   }
+  },
+  {
+   "id": "135",
+   "title": "O gramatică neambiguă (set de probleme)",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Scrie o gramatică **neambiguă** care generează același limbaj ca `S -> AS | e`, `A -> A1 | 0A1 | 01`.",
+   "hint": "Ce face `A`? `0A1` și `01` dau `0ᵏ1ᵏ`, iar `A1` adaugă `1`-uri: `A = 0ᵏ1ᵏ1ʲ`, cu `k ≥ 1`. `S` = blocuri de felul ăsta.",
+   "solution": "`A` generează `0ᵏ1ᵏ⁺ʲ` (`k ≥ 1`, `j ≥ 0`), iar `S` o concatenare de astfel de blocuri. Ambiguitatea vine din `A -> A1` combinat cu `0A1`: `0011` = `0(01)1` sau... Scriem blocul o singură dată: `C -> 0D1E`, `D -> 0D1 | ε` (perechile), `E -> 1E | ε` (`1`-urile în plus, doar la sfârșit), `S -> ε | CS`. Un bloc începe la fiecare `0` care urmează după un `1`, deci împărțirea în blocuri e unică. (Rezolvarea din set, `S -> S1 | 0S1 | 01 | ε`, generează și `1`, care nu e în limbaj: atenție.)",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "01",
+    "grammar": "S -> ε | CS\nC -> 0D1E\nD -> 0D1 | ε\nE -> 1E | ε",
+    "upTo": 10,
+    "reference": "S -> ε | CS\nC -> 0D1E\nD -> 0D1 | ε\nE -> 1E | ε",
+    "unambiguous": true
+   }
+  },
+  {
+   "id": "136",
+   "title": "Forma normală Chomsky pentru a*b(a ∪ b)*",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Fie `N = ({0, 1}, {a, b}, {(0, a, 0), (0, b, 0), (0, b, 1), (1, a, 1), (1, a, 0)}, 0, {1})`. Scrie o gramatică `G` în **Forma Normală Chomsky** cu `L(G) = L(N)`.",
+   "hint": "`L(N) = a*b(a ∪ b)*`. Gramatica regulată `S -> aS | bA | b`, `A -> aA | bA | a | b`, apoi terminalele din regulile lungi primesc neterminale.",
+   "solution": "`S -> ZS | US | UA | b`, `A -> ZA | UA | a | b`, `Z -> a`, `U -> b`. (`S` citește `a`-urile de la început și primul `b`; `A` restul, nevid.)",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "ab",
+    "grammar": "S -> ZS | US | UA | b\nA -> ZA | UA | a | b\nZ -> a\nU -> b",
+    "upTo": 8,
+    "reference": "S -> ZS | US | UA | b\nA -> ZA | UA | a | b\nZ -> a\nU -> b",
+    "chomsky": true
+   }
+  },
+  {
+   "id": "144",
+   "title": "S → ab | ba | SS | S | a | b | e",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "ușoară",
+   "source": "Test LFA · grilă",
+   "statement": "Ce limbaj generează gramatica `S -> ab | ba | SS | S | a | b | e`?",
+   "hint": "",
+   "solution": "`S -> a | b` și `S -> SS` dau orice cuvânt nevid, iar `S -> e` cuvântul vid.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "L((a ∪ b)*)",
+     "L(((ab ∪ ba ∪ aa ∪ bb)(a ∪ b ∪ e))*)",
+     "L((aba ∪ bab)*)",
+     "L((aba ∪ aab ∪ baa ∪ bab)*)"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "145",
+   "title": "O gramatică cu A, B, C",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Ce limbaj generează `S -> SS | A | B`, `A -> aAa | a | C`, `B -> BB | B | b`, `C -> a | e`?",
+   "hint": "",
+   "solution": "`A` dă `a²ᵏ(a ∪ e)`, adică `a*`; `B` dă `b⁺`; `S` concatenări de astfel de bucăți, deci `(a ∪ b)*` = `L((a* ∪ bb*)*)`. Varianta cu `(bb)*` nu conține `b`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "L(((aa)*(a ∪ e) ∪ (bb)*)*)",
+     "L((a* ∪ bb*)*)",
+     "∅",
+     "L(a*(a ∪ e)a*b*b*)"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "157",
+   "title": "S → A, A → S",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Ce e adevărat despre gramatica `S -> A`, `A -> S`?",
+   "hint": "",
+   "solution": "E o gramatică validă pentru `∅` (nicio derivare nu se termină), iar `∅` e regulat. Un APD cu o stare și fără tranziții acceptă `∅`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu este o gramatică validă",
+     "automatul push-down echivalent are minim două stări",
+     "are un terminal și un neterminal",
+     "generează un limbaj regulat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "174",
+   "title": "S → Aa | Bb | e, A → Aa | B, B → Ba | S",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Ce limbaj generează gramatica `S -> Aa | Bb | e`, `A -> Aa | B`, `B -> Ba | S`?",
+   "hint": "",
+   "solution": "`A ⇒ B ⇒ S`, deci `S` poate deveni `Sa` și `Sb`: `S ⇒* Sa | Sb | e` generează orice cuvânt. Și nu generează nimic în afara lui `Σ*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "a*b*",
+     "(a ∪ b)*",
+     "(ab)*",
+     "∅"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "175",
+   "title": "L(A), L(B), L(S)",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Fie `S -> aBbB | BaAc`, `A -> aAa | e`, `B -> BABc | e`. Care este cel mai simplu tip de automat care acceptă `L(G)`?",
+   "hint": "",
+   "solution": "`L(A) = (aa)*`, `L(B) = ((aa)*c)*`, `L(S) = a((aa)*c)*b((aa)*c)* ∪ ((aa)*c)*a(aa)*c`: regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un automat push-down determinist",
+     "un automat finit",
+     "un automat push-down nedeterminist",
+     "o mașină Turing"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "186",
+   "title": "Σ1* minus cuvintele cu #a ≠ #b",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Test 2 LFA · 9 decembrie 2023",
+   "statement": "Fie `Σ0 = {a, b}`, `Σ1 = {a, b, c}`. Scrie o gramatică pentru `L = Σ1* \\ {w ∈ Σ0* | #a(w) ≠ #b(w)}`.",
+   "hint": "Ce rămâne în `L`: cuvintele care conțin un `c`, plus cuvintele peste `{a, b}` cu `#a = #b`.",
+   "solution": "O gramatică care merge:\n`S -> T | XcX`\n`T -> aTbT | bTaT | ε`\n`X -> aX | bX | cX | ε`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "abc",
+    "grammar": "S -> T | XcX\nT -> aTbT | bTaT | ε\nX -> aX | bX | cX | ε",
+    "upTo": 7,
+    "reference": "S -> T | XcX\nT -> aTbT | bTaT | ε\nX -> aX | bX | cX | ε"
+   }
+  },
+  {
+   "id": "187",
+   "title": "0ⁿ¹1ⁿ¹ … 0ⁿᵏ1ⁿᵏ 2ᵏ",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "Test 2 LFA · 9 decembrie 2023",
+   "statement": "Fie `Σ = {0, 1, 2}`. Scrie o gramatică pentru `L = {0ⁿ¹1ⁿ¹ ⋯ 0ⁿᵏ1ⁿᵏ 2ᵏ | nᵢ > 0, k > 0}`.",
+   "hint": "Câte un bloc `X = 0ⁿ1ⁿ` pentru fiecare `2` de la sfârșit: `S -> X S 2 | X 2`.",
+   "solution": "O gramatică care merge:\n`S -> XS2 | X2`\n`X -> 0X1 | 01`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "012",
+    "grammar": "S -> XS2 | X2\nX -> 0X1 | 01",
+    "upTo": 10,
+    "reference": "S -> XS2 | X2\nX -> 0X1 | 01"
+   }
+  },
+  {
+   "id": "189",
+   "title": "S → SS | aS | bS",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "ușoară",
+   "source": "Test 2 LFA · 9 decembrie 2023",
+   "statement": "Fie gramatica `S -> SS | aS | bS`. Este limbajul regulat? Dar gramatica?",
+   "hint": "",
+   "solution": "Nicio regulă nu se termină fără `S`: `L(G) = ∅`, regulat. Gramatica nu e regulată (`S -> SS`).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu, Nu",
+     "Da, Da",
+     "Nu, Da",
+     "Da, Nu"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "193",
+   "title": "Palindroame în raport cu b",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Fie `Σ = {a, b, c}`. Scrie o gramatică pentru `L = {w | ∀i ≤ |w|: w(i) = b ↔ w(|w| + 1 - i) = b}` (pozițiile lui `b` sunt simetrice; `abc ∈ L`).",
+   "hint": "La capete: fie `b … b`, fie două simboluri care nu sunt `b` (oricare, nu neapărat egale).",
+   "solution": "O gramatică care merge:\n`S -> bSb | XSX | a | b | c | ε`\n`X -> a | c`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "abc",
+    "grammar": "S -> bSb | XSX | a | b | c | ε\nX -> a | c",
+    "upTo": 7,
+    "reference": "S -> bSb | XSX | a | b | c | ε\nX -> a | c"
+   }
+  },
+  {
+   "id": "194",
+   "title": "Câte limbaje cu două reguli",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "grea",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Fie `J = {(V, Σ, R, S) ∈ GIC | |R| = 2}`. Care este cardinalul mulțimii `M = {|L(G)| | G ∈ J}`?",
+   "hint": "",
+   "solution": "`S -> aS | bS` dă `∅` (0 cuvinte), `S -> a | S` dă `{a}` (1), `S -> a | b` dă 2, `S -> aS | e` dă infinit. Un limbaj finit cu 3 sau mai multe cuvinte nu se poate: fără recursie, fiecare regulă contribuie cu cel mult un cuvânt, iar cu recursie (care se poate termina) limbajul e infinit. Deci `M = {0, 1, 2, ∞}`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "3",
+     "4: |L(G)| poate fi 0, 1, 2 sau infinit",
+     "2",
+     "infinit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "195",
+   "title": "Începe și se termină cu același simbol",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "ușoară",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Construiește o gramatică pentru `L = {w ∈ {0, 1}* | w ≠ e, w începe și se termină cu același simbol}`.",
+   "hint": "",
+   "solution": "O gramatică care merge:\n`S -> 0X0 | 1X1 | 0 | 1`\n`X -> 0X | 1X | ε`",
+   "kind": "lfa",
+   "spec": {
+    "mode": "cfg",
+    "alphabet": "01",
+    "grammar": "S -> 0X0 | 1X1 | 0 | 1\nX -> 0X | 1X | ε",
+    "upTo": 8,
+    "reference": "S -> 0X0 | 1X1 | 0 | 1\nX -> 0X | 1X | ε"
+   }
+  },
+  {
+   "id": "149",
+   "title": "APD cu un singur simbol de stivă",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Fie `L` un limbaj acceptat de un APD cu `|Γ| = 1`. Atunci `L` poate fi acceptat și de:",
+   "hint": "",
+   "solution": "Cu un singur simbol, stiva e un contor; tot poate recunoaște `aⁿbⁿ`, care nu e regulat, deci nu un AF în general.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un AFN",
+     "un AFD",
+     "un APD fără cicluri",
+     "un APD (doar atât se poate spune)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "155",
+   "title": "Stivă de dimensiune mărginită",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Un automat push-down nedeterminist cu stiva finită, de dimensiune constantă, acceptă (în cel mai strict sens):",
+   "hint": "",
+   "solution": "Dacă stiva are cel mult `l` simboluri, conținutul ei e una dintre finit de multe posibilități; le punem în stare: `K′ = K × Γ^≤l`, un automat finit.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "orice limbaj",
+     "limbaje independente de context",
+     "limbaje regulate",
+     "nu se poate spune"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "176",
+   "title": "APD care schimbă stiva cu exact 1",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "grea",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Fie `C` mulțimea APD-urilor nedeterministe la care după fiecare tranziție dimensiunea stivei crește sau scade cu exact 1. Care afirmație e adevărată?",
+   "hint": "",
+   "solution": "O tranziție care scoate/pune mai multe simboluri se sparge în mai multe tranziții pe `e` care scot/pun câte unul; una care nu schimbă stiva pune și scoate un simbol auxiliar. Deci `C` acceptă toate LIC. APD-urile deterministe nu acceptă toate LIC (`wwᴿ`).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pentru orice automat din C există unul echivalent determinist",
+     "orice limbaj independent de context e acceptat de un automat din C",
+     "există APD-uri care nu au echivalent în C",
+     "C acceptă doar limbaje regulate"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "188",
+   "title": "Un APD dat ca tuplu",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "Test 2 LFA · 9 decembrie 2023",
+   "statement": "Fie `M = ({s, p}, {a, b}, {a, b}, Δ, s, {s})` cu `Δ = {((s, a, e), (s, a)), ((s, b, e), (p, b)), ((p, a, a), (p, e)), ((p, b, b), (s, e))}`. Ce se poate spune despre `L(M)`?",
+   "hint": "",
+   "solution": "Un `a` citit în `s` rămâne pe stivă și nu mai poate fi scos (din `p` se scoate `a` doar dacă e în vârf, dar acolo e `b`-ul abia pus). Singurele drumuri de acceptare: `b` (pune `b`, trece în `p`), `b` (scoate `b`, înapoi în `s`). Deci `L(M) = (bb)*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "este vid",
+     "este finit, dar nu vid",
+     "este independent de context, dar nu regulat",
+     "este regulat, dar nu finit"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "200",
+   "title": "aⁿbⁿ",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Construiește un automat cu stivă pentru `{aⁿbⁿ | n ≥ 0}`.\n\nAcceptarea e ca în curs: tot cuvântul citit, o stare finală, stiva goală.",
+   "hint": "Fiecare `a` pune un `A` pe stivă; la primul `b` treci în altă stare, unde fiecare `b` scoate un `A`.",
+   "solution": "Două stări: `p` (citește `a` și pune `A`), `q` (finală; citește `b` și scoate `A`), și `((p, e, e), (q, e))` ca să treacă dintr-una în alta. Stiva goală la sfârșit înseamnă exact atâția `b` câți `a`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start p\nfinal q\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "201",
+   "title": "wcwᴿ",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Construiește un automat cu stivă peste `{a, b, c}` pentru `{wcwᴿ | w ∈ {a, b}*}`.",
+   "hint": "Exemplul din curs: pune pe stivă ce citești până la `c`, apoi scoate câte un simbol egal cu cel citit.",
+   "solution": "Un automat care merge:\n```\nstart p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, c, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "abc",
+    "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, c, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
+    "upTo": 7
+   }
+  },
+  {
+   "id": "202",
+   "title": "wwᴿ (palindroame pare)",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un automat cu stivă pentru `{wwᴿ | w ∈ {a, b}*}`.",
+   "hint": "Ca la `wcwᴿ`, doar că mijlocul nu e marcat: automatul îl „ghicește” cu o tranziție pe `e`.",
+   "solution": "Nedeterminismul alege momentul în care se trece de la „pun” la „scot”; dacă alegerea e bună pentru un palindrom, drumul se termină cu stiva goală. Nu există un APD **determinist** pentru limbajul acesta.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "203",
+   "title": "La fel de mulți a și b",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un automat cu stivă pentru cuvintele peste `{a, b}` cu `#a(w) = #b(w)`.",
+   "hint": "Stiva ține diferența: câți `a` (sau câți `b`) sunt în plus până acum. Un simbol opus vârfului îl anulează.",
+   "solution": "O stare, finală. `a` pune `A` sau scoate un `B`; `b` pune `B` sau scoate un `A`. Nedeterminismul poate și pune un `A` peste un `B`, dar atunci stiva nu se mai golește corect pe drumul acela; un drum bun există mereu.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start q\nfinal q\nq, a, ε -> q, A\nq, b, A -> q, ε\nq, b, ε -> q, B\nq, a, B -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "204",
+   "title": "aⁿbᵐ cu n ≠ m",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Definește un APD care acceptă `{aⁿbᵐ | n, m ≥ 0, n ≠ m}`.",
+   "hint": "Potrivește `a`-uri cu `b`-uri; apoi, fie mai rămân `A` pe stivă (mai mulți `a`), fie mai vin `b` (mai mulți `b`). Ca să știi că stiva s-a golit, pune la început un semn de fund, `Z`.",
+   "solution": "`i` pune fundul `Z`; `p` pune `A` pentru fiecare `a`; `q` scoate câte un `A` la fiecare `b`. Mai mulți `a`: din `q` scoate încă un `A` și trece în `r`, care golește stiva până la `Z` și intră în `f`. Mai mulți `b`: un `b` citit când vârful e `Z` trece în `s`, care citește restul de `b`, apoi scoate `Z` și intră în `f`. Fără `Z`, automatul n-ar putea vedea că s-au terminat `A`-urile și ar accepta `ab`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start i\nfinal f\ni, ε, ε -> p, Z\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, A -> r, ε\nr, ε, A -> r, ε\nr, ε, Z -> f, ε\nq, b, Z -> s, Z\ns, b, Z -> s, Z\ns, ε, Z -> f, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "205",
+   "title": "APD pentru S → aAA, A → aS | bS | a",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "Examen LFA · 6 septembrie 2022",
+   "statement": "Fie gramatica `S -> aAA`, `A -> aS | bS | a`. Construiește un APD care acceptă `L(G)`.",
+   "hint": "Construcția din curs (GIC → APD): două stări; pune `S`, apoi în `q` înlocuiește un neterminal din vârf cu partea dreaptă a unei reguli, sau scoate un terminal egal cu cel citit.",
+   "solution": "`M = ({p, q}, Σ, V, Δ, p, {q})` cu `((p, e, e), (q, S))`, `((q, e, A), (q, α))` pentru fiecare regulă `A → α`, și `((q, a, a), (q, e))` pentru fiecare terminal. Automatul simulează o derivare stânga: pe stivă e restul formei propoziționale.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start p\nfinal q\np, ε, ε -> q, S\nq, ε, S -> q, aAA\nq, ε, A -> q, aS\nq, ε, A -> q, bS\nq, ε, A -> q, a\nq, a, a -> q, ε\nq, b, b -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "206",
+   "title": "#a(w1) = #b(w2)",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "grea",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Definește un APD care acceptă `{w1w2 ∈ {a, b}* | #a(w1) = #b(w2)}`.",
+   "hint": "Încearcă pe câteva cuvinte: există mereu o împărțire potrivită? Mută tăietura câte o poziție și urmărește `#a(w1) - #b(w2)`.",
+   "solution": "Limbajul e `Σ*`. Fie `f(i) = #a(w[..i]) - #b(w[i..])`. `f(0) = -#b(w) ≤ 0`, `f(|w|) = #a(w) ≥ 0`, iar mutând tăietura cu o poziție `f` crește cu exact 1 (un `a` trece în `w1` sau un `b` iese din `w2`). Deci `f` ajunge la 0. Un APD cu o stare finală care citește orice ajunge.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start q\nfinal q\nq, a, ε -> q, ε\nq, b, ε -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "207",
+   "title": "Paranteze bine închise",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Notăm `(` cu `a` și `)` cu `b`. Construiește un automat cu stivă pentru șirurile de paranteze bine închise.",
+   "hint": "O stare: `a` pune, `b` scoate. Ce se întâmplă cu un `b` când stiva e goală?",
+   "solution": "Un automat care merge:\n```\nstart q\nfinal q\nq, a, ε -> q, X\nq, b, X -> q, ε\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start q\nfinal q\nq, a, ε -> q, X\nq, b, X -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "208",
+   "title": "aⁿb²ⁿ",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Construiește un automat cu stivă pentru `{aⁿb²ⁿ | n ≥ 0}`.",
+   "hint": "Fiecare `a` pune **doi** `A`.",
+   "solution": "Un automat care merge:\n```\nstart p\nfinal q\np, a, ε -> p, AA\np, ε, ε -> q, ε\nq, b, A -> q, ε\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start p\nfinal q\np, a, ε -> p, AA\np, ε, ε -> q, ε\nq, b, A -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "209",
+   "title": "aⁱbʲcᵏ cu i = j sau j = k",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Construiește un automat cu stivă pentru `{aⁱbʲcᵏ | i = j sau j = k}`.",
+   "hint": "Ghicește de la început care egalitate verifici: două „ramuri”, una care compară `a` cu `b`, alta `b` cu `c`.",
+   "solution": "Un automat care merge:\n```\nstart s\nfinal f u\ns, ε, ε -> p, ε\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, ε -> f, ε\nf, c, ε -> f, ε\ns, ε, ε -> r, ε\nr, a, ε -> r, ε\nr, ε, ε -> t, ε\nt, b, ε -> t, B\nt, ε, ε -> u, ε\nu, c, B -> u, ε\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "abc",
+    "reference": "start s\nfinal f u\ns, ε, ε -> p, ε\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, ε -> f, ε\nf, c, ε -> f, ε\ns, ε, ε -> r, ε\nr, a, ε -> r, ε\nr, ε, ε -> t, ε\nt, b, ε -> t, B\nt, ε, ε -> u, ε\nu, c, B -> u, ε",
+    "upTo": 7
+   }
+  },
+  {
+   "id": "210",
+   "title": "Blocuri 0ⁿ1ⁿ, apoi atâția de 2 câte blocuri",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "grea",
+   "source": "Test 2 LFA · 9 decembrie 2023",
+   "statement": "Construiește un automat cu stivă pentru `L = {0ⁿ¹1ⁿ¹ ⋯ 0ⁿᵏ1ⁿᵏ 2ᵏ | nᵢ > 0, k > 0}`.",
+   "hint": "În interiorul unui bloc, stiva compară `0`-urile cu `1`-urile. După fiecare bloc lasă pe stivă un semn `B`; `2`-urile scot semnele.",
+   "solution": "`p` pune `A` pentru fiecare `0`; primul `1` trece în `q`, unde fiecare `1` scoate un `A`. Când blocul e închis (vârful nu mai e `A`… nedeterminist: oricând), `q —e/B→ m` lasă un `B`. Din `m` începe alt bloc (`0`) sau încep `2`-urile, care scot câte un `B`. Un `B` pus prea devreme lasă `A`-uri dedesubt, iar drumul acela nu se mai golește.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "012",
+    "reference": "start p\nfinal r\np, 0, ε -> p, A\np, 1, A -> q, ε\nq, 1, A -> q, ε\nq, ε, ε -> m, B\nm, 0, ε -> p, A\nm, 2, B -> r, ε\nr, 2, B -> r, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "211",
+   "title": "Palindroame",
+   "chapter": "6. Automate cu stivă",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "Construiește un automat cu stivă pentru palindroamele peste `{a, b}` (și cele de lungime impară).",
+   "hint": "Ca la `wwᴿ`, dar mijlocul poate fi și un simbol citit fără să fie pus pe stivă.",
+   "solution": "Un automat care merge:\n```\nstart p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\np, a, ε -> q, ε\np, b, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "pda",
+    "alphabet": "ab",
+    "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\np, a, ε -> q, ε\np, b, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
+    "upTo": 8
+   }
+  },
+  {
+   "id": "220",
+   "title": "aⁿbⁿ cu n ≥ 1",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "medie",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Scrie o mașină Turing care acceptă limbajul `{aⁿbⁿ | n ≥ 1}`.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "Marchează primul `a` nemarcat (`A`), mergi la dreapta la primul `b` nemarcat și marchează-l (`B`), întoarce-te. Când nu mai sunt `a`-uri, verifică să nu mai fie nici `b`-uri.",
+   "solution": "Mașina din set: `q0` marchează un `a` cu `A`; `q1` caută la dreapta primul `b` și îl face `B`; `q2` se întoarce la ultimul `A`; când în `q0` găsește `B`, toate `a`-urile sunt marcate, iar `q3` verifică că urmează doar `B`-uri până la blanc.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tm",
+    "alphabet": "ab",
+    "reference": "q0, a -> q1, A, R\nq0, B -> q3, B, R\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, b -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, A, R\nq3, B -> q3, B, R\nq3, # -> h, #, S",
+    "upTo": 7
+   }
+  },
+  {
+   "id": "221",
+   "title": "Adună 1 în baza 2",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o mașină Turing care primește un număr în baza 2 (nevid) și lasă pe bandă numărul plus 1.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.\n\n(Numărul își păstrează lungimea, cu zerourile de la început, dacă nu crește: `0011` devine `0100`, `11` devine `100`. Pentru intrarea vidă se lasă `1`.)",
+   "hint": "Mergi la ultima cifră; de acolo, spre stânga, fiecare `1` devine `0` (transportul) până la primul `0` (sau blanc), care devine `1`.",
+   "solution": "O mașină care merge:\n```\nq0, 0 -> q0, 0, R\nq0, 1 -> q0, 1, R\nq0, # -> q1, #, L\nq1, 1 -> q1, 0, L\nq1, 0 -> h, 1, S\nq1, # -> h, 1, S\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tmf",
+    "alphabet": "01",
+    "reference": "q0, 0 -> q0, 0, R\nq0, 1 -> q0, 1, R\nq0, # -> q1, #, L\nq1, 1 -> q1, 0, L\nq1, 0 -> h, 1, S\nq1, # -> h, 1, S",
+    "upTo": 6
+   }
+  },
+  {
+   "id": "223",
+   "title": "Număr par de a",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o mașină Turing care acceptă cuvintele peste `{a, b}` cu un număr par de `a`.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "Un automat finit e o mașină Turing care doar merge la dreapta: două stări pentru paritate, iar la blanc decide.",
+   "solution": "O mașină care merge:\n```\np, a -> i, a, R\np, b -> p, b, R\np, # -> h, #, S\ni, a -> p, a, R\ni, b -> i, b, R\ni, # -> n, #, S\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tm",
+    "alphabet": "ab",
+    "reference": "p, a -> i, a, R\np, b -> p, b, R\np, # -> h, #, S\ni, a -> p, a, R\ni, b -> i, b, R\ni, # -> n, #, S",
+    "upTo": 7
+   }
+  },
+  {
+   "id": "224",
+   "title": "Palindroame",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Scrie o mașină Turing care acceptă palindroamele peste `{a, b}`.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "Șterge primul simbol ținându-l minte în stare, mergi la ultimul, compară și șterge-l, întoarce-te. Repetă.",
+   "solution": "O mașină care merge:\n```\nq0, a -> qa, #, R\nq0, b -> qb, #, R\nq0, # -> h, #, S\nqa, a -> qa, a, R\nqa, b -> qa, b, R\nqa, # -> ra, #, L\nqb, a -> qb, a, R\nqb, b -> qb, b, R\nqb, # -> rb, #, L\nra, a -> back, #, L\nra, # -> h, #, S\nrb, b -> back, #, L\nrb, # -> h, #, S\nback, a -> back, a, L\nback, b -> back, b, L\nback, # -> q0, #, R\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tm",
+    "alphabet": "ab",
+    "reference": "q0, a -> qa, #, R\nq0, b -> qb, #, R\nq0, # -> h, #, S\nqa, a -> qa, a, R\nqa, b -> qa, b, R\nqa, # -> ra, #, L\nqb, a -> qb, a, R\nqb, b -> qb, b, R\nqb, # -> rb, #, L\nra, a -> back, #, L\nra, # -> h, #, S\nrb, b -> back, #, L\nrb, # -> h, #, S\nback, a -> back, a, L\nback, b -> back, b, L\nback, # -> q0, #, R",
+    "upTo": 7
+   }
+  },
+  {
+   "id": "225",
+   "title": "aⁿbⁿcⁿ",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Scrie o mașină Turing care acceptă `{aⁿbⁿcⁿ | n ≥ 0}` (un limbaj care nu e independent de context, dar e decidabil).\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "Ca la `aⁿbⁿ`, dar o trecere marchează câte un `a` (`X`), un `b` (`Y`) și un `c` (`Z`).",
+   "solution": "O mașină care merge:\n```\nq0, a -> q1, X, R\nq0, Y -> q4, Y, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, Y -> q1, Y, R\nq1, b -> q2, Y, R\nq2, b -> q2, b, R\nq2, Z -> q2, Z, R\nq2, c -> q3, Z, L\nq3, a -> q3, a, L\nq3, b -> q3, b, L\nq3, Y -> q3, Y, L\nq3, Z -> q3, Z, L\nq3, X -> q0, X, R\nq4, Y -> q4, Y, R\nq4, Z -> q4, Z, R\nq4, # -> h, #, S\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tm",
+    "alphabet": "abc",
+    "reference": "q0, a -> q1, X, R\nq0, Y -> q4, Y, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, Y -> q1, Y, R\nq1, b -> q2, Y, R\nq2, b -> q2, b, R\nq2, Z -> q2, Z, R\nq2, c -> q3, Z, L\nq3, a -> q3, a, L\nq3, b -> q3, b, L\nq3, Y -> q3, Y, L\nq3, Z -> q3, Z, L\nq3, X -> q0, X, R\nq4, Y -> q4, Y, R\nq4, Z -> q4, Z, R\nq4, # -> h, #, S",
+    "upTo": 7
+   }
+  },
+  {
+   "id": "226",
+   "title": "Dublează aⁿ",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "grea",
+   "source": "",
+   "statement": "Intrarea e `aⁿ`. Scrie o mașină Turing care lasă pe bandă `a²ⁿ`.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "Pentru fiecare `a` (marcat temporar), scrie un `B` la capătul din dreapta. La sfârșit, toate `B`-urile devin `a`.",
+   "solution": "O mașină care merge:\n```\nq0, a -> q1, A, R\nq0, B -> q3, a, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, # -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, a, R\nq3, B -> q3, a, R\nq3, # -> h, #, S\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tmf",
+    "alphabet": "a",
+    "reference": "q0, a -> q1, A, R\nq0, B -> q3, a, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, # -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, a, R\nq3, B -> q3, a, R\nq3, # -> h, #, S",
+    "upTo": 6
+   }
+  },
+  {
+   "id": "227",
+   "title": "Inversează biții",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "ușoară",
+   "source": "",
+   "statement": "Scrie o mașină Turing care înlocuiește fiecare `0` cu `1` și fiecare `1` cu `0`.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "O singură stare care merge la dreapta.",
+   "solution": "O mașină care merge:\n```\nq, 0 -> q, 1, R\nq, 1 -> q, 0, R\nq, # -> h, #, S\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tmf",
+    "alphabet": "01",
+    "reference": "q, 0 -> q, 1, R\nq, 1 -> q, 0, R\nq, # -> h, #, S",
+    "upTo": 6
+   }
+  },
+  {
+   "id": "228",
+   "title": "Ca în curs: scrie sau mută",
+   "chapter": "7. Mașini Turing",
+   "difficulty": "medie",
+   "source": "",
+   "statement": "În curs, o tranziție a mașinii Turing face **fie** o scriere, **fie** o mutare: `δ(q, a) = (p, b)` sau `δ(q, a) = (p, L)`. În aplicație le scrii `q, a -> p, b` și `q, a -> p, L`.\n\nScrie, în acest stil, o mașină care acceptă cuvintele peste `{a, b}` care se termină cu `b`.\n\nConvenția aplicației: banda e plină de blancuri `#` de o parte și de alta a intrării, capul pornește pe primul simbol al intrării (pe `#` dacă intrarea e vidă). Starea `h` (sau `y`) acceptă și oprește; `n` respinge; o tranziție lipsă respinge.",
+   "hint": "Mergi la dreapta până la blanc, apoi un pas la stânga și uită-te la simbol.",
+   "solution": "O mașină care merge:\n```\nq0, a -> q0, R\nq0, b -> q0, R\nq0, # -> q1, L\nq1, b -> h, b\nq1, a -> n, a\nq1, # -> n, #\n```",
+   "kind": "lfa",
+   "spec": {
+    "mode": "tm",
+    "alphabet": "ab",
+    "reference": "q0, a -> q0, R\nq0, b -> q0, R\nq0, # -> q1, L\nq1, b -> h, b\nq1, a -> n, a\nq1, # -> n, #",
+    "upTo": 7
+   }
+  },
+  {
    "id": "33",
    "title": "0^n 1^n 0^n",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "ușoară",
    "source": "Examen LFA · grilă, februarie 2022",
    "statement": "Fie `L = {0ⁿ1ⁿ0ⁿ | n ≥ 0}`. Cum este `L` în cel mai strict sens?",
@@ -2100,7 +4204,7 @@
   {
    "id": "34",
    "title": "Restul numărului de a",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "ușoară",
    "source": "Examen LFA · grilă, februarie 2022",
    "statement": "Fie `L = {w ∈ {a, b}* | #a(w) % 4 = 3}`. Cum este `L` în cel mai strict sens?",
@@ -2120,7 +4224,7 @@
   {
    "id": "35",
    "title": "k = |m - n|",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "Examen LFA · 9 iunie 2022",
    "statement": "Fie `L = {aⁿbᵐcᵏ | k = |m - n|}`. Cum este `L` în cel mai strict sens?",
@@ -2140,7 +4244,7 @@
   {
    "id": "36",
    "title": "vwv cu |v| = 2",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "Test LFA",
    "statement": "Fie `L = {vwv | v, w ∈ {a, b}*, |v| = 2}`. Cum este `L` în cel mai strict sens?",
@@ -2160,7 +4264,7 @@
   {
    "id": "37",
    "title": "Suma exponenților, multiplu de 5",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "Examen LFA · 15 iunie 2022",
    "statement": "Fie `L = {aⁱbʲcᵏdᵐ | i + j + k + m este multiplu de 5}`. Cum este `L` în cel mai strict sens?",
@@ -2180,7 +4284,7 @@
   {
    "id": "38",
    "title": "Diferența dintre un LIC și un regulat",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "Examen LFA · 9 iunie și 6 septembrie 2022",
    "statement": "Dacă `R` este un limbaj regulat și `L` este un limbaj independent de context, cum este `L \\ R`?",
@@ -2200,7 +4304,7 @@
   {
    "id": "39",
    "title": "Reuniunea a două limbaje neregulate",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "Test LFA",
    "statement": "Fie `L1 = {0ⁱ1ʲ | i, j ≥ 0, i ≠ j}` și `L2 = {0ⁱ1ʲ | i, j ≥ 0, i = j}`. Care afirmație este corectă?",
@@ -2220,7 +4324,7 @@
   {
    "id": "40",
    "title": "Câte limbaje independente de context sunt",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "ușoară",
    "source": "Test LFA",
    "statement": "Cum este mulțimea limbajelor independente de context (peste un alfabet dat)?",
@@ -2240,7 +4344,7 @@
   {
    "id": "41",
    "title": "O submulțime a unui LIC",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "ușoară",
    "source": "Examen LFA · 6 septembrie 2022",
    "statement": "Fie `L` un limbaj independent de context și `S ⊆ L`. Este `S` independent de context?",
@@ -2260,7 +4364,7 @@
   {
    "id": "42",
    "title": "Câte stări are cel mai mic AFD",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "",
    "statement": "Câte stări are cel mai mic automat finit determinist (complet) care acceptă cuvintele peste `{a, b}` în care al treilea simbol de la sfârșit este `a`?",
@@ -2280,7 +4384,7 @@
   {
    "id": "43",
    "title": "Intersecții",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "",
    "statement": "Care afirmație este adevărată?",
@@ -2300,7 +4404,7 @@
   {
    "id": "44",
    "title": "M nu acceptă w",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "grea",
    "source": "Examen LFA · 6 septembrie 2022",
    "statement": "Fie `L = {ρ(M)ρ(w) | M nu acceptă w}`. Este `L` Turing acceptat?",
@@ -2320,7 +4424,7 @@
   {
    "id": "45",
    "title": "Extratereștrii",
-   "chapter": "5. Clase de limbaje",
+   "chapter": "8. Clase de limbaje",
    "difficulty": "medie",
    "source": "Examen LFA · 9 iunie 2022",
    "statement": "Fie `L` limbajul care conține doar șirul `s`, unde `s = 1` dacă există extratereștri și `s = 0` dacă nu există. Este `L` decidabil?",
@@ -2338,9 +4442,625 @@
    }
   },
   {
+   "id": "121",
+   "title": "L1 LIC, L2 nu, disjuncte: reuniunea",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Examen LFA · 15 iunie 2022",
+   "statement": "Fie `L1` un limbaj independent de context și `L2` un limbaj care nu este independent de context, cu `L1 ∩ L2 = ∅`. Cum este `L1 ∪ L2`?",
+   "hint": "",
+   "solution": "Cu `L1 = ∅`, `L1 ∪ L2 = L2`, care nu e LIC. Cu `L2 = {aⁿbⁿcⁿ}` și `L1 = Σ* \\ L2` (complementul lui `aⁿbⁿcⁿ` e LIC: reuniunea condițiilor „nu e de forma a*b*c*”, „#a ≠ #b”, „#b ≠ #c”), `L1 ∪ L2 = Σ*`, regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "întotdeauna LIC",
+     "niciodată LIC",
+     "nu se poate afirma nimic: poate fi LIC sau nu",
+     "întotdeauna regulat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "122",
+   "title": "aⁿbⁿw cu |w| = n",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Examen LFA · 15 iunie 2022",
+   "statement": "Fie `L = {aⁿbⁿw | n ≥ 0, w ∈ {c, d}*, |w| = n}`. Cum este `L` în cel mai strict sens?",
+   "hint": "Intersectează cu un limbaj regulat bine ales.",
+   "solution": "Prin proprietăți de închidere: dacă `L` ar fi LIC, atunci și `L ∩ a*b*c*` ar fi LIC (intersecția cu un regulat). Dar `L ∩ a*b*c* = {aⁿbⁿcⁿ}`, care nu e LIC.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "regulat",
+     "independent de context, dar nu regulat",
+     "nu este independent de context",
+     "finit"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "123",
+   "title": "Concatenare de două cuvinte din L, cu doi de a",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Examen LFA · 15 iunie 2022",
+   "statement": "Fie `Σ` un alfabet, `a ∈ Σ`, și `L` un limbaj regulat peste `Σ`. Cum este `L′ = {w ∈ Σ* | ∃w1, w2 ∈ L, w = w1w2 și w are cel puțin 2 a}`?",
+   "hint": "",
+   "solution": "`L′ = L·L ∩ Σ*aΣ*aΣ*`: concatenarea a două limbaje regulate e regulată, „are cel puțin doi `a`” e regulat, iar intersecția a două limbaje regulate e regulată.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "independent de context, dar nu neapărat regulat",
+     "poate să nu fie LIC",
+     "finit",
+     "regulat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "124",
+   "title": "aᵏbᵏ cu k ≤ 8",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Examen LFA · 8 septembrie 2022",
+   "statement": "Cum este limbajul `{aᵏbᵏ | k ∈ N*, k ≤ 8}` peste `{a, b}`?",
+   "hint": "",
+   "solution": "Are exact 8 cuvinte. Orice limbaj finit e regulat: o expresie `ab ∪ aabb ∪ … ∪ a⁸b⁸`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "independent de context, dar nu regulat",
+     "finit, deci regulat",
+     "nu este independent de context",
+     "regulat, dar infinit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "127",
+   "title": "#a = #b și #c = #d",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Examen LFA · 8 septembrie 2022",
+   "statement": "Fie `L` limbajul șirurilor peste `{a, b, c, d}` cu `#a = #b` și `#c = #d` (de exemplu `ccbddcaadb ∈ L`). Cum este `L`?",
+   "hint": "",
+   "solution": "`L ∩ a*c*b*d* = {aⁿcᵐbⁿdᵐ}`, care nu e LIC (lema de pompare: pe `aᵖcᵖbᵖdᵖ`, `vxy` are cel mult `p` simboluri, deci atinge cel mult două blocuri vecine și strică o egalitate). Dacă `L` ar fi LIC, intersecția cu un regulat ar fi LIC.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "regulat",
+     "independent de context, dar nu regulat",
+     "finit",
+     "nu este independent de context"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "129",
+   "title": "prefix(L) pentru L Turing acceptat",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Examen LFA · 8 septembrie 2022",
+   "statement": "Dacă `L` este un limbaj Turing acceptat, este `prefix(L)` (mulțimea prefixelor cuvintelor din `L`) Turing acceptat?",
+   "hint": "",
+   "solution": "O mașină pentru `prefix(L)` primește `x` și încearcă, în paralel (dovetailing), toate continuările `y`: la pasul `k`, rulează câte `k` pași din mașina lui `L` pe primele `k` cuvinte `xy`. Dacă vreun `xy ∈ L`, rularea lui se oprește după un număr finit de pași și acceptăm. Dacă nu, mașina nu se oprește, ceea ce e voie la un limbaj Turing acceptat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu",
+     "da",
+     "doar dacă L e decidabil",
+     "doar dacă L e finit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "137",
+   "title": "L1·L2 regulat ⇒ L1, L2 regulate?",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Implicația „pentru orice `L1, L2`: `L1 · L2` regulat ⇒ `L1` regulat și `L2` regulat” este:",
+   "hint": "",
+   "solution": "`L1 = {0ⁿ1ᵐ | n > m ≥ 0}` nu e regulat, dar `L1 · 1* = 0⁺1*` (orice număr de `1`-uri se poate pune după `0ⁿ1ᵐ`). Închiderea la concatenare spune altceva: dacă `L1`, `L2` sunt regulate, atunci și `L1L2`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adevărată, pentru că LR sunt închise la concatenare",
+     "adevărată doar dacă L1 și L2 sunt finite",
+     "falsă: L1 = {0ⁿ1ⁿ}, L2 = {1ⁿ0ⁿ}",
+     "falsă: L1 = {0ⁿ1ᵐ | n > m ≥ 0}, L2 = L(1*) dau L1L2 = L(0⁺1*)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "138",
+   "title": "L* regulat ⇒ L regulat?",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Examen LFA · set de probleme rezolvate",
+   "statement": "Implicația „pentru orice `L`: `L*` regulat ⇒ `L` regulat” este:",
+   "hint": "",
+   "solution": "`L = {aᵖ | p prim}` nu e regulat (lema de pompare), dar orice `n ≥ 2` e o sumă de 2 și 3, deci `L* = {e} ∪ {aⁿ | n ≥ 2} = L(e ∪ aaa*)`, regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "adevărată",
+     "falsă: L = {a^p | p prim} are L* = {ε} ∪ {aⁿ | n ≥ 2}",
+     "falsă, dar doar pentru alfabete cu cel puțin două simboluri",
+     "adevărată pentru limbaje infinite"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "140",
+   "title": "Superlimbaje care nu sunt LIC",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Valorile de adevăr: (i) Pentru orice `L ∈ LR` există un `L′` care nu este LIC a.î. `L ⊆ L′`. (ii) Pentru orice `L ∈ LIC` există un `L′` care nu este LR a.î. `L ⊆ L′`.",
+   "hint": "",
+   "solution": "Pentru `L = Σ*` singurul `L′ ⊇ L` e `Σ*`, care e regulat (deci și LIC). Ambele afirmații cad pe același contraexemplu.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat, Adevărat",
+     "Fals, Fals",
+     "Fals, Adevărat",
+     "Adevărat, Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "141",
+   "title": "uvwvᴿ cu |u| = |w| = 2",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test LFA · grilă",
+   "statement": "Fie `L = {uvwvᴿ | u, v, w ∈ {a, b}*, |u| = |w| = 2}`. Cum este `L` în cel mai strict sens?",
+   "hint": "",
+   "solution": "O gramatică: `S -> XXT`, `T -> aTa | bTb | XX`, `X -> a | b`: `T` construiește `v ... vᴿ` în jurul lui `w`. Nu e regulat: `v` se oglindește în jurul unui centru fix, ca la palindroame (de exemplu, intersectat cu `aa(ab)*aa(ba)*` și pompat, egalitatea se strică).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "finit",
+     "LIC",
+     "nu este LIC",
+     "LR"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "142",
+   "title": "aⁿbᵏcⁿ⁺ᵖ cu p ≥ -n",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Ce tip de limbaj este `L = {aⁿbᵏcⁿ⁺ᵖ | n, k ≥ 0, p ∈ [-n, ∞)}`?",
+   "hint": "",
+   "solution": "`p ≥ -n` înseamnă doar `n + p ≥ 0`: exponentul lui `c` e orice număr natural, independent de `n`. Deci `L = a*b*c*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "LR",
+     "LIC",
+     "finit",
+     "nu este LIC"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "143",
+   "title": "aⁿb³ᵏcᵏd²ⁿ⁺ᵖfʳgᵖ⁺ʳ",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test LFA · grilă",
+   "statement": "Ce tip de limbaj este `L = {aⁿb³ᵏcᵏd²ⁿ⁺ᵖfʳgᵖ⁺ʳ | n, k, p, r ≥ 0}`?",
+   "hint": "",
+   "solution": "Desparte exponenții: `aⁿ (b³ᵏcᵏ) d²ⁿ · dᵖ (fʳgʳ) gᵖ`. Fiecare parte are perechi imbricate (ca `aⁿXd²ⁿ` cu `X` tot o pereche), deci e LIC, iar concatenarea a două LIC e LIC. Nu e regulat: intersectat cu `a*d*` dă `aⁿd²ⁿ`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "LR",
+     "finit",
+     "nu este LIC",
+     "LIC"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "146",
+   "title": "Intersecții LIC ∩ LR",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Fie `M1 = {L | L ∈ LIC}`, `M2 = {L | L ∈ LR}` și `M3 = {L1 ∩ L2 | L1 ∈ M1, L2 ∈ M2}`. Care afirmație e adevărată?",
+   "hint": "",
+   "solution": "Intersecția unui LIC cu un LR e LIC, deci `M3 ⊆ M1`; și orice LIC `L = L ∩ Σ*`, cu `Σ*` regulat, deci `M1 ⊆ M3`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "M3 = M2",
+     "M3 = ∅",
+     "M3 = M1",
+     "M3 = M1 \\ M2"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "147",
+   "title": "Același simbol la început, mijloc și sfârșit",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · grilă",
+   "statement": "Fie `L = {w ∈ {a, b}* | |w| = 2k + 1, k ≥ 0, w are același simbol la început, la mijloc și la sfârșit}`. Cum este `L` în cel mai strict sens?",
+   "hint": "",
+   "solution": "O gramatică: `S -> aAa | bBb | a | b`, `A -> XAX | a`, `B -> XBX | b`, `X -> a | b`: mijlocul se găsește punând simbolurile câte două, unul în stânga, unul în dreapta. Nu e regulat: un automat finit nu poate găsi mijlocul (`aⁿbaⁿ` vs `aⁿbaⁿ⁺²` se deosebesc prin ce urmează).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "finit",
+     "LIC",
+     "LR",
+     "nu este LIC"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "150",
+   "title": "Expresia lungă cu L1…L5",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test LFA · grilă",
+   "statement": "Fie `L1, L2 ∈ LIC`, `L3, L4 ∈ LR` și `L5` un limbaj finit. Ce este `(((L1 \\ L2) ∩ (Σ* \\ L1))Σ*)* ∩ (((L3L4) ∪ L2) \\ L5)*`?",
+   "hint": "",
+   "solution": "`L1 \\ L2 ⊆ L1`, deci `(L1 \\ L2) ∩ (Σ* \\ L1) = ∅`; `∅Σ* = ∅`; `∅* = {e}`. Iar `{e} ∩ X*` = `{e}`, pentru că orice stea conține `e`. Rezultatul e `{e}`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu se poate specifica",
+     "un limbaj finit",
+     "LR, dar nu neapărat finit",
+     "LIC, dar nu neapărat regulat"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "152",
+   "title": "Un limbaj finit, generat de o gramatică",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Limbajul generat de `S -> aAb | aAbA`, `A -> BB | a`, `B -> bb | b | e` poate fi acceptat, în cel mai strict sens, de:",
+   "hint": "",
+   "solution": "Nicio regulă nu se apelează recursiv: `A` și `B` generează un număr finit de cuvinte, deci și `S`. Un limbaj finit e regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un automat push-down determinist",
+     "un automat push-down nedeterminist",
+     "niciuna dintre variante",
+     "un automat finit"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "153",
+   "title": "Răsturnatul unui LIC",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `L` un limbaj independent de context. `Rasturnat(L) = {wᴿ | w ∈ L}` este:",
+   "hint": "",
+   "solution": "Răsturnăm partea dreaptă a fiecărei reguli: `R′ = {(X, γᴿ) | (X, γ) ∈ R}`. Nu adăugăm și nu scoatem restricții.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "regulat",
+     "dependent de context",
+     "nu se poate afirma nimic",
+     "independent de context"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "154",
+   "title": "Prime și pare",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `L1 = {aᵖ | p prim}`, `L2 = {a²ᵏ | k ∈ N}`. `(L1 ∩ L2)* \\ L2` este:",
+   "hint": "",
+   "solution": "2 e singurul număr prim par: `L1 ∩ L2 = {aa}`, `(L1 ∩ L2)* = {a²ᵏ} = L2`, iar `L2 \\ L2 = ∅`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "L1*",
+     "complementul lui L2",
+     "L1* ∩ L2*",
+     "mulțimea vidă"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "156",
+   "title": "L1L4 = L2 ⇒ L4 regulat?",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `L1, L2, L3` regulate și `L4` oarecare. (i) `L1L4 = L2 ⇒ L4` regulat; (ii) `L1L2 = L3L4 ⇒ L4` regulat; (iii) `L1L4L2 = L3 ⇒ L4` regulat.",
+   "hint": "",
+   "solution": "`L1 = L2 = L3 = a*` și `L4 = {a^(n²)}` (cu `e`): toate concatenările dau `a*`, dar `L4` nu e regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "i) și ii) sunt adevărate, iii) e falsă",
+     "toate afirmațiile sunt adevărate",
+     "iii) e adevărată, i) și ii) sunt false",
+     "toate afirmațiile sunt false"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "158",
+   "title": "Par de a, impar de b mai mare",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `L = {w ∈ {a, b}* | w are număr par de a și număr impar de b, mai mare decât numărul de a}`. Atunci:",
+   "hint": "",
+   "solution": "Comparația `#b > #a` cere numărare nemărginită (o stivă). `e ∉ L` (0 `b` nu e impar), iar `aabbb ∈ L` are prefixul `aa`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "se poate scrie un AFN care acceptă L",
+     "șirul vid aparține lui L",
+     "orice prefix al unui cuvânt din L conține cel puțin un b",
+     "L nu este limbaj regulat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "161",
+   "title": "Gramatică pe un alfabet unar",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `G` o GIC cu `|Σ| = 1`. (i) `L(G)` e regulat; (ii) `L(G)` e independent de context; (iii) `L(G)` e finit.",
+   "hint": "",
+   "solution": "Pe un alfabet unar contează doar lungimea, iar lema de pompare dă lungimi care formează o reuniune finită de progresii aritmetice: limbajul e regulat (teorema lui Parikh). `a*` arată că nu e neapărat finit.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "toate corecte",
+     "doar ii) corectă",
+     "doar i) și iii) corecte",
+     "i) și ii) corecte"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "162",
+   "title": "L1 ∪ (Σ* \\ L3)",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `L1, L2` regulate și `L3 ⊆ L1 ∩ L2` (oarecare). Ce se poate spune despre `L1 ∪ (Σ* \\ L3)`?",
+   "hint": "",
+   "solution": "`L3 ⊆ L1` ⇒ `Σ* \\ L1 ⊆ Σ* \\ L3` ⇒ `Σ* = L1 ∪ (Σ* \\ L1) ⊆ L1 ∪ (Σ* \\ L3)`. Deci reuniunea e `Σ*`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "trebuie să fie regulat",
+     "nu poate fi independent de context",
+     "poate să nu fie independent de context",
+     "este independent de context, dar nu regulat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "164",
+   "title": "L ∩ LL pentru un LIC neregulat",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test LFA · rezolvări (G. Mitra)",
+   "statement": "Fie `L` un limbaj independent de context care nu e regulat. Ce se poate spune despre `L ∩ LL`?",
+   "hint": "",
+   "solution": "Exemplul din rezolvare: pentru `L = {wwᴿ}`, `L ∩ LL` conține palindroamele pare care sunt și concatenări de două palindroame pare, ca `wwᴿwwᴿ`; un astfel de limbaj nu e LIC, deci (a). Cu `L = {a, aa} ∪ {aⁿbⁿ | n > 0}`, `L ∩ LL = {aa}`: regulat și finit, deci (b) și (d) cad, iar (c) cade pe primul exemplu.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu poate fi regulat",
+     "este întotdeauna independent de context",
+     "poate să nu fie independent de context",
+     "are o infinitate de cuvinte"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "170",
+   "title": "L1L2 = L2L1 ⇒ L1 = L2",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Adevărat sau fals?\n\nDacă `L1L2 = L2L1`, atunci `L1 = L2`.",
+   "hint": "",
+   "solution": "`L1 = ∅`, `L2 = Σ*`: ambele concatenări dau `∅`, dar limbajele diferă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "171",
+   "title": "L1L2 = L2L1 ⇒ (L1 ∪ L2)* ⊆ (L1 ∩ L2)*",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test LFA · variante de rezolvare (G. Mitra)",
+   "statement": "Adevărat sau fals?\n\nDacă `L1L2 = L2L1`, atunci `(L1 ∪ L2)* ⊆ (L1 ∩ L2)*`.",
+   "hint": "",
+   "solution": "Cu `L1 = ∅`, `L2 = Σ*`: `(L1 ∪ L2)* = Σ*`, iar `(L1 ∩ L2)* = ∅* = {e}`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "190",
+   "title": "Complementul unui LIC e regulat",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Test 2 LFA · 9 decembrie 2023",
+   "statement": "Fie `L0` un LIC și `L1 = Σ* \\ L0` regulat. Care afirmație e adevărată?",
+   "hint": "",
+   "solution": "`L0 = Σ* \\ L1`, complementul unui limbaj regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "L0 nu poate fi finit",
+     "L0 este regulat",
+     "L1 nu poate fi regulat",
+     "L1 nu poate fi finit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "191",
+   "title": "Limbaje regulate peste {a}",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Mulțimea limbajelor regulate peste alfabetul `Σ = {a}` este:",
+   "hint": "",
+   "solution": "Fiecare `{aⁿ}` e regulat, deci sunt infinit de multe; fiecare are o expresie regulată (un șir finit), deci sunt numărabile.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "finită",
+     "nenumărabilă",
+     "cu exact 2^|Σ| elemente",
+     "infinit numărabilă"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "192",
+   "title": "aⁿbⁿ⁺ᵏcᵏ",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Cum este `L = {aⁿbⁿ⁺ᵏcᵏ | k, n ∈ N}`?",
+   "hint": "",
+   "solution": "`aⁿbⁿ · bᵏcᵏ`, concatenarea a două LIC. Intersectat cu `a*b*` dă `aⁿbⁿ`, deci nu e regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "independent de context, dar nu regulat",
+     "regulat",
+     "nu este independent de context",
+     "finit"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "196",
+   "title": "Răsturnatul unui limbaj decidabil",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "ușoară",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Fie `L` un limbaj Turing decidabil. Este `Lᴿ = {wᴿ | w ∈ L}` Turing decidabil?",
+   "hint": "",
+   "solution": "Mașina pentru `Lᴿ` întoarce cuvântul de pe bandă, apoi rulează mașina care decide `L`, care se oprește mereu.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu",
+     "da",
+     "doar dacă L e regulat",
+     "e doar Turing acceptat"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "197",
+   "title": "Mașini care acceptă cel puțin 65536 de șiruri",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "grea",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Fie `L = {ρ(M) | M e o mașină Turing care acceptă cel puțin 65536 de șiruri}`. Cum este `L`?",
+   "hint": "",
+   "solution": "Acceptat: rulăm `M` în paralel (dovetailing) pe toate cuvintele și acceptăm când am văzut 65536 acceptate. Nedecidabil: e o proprietate netrivială a limbajului lui `M` (teorema lui Rice).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Turing acceptat, dar nu decidabil",
+     "Turing decidabil",
+     "nu este Turing acceptat",
+     "regulat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "198",
+   "title": "Nedecidabil și NP-complet",
+   "chapter": "8. Clase de limbaje",
+   "difficulty": "medie",
+   "source": "Test de recuperare LFA · 2017-2018",
+   "statement": "Este posibil ca un limbaj nedecidabil să fie NP-complet?",
+   "hint": "",
+   "solution": "Un limbaj NP-complet e în NP, deci decidabil (mașina nedeterministă polinomială se poate simula determinist, în timp exponențial).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da",
+     "doar dacă P = NP",
+     "nu se știe",
+     "nu: orice limbaj din NP e decidabil"
+    ],
+    "answer": 3
+   }
+  },
+  {
    "id": "80",
    "title": "Mulțimea expresiilor regulate",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `X` mulțimea expresiilor regulate peste un alfabet nevid (văzute ca șiruri de simboluri). Care afirmație este adevărată?",
@@ -2360,7 +5080,7 @@
   {
    "id": "81",
    "title": "Care sunt regulate",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "grea",
    "source": "Model test grilă LFA",
    "statement": "Fie `L1 = { 0ⁿ1ⁿ | 1 ≤ n ≤ 1000 }`, `L2 = { aⁿ | n prim sau n impar }`, `L3 = { w ∈ {0,1}* | int(w) ≥ int(wᴿ) }`, unde `int` e valoarea în baza 2. Care sunt regulate?",
@@ -2380,7 +5100,7 @@
   {
    "id": "82",
    "title": "Pushdown și o expresie echivalentă",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "ușoară",
    "source": "Model test grilă LFA",
    "statement": "Valorile de adevăr: (1) Se poate scrie cel puțin un automat pushdown pentru orice limbaj regulat. (2) Nu se poate scrie o altă expresie regulată echivalentă cu `a(a∪b)*b`.",
@@ -2400,7 +5120,7 @@
   {
    "id": "83",
    "title": "Complementul nu e regulat",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "ușoară",
    "source": "Model test grilă LFA",
    "statement": "Fie `L ⊆ Σ*` astfel încât `Σ* \\ L` nu este regulat. Atunci `L`:",
@@ -2420,7 +5140,7 @@
   {
    "id": "84",
    "title": "Reuniunea regulată",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `L1, L2 ⊆ Σ*` cu `L1` și `L1 ∪ L2` regulate. Atunci:",
@@ -2440,7 +5160,7 @@
   {
    "id": "85",
    "title": "O gramatică amestecată",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Gramatica `S → 0S | A`, `A → A1 | B`, `B → ε | 1` (în original `S1`, `S2`). Ce este adevărat?",
@@ -2460,7 +5180,7 @@
   {
    "id": "86",
    "title": "AFD cu un singur cuvânt",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `M` un AFD cu `L(M) = {w}` și `Y = { f | (s, w) ⊢* (f, ε) }`. Ce este întotdeauna adevărat?",
@@ -2480,7 +5200,7 @@
   {
    "id": "87",
    "title": "L = L·L? Infinitate de tranziții?",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Valorile de adevăr: (1) Pentru orice limbaj regulat `L`, `L = L·L`, pentru că limbajele regulate sunt închise la concatenare. (2) Un automat finit nedeterminist poate avea o infinitate de tranziții.",
@@ -2500,7 +5220,7 @@
   {
    "id": "88",
    "title": "Un cuvânt în (ab*a ∪ b*)*",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "ușoară",
    "source": "Model test grilă LFA",
    "statement": "Fie `r = (ab*a ∪ b*)*`. Ce este adevărat despre `L(r)`?",
@@ -2520,7 +5240,7 @@
   {
    "id": "89",
    "title": "Limbajele peste alfabetul vid",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `Σ = ∅` și `Z = 2^(Σ*)`, mulțimea tuturor limbajelor peste `Σ`. Ce este adevărat?",
@@ -2540,7 +5260,7 @@
   {
    "id": "90",
    "title": "Limbajele care conțin abba",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `Σ = {a, b, c}` și `L_abba = { L ⊆ Σ* | abba ∈ L }`. În raport cu ce operație e închisă `L_abba`?",
@@ -2560,7 +5280,7 @@
   {
    "id": "91",
    "title": "Derivări",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie gramatica `U → XUX | S`, `S → aTb | bTS`, `T → XTX | X | ε`, `X → a | b`. Ce este adevărat?",
@@ -2580,7 +5300,7 @@
   {
    "id": "92",
    "title": "aⁱbʲcᵏ cu i < j < k",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `L = { aⁱbʲcᵏ | 0 < i < j < k }`. Ce este adevărat?",
@@ -2600,7 +5320,7 @@
   {
    "id": "93",
    "title": "Fiecare cuvânt, acceptat de un AFD",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "medie",
    "source": "Model test grilă LFA",
    "statement": "Fie `L` un limbaj infinit astfel încât pentru fiecare cuvânt din `L` există un AFD care îl acceptă. Ce este adevărat?",
@@ -2620,7 +5340,7 @@
   {
    "id": "94",
    "title": "Limbajul vid",
-   "chapter": "6. Grile: modelul de test",
+   "chapter": "9. Grile: modelul de test",
    "difficulty": "ușoară",
    "source": "Model test grilă LFA",
    "statement": "Care expresie regulată generează limbajul vid?",
@@ -2635,6 +5355,1846 @@
      "`∅*`"
     ],
     "answer": 1
+   }
+  },
+  {
+   "id": "300",
+   "title": "Care este numarul minim de stari al unui APD pentru…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Care este numarul minim de stari al unui APD pentru $L=\\{a\\}$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „2”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "0",
+     "2",
+     "1",
+     "3"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "301",
+   "title": "Fie L = {ρ(M) | M accepta cel putin un palindrom}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L = \\{\\rho (M) \\mid M$ accepta cel putin un palindrom$\\}$. L este in cel mai strict sens:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Turing Acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu este Turing Acceptat",
+     "Turing Decidabil",
+     "nu se poate afirma nimic",
+     "Turing Acceptat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "302",
+   "title": "Fie o MT care genereaza sirurile din limbajul L in…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie o MT care genereaza sirurile din limbajul $L$ in ordinea descrescatoare a lungimii lor. $L$ este in cel mai strict sens:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Regulat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "LIC",
+     "Regulat",
+     "Turing Decidabil",
+     "Turing Acceptat"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "303",
+   "title": "Fie L = {aⁿbⁿaᵐbᵐ | n,m ≥ 0}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L = \\{a^nb^na^mb^m$ $\\mid n,m \\geq 0\\}$. Alegeti afirmatia care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Se poate construi un APD cu 2 stari care accepta $L$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Se poate construi un APD cu 2 stari care accepta $L$",
+     "Orice APD care accepta $L$ are minim 4 stari",
+     "Nicio afirmatie nu este adevarata",
+     "Nu se poate construi niciun APD care accepta $L$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "304",
+   "title": "Fie J = {L limbaj peste Σ = {a, b, c} | L · L* = L*}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $J = \\{L$ limbaj peste $\\Sigma = \\{a, b,$ $c\\} \\mid L \\cdot L^* =$ $L^*\\}$. Care este cardinalul multimii $P = \\{w \\in \\{a, b, c\\}^*$ $\\mid \\forall L \\in J,$ $w \\in L\\}$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „1”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "0",
+     "2",
+     "1",
+     "3"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "305",
+   "title": "Fie L={0ⁿ1ⁿ1ⁿ | n ≥ 0}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L=\\{0^n1^n1^n \\mid n \\geq 0\\}$. Cum este $L$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Independent de context”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu este Independent de context",
+     "Regulat",
+     "Independent de context",
+     "Finit"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "306",
+   "title": "Fie L={w∈ {a,b}* | #a(w)%4 = 3}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L=\\{w\\in \\{a,b\\}^*$ $\\mid \\#_a(w)\\%4 =$ $3\\}$. Cum este $L$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Regulat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Finit",
+     "Independent de context",
+     "Nu este independent de context",
+     "Regulat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "307",
+   "title": "Fie L un limbaj regulat",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L$ un limbaj regulat. Definim $PREFIX(L)$ multimea prefixelor cuvintelor din $L$ si $SUFIX(L)$ multimea sufixelor cuvintelor din $L$. Alegeti afirmatia FALSA.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L = PREFIX(L)\\cdot SUFIX(L)$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$PREFIX(L)$ este regulat",
+     "$SUFIX(L)$ este regulat",
+     "$L = PREFIX(L)\\cdot SUFIX(L)$",
+     "$L \\cap PREFIX(L)$ este regulat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "308",
+   "title": "Fie L={ρ(M) ρ(w) | |w|=2 si M se opreste cu w la…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L=\\{\\rho (M) \\rho (w)$ $\\mid |w|=2$ si M se opreste cu $w$ la intrare $\\}$. Alegeti afirmatia care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Exista o infinitate de MT cu 2 benzi care accepta $L$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Exista o infinitate de MT cu 2 benzi care accepta $L$",
+     "Orice MT accepta $L$",
+     "Nu exista nicio MT care accepta $L$",
+     "$L$ este acceptat doar de MT cu o banda"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "309",
+   "title": "Adevărat/fals: Daca L ∈ TD, atunci Lᴿ poate sa nu fie T…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a afirmatiilor:\n- Daca $L \\in TD$, atunci $L^R$ poate sa nu fie $TD$.\n- Daca $L \\subseteq \\Sigma ^*,$ $|\\Sigma |=2$, atunci $L$ este intotdeauna $TD$.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Fals, Fals”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevarat, Fals",
+     "Adevarat, Adevarat",
+     "Fals, Fals",
+     "Fals, Adevarat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "310",
+   "title": "Adevărat/fals: Daca L este un limbaj NP complet, atunci…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a afirmatiilor:\n- Daca $L$ este un limbaj NP complet, atunci $L \\notin TD$\n- Daca $L \\in LIC$, atunci $\\overline {L} \\in TD$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Fals, Adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevarat, Fals",
+     "Adevarat, Adevarat",
+     "Fals, Fals",
+     "Fals, Adevarat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "311",
+   "title": "Fie L1 si L2 doua limbaje independente de context",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1$ si $L_2$ doua limbaje independente de context. Cum este $(\\overline {(\\overline {L_1} \\cup \\overline {L_2})} \\setminus (L_1 \\cap L_2))^*$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „limbaj finit”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nicio varianta",
+     "limbaj finit",
+     "limbaj regulat",
+     "limbaj independent de context"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "312",
+   "title": "Fie J = { L ⊆ {a, b}* | |L*| < ∞ }",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $J = \\{ L \\subseteq \\{a, b\\}^*$ $\\mid |L^*| < \\infty \\}$. Valoarea $\\sum \\limits _{L \\in J}|L|$ este:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „1”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "0",
+     "$\\infty $",
+     "2"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "313",
+   "title": "Fie L1 ∈ LIC si L2 ∈ LR",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1 \\in LIC$ si $L_2 \\in LR$. Alegeti afirmatia care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L_1 \\backslash L_2 \\in LIC$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L_1 \\backslash L_2 \\in LR$",
+     "$L_1 \\backslash L_2 \\notin LR$",
+     "$L_1 \\backslash L_2 \\in LIC$",
+     "$L_1 \\backslash L_2 \\notin LIC$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "314",
+   "title": "Fie L1 si L2 limbaje neregulate",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1$ si $L_2$ limbaje neregulate. Alegeti varianta care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Exista limbajele regulate $R_1$ si $R_2$ ai $R_1 \\subseteq L_1$ $\\subseteq R_2$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Exista limbajele regulate $R_1$ si $R_2$ ai $R_1 \\subseteq L_1$ $\\subseteq R_2$",
+     "$L_1 \\cap L_2$ nu este regulat",
+     "$L_1 \\cup L_2$ nu este regulat",
+     "Nicio varianta"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "315",
+   "title": "Care este numarul minim de stari al unui AFN pentru…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Care este numarul minim de stari al unui AFN pentru $L=\\{e\\}$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „1”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "3",
+     "2",
+     "0",
+     "1"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "316",
+   "title": "Fie M =(K, {0,1}, δ , s0, F ) un AFD ai L(M) = {0…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $M = (K, \\{0,1\\},$ $\\delta , s_0,$ $F )$ un AFD ai $\\mathcal {L}(M) = \\{0, 1\\}^*$. Alegeti varianta care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nicio varianta",
+     "$|\\delta | = 2$",
+     "$F = \\emptyset $",
+     "$F = K $"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "317",
+   "title": "Fie L={0ⁿ1ⁿ0ⁿ | n ≥ 0}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L=\\{0^n1^n0^n \\mid n \\geq 0\\}$. Cum este $L$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu este Independent de context”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Regulat",
+     "Nu este Independent de context",
+     "Independent de context",
+     "Finit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "318",
+   "title": "Fie L1 ∪ L2 ∈ TD si L1 ∩ L2 ∈ TD",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1 \\cup L_2 \\in TD$ si $L_1 \\cap L_2 \\in TD$. Alegeti afirmatia care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$\\exists L_1 \\in TA$ a.i cerintele sunt satisfacute”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L_1,L_2 \\in TD$",
+     "Nu exista doua limbaje care sa satisfaca simultan cerintele.",
+     "$\\exists L_1 \\in TA$ a.i cerintele sunt satisfacute",
+     "$L_1 \\in TD \\vee L_2 \\in TD$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "319",
+   "title": "Fie L reuniunea unui numar infinit numarabil de…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L$ reuniunea unui numar infinit numarabil de limbaje regulate. Alegeti varianta care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ poate sa nu fie Turing Acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este Turing Acceptat",
+     "$L$ este Turing Decidabil",
+     "nu se poate afirma nimic",
+     "$L$ poate sa nu fie Turing Acceptat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "320",
+   "title": "Fie L1, L2 ∈ LIC si L3 oarecare",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1, L_2 \\in LIC$ si $L_3$ oarecare. Alegeti valoarea de adevar a afirmatiilor:\n- $L_1L_3=L_2$ $\\Rightarrow L_3 \\in LIC$\n- $L_1L_2=L_3$ $\\Rightarrow L_3 \\in LIC$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Fals, Adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevarat, Adevarat",
+     "Fals, Adevarat",
+     "Fals, Fals",
+     "Adevarat, Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "321",
+   "title": "Fie L = {aⁱbʲaⁱbʲ | i,j ≥ 0}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L = \\{a^ib^ja^ib^j$ $\\mid i,j \\geq 0\\}$. $L$ este in cel mai strict sens:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „nu este Independent de context”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu este Independent de context",
+     "Regulat",
+     "nu se poate afirma nimic",
+     "Independent de context"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "322",
+   "title": "Fie L∈ LR si |L|>0",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L\\in LR$ si $|L|>0$. Care este numarul minim de tranzitii al unui AFD care accepta L?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „1”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "0",
+     "3",
+     "2"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "323",
+   "title": "Fie L un limbaj si L’ = {ww | w ∈ L}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L$ un limbaj si $L’ = \\{ww \\mid w \\in L\\}$. Alegeti varianta care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L’$ nu este regulat",
+     "$L’ = LL$",
+     "Nicio varianta",
+     "$L’$ este regulat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "324",
+   "title": "Fie L=∅ si un APD D ce accepta L",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L=\\emptyset $ si un APD $D$ ce accepta L. Alegeti varianta care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$D$ poate avea doar o stare”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$D$ poate avea doar o stare",
+     "$D$ are cel putin o stare finala",
+     "$D$ nu poate avea nicio stare finala",
+     "$D$ poate avea toate starile finale"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "325",
+   "title": "Fie L = {ρ(M) | M accepta cel putin 5673929 siruri}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L = \\{\\rho (M) \\mid M$ accepta cel putin $5673929$ siruri$\\}$. $L$ este in cel mai strict sens:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Turing Acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu se poate afirma nimic",
+     "nu este Turing Acceptat",
+     "Turing Acceptat",
+     "Turing Decidabil"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "326",
+   "title": "Fie G = { Gi | Gi gramatica regulata}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $G = \\{ G_i \\mid G_i$ gramatica regulata$ \\}$. Un limbaj $L$ cu proprietatea ca $\\forall w \\in L,$ $\\exists G_i \\in G,$ $w \\in \\mathcal {L} (G_i)$ este, in cel mai strict sens",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Limbaj independent de context",
+     "Nicio varianta",
+     "Limbaj regulat, dar nu finit",
+     "Limbaj finit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "327",
+   "title": "Adevărat/fals: Este posibil ca anumite limbaje nedecida…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a afirmatiilor:\n- Este posibil ca anumite limbaje nedecidabile sa fie NP complete\n- Exista $L \\in TA\\backslash TD$ a.i. $\\overline {L} \\notin TA$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Fals, Adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Fals, Fals",
+     "Fals, Adevarat",
+     "Adevarat, Adevarat",
+     "Adevarat, Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "328",
+   "title": "Fie A si B limbaje Turing acceptate ai A ∩ B = ∅",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $A$ si $B$ limbaje Turing acceptate ai $A \\cap B = \\emptyset $. Daca $\\overline {A \\cup B}$ este Turing decidabil, ce se poate spune intotdeauna despre $A$ si $B$:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „ambele sunt decidabile”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cel mult unul este decidabil",
+     "niciunul nu este decidabil",
+     "ambele sunt decidabile",
+     "nicio varianta"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "329",
+   "title": "Fie L = { u ∈ {a,b,c}* | u=wcwᴿcw, w∈ {a,b}*}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L = \\{ u \\in \\{a,b,c\\}^*$ $\\mid u=wcw^Rcw,$ $w\\in \\{a,b\\}^*\\}$. Cum este $L$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Independent de context",
+     "Turing decidabil",
+     "Regulat",
+     "Finit"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "330",
+   "title": "Fie G avand S simbol de start",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $G$ avand $S$ simbol de start. $S \\rightarrow S_1S_2 $ $S_1 \\rightarrow aS_1b | e$ $S_2 \\rightarrow bS_2a | e$ Alegeti afirmatia care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Cuvintele din $L(G)$ au lungime para”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Cuvintele din $L(G)$ se termina in a",
+     "Cuvintele din $L(G)$ contin mai multe a-uri decat b-uri",
+     "$L(G)=\\{a^nb^{2n}a^n$ $\\mid n \\geq 0\\}$",
+     "Cuvintele din $L(G)$ au lungime para"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "331",
+   "title": "Fie L1∩ L2 ∈ LR si L1 ∪ L2 ∈ LR",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1\\cap L_2 \\in LR$ si $L_1 \\cup L_2 \\in LR$. Alegeti varianta care este intotdeauna adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nicio varianta",
+     "Cel putin un limbaj este finit.",
+     "$L_1\\in LR \\vee L_2 \\in LR$",
+     "$L_1,L_2 \\in LR$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "332",
+   "title": "Fie Σ = {0,1}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $\\Sigma = \\{0,1\\}$. Definim $K$ multimea tuturor limbajelor peste $\\Sigma $ care contin sirul $101$ ($K=\\{L \\subseteq \\Sigma ^*$ $\\mid 101 \\in L\\}$). In raport cu care dintre urmatoarele operatii $K$ este inchisa?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Reuniune”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Diferenta",
+     "Concatenare",
+     "Reuniune",
+     "Complement"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "333",
+   "title": "Fie Σ ={a,b}, L = {w ∈ Σ * | #a(w)=#b(w) ∧ #aaaa(w)…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $\\Sigma =\\{a,b\\},$ $L = \\{w \\in \\Sigma ^*$ $\\mid \\#_a(w)=\\#_b(w) \\wedge \\#_{aaaa}(w) =$ $0 \\wedge \\#_{bbbb}(w) =$ $0\\}$. Alegeti afirmatia corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L \\notin LR$ si L satisface lema de pompare”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L \\notin LR$ si L satisface lema de pompare",
+     "$L \\in LR$ si L satisface lema de pompare",
+     "$L \\in LR$ si L nu satisface lema de pompare",
+     "$L \\notin LR$ si L nu satisface lema de pompare"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "334",
+   "title": "Fie L un limbaj independent de context si Turing…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L$ un limbaj independent de context si Turing acceptat. Alegeti afirmatia adevarata:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate afirma nimic",
+     "$L$ este finit",
+     "$L$ este Turing decidabil",
+     "$L$ nu este Turing decidabil"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "335",
+   "title": "Fie L1,L2 doua limbaje a.i L1L2 ∈ LR",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Grilă de examen LFA (Moodle)",
+   "statement": "Fie $L_1,L_2$ doua limbaje a.i $L_1L_2 \\in LR$. Daca $L_1 \\in LR$, ce se poate afirma intotdeauna despre $L_2$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu se poate afirma nimic”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate afirma nimic",
+     "$L_2$ nu este regulat",
+     "$L_2$ este finit",
+     "$L_2$ este regulat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "336",
+   "title": "Care este ER pentru L(a(a∪ b)*) ∪ L(b(a∪ b)*)",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Care este ER pentru $\\mathcal {L}(a(a\\cup b)^*) \\cup \\mathcal {L}(b(a\\cup b)^*)$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$(a\\cup b)(a\\cup b)^*$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\phi $",
+     "$(a\\cup b)^*$",
+     "$(a\\cup b)$",
+     "$(a\\cup b)(a\\cup b)^*$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "337",
+   "title": "Fie L1 = {aⁿbⁿaⁿ | n ≥ 0} si L2 = {aⁿ | n ≥ 0}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L_1 = \\{a^nb^na^n$ $\\mid n \\geq 0\\}$ si $L_2 = \\{a^n \\mid n \\geq 0\\}$. care dintre urmatoarele variante este adevarata?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L_1 \\notin LIC,$ $L_2 \\in LR, L_1 \\setminus L_2 \\notin LIC$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L_1 \\in LIC, L_2 \\in LR,$ $L_1 \\cup L_2 \\in LIC$",
+     "$L_1 \\notin LIC,$ $L_2 \\in LR, L_1 \\cup L_2 \\in LR$",
+     "$L_1 \\notin LIC,$ $L_2 \\in LR, L_1 \\setminus L_2 \\notin LIC$",
+     "$L_1 \\in LIC, L_2 \\in LR,$ $L_1 \\setminus L_2 \\in LR$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "338",
+   "title": "Fie r = a(a*a ∪ b*)*. Alegeti varianta corecta",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $r = a(a^*a \\cup b^*)^*$. Alegeti varianta corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$aa\\in \\mathcal {L}(r)$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$b$ este in orice sir generat de $r$",
+     "niciuna dintre variante",
+     "$b\\in \\mathcal {L}(r)$",
+     "$aa\\in \\mathcal {L}(r)$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "339",
+   "title": "Fie Σ ={a}, L={ww | w ∈ Σ * }. Cum este L",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $\\Sigma =\\{a\\}$, $L=\\{ww \\mid w \\in \\Sigma ^* \\}$. Cum este L?:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este regulat, dar nu finit”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este regulat, dar nu finit",
+     "$L$ este independent de context, dar nu regulat",
+     "$L$ nu este independent de context",
+     "$L$ este finit"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "340",
+   "title": "Cate AFD pentru L = ∅ , |Σ | = 4 se pot construi",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cate AFD pentru $L = \\phi , |\\Sigma | = 4 $ se pot construi?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „o infinitate”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nicio varianta",
+     "niciunul",
+     "unul",
+     "o infinitate"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "341",
+   "title": "Fie L1, L2 peste Σ ={a,b} a.i",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L_1, L_2$ peste $\\Sigma =\\{a,b\\}$ a.i. $L_1L_2=L_2L_1$. Doua dintre limbajele care respecta aceasta proprietate sunt:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L_1=\\{w\\in \\Sigma ^*$ $\\mid |w|=2k, k \\geq 0\\},$ $L_2=\\{w\\in \\Sigma ^*$ $\\mid |w|=2k+1,$ $k \\geq 0\\}$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu exista doua limbaje care sa satisfaca proprietatea de mai sus",
+     "$L_1=\\mathcal {L}(a^*),$ $L_2=\\mathcal {L}(b^*)$",
+     "$L_1=\\mathcal {L}(a^*b^*),$ $L_2=\\mathcal {L}(b^*a^*)$",
+     "$L_1=\\{w\\in \\Sigma ^*$ $\\mid |w|=2k, k \\geq 0\\},$ $L_2=\\{w\\in \\Sigma ^*$ $\\mid |w|=2k+1,$ $k \\geq 0\\}$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "342",
+   "title": "Care este expresia regulata care genereaza L={w ∈…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Care este expresia regulata care genereaza $L=\\{w \\in \\{0,1\\}^*$ $\\mid \\#_{00}(w) \\leq 1\\}$\n1) $((e \\cup 0)11^*)^*(e \\cup 0 \\cup 00)(11^*(e \\cup 0))^*$\n2) $(0 \\cup e)(e \\cup 1 \\cup 10)^*(e \\cup 00)(e \\cup 1 \\cup 10)^*$\n3) $(e \\cup 0)(e \\cup 1 \\cup 10)^*(e \\cup 1 \\cup 01)^*(e \\cup 0)$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „prima si a treia”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "a doua si a treia",
+     "a doua",
+     "prima",
+     "prima si a treia"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "343",
+   "title": "Fie L1 cu AFN-ul asociat M1 =(K1, Σ 1, Δ 1, s1, F1)…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L_1$ cu AFN-ul asociat $M_1 = (K_1, \\Sigma _1,$ $\\Delta _1, s_1,$ $F_1)$ si $L_2$ cu AFN-ul asociat $M_2 = (K_2, \\Sigma _2,$ $\\Delta _2, s_2,$ $F_2)$. Stiind ca $L_1 \\subseteq L_2$, $K_1 = K_2$, $\\Sigma _1 = \\Sigma _2$ si $|\\Sigma _1| > 1$, care dintre urmatoarele variante este adevarata:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu exista o relatie intre $\\Delta _1$ si $\\Delta _2$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\Delta _1 \\subseteq \\Delta _2$",
+     "$F_1 = F_2$",
+     "Nu exista o relatie intre $\\Delta _1$ si $\\Delta _2$",
+     "Nu exista $L_1, L_2$ care sa satisfaca cerintele date"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "344",
+   "title": "Fie L={aᵖbᵏaᵖ | p ≤ 100<k}. Cum este L",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L=\\{a^pb^ka^p$ $\\mid p \\leq 100<k\\}$. Cum este $L$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „limbaj regulat, dar nu finit”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "limbaj independent de context, dar nu regulat",
+     "limbaj regulat, dar nu finit",
+     "finit",
+     "nu este limbaj independent de context si nici regulat"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "345",
+   "title": "Fie L un limbaj independent de context finit",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L$ un limbaj independent de context finit. Selectati varianta adevarata.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Exista cel putin un AFD ce accepta acest limbaj”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Exista cel putin un AFD ce accepta acest limbaj",
+     "Exista cel mult o gramatica care genereaza acest limbaj",
+     "Nu se poate scrie o expresie regulata pentru acest limbaj",
+     "Nu se poate construi niciun automat pentru acest limbaj"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "346",
+   "title": "Fie expresia regulata E = 0e* ∪ 1∅ *",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie expresia regulata $E = 0e^* \\cup 1\\phi ^*$:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$E = 0 \\cup 1$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$E = 0^* \\cup 1$",
+     "$E = 0 \\cup 1$",
+     "$E = 0^*$",
+     "$E = 0$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "347",
+   "title": "Fie L={w∈ {0,1}*| w de forma uuᴿ}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L=\\{w\\in \\{0,1\\}^*\\mid w$ de forma $uu^R\\}$. Alegeti varianta corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Se poate construi un APD pentru L”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate construi un APD pentru L",
+     "$L$ este finit",
+     "Nicio varianta",
+     "Se poate construi un APD pentru L"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "348",
+   "title": "Fie L este un limbaj Turing acceptat",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L$ este un limbaj Turing acceptat. Alegeti varianta corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Niciuna dintre celelalte variante”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\overline {L}$ este Turing acceptat, dar nu Turing decidabil",
+     "$\\overline {L}$ nu este Turing acceptat",
+     "Niciuna dintre celelalte variante",
+     "$\\overline {L}$ este Turing decidabil"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "349",
+   "title": "Un limbaj decis de o masina Turing cu k = 100 benzi…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Un limbaj decis de o masina Turing cu $k = 100$ benzi si $h=10$ capete de citire:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „poate fi decis de o masina Turing cu $k=3$ si $h=1$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu poate fi decis de o masina Turing cu $k=2$ si $h=2$",
+     "niciuna dintre variante",
+     "poate fi decis de o masina Turing cu $k=3$ si $h=1$",
+     "nu poate fi acceptat de o masina Turing cu $k=1$ si $h=3$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "350",
+   "title": "Fie L un limbaj Turing decidabil",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L$ un limbaj Turing decidabil. Atunci $L^R=\\{w\\in \\Sigma ^*$ $\\mid w^R \\in L\\}$ (multimea sirurilor care au rasturnatul in $L$):",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "este Turing decidabil",
+     "nu este Turing acceptat",
+     "este Turing acceptat, dar nu decidabil",
+     "nu se poate preciza"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "351",
+   "title": "Limbajul L = {ρ(D) | D ∈ AFD ∧ ∃ M ∈ MT ai L(M) =…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Limbajul $L = \\{\\rho (D)$ $\\mid D \\in AFD \\wedge \\exists M \\in MT$ ai $L(M) = L(D)\\}$ este:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate preciza",
+     "Turing decidabil",
+     "Turing acceptat, dar nu Turing decidabil",
+     "Nu este Turing acceptat"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "352",
+   "title": "Adevărat/fals: {(L*)} = ( {L})*…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- $\\overline {(L^*)} =$ $(\\overline {L})^*$\n- $(L^*)^* = L^*$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Fals, Adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevarat, Fals",
+     "Fals, Adevarat",
+     "Adevarat, Adevarat",
+     "Fals, Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "353",
+   "title": "Fie L1 ∈ LR, L2 ∈ LIC, L3 ∉ LIC",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L_1 \\in LR, L_2 \\in LIC,$ $L_3 \\notin LIC$. Daca $L_4 = L_1 \\cap \\{a^nb^n | n=2k,$ $k \\geq 0 \\}$, atunci $L_5 = (L_1 \\cap L_2) \\cup (L_3 \\cap \\emptyset ) \\cup (L_4 \\cap \\Sigma ^*)$. Cum este $L_5$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „LIC”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "LIC",
+     "$L_5 = \\emptyset $",
+     "LR",
+     "Nu e LIC"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "354",
+   "title": "Care este numarul minim de tranzitii ale…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Care este numarul minim de tranzitii ale automatului finit determinist pentru urmatorul limbaj $ L=\\{w\\in \\{a,b\\}^* \\mid w $ incepe cu a $\\}$:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „6”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "4",
+     "2",
+     "3",
+     "6"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "355",
+   "title": "Fie L = {ρ(A1) ρ(A2) | A1, A2 ∈ APD ∧ L(A1)=L(A2)}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie L = {$\\rho (A_1) \\rho (A_2)$ $\\mid A_1, A_2 \\in APD \\wedge \\mathcal {L}(A_1)=\\mathcal {L}(A_2)\\}$. Cum este L in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu este Turing Acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Turing Decidabil",
+     "Turing Acceptat",
+     "Nu se poate afirma nimic",
+     "Nu este Turing Acceptat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "356",
+   "title": "Fie L = {ρ(M) | L(M) = ∅ }",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie L = {$\\rho (M) \\mid \\mathcal {L}(M) =$ $\\emptyset \\}$. Cum este L in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu este Turing Acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu este Turing Acceptat",
+     "Turing Decidabil",
+     "Nu se poate afirma nimic",
+     "Turing Acceptat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "357",
+   "title": "Fie L = {ρ(M)ρ(w1)ρ(w2) | M accepta w1 in mai mult…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie L = {$\\rho (M)\\rho (w_1)\\rho (w_2)$ $\\mid M$ accepta $w_1$ in mai mult de 10 tranzitii si accepta $w_2$ in mai putin de 10 tranzitii}. Cum este L in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Turing Acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu exista un astfel de limbaj",
+     "Turing Decidabil",
+     "Turing Acceptat",
+     "Nu e Turing Acceptat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "358",
+   "title": "Din ce clasa de limbaje face parte urmatorul limbaj…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Din ce clasa de limbaje face parte urmatorul limbaj (in sensul cel mai strict): $L = \\{ w \\in \\{1\\}^*$ $\\mid w = x^ny^nz^n,$ $x, y, z \\in \\{1\\}^*,$ $n \\geq 0 \\}$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „LR”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Limbaj finit",
+     "LR",
+     "LIC",
+     "Nu se poate specifica"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "359",
+   "title": "Cate automate finite deterministe se pot scrie…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cate automate finite deterministe se pot scrie pentru $L=\\{a\\}$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „O infinitate”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "Niciunul",
+     "8",
+     "O infinitate"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "360",
+   "title": "Fie Σ = {a,b,c} si L = { w ∈ Σ * | w=xcycz, x,y,z∈…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $\\Sigma = \\{a,b,c\\}$ si $L = \\{ w \\in \\Sigma ^*$ $\\mid w=xcycz, x,y,z\\in \\{a,b\\} ^*,$ $z-$palindrom, $ |z| \\geq 300\\}$. Cum este $L$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „LIC”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate spune",
+     "LIC",
+     "Limbaj finit",
+     "LR"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "361",
+   "title": "Adevărat/fals: Este posibil ca un automat finit nedeter…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- Este posibil ca un automat finit nedeterminist cu 2 stari sa accepte urmatorul limbaj $ L=\\{e\\}$?\n- Este posibil ca un automat finit nedeterminist cu 3 stari sa accepte urmatorul limbaj $ L=\\emptyset $?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Adevarat, Adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevarat, Adevarat",
+     "Fals, Adevarat",
+     "Adevarat, Fals",
+     "Fals, Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "362",
+   "title": "Fie Σ un alfabet, cate automate finite deterministe…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $\\Sigma $ un alfabet, cate automate finite deterministe se pot scrie pentru $L=\\Sigma ^*$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „O infinitate”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "1",
+     "Niciunul",
+     "O infinitate",
+     "5"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "363",
+   "title": "Fie G1 =(V1, Σ , R1, S1) si G2 =(V2, Σ , R2, S2)…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $G_1 = (V_1, \\Sigma , R_1, S_1)$ si $G_2 = (V_2, \\Sigma , R_2, S_2)$ doua gramatici independente de context. Ce regula putem adauga astfel incat sa obtinem gramatica ce genereaza $\\mathcal {L}(G_1) \\cap \\mathcal {L}(G_2)$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „niciuna dintre variante”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$S \\rightarrow S_1S_2$ $\\mid S_2S_1$ $\\mid SS$",
+     "$S \\rightarrow S_1S_2$",
+     "niciuna dintre variante",
+     "$S \\rightarrow S_1$ $\\mid S_2 \\mid SS$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "364",
+   "title": "Adevărat/fals: Daca L este un limbaj astfel incat pentr…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- Daca $L$ este un limbaj astfel incat pentru fiecare sir din $L$ exista un AFD care-l accepta, atunci $L$ este regulat.\n- Daca $L_1$ este un limbaj regulat si $L_2$ este un limbaj neregulat astfel incat $L_1 \\cap L_2=\\emptyset $, atunci $L_1 \\cup L_2$ nu\n- este regulat.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Fals, Adevarat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Fals, Fals",
+     "Adevarat, Adevarat",
+     "Adevarat, Fals",
+     "Fals, Adevarat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "365",
+   "title": "Adevărat/fals: Multimea limbajelor generate de toate ex…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Alegeti valoarea de adevar a urmatoarelor afirmatii:\n- Multimea limbajelor generate de toate expresiile regulate este echivalenta cu multimea limbajelor regulate acceptate de toate\n- automatele push-down.\n- $\\forall L\\in LR $ infinit, se poate scrie o expresie regulata pentru orice submultime a lui $L$.",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Adevarat, Fals”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Fals, Adevarat",
+     "Fals, Fals",
+     "Adevarat, Fals",
+     "Adevarat, Adevarat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "366",
+   "title": "Fie Σ = {a,b} si L = { w ∈ Σ * | w=uaᵖ, u∈ Σ *…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $\\Sigma = \\{a,b\\}$ si $L = \\{ w \\in \\Sigma ^*$ $\\mid w=ua^p, u\\in \\Sigma ^*,$ $p-$nr prim, $ p \\leq 200\\}$. Cum este $L$ in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „LR”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "LR",
+     "Nu se poate spune",
+     "Limbaj finit",
+     "LIC"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "367",
+   "title": "Fie L={w ∈ {0,1}* | numarul de 1 din w este prim}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L=\\{w \\in \\{0,1\\}^* \\mid $ numarul de 1 din w este prim$\\}$. Cum este L in cel mai strict sens?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nicio varianta",
+     "Limbaj finit",
+     "Limbaj independent de context",
+     "Limbaj regulat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "368",
+   "title": "Fie gramatica G=(V, Σ , R, S) cu urmatoarele reguli",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie gramatica $G=(V, \\Sigma , R, S)$ cu urmatoarele reguli: $S \\rightarrow SS | aAB | BB$\n$A \\rightarrow a | A | AAB | e$\n$B \\rightarrow bB | AS | SAA$ Ce limbaj genereaza gramatica G?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$\\mathcal {L}(G) = \\emptyset $”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$\\mathcal {L}(G) =$ $\\{w \\in \\{a, b\\}^*$ $\\mid \\#_a(w) > \\#_b(w)\\}$",
+     "$\\mathcal {L}(G) =$ $\\mathcal {L}((a \\cup b)^*)$",
+     "$\\mathcal {L}(G) = \\emptyset $",
+     "$\\mathcal {L}(G) = \\{e\\}$"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "369",
+   "title": "Cum este urmatorul limbaj L={ρ(G1) | G1 ∈ GIC ∧…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cum este urmatorul limbaj $L=\\{\\rho (G_1)$ $\\mid G_1 \\in GIC$ $\\wedge $ $\\mathcal {L}(G_1) $ este infinit$\\} ?$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ nu este Turing acceptat",
+     "$L$ este finit",
+     "$L$ este Turing acceptat, dar nu Turing decidabil",
+     "$L$ este Turing decidabil"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "370",
+   "title": "Cum este urmatorul limbaj L={ρ(M) | M are 3 stari…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cum este urmatorul limbaj $L=\\{\\rho (M) \\mid $ M are 3 stari si 10 tranzitii$\\} ?$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este finit",
+     "$L$ este Turing acceptat, dar nu Turing decidabil",
+     "$L$ este Turing decidabil",
+     "$L$ nu este Turing acceptat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "371",
+   "title": "Un limbaj decis de o masina Turing cu k > 100 benzi",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Un limbaj decis de o masina Turing cu $k > 100$ benzi:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „poate fi decis de o masina Turing cu $k+7$ benzi”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu poate fi acceptat de o masina Turing cu $k+10$ benzi",
+     "niciuna dintre variante",
+     "nu poate fi decis de o masina Turing cu $k - 20$ benzi",
+     "poate fi decis de o masina Turing cu $k+7$ benzi"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "372",
+   "title": "Cum este urmatorul limbaj L={ρ(M1)ρ(M2)ρ(M3) |…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cum este urmatorul limbaj $L=\\{\\rho (M_1)\\rho (M_2)\\rho (M_3)$ $\\mid$ $M_1,M_2,M_3 \\in AFD$ $\\wedge $ $\\mathcal {L}(M_1) =$ $\\mathcal {L}(M_2) =$ $\\mathcal {L}(M_3)\\}$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ nu este Turing acceptat",
+     "$L$ este finit",
+     "$L$ este Turing decidabil",
+     "$L$ este Turing acceptat, dar nu Turing decidabil"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "373",
+   "title": "Fie L={w∈ {a,b,c}* | #a(w)=#b(w)=#c(w)}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L=\\{w\\in \\{a,b,c\\}^*$ $\\mid \\#_a(w)=\\#_b(w)=\\#_c(w)\\}$. Alegeti varianta corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu se poate construi un APD determinist pentru L”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate construi un APD determinist pentru L",
+     "$L$ este finit",
+     "Nicio varianta",
+     "Se poate construi un APD determinist pentru L"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "374",
+   "title": "Un limbaj decis de o masina Turing cu k = 20 benzi…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Un limbaj decis de o masina Turing cu $k = 20$ benzi si $h=20$ capete de citire:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „niciuna dintre variante”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu poate fi decis de o masina Turing cu $2$ benzi si $2$ capete de citire",
+     "nu poate fi acceptat de o masina Turing cu o banda si $3$ capete de citire",
+     "poate fi decis de o masina Turing cu $3$ benzi limitate atat la stanga cat si la dreapta si $h - 1 + 2$ capete de citire",
+     "niciuna dintre variante"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "375",
+   "title": "Cum este urmatorul limbaj L={ρ(M)ρ(w) | M ∈ APD ∧ M…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cum este urmatorul limbaj $L=\\{\\rho (M)\\rho (w)$ $\\mid M \\in APD \\wedge M$ accepta $w\\} ?$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este Turing acceptat, dar nu Turing decidabil",
+     "$L$ este finit",
+     "$L$ este Turing decidabil",
+     "$L$ nu este Turing acceptat"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "376",
+   "title": "Fie M=(K,Σ ,Γ ,Δ ,s,F). Alegeti varianta corecta",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $M=(K,\\Sigma ,\\Gamma ,\\Delta ,s,F)$. Alegeti varianta corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Niciuna dintre celelalte variante”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$|\\Sigma |=|\\Gamma |$",
+     "Niciuna dintre celelalte variante",
+     "$\\Sigma =\\Gamma $",
+     "$|\\Sigma | \\geq |\\Gamma |$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "377",
+   "title": "Fie limbajul L1 = L(a*b*) si un limbaj L2 astfel…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie limbajul $L_1 = \\mathcal {L}(a^*b^*)$ si un limbaj $L_2$ astfel incat $L_2 \\subseteq L_1$. Care dintre urmatoarele afirmatii este intotdeauna adevarata?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu se poate spune nimic”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Nu se poate spune nimic",
+     "$L_2 \\in LR$",
+     "$L_2 \\in LIC$",
+     "$L_2 = L_1$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "378",
+   "title": "Care este expresia regulata care genereaza L={w ∈…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Care este expresia regulata care genereaza $L=\\{w \\in \\{0,1\\}^*$ $\\mid \\#_{00}(w) \\leq 1\\}$\n1) $(e \\cup 1 \\cup 01)^*(e \\cup 00 \\cup 0)(e \\cup 1 \\cup 10)^*$\n2) $(e \\cup 0)(e \\cup 1 \\cup 10)^*(e \\cup 1 \\cup 10)^*(e \\cup 0)$\n3) $((e \\cup 0)11^*)^*(e \\cup 0 \\cup 00)(11^*(e \\cup 0))^*$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „prima si a treia”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "prima si a doua",
+     "prima si a treia",
+     "a doua si a treia",
+     "prima"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "379",
+   "title": "Fie M1={L | L∈ LR ∧ {0} ∈ L} si M2={L | L∈ LR ∧ {1}…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $M_1=\\{L \\mid L\\in LR \\wedge \\textit {0} \\in L\\}$ si $M_2=\\{L \\mid L\\in LR \\wedge \\textit {1} \\in L\\}$. Cu cine este egal $M_1 \\cap M_2$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$M_3=\\phi $",
+     "nicio varianta",
+     "$M_3 =\\{L \\mid L\\in LR\\}$",
+     "$M_3 =\\{L \\mid L\\in LR \\wedge \\textit {01} \\in L\\}$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "380",
+   "title": "Cate AFD pentru L = L(0*), Σ = {0,1} se pot construi",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cate AFD pentru $L = \\mathcal {L}(0^*),$ $\\Sigma = \\{0,1\\}$ se pot construi?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „nicio varianta”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "niciunul",
+     "unul",
+     "doua",
+     "nicio varianta"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "381",
+   "title": "Fie L={0ⁿ1ᵐ0ⁿ | m<12<n}. Cum este L",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L=\\{0^n1^m0^n \\mid m<12<n\\}$. Cum este $L$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „limbaj independent de context, dar nu regulat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "limbaj independent de context, dar nu regulat",
+     "nu este limbaj independent de context si nici regulat",
+     "limbaj regulat, dar nu finit",
+     "finit"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "382",
+   "title": "Fie r = a(aa* ∪ b*)*. Alegeti varianta corecta",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $r = a(aa^* \\cup b^*)^*$. Alegeti varianta corecta:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$aa\\in \\mathcal {L}(r)$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$aa\\in \\mathcal {L}(r)$",
+     "$e\\in \\mathcal {L}(r)$",
+     "niciuna dintre variante",
+     "$b$ este in orice sir generat de $r$"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "383",
+   "title": "Fie L = {0ⁿ1ⁿ0ᵐ1ᵐ | m,n≥ 0}. L este un",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L = \\{0^n1^n0^m1^m$ $\\mid m,n\\geq 0\\}$. $L$ este un:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „limbaj independent de context”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "limbaj regulat",
+     "nu se poate preciza",
+     "limbaj dependent de context",
+     "limbaj independent de context"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "384",
+   "title": "Fie T ={L | L ∈ LR} si un limbaj oarecare L∈ T…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $T =\\{L $ $\\mid $ $L \\in LR$} si un limbaj oarecare $L\\in T$, astfel incat $M_1 = (K_1, \\Sigma _1,$ $\\delta _1, s_1,$ $F_1)$ un AFD pentru $L$ si $M_2 = (K_2, \\Sigma _2,$ $\\Delta _2, s_2,$ $F_2)$ un AFN pentru $L$. care dintre urmatoarele afirmatii este adevarata:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Numarul de tranzitii din $M_1 \\geq |K_1|$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$|K_2| <= |K_1|$ daca $L$ este un limbaj infinit",
+     "$|\\Delta _2| = |\\Sigma _2| * |K_2|$",
+     "$0 < |\\Delta _2| < \\infty $",
+     "Numarul de tranzitii din $M_1 \\geq |K_1|$"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "385",
+   "title": "Fie L1 ∈ LIC, L2 ∈ LR, L3 un limbaj finit",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L_1 \\in LIC, L_2 \\in LR, L_3$ un limbaj finit. Cum este $L_4 = ((L_1 \\cap L_3) \\setminus L_2 ) \\cap L_1$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L_4 \\in LR$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L_4 \\notin LIC$",
+     "$L_4 \\in LR$",
+     "Nu se poate preciza cu exactitate tipul lui $L_4$",
+     "$L_4 \\in LIC \\setminus LR$"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "386",
+   "title": "Care este ER pentru L(0(0∪ 1)*) ∪ L(1(1∪ 0)*)",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Care este ER pentru $\\mathcal {L}(0(0\\cup 1)^*) \\cup \\mathcal {L}(1(1\\cup 0)^*)$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$(0\\cup 1)(0\\cup 1)^*$”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$(0\\cup 1)(0\\cup 1)^*$",
+     "$(0\\cup 1)$",
+     "$(0\\cup 1)^*$",
+     "$\\phi $"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "387",
+   "title": "Un limbaj decis de o masina Turing cu k = 100 benzi…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Un limbaj decis de o masina Turing cu $k = 100$ benzi si $h=7$ capete de citire:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „poate fi decis de o masina Turing cu $3$ benzi limitate la stanga si $h - 1 + 2$ capete de citire”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu poate fi acceptat de o masina Turing cu o banda bidimensionala infinita si $3$ capete de citire",
+     "nu poate fi decis de o masina Turing cu $2$ benzi si $2$ capete de citire",
+     "poate fi decis de o masina Turing cu $3$ benzi limitate la stanga si $h - 1 + 2$ capete de citire",
+     "niciuna dintre variante"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "388",
+   "title": "Fie L={ρ(M) | M accepta ρ(M)}",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $L=\\{\\rho (M) \\mid $ M accepta $\\rho (M)\\} $. Ce se poate spune despre $\\overline {L}$?",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „Nu este Turing acceptat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Este Turing decidabil",
+     "Este Turing acceptat, dar nu Turing decidabil",
+     "Este finit",
+     "Nu este Turing acceptat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "389",
+   "title": "Cum este urmatorul limbaj L={ρ(G1)ρ(G2) | G1,G2∈…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Cum este urmatorul limbaj $L=\\{\\rho (G_1)\\rho (G_2) \\mid $ $G_1,G_2\\in GIC$ $\\wedge $ $|\\mathcal {L}(G_1)| =|\\mathcal {L}(G_2)| =$ $0$ $ \\} ?$",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este Turing decidabil”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este Turing decidabil",
+     "$L$ este finit",
+     "$L$ este Turing acceptat, dar nu Turing decidabil",
+     "$L$ nu este Turing acceptat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "390",
+   "title": "Fie Σ = {0, 1} si L = {w ∈ Σ * | ∀ u, v, x ∈ Σ *, w…",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $\\Sigma = \\{0, 1\\}$ si $L = \\{w \\in \\Sigma ^*$ $\\mid \\forall u,$ $v, x \\in \\Sigma ^*,$ $w = uvx, \\#_0(x) - \\#_1(x) \\leq 1\\}$. Alegeti varianta adevarata:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ este independent de context, dar nu regulat”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este regulat, dar nu finit",
+     "$L$ este finit",
+     "$L$ nu este independent de context",
+     "$L$ este independent de context, dar nu regulat"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "391",
+   "title": "Fie Σ ={a,b}, L={ww | w ∈ Σ * }. Cum este L",
+   "chapter": "10. Grile din teste și examene",
+   "difficulty": "medie",
+   "source": "Test grilă LFA (Moodle)",
+   "statement": "Fie $\\Sigma =\\{a,b\\}$, $L=\\{ww \\mid w \\in \\Sigma ^* \\}$. Cum este L?:",
+   "hint": "",
+   "solution": "Răspunsul corect (după grila de pe Moodle): „$L$ nu este independent de context”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "$L$ este independent de context, dar nu regulat",
+     "$L$ este finit",
+     "$L$ este regulat, dar nu finit",
+     "$L$ nu este independent de context"
+    ],
+    "answer": 3
    }
   }
  ]
