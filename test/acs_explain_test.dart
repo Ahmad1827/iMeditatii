@@ -80,6 +80,22 @@ Future<void> _wait(WidgetTester t, [int n = 12]) async {
   }
 }
 
+/// The card over a page and the window layer, as the problem page puts them.
+Future<ExplainController> _pump(WidgetTester t, AcsInk ink, _Page page, {VoidCallback? onNext}) async {
+  final c = ExplainController(problem: _problem, course: 'LFA', request: page.request, latest: page.latest, onNext: onNext);
+  addTearDown(c.dispose);
+  ThemeManager.acsStyleNotifier.value = ink.terminal ? AcsStyle.terminal : AcsStyle.notebook;
+  await t.pumpWidget(MaterialApp(
+    home: Scaffold(
+      body: Stack(children: [
+        Positioned(left: 16, right: 16, top: 16, child: ExplainLauncher(c, ink)),
+        Positioned.fill(child: ExplainLayer(c)),
+      ]),
+    ),
+  ));
+  return c;
+}
+
 Widget _host(Widget child) => MaterialApp(home: Scaffold(body: SingleChildScrollView(child: Padding(padding: const EdgeInsets.all(16), child: child))));
 
 void main() {
@@ -130,7 +146,7 @@ void main() {
       addTearDown(() => ClaudeBridge.client = http.Client());
       final ink = AcsInk.of(style, false);
       final page = _Page(gives: false, with_: _attempt);
-      await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: ink, course: 'LFA', request: page.request, latest: page.latest)));
+      await _pump(t, ink, page);
       final button = find.textContaining(RegExp('de ce nu merge', caseSensitive: false));
       expect(button, findsWidgets);
       await t.tap(button.first);
@@ -145,6 +161,26 @@ void main() {
       await _wait(t);
       expect(asked, hasLength(2));
       expect(asked.last['session'], '11111111-2222-3333-4444-555555555555');
+      // closed, the talk is kept and the card brings it back
+      await t.tap(find.byTooltip('Închide (discuția rămâne)'));
+      await t.pump();
+      expect(find.textContaining('Fă finală q0'), findsNothing);
+      expect(find.textContaining('redeschizi'), findsOneWidget);
+      await t.tap(find.textContaining(RegExp('de ce nu merge', caseSensitive: false)).first);
+      await t.pump();
+      expect(find.textContaining('Fă finală q0'), findsWidgets);
+      // dragged by its bar, the window moves
+      final before = t.getTopLeft(find.byTooltip('Șterge discuția'));
+      await t.drag(find.byIcon(Icons.drag_indicator), const Offset(60, 40));
+      await t.pump();
+      final moved = t.getTopLeft(find.byTooltip('Șterge discuția')) - before;
+      expect(moved.dx, greaterThan(20)); // less the drag's slop
+      expect(moved.dy, greaterThan(10));
+      // deleted, it waits for a new start
+      await t.tap(find.byTooltip('Șterge discuția'));
+      await _wait(t, 3);
+      expect(find.textContaining('Fă finală q0'), findsNothing);
+      expect(find.text('Discuția a fost ștearsă.'), findsOneWidget);
       expect(t.takeException(), isNull);
       await t.pumpWidget(const SizedBox());
     });
@@ -156,13 +192,13 @@ void main() {
     ClaudeBridge.client = _bridge(asked);
     addTearDown(() => ClaudeBridge.client = http.Client());
     final page = _Page(); // a check that gives no verdict (a grilă with nothing picked)
-    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, false), request: page.request, latest: page.latest)));
+    await _pump(t, AcsInk.of(AcsStyle.notebook, false), page);
     await t.tap(find.textContaining('De ce nu merge').first);
     await _wait(t);
     expect(asked, hasLength(1));
     expect(asked.first['prompt'], contains('nu a trimis încă nimic'));
     expect(asked.first['prompt'], contains('NU îi da rezolvarea'));
-    expect(find.text('Cum începi'), findsOneWidget);
+    expect(find.textContaining('Cum începi'), findsOneWidget);
     await t.pumpWidget(const SizedBox());
   });
 
@@ -173,7 +209,7 @@ void main() {
     addTearDown(() => ClaudeBridge.client = http.Client());
     var next = 0;
     final page = _Page(gives: true, with_: const Attempt('stări: q0, q1; finale: q0', '[✓] tot'));
-    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, false), request: page.request, latest: page.latest, onNext: () => next++)));
+    await _pump(t, AcsInk.of(AcsStyle.notebook, false), page, onNext: () => next++);
     await t.tap(find.textContaining('De ce nu merge').first);
     await _wait(t, 4);
     expect(find.text('Nu e nimic greșit'), findsOneWidget);
@@ -183,7 +219,7 @@ void main() {
     await t.tap(find.text('explică-mi de ce e corect'));
     await _wait(t);
     expect(asked.single['prompt'], contains('Răspunsul studentului e corect'));
-    expect(find.text('De ce e corect'), findsOneWidget);
+    expect(find.textContaining('De ce e corect'), findsOneWidget);
     expect(find.textContaining('q0 ține minte paritatea'), findsOneWidget);
     expect(t.takeException(), isNull);
     await t.pumpWidget(const SizedBox());
@@ -194,7 +230,7 @@ void main() {
     ClaudeBridge.client = MockClient((r) async => throw const SocketException('refused'));
     addTearDown(() => ClaudeBridge.client = http.Client());
     final page = _Page(gives: false, with_: _attempt);
-    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, false), request: page.request, latest: page.latest)));
+    await _pump(t, AcsInk.of(AcsStyle.notebook, false), page);
     await t.tap(find.textContaining('De ce nu merge').first);
     await _wait(t, 6);
     expect(find.textContaining('Nu găsesc Claude Code'), findsOneWidget);
@@ -207,7 +243,7 @@ void main() {
     ClaudeBridge.client = MockClient((r) async => _json(({'ok': true, 'model': 'haiku'}), 200));
     addTearDown(() => ClaudeBridge.client = http.Client());
     final page = _Page(gives: false, with_: _attempt);
-    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, true), request: page.request, latest: page.latest)));
+    await _pump(t, AcsInk.of(AcsStyle.notebook, true), page);
     await t.tap(find.textContaining('De ce nu merge').first);
     await _wait(t, 6);
     expect(find.textContaining('versiune veche'), findsOneWidget);
@@ -231,7 +267,7 @@ void main() {
     await t.tap(button);
     await _wait(t, 6);
     // the workspace's own check ran (its list of checks is drawn) and the bridge was looked for
-    expect(find.textContaining('verificare:'), findsOneWidget);
+    expect(find.textContaining('descrie exact limbajul'), findsOneWidget);
     expect(find.textContaining('Nu găsesc Claude Code'), findsOneWidget);
     expect(t.takeException(), isNull);
   });

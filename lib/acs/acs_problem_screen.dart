@@ -44,6 +44,13 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
   bool? _lastOk;
   int _verdicts = 0;
   final CheckRequest _check = CheckRequest();
+  ExplainController? _explain; // "De ce nu merge așa?": its talk and its window
+
+  @override
+  void dispose() {
+    _explain?.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -88,7 +95,7 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AcsPage(
+    final page = AcsPage(
       maxWidth: 1360,
       builder: (context, ink, narrow) {
         if (!_loaded) return Text('se încarcă...', style: ink.mono(14, color: ink.muted));
@@ -103,7 +110,17 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
         }
         final wide = MediaQuery.of(context).size.width >= 1100;
         final statement = _statement(context, ink, narrow, p);
-        final next = _data?.after(p);
+        _explain ??= ExplainController(
+          problem: p,
+          course: subject.name,
+          request: _check,
+          latest: () => (ok: _lastOk, attempt: _attempt, n: _verdicts),
+          onNext: () {
+            final next = _data?.after(p);
+            if (next != null) context.go(next.route);
+          },
+        );
+        final launcher = ExplainLauncher(_explain!, ink);
         final workspace = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           CheckHook(
             request: _check,
@@ -112,16 +129,7 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
               child: buildWorkspace(p, ink, narrow, _verdict),
             ),
           ),
-          const SizedBox(height: 16),
-          ExplainPanel(
-            key: ValueKey('explain-${p.key}'),
-            problem: p,
-            ink: ink,
-            course: subject.name,
-            request: _check,
-            latest: () => (ok: _lastOk, attempt: _attempt, n: _verdicts),
-            onNext: next == null ? null : () => context.go(next.route),
-          ),
+          if (!wide) ...[const SizedBox(height: 16), launcher],
         ]);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -133,7 +141,7 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 4, child: statement),
+                  Expanded(flex: 4, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [statement, const SizedBox(height: 22), launcher])),
                   const SizedBox(width: 28),
                   Expanded(flex: 6, child: workspace),
                 ],
@@ -149,6 +157,13 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
         );
       },
     );
+    // the talk's window floats over the page (the page stays in the same
+    // place in the tree, so its workspace keeps what was written)
+    final e = _explain;
+    return Stack(children: [
+      Positioned.fill(child: page),
+      Positioned.fill(child: e == null ? const SizedBox.shrink() : SafeArea(child: ExplainLayer(e))),
+    ]);
   }
 
   Widget _header(BuildContext context, AcsInk ink, bool narrow, AcsProblem p, String code) {

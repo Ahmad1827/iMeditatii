@@ -15,6 +15,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +23,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../code_assistant.dart' show CodeAssistant;
+import '../theme_manager.dart';
 import 'acs_data.dart';
 import 'acs_kit.dart';
 import 'ws/ws_common.dart' show Attempt, CheckRequest;
@@ -189,7 +191,7 @@ const List<(String, String)> _followUps = [
   ('arată rezolvarea', 'Acum arată-mi rezolvarea completă, explicată pas cu pas, și compar-o cu ce am scris eu.'),
 ];
 
-// ---------------------------------------------------------------- the panel
+// ---------------------------------------------------------------- the talk
 class _Turn {
   final String? question; // null: the first explanation
   String text = '';
@@ -204,206 +206,442 @@ enum _Phase { idle, checking, correct, looking, missing, old, talking }
 /// how many verdicts so far (so a new one is told from the old).
 typedef LatestVerdict = ({bool? ok, Attempt? attempt, int n});
 
-/// Under the workspace, always. Pressed, it first checks what is on the
-/// workspace now: wrong, Claude says why; nothing sent, how to start; right,
-/// that nothing is wrong (and Claude can say why it works).
-class ExplainPanel extends StatefulWidget {
+/// What is said with Claude on one problem, and where its window is. The
+/// problem page owns it: the card under the statement starts it, the
+/// window floating over the page shows it.
+///   Started, it first checks what is on the workspace now: wrong, Claude
+///   says why; nothing sent, how to start; right, that nothing is wrong
+///   (and Claude says why it works, if asked).
+class ExplainController extends ChangeNotifier {
   final AcsProblem problem;
-  final AcsInk ink;
   final String course;
   final CheckRequest? request;
   final LatestVerdict Function() latest;
   final VoidCallback? onNext;
-  const ExplainPanel({super.key, required this.problem, required this.ink, required this.latest, this.request, this.course = '', this.onNext});
+  ExplainController({required this.problem, required this.latest, this.request, this.course = '', this.onNext});
 
-  @override
-  State<ExplainPanel> createState() => _ExplainPanelState();
-}
-
-class _ExplainPanelState extends State<ExplainPanel> {
   _Phase _phase = _Phase.idle;
   final List<_Turn> _turns = [];
   String? _session, _job;
   Timer? _timer;
   int _from = 0;
-  final TextEditingController _askField = TextEditingController();
-  ExplainMode _mode = ExplainMode.wrong;
+  bool _polling = false;
+  ExplainMode mode = ExplainMode.wrong;
   Attempt _attempt = const Attempt('');
-  int _usedN = -1; // the verdict the conversation is about
+  int _usedN = -1; // the verdict the talk is about
+  bool _disposed = false;
 
-  bool get _busy => _turns.isNotEmpty && !_turns.last.done;
+  // the window
+  bool open = false;
+  bool minimized = false;
+  Offset? place; // its top left; null: where it first goes
+  Size? size;
+
+  bool get busy => _turns.isNotEmpty && !_turns.last.done;
+  bool get started => _phase != _Phase.idle;
+  bool get answerChanged => latest().n != _usedN;
+
+  void _changed() {
+    if (!_disposed) notifyListeners();
+  }
 
   @override
   void dispose() {
+    _disposed = true;
     _timer?.cancel();
-    if (_busy && _job != null) ClaudeBridge.stop(_job!);
-    _askField.dispose();
+    if (busy && _job != null) ClaudeBridge.stop(_job!);
     super.dispose();
   }
 
+  void show() {
+    open = true;
+    minimized = false;
+    _changed();
+  }
+
+  void close() {
+    open = false;
+    _changed();
+  }
+
+  void moveTo(Offset at, Size now) {
+    place = at;
+    size ??= now;
+    _changed();
+  }
+
+  void resize(Size s) {
+    size = s;
+    _changed();
+  }
+
+  void toggleMinimized() {
+    minimized = !minimized;
+    _changed();
+  }
+
+  /// Everything said is forgotten: the window waits for a new start.
+  void clear() {
+    _timer?.cancel();
+    if (busy && _job != null) ClaudeBridge.stop(_job!);
+    _turns.clear();
+    _session = null;
+    _job = null;
+    _phase = _Phase.idle;
+    _changed();
+  }
+
   /// Checks what is on the workspace now, then decides what to say.
-  Future<void> _start() async {
-    setState(() {
-      _phase = _Phase.checking;
-      _turns.clear();
-      _session = null;
-    });
-    final before = widget.latest().n;
+  Future<void> start() async {
+    _timer?.cancel();
+    if (busy && _job != null) ClaudeBridge.stop(_job!);
+    _turns.clear();
+    _session = null;
+    _phase = _Phase.checking;
+    show();
+    final before = latest().n;
     try {
-      await Future.sync(() => widget.request?.verify?.call()).timeout(const Duration(minutes: 2));
+      await Future.sync(() => request?.verify?.call()).timeout(const Duration(minutes: 2));
     } catch (_) {
       // a check that failed to run: what was heard before is used
     }
-    if (!mounted) return;
-    final l = widget.latest();
+    if (_disposed) return;
+    final l = latest();
     _usedN = l.n;
     final heard = l.n != before && l.attempt != null;
     final a = heard ? l.attempt! : (l.attempt ?? const Attempt(''));
     if (heard && l.ok == true) {
-      setState(() {
-        _attempt = a;
-        _phase = _Phase.correct;
-      });
+      _attempt = a;
+      _phase = _Phase.correct;
+      _changed();
       return;
     }
     final nothing = !heard && l.attempt == null || a.answer.trim().isEmpty;
-    _ask(nothing ? ExplainMode.empty : ExplainMode.wrong, a);
+    ask(nothing ? ExplainMode.empty : ExplainMode.wrong, a);
   }
 
-  Future<void> _ask(ExplainMode mode, Attempt a) async {
-    setState(() {
-      _mode = mode;
-      _attempt = a;
-      _phase = _Phase.looking;
-    });
+  Future<void> ask(ExplainMode m, Attempt a) async {
+    mode = m;
+    _attempt = a;
+    _phase = _Phase.looking;
+    _changed();
     final s = await ClaudeBridge.probe();
-    if (!mounted) return;
+    if (_disposed) return;
     if (s != BridgeState.found) {
-      setState(() => _phase = s == BridgeState.old ? _Phase.old : _Phase.missing);
+      _phase = s == BridgeState.old ? _Phase.old : _Phase.missing;
+      _changed();
       return;
     }
-    setState(() => _phase = _Phase.talking);
-    _send(null, explainPrompt(widget.problem, a, course: widget.course, mode: mode));
+    _phase = _Phase.talking;
+    _send(null, explainPrompt(problem, a, course: course, mode: m));
   }
 
   Future<void> _send(String? label, String prompt) async {
     final turn = _Turn(label);
-    setState(() => _turns.add(turn));
+    _turns.add(turn);
+    _changed();
     try {
       _job = await ClaudeBridge.start(prompt, session: _session);
       _from = 0;
       _timer?.cancel();
       _timer = Timer.periodic(const Duration(milliseconds: 400), (_) => _poll(turn));
     } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        turn.error = 'Nu am putut vorbi cu Claude Code: e pornit podul? ($e)';
-        turn.done = true;
-      });
+      turn.error = 'Nu am putut vorbi cu Claude Code: e pornit podul? ($e)';
+      turn.done = true;
+      _changed();
     }
   }
 
-  bool _polling = false;
   Future<void> _poll(_Turn turn) async {
-    if (_polling || _job == null) return;
+    if (_polling || _job == null || _disposed) return;
     _polling = true;
     try {
       final j = await ClaudeBridge.poll(_job!, _from);
-      if (!mounted) return;
-      setState(() {
-        turn.text += '${j['text'] ?? ''}';
-        _from = (j['next'] as num?)?.toInt() ?? _from;
-        if (j['session'] is String) _session = j['session'] as String;
-        if (j['done'] == true) {
-          turn.done = true;
-          if (j['error'] is String) turn.error = j['error'] as String;
-          _timer?.cancel();
-        }
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        turn.error = 'Podul nu mai răspunde (l-ai închis?).';
+      if (_disposed || !_turns.contains(turn)) return;
+      turn.text += '${j['text'] ?? ''}';
+      _from = (j['next'] as num?)?.toInt() ?? _from;
+      if (j['session'] is String) _session = j['session'] as String;
+      if (j['done'] == true) {
         turn.done = true;
-      });
+        if (j['error'] is String) turn.error = j['error'] as String;
+        _timer?.cancel();
+      }
+      _changed();
+    } catch (_) {
+      if (_disposed || !_turns.contains(turn)) return;
+      turn.error = 'Podul nu mai răspunde (l-ai închis?).';
+      turn.done = true;
       _timer?.cancel();
+      _changed();
     } finally {
       _polling = false;
     }
   }
 
-  void _stop() {
+  void stop() {
     final j = _job;
     if (j != null) ClaudeBridge.stop(j);
   }
 
-  void _followUp(String label, String prompt) {
-    if (_busy || _session == null) return;
+  void followUp(String label, String prompt) {
+    if (busy || _session == null) return;
     _send(label, prompt);
+  }
+}
+
+BoxDecoration _card(AcsInk ink, {Color? edge}) => BoxDecoration(
+      color: ink.panel,
+      border: Border.all(color: edge ?? ink.line, width: edge == null ? 1 : 1.4),
+      borderRadius: ink.terminal ? null : BorderRadius.circular(10),
+    );
+
+// ---------------------------------------------------------------- the card
+/// Under the statement (under the workspace on a phone): starts the talk,
+/// or brings its window back.
+class ExplainLauncher extends StatelessWidget {
+  final ExplainController c;
+  final AcsInk ink;
+  const ExplainLauncher(this.c, this.ink, {super.key});
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: c,
+        builder: (context, _) {
+          final kept = c.started && !c.open;
+          return AcsTap(
+            label: 'De ce nu merge așa?',
+            onTap: kept ? c.show : (c.open && c.started ? c.show : c.start),
+            builder: (h) => AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              decoration: _card(ink, edge: h ? ink.strong : ink.accent).copyWith(color: h ? ink.hover : ink.panel),
+              child: Row(children: [
+                _Pulse(ink: ink, child: Icon(Icons.psychology_alt_outlined, size: 26, color: ink.accent)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(ink.terminal ? '\$ de ce nu merge așa?' : 'De ce nu merge așa?', style: ink.mono(16, weight: FontWeight.w800, color: ink.strong)),
+                    const SizedBox(height: 2),
+                    Text(
+                        kept
+                            ? 'Ai o discuție cu Claude despre problema asta: apasă ca s-o redeschizi.'
+                            : c.open
+                                ? 'Discuția e deschisă în fereastra de deasupra paginii: o muți trăgând de bara ei.'
+                                : 'Verifică ce ai scris până acum și, dacă e greșit, Claude îți arată pe exemple unde și de ce. N-ai scris nimic? Îți spune cum să începi. Merge cu Claude Code de pe calculatorul tău.',
+                        style: ink.mono(13, color: ink.muted)),
+                  ]),
+                ),
+                const SizedBox(width: 8),
+                Icon(kept || c.open ? Icons.open_in_new_rounded : Icons.arrow_forward, size: 18, color: h ? ink.strong : ink.accent),
+              ]),
+            ),
+          );
+        },
+      );
+}
+
+// ---------------------------------------------------------------- the window
+/// The talk in a window over the page, moved by its bar and sized from its
+/// corner, so the answer on the page stays in sight. Put it in a Stack over
+/// the whole page: where there is no window, the page is touched.
+class ExplainLayer extends StatelessWidget {
+  final ExplainController c;
+  const ExplainLayer(this.c, {super.key});
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: Listenable.merge([c, ThemeManager.themeNotifier, ThemeManager.acsStyleNotifier]),
+        builder: (context, _) {
+          if (!c.open) return const SizedBox.shrink();
+          final ink = AcsInk.current;
+          return LayoutBuilder(builder: (context, box) {
+            final w = box.maxWidth, h = box.maxHeight;
+            final phone = w < 600;
+            final size = c.size ?? (phone ? Size(w - 16, h * 0.72) : Size(math.min(620, w * 0.46), math.max(380, h - 110)));
+            final sw = size.width.clamp(300.0, w).toDouble(), sh = size.height.clamp(220.0, h).toDouble();
+            final at = c.place ?? (phone ? Offset(8, h - sh - 8) : const Offset(24, 64));
+            final left = at.dx.clamp(80 - sw, w - 80).toDouble(), top = at.dy.clamp(0.0, math.max(0.0, h - 52)).toDouble();
+            return Stack(children: [
+              Positioned(
+                left: left,
+                top: top,
+                width: sw,
+                height: c.minimized ? null : sh,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, t, child) => Opacity(opacity: t, child: Transform.scale(scale: 0.96 + 0.04 * t, alignment: Alignment.topLeft, child: child)),
+                  child: Material(
+                    color: ink.bg,
+                    elevation: 8,
+                    shadowColor: Colors.black54,
+                    shape: ink.terminal
+                        ? RoundedRectangleBorder(side: BorderSide(color: ink.accent, width: 1.2))
+                        : RoundedRectangleBorder(side: BorderSide(color: ink.accent, width: 1.2), borderRadius: BorderRadius.circular(12)),
+                    clipBehavior: Clip.antiAlias,
+                    child: DefaultTextStyle(
+                      style: ink.mono(14),
+                      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                        _bar(ink, left, top, sw, sh),
+                        if (!c.minimized)
+                          Expanded(
+                            child: Stack(children: [
+                              Positioned.fill(child: _WindowBody(c, ink)),
+                              Positioned(right: 0, bottom: 0, child: _grip(ink, sw, sh, w, h)),
+                            ]),
+                          ),
+                      ]),
+                    ),
+                  ),
+                ),
+              ),
+            ]);
+          });
+        },
+      );
+
+  Widget _bar(AcsInk ink, double left, double top, double sw, double sh) {
+    Widget icon(IconData i, String tip, VoidCallback? on) => IconButton(
+          tooltip: tip,
+          visualDensity: VisualDensity.compact,
+          iconSize: 19,
+          color: ink.strong,
+          disabledColor: ink.dim,
+          onPressed: on,
+          icon: Icon(i),
+        );
+    final title = switch (c.mode) {
+      ExplainMode.wrong => 'De ce nu merge așa',
+      ExplainMode.empty => 'Cum începi',
+      ExplainMode.correct => 'De ce e corect',
+    };
+    return MouseRegion(
+      cursor: SystemMouseCursors.move,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onPanUpdate: (d) {
+          c.moveTo(Offset(left, top) + d.delta, Size(sw, sh));
+        },
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+          decoration: BoxDecoration(color: ink.accent.withValues(alpha: 0.12), border: Border(bottom: BorderSide(color: ink.line))),
+          child: Row(children: [
+            Icon(Icons.drag_indicator, size: 18, color: ink.muted),
+            const SizedBox(width: 4),
+            Icon(Icons.psychology_alt_outlined, size: 19, color: ink.accent),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(ink.terminal ? 'claude: ${title.toLowerCase()}' : title,
+                  maxLines: 1, overflow: TextOverflow.ellipsis, style: ink.mono(14.5, weight: FontWeight.w800, color: ink.strong)),
+            ),
+            if (c.busy) ...[_Dots(ink), const SizedBox(width: 6)],
+            icon(Icons.delete_outline_rounded, 'Șterge discuția', c.started ? c.clear : null),
+            icon(c.minimized ? Icons.expand_more_rounded : Icons.minimize_rounded, c.minimized ? 'Mărește' : 'Micșorează', c.toggleMinimized),
+            icon(Icons.close_rounded, 'Închide (discuția rămâne)', c.close),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _grip(AcsInk ink, double sw, double sh, double w, double h) => MouseRegion(
+        cursor: SystemMouseCursors.resizeDownRight,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onPanUpdate: (d) {
+            c.resize(Size((sw + d.delta.dx).clamp(300.0, w), (sh + d.delta.dy).clamp(220.0, h)));
+          },
+          child: Padding(padding: const EdgeInsets.all(3), child: Icon(Icons.south_east_rounded, size: 16, color: ink.muted)),
+        ),
+      );
+}
+
+class _WindowBody extends StatefulWidget {
+  final ExplainController c;
+  final AcsInk ink;
+  const _WindowBody(this.c, this.ink);
+
+  @override
+  State<_WindowBody> createState() => _WindowBodyState();
+}
+
+class _WindowBodyState extends State<_WindowBody> {
+  final ScrollController _scroll = ScrollController();
+  final TextEditingController _field = TextEditingController();
+  int _turns = 0;
+
+  ExplainController get c => widget.c;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _field.dispose();
+    super.dispose();
   }
 
   void _askTyped() {
-    final q = _askField.text.trim();
+    final q = _field.text.trim();
     if (q.isEmpty) return;
-    _askField.clear();
-    _followUp(q, q);
+    _field.clear();
+    c.followUp(q, q);
   }
 
   @override
   Widget build(BuildContext context) {
     final ink = widget.ink;
-    final Widget body = switch (_phase) {
-      _Phase.idle => _idle(ink),
-      _Phase.checking => _note(ink, 'Verific ce ai scris...', spinner: true),
-      _Phase.correct => _correct(ink),
-      _Phase.looking => _note(ink, 'Caut Claude Code pe calculatorul tău...', spinner: true),
-      _Phase.missing || _Phase.old => _setup(ink, _phase == _Phase.old),
-      _Phase.talking => _talk(ink),
-    };
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOutCubic,
-      alignment: Alignment.topCenter,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 220),
-        transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, 0.04), end: Offset.zero).animate(a), child: c)),
-        child: KeyedSubtree(key: ValueKey(_phase), child: body),
+    // a new question: shown from its start
+    if (c._turns.length != _turns) {
+      final grew = c._turns.length > _turns;
+      _turns = c._turns.length;
+      if (grew && _turns > 1) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+        });
+      }
+    }
+    final last = c._turns.isEmpty ? null : c._turns.last;
+    final canAsk = c._phase == _Phase.talking && last != null && last.done && c._session != null && !(last.error != null && last.text.isEmpty);
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Expanded(
+        child: SingleChildScrollView(
+          controller: _scroll,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 22),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            child: KeyedSubtree(key: ValueKey(c._phase), child: _content(ink, last)),
+          ),
+        ),
       ),
-    );
+      if (canAsk) _askBar(ink),
+    ]);
   }
 
-  BoxDecoration _card(AcsInk ink, {Color? edge}) => BoxDecoration(
-        color: ink.panel,
-        border: Border.all(color: edge ?? ink.line, width: edge == null ? 1 : 1.4),
-        borderRadius: ink.terminal ? null : BorderRadius.circular(10),
-      );
+  Widget _content(AcsInk ink, _Turn? last) => switch (c._phase) {
+        _Phase.idle => _fresh(ink),
+        _Phase.checking => _note(ink, 'Verific ce ai scris...'),
+        _Phase.correct => _correct(ink),
+        _Phase.looking => _note(ink, 'Caut Claude Code pe calculatorul tău...'),
+        _Phase.missing || _Phase.old => _setup(ink, c._phase == _Phase.old),
+        _Phase.talking => _talk(ink, last),
+      };
 
-  Widget _idle(AcsInk ink) => AcsTap(
-        label: 'De ce nu merge așa?',
-        onTap: _start,
-        builder: (h) => AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-          decoration: _card(ink, edge: h ? ink.strong : ink.accent).copyWith(color: h ? ink.hover : ink.panel),
-          child: Row(children: [
-            _Pulse(ink: ink, child: Icon(Icons.psychology_alt_outlined, size: 26, color: ink.accent)),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(ink.terminal ? '\$ de ce nu merge așa?' : 'De ce nu merge așa?', style: ink.mono(16, weight: FontWeight.w800, color: ink.strong)),
-                const SizedBox(height: 2),
-                Text('Verifică ce ai scris până acum și, dacă e greșit, Claude îți arată pe exemple unde și de ce. N-ai scris nimic? Îți spune cum să începi. Merge cu Claude Code de pe calculatorul tău.',
-                    style: ink.mono(13, color: ink.muted)),
-              ]),
-            ),
-            const SizedBox(width: 8),
-            Icon(Icons.arrow_forward, size: 18, color: h ? ink.strong : ink.accent),
-          ]),
-        ),
-      );
+  Widget _fresh(AcsInk ink) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Discuția a fost ștearsă.', style: ink.mono(15, weight: FontWeight.w800, color: ink.strong)),
+        const SizedBox(height: 4),
+        Text('Claude verifică din nou ce e acum în spațiul de lucru și o ia de la capăt.', style: ink.mono(13.5, color: ink.muted)),
+        const SizedBox(height: 12),
+        AcsButton(ink, 'analizează ce am scris acum', c.start, primary: true, icon: Icons.psychology_alt_outlined),
+      ]);
+
+  Widget _note(AcsInk ink, String text) => Row(children: [
+        SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: ink.accent)),
+        const SizedBox(width: 10),
+        Expanded(child: Text(text, style: ink.mono(14, color: ink.muted))),
+      ]);
 
   Widget _correct(AcsInk ink) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: _card(ink, edge: ink.good).copyWith(color: ink.good.withValues(alpha: ink.dark ? 0.10 : 0.07)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
@@ -415,19 +653,10 @@ class _ExplainPanelState extends State<ExplainPanel> {
           Text('Răspunsul tău trece toate verificările: problema e rezolvată. Vrei să știi de ce merge și ce l-ar fi stricat?', style: ink.mono(13.5, color: ink.fg)),
           const SizedBox(height: 12),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            AcsButton(ink, 'explică-mi de ce e corect', () => _ask(ExplainMode.correct, _attempt), primary: true, icon: Icons.psychology_alt_outlined),
-            if (widget.onNext != null) AcsButton(ink, 'următoarea problemă', widget.onNext, icon: Icons.arrow_forward),
-            AcsButton(ink, 'verifică din nou', _start, icon: Icons.refresh),
+            AcsButton(ink, 'explică-mi de ce e corect', () => c.ask(ExplainMode.correct, c._attempt), primary: true, icon: Icons.psychology_alt_outlined),
+            if (c.onNext != null) AcsButton(ink, 'următoarea problemă', c.onNext, icon: Icons.arrow_forward),
+            AcsButton(ink, 'verifică din nou', c.start, icon: Icons.refresh),
           ]),
-        ]),
-      );
-
-  Widget _note(AcsInk ink, String text, {bool spinner = false}) => Container(
-        padding: const EdgeInsets.all(14),
-        decoration: _card(ink),
-        child: Row(children: [
-          if (spinner) ...[SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: ink.accent)), const SizedBox(width: 10)],
-          Expanded(child: Text(text, style: ink.mono(14, color: ink.muted))),
         ]),
       );
 
@@ -446,30 +675,25 @@ class _ExplainPanelState extends State<ExplainPanel> {
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Text(title, style: ink.mono(14, weight: FontWeight.w700, color: ink.strong)), const SizedBox(height: 4), child])),
           ]),
         );
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(ink, edge: ink.warn),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text(old ? 'Podul pentru Claude Code e o versiune veche' : 'Nu găsesc Claude Code pe calculatorul tău',
-            style: ink.mono(15.5, weight: FontWeight.w800, color: ink.strong)),
-        const SizedBox(height: 4),
-        Text(
-            old
-                ? 'Îl ai pornit, dar nu știe încă să explice. Oprește-l (Ctrl+C) și pornește-l din nou cu comanda de mai jos: descarcă versiunea nouă.'
-                : 'Explicația o scrie Claude Code, folosind contul tău. Pagina nu poate porni programe, așa că un mic „pod” face legătura. Problema, răspunsul tău și rezolvarea ajung la Claude.',
-            style: ink.mono(13.5, color: ink.muted)),
-        if (!old)
-          step('1', 'Ai Claude Code instalat și te-ai autentificat',
-              Text('Dacă nu: instalează-l de pe claude.com/claude-code, apoi rulează o dată `claude` într-un terminal.', style: ink.mono(13, color: ink.muted))),
-        step(old ? '1' : '2', 'Pornește podul și lasă terminalul deschis (îți trebuie Node 18+)', _command(ink)),
-        step(old ? '2' : '3', 'Apasă din nou', Align(alignment: Alignment.centerLeft, child: AcsButton(ink, 'încearcă din nou', _start, primary: true, icon: Icons.refresh))),
-      ]),
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Text(old ? 'Podul pentru Claude Code e o versiune veche' : 'Nu găsesc Claude Code pe calculatorul tău', style: ink.mono(15.5, weight: FontWeight.w800, color: ink.strong)),
+      const SizedBox(height: 4),
+      Text(
+          old
+              ? 'Îl ai pornit, dar nu știe încă să explice. Oprește-l (Ctrl+C) și pornește-l din nou cu comanda de mai jos: descarcă versiunea nouă.'
+              : 'Explicația o scrie Claude Code, folosind contul tău. Pagina nu poate porni programe, așa că un mic „pod” face legătura. Problema, răspunsul tău și rezolvarea ajung la Claude.',
+          style: ink.mono(13.5, color: ink.muted)),
+      if (!old)
+        step('1', 'Ai Claude Code instalat și te-ai autentificat',
+            Text('Dacă nu: instalează-l de pe claude.com/claude-code, apoi rulează o dată `claude` într-un terminal.', style: ink.mono(13, color: ink.muted))),
+      step(old ? '1' : '2', 'Pornește podul și lasă terminalul deschis (îți trebuie Node 18+)', _command(ink)),
+      step(old ? '2' : '3', 'Apasă din nou', Align(alignment: Alignment.centerLeft, child: AcsButton(ink, 'încearcă din nou', c.start, primary: true, icon: Icons.refresh))),
+    ]);
   }
 
   Widget _command(AcsInk ink) => Container(
         padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
-        decoration: BoxDecoration(color: ink.bg, border: Border.all(color: ink.line), borderRadius: ink.terminal ? null : BorderRadius.circular(6)),
+        decoration: BoxDecoration(color: ink.panel, border: Border.all(color: ink.line), borderRadius: ink.terminal ? null : BorderRadius.circular(6)),
         child: Row(children: [
           Expanded(child: SelectableText(CodeAssistant.setupCommand, style: ink.mono(12.5, color: ink.strong))),
           IconButton(
@@ -483,99 +707,81 @@ class _ExplainPanelState extends State<ExplainPanel> {
         ]),
       );
 
-  Widget _talk(AcsInk ink) {
-    final last = _turns.isEmpty ? null : _turns.last;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      decoration: _card(ink, edge: ink.accent),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
-          Icon(Icons.psychology_alt_outlined, size: 20, color: ink.accent),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-                switch (_mode) {
-                  ExplainMode.wrong => ink.terminal ? 'claude: de ce nu merge așa' : 'De ce nu merge așa',
-                  ExplainMode.empty => ink.terminal ? 'claude: cum începi' : 'Cum începi',
-                  ExplainMode.correct => ink.terminal ? 'claude: de ce e corect' : 'De ce e corect',
-                },
-                style: ink.mono(15.5, weight: FontWeight.w800, color: ink.strong)),
-          ),
-          if (_busy) ...[
-            _Dots(ink),
-            const SizedBox(width: 8),
-            AcsButton(ink, 'oprește', _stop, icon: Icons.stop_rounded),
-          ],
-        ]),
-        for (final t in _turns) ...[
+  Widget _talk(AcsInk ink, _Turn? last) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        for (final t in c._turns) ...[
           if (t.question != null) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
               child: Container(
-                constraints: const BoxConstraints(maxWidth: 520),
+                constraints: const BoxConstraints(maxWidth: 460),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(color: ink.accent.withValues(alpha: 0.12), borderRadius: ink.terminal ? null : BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: ink.accent.withValues(alpha: 0.13), borderRadius: ink.terminal ? null : BorderRadius.circular(10)),
                 child: Text(t.question!, style: ink.mono(13.5, color: ink.strong)),
               ),
             ),
           ],
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           if (t.text.isEmpty && !t.done) Padding(padding: const EdgeInsets.only(top: 6), child: Text('Claude citește problema și răspunsul tău...', style: ink.mono(13.5, color: ink.muted))),
           if (t.text.isNotEmpty) ExplainText(t.text, ink, writing: !t.done),
           if (t.error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(t.error!, style: ink.mono(13.5, color: ink.bad))),
         ],
-        if (last != null && last.done && widget.latest().n != _usedN) ...[
+        if (c.busy) ...[
+          const SizedBox(height: 12),
+          Align(alignment: Alignment.centerLeft, child: AcsButton(ink, 'oprește', c.stop, icon: Icons.stop_rounded)),
+        ],
+        if (last != null && last.done && c.answerChanged) ...[
           const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(color: ink.warn.withValues(alpha: 0.10), borderRadius: ink.terminal ? null : BorderRadius.circular(8)),
             child: Row(children: [
               Expanded(child: Text('Ai trimis alt răspuns de atunci.', style: ink.mono(13.5, color: ink.strong))),
-              AcsButton(ink, 'analizează-l', _start, primary: true, icon: Icons.refresh),
+              AcsButton(ink, 'analizează-l', c.start, primary: true, icon: Icons.refresh),
             ]),
           ),
         ],
-        if (last != null && last.done) ...[
-          const SizedBox(height: 14),
-          if (last.error != null && last.text.isEmpty)
-            Align(alignment: Alignment.centerLeft, child: AcsButton(ink, 'încearcă din nou', _restart, icon: Icons.refresh))
-          else if (_session != null) ...[
-            Text('Mai departe', style: ink.mono(12.5, weight: FontWeight.w800, color: ink.muted).copyWith(letterSpacing: 1)),
-            const SizedBox(height: 6),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final (label, q) in _followUps) AcsButton(ink, label, () => _followUp(label, q)),
+        if (last != null && last.done && last.error != null && last.text.isEmpty) ...[
+          const SizedBox(height: 12),
+          Align(alignment: Alignment.centerLeft, child: AcsButton(ink, 'încearcă din nou', c.start, icon: Icons.refresh)),
+        ],
+      ]);
+
+  Widget _askBar(AcsInk ink) => Container(
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        decoration: BoxDecoration(color: ink.panel, border: Border(top: BorderSide(color: ink.line))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [
+              for (final (label, q) in _followUps) Padding(padding: const EdgeInsets.only(right: 8), child: AcsButton(ink, label, () => c.followUp(label, q))),
             ]),
-            const SizedBox(height: 10),
-            Row(children: [
-              Expanded(
-                child: TextField(
-                  controller: _askField,
-                  onSubmitted: (_) => _askTyped(),
-                  style: ink.mono(14, color: ink.strong),
-                  cursorColor: ink.accent,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Întreabă ce nu e clar...',
-                    hintStyle: ink.mono(13.5, color: ink.dim),
-                    filled: true,
-                    fillColor: ink.bg,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: ink.line), borderRadius: BorderRadius.circular(ink.terminal ? 0 : 6)),
-                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: ink.accent, width: 1.5), borderRadius: BorderRadius.circular(ink.terminal ? 0 : 6)),
-                  ),
+          ),
+          const SizedBox(height: 8),
+          Row(children: [
+            Expanded(
+              child: TextField(
+                controller: _field,
+                onSubmitted: (_) => _askTyped(),
+                style: ink.mono(14, color: ink.strong),
+                cursorColor: ink.accent,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: 'Întreabă ce nu e clar...',
+                  hintStyle: ink.mono(13.5, color: ink.dim),
+                  filled: true,
+                  fillColor: ink.bg,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: ink.line), borderRadius: BorderRadius.circular(ink.terminal ? 0 : 6)),
+                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: ink.accent, width: 1.5), borderRadius: BorderRadius.circular(ink.terminal ? 0 : 6)),
                 ),
               ),
-              const SizedBox(width: 8),
-              AcsButton(ink, 'trimite', _askTyped, primary: true, icon: Icons.send_rounded),
-            ]),
-          ],
-        ],
-      ]),
-    );
-  }
-
-  void _restart() => _start();
+            ),
+            const SizedBox(width: 8),
+            AcsButton(ink, 'trimite', _askTyped, primary: true, icon: Icons.send_rounded),
+          ]),
+        ]),
+      );
 }
 
 // ---------------------------------------------------------------- the answer
@@ -593,6 +799,7 @@ class ExplainText extends StatelessWidget {
       .replaceAllMapped(RegExp(r'^(\s*)[*+]\s+', multiLine: true), (m) => '${m[1]}- ')
       .replaceAllMapped(RegExp(r'^(\s*)(\d{1,2})\.\s+', multiLine: true), (m) => '${m[1]}${m[2]}) ')
       .replaceAll(RegExp(r'^\s*(-{3,}|\*{3,}|_{3,})\s*$', multiLine: true), '')
+      .replaceAllMapped(RegExp(r'\*\*([^*\n]+)\*\*'), (m) => '**${m[1]!.replaceAll('`', '')}**')
       .replaceAllMapped(RegExp(r'(?<![*\w])\*([^*\n]+)\*(?![*\w])'), (m) => m[1]!)
       .replaceAllMapped(RegExp(r'\\\((.+?)\\\)'), (m) => '\$${m[1]}\$')
       .replaceAllMapped(RegExp(r'\\\[([\s\S]+?)\\\]'), (m) => '\$\$${m[1]}\$\$');
