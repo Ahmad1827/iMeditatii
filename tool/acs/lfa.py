@@ -573,6 +573,7 @@ m(94, 'Limbajul vid', 'ușoară', 'Care expresie regulată generează limbajul v
 
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_more.py'), encoding='utf-8').read())
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_topics.py'), encoding='utf-8').read())
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_written.py'), encoding='utf-8').read())
 
 # ------------------------------------------------------------ the seminar's tests
 # Test 1: regular languages, test 2: context-free ones, test 3: Turing

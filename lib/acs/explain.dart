@@ -96,7 +96,10 @@ enum ExplainMode { wrong, empty, correct }
 
 String explainPrompt(AcsProblem p, Attempt a, {String course = '', ExplainMode mode = ExplainMode.wrong}) {
   final grila = p.kind == 'grila';
+  final written = p.kind == 'scris';
   final task = switch (mode) {
+    ExplainMode.wrong when written => _writtenTask,
+    ExplainMode.correct when written => _writtenTask,
     ExplainMode.wrong => grila ? _grilaTask : _exerciseTask,
     ExplainMode.empty => _emptyTask,
     ExplainMode.correct => _correctTask,
@@ -146,6 +149,18 @@ Direcția concretă și ce trebuie schimbat. Dacă răspunsul e aproape bun, ara
 2-4 intrări pe care studentul le poate încerca după ce repară, cu rezultatul corect pentru fiecare.
 
 Fii complet, dar nu umple: fiecare frază trebuie să ajute. Folosește notația cursului. Nu afirma ceva despre răspuns pe care nu l-ai verificat chiar tu, pe el.''';
+
+const String _writtenTask = '''E o problemă cu răspuns scris, ca la test, notată după baremul din datele verificatorului (`barem`, cu punctele fiecărui item; `model` e un răspuns model). Fii corectorul: notează răspunsul studentului strict după barem, apoi ajută-l să-l facă complet. Structura, cu aceste titluri:
+## Nota
+Pentru fiecare item din barem: ✓ sau ✗ (sau parțial), punctele acordate și un motiv scurt, citând bucata din răspunsul lui. La final totalul, „x din y p”.
+## Ce e bine
+Ce a argumentat corect.
+## Ce lipsește sau e greșit
+Fiecare lipsă sau greșeală, cu ce trebuia spus exact; dacă un pas e afirmat fără justificare, spune ce justificare cere corectorul.
+## Cum ar arăta răspunsul complet
+Răspunsul lui, completat și corectat, scris cum l-ar scrie pe foaie (nu copia modelul cuvânt cu cuvânt dacă abordarea lui e alta, dar validă).
+## Pentru test
+1-2 sfaturi de redactare pentru tipul ăsta de problemă.''';
 
 const String _emptyTask = '''Studentul nu a trimis încă nimic și te întreabă cum să înceapă. NU îi da rezolvarea: învață-l s-o găsească singur. Structura, cu aceste titluri:
 ## Ce cere problema

@@ -21,6 +21,7 @@ import 'ws_logic.dart';
 import 'ws_math.dart';
 import 'ws_octave.dart';
 import 'ws_rowops.dart';
+import 'ws_scris.dart';
 import 'ws_shell.dart';
 import 'ws_sim.dart';
 
@@ -61,6 +62,8 @@ Widget buildWorkspace(AcsProblem p, AcsInk ink, bool narrow, Verdict onVerdict) 
       return CryptoWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'lfa':
       return LfaWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
+    case 'scris':
+      return WrittenWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'rowops':
       return RowOpsWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
   }

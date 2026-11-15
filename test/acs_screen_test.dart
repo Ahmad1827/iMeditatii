@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:iMeditatii/acs/acs_course_screen.dart';
 import 'package:iMeditatii/acs/acs_data.dart';
 import 'package:iMeditatii/acs/acs_problem_screen.dart';
+import 'package:iMeditatii/acs/acs_kit.dart';
+import 'package:iMeditatii/acs/ws/workspaces.dart';
 import 'package:iMeditatii/acs_screen.dart';
 import 'package:iMeditatii/theme_manager.dart';
 
@@ -57,6 +59,68 @@ void main() {
       expect(t.topics.map((x) => x.id), contains(p.topic), reason: p.id);
     }
     expect(d.tests.first.topics.map((x) => x.points).fold(0.0, (a, b) => a + b), 12); // 10 + the bonus
+  });
+
+  test('every written problem has a model answer and a barem with points', () {
+    final d = AcsCourseData.parse('lfa', File('assets/data/acs/lfa.json').readAsStringSync());
+    final ws = d.problems.where((p) => p.kind == 'scris').toList();
+    expect(ws.length, greaterThanOrEqualTo(20));
+    for (final p in ws) {
+      expect('${p.spec['model']}'.length, greaterThan(80), reason: p.id);
+      final barem = p.spec['barem'] as List;
+      expect(barem.length, greaterThanOrEqualTo(3), reason: p.id);
+      expect(barem.every((b) => (b['points'] as num) > 0 && '${b['text']}'.isNotEmpty), isTrue, reason: p.id);
+    }
+    // the items asked for in writing at the test have some
+    for (final topic in ['lr-inchidere', 'lr-algoritmice', 'lr-pompare', 'lr-bonus']) {
+      expect(ws.where((p) => p.topic == topic).length, greaterThanOrEqualTo(3), reason: topic);
+    }
+  });
+
+  testWidgets('a written answer is compared with its barem, and solved with three quarters of the points', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    final d = AcsCourseData.parse('lfa', File('assets/data/acs/lfa.json').readAsStringSync());
+    final p = d.problems.firstWhere((p) => p.id == '470');
+    final verdicts = <bool>[];
+    ThemeManager.acsStyleNotifier.value = AcsStyle.notebook;
+    t.view.physicalSize = const Size(1000, 3000);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: buildWorkspace(p, AcsInk.of(AcsStyle.notebook, false), false, (ok, [a]) => verdicts.add(ok)),
+        ),
+      ),
+    ));
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
+    await t.pump();
+    // nothing written: asked to try first
+    await t.tap(find.text('compară cu baremul'));
+    await t.pump();
+    expect(find.textContaining('Încearcă întâi singur'), findsOneWidget);
+    await t.enterText(find.byType(TextField), 'Presupun L regulat, iau w = a^p b^p, y = a^k, pompez cu i = 2 si obtin mai multi a decat b.');
+    await t.tap(find.text('compară cu baremul'));
+    for (var i = 0; i < 4; i++) {
+      await t.pump(const Duration(milliseconds: 200));
+    }
+    expect(find.text('Un răspuns model'), findsOneWidget);
+    final items = p.spec['barem'] as List;
+    // two items ticked: not enough
+    for (var i = 0; i < 2; i++) {
+      await t.tap(find.byIcon(Icons.check_box_outline_blank).first);
+      await t.pump();
+    }
+    await t.tap(find.text('gata'));
+    expect(verdicts.last, isFalse);
+    for (var i = 2; i < items.length; i++) {
+      await t.tap(find.byIcon(Icons.check_box_outline_blank).first);
+      await t.pump();
+    }
+    expect(find.text('2 / 2 p'), findsOneWidget);
+    await t.tap(find.text('gata'));
+    expect(verdicts.last, isTrue);
+    expect(t.takeException(), isNull);
   });
 
   testWidgets('a long list draws a page of rows, and more on request', (t) async {
