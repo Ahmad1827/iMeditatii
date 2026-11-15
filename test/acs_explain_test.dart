@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:iMeditatii/acs/acs_data.dart';
 import 'package:iMeditatii/acs/acs_kit.dart';
+import 'package:iMeditatii/acs/acs_problem_screen.dart';
 import 'package:iMeditatii/acs/explain.dart';
 import 'package:iMeditatii/acs/ws/ws_common.dart';
 import 'package:iMeditatii/theme_manager.dart';
@@ -34,6 +35,50 @@ const _problem = AcsProblem(
 const _attempt = Attempt('stări: q0, q1; inițială q0; finale: q1\nδ(q0, a) = q1', '[✗] acceptă ε\n    ar trebui acceptat, automatul tău îl respinge');
 
 http.Response _json(Object o, int status) => http.Response.bytes(utf8.encode(jsonEncode(o)), status, headers: {'content-type': 'application/json; charset=utf-8'});
+
+/// The problem page's side: a check that gives [ok] with [attempt] (or nothing, when null).
+class _Page {
+  bool? ok;
+  Attempt? attempt;
+  int n = 0;
+  final CheckRequest request = CheckRequest();
+  _Page({bool? gives, Attempt? with_}) {
+    if (gives != null) {
+      request.verify = () {
+        ok = gives;
+        attempt = with_;
+        n++;
+      };
+    }
+  }
+  LatestVerdict latest() => (ok: ok, attempt: attempt, n: n);
+}
+
+/// A bridge that answers [answer], in two pieces; [asked] gets what was sent.
+http.Client _bridge(List<Map<String, dynamic>> asked, {String answer = '## Pe scurt\nAi pus finală starea **q1**.\n## Cum repari\nFă finală q0.'}) {
+  var polls = 0;
+  return MockClient((r) async {
+    if (r.url.path == '/health') return _json(({'ok': true, 'version': 2}), 200);
+    if (r.url.path == '/explain' && r.method == 'POST') {
+      asked.add(jsonDecode(r.body) as Map<String, dynamic>);
+      polls = 0;
+      return _json(({'job': 'j${asked.length}'}), 200);
+    }
+    if (r.url.path.startsWith('/explain/')) {
+      polls++;
+      final from = int.parse(r.url.queryParameters['from'] ?? '0');
+      final upTo = polls == 1 ? 20 : answer.length;
+      return _json(({'text': answer.substring(from, upTo), 'next': upTo, 'done': polls > 1, 'error': null, 'session': '11111111-2222-3333-4444-555555555555'}), 200);
+    }
+    return http.Response('{}', 404);
+  });
+}
+
+Future<void> _wait(WidgetTester t, [int n = 12]) async {
+  for (var i = 0; i < n; i++) {
+    await t.pump(const Duration(milliseconds: 250));
+  }
+}
 
 Widget _host(Widget child) => MaterialApp(home: Scaffold(body: SingleChildScrollView(child: Padding(padding: const EdgeInsets.all(16), child: child))));
 
@@ -78,44 +123,26 @@ void main() {
   });
 
   for (final style in AcsStyle.values) {
-    testWidgets('the panel explains, through the bridge (${style.name})', (t) async {
+    testWidgets('a wrong answer: the panel checks it, then Claude explains (${style.name})', (t) async {
       SharedPreferences.setMockInitialValues({});
       final asked = <Map<String, dynamic>>[];
-      var polls = 0;
-      ClaudeBridge.client = MockClient((r) async {
-        if (r.url.path == '/health') return _json(({'ok': true, 'version': 2}), 200);
-        if (r.url.path == '/explain' && r.method == 'POST') {
-          asked.add(jsonDecode(r.body) as Map<String, dynamic>);
-          return _json(({'job': 'j${asked.length}'}), 200);
-        }
-        if (r.url.path.startsWith('/explain/')) {
-          polls++;
-          final from = int.parse(r.url.queryParameters['from'] ?? '0');
-          const all = '## Pe scurt\nAi pus finală starea **q1**.\n## Cum repari\nFă finală q0.';
-          final upTo = polls == 1 ? 20 : all.length;
-          return _json(({'text': all.substring(from, upTo), 'next': upTo, 'done': polls > 1, 'error': null, 'session': '11111111-2222-3333-4444-555555555555'}), 200);
-        }
-        return http.Response('{}', 404);
-      });
+      ClaudeBridge.client = _bridge(asked);
       addTearDown(() => ClaudeBridge.client = http.Client());
       final ink = AcsInk.of(style, false);
-      await t.pumpWidget(_host(ExplainPanel(problem: _problem, attempt: _attempt, ink: ink, course: 'LFA')));
+      final page = _Page(gives: false, with_: _attempt);
+      await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: ink, course: 'LFA', request: page.request, latest: page.latest)));
       final button = find.textContaining(RegExp('de ce nu merge', caseSensitive: false));
       expect(button, findsWidgets);
       await t.tap(button.first);
-      for (var i = 0; i < 12; i++) {
-        await t.pump(const Duration(milliseconds: 250));
-      }
+      await _wait(t);
+      expect(page.n, 1); // the panel asked for the check
       expect(asked, hasLength(1));
       expect(asked.first['prompt'], contains('δ(q0, a) = q1'));
       expect(find.text(ink.terminal ? '## Cum repari' : 'Cum repari'), findsOneWidget);
       expect(find.textContaining('Fă finală q0'), findsOneWidget);
       // a follow-up resumes the session
       await t.tap(find.text(ink.terminal ? '[ doar un indiciu ]' : 'doar un indiciu'));
-      polls = 0;
-      for (var i = 0; i < 12; i++) {
-        await t.pump(const Duration(milliseconds: 250));
-      }
+      await _wait(t);
       expect(asked, hasLength(2));
       expect(asked.last['session'], '11111111-2222-3333-4444-555555555555');
       expect(t.takeException(), isNull);
@@ -123,15 +150,53 @@ void main() {
     });
   }
 
+  testWidgets('nothing sent: Claude says how to start, without the solution', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    final asked = <Map<String, dynamic>>[];
+    ClaudeBridge.client = _bridge(asked);
+    addTearDown(() => ClaudeBridge.client = http.Client());
+    final page = _Page(); // a check that gives no verdict (a grilă with nothing picked)
+    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, false), request: page.request, latest: page.latest)));
+    await t.tap(find.textContaining('De ce nu merge').first);
+    await _wait(t);
+    expect(asked, hasLength(1));
+    expect(asked.first['prompt'], contains('nu a trimis încă nimic'));
+    expect(asked.first['prompt'], contains('NU îi da rezolvarea'));
+    expect(find.text('Cum începi'), findsOneWidget);
+    await t.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('a right answer: nothing is wrong, and Claude only if asked', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    final asked = <Map<String, dynamic>>[];
+    ClaudeBridge.client = _bridge(asked, answer: '## Pe scurt\nE corect: q0 ține minte paritatea.');
+    addTearDown(() => ClaudeBridge.client = http.Client());
+    var next = 0;
+    final page = _Page(gives: true, with_: const Attempt('stări: q0, q1; finale: q0', '[✓] tot'));
+    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, false), request: page.request, latest: page.latest, onNext: () => next++)));
+    await t.tap(find.textContaining('De ce nu merge').first);
+    await _wait(t, 4);
+    expect(find.text('Nu e nimic greșit'), findsOneWidget);
+    expect(asked, isEmpty); // Claude is not asked for a right answer
+    await t.tap(find.text('următoarea problemă'));
+    expect(next, 1);
+    await t.tap(find.text('explică-mi de ce e corect'));
+    await _wait(t);
+    expect(asked.single['prompt'], contains('Răspunsul studentului e corect'));
+    expect(find.text('De ce e corect'), findsOneWidget);
+    expect(find.textContaining('q0 ține minte paritatea'), findsOneWidget);
+    expect(t.takeException(), isNull);
+    await t.pumpWidget(const SizedBox());
+  });
+
   testWidgets('with no bridge, the panel says how to start it', (t) async {
     SharedPreferences.setMockInitialValues({});
     ClaudeBridge.client = MockClient((r) async => throw const SocketException('refused'));
     addTearDown(() => ClaudeBridge.client = http.Client());
-    await t.pumpWidget(_host(ExplainPanel(problem: _problem, attempt: _attempt, ink: AcsInk.of(AcsStyle.notebook, false))));
+    final page = _Page(gives: false, with_: _attempt);
+    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, false), request: page.request, latest: page.latest)));
     await t.tap(find.textContaining('De ce nu merge').first);
-    for (var i = 0; i < 6; i++) {
-      await t.pump(const Duration(milliseconds: 200));
-    }
+    await _wait(t, 6);
     expect(find.textContaining('Nu găsesc Claude Code'), findsOneWidget);
     expect(find.textContaining('claude_bridge.mjs'), findsOneWidget);
     expect(t.takeException(), isNull);
@@ -141,11 +206,33 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     ClaudeBridge.client = MockClient((r) async => _json(({'ok': true, 'model': 'haiku'}), 200));
     addTearDown(() => ClaudeBridge.client = http.Client());
-    await t.pumpWidget(_host(ExplainPanel(problem: _problem, attempt: _attempt, ink: AcsInk.of(AcsStyle.notebook, true))));
+    final page = _Page(gives: false, with_: _attempt);
+    await t.pumpWidget(_host(ExplainPanel(problem: _problem, ink: AcsInk.of(AcsStyle.notebook, true), request: page.request, latest: page.latest)));
     await t.tap(find.textContaining('De ce nu merge').first);
-    for (var i = 0; i < 6; i++) {
-      await t.pump(const Duration(milliseconds: 200));
-    }
+    await _wait(t, 6);
     expect(find.textContaining('versiune veche'), findsOneWidget);
+  });
+
+  testWidgets('on a real problem page the button is there before anything is sent, and checks the workspace', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    ClaudeBridge.client = MockClient((r) async => throw const SocketException('refused'));
+    addTearDown(() => ClaudeBridge.client = http.Client());
+    t.view.physicalSize = const Size(1300, 2400);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    ThemeManager.acsStyleNotifier.value = AcsStyle.notebook;
+    await t.pumpWidget(const MaterialApp(home: AcsProblemScreen(course: 'lfa', id: '2')));
+    for (var i = 0; i < 40 && find.textContaining('De ce nu merge').evaluate().isEmpty; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await t.pump(const Duration(milliseconds: 50));
+    }
+    final button = find.textContaining('De ce nu merge').first;
+    await t.ensureVisible(button);
+    await t.tap(button);
+    await _wait(t, 6);
+    // the workspace's own check ran (its list of checks is drawn) and the bridge was looked for
+    expect(find.textContaining('verificare:'), findsOneWidget);
+    expect(find.textContaining('Nu găsesc Claude Code'), findsOneWidget);
+    expect(t.takeException(), isNull);
   });
 }

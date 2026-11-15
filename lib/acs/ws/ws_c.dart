@@ -50,6 +50,7 @@ class _CWorkspaceState extends State<CWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _runTests;
     _code = acsCodeController(widget.problem.spec['starter'] as String? ?? '', _cKeywords);
     if (_tests.isNotEmpty) _stdin.text = '${_tests.first['input']}';
     AcsProgress.draft(widget.problem).then((d) {

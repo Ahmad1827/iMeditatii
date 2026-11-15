@@ -41,6 +41,7 @@ class _ApdWorkspaceState extends State<ApdWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     _parse();
     if (_fix) {
       AcsProgress.draft(widget.problem).then((d) {

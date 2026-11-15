@@ -39,6 +39,7 @@ class _DsWorkspaceState extends State<DsWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _report;
     _reset();
   }
 
@@ -48,6 +49,12 @@ class _DsWorkspaceState extends State<DsWorkspace> {
     _selected = null;
     _reported = false;
   }
+
+  /// What has been done so far, as an answer (asked from the problem page).
+  void _report() => widget.onVerdict(
+      _task.done,
+      Attempt(_task.log.isEmpty ? '' : 'pașii făcuți:\n${_task.log.join('\n')}',
+          _task.done ? '' : 'nu e terminat; greșeli: ${_task.mistakes}${_last == null ? '' : '; ultimul răspuns al verificatorului: ${_last!.message}'}'));
 
   void _play(DsTarget t) {
     if (_task.done || _task.failed) return;

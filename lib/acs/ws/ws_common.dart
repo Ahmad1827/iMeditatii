@@ -7,6 +7,8 @@
 //   checked, ✓ or ✗.
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +25,23 @@ class Attempt {
 }
 
 typedef Verdict = void Function(bool solved, [Attempt? attempt]);
+
+/// Lets the problem page check what is on the workspace now, without the
+/// student pressing its button ("De ce nu merge așa?" pressed first): each
+/// workspace puts its check here when it starts.
+class CheckRequest {
+  FutureOr<void> Function()? verify;
+}
+
+class CheckHook extends InheritedWidget {
+  final CheckRequest request;
+  const CheckHook({super.key, required this.request, required super.child});
+
+  static CheckRequest? find(BuildContext context) => context.getInheritedWidgetOfExactType<CheckHook>()?.request;
+
+  @override
+  bool updateShouldNotify(CheckHook old) => old.request != request;
+}
 
 /// The checks as lines: `[✓] label` or `[✗] label: what was found`.
 String reportOf(Iterable<Check> checks) => [

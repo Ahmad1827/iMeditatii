@@ -45,6 +45,7 @@ class _GrilaWorkspaceState extends State<GrilaWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     HardwareKeyboard.instance.addHandler(_key);
     AcsProgress.draft(widget.problem).then((d) {
       if (d == null || !mounted) return;

@@ -42,6 +42,7 @@ class _OctaveWorkspaceState extends State<OctaveWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _runTests;
     _code = acsCodeController(widget.problem.spec['starter'] as String? ?? '', _octKeywords, comment: '%');
     AcsProgress.draft(widget.problem).then((d) {
       if (d != null && d.trim().isNotEmpty && mounted) _code.text = d;

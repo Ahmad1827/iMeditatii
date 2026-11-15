@@ -38,6 +38,7 @@ class _CryptoWorkspaceState extends State<CryptoWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     AcsProgress.draft(widget.problem).then((d) {
       if (d == null || !mounted) return;
       try {

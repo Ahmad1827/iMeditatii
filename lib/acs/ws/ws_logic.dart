@@ -46,6 +46,7 @@ class _LogicWorkspaceState extends State<LogicWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     if (_expr != null) {
       for (final o in _expr.outputs) {
         final c = TextEditingController();

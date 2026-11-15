@@ -37,6 +37,7 @@ class _RowOpsWorkspaceState extends State<RowOpsWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     for (final _ in _answerSpecs) {
       _answers.add(TextEditingController());
     }

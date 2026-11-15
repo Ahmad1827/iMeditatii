@@ -46,6 +46,7 @@ class _AsmWorkspaceState extends State<AsmWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _runTests;
     final spec = widget.problem.spec;
     _call = AsmCall.fromSpec(spec);
     _cases = [for (final c in spec['tests'] as List) AsmCase.fromJson(c as Map)];

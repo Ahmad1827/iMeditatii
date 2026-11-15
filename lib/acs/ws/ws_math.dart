@@ -36,6 +36,7 @@ class _MathWorkspaceState extends State<MathWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     for (final f in _task.fields) {
       switch (f.type) {
         case 'matrix':

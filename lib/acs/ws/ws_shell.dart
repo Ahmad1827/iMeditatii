@@ -61,6 +61,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     _task = ShellTask(widget.problem.spec);
     _start();
     _restore();

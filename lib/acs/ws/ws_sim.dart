@@ -35,6 +35,7 @@ class _SimWorkspaceState extends State<SimWorkspace> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     for (final f in _t.fields) {
       _in[f['name'] as String] = TextEditingController();
     }

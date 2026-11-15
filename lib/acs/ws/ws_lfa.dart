@@ -48,6 +48,7 @@ class _LfaWorkspaceState extends State<LfaWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     _text.addListener(_changed);
     _word.addListener(() => setState(() => _at = 0));
     final start = widget.problem.spec['starter'];

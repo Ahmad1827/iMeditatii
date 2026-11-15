@@ -16,7 +16,7 @@ import 'acs_kit.dart';
 import 'explain.dart';
 import 'teorie/teorie_data.dart';
 import 'teorie/teorie_screen.dart' show teorieRoute;
-import 'ws/ws_common.dart' show Attempt;
+import 'ws/ws_common.dart' show Attempt, CheckHook, CheckRequest;
 import 'ws/workspaces.dart';
 
 class AcsProblemScreen extends StatefulWidget {
@@ -39,8 +39,11 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
   int _fails = 0;
   bool _hint = false;
   bool _solution = false;
-  Attempt? _attempt; // the last answer the checks refused, for "De ce nu merge așa?"
-  int _attempts = 0;
+  // the last verdict, for "De ce nu merge așa?", which can also ask for one
+  Attempt? _attempt;
+  bool? _lastOk;
+  int _verdicts = 0;
+  final CheckRequest _check = CheckRequest();
 
   @override
   void initState() {
@@ -67,8 +70,9 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
   void _verdict(bool ok, [Attempt? attempt]) {
     final p = _p!;
     setState(() {
-      _attempt = ok ? null : attempt;
-      if (!ok && attempt != null) _attempts++;
+      _attempt = attempt ?? _attempt;
+      _lastOk = ok;
+      _verdicts++;
     });
     if (ok) {
       AcsProgress.markSolved(p);
@@ -99,16 +103,25 @@ class _AcsProblemScreenState extends State<AcsProblemScreen> {
         }
         final wide = MediaQuery.of(context).size.width >= 1100;
         final statement = _statement(context, ink, narrow, p);
-        final attempt = _attempt;
+        final next = _data?.after(p);
         final workspace = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          KeyedSubtree(
-            key: ValueKey(p.key),
-            child: buildWorkspace(p, ink, narrow, _verdict),
+          CheckHook(
+            request: _check,
+            child: KeyedSubtree(
+              key: ValueKey(p.key),
+              child: buildWorkspace(p, ink, narrow, _verdict),
+            ),
           ),
-          if (attempt != null) ...[
-            const SizedBox(height: 16),
-            ExplainPanel(key: ValueKey('explain-${p.key}-$_attempts'), problem: p, attempt: attempt, ink: ink, course: subject.name),
-          ],
+          const SizedBox(height: 16),
+          ExplainPanel(
+            key: ValueKey('explain-${p.key}'),
+            problem: p,
+            ink: ink,
+            course: subject.name,
+            request: _check,
+            latest: () => (ok: _lastOk, attempt: _attempt, n: _verdicts),
+            onNext: next == null ? null : () => context.go(next.route),
+          ),
         ]);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -46,6 +46,7 @@ class _TransformWorkspaceState extends State<TransformWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     AcsProgress.draft(widget.problem).then((d) {
       if (d == null || !mounted) return;
       try {
@@ -301,6 +302,7 @@ class _RasterWorkspaceState extends State<RasterWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     AcsProgress.draft(widget.problem).then((d) {
       if (d == null || !mounted) return;
       try {

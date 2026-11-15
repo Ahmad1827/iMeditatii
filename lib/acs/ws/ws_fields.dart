@@ -26,6 +26,7 @@ mixin _Fields<T extends AcsWorkspace> on State<T> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = verify;
     AcsProgress.draft(widget.problem).then((d) {
       if (d == null || !mounted) return;
       try {

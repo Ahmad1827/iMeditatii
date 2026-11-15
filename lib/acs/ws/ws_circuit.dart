@@ -38,6 +38,7 @@ class _CircuitWorkspaceState extends State<CircuitWorkspace> {
   @override
   void initState() {
     super.initState();
+    CheckHook.find(context)?.verify = _verify;
     for (final a in _ask) {
       _in[a['q'] as String] = TextEditingController();
     }
