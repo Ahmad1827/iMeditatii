@@ -573,4 +573,32 @@ m(94, 'Limbajul vid', 'ușoară', 'Care expresie regulată generează limbajul v
 
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_more.py'), encoding='utf-8').read())
 
-write_course('lfa', CHAPTERS, P)
+# ------------------------------------------------------------ the seminar's tests
+# Test 1: regular languages, test 2: context-free ones, test 3: Turing
+# machines and computability. A chapter on one topic goes to its test; the
+# mixed grile (classes of languages, the model test, the Moodle ones) go to the
+# highest one their statement or right answer needs.
+TESTS = [
+    {'n': 1, 'name': 'Testul 1', 'about': 'Limbaje regulate (LR)'},
+    {'n': 2, 'name': 'Testul 2', 'about': 'Limbaje independente de context (LIC)'},
+    {'n': 3, 'name': 'Testul 3', 'about': 'Mașina Turing (MT)'},
+]
+BY_CHAPTER = {CHAPTERS[0]: 1, CHAPTERS[1]: 1, CHAPTERS[2]: 1, CHAPTERS[3]: 1, CHAPTERS[4]: 2, CHAPTERS[5]: 2, CHAPTERS[6]: 3}
+LEVEL3 = re.compile(r'Turing|\bMT\b|\bTD\b|\bTA\b|\bNP\b|\bRice\b|ρ\(|\\rho|(?i:decid|benzi|capete de citire|oprire|se opre[sș]te|calculabil)')
+LEVEL2 = re.compile(r'\bLIC\b|\bGIC\b|\bAPD\b|→|->|\\rightarrow|Chomsky|CYK|(?i:independent\w* de context|gramatic|pushdown|stiv[aăe]|ambigu)')
+
+
+def test_of(p):
+    if p['chapter'] in BY_CHAPTER:
+        return BY_CHAPTER[p['chapter']]
+    spec = p.get('spec', {})
+    opts = spec.get('options', [])
+    right = [opts[i] for i in (spec.get('answers') or [spec.get('answer')]) if isinstance(i, int) and i < len(opts)]
+    text = ' '.join([p['title'], p['statement'], *right])
+    return 3 if LEVEL3.search(text) else 2 if LEVEL2.search(text) else 1
+
+
+for p_ in P:
+    p_['test'] = test_of(p_)
+
+write_course('lfa', CHAPTERS, P, tests=TESTS)

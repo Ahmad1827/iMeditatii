@@ -2,7 +2,8 @@
 // ACS DATA: a course's problems and what is solved on this device
 //   Each course is one file, assets/data/acs/<code>.json (made by tool/acs/):
 //   {"code", "chapters": [...], "problems": [{id, title, chapter, difficulty,
-//   source, statement, hint, solution, kind, spec}]}. The kind says which
+//   source, statement, hint, solution, kind, spec, test}], "tests": [{n, name,
+//   about}]} (tests only where the seminar's tests split the problems). The kind says which
 //   workspace solves it (shell, asm, c, logic, octave, rowops, math, circuit,
 //   sim, ds, grila, lfa, threads, transform, raster, net, crypto, market,
 //   calc) and spec holds what that workspace needs.
@@ -25,6 +26,7 @@ class AcsProblem {
   final String solution;
   final String kind;
   final Map<String, dynamic> spec;
+  final int test; // the seminar test it is for (see [AcsCourseData.tests]); 0: none
 
   const AcsProblem({
     required this.course,
@@ -38,6 +40,7 @@ class AcsProblem {
     required this.solution,
     required this.kind,
     required this.spec,
+    this.test = 0,
   });
 
   factory AcsProblem.fromJson(String course, Map<String, dynamic> j) => AcsProblem(
@@ -52,6 +55,7 @@ class AcsProblem {
         solution: j['solution'] as String? ?? '',
         kind: j['kind'] as String,
         spec: (j['spec'] as Map?)?.cast<String, dynamic>() ?? const {},
+        test: (j['test'] as num?)?.toInt() ?? 0,
       );
 
   String get key => 'acs:$course:$id';
@@ -84,11 +88,22 @@ const Map<String, String> acsKindLabels = {
   'calc': 'calcul',
 };
 
+/// One of the seminar's tests: "Testul 1", "Limbaje regulate (LR)".
+class AcsTest {
+  final int n;
+  final String name, about;
+  const AcsTest(this.n, this.name, this.about);
+
+  /// What is in the brackets of [about] ("LR"), or [about] itself.
+  String get short => RegExp(r'\(([^)]+)\)').firstMatch(about)?.group(1) ?? about;
+}
+
 class AcsCourseData {
   final String code;
   final List<String> chapters;
   final List<AcsProblem> problems;
-  const AcsCourseData(this.code, this.chapters, this.problems);
+  final List<AcsTest> tests; // empty: the course's problems are not split by test
+  const AcsCourseData(this.code, this.chapters, this.problems, {this.tests = const []});
 
   AcsProblem? byId(String id) {
     for (final p in problems) {
@@ -109,6 +124,7 @@ class AcsCourseData {
       code,
       [for (final c in j['chapters'] as List) '$c'],
       [for (final p in j['problems'] as List) AcsProblem.fromJson(code, (p as Map).cast<String, dynamic>())],
+      tests: [for (final t in j['tests'] as List? ?? const []) AcsTest((t['n'] as num).toInt(), '${t['name']}', '${t['about'] ?? ''}')],
     );
   }
 }

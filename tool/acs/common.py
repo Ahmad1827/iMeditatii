@@ -18,7 +18,8 @@ def problem(id, title, chapter, difficulty, statement, kind, spec, hint='', solu
     }
 
 
-def write_course(code, chapters, problems):
+def write_course(code, chapters, problems, tests=None):
+    """[tests]: the seminar's tests, [{n, name, about}], when each problem says its own (p['test'])."""
     ids = [p['id'] for p in problems]
     assert len(ids) == len(set(ids)), 'duplicate ids'
     for p in problems:
@@ -26,7 +27,13 @@ def write_course(code, chapters, problems):
     # chapter order, then the order written
     problems = sorted(problems, key=lambda p: (chapters.index(p['chapter']), problems.index(p)))
     out = os.path.join(ROOT, 'assets', 'data', 'acs', f'{code}.json')
-    text = json.dumps({'code': code, 'chapters': chapters, 'problems': problems}, ensure_ascii=False, indent=1)
+    data = {'code': code, 'chapters': chapters}
+    if tests:
+        known = {t['n'] for t in tests}
+        assert all(p.get('test') in known for p in problems), [p['id'] for p in problems if p.get('test') not in known]
+        data['tests'] = tests
+    data['problems'] = problems
+    text = json.dumps(data, ensure_ascii=False, indent=1)
     # the app's font (a subset of Iosevka) has no U+2212: a plain minus reads the same
     text = text.replace('\u2212', '-')
     with open(out, 'w', encoding='utf-8') as f:

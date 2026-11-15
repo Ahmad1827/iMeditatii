@@ -12,6 +12,23 @@
   "9. Grile: modelul de test",
   "10. Grile din teste și examene"
  ],
+ "tests": [
+  {
+   "n": 1,
+   "name": "Testul 1",
+   "about": "Limbaje regulate (LR)"
+  },
+  {
+   "n": 2,
+   "name": "Testul 2",
+   "about": "Limbaje independente de context (LIC)"
+  },
+  {
+   "n": 3,
+   "name": "Testul 3",
+   "about": "Mașina Turing (MT)"
+  }
+ ],
  "problems": [
   {
    "id": "1",
@@ -59,7 +76,8 @@
      }
     },
     "regex": "(a∪b)*ab"
-   }
+   },
+   "test": 1
   },
   {
    "id": "2",
@@ -100,7 +118,8 @@
     },
     "regex": "(b*ab*a)*b*",
     "maxStates": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "3",
@@ -148,7 +167,8 @@
      }
     },
     "regex": "(a∪b)*aa(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "4",
@@ -197,7 +217,8 @@
      }
     },
     "regex": "(b∪ab)*(a∪ε)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "5",
@@ -246,7 +267,8 @@
     },
     "regex": "(b*ab*ab*a)*b*",
     "maxStates": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "6",
@@ -311,7 +333,8 @@
      }
     },
     "regex": "a(a∪b)*a∪b(a∪b)*b∪a∪b"
-   }
+   },
+   "test": 1
   },
   {
    "id": "7",
@@ -360,7 +383,8 @@
     },
     "regex": "(0∪1(01*0)*1)*",
     "maxStates": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "8",
@@ -488,7 +512,8 @@
      }
     },
     "maxStates": 6
-   }
+   },
+   "test": 1
   },
   {
    "id": "9",
@@ -528,7 +553,8 @@
      }
     },
     "regex": "a*b(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "50",
@@ -584,7 +610,8 @@
      }
     },
     "regex": "(a∪b)*aba(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "51",
@@ -633,7 +660,8 @@
      }
     },
     "regex": "(a∪ba)*(b∪ε)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "52",
@@ -681,7 +709,8 @@
      }
     },
     "regex": "(b∪ab)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "53",
@@ -777,7 +806,8 @@
      }
     },
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "54",
@@ -826,7 +856,8 @@
     },
     "regex": "(a∪b)((a∪b)(a∪b)(a∪b))*",
     "maxStates": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "55",
@@ -938,7 +969,8 @@
      }
     },
     "maxStates": 5
-   }
+   },
+   "test": 1
   },
   {
    "id": "56",
@@ -994,7 +1026,8 @@
      }
     },
     "regex": "(a∪b)*abb"
-   }
+   },
+   "test": 1
   },
   {
    "id": "57",
@@ -1139,7 +1172,8 @@
       }
      }
     }
-   }
+   },
+   "test": 1
   },
   {
    "id": "104",
@@ -1347,7 +1381,8 @@
      }
     },
     "maxStates": 8
-   }
+   },
+   "test": 1
   },
   {
    "id": "105",
@@ -1405,7 +1440,8 @@
     },
     "regex": "((0∪2)(0∪2))*",
     "maxStates": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "108",
@@ -1423,7 +1459,8 @@
      "Fals"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "109",
@@ -1441,7 +1478,8 @@
      "Fals"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "113",
@@ -1459,7 +1497,8 @@
      "Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "117",
@@ -1479,7 +1518,8 @@
      "are exact o stare finală"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "159",
@@ -1499,7 +1539,8 @@
      "|L(M)| = 2ᵏ⁺¹"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "160",
@@ -1519,7 +1560,8 @@
      "niciuna dintre celelalte variante"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "163",
@@ -1539,7 +1581,8 @@
      "atât M1 cât și M2 pot avea stări finale"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "177",
@@ -1559,7 +1602,8 @@
      "minim 1, maxim |K|² · |Σ|"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "181",
@@ -1682,7 +1726,8 @@
       }
      }
     }
-   }
+   },
+   "test": 1
   },
   {
    "id": "10",
@@ -1732,7 +1777,8 @@
     },
     "regex": "(a∪b)*a(a∪b)(a∪b)",
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "11",
@@ -1784,7 +1830,8 @@
     },
     "regex": "(a∪b)*aba(a∪b)*",
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "12",
@@ -1830,7 +1877,8 @@
     },
     "regex": "a*b*c*",
     "maxStates": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "13",
@@ -1875,7 +1923,8 @@
     },
     "regex": "(a∪b)*(ab∪ba)",
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "14",
@@ -1932,7 +1981,8 @@
     },
     "regex": "(aa)*∪(aaa)*",
     "maxStates": 6
-   }
+   },
+   "test": 1
   },
   {
    "id": "58",
@@ -1982,7 +2032,8 @@
     },
     "regex": "(a∪b)*a(a∪b)(a∪b)",
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "59",
@@ -2034,7 +2085,8 @@
      }
     },
     "regex": "(a∪b)*(aa∪bb)(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "60",
@@ -2079,7 +2131,8 @@
     },
     "regex": "(a∪b)*(ab∪ba)",
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "100",
@@ -2099,7 +2152,8 @@
      "o infinitate"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "101",
@@ -2155,7 +2209,8 @@
      }
     },
     "regex": "a*(ab∪ba∪ε)∪b*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "102",
@@ -2191,7 +2246,8 @@
     },
     "regex": "((a∪b)*(ε∪c)*)*",
     "maxStates": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "103",
@@ -2257,7 +2313,8 @@
      }
     },
     "regex": "((ab)*∪(bc)*)ab"
-   }
+   },
+   "test": 1
   },
   {
    "id": "110",
@@ -2275,7 +2332,8 @@
      "Fals"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "111",
@@ -2293,7 +2351,8 @@
      "Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "112",
@@ -2311,7 +2370,8 @@
      "Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "165",
@@ -2331,7 +2391,8 @@
      "4"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "173",
@@ -2349,7 +2410,8 @@
      "Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "184",
@@ -2369,7 +2431,8 @@
      "Nu, Da"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "185",
@@ -2389,7 +2452,8 @@
      "finit și mărginit superior"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "15",
@@ -2406,7 +2470,8 @@
     "alphabet": "abc",
     "regex": "(b∪c∪ab)*c",
     "reference": "(b∪c∪ab)*c"
-   }
+   },
+   "test": 1
   },
   {
    "id": "16",
@@ -2424,7 +2489,8 @@
     "regex": "(0*∪1∪1*)*",
     "reference": "(0∪1)*",
     "maxLen": 6
-   }
+   },
+   "test": 1
   },
   {
    "id": "17",
@@ -2441,7 +2507,8 @@
     "alphabet": "ab",
     "regex": "a*ba*ba*",
     "reference": "a*ba*ba*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "18",
@@ -2458,7 +2525,8 @@
     "alphabet": "ab",
     "regex": "((a∪b)(a∪b)(a∪b))*",
     "reference": "((a∪b)(a∪b)(a∪b))*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "19",
@@ -2475,7 +2543,8 @@
     "alphabet": "ab",
     "regex": "(ε∪b)(ab)*(ε∪a)",
     "reference": "(ε∪b)(ab)*(ε∪a)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "20",
@@ -2492,7 +2561,8 @@
     "alphabet": "ab",
     "regex": "(a∪b)*(ab∪ba)(a∪b)*",
     "reference": "(a∪b)*(ab∪ba)(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "21",
@@ -2509,7 +2579,8 @@
     "alphabet": "01",
     "regex": "0∪1(0∪1)*0",
     "reference": "0∪1(0∪1)*0"
-   }
+   },
+   "test": 1
   },
   {
    "id": "22",
@@ -2526,7 +2597,8 @@
     "alphabet": "ab",
     "regex": "(b*ab*ab*ab*a)*b*ab*ab*ab*",
     "reference": "(b*ab*ab*ab*a)*b*ab*ab*ab*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "23",
@@ -2543,7 +2615,8 @@
     "alphabet": "ab",
     "regex": "a*b(a∪b)*",
     "reference": "a*b(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "61",
@@ -2560,7 +2633,8 @@
     "alphabet": "ab",
     "regex": "((a∪b)(a∪b))*",
     "reference": "((a∪b)(a∪b))*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "62",
@@ -2577,7 +2651,8 @@
     "alphabet": "ab",
     "regex": "b*(a∪ε)b*",
     "reference": "b*(a∪ε)b*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "63",
@@ -2594,7 +2669,8 @@
     "alphabet": "ab",
     "regex": "(b∪ab)*(a∪ε)",
     "reference": "(b∪ab)*(a∪ε)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "64",
@@ -2611,7 +2687,8 @@
     "alphabet": "01",
     "regex": "0*10*10*",
     "reference": "0*10*10*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "65",
@@ -2628,7 +2705,8 @@
     "alphabet": "ab",
     "regex": "b*(ab*ab*ab*)*",
     "reference": "b*(ab*ab*ab*)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "66",
@@ -2645,7 +2723,8 @@
     "alphabet": "ab",
     "regex": "aa*bb*",
     "reference": "aa*bb*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "67",
@@ -2662,7 +2741,8 @@
     "alphabet": "ab",
     "regex": "b*a*",
     "reference": "b*a*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "68",
@@ -2679,7 +2759,8 @@
     "alphabet": "01",
     "regex": "(0100)*(ε∪0∪01∪010)∪00(0100)*(ε∪0∪01∪010)∪(1011)*(ε∪1∪10∪101)∪11(1011)*(ε∪1∪10∪101)",
     "reference": "(0100)*(ε∪0∪01∪010)∪00(0100)*(ε∪0∪01∪010)∪(1011)*(ε∪1∪10∪101)∪11(1011)*(ε∪1∪10∪101)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "125",
@@ -2696,7 +2777,8 @@
     "alphabet": "ab",
     "regex": "b(a∪b)*",
     "reference": "b(a∪b)*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "130",
@@ -2713,7 +2795,8 @@
     "alphabet": "ab",
     "regex": "b*a*∪((a∪b)(a∪b))*",
     "reference": "b*a*∪((a∪b)(a∪b))*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "132",
@@ -2730,7 +2813,8 @@
     "alphabet": "01",
     "regex": "(0100)*(ε∪0∪01∪010)∪(0001)*(ε∪0∪00∪000)∪(1011)*(ε∪1∪10∪101)∪(1110)*(ε∪1∪11∪111)",
     "reference": "(0100)*(ε∪0∪01∪010)∪(0001)*(ε∪0∪00∪000)∪(1011)*(ε∪1∪10∪101)∪(1110)*(ε∪1∪11∪111)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "133",
@@ -2747,7 +2831,8 @@
     "alphabet": "01",
     "regex": "1*0*(0∪10)*1*",
     "reference": "1*0*(0∪10)*1*"
-   }
+   },
+   "test": 1
   },
   {
    "id": "148",
@@ -2767,7 +2852,8 @@
      "(a ∪ b)* ∩ a*b*"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "151",
@@ -2787,7 +2873,8 @@
      "a doua cu a treia"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "172",
@@ -2807,7 +2894,8 @@
      "4"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "180",
@@ -2824,7 +2912,8 @@
     "alphabet": "01",
     "regex": "1*(ε∪0(1(11)*0)*1*)",
     "reference": "1*(ε∪0(1(11)*0)*1*)"
-   }
+   },
+   "test": 1
   },
   {
    "id": "183",
@@ -2844,7 +2933,8 @@
      "|L1| > |L2|"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "106",
@@ -2961,7 +3051,8 @@
       }
      }
     }
-   }
+   },
+   "test": 1
   },
   {
    "id": "107",
@@ -3059,7 +3150,8 @@
      }
     },
     "maxStates": 4
-   }
+   },
+   "test": 1
   },
   {
    "id": "114",
@@ -3079,7 +3171,8 @@
      "pe niciun drum de la starea inițială la o stare finală nu există un ciclu"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "115",
@@ -3123,7 +3216,8 @@
      }
     },
     "regex": "ε∪b*a∪ab*a"
-   }
+   },
+   "test": 1
   },
   {
    "id": "116",
@@ -3143,7 +3237,8 @@
      "nu, niciun limbaj infinit nu poate"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "128",
@@ -3163,7 +3258,8 @@
      "nu se poate decide"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "182",
@@ -3183,7 +3279,8 @@
      "L1 ∪ L2, (L1 \\ L2) ∪ (L2 \\ L1), L1 ∩ L2 ∘ ∅"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "24",
@@ -3201,7 +3298,8 @@
     "grammar": "S -> aSb | ε",
     "upTo": 10,
     "reference": "S -> aSb | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "25",
@@ -3220,7 +3318,8 @@
     "upTo": 10,
     "reference": "S -> AT | AB\nT -> SB\nA -> a\nB -> b",
     "chomsky": true
-   }
+   },
+   "test": 2
   },
   {
    "id": "26",
@@ -3238,7 +3337,8 @@
     "grammar": "S -> aSa | bSb | a | b | ε",
     "upTo": 9,
     "reference": "S -> aSa | bSb | a | b | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "27",
@@ -3256,7 +3356,8 @@
     "grammar": "S -> aSbS | bSaS | ε",
     "upTo": 10,
     "reference": "S -> aSbS | bSaS | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "28",
@@ -3274,7 +3375,8 @@
     "grammar": "S -> 00S2 | 0S2 | 01T2 | T\nT -> 11T2 | 1T2 | T2 | ε",
     "upTo": 7,
     "reference": "S -> 00S2 | 0S2 | 01T2 | T\nT -> 11T2 | 1T2 | T2 | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "29",
@@ -3292,7 +3394,8 @@
     "grammar": "S -> SS | 0S0S1 | 0S1S0 | 1S0S0 | ε",
     "upTo": 9,
     "reference": "S -> SS | 0S0S1 | 0S1S0 | 1S0S0 | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "30",
@@ -3310,7 +3413,8 @@
     "grammar": "S -> aSb | A | B\nA -> aA | a\nB -> bB | b",
     "upTo": 10,
     "reference": "S -> aSb | A | B\nA -> aA | a\nB -> bB | b"
-   }
+   },
+   "test": 2
   },
   {
    "id": "31",
@@ -3328,7 +3432,8 @@
     "grammar": "S -> XC | AY\nX -> aXb | ε\nC -> cC | ε\nA -> aA | ε\nY -> bYc | ε",
     "upTo": 7,
     "reference": "S -> XC | AY\nX -> aXb | ε\nC -> cC | ε\nA -> aA | ε\nY -> bYc | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "32",
@@ -3346,7 +3451,8 @@
     "grammar": "S -> aSbS | ε",
     "upTo": 10,
     "reference": "S -> aSbS | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "69",
@@ -3364,7 +3470,8 @@
     "grammar": "S -> aSbb|ε",
     "upTo": 8,
     "reference": "S -> aSbb|ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "71",
@@ -3382,7 +3489,8 @@
     "grammar": "S -> aSbS|bSaS|ε",
     "upTo": 8,
     "reference": "S -> aSbS|bSaS|ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "72",
@@ -3400,7 +3508,8 @@
     "grammar": "S -> aSb|aS|a",
     "upTo": 8,
     "reference": "S -> aSb|aS|a"
-   }
+   },
+   "test": 2
   },
   {
    "id": "73",
@@ -3418,7 +3527,8 @@
     "grammar": "S -> <S>|>S<|ε",
     "upTo": 8,
     "reference": "S -> <S>|>S<|ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "74",
@@ -3436,7 +3546,8 @@
     "grammar": "S -> XC|AY\nX -> aXb|ε\nC -> cC|ε\nA -> aA|ε\nY -> bYc|ε",
     "upTo": 7,
     "reference": "S -> XC|AY\nX -> aXb|ε\nC -> cC|ε\nA -> aA|ε\nY -> bYc|ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "120",
@@ -3454,7 +3565,8 @@
     "grammar": "S -> aaaSccc | ε | abc | aabbcc",
     "upTo": 12,
     "reference": "S -> aaaSccc | ε | abc | aabbcc"
-   }
+   },
+   "test": 2
   },
   {
    "id": "126",
@@ -3472,7 +3584,8 @@
     "grammar": "S -> SS | aS | b",
     "upTo": 9,
     "reference": "S -> SS | aS | b"
-   }
+   },
+   "test": 2
   },
   {
    "id": "131",
@@ -3490,7 +3603,8 @@
     "grammar": "S -> A | B\nA -> bA | Aa | ε\nB -> aaB | abB | baB | bbB | ε",
     "upTo": 8,
     "reference": "S -> A | B\nA -> bA | Aa | ε\nB -> aaB | abB | baB | bbB | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "134",
@@ -3509,7 +3623,8 @@
     "upTo": 10,
     "reference": "S -> 01S | T\nT -> 01T10 | 0110",
     "unambiguous": true
-   }
+   },
+   "test": 2
   },
   {
    "id": "135",
@@ -3528,7 +3643,8 @@
     "upTo": 10,
     "reference": "S -> ε | CS\nC -> 0D1E\nD -> 0D1 | ε\nE -> 1E | ε",
     "unambiguous": true
-   }
+   },
+   "test": 2
   },
   {
    "id": "136",
@@ -3547,7 +3663,8 @@
     "upTo": 8,
     "reference": "S -> ZS | US | UA | b\nA -> ZA | UA | a | b\nZ -> a\nU -> b",
     "chomsky": true
-   }
+   },
+   "test": 2
   },
   {
    "id": "144",
@@ -3567,7 +3684,8 @@
      "L((aba ∪ aab ∪ baa ∪ bab)*)"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "145",
@@ -3587,7 +3705,8 @@
      "L(a*(a ∪ e)a*b*b*)"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "157",
@@ -3607,7 +3726,8 @@
      "generează un limbaj regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "174",
@@ -3627,7 +3747,8 @@
      "∅"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "175",
@@ -3647,7 +3768,8 @@
      "o mașină Turing"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "186",
@@ -3665,7 +3787,8 @@
     "grammar": "S -> T | XcX\nT -> aTbT | bTaT | ε\nX -> aX | bX | cX | ε",
     "upTo": 7,
     "reference": "S -> T | XcX\nT -> aTbT | bTaT | ε\nX -> aX | bX | cX | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "187",
@@ -3683,7 +3806,8 @@
     "grammar": "S -> XS2 | X2\nX -> 0X1 | 01",
     "upTo": 10,
     "reference": "S -> XS2 | X2\nX -> 0X1 | 01"
-   }
+   },
+   "test": 2
   },
   {
    "id": "189",
@@ -3703,7 +3827,8 @@
      "Da, Nu"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "193",
@@ -3721,7 +3846,8 @@
     "grammar": "S -> bSb | XSX | a | b | c | ε\nX -> a | c",
     "upTo": 7,
     "reference": "S -> bSb | XSX | a | b | c | ε\nX -> a | c"
-   }
+   },
+   "test": 2
   },
   {
    "id": "194",
@@ -3741,7 +3867,8 @@
      "infinit"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "195",
@@ -3759,7 +3886,8 @@
     "grammar": "S -> 0X0 | 1X1 | 0 | 1\nX -> 0X | 1X | ε",
     "upTo": 8,
     "reference": "S -> 0X0 | 1X1 | 0 | 1\nX -> 0X | 1X | ε"
-   }
+   },
+   "test": 2
   },
   {
    "id": "149",
@@ -3779,7 +3907,8 @@
      "un APD (doar atât se poate spune)"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "155",
@@ -3799,7 +3928,8 @@
      "nu se poate spune"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "176",
@@ -3819,7 +3949,8 @@
      "C acceptă doar limbaje regulate"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "188",
@@ -3839,7 +3970,8 @@
      "este regulat, dar nu finit"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "200",
@@ -3856,7 +3988,8 @@
     "alphabet": "ab",
     "reference": "start p\nfinal q\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "201",
@@ -3873,7 +4006,8 @@
     "alphabet": "abc",
     "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, c, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 7
-   }
+   },
+   "test": 2
   },
   {
    "id": "202",
@@ -3890,7 +4024,8 @@
     "alphabet": "ab",
     "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "203",
@@ -3907,7 +4042,8 @@
     "alphabet": "ab",
     "reference": "start q\nfinal q\nq, a, ε -> q, A\nq, b, A -> q, ε\nq, b, ε -> q, B\nq, a, B -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "204",
@@ -3924,7 +4060,8 @@
     "alphabet": "ab",
     "reference": "start i\nfinal f\ni, ε, ε -> p, Z\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, A -> r, ε\nr, ε, A -> r, ε\nr, ε, Z -> f, ε\nq, b, Z -> s, Z\ns, b, Z -> s, Z\ns, ε, Z -> f, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "205",
@@ -3941,7 +4078,8 @@
     "alphabet": "ab",
     "reference": "start p\nfinal q\np, ε, ε -> q, S\nq, ε, S -> q, aAA\nq, ε, A -> q, aS\nq, ε, A -> q, bS\nq, ε, A -> q, a\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "206",
@@ -3958,7 +4096,8 @@
     "alphabet": "ab",
     "reference": "start q\nfinal q\nq, a, ε -> q, ε\nq, b, ε -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "207",
@@ -3975,7 +4114,8 @@
     "alphabet": "ab",
     "reference": "start q\nfinal q\nq, a, ε -> q, X\nq, b, X -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "208",
@@ -3992,7 +4132,8 @@
     "alphabet": "ab",
     "reference": "start p\nfinal q\np, a, ε -> p, AA\np, ε, ε -> q, ε\nq, b, A -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "209",
@@ -4009,7 +4150,8 @@
     "alphabet": "abc",
     "reference": "start s\nfinal f u\ns, ε, ε -> p, ε\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, ε -> f, ε\nf, c, ε -> f, ε\ns, ε, ε -> r, ε\nr, a, ε -> r, ε\nr, ε, ε -> t, ε\nt, b, ε -> t, B\nt, ε, ε -> u, ε\nu, c, B -> u, ε",
     "upTo": 7
-   }
+   },
+   "test": 2
   },
   {
    "id": "210",
@@ -4026,7 +4168,8 @@
     "alphabet": "012",
     "reference": "start p\nfinal r\np, 0, ε -> p, A\np, 1, A -> q, ε\nq, 1, A -> q, ε\nq, ε, ε -> m, B\nm, 0, ε -> p, A\nm, 2, B -> r, ε\nr, 2, B -> r, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "211",
@@ -4043,7 +4186,8 @@
     "alphabet": "ab",
     "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\np, a, ε -> q, ε\np, b, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 8
-   }
+   },
+   "test": 2
   },
   {
    "id": "220",
@@ -4060,7 +4204,8 @@
     "alphabet": "ab",
     "reference": "q0, a -> q1, A, R\nq0, B -> q3, B, R\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, b -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, A, R\nq3, B -> q3, B, R\nq3, # -> h, #, S",
     "upTo": 7
-   }
+   },
+   "test": 3
   },
   {
    "id": "221",
@@ -4077,7 +4222,8 @@
     "alphabet": "01",
     "reference": "q0, 0 -> q0, 0, R\nq0, 1 -> q0, 1, R\nq0, # -> q1, #, L\nq1, 1 -> q1, 0, L\nq1, 0 -> h, 1, S\nq1, # -> h, 1, S",
     "upTo": 6
-   }
+   },
+   "test": 3
   },
   {
    "id": "223",
@@ -4094,7 +4240,8 @@
     "alphabet": "ab",
     "reference": "p, a -> i, a, R\np, b -> p, b, R\np, # -> h, #, S\ni, a -> p, a, R\ni, b -> i, b, R\ni, # -> n, #, S",
     "upTo": 7
-   }
+   },
+   "test": 3
   },
   {
    "id": "224",
@@ -4111,7 +4258,8 @@
     "alphabet": "ab",
     "reference": "q0, a -> qa, #, R\nq0, b -> qb, #, R\nq0, # -> h, #, S\nqa, a -> qa, a, R\nqa, b -> qa, b, R\nqa, # -> ra, #, L\nqb, a -> qb, a, R\nqb, b -> qb, b, R\nqb, # -> rb, #, L\nra, a -> back, #, L\nra, # -> h, #, S\nrb, b -> back, #, L\nrb, # -> h, #, S\nback, a -> back, a, L\nback, b -> back, b, L\nback, # -> q0, #, R",
     "upTo": 7
-   }
+   },
+   "test": 3
   },
   {
    "id": "225",
@@ -4128,7 +4276,8 @@
     "alphabet": "abc",
     "reference": "q0, a -> q1, X, R\nq0, Y -> q4, Y, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, Y -> q1, Y, R\nq1, b -> q2, Y, R\nq2, b -> q2, b, R\nq2, Z -> q2, Z, R\nq2, c -> q3, Z, L\nq3, a -> q3, a, L\nq3, b -> q3, b, L\nq3, Y -> q3, Y, L\nq3, Z -> q3, Z, L\nq3, X -> q0, X, R\nq4, Y -> q4, Y, R\nq4, Z -> q4, Z, R\nq4, # -> h, #, S",
     "upTo": 7
-   }
+   },
+   "test": 3
   },
   {
    "id": "226",
@@ -4145,7 +4294,8 @@
     "alphabet": "a",
     "reference": "q0, a -> q1, A, R\nq0, B -> q3, a, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, # -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, a, R\nq3, B -> q3, a, R\nq3, # -> h, #, S",
     "upTo": 6
-   }
+   },
+   "test": 3
   },
   {
    "id": "227",
@@ -4162,7 +4312,8 @@
     "alphabet": "01",
     "reference": "q, 0 -> q, 1, R\nq, 1 -> q, 0, R\nq, # -> h, #, S",
     "upTo": 6
-   }
+   },
+   "test": 3
   },
   {
    "id": "228",
@@ -4179,7 +4330,8 @@
     "alphabet": "ab",
     "reference": "q0, a -> q0, R\nq0, b -> q0, R\nq0, # -> q1, L\nq1, b -> h, b\nq1, a -> n, a\nq1, # -> n, #",
     "upTo": 7
-   }
+   },
+   "test": 3
   },
   {
    "id": "33",
@@ -4199,7 +4351,8 @@
      "finit"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "34",
@@ -4219,7 +4372,8 @@
      "regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "35",
@@ -4239,7 +4393,8 @@
      "finit"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "36",
@@ -4259,7 +4414,8 @@
      "finit"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "37",
@@ -4279,7 +4435,8 @@
      "regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "38",
@@ -4299,7 +4456,8 @@
      "independent de context"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "39",
@@ -4319,7 +4477,8 @@
      "L1, L2 și L1 ∪ L2 sunt finite"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "40",
@@ -4339,7 +4498,8 @@
      "nu se poate specifica"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "41",
@@ -4359,7 +4519,8 @@
      "nu, niciodată"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "42",
@@ -4379,7 +4540,8 @@
      "6"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "43",
@@ -4399,7 +4561,8 @@
      "intersecția unui LIC cu un limbaj regulat este întotdeauna regulată"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "44",
@@ -4419,7 +4582,8 @@
      "depinde de M"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "45",
@@ -4439,7 +4603,8 @@
      "este Turing acceptat, dar nu decidabil"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "121",
@@ -4459,7 +4624,8 @@
      "întotdeauna regulat"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "122",
@@ -4479,7 +4645,8 @@
      "finit"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "123",
@@ -4499,7 +4666,8 @@
      "regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "124",
@@ -4519,7 +4687,8 @@
      "regulat, dar infinit"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "127",
@@ -4539,7 +4708,8 @@
      "nu este independent de context"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "129",
@@ -4559,7 +4729,8 @@
      "doar dacă L e finit"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "137",
@@ -4579,7 +4750,8 @@
      "falsă: L1 = {0ⁿ1ᵐ | n > m ≥ 0}, L2 = L(1*) dau L1L2 = L(0⁺1*)"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "138",
@@ -4599,7 +4771,8 @@
      "adevărată pentru limbaje infinite"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "140",
@@ -4619,7 +4792,8 @@
      "Adevărat, Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "141",
@@ -4639,7 +4813,8 @@
      "LR"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "142",
@@ -4659,7 +4834,8 @@
      "nu este LIC"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "143",
@@ -4679,7 +4855,8 @@
      "LIC"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "146",
@@ -4699,7 +4876,8 @@
      "M3 = M1 \\ M2"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "147",
@@ -4719,7 +4897,8 @@
      "nu este LIC"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "150",
@@ -4739,7 +4918,8 @@
      "LIC, dar nu neapărat regulat"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "152",
@@ -4759,7 +4939,8 @@
      "un automat finit"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "153",
@@ -4779,7 +4960,8 @@
      "independent de context"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "154",
@@ -4799,7 +4981,8 @@
      "mulțimea vidă"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "156",
@@ -4819,7 +5002,8 @@
      "toate afirmațiile sunt false"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "158",
@@ -4839,7 +5023,8 @@
      "L nu este limbaj regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "161",
@@ -4859,7 +5044,8 @@
      "i) și ii) corecte"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "162",
@@ -4879,7 +5065,8 @@
      "este independent de context, dar nu regulat"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "164",
@@ -4899,7 +5086,8 @@
      "are o infinitate de cuvinte"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "170",
@@ -4917,7 +5105,8 @@
      "Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "171",
@@ -4935,7 +5124,8 @@
      "Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "190",
@@ -4955,7 +5145,8 @@
      "L1 nu poate fi finit"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "191",
@@ -4975,7 +5166,8 @@
      "infinit numărabilă"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "192",
@@ -4995,7 +5187,8 @@
      "finit"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "196",
@@ -5015,7 +5208,8 @@
      "e doar Turing acceptat"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "197",
@@ -5035,7 +5229,8 @@
      "regulat"
     ],
     "answer": 0
-   }
+   },
+   "test": 3
   },
   {
    "id": "198",
@@ -5055,7 +5250,8 @@
      "nu: orice limbaj din NP e decidabil"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "80",
@@ -5075,7 +5271,8 @@
      "`|X| ≠ |N|`"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "81",
@@ -5095,7 +5292,8 @@
      "L2 și L3"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "82",
@@ -5115,7 +5313,8 @@
      "fals, fals"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "83",
@@ -5135,7 +5334,8 @@
      "este întotdeauna regulat"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "84",
@@ -5155,7 +5355,8 @@
      "`L2 = (L1 ∪ L2) \\ L1`"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "85",
@@ -5175,7 +5376,8 @@
      "gramatica are 2 neterminali"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "86",
@@ -5195,7 +5397,8 @@
      "`|Y| = 1`"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "87",
@@ -5215,7 +5418,8 @@
      "adevărat, fals"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "88",
@@ -5235,7 +5439,8 @@
      "`aa ∈ L(r)`"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "89",
@@ -5255,7 +5460,8 @@
      "`|Z| = 0`"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "90",
@@ -5275,7 +5481,8 @@
      "concatenare"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "91",
@@ -5295,7 +5502,8 @@
      "`T ⇒* XX`"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "92",
@@ -5315,7 +5523,8 @@
      "`L` este independent de context, dar nu regulat"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "93",
@@ -5335,7 +5544,8 @@
      "`L` este strict dependent de context"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "94",
@@ -5355,7 +5565,8 @@
      "`∅*`"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "300",
@@ -5375,7 +5586,8 @@
      "3"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "301",
@@ -5395,7 +5607,8 @@
      "Turing Acceptat"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "302",
@@ -5415,7 +5628,8 @@
      "Turing Acceptat"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "303",
@@ -5435,7 +5649,8 @@
      "Nu se poate construi niciun APD care accepta $L$"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "304",
@@ -5455,7 +5670,8 @@
      "3"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "305",
@@ -5475,7 +5691,8 @@
      "Finit"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "306",
@@ -5495,7 +5712,8 @@
      "Regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "307",
@@ -5515,7 +5733,8 @@
      "$L \\cap PREFIX(L)$ este regulat"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "308",
@@ -5535,7 +5754,8 @@
      "$L$ este acceptat doar de MT cu o banda"
     ],
     "answer": 0
-   }
+   },
+   "test": 3
   },
   {
    "id": "309",
@@ -5555,7 +5775,8 @@
      "Fals, Adevarat"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "310",
@@ -5575,7 +5796,8 @@
      "Fals, Adevarat"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "311",
@@ -5595,7 +5817,8 @@
      "limbaj independent de context"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "312",
@@ -5615,7 +5838,8 @@
      "2"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "313",
@@ -5635,7 +5859,8 @@
      "$L_1 \\backslash L_2 \\notin LIC$"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "314",
@@ -5655,7 +5880,8 @@
      "Nicio varianta"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "315",
@@ -5675,7 +5901,8 @@
      "1"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "316",
@@ -5695,7 +5922,8 @@
      "$F = K $"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "317",
@@ -5715,7 +5943,8 @@
      "Finit"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "318",
@@ -5735,7 +5964,8 @@
      "$L_1 \\in TD \\vee L_2 \\in TD$"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "319",
@@ -5755,7 +5985,8 @@
      "$L$ poate sa nu fie Turing Acceptat"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "320",
@@ -5775,7 +6006,8 @@
      "Adevarat, Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "321",
@@ -5795,7 +6027,8 @@
      "Independent de context"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "322",
@@ -5815,7 +6048,8 @@
      "2"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "323",
@@ -5835,7 +6069,8 @@
      "$L’$ este regulat"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "324",
@@ -5855,7 +6090,8 @@
      "$D$ poate avea toate starile finale"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "325",
@@ -5875,7 +6111,8 @@
      "Turing Decidabil"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "326",
@@ -5895,7 +6132,8 @@
      "Limbaj finit"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "327",
@@ -5915,7 +6153,8 @@
      "Adevarat, Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "328",
@@ -5935,7 +6174,8 @@
      "nicio varianta"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "329",
@@ -5955,7 +6195,8 @@
      "Finit"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "330",
@@ -5975,7 +6216,8 @@
      "Cuvintele din $L(G)$ au lungime para"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "331",
@@ -5995,7 +6237,8 @@
      "$L_1,L_2 \\in LR$"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "332",
@@ -6015,7 +6258,8 @@
      "Complement"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "333",
@@ -6035,7 +6279,8 @@
      "$L \\notin LR$ si L nu satisface lema de pompare"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "334",
@@ -6055,7 +6300,8 @@
      "$L$ nu este Turing decidabil"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "335",
@@ -6075,7 +6321,8 @@
      "$L_2$ este regulat"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "336",
@@ -6095,7 +6342,8 @@
      "$(a\\cup b)(a\\cup b)^*$"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "337",
@@ -6115,7 +6363,8 @@
      "$L_1 \\in LIC, L_2 \\in LR,$ $L_1 \\setminus L_2 \\in LR$"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "338",
@@ -6135,7 +6384,8 @@
      "$aa\\in \\mathcal {L}(r)$"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "339",
@@ -6155,7 +6405,8 @@
      "$L$ este finit"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "340",
@@ -6175,7 +6426,8 @@
      "o infinitate"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "341",
@@ -6195,7 +6447,8 @@
      "$L_1=\\{w\\in \\Sigma ^*$ $\\mid |w|=2k, k \\geq 0\\},$ $L_2=\\{w\\in \\Sigma ^*$ $\\mid |w|=2k+1,$ $k \\geq 0\\}$"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "342",
@@ -6215,7 +6468,8 @@
      "prima si a treia"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "343",
@@ -6235,7 +6489,8 @@
      "Nu exista $L_1, L_2$ care sa satisfaca cerintele date"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "344",
@@ -6255,7 +6510,8 @@
      "nu este limbaj independent de context si nici regulat"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "345",
@@ -6275,7 +6531,8 @@
      "Nu se poate construi niciun automat pentru acest limbaj"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "346",
@@ -6295,7 +6552,8 @@
      "$E = 0$"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "347",
@@ -6315,7 +6573,8 @@
      "Se poate construi un APD pentru L"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "348",
@@ -6335,7 +6594,8 @@
      "$\\overline {L}$ este Turing decidabil"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "349",
@@ -6355,7 +6615,8 @@
      "nu poate fi acceptat de o masina Turing cu $k=1$ si $h=3$"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "350",
@@ -6375,7 +6636,8 @@
      "nu se poate preciza"
     ],
     "answer": 0
-   }
+   },
+   "test": 3
   },
   {
    "id": "351",
@@ -6395,7 +6657,8 @@
      "Nu este Turing acceptat"
     ],
     "answer": 1
-   }
+   },
+   "test": 3
   },
   {
    "id": "352",
@@ -6415,7 +6678,8 @@
      "Fals, Fals"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "353",
@@ -6435,7 +6699,8 @@
      "Nu e LIC"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "354",
@@ -6455,7 +6720,8 @@
      "6"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "355",
@@ -6475,7 +6741,8 @@
      "Nu este Turing Acceptat"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "356",
@@ -6495,7 +6762,8 @@
      "Turing Acceptat"
     ],
     "answer": 0
-   }
+   },
+   "test": 3
   },
   {
    "id": "357",
@@ -6515,7 +6783,8 @@
      "Nu e Turing Acceptat"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "358",
@@ -6535,7 +6804,8 @@
      "Nu se poate specifica"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "359",
@@ -6555,7 +6825,8 @@
      "O infinitate"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "360",
@@ -6575,7 +6846,8 @@
      "LR"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "361",
@@ -6595,7 +6867,8 @@
      "Fals, Fals"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "362",
@@ -6615,7 +6888,8 @@
      "5"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "363",
@@ -6635,7 +6909,8 @@
      "$S \\rightarrow S_1$ $\\mid S_2 \\mid SS$"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "364",
@@ -6655,7 +6930,8 @@
      "Fals, Adevarat"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "365",
@@ -6675,7 +6951,8 @@
      "Adevarat, Adevarat"
     ],
     "answer": 2
-   }
+   },
+   "test": 1
   },
   {
    "id": "366",
@@ -6695,7 +6972,8 @@
      "LIC"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "367",
@@ -6715,7 +6993,8 @@
      "Limbaj regulat"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "368",
@@ -6735,7 +7014,8 @@
      "$\\mathcal {L}(G) = \\{e\\}$"
     ],
     "answer": 2
-   }
+   },
+   "test": 2
   },
   {
    "id": "369",
@@ -6755,7 +7035,8 @@
      "$L$ este Turing decidabil"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "370",
@@ -6775,7 +7056,8 @@
      "$L$ nu este Turing acceptat"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "371",
@@ -6795,7 +7077,8 @@
      "poate fi decis de o masina Turing cu $k+7$ benzi"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "372",
@@ -6815,7 +7098,8 @@
      "$L$ este Turing acceptat, dar nu Turing decidabil"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "373",
@@ -6835,7 +7119,8 @@
      "Se poate construi un APD determinist pentru L"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "374",
@@ -6855,7 +7140,8 @@
      "niciuna dintre variante"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "375",
@@ -6875,7 +7161,8 @@
      "$L$ nu este Turing acceptat"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "376",
@@ -6895,7 +7182,8 @@
      "$|\\Sigma | \\geq |\\Gamma |$"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "377",
@@ -6915,7 +7203,8 @@
      "$L_2 = L_1$"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "378",
@@ -6935,7 +7224,8 @@
      "prima"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "379",
@@ -6955,7 +7245,8 @@
      "$M_3 =\\{L \\mid L\\in LR \\wedge \\textit {01} \\in L\\}$"
     ],
     "answer": 1
-   }
+   },
+   "test": 1
   },
   {
    "id": "380",
@@ -6975,7 +7266,8 @@
      "nicio varianta"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "381",
@@ -6995,7 +7287,8 @@
      "finit"
     ],
     "answer": 0
-   }
+   },
+   "test": 2
   },
   {
    "id": "382",
@@ -7015,7 +7308,8 @@
      "$b$ este in orice sir generat de $r$"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "383",
@@ -7035,7 +7329,8 @@
      "limbaj independent de context"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "384",
@@ -7055,7 +7350,8 @@
      "Numarul de tranzitii din $M_1 \\geq |K_1|$"
     ],
     "answer": 3
-   }
+   },
+   "test": 1
   },
   {
    "id": "385",
@@ -7075,7 +7371,8 @@
      "$L_4 \\in LIC \\setminus LR$"
     ],
     "answer": 1
-   }
+   },
+   "test": 2
   },
   {
    "id": "386",
@@ -7095,7 +7392,8 @@
      "$\\phi $"
     ],
     "answer": 0
-   }
+   },
+   "test": 1
   },
   {
    "id": "387",
@@ -7115,7 +7413,8 @@
      "niciuna dintre variante"
     ],
     "answer": 2
-   }
+   },
+   "test": 3
   },
   {
    "id": "388",
@@ -7135,7 +7434,8 @@
      "Nu este Turing acceptat"
     ],
     "answer": 3
-   }
+   },
+   "test": 3
   },
   {
    "id": "389",
@@ -7155,7 +7455,8 @@
      "$L$ nu este Turing acceptat"
     ],
     "answer": 0
-   }
+   },
+   "test": 3
   },
   {
    "id": "390",
@@ -7175,7 +7476,8 @@
      "$L$ este independent de context, dar nu regulat"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   },
   {
    "id": "391",
@@ -7195,7 +7497,8 @@
      "$L$ nu este independent de context"
     ],
     "answer": 3
-   }
+   },
+   "test": 2
   }
  ]
 }

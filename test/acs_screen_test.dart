@@ -37,6 +37,47 @@ void main() {
         .load();
   });
 
+  test('LFA is split by the seminar\'s three tests, each problem in one', () {
+    final d = AcsCourseData.parse('lfa', File('assets/data/acs/lfa.json').readAsStringSync());
+    expect([for (final t in d.tests) '${t.name} ${t.short}'], ['Testul 1 LR', 'Testul 2 LIC', 'Testul 3 MT']);
+    for (final p in d.problems) {
+      expect(p.test, inInclusiveRange(1, 3), reason: p.id);
+    }
+    expect(d.problems.firstWhere((p) => p.chapter.startsWith('7.')).test, 3);
+    expect(d.problems.firstWhere((p) => p.chapter.startsWith('5.')).test, 2);
+  });
+
+  testWidgets('the list filters by one test or more', (t) async {
+    SharedPreferences.setMockInitialValues({'acs-capitol:lfa': ''});
+    await show(t, const AcsCourseScreen(code: 'lfa'), 1300, AcsStyle.notebook);
+    for (var i = 0; i < 40 && find.textContaining('Testul').evaluate().isEmpty; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await t.pump(const Duration(milliseconds: 50));
+    }
+    final d = AcsCourseData.parse('lfa', File('assets/data/acs/lfa.json').readAsStringSync());
+    final t3 = d.problems.where((p) => p.test == 3).toList();
+    final t1 = d.problems.firstWhere((p) => p.test == 1);
+    Future<void> pick(String name) async {
+      final chip = find.textContaining(name).first;
+      await t.ensureVisible(chip);
+      await t.tap(chip);
+      for (var i = 0; i < 4; i++) {
+        await t.pump(const Duration(milliseconds: 150));
+      }
+    }
+
+    await pick('Testul 3 · MT ${t3.length}');
+    expect(find.text(t3.first.title), findsWidgets);
+    expect(find.text(t1.title), findsNothing);
+    expect(find.text('${t3.length} probleme'), findsOneWidget);
+    // and a second one
+    await pick('Testul 1 · LR');
+    expect(find.text(t1.title), findsWidgets);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('acs-teste:lfa'), '1,3');
+    expect(t.takeException(), isNull);
+  });
+
   test('every ready course has problems, and counts what is solved', () async {
     SharedPreferences.setMockInitialValues({'acs:pclp:1': true, 'acs:pclp:2': true, 'acs:sd:1': false});
     final counts = await loadAcsCounts();
