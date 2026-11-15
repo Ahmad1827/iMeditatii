@@ -51,6 +51,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
   _Type _type = _Type.all;
   bool _examOnly = false;
   Set<int> _tests = {}; // the seminar tests asked for; empty: all
+  Set<String> _topics = {}; // their items asked for; empty: all
   String _query = '';
   final TextEditingController _search = TextEditingController();
 
@@ -85,6 +86,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       }
       final t = prefs.getString(_testsKey) ?? '';
       _tests = {for (final x in t.split(',')) if (int.tryParse(x) != null) int.parse(x)};
+      _topics = {for (final x in (prefs.getString('acs-subiecte:${widget.code}') ?? '').split(',')) if (x.isNotEmpty) x};
     } catch (_) {}
     if (!mounted) return;
     setState(() {
@@ -117,7 +119,10 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
   /// Where to go on: a problem tried and not solved, else the first not solved.
   AcsProblem? _next(AcsCourseData d) {
     // within the tests chosen, if any
-    final ps = _tests.isEmpty ? d.problems : [for (final p in d.problems) if (_tests.contains(p.test)) p];
+    final ps = [
+      for (final p in d.problems)
+        if ((_tests.isEmpty || _tests.contains(p.test)) && (_topics.isEmpty || _topics.contains(p.topic))) p,
+    ];
     for (final p in ps) {
       if (_tried.contains(p.id) && !_solved.contains(p.id)) return p;
     }
@@ -127,18 +132,36 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
     return null;
   }
 
-  bool get _filtering => _status != _Status.all || _diff != null || _type != _Type.all || _examOnly || _tests.isNotEmpty || _query.trim().isNotEmpty;
+  bool get _filtering => _status != _Status.all || _diff != null || _type != _Type.all || _examOnly || _tests.isNotEmpty || _topics.isNotEmpty || _query.trim().isNotEmpty;
 
   String get _testsKey => 'acs-teste:${widget.code}';
 
   void _toggleTest(int n) {
-    setState(() => _tests.contains(n) ? _tests.remove(n) : _tests.add(n));
+    setState(() {
+      if (_tests.contains(n)) {
+        _tests.remove(n);
+        // its items go with it
+        final gone = {for (final t in _data?.tests ?? const <AcsTest>[]) if (t.n == n) ...t.topics.map((x) => x.id)};
+        _topics.removeAll(gone);
+      } else {
+        _tests.add(n);
+      }
+    });
+    _saveTests();
+  }
+
+  void _toggleTopic(String id) {
+    setState(() => _topics.contains(id) ? _topics.remove(id) : _topics.add(id));
     _saveTests();
   }
 
   void _saveTests() {
     final v = (_tests.toList()..sort()).join(',');
-    SharedPreferences.getInstance().then((p) => p.setString(_testsKey, v)).catchError((_) => false);
+    final w = (_topics.toList()..sort()).join(',');
+    SharedPreferences.getInstance().then((p) {
+      p.setString(_testsKey, v);
+      p.setString('acs-subiecte:${widget.code}', w);
+    }).catchError((_) {});
   }
 
   bool _passes(AcsProblem p) {
@@ -157,6 +180,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
     if (_type == _Type.exercises && _isGrila(p)) return false;
     if (_examOnly && !_fromExam(p)) return false;
     if (_tests.isNotEmpty && !_tests.contains(p.test)) return false;
+    if (_topics.isNotEmpty && !_topics.contains(p.topic)) return false;
     final q = _fold(_query.trim());
     if (q.isNotEmpty && !_fold('${p.title} ${p.statement} ${p.source} ${p.kindLabel}').contains(q)) return false;
     return true;
@@ -210,7 +234,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
                 opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, 0.01), end: Offset.zero).animate(a), child: c)),
             layoutBuilder: (current, previous) => Stack(alignment: Alignment.topCenter, children: [...previous.map((w) => Positioned(top: 0, left: 0, right: 0, child: w)), if (current != null) current]),
             child: Column(
-              key: ValueKey('$_chapter|$_status|$_diff|$_type|$_examOnly|${(_tests.toList()..sort()).join(',')}|$_query'),
+              key: ValueKey('$_chapter|$_status|$_diff|$_type|$_examOnly|${(_tests.toList()..sort()).join(',')}|${(_topics.toList()..sort()).join(',')}|$_query'),
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: _list(context, ink, narrow, data),
             ),
@@ -411,7 +435,9 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
     final byDiff = [for (final d in _diffs) ps.where((p) => p.difficulty == d).length];
     final sel = _chapter == ch;
     final complete = ps.isNotEmpty && done == ps.length;
-    final outside = _tests.isNotEmpty && !ps.any((p) => _tests.contains(p.test)); // nothing for the tests chosen
+    // nothing for the tests (and items) chosen
+    final outside = (_tests.isNotEmpty || _topics.isNotEmpty) &&
+        !ps.any((p) => (_tests.isEmpty || _tests.contains(p.test)) && (_topics.isEmpty || _topics.contains(p.topic)));
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 250),
       opacity: outside ? 0.38 : 1,
@@ -479,12 +505,22 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       if (data.tests.isNotEmpty)
         group('test', [
           _chip(ink, 'toate', _tests.isEmpty, () {
-            setState(() => _tests = {});
+            setState(() {
+              _tests = {};
+              _topics = {};
+            });
             _saveTests();
           }),
           for (final t in data.tests)
             _chip(ink, '${t.name} · ${t.short} ${count((p) => p.test == t.n)}', _tests.contains(t.n), () => _toggleTest(t.n)),
         ]),
+      // a test chosen: its items, as the seminar announced them
+      for (final t in data.tests)
+        if (_tests.contains(t.n) && t.topics.isNotEmpty)
+          group(_tests.length > 1 ? 'subiect T${t.n}' : 'subiect', [
+            for (final x in t.topics)
+              _chip(ink, '${x.name}${x.points > 0 ? ' (${_pts(x.points)}p)' : ''} ${count((p) => p.topic == x.id)}', _topics.contains(x.id), () => _toggleTopic(x.id)),
+          ]),
       group('stare', [
         _chip(ink, 'toate', _status == _Status.all, () => setState(() => _status = _Status.all)),
         _chip(ink, 'de rezolvat', _status == _Status.todo, () => setState(() => _status = _Status.todo)),
@@ -505,6 +541,8 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       ]),
     ]);
   }
+
+  static String _pts(double p) => p == p.roundToDouble() ? '${p.round()}' : p.toString().replaceAll('.', ',');
 
   Widget _searchField(AcsInk ink) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -619,6 +657,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
                 _type = _Type.all;
                 _examOnly = false;
                 _tests = {};
+                _topics = {};
                 _search.clear();
                 _query = '';
                 _chapter = null;

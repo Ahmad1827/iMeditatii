@@ -27,6 +27,7 @@ class AcsProblem {
   final String kind;
   final Map<String, dynamic> spec;
   final int test; // the seminar test it is for (see [AcsCourseData.tests]); 0: none
+  final String topic; // the test's item it trains ([AcsTopic.id]); '' for none
 
   const AcsProblem({
     required this.course,
@@ -41,6 +42,7 @@ class AcsProblem {
     required this.kind,
     required this.spec,
     this.test = 0,
+    this.topic = '',
   });
 
   factory AcsProblem.fromJson(String course, Map<String, dynamic> j) => AcsProblem(
@@ -56,6 +58,7 @@ class AcsProblem {
         kind: j['kind'] as String,
         spec: (j['spec'] as Map?)?.cast<String, dynamic>() ?? const {},
         test: (j['test'] as num?)?.toInt() ?? 0,
+        topic: j['topic'] as String? ?? '',
       );
 
   String get key => 'acs:$course:$id';
@@ -88,11 +91,19 @@ const Map<String, String> acsKindLabels = {
   'calc': 'calcul',
 };
 
-/// One of the seminar's tests: "Testul 1", "Limbaje regulate (LR)".
+/// An item of a test: "P3 · Conversii", worth 2.5 points.
+class AcsTopic {
+  final String id, name;
+  final double points; // 0: not announced
+  const AcsTopic(this.id, this.name, this.points);
+}
+
+/// One of the seminar's tests: "Testul 1", "Limbaje regulate (LR)", and its items.
 class AcsTest {
   final int n;
   final String name, about;
-  const AcsTest(this.n, this.name, this.about);
+  final List<AcsTopic> topics;
+  const AcsTest(this.n, this.name, this.about, {this.topics = const []});
 
   /// What is in the brackets of [about] ("LR"), or [about] itself.
   String get short => RegExp(r'\(([^)]+)\)').firstMatch(about)?.group(1) ?? about;
@@ -124,7 +135,12 @@ class AcsCourseData {
       code,
       [for (final c in j['chapters'] as List) '$c'],
       [for (final p in j['problems'] as List) AcsProblem.fromJson(code, (p as Map).cast<String, dynamic>())],
-      tests: [for (final t in j['tests'] as List? ?? const []) AcsTest((t['n'] as num).toInt(), '${t['name']}', '${t['about'] ?? ''}')],
+      tests: [
+        for (final t in j['tests'] as List? ?? const [])
+          AcsTest((t['n'] as num).toInt(), '${t['name']}', '${t['about'] ?? ''}', topics: [
+            for (final x in t['topics'] as List? ?? const []) AcsTopic('${x['id']}', '${x['name']}', (x['points'] as num?)?.toDouble() ?? 0),
+          ]),
+      ],
     );
   }
 }

@@ -572,6 +572,7 @@ m(94, 'Limbajul vid', 'ușoară', 'Care expresie regulată generează limbajul v
   'Concatenarea cu `∅` dă `∅`. Atenție: `∅* = {ε}`, nu vid; `∅*(∅ ∪ 0*) = 0*`.')
 
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_more.py'), encoding='utf-8').read())
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_topics.py'), encoding='utf-8').read())
 
 # ------------------------------------------------------------ the seminar's tests
 # Test 1: regular languages, test 2: context-free ones, test 3: Turing
@@ -598,7 +599,67 @@ def test_of(p):
     return 3 if LEVEL3.search(text) else 2 if LEVEL2.search(text) else 1
 
 
+# each test's items, as the seminar announced them (test 3's were not: by subject)
+TOPICS = {
+    1: [('lr-inchidere', 'P1 · Proprietăți de închidere', 2), ('lr-reprezentare', 'P2 · Reprezentare ER / AF', 2),
+        ('lr-conversii', 'P3 · Conversii', 2.5), ('lr-algoritmice', 'P4 · Proprietăți algoritmice', 1.5),
+        ('lr-pompare', 'P5 · Lema de pompare', 2), ('lr-bonus', 'P6 · Bonus', 2)],
+    2: [('lic-gramatici', 'P1 · Gramatici: derivări, arbori, ambiguitate', 3), ('lic-apd', 'P2 · Automate pushdown', 3),
+        ('lic-scriere', 'P3 · Gramatica unui limbaj, GIC → APD', 2), ('lic-algoritmice', 'P4 · Proprietăți algoritmice', 2),
+        ('lic-bonus', 'P5–6 · Bonus: clase, închidere, pompare', 4)],
+    3: [('mt-masini', 'Mașini Turing: construcție și calcul', 0), ('mt-decidabil', 'Decidabil și Turing acceptat', 0),
+        ('mt-extensii', 'Extensii și complexitate', 0)],
+}
+for t_ in TESTS:
+    t_['topics'] = [{'id': i, 'name': n, 'points': pts} for i, n, pts in TOPICS[t_['n']]]
+
+I = re.I
+LR_BONUS = re.compile(r'Câte AFD|Cate AFD|automate finite deterministe se pot|Myhill|alfabetul vid|Σ = ∅|Sigma = \\emptyset|mulțimea (limbajelor|expresiilor)|Multimea limbajelor|infinit numarabil|\|L\*\| < ∞|L1L2 = L2L1|L_1L_2=L_2L_1', I)
+LR_POMPARE = re.compile(r'pomp|neregulat|nu (este|e) regulat|cel mai strict sens|Cum este `?L|Cum este \$L|Ce tip de limbaj|Care sunt regulate|Din ce clasa', I)
+LR_CONV = re.compile(r'nedeterminist în determinist|Din automat|Automat pentru|echivalent|minim|cel mai mic AFD|câte stări|cât mai puține stări|submulț|Thompson|elimin|AFN-ul asociat', I)
+LR_ALG = re.compile(r'decid|algoritm|\bvid\b|limbajul vid|infinit|apartenen|incluziun|se poate determina', I)
+LR_INCH = re.compile(r'închis|inchis|reuniun|intersec|complement|concaten|∪|∩|\\cup|\\cap|overline|oglind|prefix|sufix|Suf\(|Pref|diferen|Σ\* \\\\|L1|L_1|L\*|L\^\*', I)
+LIC_ALG = re.compile(r'decid|algoritm|CYK|apartenen|\bvid\b|finit|echivalen', I)
+LIC_APD = re.compile(r'\bAPD\b|pushdown|stiv|Γ|\\Gamma', I)
+LIC_GRAM = re.compile(r'gramatic|deriv|arbore|ambigu|→|->|rightarrow|FNC|Chomsky', I)
+
+
+def topic_of(p):
+    if p.get('topic'):
+        return p['topic']
+    t = p['test']
+    spec = p.get('spec', {})
+    mode = spec.get('mode') if p['kind'] == 'lfa' else None
+    text = ' '.join([p['title'], p['statement']])
+    if t == 1:
+        if p['chapter'] == CHAPTERS[3]:
+            return 'lr-inchidere'
+        if mode in ('dfa', 'nfa', 'regex'):
+            return 'lr-conversii' if LR_CONV.search(text) else 'lr-reprezentare'
+        for rx, top in ((LR_BONUS, 'lr-bonus'), (LR_POMPARE, 'lr-pompare'), (LR_CONV, 'lr-conversii'), (LR_ALG, 'lr-algoritmice'), (LR_INCH, 'lr-inchidere')):
+            if rx.search(text):
+                return top
+        return 'lr-reprezentare'
+    if t == 2:
+        if mode == 'cfg':
+            return 'lic-gramatici' if spec.get('unambiguous') or spec.get('chomsky') or re.search(r'ambigu|deriv|arbore|FNC|Chomsky', text, I) else 'lic-scriere'
+        if mode == 'pda':
+            return 'lic-scriere' if re.search(r'gramatic|GIC', text, I) else 'lic-apd'
+        for rx, top in ((LIC_ALG, 'lic-algoritmice'), (LIC_APD, 'lic-apd'), (LIC_GRAM, 'lic-gramatici')):
+            if rx.search(text):
+                return top
+        return 'lic-bonus'
+    if mode in ('tm', 'tmf'):
+        return 'mt-masini'
+    if re.search(r'benzi|capete|\bNP\b|complex|nedeterminist', text, I):
+        return 'mt-extensii'
+    if re.search(r'ρ|\\rho|decid|Turing acceptat|\bTD\b|\bTA\b|oprire|opre[sș]te|Rice', text, I):
+        return 'mt-decidabil'
+    return 'mt-masini'
+
+
 for p_ in P:
     p_['test'] = test_of(p_)
+    p_['topic'] = topic_of(p_)
 
 write_course('lfa', CHAPTERS, P, tests=TESTS)

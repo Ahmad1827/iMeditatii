@@ -323,3 +323,22 @@ for l in LESSONS:
 missing = [(l['id'], s_['id']) for l in LESSONS for s_ in l['sections'] if 'key' not in s_]
 assert not missing, f'sections with no key: {missing}'
 assert all('goals' in l for l in LESSONS), 'a lesson with no goals'
+
+# problems added for the tests' items (tool/acs/lfa_topics.py), practised after their lesson
+MORE_PRACTICE = {
+    'algoritmice-lr': [str(i) for i in range(410, 419)],
+    'pompare-lr': [str(i) for i in range(420, 425)],
+    'afn': ['425', '426', '400'],
+    'af-er': ['427'],
+    'minimizare': ['428'],
+    'inchidere-lr': ['401', '402', '403', '404', '407', '408'],
+    'expresii-regulate': ['406'],
+    'afd': ['405'],
+    'proprietati-lic': [str(i) for i in range(430, 436)],
+}
+_ids = {str(p_['id']) for p_ in json.load(open(os.path.join(ROOT, 'assets', 'data', 'acs', 'lfa.json'), encoding='utf-8'))['problems']}
+for l in LESSONS:
+    for i in MORE_PRACTICE.get(l['id'], []):
+        assert i in _ids, i
+        if i not in l['practice']:
+            l['practice'].append(i)

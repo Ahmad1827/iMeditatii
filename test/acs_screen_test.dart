@@ -45,6 +45,18 @@ void main() {
     }
     expect(d.problems.firstWhere((p) => p.chapter.startsWith('7.')).test, 3);
     expect(d.problems.firstWhere((p) => p.chapter.startsWith('5.')).test, 2);
+    // each test's items: every problem in one item of its own test, every item with problems to train on
+    for (final t in d.tests) {
+      expect(t.topics, isNotEmpty, reason: t.name);
+      for (final x in t.topics) {
+        expect(d.problems.where((p) => p.topic == x.id).length, greaterThanOrEqualTo(5), reason: x.name);
+      }
+    }
+    for (final p in d.problems) {
+      final t = d.tests.firstWhere((t) => t.n == p.test);
+      expect(t.topics.map((x) => x.id), contains(p.topic), reason: p.id);
+    }
+    expect(d.tests.first.topics.map((x) => x.points).fold(0.0, (a, b) => a + b), 12); // 10 + the bonus
   });
 
   testWidgets('the list filters by one test or more', (t) async {
@@ -73,8 +85,15 @@ void main() {
     // and a second one
     await pick('Testul 1 · LR');
     expect(find.text(t1.title), findsWidgets);
+    // an item of test 1
+    final alg = d.problems.where((p) => p.topic == 'lr-algoritmice').toList();
+    await pick('P4 · Proprietăți algoritmice (1,5p) ${alg.length}');
+    expect(find.text(alg.first.title), findsWidgets);
+    expect(find.text(t3.first.title), findsNothing);
+    expect(find.text('${alg.length} probleme'), findsOneWidget);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString('acs-teste:lfa'), '1,3');
+    expect(prefs.getString('acs-subiecte:lfa'), 'lr-algoritmice');
     expect(t.takeException(), isNull);
   });
 

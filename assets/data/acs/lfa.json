@@ -16,17 +16,93 @@
   {
    "n": 1,
    "name": "Testul 1",
-   "about": "Limbaje regulate (LR)"
+   "about": "Limbaje regulate (LR)",
+   "topics": [
+    {
+     "id": "lr-inchidere",
+     "name": "P1 · Proprietăți de închidere",
+     "points": 2
+    },
+    {
+     "id": "lr-reprezentare",
+     "name": "P2 · Reprezentare ER / AF",
+     "points": 2
+    },
+    {
+     "id": "lr-conversii",
+     "name": "P3 · Conversii",
+     "points": 2.5
+    },
+    {
+     "id": "lr-algoritmice",
+     "name": "P4 · Proprietăți algoritmice",
+     "points": 1.5
+    },
+    {
+     "id": "lr-pompare",
+     "name": "P5 · Lema de pompare",
+     "points": 2
+    },
+    {
+     "id": "lr-bonus",
+     "name": "P6 · Bonus",
+     "points": 2
+    }
+   ]
   },
   {
    "n": 2,
    "name": "Testul 2",
-   "about": "Limbaje independente de context (LIC)"
+   "about": "Limbaje independente de context (LIC)",
+   "topics": [
+    {
+     "id": "lic-gramatici",
+     "name": "P1 · Gramatici: derivări, arbori, ambiguitate",
+     "points": 3
+    },
+    {
+     "id": "lic-apd",
+     "name": "P2 · Automate pushdown",
+     "points": 3
+    },
+    {
+     "id": "lic-scriere",
+     "name": "P3 · Gramatica unui limbaj, GIC → APD",
+     "points": 2
+    },
+    {
+     "id": "lic-algoritmice",
+     "name": "P4 · Proprietăți algoritmice",
+     "points": 2
+    },
+    {
+     "id": "lic-bonus",
+     "name": "P5–6 · Bonus: clase, închidere, pompare",
+     "points": 4
+    }
+   ]
   },
   {
    "n": 3,
    "name": "Testul 3",
-   "about": "Mașina Turing (MT)"
+   "about": "Mașina Turing (MT)",
+   "topics": [
+    {
+     "id": "mt-masini",
+     "name": "Mașini Turing: construcție și calcul",
+     "points": 0
+    },
+    {
+     "id": "mt-decidabil",
+     "name": "Decidabil și Turing acceptat",
+     "points": 0
+    },
+    {
+     "id": "mt-extensii",
+     "name": "Extensii și complexitate",
+     "points": 0
+    }
+   ]
   }
  ],
  "problems": [
@@ -77,7 +153,8 @@
     },
     "regex": "(a∪b)*ab"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "2",
@@ -119,7 +196,8 @@
     "regex": "(b*ab*a)*b*",
     "maxStates": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "3",
@@ -168,7 +246,8 @@
     },
     "regex": "(a∪b)*aa(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "4",
@@ -218,7 +297,8 @@
     },
     "regex": "(b∪ab)*(a∪ε)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "5",
@@ -268,7 +348,8 @@
     "regex": "(b*ab*ab*a)*b*",
     "maxStates": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "6",
@@ -334,7 +415,8 @@
     },
     "regex": "a(a∪b)*a∪b(a∪b)*b∪a∪b"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "7",
@@ -384,7 +466,8 @@
     "regex": "(0∪1(01*0)*1)*",
     "maxStates": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "8",
@@ -513,7 +596,8 @@
     },
     "maxStates": 6
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "9",
@@ -554,7 +638,8 @@
     },
     "regex": "a*b(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "50",
@@ -611,7 +696,8 @@
     },
     "regex": "(a∪b)*aba(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "51",
@@ -661,7 +747,8 @@
     },
     "regex": "(a∪ba)*(b∪ε)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "52",
@@ -710,7 +797,8 @@
     },
     "regex": "(b∪ab)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "53",
@@ -807,7 +895,8 @@
     },
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "54",
@@ -857,7 +946,8 @@
     "regex": "(a∪b)((a∪b)(a∪b)(a∪b))*",
     "maxStates": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "55",
@@ -970,7 +1060,8 @@
     },
     "maxStates": 5
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "56",
@@ -1027,7 +1118,8 @@
     },
     "regex": "(a∪b)*abb"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "57",
@@ -1173,7 +1265,8 @@
      }
     }
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "104",
@@ -1382,7 +1475,8 @@
     },
     "maxStates": 8
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "105",
@@ -1441,7 +1535,8 @@
     "regex": "((0∪2)(0∪2))*",
     "maxStates": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "108",
@@ -1460,7 +1555,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "109",
@@ -1479,7 +1575,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "113",
@@ -1498,7 +1595,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "117",
@@ -1519,7 +1617,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "159",
@@ -1540,7 +1639,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "160",
@@ -1561,7 +1661,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "163",
@@ -1582,7 +1683,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "177",
@@ -1603,7 +1705,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "181",
@@ -1727,6 +1830,196 @@
      }
     }
    },
+   "test": 1,
+   "topic": "lr-reprezentare"
+  },
+  {
+   "id": "405",
+   "title": "3 | #0, 2 | #1, se termină cu 0",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `Σ = {0, 1}`. Scrie un AF pentru `L = {w ∈ Σ* | 3 | #0(w) ∧ 2 | #1(w) ∧ ∃x ∈ Σ*: w = x0}` (numărul de `0` divizibil cu 3, numărul de `1` par, iar `w` se termină cu `0`).",
+   "hint": "Produsul a două numărătoare (`#0 mod 3`, `#1 mod 2`): 6 stări. Starea finală (0, 0) trebuie împărțită după ultimul simbol citit.",
+   "solution": "Stările (`#0 mod 3`, `#1 mod 2`) dau 6 stări; în (0, 0) se poate ajunge și cu `0`, și cu `1`, iar acceptăm doar după `0`. Deci (0, 0) se dublează: „(0, 0) după 0” e finală, „(0, 0) altfel” (inclusiv starea inițială) nu: 7 stări.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "01",
+    "reference": {
+     "states": 7,
+     "final": [
+      5
+     ],
+     "t": {
+      "0": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ]
+      },
+      "1": {
+       "0": [
+        3
+       ],
+       "1": [
+        4
+       ]
+      },
+      "2": {
+       "0": [
+        4
+       ],
+       "1": [
+        0
+       ]
+      },
+      "3": {
+       "0": [
+        5
+       ],
+       "1": [
+        6
+       ]
+      },
+      "4": {
+       "0": [
+        6
+       ],
+       "1": [
+        1
+       ]
+      },
+      "5": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ]
+      },
+      "6": {
+       "0": [
+        2
+       ],
+       "1": [
+        3
+       ]
+      }
+     }
+    },
+    "automaton": {
+     "states": 7,
+     "final": [
+      5
+     ],
+     "t": {
+      "0": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ]
+      },
+      "1": {
+       "0": [
+        3
+       ],
+       "1": [
+        4
+       ]
+      },
+      "2": {
+       "0": [
+        4
+       ],
+       "1": [
+        0
+       ]
+      },
+      "3": {
+       "0": [
+        5
+       ],
+       "1": [
+        6
+       ]
+      },
+      "4": {
+       "0": [
+        6
+       ],
+       "1": [
+        1
+       ]
+      },
+      "5": {
+       "0": [
+        1
+       ],
+       "1": [
+        2
+       ]
+      },
+      "6": {
+       "0": [
+        2
+       ],
+       "1": [
+        3
+       ]
+      }
+     }
+    },
+    "maxStates": 7
+   },
+   "topic": "lr-reprezentare",
+   "test": 1
+  },
+  {
+   "id": "428",
+   "title": "Minimizare: 6 stări pentru „se termină cu a”",
+   "chapter": "1. Automate finite deterministe",
+   "difficulty": "medie",
+   "source": "Seminar LFA · conversii",
+   "statement": "AFD-ul `M` peste `{a, b}` cu stările `0`–`5`, inițială `0`, finale `{1, 3, 5}` și `δ`: `0 a→1, 0 b→2, 1 a→3, 1 b→4, 2 a→5, 2 b→0, 3 a→1, 3 b→2, 4 a→3, 4 b→0, 5 a→5, 5 b→4`. Minimizează-l: scrie AFD-ul minimal echivalent (cel mult 2 stări).",
+   "hint": "Marchează perechile (finală, nefinală), apoi propagă. Câte clase rămân?",
+   "solution": "Toate finalele duc cu `a` într-o finală și cu `b` într-o nefinală; toate nefinalele la fel. Algoritmul de marcare nu mai marchează nimic după primul pas: două clase, `{1, 3, 5}` și `{0, 2, 4}`. `L = L((a ∪ b)*a)`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 2,
+     "final": [
+      1
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*a",
+    "maxStates": 2
+   },
+   "topic": "lr-conversii",
    "test": 1
   },
   {
@@ -1778,7 +2071,8 @@
     "regex": "(a∪b)*a(a∪b)(a∪b)",
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "11",
@@ -1831,7 +2125,8 @@
     "regex": "(a∪b)*aba(a∪b)*",
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "12",
@@ -1878,7 +2173,8 @@
     "regex": "a*b*c*",
     "maxStates": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "13",
@@ -1924,7 +2220,8 @@
     "regex": "(a∪b)*(ab∪ba)",
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "14",
@@ -1982,7 +2279,8 @@
     "regex": "(aa)*∪(aaa)*",
     "maxStates": 6
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "58",
@@ -2033,7 +2331,8 @@
     "regex": "(a∪b)*a(a∪b)(a∪b)",
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "59",
@@ -2086,7 +2385,8 @@
     },
     "regex": "(a∪b)*(aa∪bb)(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "60",
@@ -2132,7 +2432,8 @@
     "regex": "(a∪b)*(ab∪ba)",
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "100",
@@ -2153,7 +2454,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "101",
@@ -2210,7 +2512,8 @@
     },
     "regex": "a*(ab∪ba∪ε)∪b*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "102",
@@ -2247,7 +2550,8 @@
     "regex": "((a∪b)*(ε∪c)*)*",
     "maxStates": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "103",
@@ -2314,7 +2618,8 @@
     },
     "regex": "((ab)*∪(bc)*)ab"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "110",
@@ -2333,7 +2638,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "111",
@@ -2352,7 +2658,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "112",
@@ -2371,7 +2678,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "165",
@@ -2392,7 +2700,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "173",
@@ -2411,7 +2720,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "184",
@@ -2432,7 +2742,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "185",
@@ -2453,6 +2764,193 @@
     ],
     "answer": 0
    },
+   "test": 1,
+   "topic": "lr-reprezentare"
+  },
+  {
+   "id": "400",
+   "title": "|Δ| la un AFN: cel mai mic și cel mai mare",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `A = (Σ, Q, q0, F, Δ)` un AFN cu tranziții pe simboluri și pe `e` (`Δ ⊆ Q × (Σ ∪ {e}) × Q`). Care sunt cea mai mică și cea mai mare valoare posibilă a lui `|Δ|`?",
+   "hint": "",
+   "solution": "Un AFN poate să nu aibă nicio tranziție (acceptă atunci cel mult `e`, dacă `q0 ∈ F`), deci minimul e 0. O tranziție e un triplet (stare, simbol sau `e`, stare): `|Q| · (|Σ| + 1) · |Q|` triplete posibile.\n\nBonus (din test): în definiția cursului `Δ ⊆ K × Σ* × K`, cu etichete șiruri. Atunci `Δ` e **finită** (orice automat e un obiect finit), dar **nu e mărginită** pentru `K` și `Σ` date: etichetele pot fi oricât de lungi.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`(0, |Q||Σ|²)`",
+     "`(0, (|Q| + 1)|Σ|²)`",
+     "`(0, |Q|²|Σ|)`",
+     "`(1, |Q|²(|Σ| + 1))`",
+     "`(0, |Q|²(|Σ| + 1))`",
+     "`(1, |Q|²|Σ|)`"
+    ],
+    "answer": 4
+   },
+   "topic": "lr-reprezentare",
+   "test": 1
+  },
+  {
+   "id": "425",
+   "title": "Submulțimi: AFN pentru „se termină cu ab”",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Seminar LFA · conversii",
+   "statement": "Fie AFN-ul `N = ({0, 1, 2}, {a, b}, Δ, 0, {2})` cu `Δ = {(0, a, 0), (0, b, 0), (0, a, 1), (1, b, 2)}`. Aplică construcția submulțimilor și scrie AFD-ul obținut (cel mult 3 stări accesibile).",
+   "hint": "Pornești din `{0}`. Calculează pentru fiecare mulțime nouă unde duc `a` și `b`.",
+   "solution": "`{0}` --a--> `{0, 1}`, `{0}` --b--> `{0}`; `{0, 1}` --a--> `{0, 1}`, `{0, 1}` --b--> `{0, 2}`; `{0, 2}` --a--> `{0, 1}`, `{0, 2}` --b--> `{0}`. Finală: `{0, 2}`. Trei stări.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 3,
+     "final": [
+      2
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      },
+      "1": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "2": {
+       "a": [
+        1
+       ],
+       "b": [
+        0
+       ]
+      }
+     }
+    },
+    "regex": "(a∪b)*ab",
+    "maxStates": 3
+   },
+   "topic": "lr-conversii",
+   "test": 1
+  },
+  {
+   "id": "426",
+   "title": "Submulțimi cu e-tranziții: a*b*",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Seminar LFA · conversii",
+   "statement": "Fie AFN-ul `N = ({0, 1}, {a, b}, Δ, 0, {1})` cu `Δ = {(0, a, 0), (0, e, 1), (1, b, 1)}`. Aplică construcția submulțimilor (cu ε-închideri) și scrie un AFD echivalent (cel mult 3 stări).",
+   "hint": "Starea inițială a AFD-ului e `E(0) = {0, 1}`.",
+   "solution": "`E(0) = {0, 1}` (inițială, finală) --a--> `{0, 1}`, --b--> `{1}`; `{1}` (finală) --b--> `{1}`, --a--> `∅` (groapa). Trei stări: `L = L(a*b*)`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 3,
+     "final": [
+      0,
+      1
+     ],
+     "t": {
+      "0": {
+       "a": [
+        0
+       ],
+       "b": [
+        1
+       ]
+      },
+      "1": {
+       "a": [
+        2
+       ],
+       "b": [
+        1
+       ]
+      },
+      "2": {
+       "a": [
+        2
+       ],
+       "b": [
+        2
+       ]
+      }
+     }
+    },
+    "regex": "a*b*",
+    "maxStates": 3
+   },
+   "topic": "lr-conversii",
+   "test": 1
+  },
+  {
+   "id": "429",
+   "title": "Din ER în AFD: (ab ∪ ba)*",
+   "chapter": "2. Automate nedeterministe",
+   "difficulty": "medie",
+   "source": "Seminar LFA · conversii",
+   "statement": "Construiește un AFD (complet) pentru `L((ab ∪ ba)*)` peste `{a, b}`, cu cel mult 4 stări (pornind, dacă vrei, de la Thompson și construcția submulțimilor).",
+   "hint": "Starea inițială e și finală; după `a` aștepți `b`, după `b` aștepți `a`.",
+   "solution": "`q0` (inițială, finală) --a--> `q1`, --b--> `q2`; `q1` --b--> `q0`, `q2` --a--> `q0`; restul în groapa `q3`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "dfa",
+    "alphabet": "ab",
+    "reference": {
+     "states": 4,
+     "final": [
+      0
+     ],
+     "t": {
+      "0": {
+       "a": [
+        1
+       ],
+       "b": [
+        2
+       ]
+      },
+      "1": {
+       "a": [
+        3
+       ],
+       "b": [
+        0
+       ]
+      },
+      "2": {
+       "a": [
+        0
+       ],
+       "b": [
+        3
+       ]
+      },
+      "3": {
+       "a": [
+        3
+       ],
+       "b": [
+        3
+       ]
+      }
+     }
+    },
+    "regex": "(ab∪ba)*",
+    "maxStates": 4
+   },
+   "topic": "lr-conversii",
    "test": 1
   },
   {
@@ -2471,7 +2969,8 @@
     "regex": "(b∪c∪ab)*c",
     "reference": "(b∪c∪ab)*c"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "16",
@@ -2490,7 +2989,8 @@
     "reference": "(0∪1)*",
     "maxLen": 6
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "17",
@@ -2508,7 +3008,8 @@
     "regex": "a*ba*ba*",
     "reference": "a*ba*ba*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "18",
@@ -2526,7 +3027,8 @@
     "regex": "((a∪b)(a∪b)(a∪b))*",
     "reference": "((a∪b)(a∪b)(a∪b))*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "19",
@@ -2544,7 +3046,8 @@
     "regex": "(ε∪b)(ab)*(ε∪a)",
     "reference": "(ε∪b)(ab)*(ε∪a)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "20",
@@ -2562,7 +3065,8 @@
     "regex": "(a∪b)*(ab∪ba)(a∪b)*",
     "reference": "(a∪b)*(ab∪ba)(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "21",
@@ -2580,7 +3084,8 @@
     "regex": "0∪1(0∪1)*0",
     "reference": "0∪1(0∪1)*0"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "22",
@@ -2598,7 +3103,8 @@
     "regex": "(b*ab*ab*ab*a)*b*ab*ab*ab*",
     "reference": "(b*ab*ab*ab*a)*b*ab*ab*ab*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "23",
@@ -2616,7 +3122,8 @@
     "regex": "a*b(a∪b)*",
     "reference": "a*b(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "61",
@@ -2634,7 +3141,8 @@
     "regex": "((a∪b)(a∪b))*",
     "reference": "((a∪b)(a∪b))*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "62",
@@ -2652,7 +3160,8 @@
     "regex": "b*(a∪ε)b*",
     "reference": "b*(a∪ε)b*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "63",
@@ -2670,7 +3179,8 @@
     "regex": "(b∪ab)*(a∪ε)",
     "reference": "(b∪ab)*(a∪ε)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "64",
@@ -2688,7 +3198,8 @@
     "regex": "0*10*10*",
     "reference": "0*10*10*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "65",
@@ -2706,7 +3217,8 @@
     "regex": "b*(ab*ab*ab*)*",
     "reference": "b*(ab*ab*ab*)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "66",
@@ -2724,7 +3236,8 @@
     "regex": "aa*bb*",
     "reference": "aa*bb*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "67",
@@ -2742,7 +3255,8 @@
     "regex": "b*a*",
     "reference": "b*a*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "68",
@@ -2760,7 +3274,8 @@
     "regex": "(0100)*(ε∪0∪01∪010)∪00(0100)*(ε∪0∪01∪010)∪(1011)*(ε∪1∪10∪101)∪11(1011)*(ε∪1∪10∪101)",
     "reference": "(0100)*(ε∪0∪01∪010)∪00(0100)*(ε∪0∪01∪010)∪(1011)*(ε∪1∪10∪101)∪11(1011)*(ε∪1∪10∪101)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "125",
@@ -2778,7 +3293,8 @@
     "regex": "b(a∪b)*",
     "reference": "b(a∪b)*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "130",
@@ -2796,7 +3312,8 @@
     "regex": "b*a*∪((a∪b)(a∪b))*",
     "reference": "b*a*∪((a∪b)(a∪b))*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "132",
@@ -2814,7 +3331,8 @@
     "regex": "(0100)*(ε∪0∪01∪010)∪(0001)*(ε∪0∪00∪000)∪(1011)*(ε∪1∪10∪101)∪(1110)*(ε∪1∪11∪111)",
     "reference": "(0100)*(ε∪0∪01∪010)∪(0001)*(ε∪0∪00∪000)∪(1011)*(ε∪1∪10∪101)∪(1110)*(ε∪1∪11∪111)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "133",
@@ -2832,7 +3350,8 @@
     "regex": "1*0*(0∪10)*1*",
     "reference": "1*0*(0∪10)*1*"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "148",
@@ -2853,7 +3372,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "151",
@@ -2874,7 +3394,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "172",
@@ -2895,7 +3416,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "180",
@@ -2913,7 +3435,8 @@
     "regex": "1*(ε∪0(1(11)*0)*1*)",
     "reference": "1*(ε∪0(1(11)*0)*1*)"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "183",
@@ -2934,6 +3457,64 @@
     ],
     "answer": 1
    },
+   "test": 1,
+   "topic": "lr-inchidere"
+  },
+  {
+   "id": "406",
+   "title": "Doar perechile 00, 12, 22",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `Σ = {0, 1, 2}`. Scrie o ER pentru `L = {w ∈ Σ* | #01(w) = #02(w) = #11(w) = #10(w) = #21(w) = #20(w) = 0}` (la test: altă formă de reprezentare decât la exercițiul anterior).",
+   "hint": "Ce poate urma după fiecare simbol? Rămân doar perechile `00`, `12`, `22`.",
+   "solution": "După `0` vine doar `0`, după `1` doar `2`, după `2` doar `2`. Un cuvânt e deci `0…0`, sau `1` urmat de `2`-uri, sau doar `2`-uri: `0* ∪ 12* ∪ 2*` (sau `0* ∪ (1 ∪ e)2*`).",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "012",
+    "regex": "0*∪12*∪2*",
+    "reference": "0*∪12*∪2*"
+   },
+   "topic": "lr-reprezentare",
+   "test": 1
+  },
+  {
+   "id": "407",
+   "title": "Câtul X \\ L, pe un exemplu",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "grea",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Pentru `X, L ∈ LR`, `W = {w ∈ Σ* | ∃x ∈ X astfel încât xw ∈ L}`. Fie `Σ = {a, b}`, `X = L(b*a)` și `L = L((a ∪ b)*aab)`. Scrie o ER pentru `W`.",
+   "hint": "Orice `x ∈ X` se termină cu `a`, iar `b`-urile de dinainte nu contează. Când se termină `aw` cu `aab`?",
+   "solution": "`xw` se termină cu `aab` exact când `aw` se termină cu `aab`: fie `w` însuși se termină cu `aab`, fie `w = ab` (`a·ab = aab`). Deci `W = L((a ∪ b)*aab ∪ ab)`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "(a∪b)*aab∪ab",
+    "reference": "(a∪b)*aab∪ab"
+   },
+   "topic": "lr-inchidere",
+   "test": 1
+  },
+  {
+   "id": "427",
+   "title": "Eliminarea stărilor: din AFD în ER",
+   "chapter": "3. Expresii regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · conversii",
+   "statement": "AFD-ul `M` peste `{a, b}`: `q0` (inițială) --a--> `q1`, `q0` --b--> `q0`, `q1` --a--> `q1`, `q1` --b--> `q2`, `q2` --a--> `q1`, `q2` --b--> `q0`, finală `q2`. Elimină stările și scrie o ER pentru `L(M)`.",
+   "hint": "Adaugă `qs` și `qf`. Ce ține minte fiecare stare din ce s-a citit?",
+   "solution": "`q1` = „ultimul e `a`”, `q2` = „ultimele două sunt `ab`”. Eliminând pe rând (de exemplu `q1`, apoi `q0`, apoi `q2`) se ajunge la o expresie echivalentă cu `(a ∪ b)*ab`.",
+   "kind": "lfa",
+   "spec": {
+    "mode": "regex",
+    "alphabet": "ab",
+    "regex": "(a∪b)*ab",
+    "reference": "(a∪b)*ab"
+   },
+   "topic": "lr-conversii",
    "test": 1
   },
   {
@@ -3052,7 +3633,8 @@
      }
     }
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "107",
@@ -3151,7 +3733,8 @@
     },
     "maxStates": 4
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "114",
@@ -3172,7 +3755,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "115",
@@ -3217,7 +3801,8 @@
     },
     "regex": "ε∪b*a∪ab*a"
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "116",
@@ -3238,7 +3823,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "128",
@@ -3259,7 +3845,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "182",
@@ -3280,6 +3867,419 @@
     ],
     "answer": 3
    },
+   "test": 1,
+   "topic": "lr-inchidere"
+  },
+  {
+   "id": "401",
+   "title": "|L1| > |L2|: Dacă L1 este finit, atunci și L2 este finit.",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `L1, L2 ∈ LR` cu `|L1| > |L2|`. Propoziția următoare este: Dacă `L1` este finit, atunci și `L2` este finit.",
+   "hint": "",
+   "solution": "Cheia: dacă `|L1| > |L2|`, atunci `L2` e **finit** (două limbaje infinite peste `Σ` sunt ambele numărabile, deci au același cardinal).\n\nDin `|L1| > |L2|`, `L2` are mai puține cuvinte decât un limbaj finit, deci e finit (de fapt `L2` e finit oricum).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "întotdeauna adevărată",
+     "întotdeauna falsă",
+     "depinde de `L1` și `L2`"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-inchidere",
+   "test": 1
+  },
+  {
+   "id": "402",
+   "title": "|L1| > |L2|: L1 ⊆ L2",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `L1, L2 ∈ LR` cu `|L1| > |L2|`. Propoziția următoare este: `L1 ⊆ L2`",
+   "hint": "",
+   "solution": "Cheia: dacă `|L1| > |L2|`, atunci `L2` e **finit** (două limbaje infinite peste `Σ` sunt ambele numărabile, deci au același cardinal).\n\nO submulțime nu poate avea mai multe elemente: `L1 ⊆ L2 ⇒ |L1| ≤ |L2|`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "întotdeauna adevărată",
+     "întotdeauna falsă",
+     "depinde de `L1` și `L2`"
+    ],
+    "answer": 1
+   },
+   "topic": "lr-inchidere",
+   "test": 1
+  },
+  {
+   "id": "403",
+   "title": "|L1| > |L2|: L2 ⊆ L1",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `L1, L2 ∈ LR` cu `|L1| > |L2|`. Propoziția următoare este: `L2 ⊆ L1`",
+   "hint": "",
+   "solution": "Cheia: dacă `|L1| > |L2|`, atunci `L2` e **finit** (două limbaje infinite peste `Σ` sunt ambele numărabile, deci au același cardinal).\n\nDepinde: `L1 = {a, b}`, `L2 = {a}` o face adevărată, `L2 = {c}` falsă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "întotdeauna adevărată",
+     "întotdeauna falsă",
+     "depinde de `L1` și `L2`"
+    ],
+    "answer": 2
+   },
+   "topic": "lr-inchidere",
+   "test": 1
+  },
+  {
+   "id": "404",
+   "title": "|L1| > |L2|: L1 ∩ (L2 ∘ {e}) ∉ LR",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `L1, L2 ∈ LR` cu `|L1| > |L2|`. Propoziția următoare este: `L1 ∩ (L2 ∘ {e}) ∉ LR`",
+   "hint": "",
+   "solution": "Cheia: dacă `|L1| > |L2|`, atunci `L2` e **finit** (două limbaje infinite peste `Σ` sunt ambele numărabile, deci au același cardinal).\n\n`L2 ∘ {e} = L2`, iar `L1 ∩ L2` e regulat (LR e închisă la intersecție). Deci „∉ LR” e mereu fals.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "întotdeauna adevărată",
+     "întotdeauna falsă",
+     "depinde de `L1` și `L2`"
+    ],
+    "answer": 1
+   },
+   "topic": "lr-inchidere",
+   "test": 1
+  },
+  {
+   "id": "408",
+   "title": "De ce W = {w | ∃x ∈ X: xw ∈ L} e regulat",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "grea",
+   "source": "Test LR · Numărul 1 (altă grupă)",
+   "statement": "Fie `X, L ∈ LR` și `W = {w ∈ Σ* | ∃x ∈ X astfel încât xw ∈ L}`. Care construcție dă un AF pentru `W`?",
+   "hint": "",
+   "solution": "Un `w` e bun dacă `M`, pornit dintr-o stare `q` în care ajunge după un `x ∈ X`, termină într-o stare finală. Mulțimea `S` a acestor stări e calculabilă: `q ∈ S` ⇔ `X ∩ L(M cu finala {q})` e nevid (produs + test de vid). Apoi o stare inițială nouă cu `e` spre fiecare `q ∈ S`. Produsul dă `X ∩ L`, legarea dă `XL`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "AFD-ul `M` al lui `L`, cu o stare inițială nouă legată prin `e` de toate stările în care `M` ajunge citind un cuvânt din `X`",
+     "produsul AFD-urilor lui `X` și `L`, cu finale perechile (finală, finală)",
+     "automatul lui `X` legat prin `e`, din stările finale, de starea inițială a lui `L`",
+     "`W` nu e neapărat regulat: depinde de `X`"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-inchidere",
+   "test": 1
+  },
+  {
+   "id": "410",
+   "title": "L(M) = ∅?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Cum decizi dacă un AFD `M` acceptă măcar un cuvânt?",
+   "hint": "",
+   "solution": "Graful stărilor e finit, deci căutarea se termină. Încercarea tuturor cuvintelor nu se oprește dacă limbajul e vid.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "încerci pe rând toate cuvintele din `Σ*`",
+     "aplici lema de pompare",
+     "nu se poate decide",
+     "cauți (BFS/DFS) un drum de la starea inițială la o stare finală"
+    ],
+    "answer": 3
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "411",
+   "title": "L(M) infinit?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Fie `M` un AFD cu `n` stări. `L(M)` este infinit dacă și numai dacă:",
+   "hint": "",
+   "solution": "Un cuvânt de lungime ≥ n trece de două ori printr-o stare (pompare), deci se poate repeta bucla. Iar dacă există unul acceptat de lungime ≥ n, există și unul între n și 2n - 1 (scoți bucle). Echivalent: un ciclu pe un drum de la start la o finală (o buclă oarecare nu ajunge: poate fi într-o groapă).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`M` are cel puțin o buclă",
+     "`M` acceptă un cuvânt de lungime `n - 1`",
+     "`M` acceptă un cuvânt `w` cu `n ≤ |w| < 2n`",
+     "`M` are mai multe stări finale decât nefinale"
+    ],
+    "answer": 2
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "412",
+   "title": "L(M1) = L(M2)?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Cum decizi dacă două AFD-uri `M1`, `M2` acceptă același limbaj?",
+   "hint": "",
+   "solution": "Diferența simetrică e regulată (produs, finale = perechi cu exact o componentă finală) și e vidă exact când limbajele coincid. Altă cale: minimizezi ambele și compari (AFD-ul minimal e unic, până la redenumire).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "compari numărul de stări",
+     "testezi toate cuvintele de lungime cel mult 100",
+     "construiești automatul produs pentru `(L1 \\ L2) ∪ (L2 \\ L1)` și verifici că e vid",
+     "nu se poate decide"
+    ],
+    "answer": 2
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "413",
+   "title": "L(M) = Σ*?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Cum decizi dacă un AFD complet `M` acceptă toate cuvintele?",
+   "hint": "",
+   "solution": "Complementul unui AFD complet se obține inversând finalele; `L = Σ*` ⇔ `∁L = ∅`. „Toate stările finale” e suficient, dar nu necesar (stările inaccesibile pot fi nefinale).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "verifici că toate stările sunt finale",
+     "schimbi stările finale cu cele nefinale și verifici că limbajul obținut e vid",
+     "verifici că starea inițială e finală",
+     "nu se poate decide pentru AF"
+    ],
+    "answer": 1
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "414",
+   "title": "L1 ⊆ L2?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Cum decizi dacă `L(M1) ⊆ L(M2)` pentru două AFD-uri?",
+   "hint": "",
+   "solution": "`L1 ⊆ L2` ⇔ niciun cuvânt din `L1` nu e în afara lui `L2` ⇔ `L1 ∩ ∁L2 = ∅`. Toate operațiile se fac pe automate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "verifici că `M1` are mai puține stări decât `M2`",
+     "verifici că `L1 ∪ L2 = L2` pe cuvinte scurte",
+     "verifici că `L1 ∩ ∁L2` e vid (produs + test de vid)",
+     "nu se poate decide"
+    ],
+    "answer": 2
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "415",
+   "title": "w ∈ L(M) pentru un AFD",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Cât durează să decizi dacă `w ∈ L(M)` pentru un AFD `M` dat?",
+   "hint": "",
+   "solution": "Un AFD citește fiecare simbol o dată, fără alegeri. Pentru un AFN se ține mulțimea stărilor posibile: `O(|w| · |K|²)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`O(2^|w|)`",
+     "`O(|w|³)`, ca CYK",
+     "depinde de numărul de stări exponențial",
+     "`O(|w|)`: un pas pentru fiecare simbol"
+    ],
+    "answer": 3
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "416",
+   "title": "Două ER, același limbaj?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Este decidabil dacă două expresii regulate descriu același limbaj?",
+   "hint": "",
+   "solution": "Toate conversiile sunt algoritmi. Spre deosebire de LIC, unde echivalența e nedecidabilă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da: ER → AFN → AFD, apoi AFD-urile minimale (sau diferența simetrică) se compară",
+     "nu, e nedecidabil ca la gramatici",
+     "da, comparând expresiile simbol cu simbol",
+     "doar dacă expresiile nu au stea"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "417",
+   "title": "Un cuvânt de lungime pară în L(M)?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Cum decizi dacă un AFD `M` acceptă măcar un cuvânt de lungime pară?",
+   "hint": "",
+   "solution": "`L(M) ∩ ((a ∪ b)(a ∪ b))*` e regulat; întrebarea devine „e vid?”. Încercarea la nesfârșit nu se oprește dacă răspunsul e nu.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "verifici dacă `M` are un număr par de stări",
+     "produsul lui `M` cu AFD-ul cu 2 stări pentru lungime pară, apoi test de vid",
+     "încerci cuvintele de lungime 0, 2, 4, … până găsești unul",
+     "nu se poate decide"
+    ],
+    "answer": 1
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "418",
+   "title": "Câte cuvinte are L(M)?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice",
+   "statement": "Fie `M` un AFD cu `L(M)` finit. Se poate calcula `|L(M)|`?",
+   "hint": "",
+   "solution": "Limbaj finit ⇒ după ce scoți stările care nu duc la o finală, nu rămâne niciun ciclu; drumurile se numără prin programare dinamică pe un graf aciclic.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da: numeri drumurile de la start la stările finale (graful util nu are cicluri)",
+     "nu, nu se poate calcula",
+     "doar prin lema de pompare",
+     "e mereu numărul de stări finale"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-algoritmice",
+   "test": 1
+  },
+  {
+   "id": "420",
+   "title": "Cine ce alege în lema de pompare",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "ușoară",
+   "source": "Seminar LFA · lema de pompare",
+   "statement": "Când demonstrezi cu lema de pompare că `L` NU e regulat, ce alegi TU?",
+   "hint": "",
+   "solution": "Lema: ∃p ∀w ∃xyz ∀i. Ca s-o negi: ∀p ∃w ∀xyz ∃i. Adversarul alege `p` și împărțirea; tu alegi `w` (în funcție de `p`) și `i` (în funcție de împărțire).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cuvântul `w ∈ L` cu `|w| ≥ p` și, pentru fiecare împărțire, un `i`",
+     "`p` și împărțirea `w = xyz`",
+     "doar `i`",
+     "`p`, `w` și împărțirea"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-pompare",
+   "test": 1
+  },
+  {
+   "id": "421",
+   "title": "aⁿbⁿ: de ce y are doar a",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "ușoară",
+   "source": "Seminar LFA · lema de pompare",
+   "statement": "Pentru `L = {aⁿbⁿ | n ≥ 0}` alegi `w = aᵖbᵖ`. De ce, în orice împărțire `w = xyz`, `y` conține doar `a`?",
+   "hint": "",
+   "solution": "Condiția `|xy| ≤ p` e cea care fixează `y` în prima zonă. Apoi `xy²z = aᵖ⁺ᵏbᵖ ∉ L` (cu `k = |y| ≥ 1`).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pentru că `|y| ≥ 1`",
+     "pentru că tu alegi `y`",
+     "pentru că `w ∈ L`",
+     "pentru că `|xy| ≤ p`, deci `xy` stă în primele `p` simboluri, care sunt toate `a`"
+    ],
+    "answer": 3
+   },
+   "topic": "lr-pompare",
+   "test": 1
+  },
+  {
+   "id": "422",
+   "title": "Limbajul satisface lema: deci?",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · lema de pompare",
+   "statement": "Un limbaj `L` satisface condiția din lema de pompare pentru limbaje regulate. Ce se poate spune?",
+   "hint": "",
+   "solution": "Lema e o condiție necesară, nu suficientă. Exemplu: `{aⁱbʲcʲ | i ≥ 1} ∪ {bʲcᵏ}` satisface lema, dar nu e regulat. Lema se folosește doar ca să arăți că un limbaj NU e regulat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nimic sigur: și unele limbaje neregulate o satisfac",
+     "`L` e regulat",
+     "`L` nu e regulat",
+     "`L` e finit"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-pompare",
+   "test": 1
+  },
+  {
+   "id": "423",
+   "title": "a^(n²): cum închizi demonstrația",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "grea",
+   "source": "Seminar LFA · lema de pompare",
+   "statement": "Pentru `L = {a^(n²) | n ≥ 0}`, `w = a^(p²)` și `i = 2`. Ce argument arată că `xy²z ∉ L`?",
+   "hint": "",
+   "solution": "`1 ≤ |y| ≤ |xy| ≤ p`, deci noua lungime e strict între două pătrate consecutive.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`|xy²z| = 2p²`, care nu e pătrat perfect",
+     "`p² < p² + |y| ≤ p² + p < (p + 1)²`, deci lungimea nu e pătrat perfect",
+     "`xy²z` are mai mulți `a` decât `b`",
+     "`|y| ≥ 1`, deci `xy²z` e mai lung"
+    ],
+    "answer": 1
+   },
+   "topic": "lr-pompare",
+   "test": 1
+  },
+  {
+   "id": "424",
+   "title": "Limbajele finite și lema de pompare",
+   "chapter": "4. Proprietăți ale limbajelor regulate",
+   "difficulty": "medie",
+   "source": "Seminar LFA · lema de pompare",
+   "statement": "Orice limbaj finit satisface lema de pompare pentru limbaje regulate (cu `p` mai mare decât cel mai lung cuvânt).",
+   "hint": "",
+   "solution": "Dacă `p` depășește lungimea oricărui cuvânt, nu există `w ∈ L` cu `|w| ≥ p`, deci condiția e adevărată în gol. Firesc: limbajele finite sunt regulate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   },
+   "topic": "lr-pompare",
    "test": 1
   },
   {
@@ -3299,7 +4299,8 @@
     "upTo": 10,
     "reference": "S -> aSb | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "25",
@@ -3319,7 +4320,8 @@
     "reference": "S -> AT | AB\nT -> SB\nA -> a\nB -> b",
     "chomsky": true
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "26",
@@ -3338,7 +4340,8 @@
     "upTo": 9,
     "reference": "S -> aSa | bSb | a | b | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "27",
@@ -3357,7 +4360,8 @@
     "upTo": 10,
     "reference": "S -> aSbS | bSaS | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "28",
@@ -3376,7 +4380,8 @@
     "upTo": 7,
     "reference": "S -> 00S2 | 0S2 | 01T2 | T\nT -> 11T2 | 1T2 | T2 | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "29",
@@ -3395,7 +4400,8 @@
     "upTo": 9,
     "reference": "S -> SS | 0S0S1 | 0S1S0 | 1S0S0 | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "30",
@@ -3414,7 +4420,8 @@
     "upTo": 10,
     "reference": "S -> aSb | A | B\nA -> aA | a\nB -> bB | b"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "31",
@@ -3433,7 +4440,8 @@
     "upTo": 7,
     "reference": "S -> XC | AY\nX -> aXb | ε\nC -> cC | ε\nA -> aA | ε\nY -> bYc | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "32",
@@ -3452,7 +4460,8 @@
     "upTo": 10,
     "reference": "S -> aSbS | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "69",
@@ -3471,7 +4480,8 @@
     "upTo": 8,
     "reference": "S -> aSbb|ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "71",
@@ -3490,7 +4500,8 @@
     "upTo": 8,
     "reference": "S -> aSbS|bSaS|ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "72",
@@ -3509,7 +4520,8 @@
     "upTo": 8,
     "reference": "S -> aSb|aS|a"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "73",
@@ -3528,7 +4540,8 @@
     "upTo": 8,
     "reference": "S -> <S>|>S<|ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "74",
@@ -3547,7 +4560,8 @@
     "upTo": 7,
     "reference": "S -> XC|AY\nX -> aXb|ε\nC -> cC|ε\nA -> aA|ε\nY -> bYc|ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "120",
@@ -3566,7 +4580,8 @@
     "upTo": 12,
     "reference": "S -> aaaSccc | ε | abc | aabbcc"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "126",
@@ -3585,7 +4600,8 @@
     "upTo": 9,
     "reference": "S -> SS | aS | b"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "131",
@@ -3604,7 +4620,8 @@
     "upTo": 8,
     "reference": "S -> A | B\nA -> bA | Aa | ε\nB -> aaB | abB | baB | bbB | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "134",
@@ -3624,7 +4641,8 @@
     "reference": "S -> 01S | T\nT -> 01T10 | 0110",
     "unambiguous": true
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "135",
@@ -3644,7 +4662,8 @@
     "reference": "S -> ε | CS\nC -> 0D1E\nD -> 0D1 | ε\nE -> 1E | ε",
     "unambiguous": true
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "136",
@@ -3664,7 +4683,8 @@
     "reference": "S -> ZS | US | UA | b\nA -> ZA | UA | a | b\nZ -> a\nU -> b",
     "chomsky": true
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "144",
@@ -3685,7 +4705,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "145",
@@ -3706,7 +4727,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "157",
@@ -3727,7 +4749,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "174",
@@ -3748,7 +4771,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "175",
@@ -3769,7 +4793,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "186",
@@ -3788,7 +4813,8 @@
     "upTo": 7,
     "reference": "S -> T | XcX\nT -> aTbT | bTaT | ε\nX -> aX | bX | cX | ε"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "187",
@@ -3807,7 +4833,8 @@
     "upTo": 10,
     "reference": "S -> XS2 | X2\nX -> 0X1 | 01"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "189",
@@ -3828,7 +4855,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "193",
@@ -3847,7 +4875,8 @@
     "upTo": 7,
     "reference": "S -> bSb | XSX | a | b | c | ε\nX -> a | c"
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "194",
@@ -3868,7 +4897,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "195",
@@ -3887,6 +4917,139 @@
     "upTo": 8,
     "reference": "S -> 0X0 | 1X1 | 0 | 1\nX -> 0X | 1X | ε"
    },
+   "test": 2,
+   "topic": "lic-scriere"
+  },
+  {
+   "id": "430",
+   "title": "w ∈ L(G) pentru o GIC",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice LIC",
+   "statement": "Cum decizi dacă `w ∈ L(G)` pentru o gramatică independentă de context `G`?",
+   "hint": "",
+   "solution": "În FNC fiecare pas lungește forma sau pune un terminal, deci derivările lui `w` au exact `2|w| - 1` pași: căutarea e finită, iar CYK o face eficient.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "simulezi un AFD",
+     "nu se poate decide",
+     "încerci toate derivările, oricât de lungi",
+     "aduci `G` în FNC și aplici CYK, în `O(|w|³ · |G|)`"
+    ],
+    "answer": 3
+   },
+   "topic": "lic-algoritmice",
+   "test": 2
+  },
+  {
+   "id": "431",
+   "title": "L(G) = ∅?",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice LIC",
+   "statement": "Cum decizi dacă o GIC generează măcar un cuvânt?",
+   "hint": "",
+   "solution": "Generatori: întâi cei cu o regulă doar din terminale, apoi cei cu o regulă doar din terminale și generatori; se oprește după cel mult `|V|` runde.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "verifici dacă `S` are o regulă",
+     "încerci toate cuvintele",
+     "calculezi neterminalii generatori (care derivă un șir de terminale) și verifici dacă `S` e printre ei",
+     "nu se poate decide"
+    ],
+    "answer": 2
+   },
+   "topic": "lic-algoritmice",
+   "test": 2
+  },
+  {
+   "id": "432",
+   "title": "L(G) infinit?",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice LIC",
+   "statement": "Cum decizi dacă o GIC (fără simboluri inutile, în FNC) generează un limbaj infinit?",
+   "hint": "",
+   "solution": "Un ciclu `A ⇒+ uAv` cu `uv ≠ e` (garantat în FNC) se poate repeta. Simbolurile inutile trebuie scoase întâi: un ciclu printre ele nu contează.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "verifici dacă există o regulă recursivă `A → …A…`, oricare",
+     "verifici dacă graful „A → B dacă B apare în dreapta unei reguli a lui A” are un ciclu",
+     "nu se poate decide",
+     "numeri regulile"
+    ],
+    "answer": 1
+   },
+   "topic": "lic-algoritmice",
+   "test": 2
+  },
+  {
+   "id": "433",
+   "title": "Ce NU e decidabil pentru GIC",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice LIC",
+   "statement": "Care întrebare despre gramatici independente de context NU este decidabilă?",
+   "hint": "",
+   "solution": "Echivalența, `L(G) = Σ*`, ambiguitatea și `L(G1) ∩ L(G2) = ∅` sunt nedecidabile (reducere din problema corespondenței lui Post). Apartenența, vidul și finitudinea sunt decidabile.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`w ∈ L(G)`",
+     "`L(G) = ∅`",
+     "`L(G)` e finit",
+     "`L(G1) = L(G2)`"
+    ],
+    "answer": 3
+   },
+   "topic": "lic-algoritmice",
+   "test": 2
+  },
+  {
+   "id": "434",
+   "title": "E ambiguă gramatica?",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice LIC",
+   "statement": "Este decidabil, în general, dacă o GIC dată este ambiguă?",
+   "hint": "",
+   "solution": "Ambiguitatea e nedecidabilă. Pentru o gramatică anume o arăți dând un cuvânt cu doi arbori; neambiguitatea se demonstrează de la caz la caz.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "da, cu CYK",
+     "da, încercând cuvintele de lungime cel mult |V|",
+     "nu",
+     "da, dacă e în FNC"
+    ],
+    "answer": 2
+   },
+   "topic": "lic-algoritmice",
+   "test": 2
+  },
+  {
+   "id": "435",
+   "title": "w ∈ L(M) pentru un APD",
+   "chapter": "5. Gramatici independente de context",
+   "difficulty": "medie",
+   "source": "Seminar LFA · proprietăți algoritmice LIC",
+   "statement": "Fie `M` un automat pushdown. Este decidabil dacă `M` acceptă un cuvânt `w` dat?",
+   "hint": "",
+   "solution": "APD și GIC descriu aceleași limbaje, iar construcția APD → GIC e un algoritm. Simularea directă poate cicla (pe `e`-tranziții), de aceea se trece prin gramatică.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu, APD-ul poate rula la nesfârșit",
+     "doar pentru APD deterministe",
+     "doar dacă stiva e mărginită",
+     "da: `M` se transformă într-o GIC, apoi CYK"
+    ],
+    "answer": 3
+   },
+   "topic": "lic-algoritmice",
    "test": 2
   },
   {
@@ -3908,7 +5071,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "155",
@@ -3929,7 +5093,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "176",
@@ -3950,7 +5115,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "188",
@@ -3971,7 +5137,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "200",
@@ -3989,7 +5156,8 @@
     "reference": "start p\nfinal q\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "201",
@@ -4007,7 +5175,8 @@
     "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, c, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 7
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "202",
@@ -4025,7 +5194,8 @@
     "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "203",
@@ -4043,7 +5213,8 @@
     "reference": "start q\nfinal q\nq, a, ε -> q, A\nq, b, A -> q, ε\nq, b, ε -> q, B\nq, a, B -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "204",
@@ -4061,7 +5232,8 @@
     "reference": "start i\nfinal f\ni, ε, ε -> p, Z\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, A -> r, ε\nr, ε, A -> r, ε\nr, ε, Z -> f, ε\nq, b, Z -> s, Z\ns, b, Z -> s, Z\ns, ε, Z -> f, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "205",
@@ -4079,7 +5251,8 @@
     "reference": "start p\nfinal q\np, ε, ε -> q, S\nq, ε, S -> q, aAA\nq, ε, A -> q, aS\nq, ε, A -> q, bS\nq, ε, A -> q, a\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-scriere"
   },
   {
    "id": "206",
@@ -4097,7 +5270,8 @@
     "reference": "start q\nfinal q\nq, a, ε -> q, ε\nq, b, ε -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "207",
@@ -4115,7 +5289,8 @@
     "reference": "start q\nfinal q\nq, a, ε -> q, X\nq, b, X -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "208",
@@ -4133,7 +5308,8 @@
     "reference": "start p\nfinal q\np, a, ε -> p, AA\np, ε, ε -> q, ε\nq, b, A -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "209",
@@ -4151,7 +5327,8 @@
     "reference": "start s\nfinal f u\ns, ε, ε -> p, ε\np, a, ε -> p, A\np, ε, ε -> q, ε\nq, b, A -> q, ε\nq, ε, ε -> f, ε\nf, c, ε -> f, ε\ns, ε, ε -> r, ε\nr, a, ε -> r, ε\nr, ε, ε -> t, ε\nt, b, ε -> t, B\nt, ε, ε -> u, ε\nu, c, B -> u, ε",
     "upTo": 7
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "210",
@@ -4169,7 +5346,8 @@
     "reference": "start p\nfinal r\np, 0, ε -> p, A\np, 1, A -> q, ε\nq, 1, A -> q, ε\nq, ε, ε -> m, B\nm, 0, ε -> p, A\nm, 2, B -> r, ε\nr, 2, B -> r, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "211",
@@ -4187,7 +5365,8 @@
     "reference": "start p\nfinal q\np, a, ε -> p, a\np, b, ε -> p, b\np, ε, ε -> q, ε\np, a, ε -> q, ε\np, b, ε -> q, ε\nq, a, a -> q, ε\nq, b, b -> q, ε",
     "upTo": 8
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "220",
@@ -4205,7 +5384,8 @@
     "reference": "q0, a -> q1, A, R\nq0, B -> q3, B, R\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, b -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, A, R\nq3, B -> q3, B, R\nq3, # -> h, #, S",
     "upTo": 7
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "221",
@@ -4223,7 +5403,8 @@
     "reference": "q0, 0 -> q0, 0, R\nq0, 1 -> q0, 1, R\nq0, # -> q1, #, L\nq1, 1 -> q1, 0, L\nq1, 0 -> h, 1, S\nq1, # -> h, 1, S",
     "upTo": 6
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "223",
@@ -4241,7 +5422,8 @@
     "reference": "p, a -> i, a, R\np, b -> p, b, R\np, # -> h, #, S\ni, a -> p, a, R\ni, b -> i, b, R\ni, # -> n, #, S",
     "upTo": 7
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "224",
@@ -4259,7 +5441,8 @@
     "reference": "q0, a -> qa, #, R\nq0, b -> qb, #, R\nq0, # -> h, #, S\nqa, a -> qa, a, R\nqa, b -> qa, b, R\nqa, # -> ra, #, L\nqb, a -> qb, a, R\nqb, b -> qb, b, R\nqb, # -> rb, #, L\nra, a -> back, #, L\nra, # -> h, #, S\nrb, b -> back, #, L\nrb, # -> h, #, S\nback, a -> back, a, L\nback, b -> back, b, L\nback, # -> q0, #, R",
     "upTo": 7
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "225",
@@ -4277,7 +5460,8 @@
     "reference": "q0, a -> q1, X, R\nq0, Y -> q4, Y, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, Y -> q1, Y, R\nq1, b -> q2, Y, R\nq2, b -> q2, b, R\nq2, Z -> q2, Z, R\nq2, c -> q3, Z, L\nq3, a -> q3, a, L\nq3, b -> q3, b, L\nq3, Y -> q3, Y, L\nq3, Z -> q3, Z, L\nq3, X -> q0, X, R\nq4, Y -> q4, Y, R\nq4, Z -> q4, Z, R\nq4, # -> h, #, S",
     "upTo": 7
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "226",
@@ -4295,7 +5479,8 @@
     "reference": "q0, a -> q1, A, R\nq0, B -> q3, a, R\nq0, # -> h, #, S\nq1, a -> q1, a, R\nq1, B -> q1, B, R\nq1, # -> q2, B, L\nq2, a -> q2, a, L\nq2, B -> q2, B, L\nq2, A -> q0, a, R\nq3, B -> q3, a, R\nq3, # -> h, #, S",
     "upTo": 6
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "227",
@@ -4313,7 +5498,8 @@
     "reference": "q, 0 -> q, 1, R\nq, 1 -> q, 0, R\nq, # -> h, #, S",
     "upTo": 6
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "228",
@@ -4331,7 +5517,8 @@
     "reference": "q0, a -> q0, R\nq0, b -> q0, R\nq0, # -> q1, L\nq1, b -> h, b\nq1, a -> n, a\nq1, # -> n, #",
     "upTo": 7
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "33",
@@ -4352,7 +5539,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "34",
@@ -4373,7 +5561,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "35",
@@ -4394,7 +5583,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "36",
@@ -4415,7 +5605,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "37",
@@ -4436,7 +5627,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "38",
@@ -4457,7 +5649,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "39",
@@ -4478,7 +5671,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "40",
@@ -4499,7 +5693,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "41",
@@ -4520,7 +5715,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "42",
@@ -4541,7 +5737,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "43",
@@ -4562,7 +5759,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "44",
@@ -4583,7 +5781,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "45",
@@ -4604,7 +5803,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "121",
@@ -4625,7 +5825,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "122",
@@ -4646,7 +5847,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "123",
@@ -4667,7 +5869,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "124",
@@ -4688,7 +5891,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "127",
@@ -4709,7 +5913,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "129",
@@ -4730,7 +5935,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "137",
@@ -4751,7 +5957,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "138",
@@ -4772,7 +5979,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "140",
@@ -4793,7 +6001,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "141",
@@ -4814,7 +6023,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "142",
@@ -4835,7 +6045,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "143",
@@ -4856,7 +6067,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "146",
@@ -4877,7 +6089,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "147",
@@ -4898,7 +6111,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "150",
@@ -4919,7 +6133,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "152",
@@ -4940,7 +6155,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "153",
@@ -4961,7 +6177,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "154",
@@ -4982,7 +6199,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "156",
@@ -5003,7 +6221,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "158",
@@ -5024,7 +6243,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "161",
@@ -5045,7 +6265,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "162",
@@ -5066,7 +6287,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "164",
@@ -5087,7 +6309,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "170",
@@ -5106,7 +6329,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "171",
@@ -5125,7 +6349,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "190",
@@ -5146,7 +6371,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "191",
@@ -5167,7 +6393,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "192",
@@ -5188,7 +6415,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "196",
@@ -5209,7 +6437,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "197",
@@ -5230,7 +6459,8 @@
     ],
     "answer": 0
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "198",
@@ -5251,7 +6481,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "80",
@@ -5272,7 +6503,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "81",
@@ -5293,7 +6525,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "82",
@@ -5314,7 +6547,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "83",
@@ -5335,7 +6569,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "84",
@@ -5356,7 +6591,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "85",
@@ -5377,7 +6613,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "86",
@@ -5398,7 +6635,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "87",
@@ -5419,7 +6657,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-algoritmice"
   },
   {
    "id": "88",
@@ -5440,7 +6679,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "89",
@@ -5461,7 +6701,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "90",
@@ -5482,7 +6723,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "91",
@@ -5503,7 +6745,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "92",
@@ -5524,7 +6767,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "93",
@@ -5545,7 +6789,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-algoritmice"
   },
   {
    "id": "94",
@@ -5566,7 +6811,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-algoritmice"
   },
   {
    "id": "300",
@@ -5587,7 +6833,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "301",
@@ -5608,7 +6855,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "302",
@@ -5629,7 +6877,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "303",
@@ -5650,7 +6899,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "304",
@@ -5671,7 +6921,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "305",
@@ -5692,7 +6943,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "306",
@@ -5713,7 +6965,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "307",
@@ -5734,7 +6987,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "308",
@@ -5755,7 +7009,8 @@
     ],
     "answer": 0
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "309",
@@ -5776,7 +7031,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "310",
@@ -5797,7 +7053,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "311",
@@ -5818,7 +7075,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "312",
@@ -5839,7 +7097,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "313",
@@ -5860,7 +7119,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "314",
@@ -5881,7 +7141,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "315",
@@ -5902,7 +7163,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "316",
@@ -5923,7 +7185,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "317",
@@ -5944,7 +7207,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "318",
@@ -5965,7 +7229,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "319",
@@ -5986,7 +7251,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "320",
@@ -6007,7 +7273,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "321",
@@ -6028,7 +7295,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "322",
@@ -6049,7 +7317,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "323",
@@ -6070,7 +7339,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "324",
@@ -6091,7 +7361,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-apd"
   },
   {
    "id": "325",
@@ -6112,7 +7383,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "326",
@@ -6133,7 +7405,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "327",
@@ -6154,7 +7427,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "328",
@@ -6175,7 +7449,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "329",
@@ -6196,7 +7471,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-masini"
   },
   {
    "id": "330",
@@ -6217,7 +7493,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "331",
@@ -6238,7 +7515,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "332",
@@ -6259,7 +7537,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "333",
@@ -6280,7 +7559,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "334",
@@ -6301,7 +7581,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "335",
@@ -6322,7 +7603,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "336",
@@ -6343,7 +7625,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "337",
@@ -6364,7 +7647,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "338",
@@ -6385,7 +7669,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "339",
@@ -6406,7 +7691,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "340",
@@ -6427,7 +7713,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "341",
@@ -6448,7 +7735,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "342",
@@ -6469,7 +7757,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "343",
@@ -6490,7 +7779,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "344",
@@ -6511,7 +7801,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "345",
@@ -6532,7 +7823,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "346",
@@ -6553,7 +7845,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "347",
@@ -6574,7 +7867,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "348",
@@ -6595,7 +7889,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "349",
@@ -6616,7 +7911,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "350",
@@ -6637,7 +7933,8 @@
     ],
     "answer": 0
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "351",
@@ -6658,7 +7955,8 @@
     ],
     "answer": 1
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "352",
@@ -6679,7 +7977,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "353",
@@ -6700,7 +7999,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "354",
@@ -6721,7 +8021,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-conversii"
   },
   {
    "id": "355",
@@ -6742,7 +8043,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "356",
@@ -6763,7 +8065,8 @@
     ],
     "answer": 0
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "357",
@@ -6784,7 +8087,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "358",
@@ -6805,7 +8109,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "359",
@@ -6826,7 +8131,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "360",
@@ -6847,7 +8153,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "361",
@@ -6868,7 +8175,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "362",
@@ -6889,7 +8197,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "363",
@@ -6910,7 +8219,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "364",
@@ -6931,7 +8241,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "365",
@@ -6952,7 +8263,8 @@
     ],
     "answer": 2
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "366",
@@ -6973,7 +8285,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "367",
@@ -6994,7 +8307,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-pompare"
   },
   {
    "id": "368",
@@ -7015,7 +8329,8 @@
     ],
     "answer": 2
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-gramatici"
   },
   {
    "id": "369",
@@ -7036,7 +8351,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "370",
@@ -7057,7 +8373,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "371",
@@ -7078,7 +8395,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "372",
@@ -7099,7 +8417,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "373",
@@ -7120,7 +8439,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "374",
@@ -7141,7 +8461,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "375",
@@ -7162,7 +8483,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "376",
@@ -7183,7 +8505,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "377",
@@ -7204,7 +8527,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "378",
@@ -7225,7 +8549,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "379",
@@ -7246,7 +8571,8 @@
     ],
     "answer": 1
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "380",
@@ -7267,7 +8593,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-bonus"
   },
   {
    "id": "381",
@@ -7288,7 +8615,8 @@
     ],
     "answer": 0
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "382",
@@ -7309,7 +8637,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "383",
@@ -7330,7 +8659,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "384",
@@ -7351,7 +8681,8 @@
     ],
     "answer": 3
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-reprezentare"
   },
   {
    "id": "385",
@@ -7372,7 +8703,8 @@
     ],
     "answer": 1
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-algoritmice"
   },
   {
    "id": "386",
@@ -7393,7 +8725,8 @@
     ],
     "answer": 0
    },
-   "test": 1
+   "test": 1,
+   "topic": "lr-inchidere"
   },
   {
    "id": "387",
@@ -7414,7 +8747,8 @@
     ],
     "answer": 2
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-extensii"
   },
   {
    "id": "388",
@@ -7435,7 +8769,8 @@
     ],
     "answer": 3
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "389",
@@ -7456,7 +8791,8 @@
     ],
     "answer": 0
    },
-   "test": 3
+   "test": 3,
+   "topic": "mt-decidabil"
   },
   {
    "id": "390",
@@ -7477,7 +8813,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   },
   {
    "id": "391",
@@ -7498,7 +8835,8 @@
     ],
     "answer": 3
    },
-   "test": 2
+   "test": 2,
+   "topic": "lic-bonus"
   }
  ]
 }
