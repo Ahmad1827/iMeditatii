@@ -59,6 +59,23 @@ void main() {
     expect(d.tests.first.topics.map((x) => x.points).fold(0.0, (a, b) => a + b), 12); // 10 + the bonus
   });
 
+  testWidgets('a long list draws a page of rows, and more on request', (t) async {
+    SharedPreferences.setMockInitialValues({'acs-capitol:lfa': ''});
+    await show(t, const AcsCourseScreen(code: 'lfa'), 1300, AcsStyle.notebook);
+    for (var i = 0; i < 40 && find.textContaining('arată încă').evaluate().isEmpty; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await t.pump(const Duration(milliseconds: 50));
+    }
+    final d = AcsCourseData.parse('lfa', File('assets/data/acs/lfa.json').readAsStringSync());
+    expect(find.textContaining('mai sunt ${d.problems.length - 40}'), findsOneWidget);
+    final more = find.textContaining('arată încă');
+    await t.ensureVisible(more);
+    await t.tap(more);
+    await t.pump();
+    expect(find.textContaining('mai sunt ${d.problems.length - 80}'), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+
   testWidgets('the list filters by one test or more', (t) async {
     SharedPreferences.setMockInitialValues({'acs-capitol:lfa': ''});
     await show(t, const AcsCourseScreen(code: 'lfa'), 1300, AcsStyle.notebook);

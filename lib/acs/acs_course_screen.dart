@@ -52,6 +52,11 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
   bool _examOnly = false;
   Set<int> _tests = {}; // the seminar tests asked for; empty: all
   Set<String> _topics = {}; // their items asked for; empty: all
+  // the list draws this many rows at most (more on request): a few hundred rows,
+  // laid out again on every tap of a filter, made the filters slow
+  static const int _page = 40;
+  int _limit = _page;
+  String _limitFor = '';
   String _query = '';
   final TextEditingController _search = TextEditingController();
 
@@ -114,7 +119,8 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
   bool _isGrila(AcsProblem p) => p.kind == 'grila';
 
   /// From an exam or a test of the course, not from a seminar, a lab or the course's slides.
-  static bool _fromExam(AcsProblem p) => RegExp(r'examen|test|colocviu|evaluare|parțial|partial|subiect', caseSensitive: false).hasMatch(p.source);
+  static final RegExp _examRx = RegExp(r'examen|test|colocviu|evaluare|parțial|partial|subiect', caseSensitive: false);
+  static bool _fromExam(AcsProblem p) => _examRx.hasMatch(p.source);
 
   /// Where to go on: a problem tried and not solved, else the first not solved.
   AcsProblem? _next(AcsCourseData d) {
@@ -181,8 +187,11 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
     if (_examOnly && !_fromExam(p)) return false;
     if (_tests.isNotEmpty && !_tests.contains(p.test)) return false;
     if (_topics.isNotEmpty && !_topics.contains(p.topic)) return false;
-    final q = _fold(_query.trim());
-    if (q.isNotEmpty && !_fold('${p.title} ${p.statement} ${p.source} ${p.kindLabel}').contains(q)) return false;
+    if (_query.trim().isNotEmpty) {
+      final q = _fold(_query.trim());
+      final hay = _folded.putIfAbsent(p.key, () => _fold('${p.title} ${p.statement} ${p.source} ${p.kindLabel}'));
+      if (!hay.contains(q)) return false;
+    }
     return true;
   }
 
@@ -226,19 +235,8 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
           const SizedBox(height: 18),
           _filterBar(ink, narrow, data),
           const SizedBox(height: 14),
-          // a new choice of filters fades the list in again
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 260),
-            switchInCurve: Curves.easeOutCubic,
-            transitionBuilder: (c, a) => FadeTransition(
-                opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, 0.01), end: Offset.zero).animate(a), child: c)),
-            layoutBuilder: (current, previous) => Stack(alignment: Alignment.topCenter, children: [...previous.map((w) => Positioned(top: 0, left: 0, right: 0, child: w)), if (current != null) current]),
-            child: Column(
-              key: ValueKey('$_chapter|$_status|$_diff|$_type|$_examOnly|${(_tests.toList()..sort()).join(',')}|${(_topics.toList()..sort()).join(',')}|$_query'),
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: _list(context, ink, narrow, data),
-            ),
-          ),
+          // a new choice of filters: the list as it is at once, no cross-fade of two whole lists
+          ..._list(context, ink, narrow, data),
         ]);
       },
     );
@@ -608,11 +606,31 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
     final chapters = _chapter == null ? data.chapters : [_chapter!];
     final out = <Widget>[];
     var shown = 0;
+    // other filters: from the first page again
+    final filterKey = '$_chapter|$_status|$_diff|$_type|$_examOnly|${(_tests.toList()..sort()).join(',')}|${(_topics.toList()..sort()).join(',')}|$_query';
+    if (filterKey != _limitFor) {
+      _limitFor = filterKey;
+      _limit = _page;
+    }
+    var drawn = 0, hidden = 0;
+    void row(AcsProblem p) {
+      if (drawn >= _limit) {
+        hidden++;
+        return;
+      }
+      drawn++;
+      out.add(_row(context, ink, narrow, p));
+    }
+
     for (final ch in chapters) {
       final all = data.problems.where((p) => p.chapter == ch).toList();
       final ps = _ordered(all.where(_passes));
       if (ps.isEmpty) continue;
       shown += ps.length;
+      if (drawn >= _limit) {
+        hidden += ps.length; // past the page: not even its title
+        continue;
+      }
       final done = all.where((p) => _solved.contains(p.id)).length;
       out.add(Padding(
         padding: EdgeInsets.only(top: out.isEmpty ? 6 : 22, bottom: 6),
@@ -638,12 +656,21 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       final gr = ps.where(_isGrila).toList();
       if (ex.isNotEmpty && gr.isNotEmpty) out.add(_subhead(ink, 'exerciții', ex.length));
       for (final p in ex) {
-        out.add(_row(context, ink, narrow, p));
+        row(p);
       }
-      if (gr.isNotEmpty && ex.isNotEmpty) out.add(_subhead(ink, 'grile', gr.length));
+      if (gr.isNotEmpty && ex.isNotEmpty && drawn < _limit) out.add(_subhead(ink, 'grile', gr.length));
       for (final p in gr) {
-        out.add(_row(context, ink, narrow, p));
+        row(p);
       }
+    }
+    if (hidden > 0) {
+      out.add(Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: AcsButton(ink, 'arată încă ${hidden < _page ? hidden : _page} (mai sunt $hidden)', () => setState(() => _limit += _page), icon: Icons.expand_more),
+        ),
+      ));
     }
     if (shown == 0) {
       out.add(Padding(
@@ -789,10 +816,16 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
   static Color _diffColor(AcsInk ink, String d) => d == 'grea' ? ink.bad : d == 'medie' ? ink.warn : ink.good;
 
   /// "3. Rasterizare" -> "Rasterizare".
-  static String _chapterName(String ch) => ch.replaceFirst(RegExp(r'^\d+\.\s*'), '');
+  static final RegExp _numRx = RegExp(r'^\d+\.\s*');
+  static String _chapterName(String ch) => ch.replaceFirst(_numRx, '');
 
   /// The statement's first words, without the marks of its markdown and TeX.
-  static String _excerpt(String s, int max) {
+  static final Map<String, String> _excerpts = {}, _folded = {};
+
+  /// The start of a statement, once per statement (the list asks for it on every redraw).
+  static String _excerpt(String s, int max) => _excerpts.putIfAbsent('$max|$s', () => _excerptOf(s, max));
+
+  static String _excerptOf(String s, int max) {
     var t = s
         .replaceAll(RegExp(r'```[\s\S]*?```'), ' … ')
         .replaceAll(RegExp(r'\$\$[\s\S]*?\$\$'), ' … ')
