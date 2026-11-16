@@ -134,6 +134,11 @@ const Map<String, List<AcsGhid>> acsGhiduri = {
       'Tot ce intră la test, pe itemi: ER și automate, conversii cu automatele desenate, închidere, algoritmi, pompare, fișa seminarului rezolvată, un test simulat cu barem și o foaie de memorat. 37 de pagini.',
       '/materiale/lfa-testul-1-lr.pdf',
     ),
+    AcsGhid(
+      'Testul 1 · Culegere de exerciții rezolvate',
+      '140 de exerciții pe itemii testului, fiecare cu rezolvarea explicată pas cu pas: AFD, AFN și ER, conversii cu tabelele algoritmilor, închidere, algoritmi, pompare, bonus, grilele vechi explicate și două teste simulate cu barem. 50 de pagini.',
+      '/materiale/lfa-testul-1-culegere.pdf',
+    ),
   ],
 };
 
