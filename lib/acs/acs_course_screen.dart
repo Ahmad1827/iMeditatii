@@ -227,6 +227,7 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
           _header(ink, narrow, subject, data),
           const SizedBox(height: 18),
           if (acsTeorieCourses.contains(widget.code)) ...[_teorieCard(context, ink, narrow), const SizedBox(height: 12)],
+          for (final g in acsGhiduri[widget.code] ?? const <AcsGhid>[]) ...[_ghidCard(ink, narrow, g), const SizedBox(height: 12)],
           _continueCard(context, ink, narrow, data),
           const SizedBox(height: 22),
           _sectionTitle(ink, 'capitole', 'Capitole'),
@@ -334,6 +335,34 @@ class _AcsCourseScreenState extends State<AcsCourseScreen> {
       );
 
   // ------------------------------------------------------------ theory card
+
+  // A study guide as a PDF (web/materiale/), opened in a new tab.
+  Widget _ghidCard(AcsInk ink, bool narrow, AcsGhid g) {
+    void open() => launchInNewTab(g.path);
+    final button = AcsButton(ink, 'deschide PDF-ul', open, icon: Icons.picture_as_pdf_outlined);
+    final body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(ink.terminal ? '>> ghid pdf' : 'GHID PDF', style: ink.mono(12.5, weight: FontWeight.w700, color: ink.accent).copyWith(letterSpacing: ink.terminal ? 0 : 1.2)),
+      const SizedBox(height: 4),
+      Text(g.title, style: ink.mono(narrow ? 17 : 19, weight: FontWeight.w700, color: ink.strong, height: 1.25)),
+      const SizedBox(height: 4),
+      Text(g.about, style: ink.mono(13.5, color: ink.muted)),
+    ]);
+    return AcsTap(
+      label: g.title,
+      onTap: open,
+      builder: (h) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: h ? ink.hover : ink.panel,
+          border: Border.all(color: ink.line),
+          borderRadius: ink.terminal ? null : BorderRadius.circular(10),
+        ),
+        child: narrow
+            ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [body, const SizedBox(height: 12), button])
+            : Row(children: [Expanded(child: body), const SizedBox(width: 16), button]),
+      ),
+    );
+  }
 
   Widget _teorieCard(BuildContext context, AcsInk ink, bool narrow) {
     final route = teorieRoute(widget.code);

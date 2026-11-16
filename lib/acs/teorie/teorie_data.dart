@@ -119,6 +119,24 @@ Future<TeorieCourse?> loadTeorie(String code) async {
 /// The courses that have theory pages (checked against the assets).
 const Set<String> acsTeorieCourses = {'lfa'};
 
+/// A study guide kept as a PDF in web/materiale/ (built from tool/acs/ghid_*), shown on its course's page.
+class AcsGhid {
+  final String title;
+  final String about;
+  final String path; // from the site's root
+  const AcsGhid(this.title, this.about, this.path);
+}
+
+const Map<String, List<AcsGhid>> acsGhiduri = {
+  'lfa': [
+    AcsGhid(
+      'Testul 1 · Limbaje regulate',
+      'Tot ce intră la test, pe itemi: ER și automate, conversii cu automatele desenate, închidere, algoritmi, pompare, fișa seminarului rezolvată, un test simulat cu barem și o foaie de memorat. 37 de pagini.',
+      '/materiale/lfa-testul-1-lr.pdf',
+    ),
+  ],
+};
+
 class TeorieProgress {
   static String _key(String code, String id) => 'acs-teorie:$code:$id';
 
