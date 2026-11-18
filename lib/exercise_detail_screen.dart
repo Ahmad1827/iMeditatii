@@ -31,6 +31,10 @@ import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'ui_components.dart';
 import 'grade_label.dart';
 import 'problem_author.dart';
+import 'acs/acs_data.dart' show AcsProblem;
+import 'acs/acs_kit.dart' show AcsInk;
+import 'acs/explain.dart';
+import 'acs/ws/ws_common.dart' show Attempt, CheckRequest;
 
 // ----------------------------------------------------
 // SYNTAX-HIGHLIGHTED EDITOR CONTROLLER
@@ -84,6 +88,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   StreamSubscription? _attemptsSub;
 
   List<QuizQuestion> _quiz = const []; // the questions asked on opening the problem
+
+  // "De ce nu merge așa?", as on the ACS problems: the last verdict, and the talk
+  Attempt? _xAttempt;
+  bool? _xOk;
+  int _xN = 0;
+  String? _xCode; // the code the last verdict is about, so an unchanged one is not sent again
+  final CheckRequest _xCheck = CheckRequest();
+  ExplainController? _explain;
   bool isFullScreenCode = false;
   bool isFullScreenProblem = false;
   String? _selectedGrilaOption;
@@ -139,6 +151,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     _codeController.text = defaultCppBoilerplate;
     _recordHistorySnapshot(_codeController.value);
     _codeController.addListener(_onCodeChanged);
+    _xCheck.verify = _xVerify;
     _loadExerciseDetails();
     SharedPreferences.getInstance().then((p) {
       if (!mounted) return;
@@ -170,6 +183,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   void dispose() {
     _sentSub?.cancel();
     _attemptsSub?.cancel();
+    _explain?.dispose();
     if (_cFocus) Future.microtask(() => ThemeManager.focusNotifier.value = false); // not while the tree is locked
     _codeController.removeListener(_onCodeChanged);
     _codeController.dispose();
@@ -525,7 +539,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return gv != null && ev != null && (gv - ev).abs() < 1e-9;
   }
 
-  void _checkSimpleAnswer() async {
+  Future<void> _checkSimpleAnswer() async {
     final isGrila = exerciseData!["tip_exercitiu"] == "grila";
     final raspunsCorect = exerciseData!["raspuns_corect"]?.toString() ?? '';
     final raspunsElev = isGrila ? (_selectedGrilaOption ?? '') : _answerController.text;
@@ -538,6 +552,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionChecked = true;
       solutionOk = ok;
     });
+    _xVerdict(ok, Attempt(isGrila ? _grilaAnswer(raspunsElev) : raspunsElev, ok ? '' : 'răspunsul nu e cel corect'));
     _saveSolution(raspunsElev, null, ok);
     if (!ok && !_alreadyDone) markTried(_progressKey);
     if (solutionOk) {
@@ -604,6 +619,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         solutionChecked = true;
         solutionOk = allPassed;
       });
+      _xVerdict(allPassed, Attempt(code, _testsReport()), code: code);
       _saveSolution(code, 'cpp', allPassed);
       if (allPassed) await _markExerciseAsDone();
     } catch (e) {
@@ -612,6 +628,224 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     } finally {
       if (mounted) setState(() => isRunningCode = false);
     }
+  }
+
+
+  // ===========================================================================
+  // "DE CE NU MERGE AȘA?" (lib/acs/explain.dart): Claude Code, through the
+  // bridge on the student's computer, says why the answer sent is wrong
+  // ===========================================================================
+  /// Only answers the site checks itself: not maths on a sheet.
+  bool get _explainable => exerciseData != null && exerciseData!.isNotEmpty && !_isSheet;
+
+  void _xVerdict(bool ok, Attempt a, {String? code}) {
+    setState(() {
+      _xOk = ok;
+      _xAttempt = a;
+      _xCode = code;
+      _xN++;
+    });
+  }
+
+  /// A chosen option as "B. its text".
+  String _grilaAnswer(String option) {
+    final v = _list(['variante']) ?? const <String>[];
+    final i = v.indexOf(option);
+    return i < 0 ? option : '${String.fromCharCode(65 + i)}. $option';
+  }
+
+  static String _cut(Object? v, [int n = 700]) {
+    final t = '${v ?? ''}';
+    return t.length > n ? '${t.substring(0, n)}\n... (tăiat)' : t;
+  }
+
+  /// The tests as the checker saw them: how many pass, and the first that fail in full.
+  String _testsReport() {
+    final failed = testResults.where((t) => t['passed'] != true).toList();
+    final b = StringBuffer('${testResults.length - failed.length} din ${testResults.length} teste trec');
+    for (final t in failed.take(4)) {
+      final verdict = '${t['verdict'] ?? ''}'.trim();
+      b
+        ..writeln()
+        ..writeln()
+        ..writeln('[✗] testul ${t['index']}${t['sample'] == true ? ' (din exemple)' : ''}${verdict.isEmpty ? '' : ': $verdict'}${t['timedOut'] == true ? ': depășește limita de timp' : ''}');
+      if ('${t['input'] ?? ''}'.trim().isNotEmpty) b.writeln('intrare:\n${_cut(t['input'])}');
+      b
+        ..writeln('așteptat:\n${_cut(t['expected'])}')
+        ..writeln('programul a dat:\n${_cut(t['got'])}');
+      if ('${t['error'] ?? ''}'.trim().isNotEmpty) b.writeln('erori:\n${_cut(t['error'], 1500)}');
+      if ('${t['note'] ?? ''}'.trim().isNotEmpty) b.writeln('notă: ${t['note']}');
+    }
+    if (failed.length > 4) b.write('\n... și încă ${failed.length - 4} teste greșite');
+    return b.toString().trim();
+  }
+
+  /// The exercise as the explanation's prompt wants a problem.
+  AcsProblem _xProblem() {
+    final d = exerciseData!;
+    final parts = StatementParts.of(d, file: _file);
+    final variante = _kind == 'grila' ? (_list(['variante']) ?? const <String>[]) : const <String>[];
+    final input = _str(['input', 'date_intrare']), output = _str(['output', 'date_iesire']);
+    final statement = [
+      ...parts.context,
+      ...parts.body,
+      ...parts.examples,
+      if (_file != null) 'Datele se citesc din fișierul $_file.in, iar rezultatul se scrie în fișierul $_file.out.',
+      if (_header != null && _harness != null) 'Se scrie doar subprogramul, cu antetul: $_header. Funcția main care îl apelează e dată.',
+      if (input != null) 'Date de intrare:\n$input',
+      if (output != null) 'Date de ieșire:\n$output',
+      for (final (i, e) in _examples.indexed) 'Exemplul ${i + 1}:\nintrare:\n${e['input']}\nieșire:\n${e['output']}',
+      for (final (i, o) in variante.indexed) '${String.fromCharCode(65 + i)}. $o',
+      if (_given != null) 'Programul dat, de corectat:\n```cpp\n$_given\n```',
+    ].join('\n\n');
+    final off = d['official_solution'];
+    final code = off is Map ? off['code']?.toString() : null;
+    final answer = d['raspuns_corect']?.toString();
+    final solution = [
+      if (_str(['solutie', 'rezolvare']) != null) _str(['solutie', 'rezolvare'])!,
+      if (code != null && code.trim().isNotEmpty) '```cpp\n$code\n```',
+      if (answer != null && answer.isNotEmpty) 'Răspunsul corect: ${_kind == 'grila' ? _grilaAnswer(answer) : answer}',
+    ].join('\n\n');
+    final tests = d['tests'] is List ? (d['tests'] as List).whereType<Map>().take(6).toList() : const [];
+    return AcsProblem(
+      course: widget.subject,
+      id: widget.id,
+      title: _title,
+      chapter: _str(['capitol', 'categorie']) ?? (_list(['tags', 'etichete']) ?? const <String>['-']).join(', '),
+      difficulty: _str(['dificultate', 'difficulty']) ?? 'medie',
+      source: _str(['sursa']) ?? '',
+      statement: statement,
+      hint: [_str(['hint', 'indiciu']), _str(['dificultate_motiv'])].whereType<String>().join('\n'),
+      solution: solution,
+      kind: _kind == 'grila' ? 'grila' : (_kind == 'cod' ? 'c++' : 'răspuns scurt'),
+      spec: {
+        if (_kind == 'cod') ...{
+          'limbaj': 'C++, compilat și rulat pe teste; ieșirea se compară cu cea așteptată (spațiile de la capăt de rând nu contează)',
+          if (_file != null) 'fisier': _file,
+          if (_harness != null) 'main_verificare': _harness,
+          if (_str(['limita_timp', 'time_limit']) != null) 'limita_timp': _str(['limita_timp', 'time_limit']),
+          if (tests.isNotEmpty) 'teste_ascunse (primele)': [for (final t in tests) {'input': _cut(t['input'], 400), 'output': _cut(t['output'], 400)}],
+        },
+        if (answer != null) 'raspuns_corect': answer,
+      },
+    );
+  }
+
+  /// Where the subject is learnt: "Informatică, clasa a 11-a".
+  String get _xCourse {
+    final subj = AppStyle.sentence(widget.subject);
+    return isSchoolGrade(widget.grade) ? '$subj, clasa a ${widget.grade}-a (liceu)' : '$subj, ${widget.grade}';
+  }
+
+  ExplainController? get _xController {
+    if (!_explainable) return null;
+    return _explain ??= ExplainController(problem: _xProblem(), course: _xCourse, request: _xCheck, school: true, latest: () => (ok: _xOk, attempt: _xAttempt, n: _xN));
+  }
+
+  /// "De ce nu merge așa?" pressed before the answer was checked: it is checked
+  /// now, as if sent (code already judged as it stands is not sent again).
+  Future<void> _xVerify() async {
+    if (!mounted || exerciseData == null || FirebaseAuth.instance.currentUser == null) return;
+    if (_kind == 'cod') {
+      final code = _codeController.text.trim();
+      if (code.isEmpty || code == _boilerplate.trim() || isRunningCode) return;
+      if (_xN > 0 && _xCode == code) return;
+      if (AppStyle.current.isClean) {
+        await _cRun(submit: true);
+      } else {
+        await _runJudge0Checker();
+      }
+      return;
+    }
+    if (_kind == 'grila' ? _selectedGrilaOption == null : _answerController.text.trim().isEmpty) return;
+    await _checkSimpleAnswer();
+  }
+
+  /// The window's colours: the clean page's own, or the terminal's for retro.
+  static AcsInk _xInk() {
+    if (!AppStyle.current.isClean) return AcsInk.current;
+    final dark = AppColors.isDark;
+    return AcsInk(
+      bg: Pb.surface,
+      fg: Pb.text,
+      strong: dark ? const Color(0xFFF5F5F5) : const Color(0xFF111827),
+      accent: dark ? Pb.link : Pb.primary,
+      muted: Pb.muted,
+      dim: Pb.inputBorder,
+      line: Pb.border,
+      hover: Pb.hoverBg,
+      panel: Pb.page,
+      good: Pb.successText,
+      bad: Pb.dangerText,
+      warn: Pb.warningText,
+      terminal: false,
+      dark: dark,
+    );
+  }
+
+  /// Under the statement (clean): starts the talk, or brings its window back.
+  Widget _cExplainCard() {
+    final c = _xController;
+    if (c == null) return const SizedBox.shrink();
+    return ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        final kept = c.started && !c.open;
+        final text = kept
+            ? 'Ai o discuție cu Claude despre problema asta: apasă ca s-o redeschizi.'
+            : c.open
+                ? 'Discuția e deschisă în fereastra de deasupra paginii: o muți trăgând de bara ei.'
+                : _kind == 'cod'
+                    ? 'Verifică ce ai scris și, dacă nu trece, Claude îți arată pe un test unde și de ce greșește programul. N-ai scris nimic? Îți spune cum să începi. Merge cu Claude Code de pe calculatorul tău.'
+                    : 'Verifică răspunsul ales și, dacă e greșit, Claude îți explică de ce, fără să-ți dea direct răspunsul. Merge cu Claude Code de pe calculatorul tău.';
+        return Padding(
+          padding: const EdgeInsets.only(top: 18),
+          child: Material(
+            color: Pb.surface,
+            shape: RoundedRectangleBorder(borderRadius: Pb.radius, side: BorderSide(color: Pb.primary.withValues(alpha: 0.55))),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: c.started || c.open ? c.show : c.start,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                child: Row(children: [
+                  const Icon(Icons.psychology_alt_outlined, size: 26, color: Pb.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('De ce nu merge așa?', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: Pb.text)),
+                      const SizedBox(height: 2),
+                      Text(text, style: TextStyle(fontSize: 13, height: 1.4, color: Pb.muted)),
+                    ]),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(kept || c.open ? Icons.open_in_new_rounded : Icons.arrow_forward, size: 18, color: Pb.primary),
+                ]),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// After a wrong verdict, by the result: the same talk, one tap away.
+  Widget _cExplainButton() {
+    final c = _xController;
+    if (c == null || !solutionChecked || solutionOk || isRunningCode) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: PbButton(
+          text: 'De ce nu merge așa?',
+          icon: Icons.psychology_alt_outlined,
+          variant: PbVariant.outlineSecondary,
+          size: PbSize.sm,
+          onPressed: () => c.started && !c.answerChanged ? c.show() : c.start(),
+        ),
+      ),
+    );
   }
 
   // ===========================================================================
@@ -790,7 +1024,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return StyleBuilder(
       builder: (context, s) {
         final width = MediaQuery.of(context).size.width;
-        return s.isClean ? _buildClean(width < 900) : _buildRetro(width < 920);
+        final c = _xController; // made here, so the window below hears it from the first tap
+        final page = s.isClean ? _buildClean(width < 900) : _buildRetro(width < 920);
+        // always the same shape, so the page keeps its state when the window first appears
+        return Stack(children: [
+          page,
+          Positioned.fill(child: c == null ? const SizedBox.shrink() : SafeArea(child: ExplainLayer(c, look: _xInk))),
+        ]);
       },
     );
   }
@@ -1355,6 +1595,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               ),
             ),
           ],
+          _cExplainCard(),
         ],
       );
 
@@ -1987,6 +2228,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         banner,
+        _cExplainButton(),
         const SizedBox(height: 14),
         LayoutBuilder(
           builder: (context, box) => box.maxWidth < 420
@@ -2154,6 +2396,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       });
     });
 
+    // a run that passes only the examples says nothing of the hidden tests
+    if (submit || !all) _xVerdict(all, Attempt(code, _testsReport()), code: code);
     if (submit) saveSent(_progressKey, _cSubmissions);
     if (submit) _saveSolution(code, 'cpp', all);
     if (submit && !all && !_alreadyDone) markTried(_progressKey);
@@ -2205,6 +2449,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 type: solutionOk ? PbAlertType.success : PbAlertType.danger,
                 text: solutionOk ? 'Răspuns corect. Problema e marcată ca rezolvată.' : 'Răspuns greșit. Mai încearcă.',
               ),
+              _cExplainButton(),
             ],
           ],
         ),
@@ -2633,6 +2878,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             fontSize: 13,
             onPressed: () => showProblemQuiz(context, _quiz),
           ),
+        ],
+        if (_xController != null) ...[
+          SizedBox(height: isMobile ? 16 : 22),
+          ExplainLauncher(_xController!, AcsInk.current),
         ],
       ],
     );

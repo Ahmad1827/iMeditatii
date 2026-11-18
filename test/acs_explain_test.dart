@@ -122,6 +122,18 @@ void main() {
     expect(g, contains('fără să spui direct litera corectă'));
   });
 
+  test('a high-school problem is asked of a pupil, its own text left alone', () {
+    const school = AcsProblem(
+        course: 'informatica', id: '7', title: 't', chapter: 'c', difficulty: 'medie', source: '', statement: 'Un student citește n.', hint: '', solution: '', kind: 'c++', spec: {});
+    final p = explainPrompt(school, const Attempt('int main(){}', '[✗] testul 1'), course: 'Informatica, clasa a 9-a (liceu)', school: true);
+    expect(p, contains('# Răspunsul elevului'));
+    expect(p, contains('Un student citește n.'));
+    expect(p, contains('notația de la clasă'));
+    expect(p, contains('elev de liceu'));
+    expect(p, isNot(contains('notația cursului')));
+    expect(explainPrompt(_problem, _attempt), contains('notația cursului'));
+  });
+
   test('the checks become lines a tutor can read', () {
     expect(reportOf(const [Check('acceptă ab', true), Check('acceptă ε', false, 'îl respinge')]), '[✓] acceptă ab\n[✗] acceptă ε\n    îl respinge');
   });

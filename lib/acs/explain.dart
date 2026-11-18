@@ -94,7 +94,16 @@ String _specText(Map<String, dynamic> spec) {
 /// Why Claude is asked: the answer is refused, nothing was sent yet, or it is right.
 enum ExplainMode { wrong, empty, correct }
 
-String explainPrompt(AcsProblem p, Attempt a, {String course = '', ExplainMode mode = ExplainMode.wrong}) {
+/// [school]: a high-school problem (iMeditatii, not ACS): the same questions,
+/// said of a pupil, with what is learnt in class instead of the course (the
+/// problem and the answer themselves are left as they are).
+String explainPrompt(AcsProblem p, Attempt a, {String course = '', ExplainMode mode = ExplainMode.wrong, bool school = false}) {
+  String say(String t) => !school
+      ? t
+      : t
+          .replaceAllMapped(RegExp(r'\b([Ss])tudent'), (m) => m[1] == 'S' ? 'Elev' : 'elev')
+          .replaceAll('notația cursului', 'notația de la clasă (din manual și de la BAC)')
+          .replaceAll('din curs', 'din materia de liceu');
   final grila = p.kind == 'grila';
   final written = p.kind == 'scris';
   final task = switch (mode) {
@@ -105,7 +114,7 @@ String explainPrompt(AcsProblem p, Attempt a, {String course = '', ExplainMode m
     ExplainMode.correct => _correctTask,
   };
   final report = switch (mode) {
-    ExplainMode.empty => 'studentul nu a trimis încă nimic${a.answer.trim().isEmpty ? '' : ' (mai sus e ce e acum în spațiul de lucru, poate doar începutul dat)'}',
+    ExplainMode.empty => '${say('studentul')} nu a trimis încă nimic${a.answer.trim().isEmpty ? '' : ' (mai sus e ce e acum în spațiul de lucru, poate doar începutul dat)'}',
     ExplainMode.correct => 'răspunsul trece toate verificările: e corect\n${a.report}'.trim(),
     ExplainMode.wrong => a.report.isEmpty ? 'răspunsul nu e acceptat' : a.report,
   };
@@ -115,13 +124,13 @@ Materia: ${course.isEmpty ? p.course.toUpperCase() : course}. Capitolul: ${p.cha
 # Problema: ${p.title}
 ${p.statement}
 
-# Răspunsul studentului
+# ${say('Răspunsul studentului')}
 ${_fence(a.answer)}
 
 # Ce a găsit verificatorul site-ului
 ${_fence(report)}
 
-# Doar pentru tine (studentul nu le vede încă)
+# Doar pentru tine (${say('studentul')} nu le vede încă)
 Indiciul problemei: ${p.hint.isEmpty ? '(nu are)' : p.hint}
 
 Rezolvarea de referință:
@@ -131,8 +140,10 @@ Datele verificatorului:
 ${_fence(_specText(p.spec))}
 
 # Ce vreau de la tine
-$task''';
+${say(task)}${school ? '\n\n$_schoolNote' : ''}''';
 }
+
+const String _schoolNote = '''Cine întreabă e elev de liceu, nu student: vorbește-i pe înțelesul lui, cu termenii din manual și de la BAC. La programe, C++ ca la clasă (cin/cout sau fișiere, fără STL avansat dacă nu e nevoie), și urmărește pe un test valorile variabilelor, linie cu linie.''';
 
 const String _exerciseTask = '''Explică exhaustiv de ce răspunsul studentului nu e corect. Lucrează pe răspunsul LUI, nu pe unul ideal: citează exact bucata greșită. Structura, cu aceste titluri:
 ## Pe scurt
@@ -233,7 +244,8 @@ class ExplainController extends ChangeNotifier {
   final CheckRequest? request;
   final LatestVerdict Function() latest;
   final VoidCallback? onNext;
-  ExplainController({required this.problem, required this.latest, this.request, this.course = '', this.onNext});
+  final bool school; // a high-school problem: see [explainPrompt]
+  ExplainController({required this.problem, required this.latest, this.request, this.course = '', this.onNext, this.school = false});
 
   _Phase _phase = _Phase.idle;
   final List<_Turn> _turns = [];
@@ -348,7 +360,7 @@ class ExplainController extends ChangeNotifier {
       return;
     }
     _phase = _Phase.talking;
-    _send(null, explainPrompt(problem, a, course: course, mode: m));
+    _send(null, explainPrompt(problem, a, course: course, mode: m, school: school));
   }
 
   Future<void> _send(String? label, String prompt) async {
@@ -461,14 +473,16 @@ class ExplainLauncher extends StatelessWidget {
 /// the whole page: where there is no window, the page is touched.
 class ExplainLayer extends StatelessWidget {
   final ExplainController c;
-  const ExplainLayer(this.c, {super.key});
+  /// Its colours, for a page outside ACS; ACS's own by default.
+  final AcsInk Function()? look;
+  const ExplainLayer(this.c, {super.key, this.look});
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: Listenable.merge([c, ThemeManager.themeNotifier, ThemeManager.acsStyleNotifier]),
         builder: (context, _) {
           if (!c.open) return const SizedBox.shrink();
-          final ink = AcsInk.current;
+          final ink = look?.call() ?? AcsInk.current;
           return LayoutBuilder(builder: (context, box) {
             final w = box.maxWidth, h = box.maxHeight;
             final phone = w < 600;
