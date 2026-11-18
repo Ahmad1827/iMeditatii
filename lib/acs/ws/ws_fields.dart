@@ -298,3 +298,135 @@ class _MarketPainter extends CustomPainter {
   @override
   bool shouldRepaint(_MarketPainter old) => true;
 }
+
+// ---------------------------------------------------------------- APM
+/// A bench for one 32-bit instruction: type it in hexa (or binary) or click its
+/// bits, choose a format and see its fields with their values. It does not say
+/// the format or the instruction: that is the student's to find.
+class RiscvWorkspace extends AcsWorkspace {
+  const RiscvWorkspace({super.key, required super.problem, required super.ink, required super.onVerdict, required super.narrow});
+
+  @override
+  State<RiscvWorkspace> createState() => _RiscvWorkspaceState();
+}
+
+class _RiscvWorkspaceState extends State<RiscvWorkspace> with _Fields<RiscvWorkspace> {
+  late final TextEditingController _word = TextEditingController(text: _start == null ? '' : rvHex(_start));
+  late final int? _start = parseRvWord(widget.problem.spec['word'] as String? ?? '');
+  late int _w = _start ?? 0;
+  String? _fmt; // none chosen: the bits in nibbles
+
+  @override
+  void initState() {
+    super.initState();
+    _word.addListener(() {
+      final v = parseRvWord(_word.text);
+      if (v != null && v != _w) setState(() => _w = v);
+      if (v == null) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _word.dispose();
+    super.dispose();
+  }
+
+  void _flip(int bit) {
+    setState(() => _w = (_w ^ (1 << bit)) & 0xFFFFFFFF);
+    _word.text = rvHex(_w);
+  }
+
+  Color _tint(int t) {
+    const tints = [Color(0xFF4A90D9), Color(0xFF3FA66B), Color(0xFFC9A227), Color(0xFFD9534F), Color(0xFF8E6BBF), Color(0xFFD9822B), Color(0xFF8A8F93)];
+    return tints[t].withValues(alpha: widget.ink.dark ? 0.30 : 0.20);
+  }
+
+  Widget _bitCell(int bit, Color? fill, double size) {
+    final ink = widget.ink;
+    final on = (_w >> bit) & 1 == 1;
+    return AcsTap(
+      label: 'bitul $bit',
+      onTap: () => _flip(bit),
+      builder: (h) => Container(
+        width: size,
+        height: size * 1.25,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: h ? ink.hover : fill, border: Border.all(color: ink.line, width: 0.5)),
+        child: Text(on ? '1' : '0', style: ink.mono(size * 0.62, weight: on ? FontWeight.w800 : null, color: on ? ink.strong : ink.muted)),
+      ),
+    );
+  }
+
+  Widget _group(String label, List<int> bitsHiLo, Color? fill, String? value, double size) {
+    final ink = widget.ink;
+    return Padding(
+      padding: const EdgeInsets.only(right: 3),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        SizedBox(
+          width: size * bitsHiLo.length,
+          child: Text(label, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.visible, softWrap: false, style: ink.mono(11, color: ink.muted)),
+        ),
+        const SizedBox(height: 2),
+        Row(mainAxisSize: MainAxisSize.min, children: [for (final b in bitsHiLo) _bitCell(b, fill, size)]),
+        const SizedBox(height: 2),
+        Text(bitsHiLo.length == 1 ? '${bitsHiLo.first}' : '${bitsHiLo.first}:${bitsHiLo.last}', style: ink.mono(10, color: ink.dim)),
+        if (value != null) Text(value, style: ink.mono(12, weight: FontWeight.w700, color: ink.accent)),
+      ]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ink = widget.ink;
+    final size = widget.narrow ? 16.0 : 19.0;
+    final parsed = parseRvWord(_word.text);
+    final groups = <Widget>[];
+    final fmt = _fmt;
+    if (fmt == null) {
+      for (var n = 7; n >= 0; n--) {
+        final bits = [for (var b = n * 4 + 3; b >= n * 4; b--) b];
+        groups.add(_group(((_w >> (n * 4)) & 15).toRadixString(16).toUpperCase(), bits, null, null, size));
+      }
+    } else {
+      for (final f in rvFormats[fmt]!) {
+        final v = f.of(_w);
+        final reg = f.name == 'rd' || f.name == 'rs1' || f.name == 'rs2';
+        groups.add(_group(f.name, [for (var b = f.hi; b >= f.lo; b--) b], _tint(f.tint), reg ? 'x$v' : (f.width() > 1 ? '$v' : null), size));
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AcsBox(
+          ink,
+          title: ink.terminal ? 'cuvântul pe biți: scrie-l sau apasă pe biți' : 'Cuvântul pe biți: scrie-l în hexa sau apasă pe biți',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ToolRow([
+                AcsField(ink, _word, width: 150, hint: '0x........', ok: _word.text.isEmpty || parsed != null ? null : false),
+                Text('formatul:', style: ink.mono(13, color: ink.muted)),
+                for (final k in rvFormats.keys) AcsButton(ink, k, () => setState(() => _fmt = _fmt == k ? null : k), primary: _fmt == k),
+                AcsButton(ink, 'golește', () {
+                  setState(() => _w = 0);
+                  _word.text = rvHex(0);
+                }, icon: Icons.restart_alt),
+              ]),
+              const SizedBox(height: 10),
+              SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: groups)),
+              const SizedBox(height: 8),
+              Text(
+                  fmt == null
+                      ? 'Alege un format ca să vezi câmpurile lui. Opcode-ul (biții 6:0) spune care e: 0110011 R, 0010011 și 0000011 I, 0100011 S, 1100011 B.'
+                      : 'Valorile sunt ale bucăților, fără semn; imediatul întreg (cu semn, cu biții la locul lor) îl asamblezi tu.',
+                  style: ink.mono(12.5, color: ink.muted)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        fieldsView(),
+      ],
+    );
+  }
+}

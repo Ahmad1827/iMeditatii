@@ -43,7 +43,7 @@ const List<AcsGroup> acsGroups = [
   AcsGroup('an1-sem1', 'Anul I · semestrul 1', 'Analiză, algebră, programare în C, shell, proiectare logică'),
   AcsGroup('an1-sem2', 'Anul I · semestrul 2', 'Matematici speciale, electrotehnică, fizică, metode numerice, asamblare, structuri de date'),
   AcsGroup('an2', 'Anul II', 'Programare orientată pe obiecte, proiectarea algoritmilor'),
-  AcsGroup('an3-sem1', 'Anul III · semestrul 1', 'Limbaje formale, algoritmi paraleli, grafică, rețele, securitate, economie'),
+  AcsGroup('an3-sem1', 'Anul III · semestrul 1', 'Limbaje formale, algoritmi paraleli, grafică, rețele, securitate, procesoare, economie'),
 ];
 
 AcsGroup? acsGroup(String slug) {
@@ -74,6 +74,7 @@ const List<AcsSubject> acsSubjects = [
   AcsSubject('egc', 'EGC', 'Elemente de Grafică pe Calculator', 'Transformări compuse pe desen, rasterizare pixel cu pixel', group: 'an3-sem1'),
   AcsSubject('rl', 'RL', 'Rețele Locale', 'Adrese IP pe biți: subrețele, VLSM, tabele de rutare', group: 'an3-sem1'),
   AcsSubject('isc', 'ISC', 'Introducere în Securitatea Cibernetică', 'Un banc de decodare: hex, base64, Cezar, XOR, Vigenère', group: 'an3-sem1'),
+  AcsSubject('apm', 'APM', 'Arhitectura Procesoarelor Moderne', 'Un procesor RISC-V pe biți: codificări, imm_gen, registre, pipeline-ul IF/ID și modulele Verilog', group: 'an3-sem1'),
   AcsSubject('eg', 'EG', 'Economie Generală', 'Cerere și ofertă pe grafic: echilibru, elasticitate, costuri', group: 'an3-sem1'),
 ];
 

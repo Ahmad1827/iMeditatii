@@ -1,0 +1,4376 @@
+{
+ "code": "apm",
+ "chapters": [
+  "1. Pipeline-ul RISC-V și front-end-ul",
+  "2. Etapa IF: PC, sumator, memorie",
+  "3. Codificarea instrucțiunilor",
+  "4. Decodificarea instrucțiunilor",
+  "5. Generatorul de imediate",
+  "6. Bancul de registre și etapa ID",
+  "7. Simularea: forma de undă",
+  "8. Verilog: modulele lucrării, scrise de mână",
+  "9. Verilog: semantică și capcane"
+ ],
+ "problems": [
+  {
+   "id": "1",
+   "title": "Etapele pipeline-ului",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Care este ordinea corectă a celor 5 etape ale pipeline-ului RISC-V din lucrare?",
+   "hint": "Întâi aduci instrucțiunea, apoi o înțelegi, apoi o execuți.",
+   "solution": "IF aduce instrucțiunea, ID o decodifică și citește registrele, EX calculează, MEM accesează memoria de date, WB scrie rezultatul în registre.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "IF → ID → EX → MEM → WB",
+     "ID → IF → EX → WB → MEM",
+     "IF → EX → ID → MEM → WB",
+     "IF → ID → MEM → EX → WB"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "2",
+   "title": "Ce e front-end-ul",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce înseamnă „front-end-ul” procesorului în Lucrarea 2?",
+   "hint": "",
+   "solution": "Front-end-ul aduce și înțelege instrucțiunile (IF + ID); back-end-ul (EX, MEM, WB) le execută și vine în Lucrarea 3.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "etapele EX, MEM și WB",
+     "unitatea de detecție a hazardurilor",
+     "memoria de date și ALU-ul",
+     "etapele IF și ID: aducerea și decodificarea instrucțiunilor"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "3",
+   "title": "RV32I",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce înseamnă că procesorul respectă extensia RV32I?",
+   "hint": "",
+   "solution": "RV32I e nucleul de bază pe 32 de biți: aritmetică și logică pe întregi, load/store, salturi. Înmulțirea e extensia M, virgula mobilă F/D.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "instrucțiuni de 16 biți și date de 32 de biți",
+     "32 de instrucțiuni în total",
+     "date, registre și instrucțiuni de 32 de biți, doar operații cu întregi, fără înmulțire/împărțire și fără virgulă mobilă",
+     "operații pe 32 de biți, inclusiv înmulțire și virgulă mobilă"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "4",
+   "title": "ISA și implementare",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Care afirmație despre ISA este corectă?",
+   "hint": "",
+   "solution": "Un ISA spune *ce* face procesorul, nu *cum* e construit. RISC-V e deschis: oricine îl poate implementa, dar toate implementările respectă același format și aceeași execuție.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ISA-ul e schema electrică a procesorului",
+     "fiecare procesor RISC-V are alt format al instrucțiunilor",
+     "ISA-ul RISC-V se folosește doar cu licență plătită",
+     "ISA-ul e contractul abstract (registre, instrucțiuni, codificări); procesorul din laborator e o implementare a lui"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "5",
+   "title": "Cine produce PC_write",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În procesorul complet (Lucrarea 3), cine produce semnalele `PC_write` și `IF_ID_write`?",
+   "hint": "",
+   "solution": "Unitatea de detecție a hazardurilor oprește PC-ul și IF/ID (stall) când o instrucțiune trebuie să aștepte, de exemplu după un `lw` al cărui rezultat e folosit imediat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "unitatea de detecție a hazardurilor",
+     "etapa EX",
+     "etapa WB",
+     "unitatea de forwarding"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "6",
+   "title": "Cine produce PCSrc",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De unde vin, în procesorul complet, `PCSrc` și `PC_Branch`?",
+   "hint": "",
+   "solution": "EX compară registrele și calculează `PC + imm`; dacă saltul se ia, `PCSrc = 1` și MUX-ul din IF alege `PC_Branch`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "din etapa EX: decizia de salt și adresa de salt calculată",
+     "din etapa WB",
+     "din unitatea de hazard",
+     "din memoria de instrucțiuni"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "7",
+   "title": "Semnalele din WB",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce semnale ale lui ID vin, în procesorul complet, din etapa WB?",
+   "hint": "",
+   "solution": "WB spune dacă se scrie (`RegWrite_WB`), în ce registru (`RD_WB`) și ce valoare (`ALU_DATA_WB`). În Lucrarea 2 le dă testbench-ul: 0, 0, 0.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`RS1_ID` și `RS2_ID`",
+     "`RegWrite_WB`, `RD_WB` și `ALU_DATA_WB`",
+     "`PCSrc` și `PC_Branch`",
+     "`IMM_ID` și `FUNCT3_ID`"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "8",
+   "title": "De ce x1 nu crește",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În simularea lucrării, după `addi x1,x1,1` registrul `x1` rămâne 1. De ce?",
+   "hint": "",
+   "solution": "Lucrarea 2 doar aduce și decodifică. Nimic nu duce rezultatul înapoi în registre: `RegWrite_WB` e 0 tot timpul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`addi` nu scrie niciodată registre",
+     "`x1` e legat la 1 permanent",
+     "instrucțiunea nu trece prin EX și WB (nu există încă), iar `RegWrite_WB = 0` în testbench",
+     "scrierea se face abia la sfârșitul simulării"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "9",
+   "title": "De ce un registru de pipeline",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De ce e nevoie de registrul IF/ID?",
+   "hint": "",
+   "solution": "Fără IF/ID, ID ar vedea mereu instrucțiunea pe care IF o aduce chiar acum. Registrul de pipeline separă etapele: fiecare lucrează pe altă instrucțiune, în paralel.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ca ID să lucreze un ciclu întreg pe instrucțiunea adusă în ciclul trecut, în timp ce IF o aduce pe următoarea",
+     "ca să încetinească procesorul",
+     "ca să memoreze toate instrucțiunile programului",
+     "ca să calculeze PC + 4"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "10",
+   "title": "beq în simulare",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În simularea lucrării, `beq x18,x0,5c` face saltul la `PC + 0x5C`.",
+   "hint": "",
+   "solution": "Fals: `PCSrc` e fixat pe 0 în testbench, deci MUX-ul alege mereu PC + 4. (Și în procesorul complet n-ar sări: `x18 = 18 ≠ 0`.)",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "11",
+   "title": "Debitul unui pipeline",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Un pipeline cu 5 etape, fără opriri, după ce s-a umplut. Câte instrucțiuni se termină la fiecare ciclu?",
+   "hint": "",
+   "solution": "O instrucțiune durează tot 5 cicluri (latența), dar la fiecare ciclu una iese din WB (debitul e de o instrucțiune pe ciclu).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cinci",
+     "una la fiecare 5 cicluri",
+     "una",
+     "depinde de instrucțiune"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "12",
+   "title": "Principii RISC",
+   "chapter": "1. Pipeline-ul RISC-V și front-end-ul",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Care sunt principii ale RISC-V care apar în lucrare? (unul sau mai multe)",
+   "hint": "",
+   "solution": "Lungime fixă (PC + 4), câmpuri la poziții fixe (decodare prin fire), arhitectură load/store. Operanzi din memorie și lungimi variabile sunt trăsături CISC (x86).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "toate instrucțiunile au 32 de biți",
+     "opcode, rd, rs1, rs2, funct3 stau mereu la aceiași biți",
+     "doar load/store accesează memoria",
+     "instrucțiunile aritmetice pot lua operanzi direct din memorie",
+     "fiecare instrucțiune are alt număr de octeți"
+    ],
+    "answers": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "20",
+   "title": "Indexul din memorie pentru PC = 0x2C",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Memoria de instrucțiuni primește `PC_IF[11:2]`. Ce index (linie din `codeMemory`) citește la `PC = 0x2C`?",
+   "hint": "Biții 11...2 ai PC-ului: împarte la 4 și păstrează doar 10 biți (modulo 1024).",
+   "solution": "`0x2C = 44`, `44 / 4 = 11`, deci linia `11`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "idx",
+      "label": "indexul (zecimal)",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "21",
+   "title": "Indexul din memorie pentru PC = 0x100",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Memoria de instrucțiuni primește `PC_IF[11:2]`. Ce index (linie din `codeMemory`) citește la `PC = 0x100`?",
+   "hint": "Biții 11...2 ai PC-ului: împarte la 4 și păstrează doar 10 biți (modulo 1024).",
+   "solution": "`0x100 = 256`, `256 / 4 = 64`, deci linia `64`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "idx",
+      "label": "indexul (zecimal)",
+      "answer": "64",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "22",
+   "title": "Indexul din memorie pentru PC = 0x7FC",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Memoria de instrucțiuni primește `PC_IF[11:2]`. Ce index (linie din `codeMemory`) citește la `PC = 0x7FC`?",
+   "hint": "Biții 11...2 ai PC-ului: împarte la 4 și păstrează doar 10 biți (modulo 1024).",
+   "solution": "`0x7FC = 2044`, `2044 / 4 = 511`, deci linia `511`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "idx",
+      "label": "indexul (zecimal)",
+      "answer": "511",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "23",
+   "title": "Indexul din memorie pentru PC = 0xFFC",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Memoria de instrucțiuni primește `PC_IF[11:2]`. Ce index (linie din `codeMemory`) citește la `PC = 0xFFC`?",
+   "hint": "Biții 11...2 ai PC-ului: împarte la 4 și păstrează doar 10 biți (modulo 1024).",
+   "solution": "`0xFFC = 4092`, `4092 / 4 = 1023`, deci linia `1023`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "idx",
+      "label": "indexul (zecimal)",
+      "answer": "1023",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "24",
+   "title": "Indexul din memorie pentru PC = 0x1008",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Memoria de instrucțiuni primește `PC_IF[11:2]`. Ce index (linie din `codeMemory`) citește la `PC = 0x1008`? (PC-ul a depășit 4 KB.)",
+   "hint": "Biții 11...2 ai PC-ului: împarte la 4 și păstrează doar 10 biți (modulo 1024).",
+   "solution": "`0x1008 = 4104`, `4104 / 4 = 1026`, iar pe 10 biți (modulo 1024) rămâne `2`: bitul 12 al PC-ului se ignoră.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "idx",
+      "label": "indexul (zecimal)",
+      "answer": "2",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "25",
+   "title": "Adresa instrucțiunii k",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea a 12-a din `code.mem` (linia 11, numărând de la 0). La ce PC se află?",
+   "hint": "Fiecare linie e un cuvânt de 4 octeți.",
+   "solution": "Linia `k` e la adresa `4k`: `4 · 11 = 44 = 0x2C`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC (hexa)",
+      "answer": "0x0000002c|0000002c|0x2c|2c",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "26",
+   "title": "Mărimea memoriei",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "`reg [31:0] codeMemory [0:1023];` Câte instrucțiuni încap și câți octeți are memoria? Câți biți are adresa ei?",
+   "hint": "1024 de cuvinte de 32 de biți.",
+   "solution": "1024 de cuvinte × 4 octeți = 4096 de octeți (4 KB); `2^10 = 1024`, deci 10 biți de adresă.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "n",
+      "label": "instrucțiuni",
+      "answer": "1024",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "b",
+      "label": "octeți",
+      "answer": "4096",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "a",
+      "label": "biți de adresă",
+      "answer": "10",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "27",
+   "title": "PC după n fronturi",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Testbench-ul lucrării: ceas cu perioada 10 ns (fronturi crescătoare la 5, 15, 25, ... ns), `reset = 1` până la 10 ns, fără opriri și fără salturi. Ce valoare are PC-ul din IF (`PC_IF`) imediat după frontul de la 115 ns?",
+   "hint": "Frontul de la 5 ns pune PC = 0; fiecare front de după adaugă 4.",
+   "solution": "Fronturile de după reset: 15, 25, ..., 115 ns, adică 11 fronturi. `PC = 11 · 4 = 44 = 0x2C`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_IF (hexa)",
+      "answer": "0x0000002c|0000002c|0x2c|2c",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "28",
+   "title": "Un stall",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ca la problema anterioară, dar testbench-ul pune `PC_write = 0` și `IF_ID_write = 0` exact la fronturile de la 35 și 45 ns. Ce valoare are `PC_IF` după frontul de la 65 ns?",
+   "hint": "La un front cu `PC_write = 0` PC-ul nu se schimbă.",
+   "solution": "Fronturi care încarcă PC-ul după reset: 15, 25, 55, 65 (cele de la 35 și 45 sunt oprite): 4 fronturi, `PC = 16 = 0x10`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_IF (hexa)",
+      "answer": "0x00000010|00000010|0x10|10",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "29",
+   "title": "Un salt forțat",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Testbench-ul lucrării, dar la frontul de la 45 ns `PCSrc = 1` și `PC_Branch = 0x40`. Ce valoare are `PC_IF` după frontul de la 45 ns? Dar după cel de la 55 ns? Ce PC are instrucțiunea din ID între 45 și 55 ns?",
+   "hint": "MUX-ul alege `PC_Branch` doar la frontul la care `PCSrc = 1`. IF/ID ia ce era în IF *înainte* de front.",
+   "solution": "Înainte de frontul de la 45 ns, IF era la `0x0C` (`ori`). La front: PC ← `0x40`, IF/ID ← (`0x0C`, `ori`). La 55 ns PC ← `0x44`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "PC_IF după 45 ns",
+      "answer": "0x00000040|00000040|0x40|40",
+      "hint": "0x..."
+     },
+     {
+      "id": "b",
+      "label": "PC_IF după 55 ns",
+      "answer": "0x00000044|00000044|0x44|44",
+      "hint": "0x..."
+     },
+     {
+      "id": "c",
+      "label": "PC_ID între 45 și 55 ns",
+      "answer": "0x0000000c|0000000c|0xc|c",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "30",
+   "title": "Răspunsul la „Obs”",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Cum se obțin cei 10 biți de adresă ai memoriei de instrucțiuni din PC, fără deplasare?",
+   "hint": "Cei 2 biți de jos ai unei adrese aliniate sunt mereu 00.",
+   "solution": "`PC[11:2]` aruncă biții 1:0 (împărțirea la 4) și păstrează exact 10 biți. `PC[9:0]` ar adresa cu PC-ul în octeți și ar sări peste trei instrucțiuni din patru.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cu tăietura `PC[11:2]`",
+     "cu `PC[9:0]`",
+     "cu `PC[31:22]`",
+     "cu `PC[10:1]`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "31",
+   "title": "De ce + 4",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De ce PC-ul crește cu 4?",
+   "hint": "",
+   "solution": "32 de biți = 4 octeți; instrucțiunea următoare e la 4 adrese de octet mai departe.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pentru că sunt 4 etape înainte de WB",
+     "pentru că memoria are 4 KB",
+     "o instrucțiune are 4 octeți, iar memoria e adresată pe octet",
+     "pentru că instrucțiunile au 4 câmpuri"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "32",
+   "title": "Resetul PC-ului",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "`always @(posedge clk) if (res) out <= 0; else if (write) out <= in;` Ce fel de reset are PC-ul?",
+   "hint": "",
+   "solution": "Resetul e testat doar pe front (sincron) și înaintea lui `write` (prioritar). Asincron ar fi `@(posedge clk or posedge res)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "asincron",
+     "sincron, dar doar dacă `write = 1`",
+     "nu are reset",
+     "sincron, cu prioritate față de `write`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "33",
+   "title": "PC_write = 0",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce face registrul PC la un front cu `res = 0` și `write = 0`?",
+   "hint": "",
+   "solution": "Nicio ramură nu atribuie `out`, deci registrul își ține valoarea: PC-ul îngheață.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "devine 0",
+     "ia valoarea `in`",
+     "devine X",
+     "își păstrează valoarea (stall)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "34",
+   "title": "Citirea asincronă",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De ce memoria de instrucțiuni are citire asincronă (`always @(*)`)?",
+   "hint": "",
+   "solution": "Cu o memorie sincronă, instrucțiunea ar apărea abia la frontul următor: IF ar dura două cicluri.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ca să consume mai puțin",
+     "pentru că `$readmemh` nu merge cu ceas",
+     "ca să poată fi scrisă de program",
+     "ca instrucțiunea să apară în același ciclu în care se schimbă PC-ul, gata pentru IF/ID la frontul următor"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "35",
+   "title": "Fără for-ul de inițializare",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În `instruction_memory` lipsește `for`-ul care pune 0 în `codeMemory`. Ce apare în ID după ultima instrucțiune a programului?",
+   "hint": "",
+   "solution": "Locațiile pe care `$readmemh` nu le atinge rămân neinițializate, adică `X`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`X` pe `INSTRUCTION_ID` și pe toate câmpurile",
+     "0 peste tot, ca înainte",
+     "iarăși prima instrucțiune",
+     "ultima instrucțiune, repetată"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "36",
+   "title": "Rolul MUX-ului",
+   "chapter": "2. Etapa IF: PC, sumator, memorie",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În IF, ce alege multiplexorul cu `sel = PCSrc`?",
+   "hint": "",
+   "solution": "`assign out = sel ? inb : ina;` cu `ina = PC + 4`, `inb = PC_Branch`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "instrucțiunea dintre două memorii",
+     "registrul `rs1` sau `rs2`",
+     "următorul PC: PC + 4 (sel = 0) sau `PC_Branch` (sel = 1)",
+     "imediatul sau `REG_DATA2`"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "100",
+   "title": "Codifică add x2,x1,x0",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `add x2,x1,x0` și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00000 00001 000    00010 0110011\n= 0000 0000 0000 0000 1000 0001 0011 0011\n= 0x00008133\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00008133|00008133|0x8133|8133",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "101",
+   "title": "Codifică addi x1,x1,1",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `addi x1,x1,1` și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000000001 00001 000    00001 0010011\n= 0000 0000 0001 0000 1000 0000 1001 0011\n= 0x00108093\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00108093|00108093|0x108093|108093",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "102",
+   "title": "Codifică and x3,x1,x2",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `and x3,x1,x2` și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00010 00001 111    00011 0110011\n= 0000 0000 0010 0000 1111 0001 1011 0011\n= 0x0020F1B3\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0020f1b3|0020f1b3|0x20f1b3|20f1b3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "103",
+   "title": "Codifică ori x4,x1,1",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `ori x4,x1,1` și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000000001 00001 110    00100 0010011\n= 0000 0000 0001 0000 1110 0010 0001 0011\n= 0x0010E213\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0010e213|0010e213|0x10e213|10e213",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "104",
+   "title": "Codifică sw x4,4(x5)",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sw x4,4(x5)` și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip S: imediatul se rupe: `imm[11:5]` în biții 31:25, `imm[4:0]` în biții 11:7. `rs2` e registrul scris în memorie, `rs1` e baza.",
+   "solution": "Format S.\n\n```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n0000000   00100 00101 010    00100    0100011\n= 0000 0000 0100 0010 1010 0010 0010 0011\n= 0x0042A223\n```\n\n`sw rs2, imm(rs1)`: datele vin din `rs2`, adresa e `rs1 + imm`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0042a223|0042a223|0x42a223|42a223",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "105",
+   "title": "Codifică lw x12,8(x0)",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `lw x12,8(x0)` și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000001000 00000 010    01100 0000011\n= 0000 0000 1000 0000 0010 0110 0000 0011\n= 0x00802603\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00802603|00802603|0x802603|802603",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "106",
+   "title": "Codifică beq x18,x0,5c",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `beq x18,x0,5c` (deplasamentul `5c` e în hexa, ca în enunț) și scrie cuvântul de 32 de biți în hexa. (Cerința 8 din lucrare.)",
+   "hint": "Tip B: deplasamentul pe 13 biți (bitul 0 nu se scrie): `imm[12] | imm[10:5] | rs2 | rs1 | funct3 | imm[4:1] | imm[11] | 1100011`.",
+   "solution": "Format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    000010 00000 10010 000    1110  0    1100011\n= 0000 0100 0000 1001 0000 1110 0110 0011\n= 0x04090E63\n```\n\nDeplasamentul `92` pe 13 biți: `0000001011100`; bitul 0 nu se stochează.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x04090e63|04090e63|0x4090e63|4090e63",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "107",
+   "title": "Codifică sub x5,x6,x7",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sub x5,x6,x7` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0100000 00111 00110 000    00101 0110011\n= 0100 0000 0111 0011 0000 0010 1011 0011\n= 0x407302B3\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x407302b3|407302b3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "108",
+   "title": "Codifică xor x10,x11,x12",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `xor x10,x11,x12` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 01100 01011 100    01010 0110011\n= 0000 0000 1100 0101 1100 0101 0011 0011\n= 0x00C5C533\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00c5c533|00c5c533|0xc5c533|c5c533",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "109",
+   "title": "Codifică or x1,x2,x3",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `or x1,x2,x3` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00011 00010 110    00001 0110011\n= 0000 0000 0011 0001 0110 0000 1011 0011\n= 0x003160B3\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x003160b3|003160b3|0x3160b3|3160b3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "110",
+   "title": "Codifică sll x4,x4,x5",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sll x4,x4,x5` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00101 00100 001    00100 0110011\n= 0000 0000 0101 0010 0001 0010 0011 0011\n= 0x00521233\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00521233|00521233|0x521233|521233",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "111",
+   "title": "Codifică sra x9,x8,x7",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sra x9,x8,x7` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0100000 00111 01000 101    01001 0110011\n= 0100 0000 0111 0100 0101 0100 1011 0011\n= 0x407454B3\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x407454b3|407454b3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "112",
+   "title": "Codifică slt x3,x1,x2",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `slt x3,x1,x2` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip R: `funct7 | rs2 | rs1 | funct3 | rd | opcode`, cu opcode `0110011`. Atenție: `rs2` vine înaintea lui `rs1` în cuvânt.",
+   "solution": "Format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00010 00001 010    00011 0110011\n= 0000 0000 0010 0000 1010 0001 1011 0011\n= 0x0020A1B3\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0020a1b3|0020a1b3|0x20a1b3|20a1b3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "113",
+   "title": "Codifică addi x5,x0,-1",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `addi x5,x0,-1` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n111111111111 00000 000    00101 0010011\n= 1111 1111 1111 0000 0000 0010 1001 0011\n= 0xFFF00293\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xfff00293|fff00293",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "114",
+   "title": "Codifică andi x2,x2,-16",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `andi x2,x2,-16` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n111111110000 00010 111    00010 0010011\n= 1111 1111 0000 0001 0111 0001 0001 0011\n= 0xFF017113\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xff017113|ff017113",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "115",
+   "title": "Codifică xori x6,x6,-1",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `xori x6,x6,-1` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n111111111111 00110 100    00110 0010011\n= 1111 1111 1111 0011 0100 0011 0001 0011\n= 0xFFF34313\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xfff34313|fff34313",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "116",
+   "title": "Codifică slti x3,x4,10",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `slti x3,x4,10` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000001010 00100 010    00011 0010011\n= 0000 0000 1010 0010 0010 0001 1001 0011\n= 0x00A22193\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00a22193|00a22193|0xa22193|a22193",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "117",
+   "title": "Codifică sltiu x8,x9,2047",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sltiu x8,x9,2047` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n011111111111 01001 011    01000 0010011\n= 0111 1111 1111 0100 1011 0100 0001 0011\n= 0x7FF4B413\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x7ff4b413|7ff4b413",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "118",
+   "title": "Codifică slli x10,x11,4",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `slli x10,x11,4` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Deplasare cu imediat: format I, dar biții 31:25 sunt `funct7` (`0100000` doar la `srai`) și biții 24:20 sunt `shamt`.",
+   "solution": "Format I (deplasare).\n\n```\nfunct7  shamt rs1   funct3 rd    opcode \n0000000 00100 01011 001    01010 0010011\n= 0000 0000 0100 0101 1001 0101 0001 0011\n= 0x00459513\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x00459513|00459513|0x459513|459513",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "119",
+   "title": "Codifică srli x10,x11,31",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `srli x10,x11,31` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Deplasare cu imediat: format I, dar biții 31:25 sunt `funct7` (`0100000` doar la `srai`) și biții 24:20 sunt `shamt`.",
+   "solution": "Format I (deplasare).\n\n```\nfunct7  shamt rs1   funct3 rd    opcode \n0000000 11111 01011 101    01010 0010011\n= 0000 0001 1111 0101 1101 0101 0001 0011\n= 0x01F5D513\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x01f5d513|01f5d513|0x1f5d513|1f5d513",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "120",
+   "title": "Codifică srai x3,x3,31",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `srai x3,x3,31` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Deplasare cu imediat: format I, dar biții 31:25 sunt `funct7` (`0100000` doar la `srai`) și biții 24:20 sunt `shamt`.",
+   "solution": "Format I (deplasare).\n\n```\nfunct7  shamt rs1   funct3 rd    opcode \n0100000 11111 00011 101    00011 0010011\n= 0100 0001 1111 0001 1101 0001 1001 0011\n= 0x41F1D193\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x41f1d193|41f1d193",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "121",
+   "title": "Codifică lw x6,0x40(x10)",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `lw x6,0x40(x10)` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000001000000 01010 010    00110 0000011\n= 0000 0100 0000 0101 0010 0011 0000 0011\n= 0x04052303\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x04052303|04052303|0x4052303|4052303",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "122",
+   "title": "Codifică lw x5,-12(x2)",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `lw x5,-12(x2)` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip I: `imm[11:0] | rs1 | funct3 | rd | opcode`. Un imediat negativ se scrie în complement față de 2 pe 12 biți.",
+   "solution": "Format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n111111110100 00010 010    00101 0000011\n= 1111 1111 0100 0001 0010 0010 1000 0011\n= 0xFF412283\n```",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xff412283|ff412283",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "123",
+   "title": "Codifică sw x6,-4(x2)",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sw x6,-4(x2)` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip S: imediatul se rupe: `imm[11:5]` în biții 31:25, `imm[4:0]` în biții 11:7. `rs2` e registrul scris în memorie, `rs1` e baza.",
+   "solution": "Format S.\n\n```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n1111111   00110 00010 010    11100    0100011\n= 1111 1110 0110 0001 0010 1110 0010 0011\n= 0xFE612E23\n```\n\n`sw rs2, imm(rs1)`: datele vin din `rs2`, adresa e `rs1 + imm`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xfe612e23|fe612e23",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "124",
+   "title": "Codifică sw x9,100(x1)",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `sw x9,100(x1)` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip S: imediatul se rupe: `imm[11:5]` în biții 31:25, `imm[4:0]` în biții 11:7. `rs2` e registrul scris în memorie, `rs1` e baza.",
+   "solution": "Format S.\n\n```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n0000011   01001 00001 010    00100    0100011\n= 0000 0110 1001 0000 1010 0010 0010 0011\n= 0x0690A223\n```\n\n`sw rs2, imm(rs1)`: datele vin din `rs2`, adresa e `rs1 + imm`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0690a223|0690a223|0x690a223|690a223",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "125",
+   "title": "Codifică bne x5,x0,-8",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `bne x5,x0,-8` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip B: deplasamentul pe 13 biți (bitul 0 nu se scrie): `imm[12] | imm[10:5] | rs2 | rs1 | funct3 | imm[4:1] | imm[11] | 1100011`.",
+   "solution": "Format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n1    111111 00000 00101 001    1100  1    1100011\n= 1111 1110 0000 0010 1001 1100 1110 0011\n= 0xFE029CE3\n```\n\nDeplasamentul `-8` pe 13 biți: `1111111111000`; bitul 0 nu se stochează.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xfe029ce3|fe029ce3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "126",
+   "title": "Codifică bge x1,x2,0x100",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `bge x1,x2,0x100` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip B: deplasamentul pe 13 biți (bitul 0 nu se scrie): `imm[12] | imm[10:5] | rs2 | rs1 | funct3 | imm[4:1] | imm[11] | 1100011`.",
+   "solution": "Format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    001000 00010 00001 101    0000  0    1100011\n= 0001 0000 0010 0000 1101 0000 0110 0011\n= 0x1020D063\n```\n\nDeplasamentul `256` pe 13 biți: `0000100000000`; bitul 0 nu se stochează.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x1020d063|1020d063",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "127",
+   "title": "Codifică blt x5,x6,2048",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `blt x5,x6,2048` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip B: deplasamentul pe 13 biți (bitul 0 nu se scrie): `imm[12] | imm[10:5] | rs2 | rs1 | funct3 | imm[4:1] | imm[11] | 1100011`.",
+   "solution": "Format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    000000 00110 00101 100    0000  1    1100011\n= 0000 0000 0110 0010 1100 0000 1110 0011\n= 0x0062C0E3\n```\n\nDeplasamentul `2048` pe 13 biți: `0100000000000`; bitul 0 nu se stochează.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0062c0e3|0062c0e3|0x62c0e3|62c0e3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "128",
+   "title": "Codifică bltu x3,x4,16",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `bltu x3,x4,16` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip B: deplasamentul pe 13 biți (bitul 0 nu se scrie): `imm[12] | imm[10:5] | rs2 | rs1 | funct3 | imm[4:1] | imm[11] | 1100011`.",
+   "solution": "Format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    000000 00100 00011 110    1000  0    1100011\n= 0000 0000 0100 0001 1110 1000 0110 0011\n= 0x0041E863\n```\n\nDeplasamentul `16` pe 13 biți: `0000000010000`; bitul 0 nu se stochează.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0x0041e863|0041e863|0x41e863|41e863",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "129",
+   "title": "Codifică bgeu x3,x4,-20",
+   "chapter": "3. Codificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Codifică instrucțiunea `bgeu x3,x4,-20` și scrie cuvântul de 32 de biți în hexa.",
+   "hint": "Tip B: deplasamentul pe 13 biți (bitul 0 nu se scrie): `imm[12] | imm[10:5] | rs2 | rs1 | funct3 | imm[4:1] | imm[11] | 1100011`.",
+   "solution": "Format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n1    111111 00100 00011 111    0110  1    1100011\n= 1111 1110 0100 0001 1111 0110 1110 0011\n= 0xFE41F6E3\n```\n\nDeplasamentul `-20` pe 13 biți: `1111111101100`; bitul 0 nu se stochează.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "cuvântul (hexa)",
+      "answer": "0xfe41f6e3|fe41f6e3",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "200",
+   "title": "Decodifică 0x00A50533",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x00A50533`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0110011` → format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 01010 01010 000    01010 0110011\n= 0000 0000 1010 0101 0000 0101 0011 0011\n= 0x00A50533\n```\n\nEste `add x10,x10,x10`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "R",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "add",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00A50533"
+   }
+  },
+  {
+   "id": "201",
+   "title": "Decodifică 0x40B50533",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x40B50533`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0110011` → format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0100000 01011 01010 000    01010 0110011\n= 0100 0000 1011 0101 0000 0101 0011 0011\n= 0x40B50533\n```\n\nEste `sub x10,x10,x11`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "R",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "sub",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "40B50533"
+   }
+  },
+  {
+   "id": "202",
+   "title": "Decodifică 0xFFF00293",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0xFFF00293`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0010011` → format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n111111111111 00000 000    00101 0010011\n= 1111 1111 1111 0000 0000 0010 1001 0011\n= 0xFFF00293\n```\n\nEste `addi x5,x0,-1`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "addi",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "5",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "-1",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FFF00293"
+   }
+  },
+  {
+   "id": "203",
+   "title": "Decodifică 0x0002A303",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x0002A303`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0000011` → format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000000000 00101 010    00110 0000011\n= 0000 0000 0000 0010 1010 0011 0000 0011\n= 0x0002A303\n```\n\nEste `lw x6,0(x5)`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "lw",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "6",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "5",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "0002A303"
+   }
+  },
+  {
+   "id": "204",
+   "title": "Decodifică 0xFE62AE23",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0xFE62AE23`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0100011` → format S.\n\n```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n1111111   00110 00101 010    11100    0100011\n= 1111 1110 0110 0010 1010 1110 0010 0011\n= 0xFE62AE23\n```\n\nEste `sw x6,-4(x5)`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "S",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "sw",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "5",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "6",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "-4",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FE62AE23"
+   }
+  },
+  {
+   "id": "205",
+   "title": "Decodifică 0xFE0516E3",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0xFE0516E3`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `1100011` → format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n1    111111 00000 01010 001    0110  1    1100011\n= 1111 1110 0000 0101 0001 0110 1110 0011\n= 0xFE0516E3\n```\n\nEste `bne x10,x0,-20`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "B",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "bne",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "-20",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FE0516E3"
+   }
+  },
+  {
+   "id": "206",
+   "title": "Decodifică 0x00C59593",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x00C59593`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0010011` → format I (deplasare).\n\n```\nfunct7  shamt rs1   funct3 rd    opcode \n0000000 01100 01011 001    01011 0010011\n= 0000 0000 1100 0101 1001 0101 1001 0011\n= 0x00C59593\n```\n\nEste `slli x11,x11,12`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "slli",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "shamt (zecimal)",
+      "answer": "12",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00C59593"
+   }
+  },
+  {
+   "id": "207",
+   "title": "Decodifică 0x4025D593",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x4025D593`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0010011` → format I (deplasare).\n\n```\nfunct7  shamt rs1   funct3 rd    opcode \n0100000 00010 01011 101    01011 0010011\n= 0100 0000 0010 0101 1101 0101 1001 0011\n= 0x4025D593\n```\n\nEste `srai x11,x11,2`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "srai",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "shamt (zecimal)",
+      "answer": "2",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "4025D593"
+   }
+  },
+  {
+   "id": "208",
+   "title": "Decodifică 0x00F37393",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x00F37393`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0010011` → format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000001111 00110 111    00111 0010011\n= 0000 0000 1111 0011 0111 0011 1001 0011\n= 0x00F37393\n```\n\nEste `andi x7,x6,15`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "andi",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "7",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "6",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "15",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00F37393"
+   }
+  },
+  {
+   "id": "209",
+   "title": "Decodifică 0x0062C2B3",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x0062C2B3`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0110011` → format R.\n\n```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00110 00101 100    00101 0110011\n= 0000 0000 0110 0010 1100 0010 1011 0011\n= 0x0062C2B3\n```\n\nEste `xor x5,x5,x6`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "R",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "xor",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "5",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "5",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "6",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "0062C2B3"
+   }
+  },
+  {
+   "id": "210",
+   "title": "Decodifică 0x00352423",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x00352423`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0100011` → format S.\n\n```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n0000000   00011 01010 010    01000    0100011\n= 0000 0000 0011 0101 0010 0100 0010 0011\n= 0x00352423\n```\n\nEste `sw x3,8(x10)`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "S",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "sw",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "3",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "8",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00352423"
+   }
+  },
+  {
+   "id": "211",
+   "title": "Decodifică 0x01C12083",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x01C12083`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0000011` → format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n000000011100 00010 010    00001 0000011\n= 0000 0001 1100 0001 0010 0000 1000 0011\n= 0x01C12083\n```\n\nEste `lw x1,28(x2)`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "lw",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "1",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "2",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "28",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "01C12083"
+   }
+  },
+  {
+   "id": "212",
+   "title": "Decodifică 0x00B57663",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x00B57663`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `1100011` → format B.\n\n```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    000000 01011 01010 111    0110  0    1100011\n= 0000 0000 1011 0101 0111 0110 0110 0011\n= 0x00B57663\n```\n\nEste `bgeu x10,x11,12`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "B",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "bgeu",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "rs2",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "12",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00B57663"
+   }
+  },
+  {
+   "id": "213",
+   "title": "Decodifică 0xFFF5C513",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0xFFF5C513`? Completează câmpurile.",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0010011` → format I.\n\n```\nimm[11:0]    rs1   funct3 rd    opcode \n111111111111 01011 100    01010 0010011\n= 1111 1111 1111 0101 1100 0101 0001 0011\n= 0xFFF5C513\n```\n\nEste `xori x10,x11,-1`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "I",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "xori",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "10",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs1",
+      "label": "rs1",
+      "answer": "11",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "-1",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FFF5C513"
+   }
+  },
+  {
+   "id": "214",
+   "title": "Decodifică 0x0080006F",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x0080006F`? Completează câmpurile. (`jal` nu e în lucrare, dar formatul J e în Fig. 3.)",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `1101111` → format J.\n\n```\n[20] [10:1]     [11] [19:12]  rd    opcode \n0    0000000100 0    00000000 00000 1101111\n= 0000 0000 1000 0000 0000 0000 0110 1111\n= 0x0080006F\n```\n\nEste `jal x0,8`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "J",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "jal",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imediatul (zecimal, cu semn)",
+      "answer": "8",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "0080006F"
+   }
+  },
+  {
+   "id": "215",
+   "title": "Decodifică 0x123452B7",
+   "chapter": "4. Decodificarea instrucțiunilor",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce instrucțiune RV32I este cuvântul `0x123452B7`? Completează câmpurile. (`lui` nu e în lucrare, dar formatul U e în Fig. 3.)",
+   "hint": "Scrie cuvântul în binar, citește opcode-ul (biții 6:0): el dă formatul. Apoi taie câmpurile formatului.",
+   "solution": "Opcode `0110111` → format U.\n\n```\nimm[31:12]           rd    opcode \n00010010001101000101 00101 0110111\n= 0001 0010 0011 0100 0101 0010 1011 0111\n= 0x123452B7\n```\n\nEste `lui x5,0x12345`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "fmt",
+      "label": "formatul (R, I, S, B, U, J)",
+      "answer": "U",
+      "hint": "o literă"
+     },
+     {
+      "id": "name",
+      "label": "instrucțiunea (mnemonica)",
+      "answer": "lui",
+      "hint": "add, lw..."
+     },
+     {
+      "id": "rd",
+      "label": "rd (numărul registrului)",
+      "answer": "5",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "imm",
+      "label": "imm[31:12] (hexa)",
+      "answer": "0x12345|12345",
+      "hint": "0x..."
+     }
+    ],
+    "word": "123452B7"
+   }
+  },
+  {
+   "id": "300",
+   "title": "IMM_ID pentru lw x5,-12(x2)",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `lw x5,-12(x2)` (cuvântul `0xFF412283`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n111111110100 00010 010    00101 0000011\n= 1111 1111 0100 0001 0010 0010 1000 0011\n= 0xFF412283\n```\n\nRamura de tip I: `{{20{in[31]}}, in[31:20]}`. Rezultat: `0xFFFFFFF4` = `-12`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xfffffff4|fffffff4",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-12",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FF412283"
+   }
+  },
+  {
+   "id": "301",
+   "title": "IMM_ID pentru addi x7,x0,-1",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `addi x7,x0,-1` (cuvântul `0xFFF00393`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n111111111111 00000 000    00111 0010011\n= 1111 1111 1111 0000 0000 0011 1001 0011\n= 0xFFF00393\n```\n\nRamura de tip I: `{{20{in[31]}}, in[31:20]}`. Rezultat: `0xFFFFFFFF` = `-1`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xffffffff|ffffffff",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-1",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FFF00393"
+   }
+  },
+  {
+   "id": "302",
+   "title": "IMM_ID pentru andi x3,x4,255",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `andi x3,x4,255` (cuvântul `0x0FF27193`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n000011111111 00100 111    00011 0010011\n= 0000 1111 1111 0010 0111 0001 1001 0011\n= 0x0FF27193\n```\n\nRamura de tip I: `{{20{in[31]}}, in[31:20]}`. Rezultat: `0x000000FF` = `255`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x000000ff|000000ff|0xff|ff",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "255",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "0FF27193"
+   }
+  },
+  {
+   "id": "303",
+   "title": "IMM_ID pentru xori x6,x6,-1",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `xori x6,x6,-1` (cuvântul `0xFFF34313`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n111111111111 00110 100    00110 0010011\n= 1111 1111 1111 0011 0100 0011 0001 0011\n= 0xFFF34313\n```\n\nRamura de tip I: `{{20{in[31]}}, in[31:20]}`. Rezultat: `0xFFFFFFFF` = `-1`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xffffffff|ffffffff",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-1",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FFF34313"
+   }
+  },
+  {
+   "id": "304",
+   "title": "IMM_ID pentru slti x8,x9,-100",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `slti x8,x9,-100` (cuvântul `0xF9C4A413`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n111110011100 01001 010    01000 0010011\n= 1111 1001 1100 0100 1010 0100 0001 0011\n= 0xF9C4A413\n```\n\nRamura de tip I: `{{20{in[31]}}, in[31:20]}`. Rezultat: `0xFFFFFF9C` = `-100`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xffffff9c|ffffff9c",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-100",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "F9C4A413"
+   }
+  },
+  {
+   "id": "305",
+   "title": "IMM_ID pentru sltiu x8,x9,2047",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `sltiu x8,x9,2047` (cuvântul `0x7FF4B413`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n011111111111 01001 011    01000 0010011\n= 0111 1111 1111 0100 1011 0100 0001 0011\n= 0x7FF4B413\n```\n\nRamura de tip I: `{{20{in[31]}}, in[31:20]}`. Rezultat: `0x000007FF` = `2047`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x000007ff|000007ff|0x7ff|7ff",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "2047",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "7FF4B413"
+   }
+  },
+  {
+   "id": "306",
+   "title": "IMM_ID pentru slli x10,x11,4",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `slli x10,x11,4` (cuvântul `0x00459513`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nfunct7  shamt rs1   funct3 rd    opcode \n0000000 00100 01011 001    01010 0010011\n= 0000 0000 0100 0101 1001 0101 0001 0011\n= 0x00459513\n```\n\nDeplasare: ramura `funct3 == 001 / 101` dă `{27'b0, in[24:20]}` (doar `shamt`). Rezultat: `0x00000004` = `4`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000004|00000004|0x4|4",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "4",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00459513"
+   }
+  },
+  {
+   "id": "307",
+   "title": "IMM_ID pentru srai x10,x11,3",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `srai x10,x11,3` (cuvântul `0x4035D513`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nfunct7  shamt rs1   funct3 rd    opcode \n0100000 00011 01011 101    01010 0010011\n= 0100 0000 0011 0101 1101 0101 0001 0011\n= 0x4035D513\n```\n\nDeplasare: ramura `funct3 == 001 / 101` dă `{27'b0, in[24:20]}` (doar `shamt`). Rezultat: `0x00000003` = `3`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000003|00000003|0x3|3",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "3",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "4035D513"
+   }
+  },
+  {
+   "id": "308",
+   "title": "IMM_ID pentru srli x10,x11,31",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `srli x10,x11,31` (cuvântul `0x01F5D513`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nfunct7  shamt rs1   funct3 rd    opcode \n0000000 11111 01011 101    01010 0010011\n= 0000 0001 1111 0101 1101 0101 0001 0011\n= 0x01F5D513\n```\n\nDeplasare: ramura `funct3 == 001 / 101` dă `{27'b0, in[24:20]}` (doar `shamt`). Rezultat: `0x0000001F` = `31`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x0000001f|0000001f|0x1f|1f",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "31",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "01F5D513"
+   }
+  },
+  {
+   "id": "309",
+   "title": "IMM_ID pentru sw x4,4(x5)",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `sw x4,4(x5)` (cuvântul `0x0042A223`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n0000000   00100 00101 010    00100    0100011\n= 0000 0000 0100 0010 1010 0010 0010 0011\n= 0x0042A223\n```\n\nRamura S: `{{20{in[31]}}, in[31:25], in[11:7]}`. Rezultat: `0x00000004` = `4`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000004|00000004|0x4|4",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "4",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "0042A223"
+   }
+  },
+  {
+   "id": "310",
+   "title": "IMM_ID pentru sw x9,-8(x2)",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `sw x9,-8(x2)` (cuvântul `0xFE912C23`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:5] rs2   rs1   funct3 imm[4:0] opcode \n1111111   01001 00010 010    11000    0100011\n= 1111 1110 1001 0001 0010 1100 0010 0011\n= 0xFE912C23\n```\n\nRamura S: `{{20{in[31]}}, in[31:25], in[11:7]}`. Rezultat: `0xFFFFFFF8` = `-8`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xfffffff8|fffffff8",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-8",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FE912C23"
+   }
+  },
+  {
+   "id": "311",
+   "title": "IMM_ID pentru beq x18,x0,5c",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `beq x18,x0,5c` (cuvântul `0x04090E63`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    000010 00000 10010 000    1110  0    1100011\n= 0000 0100 0000 1001 0000 1110 0110 0011\n= 0x04090E63\n```\n\nRamura B: `{{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0}`. Rezultat: `0x0000005C` = `92`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x0000005c|0000005c|0x5c|5c",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "92",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "04090E63"
+   }
+  },
+  {
+   "id": "312",
+   "title": "IMM_ID pentru bne x1,x2,-4",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `bne x1,x2,-4` (cuvântul `0xFE209EE3`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n1    111111 00010 00001 001    1110  1    1100011\n= 1111 1110 0010 0000 1001 1110 1110 0011\n= 0xFE209EE3\n```\n\nRamura B: `{{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0}`. Rezultat: `0xFFFFFFFC` = `-4`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xfffffffc|fffffffc",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-4",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FE209EE3"
+   }
+  },
+  {
+   "id": "313",
+   "title": "IMM_ID pentru blt x5,x6,2048",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `blt x5,x6,2048` (cuvântul `0x0062C0E3`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n0    000000 00110 00101 100    0000  1    1100011\n= 0000 0000 0110 0010 1100 0000 1110 0011\n= 0x0062C0E3\n```\n\nRamura B: `{{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0}`. Rezultat: `0x00000800` = `2048`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000800|00000800|0x800|800",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "2048",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "0062C0E3"
+   }
+  },
+  {
+   "id": "314",
+   "title": "IMM_ID pentru bge x5,x6,-4096",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `bge x5,x6,-4096` (cuvântul `0x8062D063`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n1    000000 00110 00101 101    0000  0    1100011\n= 1000 0000 0110 0010 1101 0000 0110 0011\n= 0x8062D063\n```\n\nRamura B: `{{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0}`. Rezultat: `0xFFFFF000` = `-4096`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xfffff000|fffff000",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-4096",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "8062D063"
+   }
+  },
+  {
+   "id": "315",
+   "title": "IMM_ID pentru bgeu x3,x4,-20",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `bgeu x3,x4,-20` (cuvântul `0xFE41F6E3`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\n[12] [10:5] rs2   rs1   funct3 [4:1] [11] opcode \n1    111111 00100 00011 111    0110  1    1100011\n= 1111 1110 0100 0001 1111 0110 1110 0011\n= 0xFE41F6E3\n```\n\nRamura B: `{{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0}`. Rezultat: `0xFFFFFFEC` = `-20`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0xffffffec|ffffffec",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "-20",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "FE41F6E3"
+   }
+  },
+  {
+   "id": "316",
+   "title": "IMM_ID pentru lui x5,0x12345",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `lui x5,0x12345` (cuvântul `0x123452B7`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[31:12]           rd    opcode \n00010010001101000101 00101 0110111\n= 0001 0010 0011 0100 0101 0010 1011 0111\n= 0x123452B7\n```\n\nOpcode `0110111` nu e în `case`: ramura `default` dă 0. (ISA-ul ar da `0x12345000`, dar `lui` nu e în lista cerinței 4.) Rezultat: `0x00000000` = `0`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "123452B7"
+   }
+  },
+  {
+   "id": "317",
+   "title": "IMM_ID pentru add x2,x1,x0",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `add x2,x1,x0` (cuvântul `0x00008133`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nfunct7  rs2   rs1   funct3 rd    opcode \n0000000 00000 00001 000    00010 0110011\n= 0000 0000 0000 0000 1000 0001 0011 0011\n= 0x00008133\n```\n\nTipul R nu are imediat: ramura `default` dă 0. Rezultat: `0x00000000` = `0`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00008133"
+   }
+  },
+  {
+   "id": "318",
+   "title": "IMM_ID pentru jal x1,8",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `jal x1,8` (cuvântul `0x008000EF`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\n[20] [10:1]     [11] [19:12]  rd    opcode \n0    0000000100 0    00000000 00001 1101111\n= 0000 0000 1000 0000 0000 0000 1110 1111\n= 0x008000EF\n```\n\nOpcode `1101111` nu e în `case`: `default`, 0. (ISA-ul ar da `8`; formatul J nu e cerut în Lucrarea 2.) Rezultat: `0x00000000` = `0`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "008000EF"
+   }
+  },
+  {
+   "id": "319",
+   "title": "IMM_ID pentru jalr x0,0(x1)",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Instrucțiunea `jalr x0,0(x1)` (cuvântul `0x00008067`) e în etapa ID. Ce scoate `imm_gen`-ul din lucrare pe `IMM_ID`? Dă valoarea în hexa (32 de biți) și în zecimal, cu semn.",
+   "hint": "Opcode-ul alege ramura din `case`; bitul de semn e mereu `in[31]`.",
+   "solution": "```\nimm[11:0]    rs1   funct3 rd    opcode \n000000000000 00001 000    00000 1100111\n= 0000 0000 0000 0000 1000 0000 0110 0111\n= 0x00008067\n```\n\nOpcode `1100111` nu e în `case` (doar `0000011` e tratat ca load): `default`, 0. Imediatul ISA e 0 oricum aici. Rezultat: `0x00000000` = `0`.",
+   "kind": "riscv",
+   "spec": {
+    "fields": [
+     {
+      "id": "hex",
+      "label": "IMM_ID (hexa, 32 de biți)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     },
+     {
+      "id": "dec",
+      "label": "IMM_ID (zecimal, cu semn)",
+      "answer": "0",
+      "hint": "un număr",
+      "number": true,
+      "tol": 0
+     }
+    ],
+    "word": "00008067"
+   }
+  },
+  {
+   "id": "330",
+   "title": "De ce shamt la deplasări",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De ce `imm_gen` ia doar biții 24:20 la `slli`, `srli`, `srai`?",
+   "hint": "",
+   "solution": "La `srai`, `funct7 = 0100000`: tratat ca I obișnuit, imediatul ar ieși `0x400 + shamt`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "pentru că deplasările nu au imediat",
+     "pentru că așa se face extensia de semn",
+     "deplasarea e de cel mult 31 de poziții (5 biți), iar biții 31:25 sunt `funct7`, nu imediat",
+     "pentru că biții 31:25 sunt `rs2`"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "331",
+   "title": "Bitul 0 la B",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De ce imediatul de tip B se termină cu `1'b0` în `imm_gen`?",
+   "hint": "",
+   "solution": "Cei 12 biți stocați sunt imm[12:1]; lipind 0 la coadă, `IMM_ID` e deplasamentul în octeți, gata de adunat la PC.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "ca să facă extensia de semn",
+     "adresele de salt sunt pare, bitul 0 nu se stochează; `1'b0` adăugat e „Shift left 1” din Fig. 3",
+     "ca să obțină 33 de biți",
+     "pentru că `beq` sare doar înapoi"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "332",
+   "title": "Extensia de semn",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Imediatul `addi` de 12 biți `0xFFF`. Ce trebuie să iasă pe 32 de biți?",
+   "hint": "",
+   "solution": "Extensia de semn copiază bitul 11 (aici 1) în toți biții de sus: -1 rămâne -1.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`0xFFFFFFFF` (-1)",
+     "`0x00000FFF` (4095)",
+     "`0xFFF00000`",
+     "`0x0000FFFF`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "333",
+   "title": "Bitul de semn",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Care bit e bitul de semn al imediatului, la toate formatele RISC-V?",
+   "hint": "",
+   "solution": "E o alegere deliberată a ISA-ului: extensia de semn începe înainte să știi formatul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`inst[31]`",
+     "`inst[0]`",
+     "`inst[11]`",
+     "`inst[20]` la I, `inst[7]` la B"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "334",
+   "title": "Fără default",
+   "chapter": "5. Generatorul de imediate",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce se întâmplă dacă din `case`-ul lui `imm_gen` lipsește `default`?",
+   "hint": "",
+   "solution": "Într-un `always @(*)`, o ieșire neatribuită pe un drum trebuie să-și țină valoarea: memorie pe nivel, adică latch.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nimic, `out` devine 0 automat",
+     "eroare de compilare",
+     "sinteza pune un latch pentru `out` (pe opcode-urile netratate își ține valoarea veche)",
+     "`out` devine Z"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "400",
+   "title": "REG_DATA pentru add x3,x1,x2",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Instrucțiunea `add x3,x1,x2` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 1`, `rs2 = 2` (biții 19:15 și 24:20). Deci `REG_DATA1_ID = 0x1`, `REG_DATA2_ID = 0x2`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "1",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "2",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x00000001|00000001|0x1|1",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x00000002|00000002|0x2|2",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "401",
+   "title": "REG_DATA pentru sw x4,4(x5)",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Instrucțiunea `sw x4,4(x5)` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 5`, `rs2 = 4` (biții 19:15 și 24:20). Deci `REG_DATA1_ID = 0x5`, `REG_DATA2_ID = 0x4`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "5",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "4",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x00000005|00000005|0x5|5",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x00000004|00000004|0x4|4",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "402",
+   "title": "REG_DATA pentru beq x18,x0,5c",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Instrucțiunea `beq x18,x0,5c` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 18`, `rs2 = 0` (biții 19:15 și 24:20). La `beq x18,x0,...` biții 24:20 sunt `x0`. Deci `REG_DATA1_ID = 0x12`, `REG_DATA2_ID = 0x0`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "18",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "0",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x00000012|00000012|0x12|12",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "403",
+   "title": "REG_DATA pentru add x7,x7,x9",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Înainte, WB a scris (cu `RegWrite_WB = 1`): `RD_WB = 7`, `ALU_DATA_WB = 0x100`. Instrucțiunea `add x7,x7,x9` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 7`, `rs2 = 9` (biții 19:15 și 24:20). Deci `REG_DATA1_ID = 0x100`, `REG_DATA2_ID = 0x9`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "7",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "9",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x00000100|00000100|0x100|100",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x00000009|00000009|0x9|9",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "404",
+   "title": "REG_DATA pentru sub x5,x0,x6",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Înainte, WB a scris (cu `RegWrite_WB = 1`): `RD_WB = 0`, `ALU_DATA_WB = 0x55`, `RD_WB = 6`, `ALU_DATA_WB = 0x20`. Instrucțiunea `sub x5,x0,x6` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 0`, `rs2 = 6` (biții 19:15 și 24:20). Scrierea în x0 e ignorată. Deci `REG_DATA1_ID = 0x0`, `REG_DATA2_ID = 0x20`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "0",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "6",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x00000020|00000020|0x20|20",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "405",
+   "title": "REG_DATA pentru lw x12,8(x0)",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Înainte, WB a scris (cu `RegWrite_WB = 1`): `RD_WB = 12`, `ALU_DATA_WB = 0xFF`. Instrucțiunea `lw x12,8(x0)` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 0`, `rs2 = 8` (biții 19:15 și 24:20). Deci `REG_DATA1_ID = 0x0`, `REG_DATA2_ID = 0x8`. La `lw x12,8(x0)` biții 24:20 fac parte din imediat (`8` → `01000` = x8), deci se citește x8, deși `lw` nu-l folosește.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "0",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "8",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x00000008|00000008|0x8|8",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "406",
+   "title": "REG_DATA pentru and x31,x30,x31",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Bancul de registre al lucrării pornește cu `xi = i`. Înainte, WB a scris (cu `RegWrite_WB = 1`): `RD_WB = 30`, `ALU_DATA_WB = 0xF0F0`, `RD_WB = 31`, `ALU_DATA_WB = 0xFF`. Instrucțiunea `and x31,x30,x31` intră în ID. Ce arată `RS1_ID`, `RS2_ID`, `REG_DATA1_ID` și `REG_DATA2_ID`?",
+   "hint": "ID citește mereu registrele din biții 19:15 și 24:20, oricare ar fi formatul. O scriere în x0 se ignoră.",
+   "solution": "`rs1 = 30`, `rs2 = 31` (biții 19:15 și 24:20). Deci `REG_DATA1_ID = 0xF0F0`, `REG_DATA2_ID = 0xFF`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rs1",
+      "label": "RS1_ID (zecimal)",
+      "answer": "30",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "rs2",
+      "label": "RS2_ID (zecimal)",
+      "answer": "31",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID (hexa)",
+      "answer": "0x0000f0f0|0000f0f0|0xf0f0|f0f0",
+      "hint": "0x..."
+     },
+     {
+      "id": "d2",
+      "label": "REG_DATA2_ID (hexa)",
+      "answer": "0x000000ff|000000ff|0xff|ff",
+      "hint": "0x..."
+     }
+    ]
+   }
+  },
+  {
+   "id": "410",
+   "title": "RD_ID pentru sw",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce arată `RD_ID` când `sw x4,4(x5)` e în ID? Dar `FUNCT7_ID`?",
+   "hint": "ID taie biții 11:7 și 31:25 fără să știe formatul.",
+   "solution": "La S, biții 11:7 sunt `imm[4:0] = 00100` = 4, iar biții 31:25 sunt `imm[11:5] = 0`. Fig. 4 arată `RD_ID = 04` la `sw`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rd",
+      "label": "RD_ID (zecimal)",
+      "answer": "4",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "f7",
+      "label": "FUNCT7_ID (zecimal)",
+      "answer": "0",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "411",
+   "title": "RD_ID pentru beq",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce arată `RD_ID` (în hexa) când `beq x18,x0,5c` e în ID? Dar `FUNCT7_ID`?",
+   "hint": "La B, biții 11:7 sunt `imm[4:1]` urmat de `imm[11]`; biții 31:25 sunt `imm[12]` urmat de `imm[10:5]`.",
+   "solution": "`0x5C`: `imm[4:1] = 1110`, `imm[11] = 0` → `11100` = `0x1C`. `imm[12] = 0`, `imm[10:5] = 000010` → `0000010` = `0x02`. Exact ca în Fig. 4.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "rd",
+      "label": "RD_ID (hexa)",
+      "answer": "0x1c|1c|0x01c",
+      "hint": "0x.."
+     },
+     {
+      "id": "f7",
+      "label": "FUNCT7_ID (hexa)",
+      "answer": "0x2|2|0x02|02",
+      "hint": "0x.."
+     }
+    ]
+   }
+  },
+  {
+   "id": "412",
+   "title": "x0 în registre",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Cum se asigură, în `registers`, că `x0` rămâne mereu 0?",
+   "hint": "",
+   "solution": "`if (reg_write && write_reg != 5'd0) regs[write_reg] <= write_data;`",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`x0` e un `wire` legat la masă",
+     "se rescrie 0 în x0 la fiecare front",
+     "scrierea e făcută doar dacă `write_reg != 0`, iar x0 pornește de la 0",
+     "citirea lui x0 e oprită"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "413",
+   "title": "Citire și scriere",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Cum sunt porturile bancului de registre din lucrare?",
+   "hint": "",
+   "solution": "Doi operanzi se citesc combinațional, în ciclul lui ID; rezultatul se scrie doar pe front, cu `reg_write = 1`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "2 porturi de citire asincrone și 1 port de scriere sincron",
+     "1 port de citire și 1 de scriere, ambele sincrone",
+     "2 porturi de citire sincrone și 2 de scriere",
+     "un singur port, folosit alternativ"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "414",
+   "title": "Scriere și citire în același ciclu",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Testbench-ul separat al bancului de registre: `read_reg2 = 3` tot timpul; la 18 ns pune `reg_write = 1`, `write_reg = 3`, `write_data = 0xAB`. Fronturi la 5, 15, 25, ... ns. Ce arată `read_data2` la 20 ns și la 30 ns?",
+   "hint": "Scrierea e sincronă, citirea asincronă.",
+   "solution": "Până la frontul de la 25 ns, x3 e încă 3. După front x3 = `0xAB`, iar citirea asincronă îl arată imediat.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "read_data2 la 20 ns (hexa)",
+      "answer": "0x00000003|00000003|0x3|3",
+      "hint": "0x.."
+     },
+     {
+      "id": "b",
+      "label": "read_data2 la 30 ns (hexa)",
+      "answer": "0x000000ab|000000ab|0xab|ab",
+      "hint": "0x.."
+     }
+    ]
+   }
+  },
+  {
+   "id": "415",
+   "title": "Unde se scrie, în ID",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În modulul ID, de unde vine adresa de scriere a bancului de registre?",
+   "hint": "",
+   "solution": "Instrucțiunea care se scrie acum a intrat în pipeline cu 3 cicluri mai devreme: adresa ei vine din WB, nu din ID.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "din `RD_ID` (instrucțiunea din ID)",
+     "din `RD_WB` (instrucțiunea care se termină în WB)",
+     "din `RS1_ID`",
+     "din `IMM_ID`"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "416",
+   "title": "PC_ID în ID",
+   "chapter": "6. Bancul de registre și etapa ID",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce face modulul ID cu intrarea `PC_ID` în Lucrarea 2?",
+   "hint": "",
+   "solution": "`PC_ID` e trecut mai departe; adresa de salt se calculează în EX (Lucrarea 3).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "o adună cu 4",
+     "o scrie în registrul x1",
+     "o dă lui `imm_gen`",
+     "nimic încă: va merge prin ID/EX la EX, pentru `PC + imm`"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "500",
+   "title": "Forma de undă la 22 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 22 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 15 ns. ID are `add x2,x1,x0` de la `PC = 0x0`: `INSTRUCTION_ID = 0x00008133`, `OPCODE_ID = 0x33`, `IMM_ID = 0x00000000`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x00008133|00008133|0x8133|8133",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000033|00000033|0x33|33",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "501",
+   "title": "Forma de undă la 47 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 47 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 45 ns. ID are `ori x4,x1,1` de la `PC = 0xC`: `INSTRUCTION_ID = 0x0010E213`, `OPCODE_ID = 0x13`, `IMM_ID = 0x00000001`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x0000000c|0000000c|0xc|c",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x0010e213|0010e213|0x10e213|10e213",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000013|00000013|0x13|13",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x00000001|00000001|0x1|1",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "502",
+   "title": "Forma de undă la 58 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 58 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 55 ns. ID are `sw x4,4(x5)` de la `PC = 0x10`: `INSTRUCTION_ID = 0x0042A223`, `OPCODE_ID = 0x23`, `IMM_ID = 0x00000004`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000010|00000010|0x10|10",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x0042a223|0042a223|0x42a223|42a223",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000023|00000023|0x23|23",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x00000004|00000004|0x4|4",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "503",
+   "title": "Forma de undă la 68 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 68 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 65 ns. ID are `lw x12,8(x0)` de la `PC = 0x14`: `INSTRUCTION_ID = 0x00802603`, `OPCODE_ID = 0x03`, `IMM_ID = 0x00000008`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000014|00000014|0x14|14",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x00802603|00802603|0x802603|802603",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000003|00000003|0x3|3",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x00000008|00000008|0x8|8",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "504",
+   "title": "Forma de undă la 80 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 80 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 75 ns. ID are `beq x18,x0,92` de la `PC = 0x18`: `INSTRUCTION_ID = 0x04090E63`, `OPCODE_ID = 0x63`, `IMM_ID = 0x0000005C`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000018|00000018|0x18|18",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x04090e63|04090e63|0x4090e63|4090e63",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000063|00000063|0x63|63",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x0000005c|0000005c|0x5c|5c",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "505",
+   "title": "Forma de undă la 100 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 100 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 95 ns. ID are `0 (după program)` de la `PC = 0x20`: `INSTRUCTION_ID = 0x00000000`, `OPCODE_ID = 0x00`, `IMM_ID = 0x00000000`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000020|00000020|0x20|20",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "506",
+   "title": "Forma de undă la 203 ns",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării (programul din cerința 8, testbench-ul dat: fronturi la 5, 15, 25, ... ns, `reset = 1` până la 10 ns). Ce valori au, la 203 ns, `PC_ID`, `INSTRUCTION_ID`, `OPCODE_ID` și `IMM_ID`?",
+   "hint": "Găsește ultimul front dinainte. IF/ID a primit atunci instrucțiunea pe care IF o avea înainte de front.",
+   "solution": "Ultimul front: 195 ns. ID are `0 (după program)` de la `PC = 0x48`: `INSTRUCTION_ID = 0x00000000`, `OPCODE_ID = 0x00`, `IMM_ID = 0x00000000`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000048|00000048|0x48|48",
+      "hint": "0x..."
+     },
+     {
+      "id": "ins",
+      "label": "INSTRUCTION_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     },
+     {
+      "id": "op",
+      "label": "OPCODE_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x.."
+     },
+     {
+      "id": "imm",
+      "label": "IMM_ID (hexa)",
+      "answer": "0x00000000|00000000|0x0|0",
+      "hint": "0x........"
+     }
+    ]
+   }
+  },
+  {
+   "id": "510",
+   "title": "Când ajunge beq în ID",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În simularea lucrării, la ce timp (ns) intră `beq x18,x0,5c` în ID? Ce `PC_ID` are?",
+   "hint": "Primul front fără reset (15 ns) aduce `add`; `beq` e a 7-a instrucțiune.",
+   "solution": "`add` la 15 ns, apoi câte una la 10 ns: a 7-a la `15 + 6 · 10 = 75` ns, `PC_ID = 6 · 4 = 0x18`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "t",
+      "label": "timpul (ns)",
+      "answer": "75",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "pc",
+      "label": "PC_ID (hexa)",
+      "answer": "0x00000018|00000018|0x18|18",
+      "hint": "0x.."
+     }
+    ]
+   }
+  },
+  {
+   "id": "511",
+   "title": "REG_DATA1 la beq",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Când `beq x18,x0,5c` e în ID, ce arată `REG_DATA1_ID` și `RS1_ID` (hexa)?",
+   "hint": "Registrele pornesc cu `xi = i`.",
+   "solution": "`rs1 = x18`; x18 = 18 = `0x12`. În Fig. 4 apare `00000012` și `12`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "d1",
+      "label": "REG_DATA1_ID",
+      "answer": "0x00000012|00000012|0x12|12",
+      "hint": "0x.."
+     },
+     {
+      "id": "rs1",
+      "label": "RS1_ID",
+      "answer": "0x12|12",
+      "hint": "0x.."
+     }
+    ]
+   }
+  },
+  {
+   "id": "512",
+   "title": "Radix",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În Vivado, `OPCODE_ID` apare ca 51, 19, 35, 99 (zecimal). Ce sunt în hexa?",
+   "hint": "Click dreapta → Radix → Hexadecimal.",
+   "solution": "51 = `0x33` (R), 19 = `0x13` (I aritmetic), 35 = `0x23` (S), 99 = `0x63` (B).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "51",
+      "answer": "0x33|33",
+      "hint": "0x.."
+     },
+     {
+      "id": "b",
+      "label": "19",
+      "answer": "0x13|13",
+      "hint": "0x.."
+     },
+     {
+      "id": "c",
+      "label": "35",
+      "answer": "0x23|23",
+      "hint": "0x.."
+     },
+     {
+      "id": "d",
+      "label": "99",
+      "answer": "0x63|63",
+      "hint": "0x.."
+     }
+    ]
+   }
+  },
+  {
+   "id": "513",
+   "title": "X la început",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "De ce Fig. 4 arată `XXX` roșu pe `PC_ID` între 0 și 5 ns?",
+   "hint": "",
+   "solution": "Primul front e la 5 ns (ceasul pornește din 0); atunci resetul le face 0.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "memoria nu e încă încărcată",
+     "reset e 1",
+     "e o greșeală în cod",
+     "până la primul front, registrele PC și IF/ID n-au primit nicio valoare"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "514",
+   "title": "Întârzierea IF/ID",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Cu cât rămâne `PC_ID` în urma PC-ului din IF, în simularea fără opriri?",
+   "hint": "",
+   "solution": "IF/ID introduce exact un ciclu: instrucțiunea adusă în ciclul n e decodificată în ciclul n + 1.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cu 8 (două cicluri)",
+     "cu 0",
+     "cu 1",
+     "cu 4 (un ciclu)"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "515",
+   "title": "Ultimul front",
+   "chapter": "7. Simularea: forma de undă",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Simularea lucrării se oprește la 210 ns (`#10 reset=0; #200 $finish;`). La ce timp e ultimul front crescător și ce valori au atunci `PC_IF` și `PC_ID` (hexa)?",
+   "hint": "Fronturi la 5, 15, ..., 205.",
+   "solution": "De la 15 la 205 ns sunt 20 de fronturi fără reset: `PC_IF = 20 · 4 = 80 = 0x50`; `PC_ID` e cu 4 în urmă: `0x4C`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "t",
+      "label": "ultimul front (ns)",
+      "answer": "205",
+      "hint": "",
+      "number": true,
+      "tol": 0
+     },
+     {
+      "id": "a",
+      "label": "PC_IF",
+      "answer": "0x00000050|00000050|0x50|50",
+      "hint": "0x.."
+     },
+     {
+      "id": "b",
+      "label": "PC_ID",
+      "answer": "0x0000004c|0000004c|0x4c|4c",
+      "hint": "0x.."
+     }
+    ]
+   }
+  },
+  {
+   "id": "600",
+   "title": "Cerința 1a · mux2_1",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie modulul `mux2_1(input [31:0] ina, inb, input sel, output [31:0] out)`: `out = ina` când `sel = 0`, `inb` când `sel = 1`.\n\n**Scrie modulul** (2p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 1a: Multiplexor 2:1 pe 32 de biti\n// sel = 0 -> iesirea = ina (PC + 4)\n// sel = 1 -> iesirea = inb (PC_Branch, adresa de salt)\nmodule mux2_1(\n    input  [31:0] ina,\n    input  [31:0] inb,\n    input         sel,\n    output [31:0] out\n);\n    assign out = sel ? inb : ina;\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 1a: Multiplexor 2:1 pe 32 de biti\n// sel = 0 -> iesirea = ina (PC + 4)\n// sel = 1 -> iesirea = inb (PC_Branch, adresa de salt)\nmodule mux2_1(\n    input  [31:0] ina,\n    input  [31:0] inb,\n    input         sel,\n    output [31:0] out\n);\n    assign out = sel ? inb : ina;\nendmodule\n```",
+    "barem": [
+     {
+      "text": "semnătura (porturi și lățimi) ca în enunț",
+      "points": 0.5
+     },
+     {
+      "text": "`assign` cu operatorul `?:` (sau `always @(*)` cu `if`/`case`, ieșirea `reg`)",
+      "points": 1
+     },
+     {
+      "text": "ordinea corectă: `sel = 1` → `inb`",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "601",
+   "title": "Cerința 1b · PC",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie registrul `PC(input clk, res, write, input [31:0] in, output reg [31:0] out)`: reset sincron la 0, încarcă `in` pe frontul crescător doar dacă `write = 1`.\n\n**Scrie modulul** (2p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 1b: Registrul PC (bistabil de tip D pe 32 de biti)\n// - la reset devine 0\n// - pe frontul pozitiv al ceasului ia valoarea de la intrare, doar daca write = 1\n//   (write = PC_Write, vine de la unitatea de detectie a hazardurilor; 0 = \"ingheata\" PC-ul)\nmodule PC(\n    input             clk,\n    input             res,\n    input             write,\n    input      [31:0] in,\n    output reg [31:0] out\n);\n    always @(posedge clk) begin\n        if (res)\n            out <= 32'b0;\n        else if (write)\n            out <= in;\n    end\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 1b: Registrul PC (bistabil de tip D pe 32 de biti)\n// - la reset devine 0\n// - pe frontul pozitiv al ceasului ia valoarea de la intrare, doar daca write = 1\n//   (write = PC_Write, vine de la unitatea de detectie a hazardurilor; 0 = \"ingheata\" PC-ul)\nmodule PC(\n    input             clk,\n    input             res,\n    input             write,\n    input      [31:0] in,\n    output reg [31:0] out\n);\n    always @(posedge clk) begin\n        if (res)\n            out <= 32'b0;\n        else if (write)\n            out <= in;\n    end\nendmodule\n```",
+    "barem": [
+     {
+      "text": "`always @(posedge clk)`",
+      "points": 0.5
+     },
+     {
+      "text": "resetul testat primul, `out <= 0`",
+      "points": 0.5
+     },
+     {
+      "text": "`else if (write) out <= in;`, altfel păstrează",
+      "points": 0.5
+     },
+     {
+      "text": "`<=` (neblocant) și `output reg`",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "602",
+   "title": "Cerința 1d · adder",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie sumatorul `adder(input [31:0] ina, inb, output reg [31:0] out)` din enunț.\n\n**Scrie modulul** (2p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "Cu `output reg`, cum cere enunțul:\n\n```\nmodule adder(input [31:0] ina, inb,\n             output reg [31:0] out);\n    always @(*) out = ina + inb;\nendmodule\n```\n\nEchivalent, varianta din laborator (`output` simplu cu `assign`):\n\n```\n// Cerinta 1d: Sumator pe 32 de biti (folosit pentru PC + 4)\nmodule adder(\n    input  [31:0] ina,\n    input  [31:0] inb,\n    output [31:0] out\n);\n    assign out = ina + inb;\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "Cu `output reg`, cum cere enunțul:\n\n```\nmodule adder(input [31:0] ina, inb,\n             output reg [31:0] out);\n    always @(*) out = ina + inb;\nendmodule\n```\n\nEchivalent, varianta din laborator (`output` simplu cu `assign`):\n\n```\n// Cerinta 1d: Sumator pe 32 de biti (folosit pentru PC + 4)\nmodule adder(\n    input  [31:0] ina,\n    input  [31:0] inb,\n    output [31:0] out\n);\n    assign out = ina + inb;\nendmodule\n```",
+    "barem": [
+     {
+      "text": "porturile de 32 de biți",
+      "points": 0.5
+     },
+     {
+      "text": "`always @(*)` cu `=` pentru `output reg` (sau `assign` cu `output` fără `reg`)",
+      "points": 1
+     },
+     {
+      "text": "nu `assign` pe un `reg`",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "603",
+   "title": "Cerința 1c · instruction_memory",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie memoria de instrucțiuni `instruction_memory(input [9:0] address, output reg [31:0] instruction)`: 1024 de cuvinte de 32 de biți, încărcate din `code_stud.mem`, citire asincronă.\n\n**Scrie modulul** (2p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 1c: Memoria de instructiuni cu citire asincrona (fara clk)\n// 1024 de cuvinte a cate 32 de biti, incarcate din fisierul code.mem\n//\n// PC-ul creste din 4 in 4 (0, 4, 8, ...), dar memoria are o instructiune pe linie (0, 1, 2, ...).\n// Varianta cu shiftare ar fi: codeMemory[(address >> 2)] (pe 10 biti).\n// Raspuns la \"Obs\": luam direct bitii [11:2] ai adresei. Ignorarea ultimilor 2 biti\n// inseamna exact impartirea la 4, deci nu mai e nevoie de shiftare.\nmodule instruction_memory(\n    input      [9:0]  address,      // primeste deja PC[11:2]\n    output reg [31:0] instruction\n);\n    reg [31:0] codeMemory [0:1023];\n\n    integer i;\n    initial begin\n        for (i = 0; i < 1024; i = i + 1)\n            codeMemory[i] = 32'h00000000;\n        $readmemh(\"code_stud.mem\", codeMemory);\n    end\n\n    always @(*) begin\n        instruction = codeMemory[address];\n    end\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 1c: Memoria de instructiuni cu citire asincrona (fara clk)\n// 1024 de cuvinte a cate 32 de biti, incarcate din fisierul code.mem\n//\n// PC-ul creste din 4 in 4 (0, 4, 8, ...), dar memoria are o instructiune pe linie (0, 1, 2, ...).\n// Varianta cu shiftare ar fi: codeMemory[(address >> 2)] (pe 10 biti).\n// Raspuns la \"Obs\": luam direct bitii [11:2] ai adresei. Ignorarea ultimilor 2 biti\n// inseamna exact impartirea la 4, deci nu mai e nevoie de shiftare.\nmodule instruction_memory(\n    input      [9:0]  address,      // primeste deja PC[11:2]\n    output reg [31:0] instruction\n);\n    reg [31:0] codeMemory [0:1023];\n\n    integer i;\n    initial begin\n        for (i = 0; i < 1024; i = i + 1)\n            codeMemory[i] = 32'h00000000;\n        $readmemh(\"code_stud.mem\", codeMemory);\n    end\n\n    always @(*) begin\n        instruction = codeMemory[address];\n    end\nendmodule\n```",
+    "barem": [
+     {
+      "text": "`reg [31:0] codeMemory [0:1023]`",
+      "points": 0.5
+     },
+     {
+      "text": "inițializarea cu 0 (for) înainte de `$readmemh`",
+      "points": 0.5
+     },
+     {
+      "text": "`$readmemh(\"code_stud.mem\", codeMemory)` într-un `initial`",
+      "points": 0.5
+     },
+     {
+      "text": "citire asincronă: `always @(*)` cu `=` (fără `clk`)",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "604",
+   "title": "Cerința 2 · modulul IF",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie modulul `IF(input clk, reset, input PCSrc, PC_write, input [31:0] PC_Branch, output [31:0] PC_IF, INSTRUCTION_IF)` care leagă `mux2_1`, `PC`, `adder` și `instruction_memory`.\n\n**Scrie modulul** (3p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 2: Etapa IF (Instruction Fetch)\n// Leaga: mux -> PC -> memoria de instructiuni, plus sumatorul PC + 4\n//\n//            PC_Branch --+\n//                        v\n//   PC+4 -------------> MUX --> PC --+--> memorie --> INSTRUCTION_IF\n//     ^                (PCSrc)       |\n//     +------- sumator (+4) <--------+--> PC_IF\nmodule IF(\n    input         clk,\n    input         reset,\n    input         PCSrc,          // 1 = saltul e luat, PC ia PC_Branch\n    input         PC_write,       // 0 = PC-ul sta pe loc (stall)\n    input  [31:0] PC_Branch,      // adresa de salt (vine din EX, simulata in testbench)\n    output [31:0] PC_IF,          // adresa instructiunii curente\n    output [31:0] INSTRUCTION_IF  // instructiunea curenta\n);\n    wire [31:0] PC_plus4;\n    wire [31:0] PC_next;\n\n    mux2_1 MUX_PC(\n        .ina(PC_plus4),\n        .inb(PC_Branch),\n        .sel(PCSrc),\n        .out(PC_next)\n    );\n\n    PC PC_REG(\n        .clk(clk),\n        .res(reset),\n        .write(PC_write),\n        .in(PC_next),\n        .out(PC_IF)\n    );\n\n    adder ADD4(\n        .ina(PC_IF),\n        .inb(32'd4),\n        .out(PC_plus4)\n    );\n\n    instruction_memory INSTR_MEM(\n        .address(PC_IF[11:2]),\n        .instruction(INSTRUCTION_IF)\n    );\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 2: Etapa IF (Instruction Fetch)\n// Leaga: mux -> PC -> memoria de instructiuni, plus sumatorul PC + 4\n//\n//            PC_Branch --+\n//                        v\n//   PC+4 -------------> MUX --> PC --+--> memorie --> INSTRUCTION_IF\n//     ^                (PCSrc)       |\n//     +------- sumator (+4) <--------+--> PC_IF\nmodule IF(\n    input         clk,\n    input         reset,\n    input         PCSrc,          // 1 = saltul e luat, PC ia PC_Branch\n    input         PC_write,       // 0 = PC-ul sta pe loc (stall)\n    input  [31:0] PC_Branch,      // adresa de salt (vine din EX, simulata in testbench)\n    output [31:0] PC_IF,          // adresa instructiunii curente\n    output [31:0] INSTRUCTION_IF  // instructiunea curenta\n);\n    wire [31:0] PC_plus4;\n    wire [31:0] PC_next;\n\n    mux2_1 MUX_PC(\n        .ina(PC_plus4),\n        .inb(PC_Branch),\n        .sel(PCSrc),\n        .out(PC_next)\n    );\n\n    PC PC_REG(\n        .clk(clk),\n        .res(reset),\n        .write(PC_write),\n        .in(PC_next),\n        .out(PC_IF)\n    );\n\n    adder ADD4(\n        .ina(PC_IF),\n        .inb(32'd4),\n        .out(PC_plus4)\n    );\n\n    instruction_memory INSTR_MEM(\n        .address(PC_IF[11:2]),\n        .instruction(INSTRUCTION_IF)\n    );\nendmodule\n```",
+    "barem": [
+     {
+      "text": "firele interne pentru PC + 4 și pentru ieșirea MUX-ului",
+      "points": 0.5
+     },
+     {
+      "text": "MUX: `ina = PC + 4`, `inb = PC_Branch`, `sel = PCSrc`",
+      "points": 0.5
+     },
+     {
+      "text": "PC: `in` = ieșirea MUX-ului, `write = PC_write`, `res = reset`, `out = PC_IF`",
+      "points": 0.5
+     },
+     {
+      "text": "sumatorul: `PC_IF + 4`",
+      "points": 0.5
+     },
+     {
+      "text": "memoria adresată cu `PC_IF[11:2]`",
+      "points": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "605",
+   "title": "Cerința 3 · registers",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie bancul de registre `registers(input clk, reg_write, input [4:0] read_reg1, read_reg2, write_reg, input [31:0] write_data, output [31:0] read_data1, read_data2)`: 32 × 32 de biți, citire asincronă, scriere sincronă, `x0` mereu 0, registrul `i` inițializat cu `i`.\n\n**Scrie modulul** (2,5p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 3: Bancul de registri (32 de registri x 32 de biti, x0..x31)\n// - 2 porturi de citire ASINCRONE (read_data1, read_data2 se schimba imediat cu adresa)\n// - 1 port de scriere SINCRON (pe frontul pozitiv, cand reg_write = 1)\n// - x0 este mereu 0 (nu se poate scrie in el)\nmodule registers(\n    input         clk,\n    input         reg_write,\n    input  [4:0]  read_reg1,\n    input  [4:0]  read_reg2,\n    input  [4:0]  write_reg,\n    input  [31:0] write_data,\n    output [31:0] read_data1,\n    output [31:0] read_data2\n);\n    reg [31:0] regs [0:31];\n\n    // pentru simulare: registrul xi primeste valoarea i\n    integer i;\n    initial begin\n        for (i = 0; i < 32; i = i + 1)\n            regs[i] = i;\n    end\n\n    // scriere sincrona; scrierea in x0 este ignorata\n    always @(posedge clk) begin\n        if (reg_write && write_reg != 5'd0)\n            regs[write_reg] <= write_data;\n    end\n\n    // citire asincrona\n    assign read_data1 = regs[read_reg1];\n    assign read_data2 = regs[read_reg2];\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 3: Bancul de registri (32 de registri x 32 de biti, x0..x31)\n// - 2 porturi de citire ASINCRONE (read_data1, read_data2 se schimba imediat cu adresa)\n// - 1 port de scriere SINCRON (pe frontul pozitiv, cand reg_write = 1)\n// - x0 este mereu 0 (nu se poate scrie in el)\nmodule registers(\n    input         clk,\n    input         reg_write,\n    input  [4:0]  read_reg1,\n    input  [4:0]  read_reg2,\n    input  [4:0]  write_reg,\n    input  [31:0] write_data,\n    output [31:0] read_data1,\n    output [31:0] read_data2\n);\n    reg [31:0] regs [0:31];\n\n    // pentru simulare: registrul xi primeste valoarea i\n    integer i;\n    initial begin\n        for (i = 0; i < 32; i = i + 1)\n            regs[i] = i;\n    end\n\n    // scriere sincrona; scrierea in x0 este ignorata\n    always @(posedge clk) begin\n        if (reg_write && write_reg != 5'd0)\n            regs[write_reg] <= write_data;\n    end\n\n    // citire asincrona\n    assign read_data1 = regs[read_reg1];\n    assign read_data2 = regs[read_reg2];\nendmodule\n```",
+    "barem": [
+     {
+      "text": "`reg [31:0] regs [0:31]`",
+      "points": 0.5
+     },
+     {
+      "text": "`initial` cu `for`: `regs[i] = i`",
+      "points": 0.5
+     },
+     {
+      "text": "scriere în `always @(posedge clk)` cu `reg_write`",
+      "points": 0.5
+     },
+     {
+      "text": "`x0` protejat (`write_reg != 0`)",
+      "points": 0.5
+     },
+     {
+      "text": "citire asincronă cu `assign`",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "606",
+   "title": "Cerința 3 · testbench pentru registers",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie un testbench care simulează separat bancul de registre și arată: citirea asincronă, scrierea sincronă, că x0 nu se poate scrie și că fără `reg_write` nu se scrie nimic.\n\n**Scrie modulul** (2,5p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 3 cere ca bancul de registri sa fie simulat SEPARAT: un testbench al lui.\n`timescale 1ns / 1ps\nmodule tb_registers;\n  reg         clk, reg_write;\n  reg  [4:0]  read_reg1, read_reg2, write_reg;\n  reg  [31:0] write_data;\n  wire [31:0] read_data1, read_data2;\n\n  registers dut(.clk(clk), .reg_write(reg_write),\n                .read_reg1(read_reg1), .read_reg2(read_reg2), .write_reg(write_reg),\n                .write_data(write_data),\n                .read_data1(read_data1), .read_data2(read_data2));\n\n  always #5 clk = ~clk;            // fronturi pozitive la 5, 15, 25, ... ns\n\n  initial begin\n    clk = 0; reg_write = 0;\n    read_reg1 = 5'd1; read_reg2 = 5'd2;  // citire: x1 = 1, x2 = 2\n    write_reg = 5'd0; write_data = 32'd0;\n\n    #12 read_reg1 = 5'd7;                // t = 12: citirea e asincrona, read_data1 = 7 imediat\n\n    #6  reg_write = 1;                   // t = 18: scriem 0xAB in x3\n        write_reg = 5'd3; write_data = 32'hAB;\n        read_reg2 = 5'd3;                // read_data2 = 3 pana la front, 0xAB dupa frontul de la 25 ns\n\n    #10 write_reg = 5'd0;                // t = 28: incercam sa scriem 0xFF in x0\n        write_data = 32'hFF;\n        read_reg1 = 5'd0;                // read_data1 = 0 si ramane 0 (x0 nu se scrie)\n\n    #10 reg_write = 0;                   // t = 38: scrierea e oprita\n        write_reg = 5'd4; write_data = 32'h55;\n        read_reg1 = 5'd4;                // read_data1 = 4: fara reg_write nu se scrie nimic\n\n    #20 $finish;                         // t = 58\n  end\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 3 cere ca bancul de registri sa fie simulat SEPARAT: un testbench al lui.\n`timescale 1ns / 1ps\nmodule tb_registers;\n  reg         clk, reg_write;\n  reg  [4:0]  read_reg1, read_reg2, write_reg;\n  reg  [31:0] write_data;\n  wire [31:0] read_data1, read_data2;\n\n  registers dut(.clk(clk), .reg_write(reg_write),\n                .read_reg1(read_reg1), .read_reg2(read_reg2), .write_reg(write_reg),\n                .write_data(write_data),\n                .read_data1(read_data1), .read_data2(read_data2));\n\n  always #5 clk = ~clk;            // fronturi pozitive la 5, 15, 25, ... ns\n\n  initial begin\n    clk = 0; reg_write = 0;\n    read_reg1 = 5'd1; read_reg2 = 5'd2;  // citire: x1 = 1, x2 = 2\n    write_reg = 5'd0; write_data = 32'd0;\n\n    #12 read_reg1 = 5'd7;                // t = 12: citirea e asincrona, read_data1 = 7 imediat\n\n    #6  reg_write = 1;                   // t = 18: scriem 0xAB in x3\n        write_reg = 5'd3; write_data = 32'hAB;\n        read_reg2 = 5'd3;                // read_data2 = 3 pana la front, 0xAB dupa frontul de la 25 ns\n\n    #10 write_reg = 5'd0;                // t = 28: incercam sa scriem 0xFF in x0\n        write_data = 32'hFF;\n        read_reg1 = 5'd0;                // read_data1 = 0 si ramane 0 (x0 nu se scrie)\n\n    #10 reg_write = 0;                   // t = 38: scrierea e oprita\n        write_reg = 5'd4; write_data = 32'h55;\n        read_reg1 = 5'd4;                // read_data1 = 4: fara reg_write nu se scrie nimic\n\n    #20 $finish;                         // t = 58\n  end\nendmodule\n```",
+    "barem": [
+     {
+      "text": "instanțierea lui `registers` și un ceas",
+      "points": 0.5
+     },
+     {
+      "text": "o schimbare a adresei de citire între fronturi (citire asincronă)",
+      "points": 0.5
+     },
+     {
+      "text": "o scriere urmărită înainte și după front",
+      "points": 0.5
+     },
+     {
+      "text": "o încercare de scriere în x0",
+      "points": 0.5
+     },
+     {
+      "text": "o scriere cu `reg_write = 0`",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "607",
+   "title": "Cerința 4 · imm_gen",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "grea",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie `imm_gen(input [31:0] in, output reg [31:0] out)` pentru: `lw`, `addi`, `andi`, `ori`, `xori`, `slti`, `sltiu`, `slli`, `srli`, `srai`, `sw` și salturile `beq`...`bgeu`.\n\n**Scrie modulul** (3,5p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 4: Generatorul de valori imediate\n// Se uita la opcode (si la funct3 pentru shiftari), reasambleaza bitii imediatului\n// si face extensie de semn pana la 32 de biti (copiaza bitul in[31] in bitii de sus).\n//\n//   Tip I  (lw, addi, andi, ori, xori, slti, sltiu): imm = in[31:20]\n//   Shift  (slli, srli, srai):                      imm = shamt = in[24:20]\n//   Tip S  (sw):                                    imm = {in[31:25], in[11:7]}\n//   Tip B  (beq, bne, blt, bge, bltu, bgeu):        imm = {in[31], in[7], in[30:25], in[11:8], 0}\nmodule imm_gen(\n    input      [31:0] in,\n    output reg [31:0] out\n);\n    wire [6:0] opcode = in[6:0];\n    wire [2:0] funct3 = in[14:12];\n\n    always @(*) begin\n        case (opcode)\n            7'b0000011: // lw (tip I)\n                out = {{20{in[31]}}, in[31:20]};\n\n            7'b0010011: // addi, slti, sltiu, xori, ori, andi, slli, srli, srai\n                if (funct3 == 3'b001 || funct3 == 3'b101)\n                    out = {27'b0, in[24:20]};          // slli / srli / srai -> shamt\n                else\n                    out = {{20{in[31]}}, in[31:20]};   // tip I obisnuit\n\n            7'b0100011: // sw (tip S)\n                out = {{20{in[31]}}, in[31:25], in[11:7]};\n\n            7'b1100011: // beq, bne, blt, bge, bltu, bgeu (tip B)\n                out = {{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0};\n\n            default:    // tip R (add, and, ...) nu are imediat\n                out = 32'b0;\n        endcase\n    end\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 4: Generatorul de valori imediate\n// Se uita la opcode (si la funct3 pentru shiftari), reasambleaza bitii imediatului\n// si face extensie de semn pana la 32 de biti (copiaza bitul in[31] in bitii de sus).\n//\n//   Tip I  (lw, addi, andi, ori, xori, slti, sltiu): imm = in[31:20]\n//   Shift  (slli, srli, srai):                      imm = shamt = in[24:20]\n//   Tip S  (sw):                                    imm = {in[31:25], in[11:7]}\n//   Tip B  (beq, bne, blt, bge, bltu, bgeu):        imm = {in[31], in[7], in[30:25], in[11:8], 0}\nmodule imm_gen(\n    input      [31:0] in,\n    output reg [31:0] out\n);\n    wire [6:0] opcode = in[6:0];\n    wire [2:0] funct3 = in[14:12];\n\n    always @(*) begin\n        case (opcode)\n            7'b0000011: // lw (tip I)\n                out = {{20{in[31]}}, in[31:20]};\n\n            7'b0010011: // addi, slti, sltiu, xori, ori, andi, slli, srli, srai\n                if (funct3 == 3'b001 || funct3 == 3'b101)\n                    out = {27'b0, in[24:20]};          // slli / srli / srai -> shamt\n                else\n                    out = {{20{in[31]}}, in[31:20]};   // tip I obisnuit\n\n            7'b0100011: // sw (tip S)\n                out = {{20{in[31]}}, in[31:25], in[11:7]};\n\n            7'b1100011: // beq, bne, blt, bge, bltu, bgeu (tip B)\n                out = {{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0};\n\n            default:    // tip R (add, and, ...) nu are imediat\n                out = 32'b0;\n        endcase\n    end\nendmodule\n```",
+    "barem": [
+     {
+      "text": "`always @(*)` cu `case` pe opcode",
+      "points": 0.5
+     },
+     {
+      "text": "I (`lw` și aritmetice): `{{20{in[31]}}, in[31:20]}`",
+      "points": 0.5
+     },
+     {
+      "text": "deplasările: doar `in[24:20]`, după `funct3`",
+      "points": 0.5
+     },
+     {
+      "text": "S: `{{20{in[31]}}, in[31:25], in[11:7]}`",
+      "points": 0.5
+     },
+     {
+      "text": "B: `{{19{in[31]}}, in[31], in[7], in[30:25], in[11:8], 1'b0}`",
+      "points": 1
+     },
+     {
+      "text": "`default` (fără latch)",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "608",
+   "title": "Cerința 5 · modulul ID",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie modulul `ID` din enunț: taie câmpurile instrucțiunii, instanțiază `registers` și `imm_gen`.\n\n**Scrie modulul** (2,5p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 5: Etapa ID (Instruction Decode)\n// Taie instructiunea in campuri, citeste registrii si genereaza imediatul.\n//\n//   | funct7 | rs2   | rs1   | funct3 | rd   | opcode |\n//   | 31:25  | 24:20 | 19:15 | 14:12  | 11:7 | 6:0    |\n//\n// RegWrite_WB, RD_WB, ALU_DATA_WB vin din etapa WB (Lucrarea 3); acum le da testbench-ul.\nmodule ID(\n    input         clk,\n    input  [31:0] PC_ID,\n    input  [31:0] INSTRUCTION_ID,\n    input         RegWrite_WB,\n    input  [31:0] ALU_DATA_WB,\n    input  [4:0]  RD_WB,\n    output [31:0] IMM_ID,\n    output [31:0] REG_DATA1_ID,\n    output [31:0] REG_DATA2_ID,\n    output [2:0]  FUNCT3_ID,\n    output [6:0]  FUNCT7_ID,\n    output [6:0]  OPCODE_ID,\n    output [4:0]  RD_ID,\n    output [4:0]  RS1_ID,\n    output [4:0]  RS2_ID\n);\n    // campurile instructiunii\n    assign OPCODE_ID = INSTRUCTION_ID[6:0];\n    assign RD_ID     = INSTRUCTION_ID[11:7];\n    assign FUNCT3_ID = INSTRUCTION_ID[14:12];\n    assign RS1_ID    = INSTRUCTION_ID[19:15];\n    assign RS2_ID    = INSTRUCTION_ID[24:20];\n    assign FUNCT7_ID = INSTRUCTION_ID[31:25];\n\n    registers REG_FILE(\n        .clk(clk),\n        .reg_write(RegWrite_WB),\n        .read_reg1(RS1_ID),\n        .read_reg2(RS2_ID),\n        .write_reg(RD_WB),\n        .write_data(ALU_DATA_WB),\n        .read_data1(REG_DATA1_ID),\n        .read_data2(REG_DATA2_ID)\n    );\n\n    imm_gen IMM_GEN(\n        .in(INSTRUCTION_ID),\n        .out(IMM_ID)\n    );\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 5: Etapa ID (Instruction Decode)\n// Taie instructiunea in campuri, citeste registrii si genereaza imediatul.\n//\n//   | funct7 | rs2   | rs1   | funct3 | rd   | opcode |\n//   | 31:25  | 24:20 | 19:15 | 14:12  | 11:7 | 6:0    |\n//\n// RegWrite_WB, RD_WB, ALU_DATA_WB vin din etapa WB (Lucrarea 3); acum le da testbench-ul.\nmodule ID(\n    input         clk,\n    input  [31:0] PC_ID,\n    input  [31:0] INSTRUCTION_ID,\n    input         RegWrite_WB,\n    input  [31:0] ALU_DATA_WB,\n    input  [4:0]  RD_WB,\n    output [31:0] IMM_ID,\n    output [31:0] REG_DATA1_ID,\n    output [31:0] REG_DATA2_ID,\n    output [2:0]  FUNCT3_ID,\n    output [6:0]  FUNCT7_ID,\n    output [6:0]  OPCODE_ID,\n    output [4:0]  RD_ID,\n    output [4:0]  RS1_ID,\n    output [4:0]  RS2_ID\n);\n    // campurile instructiunii\n    assign OPCODE_ID = INSTRUCTION_ID[6:0];\n    assign RD_ID     = INSTRUCTION_ID[11:7];\n    assign FUNCT3_ID = INSTRUCTION_ID[14:12];\n    assign RS1_ID    = INSTRUCTION_ID[19:15];\n    assign RS2_ID    = INSTRUCTION_ID[24:20];\n    assign FUNCT7_ID = INSTRUCTION_ID[31:25];\n\n    registers REG_FILE(\n        .clk(clk),\n        .reg_write(RegWrite_WB),\n        .read_reg1(RS1_ID),\n        .read_reg2(RS2_ID),\n        .write_reg(RD_WB),\n        .write_data(ALU_DATA_WB),\n        .read_data1(REG_DATA1_ID),\n        .read_data2(REG_DATA2_ID)\n    );\n\n    imm_gen IMM_GEN(\n        .in(INSTRUCTION_ID),\n        .out(IMM_ID)\n    );\nendmodule\n```",
+    "barem": [
+     {
+      "text": "câmpurile: opcode 6:0, rd 11:7, funct3 14:12, rs1 19:15, rs2 24:20, funct7 31:25",
+      "points": 1
+     },
+     {
+      "text": "registrele: citire cu `RS1_ID`, `RS2_ID`",
+      "points": 0.5
+     },
+     {
+      "text": "scrierea din WB: `RegWrite_WB`, `RD_WB`, `ALU_DATA_WB`",
+      "points": 0.5
+     },
+     {
+      "text": "`imm_gen` pe toată instrucțiunea",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "609",
+   "title": "Cerința 6 · registrul IF/ID",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie registrul de pipeline IF/ID: pe front, cu reset pune 0, altfel, dacă `write = 1`, ia PC-ul și instrucțiunea din IF.\n\n**Scrie modulul** (2p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n// Cerinta 6: registrul de pipeline IF/ID\nmodule IF_ID_reg(\n    input             clk,\n    input             res,\n    input             write,\n    input      [31:0] pc_in,\n    input      [31:0] instruction_in,\n    output reg [31:0] pc_out,\n    output reg [31:0] instruction_out\n);\n    always @(posedge clk) begin\n        if (res) begin\n            pc_out          <= 32'b0;\n            instruction_out <= 32'b0;\n        end else if (write) begin\n            pc_out          <= pc_in;\n            instruction_out <= instruction_in;\n        end\n    end\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n// Cerinta 6: registrul de pipeline IF/ID\nmodule IF_ID_reg(\n    input             clk,\n    input             res,\n    input             write,\n    input      [31:0] pc_in,\n    input      [31:0] instruction_in,\n    output reg [31:0] pc_out,\n    output reg [31:0] instruction_out\n);\n    always @(posedge clk) begin\n        if (res) begin\n            pc_out          <= 32'b0;\n            instruction_out <= 32'b0;\n        end else if (write) begin\n            pc_out          <= pc_in;\n            instruction_out <= instruction_in;\n        end\n    end\nendmodule\n```",
+    "barem": [
+     {
+      "text": "două ieșiri `reg` de 32 de biți",
+      "points": 0.5
+     },
+     {
+      "text": "`always @(posedge clk)` cu reset prioritar",
+      "points": 0.5
+     },
+     {
+      "text": "încărcare doar cu `write`, altfel păstrează",
+      "points": 0.5
+     },
+     {
+      "text": "`<=`",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "610",
+   "title": "Cerința 7 · modulul top",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie modulul `RISC_V_IF_ID` cu porturile din enunț (în aceeași ordine), care leagă IF, IF/ID și ID.\n\n**Scrie modulul** (3p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n`timescale 1ns / 1ps\n\nmodule RISC_V_IF_ID(\n    input         clk,\n    input         reset,\n    input         IF_ID_write,\n    input         PCSrc, PC_write,\n    input  [31:0] PC_Branch,\n    input         RegWrite_WB,\n    input  [31:0] ALU_DATA_WB,\n    input  [4:0]  RD_WB,\n    output [31:0] PC_ID,\n    output [31:0] INSTRUCTION_ID,\n    output [31:0] IMM_ID,\n    output [31:0] REG_DATA1_ID,\n    output [31:0] REG_DATA2_ID,\n    output [2:0]  FUNCT3_ID,\n    output [6:0]  FUNCT7_ID,\n    output [6:0]  OPCODE_ID,\n    output [4:0]  RD_ID,\n    output [4:0]  RS1_ID,\n    output [4:0]  RS2_ID\n);\n    wire [31:0] PC_IF;\n    wire [31:0] INSTRUCTION_IF;\n\n    IF IF_STAGE(\n        .clk(clk),\n        .reset(reset),\n        .PCSrc(PCSrc),\n        .PC_write(PC_write),\n        .PC_Branch(PC_Branch),\n        .PC_IF(PC_IF),\n        .INSTRUCTION_IF(INSTRUCTION_IF)\n    );\n\n    IF_ID_reg IF_ID_REGISTER(\n        .clk(clk),\n        .res(reset),\n        .write(IF_ID_write),\n        .pc_in(PC_IF),\n        .instruction_in(INSTRUCTION_IF),\n        .pc_out(PC_ID),\n        .instruction_out(INSTRUCTION_ID)\n    );\n\n    ID ID_STAGE(\n        .clk(clk),\n        .PC_ID(PC_ID),\n        .INSTRUCTION_ID(INSTRUCTION_ID),\n        .RegWrite_WB(RegWrite_WB),\n        .ALU_DATA_WB(ALU_DATA_WB),\n        .RD_WB(RD_WB),\n        .IMM_ID(IMM_ID),\n        .REG_DATA1_ID(REG_DATA1_ID),\n        .REG_DATA2_ID(REG_DATA2_ID),\n        .FUNCT3_ID(FUNCT3_ID),\n        .FUNCT7_ID(FUNCT7_ID),\n        .OPCODE_ID(OPCODE_ID),\n        .RD_ID(RD_ID),\n        .RS1_ID(RS1_ID),\n        .RS2_ID(RS2_ID)\n    );\nendmodule\n```",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n`timescale 1ns / 1ps\n\nmodule RISC_V_IF_ID(\n    input         clk,\n    input         reset,\n    input         IF_ID_write,\n    input         PCSrc, PC_write,\n    input  [31:0] PC_Branch,\n    input         RegWrite_WB,\n    input  [31:0] ALU_DATA_WB,\n    input  [4:0]  RD_WB,\n    output [31:0] PC_ID,\n    output [31:0] INSTRUCTION_ID,\n    output [31:0] IMM_ID,\n    output [31:0] REG_DATA1_ID,\n    output [31:0] REG_DATA2_ID,\n    output [2:0]  FUNCT3_ID,\n    output [6:0]  FUNCT7_ID,\n    output [6:0]  OPCODE_ID,\n    output [4:0]  RD_ID,\n    output [4:0]  RS1_ID,\n    output [4:0]  RS2_ID\n);\n    wire [31:0] PC_IF;\n    wire [31:0] INSTRUCTION_IF;\n\n    IF IF_STAGE(\n        .clk(clk),\n        .reset(reset),\n        .PCSrc(PCSrc),\n        .PC_write(PC_write),\n        .PC_Branch(PC_Branch),\n        .PC_IF(PC_IF),\n        .INSTRUCTION_IF(INSTRUCTION_IF)\n    );\n\n    IF_ID_reg IF_ID_REGISTER(\n        .clk(clk),\n        .res(reset),\n        .write(IF_ID_write),\n        .pc_in(PC_IF),\n        .instruction_in(INSTRUCTION_IF),\n        .pc_out(PC_ID),\n        .instruction_out(INSTRUCTION_ID)\n    );\n\n    ID ID_STAGE(\n        .clk(clk),\n        .PC_ID(PC_ID),\n        .INSTRUCTION_ID(INSTRUCTION_ID),\n        .RegWrite_WB(RegWrite_WB),\n        .ALU_DATA_WB(ALU_DATA_WB),\n        .RD_WB(RD_WB),\n        .IMM_ID(IMM_ID),\n        .REG_DATA1_ID(REG_DATA1_ID),\n        .REG_DATA2_ID(REG_DATA2_ID),\n        .FUNCT3_ID(FUNCT3_ID),\n        .FUNCT7_ID(FUNCT7_ID),\n        .OPCODE_ID(OPCODE_ID),\n        .RD_ID(RD_ID),\n        .RS1_ID(RS1_ID),\n        .RS2_ID(RS2_ID)\n    );\nendmodule\n```",
+    "barem": [
+     {
+      "text": "porturile în ordinea din enunț (testbench-ul instanțiază pe poziție)",
+      "points": 1
+     },
+     {
+      "text": "un singur port `ALU_DATA_WB` de 32 de biți",
+      "points": 0.5
+     },
+     {
+      "text": "firele `PC_IF`, `INSTRUCTION_IF` între IF și IF/ID",
+      "points": 0.5
+     },
+     {
+      "text": "IF/ID → ID prin `PC_ID`, `INSTRUCTION_ID`",
+      "points": 0.5
+     },
+     {
+      "text": "`clk`/`reset` la toate",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "611",
+   "title": "Cerința 8 · code_stud.mem",
+   "chapter": "8. Verilog: modulele lucrării, scrise de mână",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Scrie fișierul `code_stud.mem` pentru programul: `add x2,x1,x0`, `addi x1,x1,1`, `and x3,x1,x2`, `ori x4,x1,1`, `sw x4,4(x5)`, `lw x12,8(x0)`, `beq x18,x0,5c`.\n\n**Scrie modulul** (4p): pe foaie sau aici, apoi compară-l cu modelul și cu baremul.",
+   "hint": "",
+   "solution": "```\n00008133\n00108093\n0020F1B3\n0010E213\n0042A223\n00802603\n04090E63\n```\n\nCâte o instrucțiune pe linie, hexa, fără `0x`.",
+   "kind": "scris",
+   "spec": {
+    "model": "```\n00008133\n00108093\n0020F1B3\n0010E213\n0042A223\n00802603\n04090E63\n```\n\nCâte o instrucțiune pe linie, hexa, fără `0x`.",
+    "barem": [
+     {
+      "text": "`add x2,x1,x0` → `00008133`",
+      "points": 0.5
+     },
+     {
+      "text": "`addi x1,x1,1` → `00108093`",
+      "points": 0.5
+     },
+     {
+      "text": "`and x3,x1,x2` → `0020F1B3`",
+      "points": 0.5
+     },
+     {
+      "text": "`ori x4,x1,1` → `0010E213`",
+      "points": 0.5
+     },
+     {
+      "text": "`sw x4,4(x5)` → `0042A223`",
+      "points": 0.5
+     },
+     {
+      "text": "`lw x12,8(x0)` → `00802603`",
+      "points": 0.5
+     },
+     {
+      "text": "`beq x18,x0,5c` → `04090E63`",
+      "points": 0.5
+     },
+     {
+      "text": "ordinea programului, o linie per instrucțiune",
+      "points": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "700",
+   "title": "Blocant sau neblocant",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce atribuire se folosește în `always @(posedge clk)` pentru PC și IF/ID?",
+   "hint": "",
+   "solution": "Cu `<=`, toate registrele iau la front valorile calculate din starea de dinainte, ca bistabilele reale.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`=` (blocant)",
+     "`<=` (neblocant)",
+     "`assign`",
+     "oricare, e la fel"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "701",
+   "title": "reg nu e registru",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "`output reg [31:0] instruction` din memoria de instrucțiuni, atribuit în `always @(*)`. Ce hardware devine?",
+   "hint": "",
+   "solution": "`reg` înseamnă „primește valoare într-un bloc procedural”. Cu `@(*)` și toate drumurile acoperite, e combinațional.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "logică combinațională (citirea memoriei); `reg` e cerut doar de sintaxă",
+     "un registru de 32 de biți",
+     "un latch",
+     "o memorie sincronă"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "702",
+   "title": "Instanțiere pe poziție",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Testbench-ul instanțiază `RISC_V_IF_ID` pe poziție. Ce se întâmplă dacă top-ul declară `input [31:0] ALU_DATA, WB,` în loc de `ALU_DATA_WB`?",
+   "hint": "",
+   "solution": "Virgula declară două porturi. Pe poziție, `RD_WB` ajunge la `WB`, `PC_ID` la `RD_WB` și tot așa (cu _warning_-uri de lățime).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "top-ul are un port în plus și toate semnalele de după se leagă decalat, la porturi greșite",
+     "nimic, Verilog leagă după nume",
+     "eroare de sintaxă",
+     "doar `ALU_DATA_WB` rămâne neconectat"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "703",
+   "title": "Concatenare și replicare",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Ce înseamnă `{{20{in[31]}}, in[31:20]}`?",
+   "hint": "",
+   "solution": "`{n{x}}` replică, `{a, b}` lipește. Rezultatul e imediatul I extins cu semn.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "bitul 31 înmulțit cu 20",
+     "20 de copii ale bitului 31, urmate de biții 31...20: 32 de biți",
+     "biții 20...31 inversați",
+     "20 de biți de 0, apoi biții 31...20"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "704",
+   "title": "initial și $readmemh",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Care afirmație despre `initial $readmemh(\"code_stud.mem\", codeMemory);` e corectă?",
+   "hint": "",
+   "solution": "`initial` rulează o singură dată; `$readmemh` citește valori hexa, una pe linie.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "rulează o dată, la timpul 0 al simulării, și încarcă memoria de la adresa 0",
+     "rulează la fiecare front de ceas",
+     "scrie memoria în fișier",
+     "citește fișierul în binar"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "705",
+   "title": "Latch",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Care cod produce un latch?",
+   "hint": "",
+   "solution": "Fără `else`, când `sel = 0` `y` își ține valoarea: latch. Varianta cu `posedge clk` e un registru cu enable, nu latch.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`always @(*) if (sel) y = a;`",
+     "`always @(*) if (sel) y = a; else y = b;`",
+     "`assign y = sel ? a : b;`",
+     "`always @(posedge clk) if (sel) y <= a;`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "706",
+   "title": "Reset asincron",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Cum ar arăta lista de sensibilitate a PC-ului cu reset *asincron*?",
+   "hint": "",
+   "solution": "Resetul asincron trebuie să declanșeze blocul și fără front de ceas.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`always @(posedge clk or posedge res)`",
+     "`always @(posedge clk)`",
+     "`always @(*)`",
+     "`always @(res)`"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "707",
+   "title": "output reg și assign",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Enunțul dă `adder(... output reg [31:0] out)`. Ce variantă e *greșită*?",
+   "hint": "",
+   "solution": "Unui `reg` nu i se poate face `assign` (eroare). Celelalte două sunt echivalente.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "`output reg` cu `always @(*) out = ina + inb;`",
+     "`output reg [31:0] out` cu `assign out = ina + inb;`",
+     "`output [31:0] out` cu `assign out = ina + inb;`",
+     "toate sunt corecte"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "708",
+   "title": "Perioada ceasului",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "`always #5 clk = ~clk;` cu `timescale 1ns/1ps`. Care e frecvența ceasului?",
+   "hint": "",
+   "solution": "Ceasul se inversează la 5 ns: o perioadă are 10 ns, adică 100 MHz.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "200 MHz",
+     "100 MHz (perioadă 10 ns)",
+     "50 MHz",
+     "5 MHz"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "709",
+   "title": "Tăietura",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Câți biți are `INSTRUCTION_ID[24:20]`?",
+   "hint": "",
+   "solution": "Biții 24, 23, 22, 21, 20.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "4",
+     "20",
+     "24",
+     "5"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "710",
+   "title": "Module în același fișier",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "ușoară",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Un fișier Verilog poate conține mai multe module (de exemplu `RISC_V_IF_ID` și `IF_ID_reg`).",
+   "hint": "",
+   "solution": "Adevărat. Contează doar ca fiecare modul să fie definit o singură dată în tot proiectul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "Adevărat",
+     "Fals"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "711",
+   "title": "Modul definit de două ori",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "Vivado dă la elaborare eroarea că modulul `RISC_V_IF_ID` e definit de mai multe ori. Cauza probabilă?",
+   "hint": "",
+   "solution": "Scoate copia: fiecare modul trebuie să existe o singură dată.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "lipsește testbench-ul",
+     "`code_stud.mem` nu e găsit",
+     "același modul e în două fișiere din proiect (de exemplu o copie veche a top-ului)",
+     "porturile sunt pe poziție"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "712",
+   "title": "Fișierul .mem negăsit",
+   "chapter": "9. Verilog: semantică și capcane",
+   "difficulty": "medie",
+   "source": "APM · Lucrarea 2 (RISC-V: IF + ID)",
+   "statement": "În simulare PC-ul crește corect, dar `INSTRUCTION_ID` e mereu `00000000`. Cauza probabilă?",
+   "hint": "",
+   "solution": "Adaugă `.mem`-ul ca simulation source (Memory File) și caută _warning_-ul `$readmemh` în Tcl Console.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "IF/ID nu are reset",
+     "`code_stud.mem` nu e găsit de simulator, iar memoria a rămas plină de 0",
+     "`imm_gen` lipsește",
+     "ceasul e prea rapid"
+    ],
+    "answer": 1
+   }
+  }
+ ]
+}

@@ -128,6 +128,13 @@ class AcsGhid {
 }
 
 const Map<String, List<AcsGhid>> acsGhiduri = {
+  'apm': [
+    AcsGhid(
+      'Lucrarea 2 · Front-end-ul RISC-V (IF + ID)',
+      'Tot laboratorul explicat: pipeline-ul și RV32I, Verilog-ul de care ai nevoie, fiecare modul linie cu linie (MUX, PC, memoria, IF, registre, imm_gen, ID, IF/ID, top), cele 7 instrucțiuni codificate bit cu bit, simularea ciclu cu ciclu comparată cu Fig. 4, greșeli tipice, întrebări de la prezentare, exerciții rezolvate și o foaie de memorat. 41 de pagini.',
+      '/materiale/apm-lucrarea-2.pdf',
+    ),
+  ],
   'lfa': [
     AcsGhid(
       'Testul 1 · Limbaje regulate',

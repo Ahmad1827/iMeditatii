@@ -477,9 +477,52 @@ void main() {
     });
   });
 
+  group('APM: the RISC-V bench', () {
+    test('every format covers the 32 bits once, from bit 31 down', () {
+      for (final e in rvFormats.entries) {
+        var next = 31;
+        for (final f in e.value) {
+          expect(f.hi, next, reason: '${e.key} ${f.name}');
+          expect(f.lo, lessThanOrEqualTo(f.hi));
+          next = f.lo - 1;
+        }
+        expect(next, -1, reason: e.key);
+      }
+    });
+
+    test('a word is read in hexa or binary', () {
+      expect(parseRvWord('0x04090E63'), 0x04090E63);
+      expect(parseRvWord('4090e63'), 0x04090E63);
+      expect(parseRvWord('0000 0100 0000 1001 0000 1110 0110 0011'), 0x04090E63);
+      expect(parseRvWord('0b101'), 5);
+      expect(parseRvWord('0x1234567890'), isNull);
+      expect(parseRvWord('xyz'), isNull);
+      expect(rvHex(0x8133), '0x00008133');
+    });
+
+    test('the bench cuts the lab\'s beq into the fields of Fig. 3', () {
+      const w = 0x04090E63; // beq x18,x0,0x5c
+      final b = {for (final f in rvFormats['B']!) f.name: f.of(w)};
+      expect(b['opcode'], 0x63);
+      expect(b['rs1'], 18);
+      expect(b['rs2'], 0);
+      final imm = (b['[12]']! << 12) | (b['[11]']! << 11) | (b['imm[10:5]']! << 5) | (b['[4:1]']! << 1);
+      expect(imm, 0x5C);
+      final r = {for (final f in rvFormats['R']!) f.name: f.of(0x00008133)}; // add x2,x1,x0
+      expect([r['rd'], r['rs1'], r['rs2'], r['funct3'], r['funct7']], [2, 1, 0, 0, 0]);
+    });
+
+    test('the lab\'s seven encodings are among the problems, with the hexa of the lab', () {
+      final answers = {for (final p in course('apm').problems.where((p) => p.kind == 'riscv')) p.title: FieldsTask.fromSpec(p.spec).reference.values.first};
+      expect(answers['Codifică add x2,x1,x0'], '0x00008133');
+      expect(answers['Codifică beq x18,x0,5c'], '0x04090e63');
+      expect(answers['Codifică sw x4,4(x5)'], '0x0042a223');
+    });
+  });
+
   group('the answers typed in fields (RL, EG and the computations of every course)', () {
     for (final code in acsSubjects.where((s) => s.ready).map((s) => s.code)) {
-      for (final p in course(code).problems.where((p) => p.kind == 'net' || p.kind == 'market' || p.kind == 'calc')) {
+      for (final p in course(code).problems.where((p) => p.kind == 'net' || p.kind == 'market' || p.kind == 'calc' || p.kind == 'riscv')) {
         test('$code ${p.id}. ${p.title}', () {
           final t = FieldsTask.fromSpec(p.spec);
           expect(t.fields, isNotEmpty);

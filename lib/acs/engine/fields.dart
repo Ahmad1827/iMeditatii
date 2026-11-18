@@ -78,3 +78,42 @@ int maskOf(int prefix) => prefix == 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) & 0xFF
 
 /// The 32 bits of [v], most significant first.
 List<int> bitsOf(int v) => [for (var i = 31; i >= 0; i--) (v >> i) & 1];
+
+// ---------------------------------------------------------------- RISC-V (APM)
+/// One field of an instruction format: its bits [hi..lo] and what it holds.
+class RvField {
+  final String name;
+  final int hi, lo;
+  final int tint; // 0 opcode, 1 rd, 2 funct3, 3 rs1, 4 rs2, 5 funct7, 6 imm
+  const RvField(this.name, this.hi, this.lo, this.tint);
+  int width() => hi - lo + 1;
+  int of(int w) => (w >> lo) & ((1 << width()) - 1);
+}
+
+/// The six formats of Fig. 3 (riscv-spec v2.2, p. 12), from bit 31 down.
+const Map<String, List<RvField>> rvFormats = {
+  'R': [RvField('funct7', 31, 25, 5), RvField('rs2', 24, 20, 4), RvField('rs1', 19, 15, 3), RvField('funct3', 14, 12, 2), RvField('rd', 11, 7, 1), RvField('opcode', 6, 0, 0)],
+  'I': [RvField('imm[11:0]', 31, 20, 6), RvField('rs1', 19, 15, 3), RvField('funct3', 14, 12, 2), RvField('rd', 11, 7, 1), RvField('opcode', 6, 0, 0)],
+  'S': [RvField('imm[11:5]', 31, 25, 6), RvField('rs2', 24, 20, 4), RvField('rs1', 19, 15, 3), RvField('funct3', 14, 12, 2), RvField('imm[4:0]', 11, 7, 6), RvField('opcode', 6, 0, 0)],
+  'B': [
+    RvField('[12]', 31, 31, 6), RvField('imm[10:5]', 30, 25, 6), RvField('rs2', 24, 20, 4), RvField('rs1', 19, 15, 3), RvField('funct3', 14, 12, 2),
+    RvField('[4:1]', 11, 8, 6), RvField('[11]', 7, 7, 6), RvField('opcode', 6, 0, 0)
+  ],
+  'U': [RvField('imm[31:12]', 31, 12, 6), RvField('rd', 11, 7, 1), RvField('opcode', 6, 0, 0)],
+  'J': [RvField('[20]', 31, 31, 6), RvField('imm[10:1]', 30, 21, 6), RvField('[11]', 20, 20, 6), RvField('imm[19:12]', 19, 12, 6), RvField('rd', 11, 7, 1), RvField('opcode', 6, 0, 0)],
+};
+
+/// "0x0020F1B3", "0020f1b3" or 32 binary digits (spaces and '_' allowed) -> the word, or null.
+int? parseRvWord(String s) {
+  var t = s.trim().toLowerCase().replaceAll(RegExp(r'[\s_]'), '');
+  if (t.isEmpty) return null;
+  if (t.startsWith('0b')) {
+    t = t.substring(2);
+    return RegExp(r'^[01]{1,32}$').hasMatch(t) ? int.parse(t, radix: 2) : null;
+  }
+  if (t.length == 32 && RegExp(r'^[01]+$').hasMatch(t)) return int.parse(t, radix: 2);
+  if (t.startsWith('0x')) t = t.substring(2);
+  return RegExp(r'^[0-9a-f]{1,8}$').hasMatch(t) ? int.parse(t, radix: 16) : null;
+}
+
+String rvHex(int w) => '0x${w.toRadixString(16).toUpperCase().padLeft(8, '0')}';

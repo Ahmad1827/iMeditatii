@@ -189,7 +189,7 @@ void main() {
     // every course is in a folder of the first page, and a folder's name is not a course's
     expect(acsSubjects.map((s) => s.group).toSet(), acsGroups.map((g) => g.slug).toSet());
     expect(acsGroups.where((g) => g.slug != 'admitere').every((g) => acsSubject(g.slug) == null), isTrue);
-    expect(acsGroup('an3-sem1')!.subjects.map((s) => s.code), ['lfa', 'apd', 'egc', 'rl', 'isc', 'eg']);
+    expect(acsGroup('an3-sem1')!.subjects.map((s) => s.code), ['lfa', 'apd', 'egc', 'rl', 'isc', 'apm', 'eg']);
     expect(acsTrail('rl'), [('an3-sem1', '/acs/an3-sem1'), ('rl', '/acs/rl')]);
   });
 

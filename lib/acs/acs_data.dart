@@ -90,6 +90,7 @@ const Map<String, String> acsKindLabels = {
   'market': 'calcul',
   'calc': 'calcul',
   'scris': 'scris',
+  'riscv': 'biți RISC-V',
 };
 
 /// An item of a test: "P3 · Conversii", worth 2.5 points.

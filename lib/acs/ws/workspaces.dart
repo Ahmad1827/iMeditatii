@@ -53,6 +53,8 @@ Widget buildWorkspace(AcsProblem p, AcsInk ink, bool narrow, Verdict onVerdict) 
       return TransformWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'raster':
       return RasterWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
+    case 'riscv':
+      return RiscvWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'net':
       return NetWorkspace(problem: p, ink: ink, onVerdict: onVerdict, narrow: narrow);
     case 'market':
