@@ -43,9 +43,9 @@ class AcsInk {
     if (style == AcsStyle.terminal) {
       return dark
           ? const AcsInk(
-              bg: Color(0xFF0E1023), fg: Color(0xFFCDD0E4), strong: Color(0xFFF1EEF8), accent: Color(0xFFF4A65A),
-              muted: Color(0xFF8186A6), dim: Color(0xFF4D5175), line: Color(0xFF262A4A), hover: Color(0xFF181B36),
-              panel: Color(0xFF090A18), good: Color(0xFF7FD6C0), bad: Color(0xFFF07A86), warn: Color(0xFFE6CF72),
+              bg: Color(0xFF15132A), fg: Color(0xFFD3D0E6), strong: Color(0xFFEEEBFA), accent: Color(0xFF9FCF8F),
+              muted: Color(0xFF8A86A8), dim: Color(0xFF55517A), line: Color(0xFF2E2A4D), hover: Color(0xFF1E1B38),
+              panel: Color(0xFF0F0D21), good: Color(0xFF9FCF8F), bad: Color(0xFFE07A6E), warn: Color(0xFFD9B45A),
               terminal: true, dark: true)
           : const AcsInk(
               bg: Color(0xFFF2F4EF), fg: Color(0xFF243025), strong: Color(0xFF111A12), accent: Color(0xFF2F7A3A),
@@ -55,9 +55,9 @@ class AcsInk {
     }
     return dark
         ? const AcsInk(
-            bg: Color(0xFF13152C), fg: Color(0xFFD8D8EA), strong: Color(0xFFF4F1F8), accent: Color(0xFFF4A65A),
-            muted: Color(0xFF9497B6), dim: Color(0xFF63678C), line: Color(0xFF3A3D66), hover: Color(0xFF1D2040),
-            panel: Color(0xFF1A1C38), good: Color(0xFF7FD6C0), bad: Color(0xFFF07A86), warn: Color(0xFFE6CF72),
+            bg: Color(0xFF1C1A33), fg: Color(0xFFDCD9EC), strong: Color(0xFFF2F0FA), accent: Color(0xFFA5B4FC),
+            muted: Color(0xFF9D99B8), dim: Color(0xFF6C6890), line: Color(0xFF48446C), hover: Color(0xFF26233F),
+            panel: Color(0xFF232040), good: Color(0xFF7FC48A), bad: Color(0xFFE88A80), warn: Color(0xFFE0B860),
             terminal: false, dark: true)
         : const AcsInk(
             bg: Color(0xFFFBFBF9), fg: Color(0xFF2B2B2B), strong: Color(0xFF222222), accent: Color(0xFF1F5FA8),
@@ -104,34 +104,15 @@ class AcsPage extends StatelessWidget {
         );
         return Scaffold(
           backgroundColor: ink.bg,
-          body: DecoratedBox(
-            decoration: ink.dark ? _streetNight(ink) : BoxDecoration(color: ink.bg),
-            child: DefaultTextStyle(
-              style: ink.mono(15),
-              child: SafeArea(child: scroll ? SingleChildScrollView(child: body) : body),
-            ),
+          body: DefaultTextStyle(
+            style: ink.mono(15),
+            child: SafeArea(child: scroll ? SingleChildScrollView(child: body) : body),
           ),
         );
       },
     );
   }
 }
-
-/// The dark page as a street at night: a sodium lamp's glow at the top left
-/// fading into the indigo sky, a little violet down by the street.
-BoxDecoration _streetNight(AcsInk ink) => BoxDecoration(
-      gradient: RadialGradient(
-        center: const Alignment(-0.9, -1.1),
-        radius: 1.3,
-        colors: [
-          Color.alphaBlend(const Color(0x26F4A65A), ink.bg),
-          Color.alphaBlend(const Color(0x0AF4A65A), ink.bg),
-          ink.bg,
-          Color.alphaBlend(const Color(0x1A7A4FB0), ink.bg),
-        ],
-        stops: const [0.0, 0.28, 0.6, 1.0],
-      ),
-    );
 
 /// Terminal / notebook, and light / dark.
 class AcsSwitches extends StatelessWidget {
