@@ -340,7 +340,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
   Widget build(BuildContext context) {
     final ink = widget.ink;
     final h = widget.narrow ? 380.0 : 460.0;
-    final term = ink.terminal ? (ink.dark ? const Color(0xFF0C0A1C) : const Color(0xFF15191A)) : (ink.dark ? const Color(0xFF14122A) : const Color(0xFF1E2126));
+    final term = ink.terminal ? (ink.dark ? const Color(0xFF080917) : const Color(0xFF15191A)) : (ink.dark ? const Color(0xFF0D0F22) : const Color(0xFF1E2126));
     const tfg = Color(0xFFD5DDD0), tacc = Color(0xFF9FCF8F), tmuted = Color(0xFF7D887A), tbad = Color(0xFFE88A80), tblue = Color(0xFF8AB4F0);
     final style = ink.mono(widget.narrow ? 13 : 14, color: tfg, height: 1.4);
 
