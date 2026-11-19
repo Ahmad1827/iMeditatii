@@ -43,9 +43,9 @@ class AcsInk {
     if (style == AcsStyle.terminal) {
       return dark
           ? const AcsInk(
-              bg: Color(0xFF121513), fg: Color(0xFFCFD6C9), strong: Color(0xFFE9EFE2), accent: Color(0xFF9FCF8F),
-              muted: Color(0xFF7D887A), dim: Color(0xFF4B544A), line: Color(0xFF2A302A), hover: Color(0xFF1A1F1B),
-              panel: Color(0xFF0C0E0D), good: Color(0xFF9FCF8F), bad: Color(0xFFE07A6E), warn: Color(0xFFD9B45A),
+              bg: Color(0xFF15132A), fg: Color(0xFFD3D0E6), strong: Color(0xFFEEEBFA), accent: Color(0xFF9FCF8F),
+              muted: Color(0xFF8A86A8), dim: Color(0xFF55517A), line: Color(0xFF2E2A4D), hover: Color(0xFF1E1B38),
+              panel: Color(0xFF0F0D21), good: Color(0xFF9FCF8F), bad: Color(0xFFE07A6E), warn: Color(0xFFD9B45A),
               terminal: true, dark: true)
           : const AcsInk(
               bg: Color(0xFFF2F4EF), fg: Color(0xFF243025), strong: Color(0xFF111A12), accent: Color(0xFF2F7A3A),
@@ -55,9 +55,9 @@ class AcsInk {
     }
     return dark
         ? const AcsInk(
-            bg: Color(0xFF1B1C1E), fg: Color(0xFFDADAD6), strong: Color(0xFFF0F0EC), accent: Color(0xFF8AB4F0),
-            muted: Color(0xFF9A9A96), dim: Color(0xFF6A6B6E), line: Color(0xFF4A4B4E), hover: Color(0xFF252629),
-            panel: Color(0xFF232427), good: Color(0xFF7FC48A), bad: Color(0xFFE88A80), warn: Color(0xFFE0B860),
+            bg: Color(0xFF1C1A33), fg: Color(0xFFDCD9EC), strong: Color(0xFFF2F0FA), accent: Color(0xFFA5B4FC),
+            muted: Color(0xFF9D99B8), dim: Color(0xFF6C6890), line: Color(0xFF48446C), hover: Color(0xFF26233F),
+            panel: Color(0xFF232040), good: Color(0xFF7FC48A), bad: Color(0xFFE88A80), warn: Color(0xFFE0B860),
             terminal: false, dark: true)
         : const AcsInk(
             bg: Color(0xFFFBFBF9), fg: Color(0xFF2B2B2B), strong: Color(0xFF222222), accent: Color(0xFF1F5FA8),

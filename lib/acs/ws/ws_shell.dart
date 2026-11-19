@@ -340,7 +340,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
   Widget build(BuildContext context) {
     final ink = widget.ink;
     final h = widget.narrow ? 380.0 : 460.0;
-    final term = ink.terminal ? (ink.dark ? const Color(0xFF0A0C0B) : const Color(0xFF15191A)) : (ink.dark ? const Color(0xFF151618) : const Color(0xFF1E2126));
+    final term = ink.terminal ? (ink.dark ? const Color(0xFF0C0A1C) : const Color(0xFF15191A)) : (ink.dark ? const Color(0xFF14122A) : const Color(0xFF1E2126));
     const tfg = Color(0xFFD5DDD0), tacc = Color(0xFF9FCF8F), tmuted = Color(0xFF7D887A), tbad = Color(0xFFE88A80), tblue = Color(0xFF8AB4F0);
     final style = ink.mono(widget.narrow ? 13 : 14, color: tfg, height: 1.4);
 
@@ -382,7 +382,7 @@ class _ShellWorkspaceState extends State<ShellWorkspace> with TypeToConsole {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFF2A302A)))),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x22FFFFFF)))),
               child: Row(children: [
                 for (final c in const [Color(0xFFE07A6E), Color(0xFFD9B45A), Color(0xFF9FCF8F)])
                   Container(width: 9, height: 9, margin: const EdgeInsets.only(right: 6), decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
