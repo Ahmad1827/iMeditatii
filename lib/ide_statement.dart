@@ -29,7 +29,7 @@ class ProblemRef {
 
   /// Lowercase and without diacritics, so "sesiunea speciala" finds "Sesiunea specială".
   static String fold(String s) {
-    const from = 'ăâîșşțţ', to = 'aaissstt';
+    const from = 'ăâîșşțţ', to = 'aaisstt';
     final b = StringBuffer();
     for (final ch in s.toLowerCase().split('')) {
       final k = from.indexOf(ch);

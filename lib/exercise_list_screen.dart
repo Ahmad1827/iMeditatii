@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_link.dart';
-import 'ide_statement.dart' show ProblemRef;
 import 'app_colors.dart';
 import 'classes_models.dart' show Classes, Solution;
 import 'custom_navbar.dart' show CustomNavbar;
@@ -22,13 +21,18 @@ import 'problem_thumb.dart';
 import 'problem_author.dart';
 import 'row_glow.dart';
 import 'theme_manager.dart';
+import 'exercise_facets.dart';
+
+part 'exercise_list_views.dart';
 
 class ExerciseListScreen extends StatefulWidget {
   final String subject;
   final String? grade;
   final String? category; // a chapter to open on, as in exercises.json
+  final String? view; // ?vedere=lista|carduri|compact|tabla|ani: the view to open in
+  final String? search; // ?cauta=...: a search to open with
 
-  const ExerciseListScreen({super.key, required this.subject, this.grade, this.category});
+  const ExerciseListScreen({super.key, required this.subject, this.grade, this.category, this.view, this.search});
 
   /// A line about every problem (the start of its statement, the first example),
   /// from tool/summaries.py: read once, shared by every visit to the list.
@@ -89,7 +93,19 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
   Map<String, Solution> _sent = {}; // maths sent to be checked, by progress key: waiting or turned down
   StreamSubscription? _sentSub;
   String _cDiff = 'toate';
-  bool _cUnsolved = false;
+  String _cStatus = 'toate'; // toate, nerezolvate, incercate, rezolvate
+  int? _fYear; // the subcategories at the top: a year, a kind of paper, the classes
+  String? _fType;
+  String? _fClasses;
+  String _sort = 'implicit'; // implicit, nou, vechi, usor, greu, titlu
+  ExView _view = ExView.lista;
+  bool? _fOpen; // the subcategories shown in full (on a phone they fold, unless opened)
+  ExSearch _search = ExSearch('');
+  final Map<Object?, int> _scores = {}; // by id: how well each problem answers the search
+  int _otherChapters = 0; // problems found by the search in the grade's other chapters
+  Map<String, int> _otherGrades = {}; // and in the other grades, when none here
+  static const String _viewKey = 'exercises_view';
+  void _set(VoidCallback f) => setState(f);
   bool _cHidden = false;
   int _cLimit = 25;
   final GlobalKey _cTopKey = GlobalKey();
@@ -101,7 +117,18 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
     super.initState();
     selectedGrade = widget.grade ?? "9";
     selectedCategory = widget.category ?? "Toate";
+    if ((widget.search ?? '').trim().isNotEmpty) {
+      searchQuery = widget.search!;
+      _cSearch.text = searchQuery;
+    }
     _loadAllExercises();
+    final asked = ExView.values.where((x) => x.name == widget.view);
+    if (asked.isNotEmpty) _view = asked.first;
+    if (asked.isEmpty) SharedPreferences.getInstance().then((p) {
+      final v = p.getString(_viewKey);
+      final view = ExView.values.where((x) => x.name == v);
+      if (mounted && view.isNotEmpty) setState(() => _view = view.first);
+    });
     solvedChanged.addListener(_updateCategoriesAndFilter);
     ThemeManager.motionNotifier.addListener(_syncGlow);
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -162,6 +189,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
                 'title': ex['title'] ?? "Fără titlu",
                 'difficulty': ex['difficulty'] ?? "ușoară",
                 'sursa': ex['sursa'] ?? '',
+                ..._facetsOf('${ex['sursa'] ?? ''}', categoryName),
                 'source': 'json',
                 'about': (about[gradeKey] as Map<String, dynamic>?)?['${ex['id']}'],
               });
@@ -212,6 +240,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
           'title': data['title'] ?? "Fără titlu",
           'difficulty': data['difficulty'] ?? "ușoară",
           'sursa': data['sursa'] ?? '',
+          ..._facetsOf('${data['sursa'] ?? ''}', '${data['category'] ?? 'General'}'),
           'source': 'firebase',
           'autor': data['autor'],
         });
@@ -252,7 +281,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       _solved = solved;
       _tried = tried;
       completedCount = done;
-      availableCategories = tempCategories.toList()..sort();
+      // by the chapter's number ("2." before "10."), then by name
+      int no(String c) => int.tryParse(RegExp(r'^\d+').stringMatch(c) ?? '') ?? 9999;
+      availableCategories = tempCategories.toList()..sort((a, b) => no(a) != no(b) ? no(a).compareTo(no(b)) : a.compareTo(b));
 
       if (selectedCategory != "Toate" && !availableCategories.contains(selectedCategory)) {
         selectedCategory = "Toate";
@@ -263,13 +294,26 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
         filtered = filtered.where((ex) => ex['category'] == selectedCategory).toList();
       }
 
-      if (searchQuery.trim().isNotEmpty) {
-        // every word typed, anywhere in the title, chapter or source: "2024 iunie", "simulare"
-        final words = _fold(searchQuery).split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
-        filtered = filtered.where((ex) {
-          final hay = _fold('${ex['title']} ${ex['category']} ${ex['sursa'] ?? ''}');
-          return words.every(hay.contains);
-        }).toList();
+      _search = ExSearch(searchQuery);
+      _scores.clear();
+      _otherChapters = 0;
+      _otherGrades = {};
+      if (!_search.isEmpty) {
+        // every word typed, anywhere in the title, chapter, source or statement,
+        // a letter wrong forgiven: "2024 iunie", "simulare", "matrce", "#61"
+        for (final ex in gradeFiltered) {
+          final sc = _scoreOf(ex);
+          if (sc > 0) _scores[ex['id']] = sc;
+        }
+        filtered = filtered.where((ex) => _scores.containsKey(ex['id'])).toList();
+        if (selectedCategory != 'Toate') _otherChapters = _scores.length - filtered.length;
+        if (_scores.isEmpty) {
+          final other = <String, int>{};
+          for (final ex in allExercises) {
+            if (ex['grade'] != selectedGrade && _scoreOf(ex) > 0) other['${ex['grade']}'] = (other['${ex['grade']}'] ?? 0) + 1;
+          }
+          _otherGrades = other;
+        }
       }
 
       displayedExercises = filtered;
@@ -277,8 +321,20 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
     _syncGlow();
   }
 
-  /// Lowercase and without diacritics, so "sesiunea speciala" finds "Sesiunea specială".
-  static String _fold(String s) => ProblemRef.fold(s);
+  static Map<String, dynamic> _facetsOf(String sursa, String category) => {
+        'year': ExFacets.year(sursa),
+        'type': ExFacets.type(sursa, category),
+        'classes': ExFacets.classes(sursa),
+      };
+
+  int _scoreOf(Map<String, dynamic> ex) => _search.score(
+        id: '${ex['id']}',
+        title: '${ex['title']}',
+        category: '${ex['category']}',
+        sursa: '${ex['sursa'] ?? ''}',
+        statement: '${(ex['about'] as Map?)?['s'] ?? ''}',
+        difficulty: '${ex['difficulty'] ?? ''}',
+      );
 
   Future<bool> _isExerciseDone(String id) async {
     final prefs = await SharedPreferences.getInstance();
@@ -297,6 +353,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
     setState(() {
       selectedGrade = g;
       _cLimit = 25;
+      _fYear = null;
+      _fType = null;
+      _fClasses = null;
     });
     _updateCategoriesAndFilter();
   }
@@ -368,11 +427,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
 
   Widget _buildClean(bool isMobile) {
     final inGrade = allExercises.where((e) => e['grade'] == selectedGrade).toList();
-    final rows = displayedExercises.where((e) {
-      if (_cDiff != 'toate' && _diffKey('${e['difficulty']}') != _cDiff) return false;
-      if (_cUnsolved && _isSolved(e)) return false;
-      return true;
-    }).toList();
+    final rows = _sorted(displayedExercises.where((e) => _passes(e)).toList());
 
     Widget box(double max, Widget child) => Center(
           child: ConstrainedBox(
@@ -406,16 +461,16 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
         -1.4,
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [_cCategoryChips(inGrade), const SizedBox(height: 12), _cTable(rows, isMobile)],
+          children: [_cCategoryChips(inGrade), const SizedBox(height: 12), _cResults(rows, isMobile)],
         ),
       );
     } else {
       body = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 260, child: slide(-3.2, _cCategories(inGrade))),
+          SizedBox(width: 260, child: slide(-3.2, _cCategories(_search.isEmpty ? inGrade : inGrade.where((e) => _scores.containsKey(e['id'])).toList()))),
           const SizedBox(width: 20),
-          Expanded(child: slide(1.6, _cTable(rows, isMobile))),
+          Expanded(child: slide(1.6, _cResults(rows, isMobile))),
         ],
       );
     }
@@ -441,7 +496,21 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
                       SizedBox(height: isMobile ? 20 : 36),
                       box(1180, KeyedSubtree(key: _cTopKey, child: _LReveal(child: _cHeader(inGrade, isMobile)))),
                       SizedBox(height: isMobile ? 14 : 20),
-                      box(1180, KeyedSubtree(key: _cMainKey, child: _LReveal(delayMs: 140, child: body))),
+                      box(
+                          1180,
+                          KeyedSubtree(
+                            key: _cMainKey,
+                            child: _LReveal(
+                              delayMs: 140,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (!isLoading) ...[slide(isMobile ? -1.4 : 1.6, _cFacetBar(isMobile)), SizedBox(height: isMobile ? 12 : 16)],
+                                  body,
+                                ],
+                              ),
+                            ),
+                          )),
                     ],
                   ),
                 footer: KeyedSubtree(key: _cFootKey, child: _cFooter(isMobile)),
@@ -621,7 +690,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       },
       style: TextStyle(fontSize: 14.5, color: Pb.text),
       cursorColor: Pb.primary,
-      decoration: Pb.input(hint: 'Caută după titlu, capitol sau sursă (ex. 2024 iunie)').copyWith(
+      decoration: Pb.input(hint: isMobile ? 'Caută: titlu, enunț, sursă, #id' : 'Caută în titlu, enunț, capitol sau sursă (ex. 2024 iunie, matrice, #61)').copyWith(
         prefixIcon: Icon(Icons.search, size: 18, color: Pb.muted),
         prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
         suffixIcon: searchQuery.isEmpty
@@ -814,119 +883,6 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
     );
   }
 
-  // ---------------------------------------------------------------- table
-  Widget _cTable(List<Map<String, dynamic>> rows, bool isMobile) {
-    final shown = rows.length < _cLimit ? rows.length : _cLimit;
-    final headStyle = TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Pb.muted);
-
-    final filters = Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        _cChip('Orice dificultate', _cDiff == 'toate', () => setState(() => _cDiff = 'toate')),
-        _cChip('Ușoară', _cDiff == 'usoara', () => setState(() => _cDiff = 'usoara'), color: _cGreen),
-        _cChip('Medie', _cDiff == 'medie', () => setState(() => _cDiff = 'medie'), color: _cAmber),
-        _cChip('Grea', _cDiff == 'grea', () => setState(() => _cDiff = 'grea'), color: _cRose),
-        Container(width: 1, height: 20, margin: const EdgeInsets.symmetric(horizontal: 4), color: Pb.border),
-        _cChip('Doar nerezolvate', _cUnsolved, () => setState(() => _cUnsolved = !_cUnsolved), icon: Icons.radio_button_unchecked),
-      ],
-    );
-
-    return GlassBox(
-      radius: 14,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        selectedCategory == 'Toate' ? 'Toate problemele' : AppStyle.sentence(selectedCategory),
-                        style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w700, color: Pb.text),
-                      ),
-                    ),
-                    Text('${rows.length} probleme', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                filters,
-              ],
-            ),
-          ),
-          if (!isMobile && rows.isNotEmpty)
-            Container(
-              color: Pb.hoverBg,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: LayoutBuilder(
-                builder: (context, b) => Row(children: [
-                  const SizedBox(width: 40),
-                  Expanded(child: Text('Problema', style: headStyle)),
-                  if (b.maxWidth >= _cExampleMin && _hasExamples) SizedBox(width: _cExampleWidth + 20, child: Text('Exemplu', style: headStyle)),
-                  SizedBox(width: 96, child: Text('Dificultate', style: headStyle)),
-                ]),
-              ),
-            ),
-          if (rows.isEmpty)
-            Container(
-              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Icon(Icons.search_off, size: 30, color: Pb.muted),
-                  const SizedBox(height: 8),
-                  Text('Nicio problemă nu se potrivește filtrelor.', style: TextStyle(fontSize: 14, color: Pb.muted)),
-                  const SizedBox(height: 12),
-                  PbButton(
-                    text: 'Resetează filtrele',
-                    variant: PbVariant.outlineSecondary,
-                    size: PbSize.sm,
-                    onPressed: () {
-                      _cSearch.clear();
-                      searchQuery = '';
-                      setState(() {
-                        _cDiff = 'toate';
-                        _cUnsolved = false;
-                        selectedCategory = 'Toate';
-                      });
-                      _updateCategoriesAndFilter();
-                    },
-                  ),
-                ],
-              ),
-            )
-          else
-            for (var i = 0; i < shown; i++) ...[
-              if (i == 0 || rows[i]['category'] != rows[i - 1]['category']) _cChapterHead('${rows[i]['category'] ?? ''}', isMobile, first: i == 0),
-              _cRow(rows[i], isMobile, index: i),
-            ],
-          if (rows.isNotEmpty)
-            Container(
-              decoration: BoxDecoration(border: Border(top: BorderSide(color: Pb.border))),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Row(
-                children: [
-                  Expanded(child: Text('Afișate $shown din ${rows.length}', style: TextStyle(fontSize: 13, color: Pb.muted))),
-                  if (rows.length > shown)
-                    PbButton(
-                      text: 'Arată mai multe',
-                      variant: PbVariant.outlinePrimary,
-                      size: PbSize.sm,
-                      onPressed: () => setState(() => _cLimit += 25),
-                    ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   /// Below this width a row has no room for the example column.
   static const double _cExampleMin = 720;
   static const double _cExampleWidth = 190;
@@ -1102,7 +1058,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
                 TextSpan(
                     text: '${e['id']}  ',
                     style: TextStyle(fontSize: 13.5, color: Pb.muted, fontFamily: 'Iosevka', fontFamilyFallback: const ['monospace'], fontWeight: FontWeight.w400)),
-                TextSpan(text: '${e['title']}'),
+                ..._hlSpans('${e['title']}'),
               ]),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -1110,7 +1066,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
             );
             final line = second.isEmpty
                 ? null
-                : Text(second, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.45));
+                : Text.rich(TextSpan(children: _hlSpans(second)), maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, color: Pb.muted, height: 1.45));
             final text = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [title, if (line != null) ...[const SizedBox(height: 4), line]],

@@ -253,7 +253,7 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final q = state.uri.queryParameters;
         final materie = q['materie'] ?? 'Matematică';
-        return ExerciseListScreen(key: ValueKey(state.uri.query), subject: materie, grade: q['clasa'], category: q['capitol']);
+        return ExerciseListScreen(key: ValueKey(state.uri.query), subject: materie, grade: q['clasa'], category: q['capitol'], view: q['vedere'], search: q['cauta']);
       },
     ),
     GoRoute(
