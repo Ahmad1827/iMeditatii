@@ -8,5 +8,6 @@ PY=${PY:-python3}
 for c in uso iocla pclp sd pl math_courses fizica lfa apd egc rl isc apm eg; do python3 -I tool/acs/$c.py; done
 python3 -I tool/acs/lfa_teorie.py  # the LFA theory pages (needs lfa.json for the problems they link)
 python3 -I tool/acs/apm_model.py  # checks the APM model the problems and the guide are built from
+python3 -I tool/acs/egc_tema1_model.py  # checks the EGC Tema 1 model (egc_tema1.py and the guide take their numbers from it)
 $PY -I tool/acs/admitere.py
 for c in mn elth; do $PY -I tool/acs/$c.py; done

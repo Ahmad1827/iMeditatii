@@ -135,6 +135,13 @@ const Map<String, List<AcsGhid>> acsGhiduri = {
       '/materiale/apm-lucrarea-2.pdf',
     ),
   ],
+  'egc': [
+    AcsGhid(
+      'Tema 1 · Card Games (Hearthstone)',
+      'Tema explicată pentru prezentare: enunțul și baremul cu locul din cod al fiecărui punct, framework-ul (mesh-uri, camera, mouse-ul), transformările 2D, fiecare formă desenată cu vârfurile ei (inima și sabia din formulele polare), fiecare funcție din Tema1.cpp linie cu linie, animațiile, inamicul, o tură pas cu pas, 31 de întrebări de la prezentare cu răspunsuri, punctele slabe, exerciții rezolvate și o foaie de memorat. 49 de pagini.',
+      '/materiale/egc-tema-1.pdf',
+    ),
+  ],
   'lfa': [
     AcsGhid(
       'Testul 1 · Limbaje regulate',

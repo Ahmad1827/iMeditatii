@@ -10,7 +10,8 @@
   "7. Grile: transformări 2D și 3D",
   "8. Grile: proiecții, vizualizare, OpenGL",
   "9. Grile: eliminarea părților nevizibile",
-  "10. Grile: iluminare, umbre, culoare"
+  "10. Grile: iluminare, umbre, culoare",
+  "11. Tema 1: Card Games (Hearthstone)"
  ],
  "problems": [
   {
@@ -5181,6 +5182,1540 @@
      1,
      2
     ]
+   }
+  },
+  {
+   "id": "400",
+   "title": "DrawRect: pătratul unitate devine o carte",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Mesh-ul `square` din temă e pătratul `[0, 1]²` (colțul stânga-jos în origine). Construiește transformarea lui `DrawRect(2, 1, 2, 3)`: un dreptunghi cu colțul stânga-jos în `(2, 1)`, lat 2 și înalt 3.",
+   "hint": "În cod: `modelMatrix = parent · Translate(x, y) · Scale(width, height)`. Care se aplică întâi?",
+   "solution": "`M = T(2, 1) · S(2, 3)`: întâi scalarea (pătratul devine 2 × 3, colțul rămâne în origine), apoi translația. Invers, colțul ar ajunge în `(4, 3)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      0,
+      1
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     2.0,
+     0.0,
+     3.0,
+     1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 2,
+      "b": 3
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 1
+     }
+    ],
+    "maxOps": 2
+   }
+  },
+  {
+   "id": "401",
+   "title": "Shake: cartea rotită în jurul centrului",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cartea ocupă dreptunghiul `[2, 4] × [1, 4]`. Rotește-o cu 90° (sens trigonometric) în jurul centrului ei, ca matricea `rotation` din `DrawCard`.",
+   "hint": "Centrul e `(x + w/2, y + h/2)`. În cod: `Translate(c) · Rotate(angle) · Translate(-c)`.",
+   "solution": "`M = T(3, 2,5) · R(90°) · T(-3, -2,5)`: centrul ajunge în origine, se rotește, revine. Centrul rămâne pe loc.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      2,
+      1
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      4
+     ],
+     [
+      2,
+      4
+     ]
+    ],
+    "target": [
+     0.0,
+     -1.0,
+     5.5,
+     1.0,
+     0.0,
+     -0.5,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -3,
+      "b": -2.5
+     },
+     {
+      "op": "R",
+      "a": 90,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 3,
+      "b": 2.5
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "402",
+   "title": "Hover: cartea mărită pe loc",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Mărește cartea `[2, 4] × [1, 4]` de 1,5 ori, astfel încât centrul ei să rămână pe loc (efectul de hover / selectare).",
+   "hint": "O scalare față de origine mută și centrul. Adu centrul în origine întâi.",
+   "solution": "`M = T(3, 2,5) · S(1,5, 1,5) · T(-3, -2,5)`. În temă același efect e obținut altfel: `DrawCard` mută colțul cu `(w - cardW) / 2` la stânga și în jos.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      2,
+      1
+     ],
+     [
+      4,
+      1
+     ],
+     [
+      4,
+      4
+     ],
+     [
+      2,
+      4
+     ]
+    ],
+    "target": [
+     1.5,
+     0.0,
+     -1.5,
+     0.0,
+     1.5,
+     -1.25,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "T",
+      "a": -3,
+      "b": -2.5
+     },
+     {
+      "op": "S",
+      "a": 1.5,
+      "b": 1.5
+     },
+     {
+      "op": "T",
+      "a": 3,
+      "b": 2.5
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "403",
+   "title": "Săgeata spre cursor",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Mesh-ul `arrow` merge pe axa x de la `(0, 0)` (coada) la `(1, 0)` (vârful). Cartea selectată are centrul în `(1, 1)`, cursorul e în `(1, 5)`. Așază săgeata cu coada în centrul cărții și vârful în cursor, păstrându-i grosimea.",
+   "hint": "Ca în `DrawArrow`: `Translate(start) · Rotate(atan2(dy, dx)) · Scale(lungime, grosime)`.",
+   "solution": "`d = (0, 4)`: lungimea 4, unghiul `atan2(4, 0) = 90°`. `M = T(1, 1) · R(90°) · S(4, 1)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      -0.15
+     ],
+     [
+      0.75,
+      -0.15
+     ],
+     [
+      0.75,
+      -0.5
+     ],
+     [
+      1,
+      0
+     ],
+     [
+      0.75,
+      0.5
+     ],
+     [
+      0.75,
+      0.15
+     ],
+     [
+      0,
+      0.15
+     ]
+    ],
+    "target": [
+     0.0,
+     -1.0,
+     1.0,
+     4.0,
+     0.0,
+     1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 4,
+      "b": 1
+     },
+     {
+      "op": "R",
+      "a": 90,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 1,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "404",
+   "title": "Săgeata spre stânga",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Aceeași săgeată (de la `(0, 0)` la `(1, 0)`), din centrul cărții `(2, 1)` spre cursorul `(-1, 1)`, aflat în stânga cărții. Păstrează-i grosimea.",
+   "hint": "Lungimea e `√(dx² + dy²)`, unghiul `atan2(dy, dx)`; pentru `dx < 0` și `dy = 0`, `atan2` dă 180°.",
+   "solution": "`d = (-3, 0)`: `l = 3`, `θ = atan2(0, -3) = 180°` (cu `atan(dy/dx)` ai fi obținut 0°, adică săgeata spre dreapta). `M = T(2, 1) · R(180°) · S(3, 1)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      -0.15
+     ],
+     [
+      0.75,
+      -0.15
+     ],
+     [
+      0.75,
+      -0.5
+     ],
+     [
+      1,
+      0
+     ],
+     [
+      0.75,
+      0.5
+     ],
+     [
+      0.75,
+      0.15
+     ],
+     [
+      0,
+      0.15
+     ]
+    ],
+    "target": [
+     -3.0,
+     0.0,
+     2.0,
+     0.0,
+     -1.0,
+     1.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 3,
+      "b": 1
+     },
+     {
+      "op": "R",
+      "a": 180,
+      "b": 0
+     },
+     {
+      "op": "T",
+      "a": 2,
+      "b": 1
+     }
+    ],
+    "maxOps": 3
+   }
+  },
+  {
+   "id": "405",
+   "title": "Simbolul de pe carte",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Rombul (`diamond`) e centrat în origine, cu diagonalele de 1. Pune-l cu centrul în `(3, 2)` și diagonalele de 2 (ca `Translate(x + w/2, y + h·0,25) · Scale(size, size)` din `DrawCard`).",
+   "hint": "O formă centrată în origine se scalează pe loc; apoi se mută după centru.",
+   "solution": "`M = T(3, 2) · S(2, 2)`.",
+   "kind": "transform",
+   "spec": {
+    "shape": [
+     [
+      0,
+      0.5
+     ],
+     [
+      0.5,
+      0
+     ],
+     [
+      0,
+      -0.5
+     ],
+     [
+      -0.5,
+      0
+     ]
+    ],
+    "target": [
+     2.0,
+     0.0,
+     3.0,
+     0.0,
+     2.0,
+     2.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reference": [
+     {
+      "op": "S",
+      "a": 2,
+      "b": 2
+     },
+     {
+      "op": "T",
+      "a": 3,
+      "b": 2
+     }
+    ],
+    "maxOps": 2
+   }
+  },
+  {
+   "id": "410",
+   "title": "ArrangeZone: 3 cărți pe tablă",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În Tema 1 (Hearthstone, fereastra 1280 × 720): `cardW = 64,512`, `cardH = 92,16`, `cardGap = 12,9024`. Pe tabla ta sunt 3 cărți. Ce `targetX` primesc, de la stânga la dreapta?",
+   "hint": "`totalWidth = n·cardW + (n - 1)·cardGap`, `startX = (screenW - totalWidth) / 2`, `x_k = startX + k·(cardW + cardGap)`.",
+   "solution": "`totalWidth = 3 · 64,512 + 2 · 12,9024 = 219,341`; `startX = (1280 - 219,341) / 2 = 530,33`; pasul `77,414`: `530,33`, `607,74`, `685,16`. Cartea din mijloc stă exact la `heroX`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "prima carte",
+      "answer": "530.3296",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "a doua",
+      "answer": "607.744",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     },
+     {
+      "id": "c",
+      "label": "a treia",
+      "answer": "685.1584",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "411",
+   "title": "ArrangeZone: a șasea carte din mână",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În Tema 1 (Hearthstone, fereastra 1280 × 720): `cardW = 64,512`, `cardH = 92,16`, `cardGap = 12,9024`. Ai 6 cărți în mână. La ce `targetX` stă prima și la ce `targetX` stă ultima?",
+   "hint": "Grupul e centrat: prima începe la `(1280 - totalWidth) / 2`.",
+   "solution": "`totalWidth = 6 · 64,512 + 5 · 12,9024 = 451,58`, `startX = 414,21`, ultima: `startX + 5 · 77,414 = 801,28`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "prima",
+      "answer": "414.208",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "ultima",
+      "answer": "801.28",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "412",
+   "title": "Layout-ul din Init",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În `Init` (fereastra 1280 × 720): `handH = heroZoneH = 0,16·screenH`, `halfH = 0,18·screenH`, `cardH = 0,8·handH`, `cardW = 0,7·cardH`, `cardGap = 0,2·cardW`. Calculează-le.",
+   "hint": "Totul e proporțional cu înălțimea ecranului.",
+   "solution": "`handH = 115,2`, `halfH = 129,6`, `cardH = 92,16`, `cardW = 64,512` (și `cardGap = 12,9024`). Benzile: `4 · 115,2 + 2 · 129,6 = 720`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "h",
+      "label": "handH",
+      "answer": "115.2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "f",
+      "label": "halfH",
+      "answer": "129.6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "ch",
+      "label": "cardH",
+      "answer": "92.16",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "cw",
+      "label": "cardW",
+      "answer": "64.512",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "413",
+   "title": "Jumătatea ta de tablă",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În Tema 1 (Hearthstone, fereastra 1280 × 720): `cardW = 64,512`, `cardH = 92,16`, `cardGap = 12,9024`. Între ce valori trebuie să fie y-ul cursorului la eliberare, ca plasarea să fie validă? (`handH = heroZoneH = 115,2`)",
+   "hint": "Condiția din `OnMouseBtnRelease`: `handH + heroZoneH <= my && my <= screenH / 2`.",
+   "solution": "`[230,4, 360]`: între zona eroului tău și linia de mijloc.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "y minim",
+      "answer": "230.4",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "y maxim",
+      "answer": "360",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "414",
+   "title": "Mouse-ul în scenă",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Fereastra are 1280 × 720. Framework-ul raportează mouse-ul în `(100, 700)` (origine sus-stânga). Unde e în scenă?",
+   "hint": "`y = screenH - mouseY · screenH / res.y`.",
+   "solution": "`(100, 720 - 700) = (100, 20)`: jos, în banda mâinii tale.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x",
+      "answer": "100",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y",
+      "answer": "20",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "415",
+   "title": "Mouse-ul, fereastra mărită",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Fereastra a fost mărită la 1920 × 1080 (scena rămâne 1280 × 720). Mouse-ul e la `(960, 270)`. Unde e în scenă?",
+   "hint": "Se împarte la rezoluția curentă: `x = mouseX · screenW / res.x`.",
+   "solution": "`x = 960 · 1280 / 1920 = 640`, `y = 720 - 270 · 720 / 1080 = 540`: pe eroul inamic.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x",
+      "label": "x",
+      "answer": "640",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "y",
+      "label": "y",
+      "answer": "540",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "416",
+   "title": "Hover: unde se desenează cartea",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În Tema 1 (Hearthstone, fereastra 1280 × 720): `cardW = 64,512`, `cardH = 92,16`, `cardGap = 12,9024`. O carte din mână are `card.x = 500` și a ajuns la mărimea de hover (×1,15). Ce lățime și ce x folosește `DrawCard`?",
+   "hint": "`x = card.x - (w - cardW) / 2`.",
+   "solution": "`w = 1,15 · 64,512 = 74,189`, `x = 500 - 4,838 = 495,162`: cartea crește egal în toate părțile.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "w",
+      "label": "w",
+      "answer": "74.1888",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "x",
+      "label": "x",
+      "answer": "495.1616",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "417",
+   "title": "Interpolarea spre țintă",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "O carte e la `x = 0`, ținta e `100`. `Update` face `x += (target - x) · min(1, 8·dt)`. Unde e după 2 cadre la 60 FPS? Dar după 2 cadre la 30 FPS?",
+   "hint": "Distanța rămasă se înmulțește la fiecare cadru cu `1 - step`.",
+   "solution": "60 FPS: `step = 0,1333`, `100 · (1 - 0,8667²) = 24,89`. 30 FPS: `step = 0,2667`, `100 · (1 - 0,7333²) = 46,22`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "60 FPS",
+      "answer": "24.8889",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "30 FPS",
+      "answer": "46.2222",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "418",
+   "title": "Interpolarea, un cadru lung",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Același `x += (target - x) · min(1, 8·dt)`, de la 0 spre 100, dar un singur cadru a durat 0,2 s. Unde ajunge x?",
+   "hint": "`8 · 0,2 = 1,6`; ce face `min`?",
+   "solution": "`step = min(1, 1,6) = 1`: sare direct în țintă, fără să o depășească.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "x",
+      "answer": "100",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "419",
+   "title": "Shake",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "După un atac, `shakeTimer = 0,6`. În cadrul în care a scăzut la 0,52, apoi în cel în care e 0,49, ce unghi (în radiani) are cartea?",
+   "hint": "`(int)(shakeTimer · 20) % 2 == 0` → `0,15`, altfel `-0,15`.",
+   "solution": "`(int)10,4 = 10` par → `0,15`; `(int)9,8 = 9` impar → `-0,15`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "la 0,52",
+      "answer": "0.15",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "la 0,49",
+      "answer": "-0.15",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "420",
+   "title": "Timer-ul",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În Tema 1 (Hearthstone, fereastra 1280 × 720): `cardW = 64,512`, `cardH = 92,16`, `cardGap = 12,9024`. Bara timer-ului are lățimea maximă `timerW = cardW`. Au mai rămas 12 s din 30. Cât de lată e bara galbenă?",
+   "hint": "`width = timerW · turnTimer / turnTime`.",
+   "solution": "`64,512 · 12 / 30 = 25,805`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "w",
+      "label": "lățimea",
+      "answer": "25.8048",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "421",
+   "title": "Săgeata",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cartea selectată are centrul în `(600, 295,2)`, cursorul e în `(700, 495,2)`. Ce lungime și ce unghi (în grade) dă `DrawArrow`?",
+   "hint": "`length = √(dx² + dy²)`, `angle = atan2(dy, dx)`.",
+   "solution": "`d = (100, 200)`, `l = √50000 ≈ 223,61`, `θ = atan2(200, 100) ≈ 63,43°` (1,107 rad).",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "l",
+      "label": "lungimea",
+      "answer": "223.607",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "a",
+      "label": "unghiul (grade)",
+      "answer": "63.435",
+      "number": true,
+      "tol": 0.05,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "422",
+   "title": "Inima: un vârf",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "`CreateHeart`: `a = 0,38`, `offsetY = 0,875·a`, pentru `i` din 64: `θ = 2πi/64`, `r = a(1 - cos θ)`, vârful `(-r sin θ, r cos θ + offsetY)`. Ce coordonate are vârful pentru `i = 16`? Dar pentru `i = 32`?",
+   "hint": "`i = 16` înseamnă `θ = π/2`, `i = 32` înseamnă `θ = π`.",
+   "solution": "`θ = π/2`: `r = 0,38`, `(-0,38, 0,3325)`. `θ = π`: `r = 0,76`, `(0, -0,76 + 0,3325) = (0, -0,4275)`: vârful de jos.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "x1",
+      "label": "x (i = 16)",
+      "answer": "-0.38",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     },
+     {
+      "id": "y1",
+      "label": "y (i = 16)",
+      "answer": "0.3325",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     },
+     {
+      "id": "x2",
+      "label": "x (i = 32)",
+      "answer": "0",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     },
+     {
+      "id": "y2",
+      "label": "y (i = 32)",
+      "answer": "-0.4275",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "423",
+   "title": "De ce 0,875·a",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "grea",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Înainte de deplasare, y-ul inimii e `a(1 - cos θ)·cos θ`. Care e y-ul maxim și cel minim (în funcție de `a = 1`) și ce deplasare centrează inima?",
+   "hint": "Cu `c = cos θ ∈ [-1, 1]`, `y = c - c²`.",
+   "solution": "Maxim la `c = 1/2`: `1/4`; minim la `c = -1`: `-2`. Mijlocul: `(1/4 - 2)/2 = -0,875`, deci se adună `0,875·a`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "M",
+      "label": "y maxim (a = 1)",
+      "answer": "0.25",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "m",
+      "label": "y minim (a = 1)",
+      "answer": "-2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "o",
+      "label": "deplasarea (a = 1)",
+      "answer": "0.875",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "424",
+   "title": "Sabia: vârfurile lamei",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "grea",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "`CreateSword`: `r(θ) = 0,3 + 0,1·sin(3θ) / (1,05 + cos(2θ))`. Cât e r la `θ = π/2` și la `θ = 3π/2`?",
+   "hint": "Numitorul `1,05 + cos(2θ)` e aproape zero acolo.",
+   "solution": "`cos π = -1`: numitorul `0,05`. `sin(3π/2) = -1`: `0,3 - 2 = -1,7`; `sin(9π/2) = 1`: `0,3 + 2 = 2,3`. De aici vârfurile lungi ale lamei.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "r(π/2)",
+      "answer": "-1.7",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "r(3π/2)",
+      "answer": "2.3",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "425",
+   "title": "Câte triunghiuri",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cercul are 48 de segmente, inima și sabia 64, rombul 2 triunghiuri. Câte triunghiuri desenează `DrawCard` pentru simbolul și statisticile unei cărți Tank cu cost 4, ATK 3, HP 2 (fără chenar și fundal)?",
+   "hint": "Fiecare punct de mana e un cerc, de ATK o sabie, de HP o inimă.",
+   "solution": "`2 + 4·48 + 3·64 + 2·64 = 514`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "t",
+      "label": "triunghiuri",
+      "answer": "514",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "426",
+   "title": "Indicii evantaiului",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Câți indici au mesh-urile `circle` (48 de segmente) și `star` (10 puncte)? Ce indici are ultimul triunghi al cercului?",
+   "hint": "Triunghiul `i`: `0, i + 1, (i + 1) % n + 1`.",
+   "solution": "`3 · 48 = 144`, `3 · 10 = 30`. Pentru `i = 47`: `0, 48, 48 % 48 + 1 = 1`: închide cercul.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "c",
+      "label": "indici cerc",
+      "answer": "144",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "s",
+      "label": "indici stea",
+      "answer": "30",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "u",
+      "label": "ultimul triunghi (trei numere, separate prin virgulă)",
+      "answer": "0,48,1",
+      "hint": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "427",
+   "title": "Cristalele de mana",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ești în runda ta 4 (`maxMana = 4`) și ai pus o carte Silence (cost 2). Câte cristale sunt albastre, albe și negre?",
+   "hint": "Albastru dacă `i < mana`, alb dacă `i < maxMana`, altfel negru.",
+   "solution": "`mana = 2`: 0–1 albastre, 2–3 albe, 4–9 negre.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "albastre",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "albe",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "c",
+      "label": "negre",
+      "answer": "6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "428",
+   "title": "Un atac cu Lifesteal",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cartea ta Lifesteal 4/3 (ATK 4, HP 3) atacă o carte 2/5. Eroul tău are 25 HP. Ce HP au după atac cele două cărți și eroul tău?",
+   "hint": "Damage simultan; Lifesteal: `owner.hp += attacker.atk`.",
+   "solution": "A ta `3 - 2 = 1`, a lui `5 - 4 = 1`, eroul `25 + 4 = 29`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "a",
+      "label": "cartea ta",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "b",
+      "label": "cartea inamică",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "h",
+      "label": "eroul tău",
+      "answer": "29",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "429",
+   "title": "Ambele mor",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cartea ta 1/1 atacă o carte 4/1. Câte cărți ajung în zona `DEAD`?",
+   "hint": "Ambele primesc damage, apoi `RemoveDead` pe ambele liste.",
+   "solution": "A ta `1 - 4 < 0`, a lui `1 - 1 = 0`: amândouă.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "d",
+      "label": "cărți moarte",
+      "answer": "2",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "430",
+   "title": "Prima tură",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "La începutul primei tale ture (după `Init` și `StartTurn`), câte cărți ai în mână, câte în pachet și câtă mana?",
+   "hint": "`FillDeck(30)`, 5 × `TakeFromDeck`, mana pusă pe 0, apoi `StartTurn` (+1 mana, +1 carte).",
+   "solution": "5 + 1 = 6 în mână, 30 - 6 = 24 în pachet, `maxMana` și `mana` 1.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "h",
+      "label": "în mână",
+      "answer": "6",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "d",
+      "label": "în pachet",
+      "answer": "24",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     },
+     {
+      "id": "m",
+      "label": "mana",
+      "answer": "1",
+      "number": true,
+      "tol": 0.01,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "431",
+   "title": "Șansa eroului",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Inamicul atacă fără Tank pe tabla ta, unde ai 3 cărți: `pick = rand() % (targets.size() + 1)`, iar `pick == targets.size()` înseamnă eroul. Ce probabilitate are eroul tău să fie ținta?",
+   "hint": "4 valori egal probabile.",
+   "solution": "`rand() % 4` ∈ {0, 1, 2, 3}; 3 = eroul: `1/4`.",
+   "kind": "calc",
+   "spec": {
+    "fields": [
+     {
+      "id": "p",
+      "label": "probabilitatea",
+      "answer": "0.25",
+      "number": true,
+      "tol": 0.001,
+      "hint": "un număr"
+     }
+    ]
+   }
+  },
+  {
+   "id": "440",
+   "title": "De ce glm::transpose",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "De ce funcțiile din `transform2D.h` întorc `glm::transpose(glm::mat3(...))`?",
+   "hint": "Cum interpretează constructorul `mat3` cele 9 valori?",
+   "solution": "GLM e column-major: primele trei valori sunt prima coloană. Transpusa dă matricea de pe hârtie.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "GLM umple matricea pe coloane, iar matricele sunt scrise rând cu rând",
+     "ca să inverseze transformarea",
+     "pentru că OpenGL folosește vectori linie",
+     "ca rotația să fie în sens orar"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "441",
+   "title": "Ordinea din DrawRect",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "`DrawRect` calculează `parent · Translate(x, y) · Scale(w, h)`. Ce se aplică întâi pe vârfurile pătratului?",
+   "hint": "Vectori coloană: de la dreapta la stânga.",
+   "solution": "Întâi `S`, apoi `T`, la urmă `parent` (rotația cărții).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "translația",
+     "parent",
+     "nu contează ordinea",
+     "scalarea"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "442",
+   "title": "Rotația cărții",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ce matrice rotește o carte în jurul centrului ei `c`?",
+   "hint": "Centrul trebuie adus în origine primul.",
+   "solution": "`T(-c)` se aplică primul (e cel mai din dreapta), apoi rotația, apoi `T(c)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "T(c) · R(α) · T(-c)",
+     "R(α) · T(c)",
+     "T(-c) · R(α) · T(c)",
+     "R(α)"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "443",
+   "title": "Click stânga",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "De ce `IsLeftClick` verifică `button == 1`?",
+   "hint": "Vezi `pressEvent = mouseButtonAction & mouseButtonStates`.",
+   "solution": "`SET_BIT(item, 0)` dă `1 << 0 = 1`; dreptul ar da 2.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "GLFW numerotează butoanele de la 1",
+     "framework-ul trimite o mască de biți, iar butonul stâng (GLFW 0) setează bitul 0",
+     "butonul drept are valoarea 0",
+     "1 e codul ASCII al click-ului"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "444",
+   "title": "De unde vine y-ul mouse-ului",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "De ce `OnMouseMove` calculează `cursorY = screenH - mouseY · screenH / res.y`?",
+   "hint": "Unde e originea fiecăruia?",
+   "solution": "Conversia întoarce axa y și scalează după rezoluția curentă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "fereastra are originea sus-stânga cu y în jos, scena are originea jos-stânga",
+     "ca să inverseze axa x",
+     "pentru proiecția perspectivă",
+     "pentru că mouse-ul e în coordonate normalizate"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "445",
+   "title": "Testul de adâncime",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "De ce funcționează tema cu `glDisable(GL_DEPTH_TEST)` și cartea trasă apare deasupra?",
+   "hint": "Toate formele au z = 0.",
+   "solution": "Algoritmul pictorului: în `Update`, cartea cu `isDragged` e desenată după toate celelalte.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "cartea trasă are z mai mare",
+     "ordinea de desen decide: ce e desenat mai târziu acoperă, iar cartea trasă e desenată ultima",
+     "shader-ul sortează după mărime",
+     "camera ortografică ignoră ordinea"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "446",
+   "title": "Culoarea mesh-urilor",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Toate formele din `shapes.cpp` au vârfuri albe. De ce inimile apar roșii?",
+   "hint": "Ce face al treilea parametru?",
+   "solution": "Shader-ul primește culoarea ca uniformă și colorează tot mesh-ul.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "culoarea se schimbă în InitFromData",
+     "roșul vine din fundalul cărții",
+     "`RenderMesh2D(mesh, matrice, culoare)` folosește shader-ul Color, care ignoră culoarea vârfurilor",
+     "shader-ul înmulțește alb cu roșul fundalului"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "447",
+   "title": "Dreptunghiul plin",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "`CreateRectangle` cu `fill = true` are indicii `0, 1, 2, 3, 0, 2`. Ce desenează?",
+   "hint": "Modul implicit e GL_TRIANGLES.",
+   "solution": "Câte 3 indici fac un triunghi; diagonala comună e 0–2.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un patrulater cu GL_QUADS",
+     "un contur închis",
+     "două triunghiuri: (0, 1, 2) și (3, 0, 2)",
+     "șase puncte"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "448",
+   "title": "Evantaiul",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Pentru cerc, triunghiul `i` are indicii `0, i + 1, (i + 1) % segments + 1`. Ce rol are `% segments`?",
+   "hint": "Ce dă pentru i = segments - 1?",
+   "solution": "`segments % segments + 1 = 1`: închide cercul; fără el, indicele `segments + 1` nu ar exista.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "evită vârfurile duplicate din centru",
+     "ultimul triunghi se leagă de primul vârf de pe cerc",
+     "inversează sensul triunghiurilor",
+     "face cercul să înceapă de sus"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "449",
+   "title": "De unde pornește evantaiul inimii",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "grea",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Evantaiul inimii pornește din vârful `(0, offsetY)`. Ce punct al curbei e acesta?",
+   "hint": "Pentru ce θ e r = 0?",
+   "solution": "La `θ = 0`, `r = 0`: punctul `(0, offsetY)` e cuspida. O curbă polară cu r ≥ 0 e stelată față de pol, deci evantaiul o acoperă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "polul cardioidei (r = 0), adică scobitura de sus",
+     "vârful de jos al inimii",
+     "centrul de greutate al inimii",
+     "un punct din afara inimii"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "450",
+   "title": "Animația de translație",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ce fel de mișcare dă `x += (targetX - x) · min(1, 8·dt)`?",
+   "hint": "Ce fracțiune din distanță se parcurge la fiecare cadru?",
+   "solution": "O fracțiune fixă din distanța rămasă: scădere exponențială (ease-out).",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "rapidă la început și încetinind lin la sosire, fără să depășească ținta",
+     "cu viteză constantă",
+     "care accelerează până la țintă",
+     "care oscilează în jurul țintei"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "451",
+   "title": "Cine mută cărțile",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ce face `ArrangeZone`?",
+   "hint": "Ce câmpuri scrie?",
+   "solution": "Scrie țintele; interpolarea din `Update` apropie poziția curentă de ele, de aceea toate reorganizările sunt animate.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "mută instantaneu cărțile pe pozițiile noi",
+     "sortează cărțile după cost",
+     "calculează doar țintele (targetX, targetY) ale cărților din zonă; mișcarea o face Update",
+     "șterge cărțile moarte"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "452",
+   "title": "Ordinea relativă",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cum păstrează `ArrangeZone` ordinea relativă a cărților rămase în mână?",
+   "hint": "Contorul `k`.",
+   "solution": "Cărțile nu își schimbă locul în vector; `k` le numerotează în aceeași ordine.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "parcurge vectorul în ordine și dă locul k doar cărților din zonă, crescând k",
+     "sortează după targetX",
+     "reține un index separat pentru fiecare carte",
+     "nu o păstrează"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "453",
+   "title": "O carte abia pusă",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "De ce o carte pusă în runda curentă nu are chenar verde (nu poate ataca)?",
+   "hint": "Ce reține `PlayCard`?",
+   "solution": "`PlayCard` pune `round` = runda proprietarului; abia în runda următoare `card.round < round`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "CanAttack cere card.round < round (în afară de Charge)",
+     "hasAttacked e true la plasare",
+     "nu e încă în zona BOARD",
+     "mana a ajuns la 0"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "454",
+   "title": "Tank",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Inamicul are pe tablă un Tank. Ce poți ataca?",
+   "hint": "Variabila `ok` din `OnMouseBtnPress`.",
+   "solution": "Cu `ok == 1`, țintele permise sunt doar cele cu `EFFECT_TANK`, iar atacul eroului e blocat.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "orice carte, dar nu eroul",
+     "doar eroul",
+     "doar cărțile Tank ale inamicului",
+     "orice, Tank-ul doar reduce damage-ul"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "455",
+   "title": "Silence",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ce schimbă Silence la cartea țintă?",
+   "hint": "`effect` și `type` sunt câmpuri separate.",
+   "solution": "Doar `effect` se schimbă: cartea arată la fel, dar nu mai protejează și nu mai fură viață.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "efectul devine EFFECT_NONE, dar tipul (culoarea și simbolul) rămâne",
+     "cartea e distrusă",
+     "tipul devine NORMAL",
+     "atacul ei devine 0"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "456",
+   "title": "Cărțile moarte",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "De ce `RemoveDead` nu face `erase` din vector?",
+   "hint": "Ce s-ar întâmpla cu `attacker` după un `erase`?",
+   "solution": "Cu `erase`, elementele de după s-ar muta și referințele ar indica alte cărți.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "erase nu există pentru vector",
+     "ca să poată fi înviate",
+     "ca referințele Card& folosite în Attack să rămână valide; cartea e doar marcată DEAD",
+     "pentru că vectorul e const"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "457",
+   "title": "Parametrul player",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "grea",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "În `StartTurn(Player& player, ...)`, apelată ca `StartTurn(enemy, enemyDeck, enemyCards)`, ce modifică `player.mana = player.maxMana`?",
+   "hint": "Shadowing.",
+   "solution": "Numele parametrului acoperă membrul; e o referință la `enemy`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "mana inamicului: parametrul îl ascunde pe membrul player",
+     "mana jucătorului (membrul clasei)",
+     "ambele",
+     "nimic, e o copie"
+    ],
+    "answer": 0
+   }
+  },
+  {
+   "id": "458",
+   "title": "Inamicul",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ce face `EnemyTurn` când n-are nicio carte selectată, are loc pe tablă și o carte pe care și-o permite?",
+   "hint": "Ordinea testelor.",
+   "solution": "Prioritățile: atac cu cartea selectată > plasare > selectarea unui atacator > `EndTurn`. Câte o mișcare pe secundă.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "atacă imediat cu toate cărțile",
+     "termină tura",
+     "o pune pe tablă (o mișcare), iar atacurile vin după ce nu mai are ce pune",
+     "selectează un atacator"
+    ],
+    "answer": 2
+   }
+  },
+  {
+   "id": "459",
+   "title": "Timpul expirat",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Ce se întâmplă când `turnTimer` ajunge la 0?",
+   "hint": "`UpdateTimer`.",
+   "solution": "Cerința din enunț: butonul de terminare „se apasă singur”.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "jocul se termină",
+     "jucătorul pierde viață",
+     "timer-ul repornește în aceeași tură",
+     "se apelează EndTurn, ca la apăsarea butonului"
+    ],
+    "answer": 3
+   }
+  },
+  {
+   "id": "460",
+   "title": "Plasare fără mana",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "medie",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Tragi pe tablă o carte de 3 mana când ai 2. Ce se întâmplă?",
+   "hint": "Unde e verificată mana?",
+   "solution": "Mana e verificată abia în `OnMouseBtnRelease`; plasarea invalidă cheamă `ArrangeZone(HAND)`.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "nu o poți prinde deloc",
+     "o poți prinde, dar la eliberare se întoarce animat în mână",
+     "se pune și mana devine -1",
+     "se pune, dar nu poate ataca"
+    ],
+    "answer": 1
+   }
+  },
+  {
+   "id": "461",
+   "title": "Pachetul desenat",
+   "chapter": "11. Tema 1: Card Games (Hearthstone)",
+   "difficulty": "ușoară",
+   "source": "Tema 1 EGC (Hearthstone)",
+   "statement": "Cum e desenat pachetul de cărți?",
+   "hint": "`min(3, deck.size())`.",
+   "solution": "Teancul are 3 straturi; când rămân 2 cărți se văd 2, iar pachetul gol dispare.",
+   "kind": "grila",
+   "spec": {
+    "options": [
+     "un singur dreptunghi, mereu",
+     "câte un dreptunghi pentru fiecare carte",
+     "un text cu numărul de cărți",
+     "cel mult 3 dreptunghiuri decalate, câte rămân în pachet până la 3"
+    ],
+    "answer": 3
    }
   }
  ]

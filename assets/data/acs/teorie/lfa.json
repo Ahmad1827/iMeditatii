@@ -57,7 +57,10 @@
   "7. Mașini Turing": "turing",
   "8. Clase de limbaje": "calculabilitate",
   "9. Grile: modelul de test": "recapitulare",
-  "10. Grile din teste și examene": "recapitulare"
+  "10. Grile din teste și examene": "recapitulare",
+  "11. Grile: limbaje regulate": "inchidere-lr",
+  "12. Grile: LIC, gramatici, APD": "proprietati-lic",
+  "13. Grile: Turing și decidabilitate": "calculabilitate"
  },
  "lessons": [
   {

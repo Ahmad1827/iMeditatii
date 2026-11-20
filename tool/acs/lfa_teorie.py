@@ -206,6 +206,9 @@ CHAPTERS = {
     '8. Clase de limbaje': 'calculabilitate',
     '9. Grile: modelul de test': 'recapitulare',
     '10. Grile din teste și examene': 'recapitulare',
+    '11. Grile: limbaje regulate': 'inchidere-lr',
+    '12. Grile: LIC, gramatici, APD': 'proprietati-lic',
+    '13. Grile: Turing și decidabilitate': 'calculabilitate',
 }
 _problem_chapters = {c for c in json.load(open(os.path.join(ROOT, 'assets', 'data', 'acs', 'lfa.json'), encoding='utf-8'))['chapters']}
 assert set(CHAPTERS) == _problem_chapters, set(CHAPTERS) ^ _problem_chapters

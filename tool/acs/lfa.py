@@ -574,6 +574,7 @@ m(94, 'Limbajul vid', 'ușoară', 'Care expresie regulată generează limbajul v
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_more.py'), encoding='utf-8').read())
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_topics.py'), encoding='utf-8').read())
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_written.py'), encoding='utf-8').read())
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lfa_grile_more.py'), encoding='utf-8').read())
 
 # ------------------------------------------------------------ the seminar's tests
 # Test 1: regular languages, test 2: context-free ones, test 3: Turing
@@ -586,6 +587,7 @@ TESTS = [
     {'n': 3, 'name': 'Testul 3', 'about': 'Mașina Turing (MT)'},
 ]
 BY_CHAPTER = {CHAPTERS[0]: 1, CHAPTERS[1]: 1, CHAPTERS[2]: 1, CHAPTERS[3]: 1, CHAPTERS[4]: 2, CHAPTERS[5]: 2, CHAPTERS[6]: 3}
+BY_CHAPTER.update(GRILE_TESTS)
 LEVEL3 = re.compile(r'Turing|\bMT\b|\bTD\b|\bTA\b|\bNP\b|\bRice\b|ρ\(|\\rho|(?i:decid|benzi|capete de citire|oprire|se opre[sș]te|calculabil)')
 LEVEL2 = re.compile(r'\bLIC\b|\bGIC\b|\bAPD\b|→|->|\\rightarrow|Chomsky|CYK|(?i:independent\w* de context|gramatic|pushdown|stiv[aăe]|ambigu)')
 

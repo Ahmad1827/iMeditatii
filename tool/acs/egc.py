@@ -504,4 +504,7 @@ def egc_difficulty(it):
 
 add_grile(P, load_grile('egc_grile'), 101, egc_chapter, egc_difficulty, egc_source)
 
+# the student's Tema 1 (Hearthstone): tool/acs/egc_tema1.py, numbers from egc_tema1_model.py
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'egc_tema1.py'), encoding='utf-8').read())
+
 write_course('egc', CHAPTERS, P)
