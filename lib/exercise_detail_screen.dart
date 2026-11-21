@@ -1348,7 +1348,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       key: _cLeftKey,
       child: _cCard(
         fill: !isMobile,
-        header: Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 10), child: Align(alignment: Alignment.centerLeft, child: _aSegments())),
+        header: Padding(padding: const EdgeInsets.only(left: 8, top: 2), child: Align(alignment: Alignment.centerLeft, child: _aTabs())),
         child: isMobile
             ? Padding(padding: const EdgeInsets.all(16), child: _aPaneBody())
             : SingleChildScrollView(padding: const EdgeInsets.fromLTRB(22, 16, 22, 28), child: _aPaneBody()),
@@ -1472,49 +1472,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  /// Enunț / Soluție / Trimiteri as one switch, right above what they change.
-  Widget _aSegments() {
-    const labels = ['Enunț', 'Soluție', 'Trimiteri'];
-    final counts = [null, null, _cSubmissionsCount];
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(10)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < labels.length; i++)
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => setState(() => _cTab = i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 160),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: i == _cTab ? Pb.surface : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: i == _cTab ? [BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 3, offset: const Offset(0, 1))] : null,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(labels[i],
-                          style: TextStyle(fontSize: 13.5, fontWeight: i == _cTab ? FontWeight.w600 : FontWeight.w500, color: i == _cTab ? Pb.text : Pb.muted)),
-                      if (counts[i] != null) ...[
-                        const SizedBox(width: 6),
-                        Text(counts[i]!, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Pb.muted)),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
+  /// Enunț / Soluție / Trimiteri, the same tabs as the rest of the page, right above what they change.
+  Widget _aTabs() => _cTabs(const ['Enunț', 'Soluție', 'Trimiteri'], _cTab, (i) => setState(() => _cTab = i), counts: [null, null, _cSubmissionsCount]);
 
-  /// The pane under the switch: on the statement, who wrote it and why it's at
+  /// The pane under the tabs: on the statement, who wrote it and why it's at
   /// its level first (the thin bar has no room for them).
   Widget _aPaneBody() {
     if (_cTab != 0) return _cTabContent;

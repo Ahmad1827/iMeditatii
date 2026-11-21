@@ -673,6 +673,91 @@ class _PbTabState extends State<_PbTab> {
   }
 }
 
+/// One tab of a row of plain tabs: no box around it, the chosen one in bold and
+/// underlined in [color]. The row is meant to sit on a 1 px line ([PbLineTabs]).
+class PbLineTab extends StatefulWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final IconData? icon;
+  final String? count;
+  final Color? color;
+  final TextStyle? labelStyle; // a face of its own (ACS in Iosevka)
+  final Widget? trailing;
+  final bool showLabel; // false: the icon alone (a narrow screen), the label in a tooltip
+
+  const PbLineTab({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.icon,
+    this.count,
+    this.color,
+    this.labelStyle,
+    this.trailing,
+    this.showLabel = true,
+  });
+
+  @override
+  State<PbLineTab> createState() => _PbLineTabState();
+}
+
+class _PbLineTabState extends State<PbLineTab> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final sel = widget.selected;
+    final c = widget.color ?? Pb.primary;
+    final fg = sel || _hover ? Pb.text : Pb.muted;
+    final tab = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 7),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: sel ? c : (_hover ? Pb.inputBorder : Colors.transparent), width: 2)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, size: 16, color: sel ? c : fg),
+                if (widget.showLabel) const SizedBox(width: 6),
+              ],
+              if (widget.showLabel)
+                Text(widget.label, style: (widget.labelStyle ?? const TextStyle(fontSize: 14)).copyWith(fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: fg)),
+              if (widget.count != null) ...[
+                const SizedBox(width: 6),
+                Text(widget.count!, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: sel ? c : Pb.muted)),
+              ],
+              if (widget.trailing != null) ...[const SizedBox(width: 4), widget.trailing!],
+            ],
+          ),
+        ),
+      ),
+    );
+    return widget.showLabel ? tab : Tooltip(message: widget.label, child: tab);
+  }
+}
+
+/// A row of [PbLineTab]s on a 1 px line.
+class PbLineTabs extends StatelessWidget {
+  final List<Widget> children;
+  const PbLineTabs({super.key, required this.children});
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Pb.border))),
+        child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: children),
+      );
+}
+
 /// Body under [PbNavTabs] (no top border, joins the active tab).
 class PbTabPanel extends StatelessWidget {
   final Widget child;

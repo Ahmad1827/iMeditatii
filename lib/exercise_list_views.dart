@@ -277,47 +277,20 @@ extension _Views on _ExerciseListScreenState {
       (ExView.tabla, Icons.view_kanban_outlined, 'Tablă'),
       (ExView.ani, Icons.timeline, hasYears ? 'Pe ani' : 'Pe niveluri'),
     ];
-    final switcher = Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(11)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final (v, icon, name) in views)
-            Tooltip(
-              message: name,
-              child: _LHover(
-                onTap: () {
-                  _set(() => _view = v);
-                  SharedPreferences.getInstance().then((p) => p.setString(_ExerciseListScreenState._viewKey, v.name));
-                },
-                builder: (h) {
-                  final sel = _view == v;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 160),
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 11, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: sel ? Pb.surface : (h ? Pb.surface.withOpacity(0.5) : Colors.transparent),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, 1))] : null,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(icon, size: 16, color: sel ? _subjectColor : Pb.muted),
-                        if (!isMobile || sel) ...[
-                          const SizedBox(width: 6),
-                          Text(name, style: TextStyle(fontSize: 13, fontWeight: sel ? FontWeight.w700 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
-                        ],
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-        ],
-      ),
-    );
+    final switcher = PbLineTabs(children: [
+      for (final (v, icon, name) in views)
+        PbLineTab(
+          label: name,
+          icon: icon,
+          showLabel: !isMobile || _view == v,
+          selected: _view == v,
+          color: _subjectColor,
+          onTap: () {
+            _set(() => _view = v);
+            SharedPreferences.getInstance().then((p) => p.setString(_ExerciseListScreenState._viewKey, v.name));
+          },
+        ),
+    ]);
 
     final sortLabel = _sort == 'implicit' && !_search.isEmpty ? 'Relevanță' : _sortNames[_sort]!;
     final sort = PopupMenuButton<String>(

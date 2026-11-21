@@ -15,7 +15,7 @@ import 'custom_navbar.dart' show CustomNavbar;
 import 'progress.dart';
 import 'home_ambient.dart' show HomeSky, HomeScene;
 import 'sticky_footer.dart';
-import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer;
+import 'ui_components.dart' show StyleBuilder, AppStyle, Pb, PbButton, PbVariant, PbSize, PbLink, PbContainer, PbLineTab, PbLineTabs;
 import 'grade_label.dart';
 import 'problem_thumb.dart';
 import 'problem_author.dart';
@@ -559,63 +559,28 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> with SingleTick
       ),
     );
 
-    Widget seg(String g) {
-      final sel = selectedGrade == g;
-      final count = allExercises.where((e) => e['grade'] == g).length;
-      return _LHover(
-        onTap: () => _selectGrade(g),
-        builder: (h) => AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-          decoration: BoxDecoration(
-            color: sel ? Pb.surface : (h ? Pb.surface.withOpacity(0.5) : Colors.transparent),
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, 1))] : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(_gradeLabel(g),
-                  style: TextStyle(fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel ? Pb.text : Pb.muted)),
-              const SizedBox(width: 6),
-              Text('$count', style: TextStyle(fontSize: 12.5, color: Pb.muted)),
-            ],
-          ),
+    final toggle = PbLineTabs(children: [
+      for (final g in availableGrades)
+        PbLineTab(
+          label: _gradeLabel(g),
+          count: '${allExercises.where((e) => e['grade'] == g).length}',
+          selected: selectedGrade == g,
+          color: c,
+          onTap: () => _selectGrade(g),
         ),
-      );
-    }
-
-    final toggle = Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(12)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        for (final g in availableGrades) seg(g),
-        // the university section: a page of its own, with its own look
-        Container(width: 1, height: 18, margin: const EdgeInsets.symmetric(horizontal: 4), color: Pb.border),
-        AppLink(
-          to: '/acs',
-          child: _LHover(
-            onTap: () => context.go('/acs'),
-            builder: (h) => AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-              decoration: BoxDecoration(
-                color: h ? Pb.surface.withOpacity(0.5) : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('ACS', style: TextStyle(fontFamily: 'Iosevka', fontSize: 14.5, fontWeight: FontWeight.w700, color: h ? Pb.text : Pb.muted)),
-                  const SizedBox(width: 4),
-                  Icon(Icons.arrow_outward, size: 13, color: Pb.muted),
-                ],
-              ),
-            ),
-          ),
+      // the university section: a page of its own, with its own look
+      Container(width: 1, height: 18, margin: const EdgeInsets.fromLTRB(4, 0, 4, 9), color: Pb.border),
+      AppLink(
+        to: '/acs',
+        child: PbLineTab(
+          label: 'ACS',
+          labelStyle: const TextStyle(fontFamily: 'Iosevka', fontSize: 14.5),
+          trailing: Icon(Icons.arrow_outward, size: 13, color: Pb.muted),
+          selected: false,
+          onTap: () => context.go('/acs'),
         ),
-      ]),
-    );
+      ),
+    ]);
 
     Widget subjectTile(IconData icon, String name, String tagline) {
       final sel = widget.subject == name;

@@ -711,51 +711,11 @@ class _HomeScreenState extends State<HomeScreen> {
           _hLimit = 6;
         });
 
-    Widget seg(String label, IconData icon, int count, bool sel, Color c, VoidCallback onTap) => _HHover(
-          onTap: onTap,
-          builder: (h) => AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: Pb.surface.withOpacity(sel ? 1 : (h ? 0.5 : 0)),
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: sel ? [BoxShadow(color: Colors.black.withOpacity(0.14), blurRadius: 3, offset: const Offset(0, 1))] : null,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 16, color: sel || h ? c : Pb.muted),
-                const SizedBox(width: 6),
-                Text(label,
-                    style: TextStyle(
-                        fontSize: 14, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: sel || h ? Pb.text : Pb.muted)),
-                const SizedBox(width: 6),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 160),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: sel ? c.withOpacity(0.15) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  child: Text('$count', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: sel ? c : Pb.muted)),
-                ),
-              ],
-            ),
-          ),
-        );
-
-    final toggle = Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: _hGlassIn, borderRadius: BorderRadius.circular(999)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          seg('Exerciții', Icons.code, exercises.length, !_hShowLessons && !_hShowLeaders, _cGreen, () => switchTo(0)),
-          seg('Lecții', Icons.menu_book_outlined, lessonsAll.length, _hShowLessons, _cBlue, () => switchTo(1)),
-          seg('Clasament', Icons.emoji_events_outlined, _hLeaders?.length ?? 0, _hShowLeaders, _cGold, () => switchTo(2)),
-        ],
-      ),
-    );
+    final toggle = PbLineTabs(children: [
+      PbLineTab(label: 'Exerciții', icon: Icons.code, count: '${exercises.length}', selected: !_hShowLessons && !_hShowLeaders, color: _cGreen, onTap: () => switchTo(0)),
+      PbLineTab(label: 'Lecții', icon: Icons.menu_book_outlined, count: '${lessonsAll.length}', selected: _hShowLessons, color: _cBlue, onTap: () => switchTo(1)),
+      PbLineTab(label: 'Clasament', icon: Icons.emoji_events_outlined, count: '${_hLeaders?.length ?? 0}', selected: _hShowLeaders, color: _cGold, onTap: () => switchTo(2)),
+    ]);
 
     final search = SizedBox(
       width: (isMobile || compact) ? double.infinity : 250,
