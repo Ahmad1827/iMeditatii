@@ -158,6 +158,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       setState(() {
         _splitX = p.getDouble(_kSplitX) ?? _splitX;
         _splitY = p.getDouble(_kSplitY) ?? _splitY;
+        _layout = (p.getInt(_kLayout) ?? 0).clamp(0, _layoutNames.length - 1);
       });
     }).catchError((_) {});
     _isExerciseDone().then((done) {
@@ -1097,16 +1098,18 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           icon: _linkCopied ? Icons.check : Icons.link,
           variant: PbVariant.outlineSecondary,
           size: PbSize.sm,
-          onPressed: () async {
-            await Clipboard.setData(ClipboardData(text: _shareLink));
-            if (!mounted) return;
-            setState(() => _linkCopied = true);
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) setState(() => _linkCopied = false);
-            });
-          },
+          onPressed: _copyShareLink,
         ),
       );
+
+  Future<void> _copyShareLink() async {
+    await Clipboard.setData(ClipboardData(text: _shareLink));
+    if (!mounted) return;
+    setState(() => _linkCopied = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _linkCopied = false);
+    });
+  }
 
   Widget _cSceneToggle() => Padding(
         padding: const EdgeInsets.only(left: 8, bottom: 6),
@@ -1122,34 +1125,110 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
       );
 
-  Widget _buildClean(bool isMobile) {
-    Widget shell(Widget body, {bool sky = true}) => Scaffold(
-          backgroundColor: Pb.page,
-          body: Column(
-            children: [
-              const CustomNavbar(),
-              Expanded(
-                child: sky
-                    ? HomeSky(
-                        scene: HomeScene.fantasy,
-                        cheerSignal: _cCheer,
-                        blockers: [_cHeadKey, _cLeftKey, _cRightKey],
-                        cardsHidden: _cHidden,
-                        onToggleCards: _cHidden ? () => setState(() => _cHidden = false) : null,
-                        showLabel: 'Arată problema',
-                        child: body,
-                      )
-                    : body,
-              ),
-            ],
-          ),
-        );
+  // ---------------------------------------------------------------- the three looks
+  // Clasic: the header with the tabs on top, the statement beside the editor.
+  // Bară subțire: one thin line on top (with Rulează / Trimite), the tabs in the
+  //   statement's pane, the console a drawer under the code that opens on a run.
+  // Citește, apoi scrie: one column to read down, the code under the statement,
+  //   a bar held at the bottom with the result and Rulează / Trimite.
+  static const _kLayout = 'problem_layout';
+  static const _layoutNames = ['Clasic', 'Bară subțire', 'Citește, apoi scrie'];
+  static const _layoutHints = [
+    'Antetul cu filele sus, enunțul lângă cod',
+    'O linie sus, mai mult loc pentru cod',
+    'Totul de sus în jos, butoanele jos',
+  ];
+  int _layout = 0;
+  bool _aConsole = false; // bară subțire: the console's drawer open
+  final GlobalKey _rConsoleKey = GlobalKey();
 
+  void _setLayout(int i) {
+    setState(() => _layout = i);
+    SharedPreferences.getInstance().then((p) => p.setInt(_kLayout, i)).catchError((_) => false);
+  }
+
+  Widget _cLayoutMenu({bool compact = false}) => PopupMenuButton<int>(
+        tooltip: 'Aspectul paginii',
+        color: Pb.surface,
+        position: PopupMenuPosition.under,
+        onSelected: _setLayout,
+        itemBuilder: (_) => [
+          for (final (i, n) in _layoutNames.indexed)
+            PopupMenuItem(
+              value: i,
+              child: Row(
+                children: [
+                  Icon(i == _layout ? Icons.radio_button_checked : Icons.radio_button_unchecked, size: 18, color: i == _layout ? Pb.primary : Pb.muted),
+                  const SizedBox(width: 10),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(n, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Pb.text)),
+                      Text(_layoutHints[i], style: TextStyle(fontSize: 12, color: Pb.muted)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+        ],
+        child: compact
+            ? Padding(padding: const EdgeInsets.all(6), child: Icon(Icons.dashboard_customize_outlined, size: 19, color: Pb.muted))
+            : Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(6), border: Border.all(color: Pb.inputBorder)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.dashboard_customize_outlined, size: 16, color: Pb.muted),
+                    const SizedBox(width: 6),
+                    Text('Aspect', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Pb.text)),
+                  ],
+                ),
+              ),
+      );
+
+  Widget _cShell(Widget body, {bool sky = true}) => Scaffold(
+        backgroundColor: Pb.page,
+        body: Column(
+          children: [
+            const CustomNavbar(),
+            Expanded(
+              child: sky
+                  ? HomeSky(
+                      scene: HomeScene.fantasy,
+                      cheerSignal: _cCheer,
+                      blockers: [_cHeadKey, _cLeftKey, _cRightKey],
+                      cardsHidden: _cHidden,
+                      onToggleCards: _cHidden ? () => setState(() => _cHidden = false) : null,
+                      showLabel: 'Arată problema',
+                      child: body,
+                    )
+                  : body,
+            ),
+          ],
+        ),
+      );
+
+  /// A pane slid out of sight while the scene is shown.
+  Widget _cSlide(Offset away, Widget child) => AnimatedSlide(
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeInOutCubic,
+        offset: _cHidden ? away : Offset.zero,
+        child: IgnorePointer(ignoring: _cHidden, child: child),
+      );
+
+  Widget get _cTabContent => _cTab == 0 ? _cStatement() : (_cTab == 1 ? _cSolution() : _cSubmissionsList());
+
+  String? get _cSubmissionsCount =>
+      _isSheet ? (_sent == null ? null : '${_attemptsN > 0 ? _attemptsN : 1}') : (_cSubmissions.isEmpty ? null : '${_cSubmissions.length}');
+
+  Widget _buildClean(bool isMobile) {
     if (exerciseData == null) {
-      return shell(const Center(child: CircularProgressIndicator(color: Pb.primary)), sky: false);
+      return _cShell(const Center(child: CircularProgressIndicator(color: Pb.primary)), sky: false);
     }
     if (exerciseData!.isEmpty) {
-      return shell(Center(
+      return _cShell(Center(
         child: Container(
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
@@ -1169,21 +1248,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       ));
     }
 
-    final tabContent = _cTab == 0 ? _cStatement() : (_cTab == 1 ? _cSolution() : _cSubmissionsList());
     final isCode = _kind == 'cod';
     if (_cFocus && isCode) return _cFocusView(isMobile);
+    if (_layout == 1) return _buildSlim(isMobile);
+    if (_layout == 2) return _buildRead(isMobile);
 
-    Widget slide(double dx, Widget child) => AnimatedSlide(
-          duration: const Duration(milliseconds: 650),
-          curve: Curves.easeInOutCubic,
-          offset: _cHidden ? Offset(dx, 0) : Offset.zero,
-          child: IgnorePointer(ignoring: _cHidden, child: child),
-        );
-
+    final tabContent = _cTabContent;
     final header = KeyedSubtree(key: _cHeadKey, child: _cHeader(isMobile));
 
     if (isMobile) {
-      return shell(SingleChildScrollView(
+      return _cShell(SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -1191,16 +1265,16 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             children: [
               header,
               const SizedBox(height: 14),
-              slide(
-                -1.4,
+              _cSlide(
+                const Offset(-1.4, 0),
                 KeyedSubtree(
                   key: _cLeftKey,
                   child: _cCard(child: Padding(padding: const EdgeInsets.all(16), child: tabContent)),
                 ),
               ),
               const SizedBox(height: 14),
-              slide(
-                1.4,
+              _cSlide(
+                const Offset(1.4, 0),
                 KeyedSubtree(
                   key: _cRightKey,
                   child: isCode
@@ -1218,7 +1292,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       ));
     }
 
-    return shell(Padding(
+    return _cShell(Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1227,8 +1301,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           const SizedBox(height: 14),
           Expanded(
             child: _sideBySide(
-              first: slide(
-                -1.4,
+              first: _cSlide(
+                const Offset(-1.4, 0),
                 KeyedSubtree(
                   key: _cLeftKey,
                   child: _cCard(
@@ -1240,8 +1314,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ),
                 ),
               ),
-              second: slide(
-                1.4,
+              second: _cSlide(
+                const Offset(1.4, 0),
                 KeyedSubtree(
                   key: _cRightKey,
                   child: isCode
@@ -1265,6 +1339,427 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       ),
     ));
   }
+
+  // ---------------------------------------------------------------- bară subțire
+  Widget _buildSlim(bool isMobile) {
+    final isCode = _kind == 'cod';
+    final bar = KeyedSubtree(key: _cHeadKey, child: _aBar(isMobile));
+    final left = KeyedSubtree(
+      key: _cLeftKey,
+      child: _cCard(
+        fill: !isMobile,
+        header: Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 10), child: Align(alignment: Alignment.centerLeft, child: _aSegments())),
+        child: isMobile
+            ? Padding(padding: const EdgeInsets.all(16), child: _aPaneBody())
+            : SingleChildScrollView(padding: const EdgeInsets.fromLTRB(22, 16, 22, 28), child: _aPaneBody()),
+      ),
+    );
+    Widget right({required bool fill}) => KeyedSubtree(
+          key: _cRightKey,
+          child: isCode
+              ? _cEditor(height: fill ? null : 340, actions: isMobile, bottom: _aDrawer(fill: fill))
+              : (_isSheet ? _sheet(fill: fill) : (fill ? SingleChildScrollView(child: _cAnswerPanel()) : _cAnswerPanel())),
+        );
+
+    if (isMobile) {
+      return _cShell(SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            bar,
+            const SizedBox(height: 12),
+            _cSlide(const Offset(-1.4, 0), left),
+            const SizedBox(height: 12),
+            _cSlide(const Offset(1.4, 0), right(fill: false)),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ));
+    }
+    return _cShell(Padding(
+      padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          bar,
+          const SizedBox(height: 12),
+          Expanded(
+            child: _sideBySide(
+              first: _cSlide(const Offset(-1.4, 0), left),
+              second: _cSlide(const Offset(1.4, 0), right(fill: true)),
+            ),
+          ),
+        ],
+      ),
+    ));
+  }
+
+  /// The thin line on top: where the problem is, its name, its chips, how far
+  /// the student got, and (on a computer) Rulează / Trimite.
+  Widget _aBar(bool isMobile) {
+    final listRoute = '/lista-exercitii?materie=${Uri.encodeComponent(widget.subject)}';
+    final grade = isSchoolGrade(widget.grade) ? 'a ${widget.grade}-a' : widget.grade;
+    final crumb = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AppLink(to: listRoute, child: PbLink(text: widget.subject, fontSize: 13, onTap: () => context.go(listRoute))),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 5), child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted))),
+        Text(grade, style: TextStyle(fontSize: 13, color: Pb.muted)),
+      ],
+    );
+    final title = Text(
+      '${widget.id}. $_title',
+      maxLines: isMobile ? 3 : 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(fontSize: isMobile ? 19 : 17, fontWeight: FontWeight.w700, color: Pb.text, height: 1.25),
+    );
+    final chips = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(children: [for (final c in _cChipItems()) Padding(padding: const EdgeInsets.only(right: 6), child: c)]),
+    );
+    final tools = [_cLayoutMenu(compact: true), _cIconShare(), _cIconScene()];
+
+    if (isMobile) {
+      return GlassBox(
+        radius: 14,
+        padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [Expanded(child: crumb), ...tools]),
+            Padding(padding: const EdgeInsets.only(right: 6), child: title),
+            const SizedBox(height: 8),
+            chips,
+            const SizedBox(height: 8),
+            _aStatusPill(),
+          ],
+        ),
+      );
+    }
+    return GlassBox(
+      radius: 14,
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+      child: Row(
+        children: [
+          crumb,
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 5), child: Text('/', style: TextStyle(fontSize: 13, color: Pb.muted))),
+          Flexible(child: title),
+          const SizedBox(width: 14),
+          Expanded(child: chips),
+          const SizedBox(width: 12),
+          _aStatusPill(),
+          if (_kind == 'cod') ...[const SizedBox(width: 12), ..._cRunButtons()],
+          const SizedBox(width: 6),
+          ...tools,
+        ],
+      ),
+    );
+  }
+
+  Widget _aStatusPill() {
+    final s = _cStatusInfo();
+    return Tooltip(
+      message: s.sub,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(s.icon, size: 17, color: s.fg),
+          const SizedBox(width: 6),
+          Text(s.short, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: s.fg)),
+        ],
+      ),
+    );
+  }
+
+  /// Enunț / Soluție / Trimiteri as one switch, right above what they change.
+  Widget _aSegments() {
+    const labels = ['Enunț', 'Soluție', 'Trimiteri'];
+    final counts = [null, null, _cSubmissionsCount];
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(color: Pb.gray, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => setState(() => _cTab = i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: i == _cTab ? Pb.surface : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: i == _cTab ? [BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 3, offset: const Offset(0, 1))] : null,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(labels[i],
+                          style: TextStyle(fontSize: 13.5, fontWeight: i == _cTab ? FontWeight.w600 : FontWeight.w500, color: i == _cTab ? Pb.text : Pb.muted)),
+                      if (counts[i] != null) ...[
+                        const SizedBox(width: 6),
+                        Text(counts[i]!, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Pb.muted)),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// The pane under the switch: on the statement, who wrote it and why it's at
+  /// its level first (the thin bar has no room for them).
+  Widget _aPaneBody() {
+    if (_cTab != 0) return _cTabContent;
+    final credit = problemCredit(exerciseData!, fromSiteFiles: _fromSiteFiles, grade: widget.grade);
+    final why = _cWhy();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (credit != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: '${credit.$1} '),
+                TextSpan(text: credit.$2, style: TextStyle(fontWeight: FontWeight.w700, color: Pb.text)),
+              ]),
+              style: TextStyle(fontSize: 13, color: Pb.muted),
+            ),
+          ),
+        if (why != null) Padding(padding: const EdgeInsets.only(bottom: 10), child: why),
+        _cStatement(),
+      ],
+    );
+  }
+
+  /// The console folded under the code: a line with the result, opened by a
+  /// tap or by a run.
+  Widget _aDrawer({required bool fill}) {
+    final passed = testResults.where((t) => t['passed'] == true).length;
+    final head = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => setState(() => _aConsole = !_aConsole),
+      child: Container(
+        color: Pb.hoverBg.withOpacity(0.7),
+        padding: const EdgeInsets.only(left: 6, right: 12),
+        child: Row(
+          children: [
+            Icon(_aConsole ? Icons.expand_more : Icons.expand_less, size: 20, color: Pb.muted),
+            _cTabs(
+              const ['Exemplu', 'Rezultat'],
+              _cBottom,
+              (i) => setState(() {
+                _cBottom = i;
+                _aConsole = true;
+              }),
+              counts: [null, testResults.isEmpty ? null : '$passed/${testResults.length}'],
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: _cResultLine()),
+          ],
+        ),
+      ),
+    );
+    final body = Padding(padding: const EdgeInsets.all(14), child: _cBottom == 0 ? _cSampleView() : _cResultView());
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(height: 1, color: Pb.border),
+        head,
+        if (_aConsole) ...[
+          Container(height: 1, color: Pb.border),
+          fill
+              ? LayoutBuilder(builder: (context, _) {
+                  final h = (MediaQuery.of(context).size.height * 0.3).clamp(160.0, 300.0);
+                  return SizedBox(height: h, child: SingleChildScrollView(child: body));
+                })
+              : body,
+        ],
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------- citește, apoi scrie
+  Widget _buildRead(bool isMobile) {
+    final isCode = _kind == 'cod';
+    final pad = isMobile ? 12.0 : 24.0;
+    final column = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        KeyedSubtree(key: _cHeadKey, child: _cHeader(isMobile)),
+        const SizedBox(height: 14),
+        _cSlide(
+          const Offset(-1.4, 0),
+          KeyedSubtree(
+            key: _cLeftKey,
+            child: _cCard(child: Padding(padding: EdgeInsets.fromLTRB(isMobile ? 16 : 26, isMobile ? 16 : 20, isMobile ? 16 : 26, isMobile ? 16 : 24), child: _cTabContent)),
+          ),
+        ),
+        const SizedBox(height: 18),
+        _cSlide(
+          const Offset(1.4, 0),
+          KeyedSubtree(
+            key: _cRightKey,
+            child: isCode
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 8),
+                        child: Text('Soluția ta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Pb.text)),
+                      ),
+                      _cEditor(height: isMobile ? 340 : 460, actions: false),
+                      const SizedBox(height: 14),
+                      KeyedSubtree(key: _rConsoleKey, child: _cConsole(fill: false)),
+                    ],
+                  )
+                : (_isSheet ? _sheet() : _cAnswerPanel()),
+          ),
+        ),
+      ],
+    );
+    final scroll = SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(pad, 14, pad, isCode ? 96 : 28),
+      child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 940), child: column)),
+    );
+    if (!isCode) return _cShell(scroll);
+    return _cShell(Stack(
+      children: [
+        Positioned.fill(child: scroll),
+        Positioned(left: 0, right: 0, bottom: 0, child: _cSlide(const Offset(0, 1.5), _rBottomBar(isMobile))),
+      ],
+    ));
+  }
+
+  /// Held at the bottom: how the last run went (a tap shows the console) and
+  /// Rulează / Trimite, always at hand.
+  Widget _rBottomBar(bool isMobile) => Container(
+        decoration: BoxDecoration(
+          color: Pb.surface,
+          border: Border(top: BorderSide(color: Pb.border)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, -4))],
+        ),
+        // on a phone, clear of the scene's handle at the left edge
+        padding: EdgeInsets.fromLTRB(isMobile ? 34 : 24, 10, isMobile ? 12 : 24, 10 + MediaQuery.of(context).padding.bottom),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 940),
+            child: Row(
+              children: [
+                Expanded(
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        setState(() => _cBottom = testResults.isEmpty && !isRunningCode ? 0 : 1);
+                        final c = _rConsoleKey.currentContext;
+                        if (c != null) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 400), curve: Curves.easeOutCubic, alignment: 0.1);
+                      },
+                      child: _cResultLine(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ..._cRunButtons(),
+              ],
+            ),
+          ),
+        ),
+      );
+
+  // ---------------------------------------------------------------- shared by the looks
+  List<Widget> _cRunButtons() => [
+        PbButton(
+          text: 'Rulează',
+          icon: Icons.play_arrow,
+          variant: PbVariant.outlineSecondary,
+          size: PbSize.sm,
+          onPressed: isRunningCode ? null : () => _checkAuthAndExecute(() => _cRun(submit: false)),
+        ),
+        const SizedBox(width: 8),
+        PbButton(
+          text: isRunningCode ? 'Se evaluează...' : 'Trimite',
+          icon: Icons.cloud_upload_outlined,
+          variant: PbVariant.success,
+          size: PbSize.sm,
+          loading: isRunningCode,
+          onPressed: isRunningCode ? null : () => _checkAuthAndExecute(() => _cRun(submit: true)),
+        ),
+      ];
+
+  /// What the last run gave, as the console's banner says it.
+  String get _cVerdictTitle => _cLastWasRun
+      ? (solutionOk ? 'Exemplele trec' : (_cFailVerdict.isNotEmpty ? _cFailVerdict : 'Exemplele nu trec'))
+      : (solutionOk ? 'Acceptat. Felicitări!' : (_cFailVerdict.isNotEmpty ? _cFailVerdict : 'Respins'));
+
+  /// The last run in one line: the verdict, the count, a square a test.
+  Widget _cResultLine() {
+    final total = testResults.length;
+    if (isRunningCode) {
+      return Row(
+        children: [
+          const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Pb.primary)),
+          const SizedBox(width: 8),
+          Flexible(child: Text('Se evaluează... ($total gata)', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: Pb.muted))),
+        ],
+      );
+    }
+    if (total == 0) {
+      return Text('Rulează sau trimite ca să vezi rezultatul aici.', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: Pb.muted));
+    }
+    final passed = testResults.where((t) => t['passed'] == true).length;
+    final c = solutionOk ? Pb.success : Pb.danger;
+    return Row(
+      children: [
+        Icon(solutionOk ? Icons.check_circle : Icons.cancel, size: 17, color: c),
+        const SizedBox(width: 6),
+        Flexible(child: Text(_cVerdictTitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: c))),
+        const SizedBox(width: 10),
+        Flexible(
+          child: Text(
+            '$passed din $total${_cLastWasRun ? '' : ' · ${(passed * 100 / total).round()}p'}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 13, color: Pb.muted),
+          ),
+        ),
+        if (total <= 24) ...[
+          const SizedBox(width: 10),
+          for (final t in testResults)
+            Container(
+              width: 11,
+              height: 11,
+              margin: const EdgeInsets.only(right: 3),
+              decoration: BoxDecoration(color: (t['passed'] == true ? Pb.success : Pb.danger).withOpacity(0.85), borderRadius: BorderRadius.circular(3)),
+            ),
+        ],
+      ],
+    );
+  }
+
+  Widget _cIconShare() => IconButton(
+        tooltip: _linkCopied ? 'Link copiat' : 'Copiază linkul',
+        icon: Icon(_linkCopied ? Icons.check : Icons.link, size: 19, color: _linkCopied ? Pb.success : Pb.muted),
+        visualDensity: VisualDensity.compact,
+        onPressed: _copyShareLink,
+      );
+
+  Widget _cIconScene() => IconButton(
+        tooltip: _cHidden ? 'Arată problema' : 'Ascunde panourile și privește scena',
+        icon: Icon(_cHidden ? Icons.visibility_outlined : Icons.landscape_outlined, size: 19, color: Pb.muted),
+        visualDensity: VisualDensity.compact,
+        onPressed: () => setState(() => _cHidden = !_cHidden),
+      );
 
   /// The statement and the work beside it, with a divider to drag between them.
   Widget _sideBySide({required Widget first, required Widget second, double gap = 14}) => PaneSplit(
@@ -1427,12 +1922,20 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     const ['Enunț', 'Soluție', 'Trimiterile mele'],
                     _cTab,
                     (i) => setState(() => _cTab = i),
-                    counts: [null, null, _isSheet ? (_sent == null ? null : '${_attemptsN > 0 ? _attemptsN : 1}') : (_cSubmissions.isEmpty ? null : '${_cSubmissions.length}')],
+                    counts: [null, null, _cSubmissionsCount],
                   ),
                 ),
               ),
-              _cShareLink(),
-              _cSceneToggle(),
+              // on a phone the tabs need the row: the three as icons
+              if (isMobile) ...[
+                _cLayoutMenu(compact: true),
+                _cIconShare(),
+                _cIconScene(),
+              ] else ...[
+                _cShareLink(),
+                _cSceneToggle(),
+                Padding(padding: const EdgeInsets.only(left: 8, bottom: 6), child: _cLayoutMenu()),
+              ],
             ],
           ),
         ],
@@ -1440,64 +1943,53 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _cStatus() {
+  /// How far the student got: the word, the line under it, its colours.
+  ({IconData icon, Color fg, Color bg, Color border, String label, String sub, String short}) _cStatusInfo() {
     final sent = _isSheet ? _sent : null;
     if (sent != null && !sent.approved) {
       // maths sent to be checked: waiting (amber) or turned down (red)
       final bad = sent.rejected;
-      final fg = bad ? Pb.dangerText : Pb.warningText;
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: bad ? Pb.dangerBg : Pb.warningBg,
-          borderRadius: Pb.radius,
-          border: Border.all(color: bad ? Pb.dangerBorder : Pb.warningBorder),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(bad ? Icons.cancel : Icons.hourglass_top_rounded, size: 20, color: fg),
-            const SizedBox(width: 10),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(bad ? 'Respinsă' : 'La verificare', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: fg)),
-                Text(
-                  bad ? 'Corectează și trimite din nou' : 'Trimisă ${wsAgo(sent.lastAt)}',
-                  style: TextStyle(fontSize: 12.5, color: Pb.muted),
-                ),
-              ],
-            ),
-          ],
-        ),
+      return (
+        icon: bad ? Icons.cancel : Icons.hourglass_top_rounded,
+        fg: bad ? Pb.dangerText : Pb.warningText,
+        bg: bad ? Pb.dangerBg : Pb.warningBg,
+        border: bad ? Pb.dangerBorder : Pb.warningBorder,
+        label: bad ? 'Respinsă' : 'La verificare',
+        sub: bad ? 'Corectează și trimite din nou' : 'Trimisă ${wsAgo(sent.lastAt)}',
+        short: bad ? 'Respinsă' : 'La verificare',
       );
     }
     final done = _alreadyDone || (sent?.approved ?? false);
     final best = _cSubmissions
         .where((s) => s['submit'] == true)
         .fold<int>(0, (m, s) => (s['score'] as int) > m ? s['score'] as int : m);
-    final sub = best > 0 ? 'Cel mai bun punctaj: $best/100' : (done ? 'Rezolvată anterior' : 'Încă nicio trimitere');
+    return (
+      icon: done ? Icons.check_circle : Icons.radio_button_unchecked,
+      fg: done ? Pb.successText : Pb.muted,
+      bg: done ? Pb.successBg : Pb.hoverBg,
+      border: done ? Pb.successBorder : Pb.border,
+      label: done ? 'Rezolvată' : 'Nerezolvată',
+      sub: best > 0 ? 'Cel mai bun punctaj: $best/100' : (done ? 'Rezolvată anterior' : 'Încă nicio trimitere'),
+      short: best > 0 ? '${done ? 'Rezolvată' : 'Cel mai bun'} · ${best}p' : (done ? 'Rezolvată' : 'Nerezolvată'),
+    );
+  }
 
+  Widget _cStatus() {
+    final s = _cStatusInfo();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: done ? Pb.successBg : Pb.hoverBg,
-        borderRadius: Pb.radius,
-        border: Border.all(color: done ? Pb.successBorder : Pb.border),
-      ),
+      decoration: BoxDecoration(color: s.bg, borderRadius: Pb.radius, border: Border.all(color: s.border)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(done ? Icons.check_circle : Icons.radio_button_unchecked, size: 20, color: done ? Pb.successText : Pb.muted),
+          Icon(s.icon, size: 20, color: s.fg),
           const SizedBox(width: 10),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(done ? 'Rezolvată' : 'Nerezolvată',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: done ? Pb.successText : Pb.text)),
-              Text(sub, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
+              Text(s.label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: s.fg == Pb.muted ? Pb.text : s.fg)),
+              Text(s.sub, style: TextStyle(fontSize: 12.5, color: Pb.muted)),
             ],
           ),
         ],
@@ -1505,7 +1997,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _cChips() {
+  List<Widget> _cChipItems() {
     final diffRaw = _str(['dificultate', 'difficulty']);
     final diff = (diffRaw ?? '').toLowerCase();
     Color? diffColor;
@@ -1533,47 +2025,46 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
         );
 
+    return [
+      if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
+      chip(kind, icon: _kind == 'cod' ? Icons.code : (_isSheet ? Icons.draw_outlined : Icons.quiz_outlined)),
+      if (_file != null) chip('$_file.in / $_file.out', icon: Icons.description_outlined),
+      chip(isSchoolGrade(widget.grade) ? 'Clasa a ${widget.grade}-a' : widget.grade, icon: isSchoolGrade(widget.grade) ? Icons.school_outlined : Icons.emoji_events_outlined),
+      if (time != null) chip(time, icon: Icons.timer_outlined),
+      if (mem != null) chip(mem, icon: Icons.memory),
+      for (final t in tags) chip(t, icon: Icons.sell_outlined),
+    ];
+  }
+
+  /// Why the problem is at its level, behind a tap (it gives the idea away); null when it isn't said.
+  Widget? _cWhy() {
     final why = _str(['dificultate_motiv']);
-    final chips = Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        if (diffRaw != null) chip(AppStyle.sentence(diffRaw), fg: diffColor),
-        chip(kind, icon: _kind == 'cod' ? Icons.code : (_isSheet ? Icons.draw_outlined : Icons.quiz_outlined)),
-        if (_file != null) chip('$_file.in / $_file.out', icon: Icons.description_outlined),
-        chip(isSchoolGrade(widget.grade) ? 'Clasa a ${widget.grade}-a' : widget.grade, icon: isSchoolGrade(widget.grade) ? Icons.school_outlined : Icons.emoji_events_outlined),
-        if (time != null) chip(time, icon: Icons.timer_outlined),
-        if (mem != null) chip(mem, icon: Icons.memory),
-        for (final t in tags) chip(t, icon: Icons.sell_outlined),
-      ],
-    );
-    if (why == null) return chips; // the source is shown above the statement
-    Widget line(IconData icon, String text) => Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 15, color: Pb.muted)),
-              const SizedBox(width: 6),
-              Expanded(child: Text(text, style: TextStyle(fontSize: 13, height: 1.4, color: Pb.muted))),
-            ],
-          ),
-        );
-    return Column(
+    if (why == null) return null;
+    final diff = (_str(['dificultate', 'difficulty']) ?? '').toLowerCase();
+    if (!_whyOpen) {
+      return PbLink(
+        text: 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}? (dă un indiciu)',
+        fontSize: 13,
+        onTap: () => setState(() => _whyOpen = true),
+      );
+    }
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        chips,
-        _whyOpen
-            ? line(Icons.insights_outlined, 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why')
-            : Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: PbLink(
-                  text: 'De ce e ${diff.isEmpty ? 'la acest nivel' : diff}? (dă un indiciu)',
-                  fontSize: 13,
-                  onTap: () => setState(() => _whyOpen = true),
-                ),
-              ),
+        Padding(padding: const EdgeInsets.only(top: 1), child: Icon(Icons.insights_outlined, size: 15, color: Pb.muted)),
+        const SizedBox(width: 6),
+        Expanded(child: Text('De ce e ${diff.isEmpty ? 'la acest nivel' : diff}: $why', style: TextStyle(fontSize: 13, height: 1.4, color: Pb.muted))),
       ],
+    );
+  }
+
+  Widget _cChips() {
+    final chips = Wrap(spacing: 8, runSpacing: 8, children: _cChipItems());
+    final why = _cWhy();
+    if (why == null) return chips; // the source is shown above the statement
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [chips, Padding(padding: EdgeInsets.only(top: _whyOpen ? 8 : 6), child: why)],
     );
   }
 
@@ -1688,7 +2179,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   // ---------------------------------------------------------------- editor
-  Widget _cEditor({double? height}) {
+  Widget _cEditor({double? height, bool actions = true, Widget? bottom}) {
     final fill = height == null;
 
     Widget iconBtn(IconData i, String tip, VoidCallback f) => IconButton(
@@ -1772,22 +2263,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               style: TextStyle(color: Pb.muted, fontSize: 12.5),
             ),
           ),
-          PbButton(
-            text: 'Rulează',
-            icon: Icons.play_arrow,
-            variant: PbVariant.outlineSecondary,
-            size: PbSize.sm,
-            onPressed: isRunningCode ? null : () => _checkAuthAndExecute(() => _cRun(submit: false)),
-          ),
-          const SizedBox(width: 8),
-          PbButton(
-            text: isRunningCode ? 'Se evaluează...' : 'Trimite',
-            icon: Icons.cloud_upload_outlined,
-            variant: PbVariant.success,
-            size: PbSize.sm,
-            loading: isRunningCode,
-            onPressed: isRunningCode ? null : () => _checkAuthAndExecute(() => _cRun(submit: true)),
-          ),
+          if (actions) ..._cRunButtons(),
         ],
       ),
     );
@@ -1805,6 +2281,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           fill ? Expanded(child: editor) : SizedBox(height: height, child: editor),
           Container(height: 1, color: Pb.border),
           footer,
+          if (bottom != null) bottom,
         ],
       ),
     );
@@ -2152,9 +2629,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _cLastWasRun
-                          ? (solutionOk ? 'Exemplele trec' : (_cFailVerdict.isNotEmpty ? _cFailVerdict : 'Exemplele nu trec'))
-                          : (solutionOk ? 'Acceptat. Felicitări!' : (_cFailVerdict.isNotEmpty ? _cFailVerdict : 'Respins')),
+                      _cVerdictTitle,
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: solutionOk ? Pb.success : Pb.danger),
                     ),
                     Text(
@@ -2314,6 +2789,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ..clear()
           ..add({'index': 1, 'passed': false, 'sample': true, 'input': '', 'expected': 'testele problemei', 'got': 'testele nu s-au putut încărca; verifică internetul și încearcă din nou', 'error': ''});
         _cBottom = 1;
+        _aConsole = true;
         _cSelTest = 0;
         _cLastWasRun = false;
       });
@@ -2333,6 +2809,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       solutionOk = false;
       testResults.clear();
       _cBottom = 1;
+      _aConsole = true;
       _cSelTest = 0;
       _cLastWasRun = !submit;
     });
